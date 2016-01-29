@@ -1,0 +1,45 @@
+package com.netflix.vms.videos.hollowinput;
+
+import com.netflix.hollow.objects.delegate.HollowObjectAbstractDelegate;
+import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.HollowObjectSchema;
+
+public class TopNDelegateLookupImpl extends HollowObjectAbstractDelegate implements TopNDelegate {
+
+    private final TopNTypeAPI typeAPI;
+
+    public TopNDelegateLookupImpl(TopNTypeAPI typeAPI) {
+        this.typeAPI = typeAPI;
+    }
+
+    public long getVideoId(int ordinal) {
+        return typeAPI.getVideoId(ordinal);
+    }
+
+    public Long getVideoIdBoxed(int ordinal) {
+        return typeAPI.getVideoIdBoxed(ordinal);
+    }
+
+    public int getAttributesOrdinal(int ordinal) {
+        return typeAPI.getAttributesOrdinal(ordinal);
+    }
+
+    public int getDseSourceFileOrdinal(int ordinal) {
+        return typeAPI.getDseSourceFileOrdinal(ordinal);
+    }
+
+    public TopNTypeAPI getTypeAPI() {
+        return typeAPI;
+    }
+
+    @Override
+    public HollowObjectSchema getSchema() {
+        return typeAPI.getTypeDataAccess().getSchema();
+    }
+
+    @Override
+    public HollowObjectTypeDataAccess getTypeDataAccess() {
+        return typeAPI.getTypeDataAccess();
+    }
+
+}

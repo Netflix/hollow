@@ -1,0 +1,14 @@
+apply plugin: 'nebula'
+apply plugin: 'java'
+
+nebula {
+    moduleOwner = 'vms-support@netflix.com'
+}
+
+dependencies {
+    compile 'com.netflix.hollow:netflix-hollow:latest.release'
+    
+
+    testCompile 'junit:junit:4.11'
+    testCompile 'com.netflix.hollow:netflix-hollow-diff-ui:latest.release'
+}
