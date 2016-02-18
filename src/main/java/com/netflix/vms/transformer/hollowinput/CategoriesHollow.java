@@ -1,0 +1,46 @@
+package com.netflix.vms.transformer.hollowinput;
+
+import com.netflix.hollow.objects.HollowObject;
+import com.netflix.hollow.HollowObjectSchema;
+
+public class CategoriesHollow extends HollowObject {
+
+    public CategoriesHollow(CategoriesDelegate delegate, int ordinal) {
+        super(delegate, ordinal);
+    }
+
+    public long _getCategoryId() {
+        return delegate().getCategoryId(ordinal);
+    }
+
+    public Long _getCategoryIdBoxed() {
+        return delegate().getCategoryIdBoxed(ordinal);
+    }
+
+    public TranslatedTextHollow _getDisplayName() {
+        int refOrdinal = delegate().getDisplayNameOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getTranslatedTextHollow(refOrdinal);
+    }
+
+    public TranslatedTextHollow _getShortName() {
+        int refOrdinal = delegate().getShortNameOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getTranslatedTextHollow(refOrdinal);
+    }
+
+    public VMSHollowVideoInputAPI api() {
+        return typeApi().getAPI();
+    }
+
+    public CategoriesTypeAPI typeApi() {
+        return delegate().getTypeAPI();
+    }
+
+    protected CategoriesDelegate delegate() {
+        return (CategoriesDelegate)delegate;
+    }
+
+}

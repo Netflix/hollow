@@ -1,50 +1,41 @@
 package com.netflix.vmsserver;
 
+import com.netflix.hollow.HollowSchema;
 import com.netflix.hollow.codegen.HollowAPIGenerator;
-import com.netflix.hollow.read.engine.HollowBlobReader;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
+import com.netflix.hollow.util.HollowSchemaParser;
+import com.netflix.hollow.util.HollowTypeWriteStateCreator;
+import com.netflix.hollow.write.HollowWriteStateEngine;
+import java.io.FileReader;
 import java.io.IOException;
-
+import java.util.Collection;
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 public class GenerateAPIs {
 
-    @Test
-    public void generatePackages() throws IOException {
-        HollowReadStateEngine packagesStateEngine = loadStateEngine("/space/hollowinput/VMSInputPackagesData.hollow");
-        HollowAPIGenerator packagesGenerator = new HollowAPIGenerator("VMSHollowPackagesInputAPI", "com.netflix.vms.packages.hollowinput", packagesStateEngine);
-        packagesGenerator.generateFiles("/common/git/videometadata/server/test-tools/com/netflix/vms/packages/hollowinput");
-    }
+    private static final String TRANSFORMER_PROJECT_BASE_DIR = "/common/git/videometadata-transformer";
+    private static final String CONVERTER_PROJECT_BASE_DIR = "/common/git/videometadata-converter";
 
     @Test
     public void generateEverythingElse() throws IOException {
-        HollowReadStateEngine videosStateEngine = loadStateEngine("/space/hollowinput/VMSInputVideosData.hollow");
-        HollowAPIGenerator videosGenerator = new HollowAPIGenerator("VMSHollowVideoInputAPI", "com.netflix.vms.videos.hollowinput", videosStateEngine);
-        videosGenerator.generateFiles("/common/git/videometadata/server/test-tools/com/netflix/vms/videos/hollowinput");
+        String schemas = IOUtils.toString(new FileReader(CONVERTER_PROJECT_BASE_DIR + "/src/main/resources/schemas.txt"));
+        Collection<HollowSchema> configuredSchemas = HollowSchemaParser.parseCollectionOfSchemas(schemas);
+
+        HollowWriteStateEngine stateEngine = HollowTypeWriteStateCreator.createWithSchemas(configuredSchemas);
+
+        HollowAPIGenerator videosGenerator = new HollowAPIGenerator("VMSHollowVideoInputAPI", "com.netflix.vms.transformer.hollowinput", stateEngine);
+        videosGenerator.generateFiles(TRANSFORMER_PROJECT_BASE_DIR + "/src/main/java/com/netflix/vms/transformer/hollowinput");
     }
 
-    private HollowReadStateEngine loadStateEngine(String snapshotFilename) throws IOException {
-        HollowReadStateEngine stateEngine = new HollowReadStateEngine();
-
-        HollowBlobReader reader = new HollowBlobReader(stateEngine);
-
-        reader.readSnapshot(new BufferedInputStream(new FileInputStream(snapshotFilename)));
-
-        return stateEngine;
-
-    }
 
     /*@Test
     public void bootstrapOutputPOJOs() throws IOException {
         HollowSerializationFramework hollowFramework = new HollowSerializationFramework(VMSSerializerFactory.getInstance(), new VMSObjectHashCodeFinder());
         HollowWriteStateEngine stateEngine = hollowFramework.getStateEngine();
 
-        HollowPOJOGenerator generator = new HollowPOJOGenerator("com.netflix.vms.hollowoutput.pojos", stateEngine);
+        HollowPOJOGenerator generator = new HollowPOJOGenerator("com.netflix.vms.transformer.hollowoutput", stateEngine);
 
-        generator.generateFiles("/common/git/videometadata/server/test-tools/com/netflix/vms/hollowoutput/pojos");
+        generator.generateFiles(TRANSFORMER_PROJECT_BASE_DIR + "/src/main/java/com/netflix/vms/transformer/hollowoutput");
     }*/
 
 }

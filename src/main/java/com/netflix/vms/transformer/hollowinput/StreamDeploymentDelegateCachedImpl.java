@@ -1,0 +1,57 @@
+package com.netflix.vms.transformer.hollowinput;
+
+import com.netflix.hollow.objects.delegate.HollowObjectAbstractDelegate;
+import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.HollowObjectSchema;
+import com.netflix.hollow.read.customapi.HollowTypeAPI;
+import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
+
+public class StreamDeploymentDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, StreamDeploymentDelegate {
+
+    private final int deploymentInfoOrdinal;
+    private final int deploymentLabelOrdinal;
+    private final Integer deploymentPriority;
+   private StreamDeploymentTypeAPI typeAPI;
+
+    public StreamDeploymentDelegateCachedImpl(StreamDeploymentTypeAPI typeAPI, int ordinal) {
+        this.deploymentInfoOrdinal = typeAPI.getDeploymentInfoOrdinal(ordinal);
+        this.deploymentLabelOrdinal = typeAPI.getDeploymentLabelOrdinal(ordinal);
+        this.deploymentPriority = typeAPI.getDeploymentPriorityBoxed(ordinal);
+        this.typeAPI = typeAPI;
+    }
+
+    public int getDeploymentInfoOrdinal(int ordinal) {
+        return deploymentInfoOrdinal;
+    }
+
+    public int getDeploymentLabelOrdinal(int ordinal) {
+        return deploymentLabelOrdinal;
+    }
+
+    public int getDeploymentPriority(int ordinal) {
+        return deploymentPriority.intValue();
+    }
+
+    public Integer getDeploymentPriorityBoxed(int ordinal) {
+        return deploymentPriority;
+    }
+
+    @Override
+    public HollowObjectSchema getSchema() {
+        return typeAPI.getTypeDataAccess().getSchema();
+    }
+
+    @Override
+    public HollowObjectTypeDataAccess getTypeDataAccess() {
+        return typeAPI.getTypeDataAccess();
+    }
+
+    public StreamDeploymentTypeAPI getTypeAPI() {
+        return typeAPI;
+    }
+
+    public void updateTypeAPI(HollowTypeAPI typeAPI) {
+        this.typeAPI = (StreamDeploymentTypeAPI) typeAPI;
+    }
+
+}

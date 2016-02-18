@@ -4,22 +4,21 @@ import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.vms.hollowoutput.pojos.Strings;
-import com.netflix.vms.hollowoutput.pojos.SupplementalVideo;
-import com.netflix.vms.hollowoutput.pojos.Video;
-import com.netflix.vms.videos.hollowinput.MapKeyHollow;
-import com.netflix.vms.videos.hollowinput.RolloutHollow;
-import com.netflix.vms.videos.hollowinput.RolloutPhasesHollow;
-import com.netflix.vms.videos.hollowinput.RolloutPhasesWindowsHollow;
-import com.netflix.vms.videos.hollowinput.TrailerHollow;
-import com.netflix.vms.videos.hollowinput.TrailerTrailersHollow;
-import com.netflix.vms.videos.hollowinput.VMSHollowVideoInputAPI;
-import com.netflix.vms.videos.hollowinput.VideoDisplaySetHollow;
-import com.netflix.vms.videos.hollowinput.VideoDisplaySetSetsHollow;
-import com.netflix.vms.videos.hollowinput.VideoRightsHollow;
-import com.netflix.vms.videos.hollowinput.VideoTypeTypeHollow;
-import com.netflix.vms.videos.hollowinput.VideoTypeTypeMediaHollow;
-
+import com.netflix.vms.transformer.hollowinput.CountryVideoDisplaySetHollow;
+import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
+import com.netflix.vms.transformer.hollowinput.IndividualTrailerHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutPhaseHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowHollow;
+import com.netflix.vms.transformer.hollowinput.TrailerHollow;
+import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VideoDisplaySetHollow;
+import com.netflix.vms.transformer.hollowinput.VideoRightsHollow;
+import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
+import com.netflix.vms.transformer.hollowinput.VideoTypeMediaHollow;
+import com.netflix.vms.transformer.hollowoutput.Strings;
+import com.netflix.vms.transformer.hollowoutput.SupplementalVideo;
+import com.netflix.vms.transformer.hollowoutput.Video;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,7 +54,7 @@ public class VideoCollectionsBuilder {
     private Set<Integer> findAllSupplementalVideoIds(VMSHollowVideoInputAPI videoAPI) {
         Set<Integer> ids = new HashSet<Integer>();
 
-        for(TrailerTrailersHollow supplemental : videoAPI.getAllTrailerTrailersHollow())
+        for(IndividualTrailerHollow supplemental : videoAPI.getAllIndividualTrailerHollow())
             ids.add((int)supplemental._getMovieId());
 
         return ids;
@@ -66,15 +65,15 @@ public class VideoCollectionsBuilder {
         long topNodeId = displaySet._getTopNodeId();
         if(supplementalIds.contains(topNodeId))
             return null;
-        
+
         Map<ShowHierarchy, VideoCollectionsDataHierarchy> uniqueVideoCollectionsHierarchies = new HashMap<ShowHierarchy, VideoCollectionsDataHierarchy>();
         Map<String, VideoCollectionsDataHierarchy> videoCollectionsDataByCountry = new HashMap<String, VideoCollectionsDataHierarchy>();
         VideoCollectionsDataHierarchy standaloneHierarchy = null;
 
 
-        for(VideoDisplaySetSetsHollow set : displaySet._getSets()) {
+        for(CountryVideoDisplaySetHollow set : displaySet._getSets()) {
             String countryCode = set._getCountryCode()._getValue();
-            
+
             if(topNodeId == 70283260L && "AX".equals(countryCode)) {
                 System.out.println("ASDF");
             }
@@ -125,7 +124,7 @@ public class VideoCollectionsBuilder {
         List<SupplementalVideo> supplementalVideos = new ArrayList<SupplementalVideo>();
 
         TrailerHollow supplementals = videoAPI.getTrailerHollow(supplementalsOrdinal);
-        for(TrailerTrailersHollow supplemental : supplementals._getTrailers()) {
+        for(IndividualTrailerHollow supplemental : supplementals._getTrailers()) {
             SupplementalVideo supp = new SupplementalVideo();
             supp.id = new Video((int) supplemental._getMovieId());
             supp.attributes = new HashMap<Strings, Strings>();
@@ -142,87 +141,87 @@ public class VideoCollectionsBuilder {
     boolean isTopNodeIncluded(long videoId, String countryCode) {
         if(!isContentApproved(videoId, countryCode))
             return false;
-        
+
         if(isGoLiveOrHasFirstDisplayDate(videoId, countryCode) || isDVDData(videoId, countryCode) || hasCurrentOrFutureRollout(videoId, "DISPLAY_PAGE", countryCode))
             return true;
-        
+
         return false;
     }
-    
+
     boolean isChildNodeIncluded(long videoId, String countryCode) {
         if(!isContentApproved(videoId, countryCode))
             return false;
-        
+
         if(isGoLiveOrHasFirstDisplayDate(videoId, countryCode) || hasCurrentOrFutureRollout(videoId, "DISPLAY_PAGE", countryCode))
             return true;
-        
+
         return false;
     }
-    
+
     boolean isDVDData(long videoId, String countryCode) {
         HollowHashIndexResult queryResult = videoTypeCountryIndex.findMatches(videoId, countryCode);
-        
+
         int ordinal = queryResult.iterator().next();
-        
-        VideoTypeTypeHollow countryType = videoAPI.getVideoTypeTypeHollow(ordinal);
+
+        VideoTypeDescriptorHollow countryType = videoAPI.getVideoTypeDescriptorHollow(ordinal);
         if(countryType._getIsCanon() || countryType._getIsExtended())
             return true;
-        
-        for(VideoTypeTypeMediaHollow media : countryType._getMedia()) {
+
+        for(VideoTypeMediaHollow media : countryType._getMedia()) {
             if(media._getValue()._isValueEqual("PLASTIC"))
                 return true;
         }
-        
+
         return false;
     }
-    
+
     boolean isContentApproved(long videoId, String countryCode) {
         HollowHashIndexResult queryResult = videoTypeCountryIndex.findMatches(videoId, countryCode);
-        
+
         if(queryResult == null || queryResult.numResults() == 0)
             return false;
-        
+
         int ordinal = queryResult.iterator().next();
-        
-        VideoTypeTypeHollow countryType = videoAPI.getVideoTypeTypeHollow(ordinal);
+
+        VideoTypeDescriptorHollow countryType = videoAPI.getVideoTypeDescriptorHollow(ordinal);
         return countryType._getIsContentApproved();
     }
-    
+
     boolean isGoLiveOrHasFirstDisplayDate(long videoId, String countryCode) {
         int rightsOrdinal = videoRightsIndex.getMatchingOrdinal(videoId, countryCode);
-        
+
         if(rightsOrdinal == -1)
             return false;
-        
-        
+
+
         VideoRightsHollow videoRights = videoAPI.getVideoRightsHollow(rightsOrdinal);
         if(videoRights._getFlags()._getGoLive())
             return true;
-        
-        if(videoRights._getFlags()._getFirstDisplayDate() != Long.MIN_VALUE)
+
+        if(videoRights._getFlags()._getFirstDisplayDate() != null)
             return true;
 
         //// TODO: ALSO NEED TO CHECK IF A VALID AVAILABILITY WINDOW EXISTS.  IF SO, RETURN TRUE
-        
+
         return false;
     }
-    
+
     boolean hasCurrentOrFutureRollout(long videoId, String rolloutType, String country) {
         int rolloutOrdinal = rolloutVideoTypeIndex.getMatchingOrdinal(videoId, rolloutType);
-        
+
         if(rolloutOrdinal == -1)
             return false;
-        
+
         RolloutHollow rollout = videoAPI.getRolloutHollow(rolloutOrdinal);
-        
-        for(RolloutPhasesHollow phase : rollout._getPhases()) {
-            for(Map.Entry<MapKeyHollow, RolloutPhasesWindowsHollow> entry : phase._getWindows().entrySet()) {
-                if(entry.getKey()._isKeyEqual(country)) {
-                    return entry.getValue()._getEndDate() >= System.currentTimeMillis();
+
+        for(RolloutPhaseHollow phase : rollout._getPhases()) {
+            for(Map.Entry<ISOCountryHollow, RolloutPhaseWindowHollow> entry : phase._getWindows().entrySet()) {
+                if(entry.getKey()._isValueEqual(country)) {
+                    return entry.getValue()._getEndDate()._getValue() >= System.currentTimeMillis();
                 }
             }
         }
-        
+
         return false;
     }
 }

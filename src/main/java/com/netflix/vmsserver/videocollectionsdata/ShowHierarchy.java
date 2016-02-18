@@ -1,11 +1,11 @@
 package com.netflix.vmsserver.videocollectionsdata;
 
-import com.netflix.hollow.util.HashCodes;
+import com.netflix.vms.transformer.hollowinput.EpisodeHollow;
 
+import com.netflix.vms.transformer.hollowinput.SeasonHollow;
+import com.netflix.vms.transformer.hollowinput.CountryVideoDisplaySetHollow;
+import com.netflix.hollow.util.HashCodes;
 import java.util.Arrays;
-import com.netflix.vms.videos.hollowinput.VideoDisplaySetSetsChildrenChildrenHollow;
-import com.netflix.vms.videos.hollowinput.VideoDisplaySetSetsChildrenHollow;
-import com.netflix.vms.videos.hollowinput.VideoDisplaySetSetsHollow;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -18,15 +18,15 @@ public class ShowHierarchy {
     private final int episodeIds[][];
     private final int hashCode;
 
-    public ShowHierarchy(int topNodeId, VideoDisplaySetSetsHollow set, String countryCode, VideoCollectionsBuilder builder) {
+    public ShowHierarchy(int topNodeId, CountryVideoDisplaySetHollow set, String countryCode, VideoCollectionsBuilder builder) {
         this.topNodeId = topNodeId;
         int hashCode = HashCodes.hashInt(topNodeId);
 
-        List<VideoDisplaySetSetsChildrenHollow> seasons = set._getChildren();
+        List<SeasonHollow> seasons = set._getChildren();
         if(seasons != null) {
-            seasons = new ArrayList<VideoDisplaySetSetsChildrenHollow>(seasons);
-            Collections.sort(seasons, new Comparator<VideoDisplaySetSetsChildrenHollow>() {
-                public int compare(VideoDisplaySetSetsChildrenHollow o1, VideoDisplaySetSetsChildrenHollow o2) {
+            seasons = new ArrayList<SeasonHollow>(seasons);
+            Collections.sort(seasons, new Comparator<SeasonHollow>() {
+                public int compare(SeasonHollow o1, SeasonHollow o2) {
                     return (int)o1._getSequenceNumber() - (int)o2._getSequenceNumber();
                 }
             });
@@ -37,7 +37,7 @@ public class ShowHierarchy {
             int seasonCounter = 0;
 
             for(int i=0;i<seasons.size();i++) {
-                VideoDisplaySetSetsChildrenHollow season = seasons.get(i);
+                SeasonHollow season = seasons.get(i);
 
                 if(!builder.isChildNodeIncluded(season._getMovieId(), countryCode))
                     continue;
@@ -47,9 +47,9 @@ public class ShowHierarchy {
                 hashCode ^= seasonIds[i];
                 hashCode = HashCodes.hashInt(hashCode);
 
-                List<VideoDisplaySetSetsChildrenChildrenHollow> episodes = new ArrayList<VideoDisplaySetSetsChildrenChildrenHollow>(season._getChildren());
-                Collections.sort(episodes, new Comparator<VideoDisplaySetSetsChildrenChildrenHollow>() {
-                    public int compare(VideoDisplaySetSetsChildrenChildrenHollow o1, VideoDisplaySetSetsChildrenChildrenHollow o2) {
+                List<EpisodeHollow> episodes = new ArrayList<EpisodeHollow>(season._getChildren());
+                Collections.sort(episodes, new Comparator<EpisodeHollow>() {
+                    public int compare(EpisodeHollow o1, EpisodeHollow o2) {
                         return (int)o1._getSequenceNumber() - (int)o2._getSequenceNumber();
                     }
                 });
@@ -59,7 +59,7 @@ public class ShowHierarchy {
                 int episodeCounter = 0;
 
                 for(int j=0;j<episodes.size();j++) {
-                    VideoDisplaySetSetsChildrenChildrenHollow episode = episodes.get(j);
+                    EpisodeHollow episode = episodes.get(j);
 
                     if(!builder.isChildNodeIncluded(episode._getMovieId(), countryCode))
                         continue;

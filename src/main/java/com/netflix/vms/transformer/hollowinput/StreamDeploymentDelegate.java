@@ -1,0 +1,17 @@
+package com.netflix.vms.transformer.hollowinput;
+
+import com.netflix.hollow.objects.delegate.HollowObjectDelegate;
+
+public interface StreamDeploymentDelegate extends HollowObjectDelegate {
+
+    public int getDeploymentInfoOrdinal(int ordinal);
+
+    public int getDeploymentLabelOrdinal(int ordinal);
+
+    public int getDeploymentPriority(int ordinal);
+
+    public Integer getDeploymentPriorityBoxed(int ordinal);
+
+    public StreamDeploymentTypeAPI getTypeAPI();
+
+}

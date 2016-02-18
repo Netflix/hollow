@@ -1,23 +1,22 @@
 package com.netflix.vmsserver.videocollectionsdata;
 
-import java.util.Map;
-
-import java.util.Arrays;
-import com.netflix.vms.hollowoutput.pojos.SupplementalVideo;
-import com.netflix.vms.hollowoutput.pojos.SortedMapOfIntegerToListOfVideoEpisode;
-import com.netflix.vms.hollowoutput.pojos.Video;
-import com.netflix.vms.hollowoutput.pojos.VideoCollectionsData;
-import com.netflix.vms.hollowoutput.pojos.VideoEpisode;
-import com.netflix.vms.hollowoutput.pojos.VideoNodeType;
+import com.netflix.vms.transformer.hollowoutput.SortedMapOfIntegerToListOfVideoEpisode;
+import com.netflix.vms.transformer.hollowoutput.SupplementalVideo;
+import com.netflix.vms.transformer.hollowoutput.Video;
+import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
+import com.netflix.vms.transformer.hollowoutput.VideoEpisode;
+import com.netflix.vms.transformer.hollowoutput.VideoNodeType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class VideoCollectionsDataHierarchy {
 
-    public static final SortedMapOfIntegerToListOfVideoEpisode EMPTY_EPISODE_SEQUENCE_NUMBER_MAP = new SortedMapOfIntegerToListOfVideoEpisode(Collections.<com.netflix.vms.hollowoutput.pojos.Integer, List<VideoEpisode>>emptyMap());
+    public static final SortedMapOfIntegerToListOfVideoEpisode EMPTY_EPISODE_SEQUENCE_NUMBER_MAP = new SortedMapOfIntegerToListOfVideoEpisode(Collections.<com.netflix.vms.transformer.hollowoutput.Integer, List<VideoEpisode>>emptyMap());
 
     public static final VideoNodeType MOVIE = new VideoNodeType("MOVIE");
     public static final VideoNodeType SHOW = new VideoNodeType("SHOW");
@@ -61,7 +60,7 @@ public class VideoCollectionsDataHierarchy {
             topNodeVideoCollectionsData.showChildren = new ArrayList<Video>();
             topNodeVideoCollectionsData.seasonChildren = new ArrayList<Video>();
             topNodeVideoCollectionsData.topNode = topNode;
-            topNodeVideoCollectionsData.episodesForSeasonSequenceNumberMap = new SortedMapOfIntegerToListOfVideoEpisode(new HashMap<com.netflix.vms.hollowoutput.pojos.Integer, List<VideoEpisode>>());
+            topNodeVideoCollectionsData.episodesForSeasonSequenceNumberMap = new SortedMapOfIntegerToListOfVideoEpisode(new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, List<VideoEpisode>>());
             topNodeVideoCollectionsData.supplementalVideos = supplementalVideos;
         }
 
@@ -78,7 +77,7 @@ public class VideoCollectionsDataHierarchy {
         this.orderedSeasonEpisodes.add(currentSeasonEpisodes);
 
         topNodeVideoCollectionsData.showChildren.add(currentSeasonVideo);
-        topNodeVideoCollectionsData.episodesForSeasonSequenceNumberMap.map.put(new com.netflix.vms.hollowoutput.pojos.Integer(orderedSeasons.size()), this.currentSeasonVideoEpisodesList);
+        topNodeVideoCollectionsData.episodesForSeasonSequenceNumberMap.map.put(new com.netflix.vms.transformer.hollowoutput.Integer(orderedSeasons.size()), this.currentSeasonVideoEpisodesList);
         topNodeVideoCollectionsData.supplementalVideos.addAll(supplementalVideos);
 
         currentSeason.nodeType = SEASON;

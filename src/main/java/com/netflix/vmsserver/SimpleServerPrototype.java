@@ -6,16 +6,15 @@ import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
-import com.netflix.vms.hollowoutput.pojos.CompleteVideo;
-import com.netflix.vms.hollowoutput.pojos.CompleteVideoFacetData;
-import com.netflix.vms.hollowoutput.pojos.ISOCountry;
-import com.netflix.vms.hollowoutput.pojos.Video;
-import com.netflix.vms.hollowoutput.pojos.VideoCollectionsData;
-import com.netflix.vms.videos.hollowinput.VMSHollowVideoInputAPI;
-import com.netflix.vms.videos.hollowinput.VideoDisplaySetHollow;
+import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VideoDisplaySetHollow;
+import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
+import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
+import com.netflix.vms.transformer.hollowoutput.ISOCountry;
+import com.netflix.vms.transformer.hollowoutput.Video;
+import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
 import com.netflix.vmsserver.videocollectionsdata.VideoCollectionsBuilder;
 import com.netflix.vmsserver.videocollectionsdata.VideoCollectionsDataHierarchy;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
@@ -23,7 +22,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.junit.Test;
 
 public class SimpleServerPrototype {
@@ -39,9 +37,9 @@ public class SimpleServerPrototype {
         final HollowObjectMapper objectMapper = new HollowObjectMapper(writeStateEngine);
 
         SimultaneousExecutor executor = new SimultaneousExecutor();
-        
+
         long startTime = System.currentTimeMillis();
-        
+
         for(final VideoDisplaySetHollow displaySet : videosAPI.getAllVideoDisplaySetHollow()) {
             executor.execute(new Runnable() {
                 public void run() {
@@ -52,7 +50,7 @@ public class SimpleServerPrototype {
                 }
             });
         }
-        
+
         executor.awaitSuccessfulCompletion();
 
         long endTime = System.currentTimeMillis();
