@@ -1,0 +1,447 @@
+package com.netflix.vmsserver;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import java.io.BufferedInputStream;
+import com.netflix.hollow.combine.HollowCombiner;
+import com.netflix.hollow.combine.HollowCombinerIncludeOrdinalsCopyDirector;
+import com.netflix.hollow.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.index.traversal.HollowIndexerValueTraverser;
+import com.netflix.hollow.read.engine.HollowBlobReader;
+import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
+import com.netflix.hollow.write.HollowBlobWriter;
+import com.netflix.videometadata.lz4.LZ4VMSInputStream;
+import com.netflix.vms.generated.notemplate.GlobalVideoHollow;
+import com.netflix.vms.generated.notemplate.L10NResourcesHollow;
+import com.netflix.vms.generated.notemplate.SupplementalVideoHollow;
+import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
+import com.netflix.vms.generated.notemplate.VideoCollectionsDataHollow;
+import com.netflix.vms.generated.notemplate.VideoEpisodeHollow;
+import com.netflix.vms.generated.notemplate.VideoHollow;
+import com.netflix.vms.generated.notemplate.VideoNodeTypeHollow;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import org.junit.Test;
+
+/// NOTE:  This has a dependency on videometadata-common (for LZ4VMSInputStream)
+/// NOTE:  This has a dependency on vms-hollow-generated-notemplate (for output blob API)
+
+@SuppressWarnings("deprecation")
+public class FilterToSmallDataSubset {
+
+    private static final int TARGET_NUMBER_OF_TOPNODES = 1000;
+    private static final String ORIGINAL_OUTPUT_BLOB_LOCATION = "/space/local-blob-store/latest_candidate-snapshot-20160218221244741";
+    private static final String ORIGINAL_INPUT_BLOB_LOCATION = "/space/local-blob-store/vmsinput-snapshot-20160218221244741";
+
+    private static final String FILTERED_OUTPUT_BLOB_LOCATION = "/space/local-blob-store/control-output";
+    private static final String FILTERED_INPUT_BLOB_LOCATION = "/space/local-blob-store/filtered-input";
+
+    private HollowReadStateEngine stateEngine;
+    private HollowPrimaryKeyIndex globalVideoIdx;
+    private VMSRawHollowAPI outputAPI;
+
+    private Map<String, BitSet> ordinalsToInclude;
+
+    @Test
+    public void doFilter() throws Exception {
+        Set<Integer> includedVideoIds = filterOutputBlob();
+        filterInputBlob(includedVideoIds);
+    }
+
+    private Set<Integer> filterOutputBlob() throws IOException, FileNotFoundException {
+        stateEngine = new HollowReadStateEngine();
+        HollowBlobReader reader = new HollowBlobReader(stateEngine);
+        reader.readSnapshot(new LZ4VMSInputStream(new FileInputStream(ORIGINAL_OUTPUT_BLOB_LOCATION)));
+
+        outputAPI = new VMSRawHollowAPI(stateEngine);
+        globalVideoIdx = new HollowPrimaryKeyIndex(stateEngine, "GlobalVideo", "completeVideo.id.value");
+        ordinalsToInclude = new HashMap<String, BitSet>();
+
+
+        Set<Integer> includedVideoIds = findRandomVideoIds(stateEngine);
+
+        BitSet completeVideosToInclude = findIncludedOrdinals("CompleteVideo", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return outputAPI.getCompleteVideoHollow(ordinal)._getId()._getValueBoxed();
+            }
+        });
+
+        BitSet packagesToInclude = findIncludedOrdinals("PackageData", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return outputAPI.getPackageDataHollow(ordinal)._getVideo()._getValueBoxed();
+            }
+        });
+
+        BitSet rolloutVideosToInclude = findIncludedOrdinals("RolloutVideo", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return outputAPI.getRolloutVideoHollow(ordinal)._getVideo()._getValueBoxed();
+            }
+        });
+
+        findIncludedOrdinals("GlobalVideo", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return outputAPI.getGlobalVideoHollow(ordinal)._getCompleteVideo()._getId()._getValueBoxed();
+            }
+        });
+
+        findIncludedOrdinals("VideoEpisode_CountryList", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return outputAPI.getVideoEpisode_CountryListHollow(ordinal)._getItem()._getDeliverableVideo()._getValueBoxed();
+            }
+        });
+
+        //includeAll("NamedCollectionHolder");   //// TODO: Filter this to included Video IDs only
+        includeAll("EncodingProfile");
+        includeAll("OriginServer");
+        includeAll("DeploymentIntent");
+        includeAll("DrmSystem");
+        includeAll("EncodingProfileGroup");
+
+        ordinalsToInclude.put("L10NResources", findIncludedL10NOrdinals(includedVideoIds));
+
+        joinIncludedOrdinals(completeVideosToInclude,
+                "GlobalPerson", "id",
+                "CompleteVideo", "facetData.videoMetaData.actorList.element.id",
+                                 "facetData.videoMetaData.directorList.element.id",
+                                 "facetData.videoMetaData.creatorList.element.id");
+
+        joinIncludedOrdinals(completeVideosToInclude,
+                        "PersonImages", "id",
+                        "CompleteVideo", "facetData.videoMetaData.actorList.element.id",
+                                         "facetData.videoMetaData.directorList.element.id",
+                                         "facetData.videoMetaData.creatorList.element.id");
+
+        joinIncludedOrdinals(rolloutVideosToInclude,
+                        "CharacterImages", "id",
+                        "RolloutVideo", "summaryMap.value.allPhases.element.roles.element.characterId");
+
+        joinIncludedOrdinals(rolloutVideosToInclude,
+                        "RolloutCharacter", "id",
+                        "RolloutVideo", "summaryMap.value.allPhases.element.roles.element.characterId");
+
+        joinIncludedOrdinals(packagesToInclude,
+                        "FileEncodingData", "downloadableId",
+                        "PackageData", "streams.element.downloadableId");
+
+        joinIncludedOrdinals(packagesToInclude,
+                        "DrmInfoData", "packageId",
+                        "PackageData", "id");
+
+
+        writeFilteredBlob(FILTERED_OUTPUT_BLOB_LOCATION);
+        return includedVideoIds;
+    }
+
+    private void filterInputBlob(Set<Integer> includedVideoIds) throws IOException, FileNotFoundException {
+        ordinalsToInclude.clear();
+        stateEngine = new HollowReadStateEngine();
+        HollowBlobReader reader = new HollowBlobReader(stateEngine);
+        reader.readSnapshot(new BufferedInputStream(new FileInputStream(ORIGINAL_INPUT_BLOB_LOCATION)));
+
+        final VMSHollowVideoInputAPI inputAPI = new VMSHollowVideoInputAPI(stateEngine);
+
+        findIncludedOrdinals("VideoDisplaySet", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int)inputAPI.getVideoDisplaySetHollow(ordinal)._getTopNodeId());
+            }
+        });
+        findIncludedOrdinals("Packages", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int)inputAPI.getPackagesHollow(ordinal)._getMovieId());
+            }
+        });
+        findIncludedOrdinals("VideoRights", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int)inputAPI.getVideoRightsHollow(ordinal)._getMovieId());
+            }
+        });
+        findIncludedOrdinals("CSMReview", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int)inputAPI.getCSMReviewHollow(ordinal)._getVideoId());
+            }
+        });
+        findIncludedOrdinals("DeployablePackages", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int)inputAPI.getDeployablePackagesHollow(ordinal)._getMovieId());
+            }
+        });
+        findIncludedOrdinals("Episodes", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int)inputAPI.getEpisodesHollow(ordinal)._getEpisodeId());
+            }
+        });
+        findIncludedOrdinals("LocalizedMetadata", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int)inputAPI.getLocalizedMetadataHollow(ordinal)._getMovieId());
+            }
+        });
+        findIncludedOrdinals("MovieRatings", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int)inputAPI.getMovieRatingsHollow(ordinal)._getMovieId());
+            }
+        });
+        findIncludedOrdinals("Movies", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int)inputAPI.getMoviesHollow(ordinal)._getMovieId());
+            }
+        });
+        findIncludedOrdinals("Rollout", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int)inputAPI.getRolloutHollow(ordinal)._getMovieId());
+            }
+        });
+        findIncludedOrdinals("Stories_Synopses", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int)inputAPI.getStories_SynopsesHollow(ordinal)._getMovieId());
+            }
+        });
+        findIncludedOrdinals("Trailer", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int)inputAPI.getTrailerHollow(ordinal)._getMovieId());
+            }
+        });
+        findIncludedOrdinals("VideoArtWork", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int)inputAPI.getVideoArtWorkHollow(ordinal)._getMovieId());
+            }
+        });
+        findIncludedOrdinals("VideoAward", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int)inputAPI.getVideoAwardHollow(ordinal)._getVideoId());
+            }
+        });
+        findIncludedOrdinals("VideoDate", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int)inputAPI.getVideoDateHollow(ordinal)._getVideoId());
+            }
+        });
+        findIncludedOrdinals("VideoGeneral", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int)inputAPI.getVideoGeneralHollow(ordinal)._getVideoId());
+            }
+        });
+        findIncludedOrdinals("VideoRating", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int)inputAPI.getVideoRatingHollow(ordinal)._getVideoId());
+            }
+        });
+        findIncludedOrdinals("VideoType", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int)inputAPI.getVideoTypeHollow(ordinal)._getVideoId());
+            }
+        });
+
+        includeAll("TopN");
+        includeAll("AltGenres");
+        includeAll("ArtWorkImageFormat");
+        includeAll("ArtWorkImageType");
+        includeAll("ArtworkRecipe");
+        includeAll("AssetMetaDatas");
+        includeAll("Awards");
+        includeAll("Bcp47Code");
+        includeAll("CacheDeploymentIntent");
+        includeAll("Categories");
+        includeAll("CategoryGroups");
+        includeAll("Cdns");
+        includeAll("Certifications");
+        includeAll("CertificationSystem");
+        includeAll("Character");
+        includeAll("CharacterArtwork");
+        includeAll("Characters");
+        includeAll("ConsolidatedCertificationSystems");
+        includeAll("ConsolidatedVideoRatings");
+        includeAll("DefaultExtensionRecipe");
+        includeAll("DrmSystemIdentifiers");
+        includeAll("Festivals");
+        includeAll("Languages");
+        includeAll("LocalizedCharacter");
+        includeAll("OriginServers");
+        includeAll("PersonAliases");
+        includeAll("PersonArtwork");
+        includeAll("Persons");
+        includeAll("ProtectionTypes");
+        includeAll("Ratings");
+        includeAll("ShowMemberTypes");
+        includeAll("StorageGroups");
+        includeAll("StreamProfileGroups");
+        includeAll("StreamProfiles");
+        includeAll("TerritoryCountries");
+        includeAll("VideoPerson");
+        includeAll("VMSAward");
+
+        writeFilteredBlob(FILTERED_INPUT_BLOB_LOCATION);
+    }
+
+    private void includeAll(String type) {
+        ordinalsToInclude.put(type, populatedOrdinals(type));
+    }
+
+    private BitSet findIncludedOrdinals(String type, Set<Integer> includedVideoIds, VideoIdDeriver idDeriver) {
+        int maxOrdinal = stateEngine.getTypeState(type).maxOrdinal();
+        BitSet populatedOrdinals = new BitSet(maxOrdinal + 1);
+        for(int i=0;i<maxOrdinal + 1;i++) {
+            if(ordinalIsPopulated(type, i)) {
+                if(includedVideoIds.contains(idDeriver.deriveId(i))) {
+                    populatedOrdinals.set(i);
+                }
+            }
+        }
+
+        ordinalsToInclude.put(type, populatedOrdinals);
+
+        return populatedOrdinals;
+    }
+
+    private Set<Integer> findRandomVideoIds(HollowReadStateEngine stateEngine) {
+        Random rand = new Random(1000);
+        Set<Integer> topNodeVideoIds = new HashSet<Integer>();
+        Set<Integer> allVideoIds = new HashSet<Integer>();
+
+        int maxGlobalVideoOrdinal = stateEngine.getTypeState("GlobalVideo").maxOrdinal();
+
+        while(topNodeVideoIds.size() < TARGET_NUMBER_OF_TOPNODES) {
+            int randomOrdinal = rand.nextInt(maxGlobalVideoOrdinal + 1);
+
+            if(ordinalIsPopulated("GlobalVideo", randomOrdinal)) {
+                GlobalVideoHollow vid = (GlobalVideoHollow)outputAPI.getGlobalVideoHollow(randomOrdinal);
+                VideoCollectionsDataHollow videoCollectionsData = vid._getCompleteVideo()._getFacetData()._getVideoCollectionsData();
+                VideoNodeTypeHollow nodeType = videoCollectionsData._getNodeType();
+                if(nodeType._isValueEqual("SHOW") || nodeType._isValueEqual("MOVIE")) {
+                    Integer videoId = vid._getCompleteVideo()._getId()._getValueBoxed();
+                    topNodeVideoIds.add(videoId);
+                    allVideoIds.add(videoId);
+
+                    for(VideoEpisodeHollow episode : videoCollectionsData._getVideoEpisodes()) {
+                        Integer episodeId = episode._getDeliverableVideo()._getValueBoxed();
+                        allVideoIds.add(episodeId);
+                        addAllSupplementalVideoIds(episodeId, allVideoIds);
+                    }
+
+                    for(VideoHollow season : videoCollectionsData._getShowChildren()) {
+                        Integer seasonId = season._getValueBoxed();
+                        allVideoIds.add(seasonId);
+                        addAllSupplementalVideoIds(seasonId, allVideoIds);
+                    }
+
+                    addAllSupplementalVideoIds(videoId, allVideoIds);
+                }
+            }
+        }
+        return allVideoIds;
+    }
+
+    private void addAllSupplementalVideoIds(Integer videoId, Set<Integer> toSet) {
+        int globalVideoOrdinal = globalVideoIdx.getMatchingOrdinal(videoId);
+        GlobalVideoHollow vid = outputAPI.getGlobalVideoHollow(globalVideoOrdinal);
+
+        VideoCollectionsDataHollow videoCollectionsData = vid._getCompleteVideo()._getFacetData()._getVideoCollectionsData();
+
+        for(SupplementalVideoHollow supplemental : videoCollectionsData._getSupplementalVideos()) {
+            toSet.add(supplemental._getId()._getValueBoxed());
+        }
+    }
+
+    private BitSet findIncludedL10NOrdinals(Set<Integer> includedVideoIds) {
+        VMSRawHollowAPI api = new VMSRawHollowAPI(stateEngine);
+
+        BitSet l10nResourcesPopulatedOrdinals = populatedOrdinals("L10NResources");
+        BitSet includedL10nResourcesOrdinals = new BitSet(l10nResourcesPopulatedOrdinals.length());
+
+        int l10nOrdinal = l10nResourcesPopulatedOrdinals.nextSetBit(0);
+        while(l10nOrdinal != -1) {
+            L10NResourcesHollow l10nResources = api.getL10NResourcesHollow(l10nOrdinal);
+
+            String idStr = l10nResources._getResourceIdStr();
+            for(int i=0;i<idStr.length();i++) {
+                if(isNumberCharacter(idStr.charAt(i))) {
+                    int j=i+1;
+                    while(j < idStr.length() && isNumberCharacter(idStr.charAt(j)))
+                        j++;
+
+                    int id = (int)Long.parseLong(idStr.substring(i, j));
+                    if(includedVideoIds.contains(Integer.valueOf(id))) {
+                        includedL10nResourcesOrdinals.set(l10nOrdinal);
+                        break;
+                    }
+
+                    i = j;
+                }
+            }
+
+            l10nOrdinal = l10nResourcesPopulatedOrdinals.nextSetBit(l10nOrdinal + 1);
+        }
+
+        return includedL10nResourcesOrdinals;
+    }
+
+    private void joinIncludedOrdinals(
+            BitSet fromOrdinals,
+            String toType, String toField,
+            String fromType, String... fromFields) {
+
+        HollowPrimaryKeyIndex pkIdx = new HollowPrimaryKeyIndex(stateEngine, toType, toField);
+
+        BitSet includedOrdinals = new BitSet();
+
+        for(String fromField : fromFields) {
+            HollowIndexerValueTraverser traverser = new HollowIndexerValueTraverser(stateEngine, fromType, fromField);
+
+
+            int ordinal = fromOrdinals.nextSetBit(0);
+            while(ordinal != -1) {
+                traverser.traverse(ordinal);
+                for(int i=0;i<traverser.getNumMatches();i++) {
+                    Object key = traverser.getMatchedValue(i, 0);
+                    //System.out.println("MATCHED KEY: " + key);
+                    int personImagesOrdinal = pkIdx.getMatchingOrdinal(key);
+                    if(personImagesOrdinal != -1) {
+                        //System.out.println("joined ordinal: " + personImagesOrdinal);
+                        includedOrdinals.set(personImagesOrdinal);
+                    }
+                }
+
+                ordinal = fromOrdinals.nextSetBit(ordinal + 1);
+            }
+        }
+
+        ordinalsToInclude.put(toType, includedOrdinals);
+    }
+
+    private boolean isNumberCharacter(char c) {
+        return c >= '0' && c <= '9';
+    }
+
+    private boolean ordinalIsPopulated(String type, int ordinal) {
+        return populatedOrdinals(type).get(ordinal);
+    }
+
+    private BitSet populatedOrdinals(String type) {
+        return stateEngine.getTypeState(type).getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
+    }
+
+    private interface VideoIdDeriver {
+        Integer deriveId(int ordinal);
+    }
+
+    private void writeFilteredBlob(String filename) throws FileNotFoundException, IOException {
+        HollowCombiner combiner = new HollowCombiner(new HollowCombinerIncludeOrdinalsCopyDirector(ordinalsToInclude), stateEngine);
+
+        combiner.combine();
+
+        HollowBlobWriter writer = new HollowBlobWriter(combiner.getCombinedStateEngine());
+        BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(filename));
+        writer.writeSnapshot(os);
+        os.close();
+    }
+
+
+}
