@@ -1,7 +1,7 @@
-package com.netflix.vmsserver.index;
+package com.netflix.vms.transformer.index;
 
-import static com.netflix.vmsserver.index.IndexSpec.IndexType.HASH;
-import static com.netflix.vmsserver.index.IndexSpec.IndexType.PRIMARY_KEY;
+import static com.netflix.vms.transformer.index.IndexSpec.IndexType.HASH;
+import static com.netflix.vms.transformer.index.IndexSpec.IndexType.PRIMARY_KEY;
 
 public enum IndexSpec {
 

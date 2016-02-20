@@ -1,4 +1,4 @@
-package com.netflix.vmsserver.videocollectionsdata;
+package com.netflix.vms.transformer.modules.collections;
 
 import com.netflix.vms.transformer.hollowoutput.SortedMapOfIntegerToListOfVideoEpisode;
 import com.netflix.vms.transformer.hollowoutput.SupplementalVideo;

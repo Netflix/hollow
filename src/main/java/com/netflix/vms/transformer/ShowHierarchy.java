@@ -1,12 +1,13 @@
-package com.netflix.vmsserver.videocollectionsdata;
+package com.netflix.vms.transformer;
 
-import com.netflix.vms.transformer.hollowinput.EpisodeHollow;
-
-import com.netflix.vms.transformer.hollowinput.SeasonHollow;
-import com.netflix.vms.transformer.hollowinput.CountryVideoDisplaySetHollow;
 import com.netflix.hollow.util.HashCodes;
-import java.util.Arrays;
+import com.netflix.hollow.util.IntList;
+import com.netflix.vms.transformer.hollowinput.CountryVideoDisplaySetHollow;
+import com.netflix.vms.transformer.hollowinput.EpisodeHollow;
+import com.netflix.vms.transformer.hollowinput.SeasonHollow;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -16,12 +17,16 @@ public class ShowHierarchy {
     private final int topNodeId;
     private final int seasonIds[];
     private final int episodeIds[][];
+    private final int supplementalIds[];
     private final int hashCode;
 
-    public ShowHierarchy(int topNodeId, CountryVideoDisplaySetHollow set, String countryCode, VideoCollectionsBuilder builder) {
+    public ShowHierarchy(int topNodeId, CountryVideoDisplaySetHollow set, String countryCode, ShowHierarchyInitializer initializer) {
         this.topNodeId = topNodeId;
         int hashCode = HashCodes.hashInt(topNodeId);
-
+        
+        IntList supplementalIds = new IntList();
+        initializer.addSupplementalVideos(topNodeId, countryCode, supplementalIds);
+        
         List<SeasonHollow> seasons = set._getChildren();
         if(seasons != null) {
             seasons = new ArrayList<SeasonHollow>(seasons);
@@ -39,9 +44,10 @@ public class ShowHierarchy {
             for(int i=0;i<seasons.size();i++) {
                 SeasonHollow season = seasons.get(i);
 
-                if(!builder.isChildNodeIncluded(season._getMovieId(), countryCode))
+                if(!initializer.isChildNodeIncluded(season._getMovieId(), countryCode))
                     continue;
-
+                
+                initializer.addSupplementalVideos(season._getMovieId(), countryCode, supplementalIds);
 
                 seasonIds[seasonCounter] = (int)season._getMovieId();
                 hashCode ^= seasonIds[i];
@@ -61,8 +67,10 @@ public class ShowHierarchy {
                 for(int j=0;j<episodes.size();j++) {
                     EpisodeHollow episode = episodes.get(j);
 
-                    if(!builder.isChildNodeIncluded(episode._getMovieId(), countryCode))
+                    if(!initializer.isChildNodeIncluded(episode._getMovieId(), countryCode))
                         continue;
+                    
+                    initializer.addSupplementalVideos(episode._getMovieId(), countryCode, supplementalIds);
 
                     episodeIds[seasonCounter][episodeCounter] = (int)episode._getMovieId();
                     hashCode ^= episodeIds[seasonCounter][episodeCounter];
@@ -87,8 +95,18 @@ public class ShowHierarchy {
             this.seasonIds = new int[0];
             this.episodeIds = new int[0][];
         }
+        
+        this.supplementalIds = supplementalIds.arrayCopyOfRange(0, supplementalIds.size());
+        
+        for(int i=0;i<supplementalIds.size();i++) {
+            hashCode ^= HashCodes.hashInt(supplementalIds.get(i));
+        }
 
         this.hashCode = hashCode;
+    }
+    
+    public boolean isStandalone() {
+        return seasonIds.length == 0;
     }
 
     public int getTopNodeId() {
@@ -101,6 +119,17 @@ public class ShowHierarchy {
 
     public int[][] getEpisodeIds() {
         return episodeIds;
+    }
+    
+    public int[] getSupplementalIds() {
+        return supplementalIds;
+    }
+    
+    public boolean includesSupplementalId(int id) {
+        for(int i=0;i<supplementalIds.length;i++)
+            if(supplementalIds[i] == id)
+                return true;
+        return false;
     }
 
     @Override
@@ -116,6 +145,8 @@ public class ShowHierarchy {
             if(!Arrays.equals(episodeIds[i], other.episodeIds[i]))
                 return false;
         }
+        if(!Arrays.equals(supplementalIds, other.supplementalIds))
+            return false;
         return true;
     }
 

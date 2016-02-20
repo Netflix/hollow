@@ -1,4 +1,4 @@
-package com.netflix.vmsserver.index;
+package com.netflix.vms.transformer.index;
 
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;

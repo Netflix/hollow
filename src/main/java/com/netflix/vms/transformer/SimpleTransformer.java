@@ -1,6 +1,4 @@
-package com.netflix.vmsserver;
-
-import com.netflix.vmsserver.index.VMSTransformerIndexer;
+package com.netflix.vms.transformer;
 
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
@@ -13,8 +11,10 @@ import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
-import com.netflix.vmsserver.videocollectionsdata.VideoCollectionsBuilder;
-import com.netflix.vmsserver.videocollectionsdata.VideoCollectionsDataHierarchy;
+import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
+import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHierarchy;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +24,8 @@ public class SimpleTransformer {
 
         VMSTransformerIndexer indexer = new VMSTransformerIndexer(inputStateEngine, new SimultaneousExecutor());
 
-        final VideoCollectionsBuilder collectionsBuilder = new VideoCollectionsBuilder(api, indexer);
+        final ShowHierarchyInitializer hierarchyInitializer = new ShowHierarchyInitializer(api, indexer);
+        final VideoCollectionsModule collectionsBuilder = new VideoCollectionsModule(api, indexer);
 
         HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();  //TODO: Need to define a HashCodeFinder.
         final HollowObjectMapper objectMapper = new HollowObjectMapper(writeStateEngine);
@@ -36,10 +37,14 @@ public class SimpleTransformer {
         for(final VideoDisplaySetHollow displaySet : api.getAllVideoDisplaySetHollow()) {
             executor.execute(new Runnable() {
                 public void run() {
-                    Map<String, VideoCollectionsDataHierarchy> vcdByCountry = collectionsBuilder.buildVideoCollectionsDataByCountry(displaySet);
-
-                    if(vcdByCountry != null)
-                        writeJustTheVideoCollectionsDatas(vcdByCountry, objectMapper);
+                    Map<String, ShowHierarchy> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(displaySet);
+                    
+                    if(showHierarchiesByCountry != null) {
+                        Map<String, VideoCollectionsDataHierarchy> vcdByCountry = collectionsBuilder.buildVideoCollectionsDataByCountry(showHierarchiesByCountry);
+    
+                        if(vcdByCountry != null)
+                            writeJustTheVideoCollectionsDatas(vcdByCountry, objectMapper);
+                    }
                 }
             });
         }

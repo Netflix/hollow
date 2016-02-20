@@ -1,47 +1,32 @@
-package com.netflix.vmsserver.videocollectionsdata;
-
-import com.netflix.vms.transformer.hollowinput.RolloutPhaseTrailerHollow;
+package com.netflix.vms.transformer;
 
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.util.IntList;
 import com.netflix.vms.transformer.hollowinput.CountryVideoDisplaySetHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.IndividualTrailerHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutPhaseTrailerHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowHollow;
-import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.TrailerHollow;
-import com.netflix.vms.transformer.hollowinput.TrailerThemeHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoDisplaySetHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeMediaHollow;
-import com.netflix.vms.transformer.hollowoutput.Strings;
-import com.netflix.vms.transformer.hollowoutput.SupplementalVideo;
-import com.netflix.vms.transformer.hollowoutput.Video;
-import com.netflix.vmsserver.index.IndexSpec;
-import com.netflix.vmsserver.index.VMSTransformerIndexer;
-import java.util.ArrayList;
+import com.netflix.vms.transformer.index.IndexSpec;
+import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class VideoCollectionsBuilder {
-
-
-    private static final Strings POST_PLAY = new Strings("postPlay");
-    private static final Strings TYPE = new Strings("type");
-    private static final Strings TRAILER = new Strings("trailer");
-    private static final Strings SUB_TYPE = new Strings("subType");
-    private static final Strings IDENTIFIER = new Strings("identifier");
-    private static final Strings THEMES = new Strings("themes");
-    private static final Strings USAGES = new Strings("usages");
+public class ShowHierarchyInitializer {
 
     private final VMSHollowVideoInputAPI videoAPI;
     private final HollowPrimaryKeyIndex supplementalIndex;
@@ -50,18 +35,16 @@ public class VideoCollectionsBuilder {
     private final HollowPrimaryKeyIndex rolloutVideoTypeIndex;
     private final Set<Integer> supplementalIds;
 
-    public VideoCollectionsBuilder(VMSHollowVideoInputAPI videoAPI, VMSTransformerIndexer indexer) {
+    public ShowHierarchyInitializer(VMSHollowVideoInputAPI videoAPI, VMSTransformerIndexer indexer) {
         this.videoAPI = videoAPI;
         this.supplementalIndex = indexer.getPrimaryKeyIndex(IndexSpec.SUPPLEMENTAL);
         this.videoTypeCountryIndex = indexer.getHashIndex(IndexSpec.VIDEO_TYPE_COUNTRY);
         this.videoRightsIndex = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_RIGHTS);
         this.rolloutVideoTypeIndex = indexer.getPrimaryKeyIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
 
-        //indexer.getPrimaryKeyIndex()
-
         this.supplementalIds = findAllSupplementalVideoIds(videoAPI);
     }
-
+    
     private Set<Integer> findAllSupplementalVideoIds(VMSHollowVideoInputAPI videoAPI) {
         Set<Integer> ids = new HashSet<Integer>();
 
@@ -71,21 +54,16 @@ public class VideoCollectionsBuilder {
         for(RolloutPhaseTrailerHollow rolloutTrailer : videoAPI.getAllRolloutPhaseTrailerHollow())
             ids.add((int)rolloutTrailer._getTrailerMovieId());
 
-
-
         return ids;
     }
-
-    public Map<String, VideoCollectionsDataHierarchy> buildVideoCollectionsDataByCountry(VideoDisplaySetHollow displaySet) {
-
+    
+    public Map<String, ShowHierarchy> getShowHierarchiesByCountry(VideoDisplaySetHollow displaySet) {
         long topNodeId = displaySet._getTopNodeId();
         if(supplementalIds.contains((int)topNodeId))
             return null;
 
-        Map<ShowHierarchy, VideoCollectionsDataHierarchy> uniqueVideoCollectionsHierarchies = new HashMap<ShowHierarchy, VideoCollectionsDataHierarchy>();
-        Map<String, VideoCollectionsDataHierarchy> videoCollectionsDataByCountry = new HashMap<String, VideoCollectionsDataHierarchy>();
-        VideoCollectionsDataHierarchy standaloneHierarchy = null;
-
+        Map<String, ShowHierarchy> showHierarchiesByCountry = new HashMap<String, ShowHierarchy>();
+        Map<ShowHierarchy, ShowHierarchy> uniqueShowHierarchies = new HashMap<ShowHierarchy, ShowHierarchy>();
 
         for(CountryVideoDisplaySetHollow set : displaySet._getSets()) {
             String countryCode = set._getCountryCode()._getValue();
@@ -95,91 +73,27 @@ public class VideoCollectionsBuilder {
 
             if(!isTopNodeIncluded(topNodeId, countryCode))
                 continue;
-
-            VideoCollectionsDataHierarchy hierarchy = null;
-
-            if(set._getSetType()._isValueEqual("std_show")) {
-                ShowHierarchy showHierarchy = new ShowHierarchy((int)topNodeId, set, countryCode, this);
-                hierarchy = uniqueVideoCollectionsHierarchies.get(showHierarchy);
-                if(hierarchy == null) {
-                    hierarchy = new VideoCollectionsDataHierarchy((int)topNodeId, false, getSupplementalVideos(topNodeId, topNodeId, Integer.MIN_VALUE, countryCode));
-
-                    for(int i=0;i<showHierarchy.getSeasonIds().length;i++) {
-                        int seasonId = showHierarchy.getSeasonIds()[i];
-                        hierarchy.addSeason(seasonId, getSupplementalVideos(seasonId, topNodeId, i, countryCode));
-
-                        for(int j=0;j<showHierarchy.getEpisodeIds()[i].length;j++) {
-                            int episodeId = showHierarchy.getEpisodeIds()[i][j];
-                            hierarchy.addEpisode(episodeId);
-                        }
-                    }
-
-                    uniqueVideoCollectionsHierarchies.put(showHierarchy, hierarchy);
-                }
-            } else if(set._getSetType()._isValueEqual("Standalone")){
-                ///TODO: Supplementals is country specific!
-                if(standaloneHierarchy == null)
-                    standaloneHierarchy = new VideoCollectionsDataHierarchy((int)topNodeId, true, getSupplementalVideos(topNodeId, topNodeId, Integer.MIN_VALUE, countryCode));
-                hierarchy = standaloneHierarchy;
+            
+            if(!set._getSetType()._isValueEqual("Standalone") && !set._getSetType()._isValueEqual("std_show"))
+                continue;
+                
+            ShowHierarchy showHierarchy = new ShowHierarchy((int)topNodeId, set, countryCode, this);
+            ShowHierarchy canonicalHierarchy = uniqueShowHierarchies.get(showHierarchy);
+            if(canonicalHierarchy == null) {
+                canonicalHierarchy = showHierarchy;
+                uniqueShowHierarchies.put(showHierarchy, canonicalHierarchy);
             }
-
-            if(hierarchy != null)
-                videoCollectionsDataByCountry.put(countryCode, hierarchy);
+            
+            showHierarchiesByCountry.put(countryCode, canonicalHierarchy);
         }
 
-        return videoCollectionsDataByCountry;
-    }
-
-    private List<SupplementalVideo> getSupplementalVideos(long videoId, long parentVideoId, int seasonNumber, String countryCode) {
-        int supplementalsOrdinal = supplementalIndex.getMatchingOrdinal(videoId);
-
-        if(supplementalsOrdinal == -1)
-            return new ArrayList<SupplementalVideo>();
-
-        List<SupplementalVideo> supplementalVideos = new ArrayList<SupplementalVideo>();
-
-        TrailerHollow supplementals = videoAPI.getTrailerHollow(supplementalsOrdinal);
-        for(IndividualTrailerHollow supplemental : supplementals._getTrailers()) {
-            if(isChildNodeIncluded(supplemental._getMovieId(), countryCode)) {
-
-                SupplementalVideo supp = new SupplementalVideo();
-                supp.id = new Video((int) supplemental._getMovieId());
-                supp.parent = new Video((int) parentVideoId);
-                supp.sequenceNumber = (int)supplemental._getSequenceNumber();
-                supp.seasonNumber = seasonNumber;
-                supp.attributes = new HashMap<Strings, Strings>();
-                supp.multiValueAttributes = new HashMap<Strings, List<Strings>>();
-                supp.attributes.put(POST_PLAY, new Strings(supplemental._getPostPlay()._getValue()));
-                supp.attributes.put(TYPE, TRAILER);
-                supp.attributes.put(SUB_TYPE, new Strings(supplemental._getSubType()._getValue()));
-                StringHollow identifier = supplemental._getIdentifier();
-                if(identifier != null)
-                    supp.attributes.put(IDENTIFIER, new Strings(identifier._getValue()));
-                // StringHollow usages = supplemental._  ///TODO: What to do about exotic 'attribute' parsing logic?
-                List<Strings> themesList = getThemesList(supplemental);
-                if(themesList != null)
-                    supp.multiValueAttributes.put(THEMES, themesList);
-                supplementalVideos.add(supp);
-
-            }
-       }
-
-        return supplementalVideos;
-    }
-
-    private List<Strings> getThemesList(IndividualTrailerHollow trailer) {
-        List<TrailerThemeHollow> themes = trailer._getThemes();
-        if(themes == null || themes.isEmpty())
+        if(showHierarchiesByCountry.isEmpty())
             return null;
-
-        List<Strings> list = new ArrayList<Strings>();
-
-        for(TrailerThemeHollow theme : themes) {
-            list.add(new Strings(theme._getValue()._getValue()));
-        }
-
-        return list;
+        
+        return showHierarchiesByCountry;
     }
+
+
 
     boolean isTopNodeIncluded(long videoId, String countryCode) {
         if(!isContentApproved(videoId, countryCode))
@@ -272,4 +186,19 @@ public class VideoCollectionsBuilder {
 
         return false;
     }
+    
+    void addSupplementalVideos(long videoId, String countryCode, IntList toList) {
+        int supplementalsOrdinal = supplementalIndex.getMatchingOrdinal(videoId);
+
+        if(supplementalsOrdinal == -1)
+            return;
+
+        TrailerHollow supplementals = videoAPI.getTrailerHollow(supplementalsOrdinal);
+        for(IndividualTrailerHollow supplemental : supplementals._getTrailers()) {
+            int supplementalId = (int)supplemental._getMovieId();
+            if(isChildNodeIncluded(supplementalId, countryCode))
+                toList.add(supplementalId);
+        }
+    }
+
 }
