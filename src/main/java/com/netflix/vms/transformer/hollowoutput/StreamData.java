@@ -3,15 +3,15 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class StreamData {
 
-    public long downloadableId;
-    public int packageId;
-    public long fileSizeInBytes;
-    public long creationTimeStampInSeconds;
-    public StreamDrmData drmData;
-    public StreamHashData hashData;
-    public StreamAdditionalData additionalData;
-    public DownloadDescriptor downloadDescriptor;
-    public StreamDataDescriptor streamDataDescriptor;
+    public long downloadableId = java.lang.Long.MIN_VALUE;
+    public int packageId = java.lang.Integer.MIN_VALUE;
+    public long fileSizeInBytes = java.lang.Long.MIN_VALUE;
+    public long creationTimeStampInSeconds = java.lang.Long.MIN_VALUE;
+    public StreamDrmData drmData = null;
+    public StreamHashData hashData = null;
+    public StreamAdditionalData additionalData = null;
+    public DownloadDescriptor downloadDescriptor = null;
+    public StreamDataDescriptor streamDataDescriptor = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

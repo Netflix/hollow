@@ -4,10 +4,10 @@ import java.util.Map;
 
 public class DrmSystem {
 
-    public int id;
-    public DrmKeyString guid;
-    public DrmKeyString name;
-    public Map<DrmKeyString, DrmKeyString> attributes;
+    public int id = java.lang.Integer.MIN_VALUE;
+    public DrmKeyString guid = null;
+    public DrmKeyString name = null;
+    public Map<DrmKeyString, DrmKeyString> attributes = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

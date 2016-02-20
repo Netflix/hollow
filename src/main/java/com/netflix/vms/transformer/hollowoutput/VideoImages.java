@@ -4,8 +4,8 @@ import java.util.List;
 
 public class VideoImages {
 
-    public List<ArtWorkDescriptor> artWorkDescriptors;
-    public ArtWorkIndex artWorkIndex;
+    public List<ArtWorkDescriptor> artWorkDescriptors = null;
+    public ArtWorkIndex artWorkIndex = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

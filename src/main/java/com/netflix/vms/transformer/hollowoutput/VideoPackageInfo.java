@@ -6,16 +6,16 @@ import java.util.Set;
 
 public class VideoPackageInfo {
 
-    public int packageId;
-    public Set<VideoFormatDescriptor> formats;
-    public boolean isAvailableIn3D;
-    public int runtimeInSeconds;
-    public List<Strings> soundTypes;
-    public List<Strings> screenFormats;
-    public List<VideoMoment> phoneSnacks;
-    public Map<Strings, List<VideoImage>> stillImagesMap;
-    public Map<Strings, List<VideoClip>> videoClipMap;
-    public Map<TrickPlayType, TrickPlayItem> trickPlayMap;
+    public int packageId = java.lang.Integer.MIN_VALUE;
+    public Set<VideoFormatDescriptor> formats = null;
+    public boolean isAvailableIn3D = false;
+    public int runtimeInSeconds = java.lang.Integer.MIN_VALUE;
+    public List<Strings> soundTypes = null;
+    public List<Strings> screenFormats = null;
+    public List<VideoMoment> phoneSnacks = null;
+    public Map<Strings, List<VideoImage>> stillImagesMap = null;
+    public Map<Strings, List<VideoClip>> videoClipMap = null;
+    public Map<TrickPlayType, TrickPlayItem> trickPlayMap = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

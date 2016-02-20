@@ -3,13 +3,13 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class StreamDownloadDescriptor {
 
-    public ProfileTypeDescriptor profileType;
-    public int streamProfileId;
-    public VideoResolution videoResolution;
-    public PixelAspect pixelAspect;
-    public int bitrate;
-    public Strings envBasedDirectory;
-    public Strings languageBcp47code;
+    public ProfileTypeDescriptor profileType = null;
+    public int streamProfileId = java.lang.Integer.MIN_VALUE;
+    public VideoResolution videoResolution = null;
+    public PixelAspect pixelAspect = null;
+    public int bitrate = java.lang.Integer.MIN_VALUE;
+    public Strings envBasedDirectory = null;
+    public Strings languageBcp47code = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

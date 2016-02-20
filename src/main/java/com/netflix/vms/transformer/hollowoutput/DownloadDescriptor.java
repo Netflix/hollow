@@ -3,13 +3,13 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class DownloadDescriptor {
 
-    public AssetTypeDescriptor assetTypeDescriptor;
-    public TimedTextTypeDescriptor timedTextTypeDescriptor;
-    public int encodingProfileId;
-    public VideoFormatDescriptor videoFormatDescriptor;
-    public Strings audioLanguageBcp47code;
-    public AssetMetaData assetMetaData;
-    public Strings textLanguageBcp47code;
+    public AssetTypeDescriptor assetTypeDescriptor = null;
+    public TimedTextTypeDescriptor timedTextTypeDescriptor = null;
+    public int encodingProfileId = java.lang.Integer.MIN_VALUE;
+    public VideoFormatDescriptor videoFormatDescriptor = null;
+    public Strings audioLanguageBcp47code = null;
+    public AssetMetaData assetMetaData = null;
+    public Strings textLanguageBcp47code = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

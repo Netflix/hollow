@@ -3,9 +3,9 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class Hook {
 
-    public HookType type;
-    public int rank;
-    public Video video;
+    public HookType type = null;
+    public int rank = java.lang.Integer.MIN_VALUE;
+    public Video video = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

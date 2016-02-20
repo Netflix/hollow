@@ -4,8 +4,8 @@ import java.util.List;
 
 public class VideoMiscData {
 
-    public List<VideoAward> videoAwards;
-    public ICSMReview cSMReview;
+    public List<VideoAward> videoAwards = null;
+    public ICSMReview cSMReview = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

@@ -4,9 +4,9 @@ import java.util.List;
 
 public class GlobalPerson {
 
-    public int id;
-    public List<Integer> aliasesIds;
-    public List<PersonRole> personRoles;
+    public int id = java.lang.Integer.MIN_VALUE;
+    public List<Integer> aliasesIds = null;
+    public List<PersonRole> personRoles = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

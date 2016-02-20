@@ -5,18 +5,18 @@ import java.util.Set;
 
 public class EncodingProfile {
 
-    public int id;
-    public char[] name26AndBelowStr;
-    public char[] name27AndAboveStr;
-    public Set<Strings> dRMType;
-    public int drmKeyGroup;
-    public ProfileTypeDescriptor profileTypeDescriptor;
-    public AudioChannelsDescriptor audioChannelsDescriptor;
-    public char[] fileExtensionStr;
-    public char[] mimeTypeStr;
-    public char[] descriptionStr;
-    public boolean isAdaptiveSwitching;
-    public VideoDimensionsDescriptor videoDimensionsDescriptor;
+    public int id = java.lang.Integer.MIN_VALUE;
+    public char[] name26AndBelowStr = null;
+    public char[] name27AndAboveStr = null;
+    public Set<Strings> dRMType = null;
+    public int drmKeyGroup = java.lang.Integer.MIN_VALUE;
+    public ProfileTypeDescriptor profileTypeDescriptor = null;
+    public AudioChannelsDescriptor audioChannelsDescriptor = null;
+    public char[] fileExtensionStr = null;
+    public char[] mimeTypeStr = null;
+    public char[] descriptionStr = null;
+    public boolean isAdaptiveSwitching = false;
+    public VideoDimensionsDescriptor videoDimensionsDescriptor = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

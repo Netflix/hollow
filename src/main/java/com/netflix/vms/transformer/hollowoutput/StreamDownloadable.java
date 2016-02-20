@@ -4,9 +4,9 @@ import java.util.List;
 
 public class StreamDownloadable {
 
-    public long downloadableId;
-    public List<Strings> originServerNames;
-    public StreamDownloadDescriptor descriptor;
+    public long downloadableId = java.lang.Long.MIN_VALUE;
+    public List<Strings> originServerNames = null;
+    public StreamDownloadDescriptor descriptor = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

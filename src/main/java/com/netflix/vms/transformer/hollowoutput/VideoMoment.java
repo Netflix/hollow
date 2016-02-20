@@ -4,13 +4,13 @@ import java.util.List;
 
 public class VideoMoment {
 
-    public Strings videoMomentTypeName;
-    public int sequenceNumber;
-    public long msOffset;
-    public long runtimeMs;
-    public List<Strings> momentTags;
-    public int packageId;
-    public long bifIndex;
+    public Strings videoMomentTypeName = null;
+    public int sequenceNumber = java.lang.Integer.MIN_VALUE;
+    public long msOffset = java.lang.Long.MIN_VALUE;
+    public long runtimeMs = java.lang.Long.MIN_VALUE;
+    public List<Strings> momentTags = null;
+    public int packageId = java.lang.Integer.MIN_VALUE;
+    public long bifIndex = java.lang.Long.MIN_VALUE;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

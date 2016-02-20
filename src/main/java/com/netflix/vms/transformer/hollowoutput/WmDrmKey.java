@@ -3,9 +3,9 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class WmDrmKey {
 
-    public long downloadableId;
-    public DrmKeyString contentPackagerPublicKey;
-    public DrmKeyString encryptedContentKey;
+    public long downloadableId = java.lang.Long.MIN_VALUE;
+    public DrmKeyString contentPackagerPublicKey = null;
+    public DrmKeyString encryptedContentKey = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

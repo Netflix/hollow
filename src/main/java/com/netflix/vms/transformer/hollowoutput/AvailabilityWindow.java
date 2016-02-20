@@ -3,8 +3,8 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class AvailabilityWindow {
 
-    public Date startDate;
-    public Date endDate;
+    public Date startDate = null;
+    public Date endDate = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class Float {
 
-    public float val;
+    public float val = java.lang.Float.NaN;
 
     public Float() { }
 

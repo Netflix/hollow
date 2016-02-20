@@ -4,11 +4,11 @@ import java.util.Arrays;
 
 public class ImageDownloadableDescriptor {
 
-    public int streamProfileId;
-    public VideoResolution videoResolution;
-    public TargetDimensions targetDimensions;
-    public VideoFormatDescriptor videoFormat;
-    public char[] envBasedDirectory;
+    public int streamProfileId = java.lang.Integer.MIN_VALUE;
+    public VideoResolution videoResolution = null;
+    public TargetDimensions targetDimensions = null;
+    public VideoFormatDescriptor videoFormat = null;
+    public char[] envBasedDirectory = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

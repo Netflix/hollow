@@ -4,10 +4,10 @@ import java.util.Map;
 
 public class LanguageRights {
 
-    public int contractId;
-    public Video videoId;
-    public Map<ISOCountry, Map<Integer, LanguageRestrictions>> languageRestrictionsMap;
-    public Map<Strings, Map<Integer, LanguageRestrictions>> fallbackRestrictionsMap;
+    public int contractId = java.lang.Integer.MIN_VALUE;
+    public Video videoId = null;
+    public Map<ISOCountry, Map<Integer, LanguageRestrictions>> languageRestrictionsMap = null;
+    public Map<Strings, Map<Integer, LanguageRestrictions>> fallbackRestrictionsMap = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

@@ -4,10 +4,10 @@ import java.util.Arrays;
 
 public class RolloutInfo {
 
-    public int rolloutId;
-    public Video video;
-    public char[] type;
-    public char[] name;
+    public int rolloutId = java.lang.Integer.MIN_VALUE;
+    public Video video = null;
+    public char[] type = null;
+    public char[] name = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

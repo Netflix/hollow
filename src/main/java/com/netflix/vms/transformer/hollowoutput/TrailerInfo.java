@@ -4,17 +4,17 @@ import java.util.Arrays;
 
 public class TrailerInfo {
 
-    public SupplementalInfoType type;
-    public char[] imageTag;
-    public char[] imageBackgroundTone;
-    public int mapIndex;
-    public int seasonNumber;
-    public char[] subtitleLocale;
-    public char[] video;
-    public int videoLength;
-    public int videoOffset;
-    public char[] videoValue;
-    public int priority;
+    public SupplementalInfoType type = null;
+    public char[] imageTag = null;
+    public char[] imageBackgroundTone = null;
+    public int mapIndex = java.lang.Integer.MIN_VALUE;
+    public int seasonNumber = java.lang.Integer.MIN_VALUE;
+    public char[] subtitleLocale = null;
+    public char[] video = null;
+    public int videoLength = java.lang.Integer.MIN_VALUE;
+    public int videoOffset = java.lang.Integer.MIN_VALUE;
+    public char[] videoValue = null;
+    public int priority = java.lang.Integer.MIN_VALUE;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

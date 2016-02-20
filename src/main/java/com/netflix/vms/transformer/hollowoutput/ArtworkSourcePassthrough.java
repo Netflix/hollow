@@ -3,8 +3,8 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class ArtworkSourcePassthrough {
 
-    public ArtworkSourceString source_file_id;
-    public ArtworkSourceString original_source_file_id;
+    public ArtworkSourceString source_file_id = null;
+    public ArtworkSourceString original_source_file_id = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

@@ -5,12 +5,12 @@ import java.util.Map;
 
 public class SupplementalVideo {
 
-    public Video id;
-    public Video parent;
-    public int sequenceNumber;
-    public int seasonNumber;
-    public Map<Strings, Strings> attributes;
-    public Map<Strings, List<Strings>> multiValueAttributes;
+    public Video id = null;
+    public Video parent = null;
+    public int sequenceNumber = java.lang.Integer.MIN_VALUE;
+    public int seasonNumber = java.lang.Integer.MIN_VALUE;
+    public Map<Strings, Strings> attributes = null;
+    public Map<Strings, List<Strings>> multiValueAttributes = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

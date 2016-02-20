@@ -3,9 +3,9 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class TrickPlayItem {
 
-    public Video videoId;
-    public int imageCount;
-    public TrickPlayDownloadable trickPlayDownloadable;
+    public Video videoId = null;
+    public int imageCount = java.lang.Integer.MIN_VALUE;
+    public TrickPlayDownloadable trickPlayDownloadable = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

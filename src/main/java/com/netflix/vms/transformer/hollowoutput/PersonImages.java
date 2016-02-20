@@ -4,8 +4,8 @@ import java.util.List;
 
 public class PersonImages {
 
-    public int id;
-    public List<ArtWorkDescriptor> artWorkDescriptors;
+    public int id = java.lang.Integer.MIN_VALUE;
+    public List<ArtWorkDescriptor> artWorkDescriptors = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

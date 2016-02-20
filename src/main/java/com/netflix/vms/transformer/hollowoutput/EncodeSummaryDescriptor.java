@@ -4,9 +4,9 @@ import java.util.List;
 
 public class EncodeSummaryDescriptor {
 
-    public boolean fromMuxedOnlyStreams;
-    public List<Long> downloadableIds;
-    public EncodeSummaryDescriptorData descriptorData;
+    public boolean fromMuxedOnlyStreams = false;
+    public List<Long> downloadableIds = null;
+    public EncodeSummaryDescriptorData descriptorData = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

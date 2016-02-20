@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class ArtWorkIndex {
 
-    public Map<ArtWorkImageTypeEntry, Map<ArtWorkImageFormatEntry, ArtWorkExtendedIndex>> index;
+    public Map<ArtWorkImageTypeEntry, Map<ArtWorkImageFormatEntry, ArtWorkExtendedIndex>> index = null;
 
     public ArtWorkIndex() { }
 

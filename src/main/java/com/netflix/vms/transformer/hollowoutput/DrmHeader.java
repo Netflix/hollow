@@ -5,10 +5,10 @@ import java.util.Map;
 
 public class DrmHeader {
 
-    public int drmSystemId;
-    public byte[] keyId;
-    public byte[] checksum;
-    public Map<Strings, Strings> attributes;
+    public int drmSystemId = java.lang.Integer.MIN_VALUE;
+    public byte[] keyId = null;
+    public byte[] checksum = null;
+    public Map<Strings, Strings> attributes = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

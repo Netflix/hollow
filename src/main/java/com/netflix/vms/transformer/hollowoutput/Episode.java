@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class Episode {
 
-    public int id;
+    public int id = java.lang.Integer.MIN_VALUE;
 
     public Episode() { }
 

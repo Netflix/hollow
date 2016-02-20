@@ -5,11 +5,11 @@ import java.util.Set;
 
 public class NamedCollectionHolder {
 
-    public ISOCountry country;
-    public Map<Strings, Set<Video>> videoListMap;
-    public Map<Strings, Set<VPerson>> personListMap;
-    public Map<Strings, Set<Episode>> episodeListMap;
-    public Map<Strings, Set<NFResourceID>> resourceIdListMap;
+    public ISOCountry country = null;
+    public Map<Strings, Set<Video>> videoListMap = null;
+    public Map<Strings, Set<VPerson>> personListMap = null;
+    public Map<Strings, Set<Episode>> episodeListMap = null;
+    public Map<Strings, Set<NFResourceID>> resourceIdListMap = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

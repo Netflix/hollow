@@ -4,7 +4,7 @@ import java.util.List;
 
 public class ArtWorkExtendedIndex {
 
-    public List<ArtWorkDescriptor> artWorkList;
+    public List<ArtWorkDescriptor> artWorkList = null;
 
     public ArtWorkExtendedIndex() { }
 

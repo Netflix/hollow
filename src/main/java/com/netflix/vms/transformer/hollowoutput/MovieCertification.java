@@ -3,11 +3,11 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class MovieCertification {
 
-    public Video videoId;
-    public int certificationSystemId;
-    public int ratingId;
-    public int maturityLevel;
-    public MovieRatingReason ratingReason;
+    public Video videoId = null;
+    public int certificationSystemId = java.lang.Integer.MIN_VALUE;
+    public int ratingId = java.lang.Integer.MIN_VALUE;
+    public int maturityLevel = java.lang.Integer.MIN_VALUE;
+    public MovieRatingReason ratingReason = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

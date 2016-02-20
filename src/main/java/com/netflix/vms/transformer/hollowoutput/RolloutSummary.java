@@ -6,11 +6,11 @@ import java.util.Map;
 
 public class RolloutSummary {
 
-    public char[] type;
-    public Video video;
-    public Map<Integer, RolloutInfo> rolloutInfoMap;
-    public Map<ISOCountry, List<RolloutPhaseWindow>> phaseWindowMap;
-    public List<Phase> allPhases;
+    public char[] type = null;
+    public Video video = null;
+    public Map<Integer, RolloutInfo> rolloutInfoMap = null;
+    public Map<ISOCountry, List<RolloutPhaseWindow>> phaseWindowMap = null;
+    public List<Phase> allPhases = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

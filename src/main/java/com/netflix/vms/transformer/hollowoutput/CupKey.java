@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class CupKey {
 
-    public Strings token;
+    public Strings token = null;
 
     public CupKey() { }
 

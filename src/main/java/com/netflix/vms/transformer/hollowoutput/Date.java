@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class Date {
 
-    public long val;
+    public long val = java.lang.Long.MIN_VALUE;
 
     public Date() { }
 

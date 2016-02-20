@@ -5,9 +5,9 @@ import java.util.Map;
 
 public class TopNVideoData {
 
-    public char[] countryId;
-    public Map<Integer, Float> videoViewHrs1Day;
-    public float countryViewHrs1Day;
+    public char[] countryId = null;
+    public Map<Integer, Float> videoViewHrs1Day = null;
+    public float countryViewHrs1Day = java.lang.Float.NaN;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

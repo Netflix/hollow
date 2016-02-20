@@ -5,8 +5,8 @@ import java.util.Set;
 
 public class StorageGroup {
 
-    public char[] idStr;
-    public Set<ISOCountry> countries;
+    public char[] idStr = null;
+    public Set<ISOCountry> countries = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

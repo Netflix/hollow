@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class TimedTextTypeDescriptor {
 
-    public char[] nameStr;
+    public char[] nameStr = null;
 
     public TimedTextTypeDescriptor() { }
 

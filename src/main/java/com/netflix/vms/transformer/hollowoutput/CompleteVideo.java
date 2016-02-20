@@ -3,10 +3,10 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class CompleteVideo {
 
-    public Video id;
-    public ISOCountry country;
-    public CompleteVideoFacetData facetData;
-    public CompleteVideoCountrySpecificData countrySpecificData;
+    public Video id = null;
+    public ISOCountry country = null;
+    public CompleteVideoFacetData facetData = null;
+    public CompleteVideoCountrySpecificData countrySpecificData = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

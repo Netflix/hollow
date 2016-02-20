@@ -3,9 +3,9 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class AudioChannelsDescriptor {
 
-    public int numberOfChannels;
-    public Strings name;
-    public Strings description;
+    public int numberOfChannels = java.lang.Integer.MIN_VALUE;
+    public Strings name = null;
+    public Strings description = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

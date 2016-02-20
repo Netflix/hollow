@@ -5,19 +5,19 @@ import java.util.Set;
 
 public class ArtWorkDescriptor {
 
-    public NFLocale locale;
-    public ArtWorkImageFormatEntry format;
-    public boolean isUsDescriptor;
-    public ArtWorkImageTypeEntry imageType;
-    public long imageId;
-    public int seqNum;
-    public long effectiveDate;
-    public int ordinalPriority;
-    public Set<ArtWorkImageRecipe> recipes;
-    public Map<Strings, AssetLocation> assetLocationMap;
-    public ArtworkBasicPassthrough basic_passthrough;
-    public ArtworkSourcePassthrough source;
-    public int file_seq;
+    public NFLocale locale = null;
+    public ArtWorkImageFormatEntry format = null;
+    public boolean isUsDescriptor = false;
+    public ArtWorkImageTypeEntry imageType = null;
+    public long imageId = java.lang.Long.MIN_VALUE;
+    public int seqNum = java.lang.Integer.MIN_VALUE;
+    public long effectiveDate = java.lang.Long.MIN_VALUE;
+    public int ordinalPriority = java.lang.Integer.MIN_VALUE;
+    public Set<ArtWorkImageRecipe> recipes = null;
+    public Map<Strings, AssetLocation> assetLocationMap = null;
+    public ArtworkBasicPassthrough basic_passthrough = null;
+    public ArtworkSourcePassthrough source = null;
+    public int file_seq = java.lang.Integer.MIN_VALUE;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

@@ -4,10 +4,10 @@ import java.util.List;
 
 public class VideoClip {
 
-    public Video videoId;
-    public long msDuration;
-    public VideoMoment videoMoment;
-    public List<StreamDownloadable> downloadableList;
+    public Video videoId = null;
+    public long msDuration = java.lang.Long.MIN_VALUE;
+    public VideoMoment videoMoment = null;
+    public List<StreamDownloadable> downloadableList = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

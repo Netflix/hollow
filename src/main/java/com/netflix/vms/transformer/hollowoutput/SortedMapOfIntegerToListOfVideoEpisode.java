@@ -7,7 +7,7 @@ import java.util.Map;
 public class SortedMapOfIntegerToListOfVideoEpisode {
 
     @HollowTypeName(name="SortedMapOfIntegerToListOfVideoEpisode_map")
-    public Map<Integer, List<VideoEpisode>> map;
+    public Map<Integer, List<VideoEpisode>> map = null;
 
     public SortedMapOfIntegerToListOfVideoEpisode() { }
 

@@ -4,9 +4,9 @@ import java.util.List;
 
 public class MovieRatingReason {
 
-    public List<Integer> reasonIds;
-    public boolean isDisplayImageOnly;
-    public boolean isDisplayOrderSpecific;
+    public List<Integer> reasonIds = null;
+    public boolean isDisplayImageOnly = false;
+    public boolean isDisplayOrderSpecific = false;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

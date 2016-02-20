@@ -7,19 +7,19 @@ import java.util.Set;
 
 public class Phase {
 
-    public int rolloutId;
-    public Video video;
-    public char[] name;
-    public boolean isCoreMetaDataShown;
-    public Map<ISOCountry, Date> projectedLaunchDates;
-    public Map<ISOCountry, AvailabilityWindow> windowsMap;
-    public Map<Strings, Strings> rawL10nAttribs;
-    public List<RolloutTrailer> trailers;
-    public List<RolloutCast> casts;
-    public List<RolloutRole> roles;
-    public List<SupplementalVideo> supplementalVideos;
-    public Set<Long> artWorkImageIds;
-    public Set<Strings> sourceFileIds;
+    public int rolloutId = java.lang.Integer.MIN_VALUE;
+    public Video video = null;
+    public char[] name = null;
+    public boolean isCoreMetaDataShown = false;
+    public Map<ISOCountry, Date> projectedLaunchDates = null;
+    public Map<ISOCountry, AvailabilityWindow> windowsMap = null;
+    public Map<Strings, Strings> rawL10nAttribs = null;
+    public List<RolloutTrailer> trailers = null;
+    public List<RolloutCast> casts = null;
+    public List<RolloutRole> roles = null;
+    public List<SupplementalVideo> supplementalVideos = null;
+    public Set<Long> artWorkImageIds = null;
+    public Set<Strings> sourceFileIds = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

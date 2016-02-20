@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class Video {
 
-    public int value;
+    public int value = java.lang.Integer.MIN_VALUE;
 
     public Video() { }
 

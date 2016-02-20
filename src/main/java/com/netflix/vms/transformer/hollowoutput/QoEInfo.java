@@ -3,8 +3,8 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class QoEInfo {
 
-    public int vmafScore;
-    public int scaledPsnrScore;
+    public int vmafScore = java.lang.Integer.MIN_VALUE;
+    public int scaledPsnrScore = java.lang.Integer.MIN_VALUE;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

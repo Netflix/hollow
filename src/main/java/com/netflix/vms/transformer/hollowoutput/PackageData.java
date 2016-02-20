@@ -5,15 +5,15 @@ import java.util.Set;
 
 public class PackageData {
 
-    public int id;
-    public Video video;
-    public Map<ISOCountry, Set<ContractRestriction>> contractRestrictions;
-    public Set<StreamData> streams;
-    public boolean isPrimaryPackage;
-    public Set<EncodeSummaryDescriptor> audioStreamSummary;
-    public Set<EncodeSummaryDescriptor> textStreamSummary;
-    public Set<EncodeSummaryDescriptor> muxAudioStreamSummary;
-    public Set<ISOCountry> allDeployableCountries;
+    public int id = java.lang.Integer.MIN_VALUE;
+    public Video video = null;
+    public Map<ISOCountry, Set<ContractRestriction>> contractRestrictions = null;
+    public Set<StreamData> streams = null;
+    public boolean isPrimaryPackage = false;
+    public Set<EncodeSummaryDescriptor> audioStreamSummary = null;
+    public Set<EncodeSummaryDescriptor> textStreamSummary = null;
+    public Set<EncodeSummaryDescriptor> muxAudioStreamSummary = null;
+    public Set<ISOCountry> allDeployableCountries = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

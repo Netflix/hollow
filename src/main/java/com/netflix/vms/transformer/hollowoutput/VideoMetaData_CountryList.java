@@ -3,8 +3,8 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class VideoMetaData_CountryList {
 
-    public ISOCountry country;
-    public VideoMetaData item;
+    public ISOCountry country = null;
+    public VideoMetaData item = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

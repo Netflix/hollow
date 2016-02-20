@@ -5,13 +5,13 @@ import java.util.Map;
 
 public class CompleteVideoCountrySpecificData {
 
-    public Date metadataAvailabilityDate;
-    public Date firstDisplayDate;
-    public Map<NFLocale, Date> firstDisplayDateByLocale;
-    public List<Certification> certificationList;
-    public SortedMapOfDateWindowToListOfInteger dateWindowWiseSeasonSequenceNumberMap;
-    public List<VMSAvailabilityWindow> mediaAvailabilityWindows;
-    public List<VMSAvailabilityWindow> imagesAvailabilityWindows;
+    public Date metadataAvailabilityDate = null;
+    public Date firstDisplayDate = null;
+    public Map<NFLocale, Date> firstDisplayDateByLocale = null;
+    public List<Certification> certificationList = null;
+    public SortedMapOfDateWindowToListOfInteger dateWindowWiseSeasonSequenceNumberMap = null;
+    public List<VMSAvailabilityWindow> mediaAvailabilityWindows = null;
+    public List<VMSAvailabilityWindow> imagesAvailabilityWindows = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class AssetMetaData {
 
-    public Strings id;
+    public Strings id = null;
 
     public AssetMetaData() { }
 

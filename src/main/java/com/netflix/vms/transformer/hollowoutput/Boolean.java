@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class Boolean {
 
-    public boolean val;
+    public boolean val = false;
 
     public Boolean() { }
 

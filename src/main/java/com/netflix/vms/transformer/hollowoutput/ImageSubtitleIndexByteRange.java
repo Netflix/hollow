@@ -3,8 +3,8 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class ImageSubtitleIndexByteRange {
 
-    public long masterIndexOffset;
-    public int masterIndexSize;
+    public long masterIndexOffset = java.lang.Long.MIN_VALUE;
+    public int masterIndexSize = java.lang.Integer.MIN_VALUE;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

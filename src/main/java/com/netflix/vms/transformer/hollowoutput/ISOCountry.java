@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class ISOCountry {
 
-    public char[] id;
+    public char[] id = null;
 
     public ISOCountry() { }
 

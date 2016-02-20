@@ -3,8 +3,8 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class StreamDrmData {
 
-    public DrmKey drmKey;
-    public WmDrmKey wmDrmKey;
+    public DrmKey drmKey = null;
+    public WmDrmKey wmDrmKey = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

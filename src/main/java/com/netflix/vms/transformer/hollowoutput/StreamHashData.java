@@ -3,10 +3,10 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class StreamHashData {
 
-    public long cRC32Hash;
-    public long sha1_1;
-    public long sha1_2;
-    public long sha1_3;
+    public long cRC32Hash = java.lang.Long.MIN_VALUE;
+    public long sha1_1 = java.lang.Long.MIN_VALUE;
+    public long sha1_2 = java.lang.Long.MIN_VALUE;
+    public long sha1_3 = java.lang.Long.MIN_VALUE;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

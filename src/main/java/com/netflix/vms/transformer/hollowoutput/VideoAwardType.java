@@ -3,8 +3,8 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class VideoAwardType {
 
-    public int id;
-    public VideoAwardFestival festival;
+    public int id = java.lang.Integer.MIN_VALUE;
+    public VideoAwardFestival festival = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

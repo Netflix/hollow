@@ -3,9 +3,9 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class DeploymentIntent {
 
-    public int profileId;
-    public int bitrate;
-    public ISOCountry country;
+    public int profileId = java.lang.Integer.MIN_VALUE;
+    public int bitrate = java.lang.Integer.MIN_VALUE;
+    public ISOCountry country = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

@@ -3,10 +3,10 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class StreamAdditionalData {
 
-    public FrameRate frameRate;
-    public DownloadLocationSet downloadLocations;
-    public QoEInfo qoeInfo;
-    public StreamMostlyConstantData mostlyConstantData;
+    public FrameRate frameRate = null;
+    public DownloadLocationSet downloadLocations = null;
+    public QoEInfo qoeInfo = null;
+    public StreamMostlyConstantData mostlyConstantData = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

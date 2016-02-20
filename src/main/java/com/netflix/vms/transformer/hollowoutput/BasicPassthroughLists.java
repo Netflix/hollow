@@ -4,7 +4,7 @@ import java.util.List;
 
 public class BasicPassthroughLists {
 
-    public List<SuperFloat> floatList;
+    public List<SuperFloat> floatList = null;
 
     public BasicPassthroughLists() { }
 

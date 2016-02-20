@@ -6,7 +6,7 @@ import java.util.List;
 public class LinkedHashSetOfStrings {
 
     @HollowTypeName(name="LinkedHashSetOfStrings_ordinals")
-    public List<Strings> ordinals;
+    public List<Strings> ordinals = null;
 
     public LinkedHashSetOfStrings() { }
 

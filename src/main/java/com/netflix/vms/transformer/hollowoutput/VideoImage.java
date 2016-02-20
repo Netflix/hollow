@@ -4,9 +4,9 @@ import java.util.List;
 
 public class VideoImage {
 
-    public Video videoId;
-    public VideoMoment videoMoment;
-    public List<ImageDownloadable> downloadableList;
+    public Video videoId = null;
+    public VideoMoment videoMoment = null;
+    public List<ImageDownloadable> downloadableList = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

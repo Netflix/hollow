@@ -3,8 +3,8 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class RolloutPhaseWindow {
 
-    public int phaseOrdinal;
-    public AvailabilityWindow phaseWindow;
+    public int phaseOrdinal = java.lang.Integer.MIN_VALUE;
+    public AvailabilityWindow phaseWindow = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

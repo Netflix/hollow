@@ -4,10 +4,10 @@ import java.util.Map;
 
 public class VMSAvailabilityWindow {
 
-    public Date startDate;
-    public Date endDate;
-    public int bundledAssetsGroupId;
-    public Map<Integer, WindowPackageContractInfo> windowInfosByPackageId;
+    public Date startDate = null;
+    public Date endDate = null;
+    public int bundledAssetsGroupId = java.lang.Integer.MIN_VALUE;
+    public Map<Integer, WindowPackageContractInfo> windowInfosByPackageId = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

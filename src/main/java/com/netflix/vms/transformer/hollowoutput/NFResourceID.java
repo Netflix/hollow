@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class NFResourceID {
 
-    public char[] value;
+    public char[] value = null;
 
     public NFResourceID() { }
 

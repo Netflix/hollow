@@ -4,9 +4,9 @@ import java.util.Arrays;
 
 public class OriginServer {
 
-    public char[] nameStr;
-    public CdnData cdnData;
-    public StorageGroup storageGroup;
+    public char[] nameStr = null;
+    public CdnData cdnData = null;
+    public StorageGroup storageGroup = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

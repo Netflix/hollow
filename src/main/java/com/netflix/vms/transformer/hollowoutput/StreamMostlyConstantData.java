@@ -5,12 +5,12 @@ import java.util.List;
 
 public class StreamMostlyConstantData {
 
-    public int deploymentLabel;
-    public int conformingGroupId;
-    public char[] s3FullPath;
-    public ImageSubtitleIndexByteRange imageSubtitleIndexByteRange;
-    public List<Strings> tags;
-    public int deploymentPriority;
+    public int deploymentLabel = java.lang.Integer.MIN_VALUE;
+    public int conformingGroupId = java.lang.Integer.MIN_VALUE;
+    public char[] s3FullPath = null;
+    public ImageSubtitleIndexByteRange imageSubtitleIndexByteRange = null;
+    public List<Strings> tags = null;
+    public int deploymentPriority = java.lang.Integer.MIN_VALUE;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

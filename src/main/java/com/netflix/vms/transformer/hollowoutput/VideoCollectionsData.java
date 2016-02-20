@@ -4,17 +4,17 @@ import java.util.List;
 
 public class VideoCollectionsData {
 
-    public VideoNodeType nodeType;
-    public VideoNodeType topNodeType;
-    public List<VideoEpisode> videoEpisodes;
-    public List<Video> showChildren;
-    public List<Video> seasonChildren;
-    public List<Video> supplementalVideoParents;
-    public List<SupplementalVideo> supplementalVideos;
-    public Video showParent;
-    public Video seasonParent;
-    public Video topNode;
-    public SortedMapOfIntegerToListOfVideoEpisode episodesForSeasonSequenceNumberMap;
+    public VideoNodeType nodeType = null;
+    public VideoNodeType topNodeType = null;
+    public List<VideoEpisode> videoEpisodes = null;
+    public List<Video> showChildren = null;
+    public List<Video> seasonChildren = null;
+    public List<Video> supplementalVideoParents = null;
+    public List<SupplementalVideo> supplementalVideos = null;
+    public Video showParent = null;
+    public Video seasonParent = null;
+    public Video topNode = null;
+    public SortedMapOfIntegerToListOfVideoEpisode episodesForSeasonSequenceNumberMap = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

@@ -3,8 +3,8 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class RolloutCast {
 
-    public VPerson person;
-    public int sequenceNumber;
+    public VPerson person = null;
+    public int sequenceNumber = java.lang.Integer.MIN_VALUE;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

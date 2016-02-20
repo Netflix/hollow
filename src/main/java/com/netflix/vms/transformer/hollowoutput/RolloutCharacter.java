@@ -5,9 +5,9 @@ import java.util.Map;
 
 public class RolloutCharacter {
 
-    public int id;
-    public Map<Strings, Strings> rawL10nAttribs;
-    public List<Quote> quotes;
+    public int id = java.lang.Integer.MIN_VALUE;
+    public Map<Strings, Strings> rawL10nAttribs = null;
+    public List<Quote> quotes = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

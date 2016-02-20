@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class VPerson {
 
-    public int id;
+    public int id = java.lang.Integer.MIN_VALUE;
 
     public VPerson() { }
 

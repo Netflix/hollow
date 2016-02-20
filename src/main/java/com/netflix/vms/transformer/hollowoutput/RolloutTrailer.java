@@ -4,9 +4,9 @@ import java.util.Map;
 
 public class RolloutTrailer {
 
-    public Video video;
-    public int sequenceNumber;
-    public Map<SupplementalInfoType, TrailerInfo> supplementalInfos;
+    public Video video = null;
+    public int sequenceNumber = java.lang.Integer.MIN_VALUE;
+    public Map<SupplementalInfoType, TrailerInfo> supplementalInfos = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

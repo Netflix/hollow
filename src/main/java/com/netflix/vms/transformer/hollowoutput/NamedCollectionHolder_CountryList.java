@@ -3,8 +3,8 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class NamedCollectionHolder_CountryList {
 
-    public ISOCountry country;
-    public NamedCollectionHolder item;
+    public ISOCountry country = null;
+    public NamedCollectionHolder item = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

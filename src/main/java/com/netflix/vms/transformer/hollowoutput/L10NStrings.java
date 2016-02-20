@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class L10NStrings {
 
-    public char[] value;
+    public char[] value = null;
 
     public L10NStrings() { }
 

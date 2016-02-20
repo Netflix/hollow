@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class Strings {
 
-    public char[] value;
+    public char[] value = null;
 
     public Strings() { }
 

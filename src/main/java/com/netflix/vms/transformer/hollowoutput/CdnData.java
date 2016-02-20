@@ -3,8 +3,8 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class CdnData {
 
-    public int id;
-    public Strings name;
+    public int id = java.lang.Integer.MIN_VALUE;
+    public Strings name = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

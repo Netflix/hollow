@@ -5,8 +5,8 @@ import java.util.Set;
 
 public class EncodingProfileGroup {
 
-    public char[] groupNameStr;
-    public Set<Integer> encodingProfileIds;
+    public char[] groupNameStr = null;
+    public Set<Integer> encodingProfileIds = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

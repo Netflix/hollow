@@ -3,11 +3,11 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class CompleteVideoFacetData {
 
-    public VideoMetaData videoMetaData;
-    public VideoCollectionsData videoCollectionsData;
-    public VideoMiscData videoMiscData;
-    public VideoImages videoImages;
-    public VideoMediaData videoMediaData;
+    public VideoMetaData videoMetaData = null;
+    public VideoCollectionsData videoCollectionsData = null;
+    public VideoMiscData videoMiscData = null;
+    public VideoImages videoImages = null;
+    public VideoMediaData videoMediaData = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

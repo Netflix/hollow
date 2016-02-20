@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class SupplementalInfoType {
 
-    public char[] value;
+    public char[] value = null;
 
     public SupplementalInfoType() { }
 

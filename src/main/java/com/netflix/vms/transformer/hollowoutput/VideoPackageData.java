@@ -4,8 +4,8 @@ import java.util.Set;
 
 public class VideoPackageData {
 
-    public Video videoId;
-    public Set<PackageData> packages;
+    public Video videoId = null;
+    public Set<PackageData> packages = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

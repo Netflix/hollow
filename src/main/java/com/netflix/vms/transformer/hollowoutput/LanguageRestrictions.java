@@ -4,11 +4,11 @@ import java.util.Set;
 
 public class LanguageRestrictions {
 
-    public int audioLanguageId;
-    public Strings audioLanguage;
-    public Set<Integer> disallowedTimedText;
-    public Set<Strings> disallowedTimedTextBcp47codes;
-    public boolean requiresForcedSubtitles;
+    public int audioLanguageId = java.lang.Integer.MIN_VALUE;
+    public Strings audioLanguage = null;
+    public Set<Integer> disallowedTimedText = null;
+    public Set<Strings> disallowedTimedTextBcp47codes = null;
+    public boolean requiresForcedSubtitles = false;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

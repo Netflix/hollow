@@ -4,8 +4,8 @@ import java.util.Map;
 
 public class RolloutVideo {
 
-    public Video video;
-    public Map<Strings, RolloutSummary> summaryMap;
+    public Video video = null;
+    public Map<Strings, RolloutSummary> summaryMap = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

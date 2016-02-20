@@ -3,8 +3,8 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class TrickPlayDescriptor {
 
-    public int width;
-    public int height;
+    public int width = java.lang.Integer.MIN_VALUE;
+    public int height = java.lang.Integer.MIN_VALUE;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

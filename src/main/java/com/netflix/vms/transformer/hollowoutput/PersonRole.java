@@ -3,10 +3,10 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class PersonRole {
 
-    public VPerson person;
-    public VRole roleType;
-    public Video video;
-    public int weight;
+    public VPerson person = null;
+    public VRole roleType = null;
+    public Video video = null;
+    public int weight = java.lang.Integer.MIN_VALUE;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

@@ -3,9 +3,9 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class AssetLocation {
 
-    public Strings recipeDescriptor;
-    public int cdnId;
-    public Strings cdnDirectory;
+    public Strings recipeDescriptor = null;
+    public int cdnId = java.lang.Integer.MIN_VALUE;
+    public Strings cdnDirectory = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

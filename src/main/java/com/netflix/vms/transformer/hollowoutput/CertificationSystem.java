@@ -3,9 +3,9 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class CertificationSystem {
 
-    public int id;
-    public Strings officialURL;
-    public ISOCountry country;
+    public int id = java.lang.Integer.MIN_VALUE;
+    public Strings officialURL = null;
+    public ISOCountry country = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

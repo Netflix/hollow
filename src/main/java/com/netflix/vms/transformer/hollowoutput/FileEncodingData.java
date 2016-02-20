@@ -3,11 +3,11 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class FileEncodingData {
 
-    public long downloadableId;
-    public CodecPrivateDataString codecPrivateData;
-    public ChunkDurationsString chunkDurations;
-    public long dashHeaderSize;
-    public long dashMediaStartByteOffset;
+    public long downloadableId = java.lang.Long.MIN_VALUE;
+    public CodecPrivateDataString codecPrivateData = null;
+    public ChunkDurationsString chunkDurations = null;
+    public long dashHeaderSize = java.lang.Long.MIN_VALUE;
+    public long dashMediaStartByteOffset = java.lang.Long.MIN_VALUE;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

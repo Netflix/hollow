@@ -4,10 +4,10 @@ import java.util.Set;
 
 public class GlobalVideo {
 
-    public CompleteVideo completeVideo;
-    public Set<Strings> aliases;
-    public Set<ISOCountry> availableCountries;
-    public boolean isSupplementalVideo;
+    public CompleteVideo completeVideo = null;
+    public Set<Strings> aliases = null;
+    public Set<ISOCountry> availableCountries = null;
+    public boolean isSupplementalVideo = false;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

@@ -3,8 +3,8 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class WindowPackageContractInfo {
 
-    public VideoContractInfo videoContractInfo;
-    public VideoPackageInfo videoPackageInfo;
+    public VideoContractInfo videoContractInfo = null;
+    public VideoPackageInfo videoPackageInfo = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

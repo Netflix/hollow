@@ -3,15 +3,15 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class VideoMediaData {
 
-    public boolean isAvailableForED;
-    public boolean isGoLive;
-    public boolean isOriginal;
-    public boolean isAutoPlayEnabled;
-    public Date dvdReleaseDate;
-    public boolean hasLocalAudio;
-    public boolean hasLocalText;
-    public int approximateRuntimeInSeconds;
-    public boolean isLanguageOverride;
+    public boolean isAvailableForED = false;
+    public boolean isGoLive = false;
+    public boolean isOriginal = false;
+    public boolean isAutoPlayEnabled = false;
+    public Date dvdReleaseDate = null;
+    public boolean hasLocalAudio = false;
+    public boolean hasLocalText = false;
+    public int approximateRuntimeInSeconds = java.lang.Integer.MIN_VALUE;
+    public boolean isLanguageOverride = false;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

@@ -4,8 +4,8 @@ import java.util.List;
 
 public class DownloadLocationSet {
 
-    public Strings filename;
-    public List<DownloadLocation> locations;
+    public Strings filename = null;
+    public List<DownloadLocation> locations = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

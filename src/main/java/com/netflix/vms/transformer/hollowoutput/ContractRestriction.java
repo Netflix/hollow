@@ -6,12 +6,12 @@ import java.util.Set;
 
 public class ContractRestriction {
 
-    public Set<Long> excludedDownloadables;
-    public AvailabilityWindow availabilityWindow;
-    public List<CupKey> cupKeys;
-    public int prePromotionDays;
-    public int postPromotionDays;
-    public Map<Strings, LanguageRestrictions> languageBcp47RestrictionsMap;
+    public Set<Long> excludedDownloadables = null;
+    public AvailabilityWindow availabilityWindow = null;
+    public List<CupKey> cupKeys = null;
+    public int prePromotionDays = java.lang.Integer.MIN_VALUE;
+    public int postPromotionDays = java.lang.Integer.MIN_VALUE;
+    public Map<Strings, LanguageRestrictions> languageBcp47RestrictionsMap = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

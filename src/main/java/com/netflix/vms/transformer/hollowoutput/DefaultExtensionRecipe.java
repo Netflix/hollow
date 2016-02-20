@@ -4,8 +4,8 @@ import java.util.Arrays;
 
 public class DefaultExtensionRecipe {
 
-    public char[] extensionStr;
-    public char[] recipeNameStr;
+    public char[] extensionStr = null;
+    public char[] recipeNameStr = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

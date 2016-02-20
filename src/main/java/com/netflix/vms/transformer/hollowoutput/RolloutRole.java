@@ -3,10 +3,10 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class RolloutRole {
 
-    public int id;
-    public int characterId;
-    public int sequenceNumber;
-    public VPerson person;
+    public int id = java.lang.Integer.MIN_VALUE;
+    public int characterId = java.lang.Integer.MIN_VALUE;
+    public int sequenceNumber = java.lang.Integer.MIN_VALUE;
+    public VPerson person = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

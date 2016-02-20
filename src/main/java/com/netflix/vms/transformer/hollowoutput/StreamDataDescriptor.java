@@ -4,14 +4,14 @@ import java.util.Set;
 
 public class StreamDataDescriptor {
 
-    public int runTimeInSeconds;
-    public int bitrate;
-    public PixelAspect pixelAspect;
-    public VideoResolution videoResolution;
-    public Set<ISOCountry> cacheDeployedCountries;
-    public VideoMoment videoMoment;
-    public int imageCount;
-    public TargetDimensions targetDimensions;
+    public int runTimeInSeconds = java.lang.Integer.MIN_VALUE;
+    public int bitrate = java.lang.Integer.MIN_VALUE;
+    public PixelAspect pixelAspect = null;
+    public VideoResolution videoResolution = null;
+    public Set<ISOCountry> cacheDeployedCountries = null;
+    public VideoMoment videoMoment = null;
+    public int imageCount = java.lang.Integer.MIN_VALUE;
+    public TargetDimensions targetDimensions = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

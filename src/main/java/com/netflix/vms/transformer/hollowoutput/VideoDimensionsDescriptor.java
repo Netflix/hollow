@@ -3,9 +3,9 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class VideoDimensionsDescriptor {
 
-    public int dimensions;
-    public Strings name;
-    public Strings description;
+    public int dimensions = java.lang.Integer.MIN_VALUE;
+    public Strings name = null;
+    public Strings description = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

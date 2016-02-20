@@ -3,9 +3,9 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class DrmKey {
 
-    public long keyId;
-    public Video videoId;
-    public DrmKeyString encryptedContentKey;
+    public long keyId = java.lang.Long.MIN_VALUE;
+    public Video videoId = null;
+    public DrmKeyString encryptedContentKey = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

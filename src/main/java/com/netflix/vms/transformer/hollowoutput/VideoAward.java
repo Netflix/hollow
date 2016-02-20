@@ -3,12 +3,12 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class VideoAward {
 
-    public Video video;
-    public VideoAwardType awardType;
-    public VPerson person;
-    public boolean isWinner;
-    public int year;
-    public int sequenceNumber;
+    public Video video = null;
+    public VideoAwardType awardType = null;
+    public VPerson person = null;
+    public boolean isWinner = false;
+    public int year = java.lang.Integer.MIN_VALUE;
+    public int sequenceNumber = java.lang.Integer.MIN_VALUE;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

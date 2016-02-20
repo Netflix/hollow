@@ -4,15 +4,15 @@ import java.util.List;
 
 public class ArtworkBasicPassthrough {
 
-    public List<__passthrough_string> themes;
-    public PassthroughString tone;
-    public List<__passthrough_string> awardCampaigns;
-    public PassthroughString group_id;
-    public BasicPassthroughLists lists;
-    public PassthroughString design_attribute;
-    public PassthroughString focal_point;
-    public PassthroughString approval_source;
-    public boolean approval_state;
+    public List<__passthrough_string> themes = null;
+    public PassthroughString tone = null;
+    public List<__passthrough_string> awardCampaigns = null;
+    public PassthroughString group_id = null;
+    public BasicPassthroughLists lists = null;
+    public PassthroughString design_attribute = null;
+    public PassthroughString focal_point = null;
+    public PassthroughString approval_source = null;
+    public boolean approval_state = false;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

@@ -3,12 +3,12 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class VideoEpisode {
 
-    public Video seriesParent;
-    public Video deliverableVideo;
-    public int sequenceNumber;
-    public int showSequenceNumber;
-    public int seasonSequenceNumber;
-    public int episodeSequenceNumber;
+    public Video seriesParent = null;
+    public Video deliverableVideo = null;
+    public int sequenceNumber = java.lang.Integer.MIN_VALUE;
+    public int showSequenceNumber = java.lang.Integer.MIN_VALUE;
+    public int seasonSequenceNumber = java.lang.Integer.MIN_VALUE;
+    public int episodeSequenceNumber = java.lang.Integer.MIN_VALUE;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

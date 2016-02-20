@@ -4,10 +4,10 @@ import java.util.Arrays;
 
 public class ArtWorkImageRecipe {
 
-    public char[] recipeNameStr;
-    public char[] extensionStr;
-    public char[] cdnFolderStr;
-    public char[] hostNameStr;
+    public char[] recipeNameStr = null;
+    public char[] extensionStr = null;
+    public char[] cdnFolderStr = null;
+    public char[] hostNameStr = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

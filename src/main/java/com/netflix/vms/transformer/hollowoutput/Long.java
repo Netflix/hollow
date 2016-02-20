@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class Long {
 
-    public long val;
+    public long val = java.lang.Long.MIN_VALUE;
 
     public Long() { }
 

@@ -4,9 +4,9 @@ import java.util.Arrays;
 
 public class Quote {
 
-    public int characterId;
-    public char[] rawL10nLabel;
-    public int sequenceNumber;
+    public int characterId = java.lang.Integer.MIN_VALUE;
+    public char[] rawL10nLabel = null;
+    public int sequenceNumber = java.lang.Integer.MIN_VALUE;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

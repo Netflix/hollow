@@ -3,9 +3,9 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class TrickPlayDownloadable {
 
-    public Strings fileName;
-    public BaseDownloadable baseDownloadable;
-    public TrickPlayDescriptor descriptor;
+    public Strings fileName = null;
+    public BaseDownloadable baseDownloadable = null;
+    public TrickPlayDescriptor descriptor = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

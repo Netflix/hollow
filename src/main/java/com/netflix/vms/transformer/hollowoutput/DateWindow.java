@@ -3,8 +3,8 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class DateWindow {
 
-    public long startDateTimestamp;
-    public long endDateTimestamp;
+    public long startDateTimestamp = java.lang.Long.MIN_VALUE;
+    public long endDateTimestamp = java.lang.Long.MIN_VALUE;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

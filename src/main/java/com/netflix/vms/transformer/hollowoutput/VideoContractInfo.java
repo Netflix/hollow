@@ -4,14 +4,14 @@ import java.util.Set;
 
 public class VideoContractInfo {
 
-    public int contractId;
-    public int primaryPackageId;
-    public int prePromotionDays;
-    public int postPromotionDays;
-    public boolean isDayAfterBroadcast;
-    public boolean hasRollingEpisodes;
-    public LinkedHashSetOfStrings cupTokens;
-    public Set<Strings> assetBcp47Codes;
+    public int contractId = java.lang.Integer.MIN_VALUE;
+    public int primaryPackageId = java.lang.Integer.MIN_VALUE;
+    public int prePromotionDays = java.lang.Integer.MIN_VALUE;
+    public int postPromotionDays = java.lang.Integer.MIN_VALUE;
+    public boolean isDayAfterBroadcast = false;
+    public boolean hasRollingEpisodes = false;
+    public LinkedHashSetOfStrings cupTokens = null;
+    public Set<Strings> assetBcp47Codes = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class __passthrough_string {
 
-    public char[] value;
+    public char[] value = null;
 
     public __passthrough_string() { }
 

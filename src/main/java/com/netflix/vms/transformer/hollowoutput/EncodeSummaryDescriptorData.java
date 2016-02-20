@@ -3,15 +3,15 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class EncodeSummaryDescriptorData {
 
-    public AssetTypeDescriptor assetType;
-    public TimedTextTypeDescriptor timedTextType;
-    public Strings audioLanguage;
-    public Strings textLanguage;
-    public boolean isNative;
-    public int encodingProfileId;
-    public boolean isSubtitleBurnedIn;
-    public boolean isImageBasedSubtitles;
-    public AssetMetaData assetMetaData;
+    public AssetTypeDescriptor assetType = null;
+    public TimedTextTypeDescriptor timedTextType = null;
+    public Strings audioLanguage = null;
+    public Strings textLanguage = null;
+    public boolean isNative = false;
+    public int encodingProfileId = java.lang.Integer.MIN_VALUE;
+    public boolean isSubtitleBurnedIn = false;
+    public boolean isImageBasedSubtitles = false;
+    public AssetMetaData assetMetaData = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

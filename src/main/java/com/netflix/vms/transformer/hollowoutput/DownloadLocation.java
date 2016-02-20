@@ -3,8 +3,8 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class DownloadLocation {
 
-    public Strings directory;
-    public Strings originServerName;
+    public Strings directory = null;
+    public Strings originServerName = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

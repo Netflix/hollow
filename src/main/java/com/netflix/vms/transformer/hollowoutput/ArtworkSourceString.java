@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class ArtworkSourceString {
 
-    public char[] value;
+    public char[] value = null;
 
     public ArtworkSourceString() { }
 

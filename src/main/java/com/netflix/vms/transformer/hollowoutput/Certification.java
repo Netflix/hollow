@@ -3,8 +3,8 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class Certification {
 
-    public MovieCertification movieCert;
-    public CertificationSystem certSystem;
+    public MovieCertification movieCert = null;
+    public CertificationSystem certSystem = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

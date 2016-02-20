@@ -5,29 +5,29 @@ import java.util.Set;
 
 public class VideoMetaData {
 
-    public boolean isTestTitle;
-    public Set<Strings> titleTypes;
-    public boolean isSearchOnly;
-    public boolean isTV;
-    public boolean hasNewContent;
-    public int year;
-    public int latestYear;
-    public boolean isTheatricalRelease;
-    public Date theatricalReleaseDate;
-    public List<VPerson> actorList;
-    public List<VPerson> directorList;
-    public List<VPerson> creatorList;
-    public int showMemberTypeId;
-    public Strings showMemberSequenceLabel;
-    public Strings copyright;
-    public Set<VideoSetType> videoSetTypes;
-    public ISOCountry countryOfOrigin;
-    public NFLocale countryOfOriginNameLocale;
-    public Strings originalLanguageBcp47code;
-    public Set<Strings> aliases;
-    public Set<Strings> episodeTypes;
-    public List<Hook> hooks;
-    public Strings overrideTitle;
+    public boolean isTestTitle = false;
+    public Set<Strings> titleTypes = null;
+    public boolean isSearchOnly = false;
+    public boolean isTV = false;
+    public boolean hasNewContent = false;
+    public int year = java.lang.Integer.MIN_VALUE;
+    public int latestYear = java.lang.Integer.MIN_VALUE;
+    public boolean isTheatricalRelease = false;
+    public Date theatricalReleaseDate = null;
+    public List<VPerson> actorList = null;
+    public List<VPerson> directorList = null;
+    public List<VPerson> creatorList = null;
+    public int showMemberTypeId = java.lang.Integer.MIN_VALUE;
+    public Strings showMemberSequenceLabel = null;
+    public Strings copyright = null;
+    public Set<VideoSetType> videoSetTypes = null;
+    public ISOCountry countryOfOrigin = null;
+    public NFLocale countryOfOriginNameLocale = null;
+    public Strings originalLanguageBcp47code = null;
+    public Set<Strings> aliases = null;
+    public Set<Strings> episodeTypes = null;
+    public List<Hook> hooks = null;
+    public Strings overrideTitle = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

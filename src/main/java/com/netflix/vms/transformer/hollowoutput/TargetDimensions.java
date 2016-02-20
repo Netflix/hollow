@@ -3,8 +3,8 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class TargetDimensions {
 
-    public int heightInPixels;
-    public int widthInPixels;
+    public int heightInPixels = java.lang.Integer.MIN_VALUE;
+    public int widthInPixels = java.lang.Integer.MIN_VALUE;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

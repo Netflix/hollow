@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class VideoNodeType {
 
-    public char[] value;
+    public char[] value = null;
 
     public VideoNodeType() { }
 

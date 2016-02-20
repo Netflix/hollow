@@ -4,8 +4,8 @@ import java.util.Map;
 
 public class DrmInfoData {
 
-    public int packageId;
-    public Map<Long, DrmInfo> downloadableIdToDrmInfoMap;
+    public int packageId = java.lang.Integer.MIN_VALUE;
+    public Map<Long, DrmInfo> downloadableIdToDrmInfoMap = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

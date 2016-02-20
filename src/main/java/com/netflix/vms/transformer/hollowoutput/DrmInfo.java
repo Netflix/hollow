@@ -4,9 +4,9 @@ import java.util.Map;
 
 public class DrmInfo {
 
-    public int drmKeyGroup;
-    public DrmKey drmKey;
-    public Map<Integer, DrmHeader> drmHeaders;
+    public int drmKeyGroup = java.lang.Integer.MIN_VALUE;
+    public DrmKey drmKey = null;
+    public Map<Integer, DrmHeader> drmHeaders = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

@@ -5,10 +5,10 @@ import java.util.List;
 
 public class BaseDownloadable {
 
-    public long downloadableId;
-    public int streamProfileId;
-    public List<Strings> originServerNames;
-    public char[] envBasedDirectory;
+    public long downloadableId = java.lang.Long.MIN_VALUE;
+    public int streamProfileId = java.lang.Integer.MIN_VALUE;
+    public List<Strings> originServerNames = null;
+    public char[] envBasedDirectory = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class SupportedCountrySetProviderKey {
 
-    public char[] value;
+    public char[] value = null;
 
     public SupportedCountrySetProviderKey() { }
 

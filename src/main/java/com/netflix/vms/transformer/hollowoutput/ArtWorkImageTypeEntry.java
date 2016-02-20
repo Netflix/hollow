@@ -4,10 +4,10 @@ import java.util.Arrays;
 
 public class ArtWorkImageTypeEntry {
 
-    public char[] nameStr;
-    public char[] unavailableFileNameStr;
-    public boolean allowMultiples;
-    public char[] recipeNameStr;
+    public char[] nameStr = null;
+    public char[] unavailableFileNameStr = null;
+    public boolean allowMultiples = false;
+    public char[] recipeNameStr = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

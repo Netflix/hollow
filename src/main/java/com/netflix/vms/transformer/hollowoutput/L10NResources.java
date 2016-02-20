@@ -5,8 +5,8 @@ import java.util.Map;
 
 public class L10NResources {
 
-    public char[] resourceIdStr;
-    public Map<NFLocale, L10NStrings> localizedStrings;
+    public char[] resourceIdStr = null;
+    public Map<NFLocale, L10NStrings> localizedStrings = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
