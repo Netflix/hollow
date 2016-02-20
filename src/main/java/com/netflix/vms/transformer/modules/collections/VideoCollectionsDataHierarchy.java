@@ -32,6 +32,7 @@ public class VideoCollectionsDataHierarchy {
     private final Map<Integer, VideoCollectionsData> supplementalVideosCollectionsData;
 
     private VideoCollectionsData currentSeason;
+    private int currentSeasonSequenceNumber;
     private Video currentSeasonVideo;
     private LinkedHashMap<Integer, VideoCollectionsData> currentSeasonEpisodes;
     private List<VideoEpisode> currentSeasonVideoEpisodesList;
@@ -67,17 +68,18 @@ public class VideoCollectionsDataHierarchy {
         addSupplementalVideoCollectionsData(supplementalVideos);
     }
 
-    public void addSeason(Integer videoId, List<SupplementalVideo> supplementalVideos) {
+    public void addSeason(Integer videoId, int sequenceNumber, List<SupplementalVideo> supplementalVideos) {
         this.currentSeasonVideo = new Video(videoId.intValue());
         this.currentSeasonEpisodes = new LinkedHashMap<Integer, VideoCollectionsData>();
         this.currentSeasonVideoEpisodesList = new ArrayList<VideoEpisode>();
         this.currentSeason = new VideoCollectionsData();
+        this.currentSeasonSequenceNumber = sequenceNumber;
         currentSeason.seasonChildren = new ArrayList<Video>();
         this.orderedSeasons.put(videoId, currentSeason);
         this.orderedSeasonEpisodes.add(currentSeasonEpisodes);
 
         topNodeVideoCollectionsData.showChildren.add(currentSeasonVideo);
-        topNodeVideoCollectionsData.episodesForSeasonSequenceNumberMap.map.put(new com.netflix.vms.transformer.hollowoutput.Integer(orderedSeasons.size()), this.currentSeasonVideoEpisodesList);
+        topNodeVideoCollectionsData.episodesForSeasonSequenceNumberMap.map.put(new com.netflix.vms.transformer.hollowoutput.Integer(sequenceNumber), this.currentSeasonVideoEpisodesList);
         topNodeVideoCollectionsData.supplementalVideos.addAll(supplementalVideos);
 
         currentSeason.nodeType = SEASON;
@@ -93,7 +95,7 @@ public class VideoCollectionsDataHierarchy {
         addSupplementalVideoCollectionsData(supplementalVideos);
     }
 
-    public void addEpisode(int videoId) {
+    public void addEpisode(int videoId, int sequenceNumber) {
         VideoCollectionsData episode = new VideoCollectionsData();
         Video v = new Video(videoId);
         currentSeason.seasonChildren.add(v);
@@ -103,9 +105,9 @@ public class VideoCollectionsDataHierarchy {
         VideoEpisode videoEpisode = new VideoEpisode();
         videoEpisode.seriesParent = currentSeasonVideo;
         videoEpisode.deliverableVideo = v;
-        videoEpisode.sequenceNumber = currentSeasonEpisodes.size();
+        videoEpisode.sequenceNumber = sequenceNumber;
         videoEpisode.showSequenceNumber = ++totalAddedEpisodes;
-        videoEpisode.seasonSequenceNumber = orderedSeasons.size();
+        videoEpisode.seasonSequenceNumber = currentSeasonSequenceNumber;
         videoEpisode.episodeSequenceNumber = currentSeasonEpisodes.size(); ///TODO: This is just a duplicate of the sequenceNumber field?
         topNodeVideoCollectionsData.videoEpisodes.add(videoEpisode);
         currentSeason.videoEpisodes.add(videoEpisode);

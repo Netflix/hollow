@@ -57,11 +57,13 @@ public class VideoCollectionsModule {
             VideoCollectionsDataHierarchy hierarchy = new VideoCollectionsDataHierarchy(topNodeId, showHierarchy.isStandalone(), getSupplementalVideos(showHierarchy, topNodeId, topNodeId));
             for(int i=0;i<showHierarchy.getSeasonIds().length;i++) {
                 int seasonId = showHierarchy.getSeasonIds()[i];
-                hierarchy.addSeason(seasonId, getSupplementalVideos(showHierarchy, seasonId, topNodeId));
+                int seasonSequenceNumber = showHierarchy.getSeasonSequenceNumbers()[i];
+                hierarchy.addSeason(seasonId, seasonSequenceNumber, getSupplementalVideos(showHierarchy, seasonId, topNodeId));
 
                 for(int j=0;j<showHierarchy.getEpisodeIds()[i].length;j++) {
                     int episodeId = showHierarchy.getEpisodeIds()[i][j];
-                    hierarchy.addEpisode(episodeId);
+                    int episodeSequenceNumber = showHierarchy.getEpisodeSequenceNumbers()[i][j];
+                    hierarchy.addEpisode(episodeId, episodeSequenceNumber);
                 }
             }
             

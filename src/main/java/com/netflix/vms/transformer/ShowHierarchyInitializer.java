@@ -68,9 +68,6 @@ public class ShowHierarchyInitializer {
         for(CountryVideoDisplaySetHollow set : displaySet._getSets()) {
             String countryCode = set._getCountryCode()._getValue();
 
-            /*if(topNodeId == 60034584 && "AO".equals(countryCode))
-                System.out.println("asdf");*/
-
             if(!isTopNodeIncluded(topNodeId, countryCode))
                 continue;
             
@@ -125,7 +122,7 @@ public class ShowHierarchyInitializer {
             return true;
 
         for(VideoTypeMediaHollow media : countryType._getMedia()) {
-            if(media._getValue()._isValueEqual("PLASTIC"))
+            if(media._getValue()._isValueEqual("Plastic"))
                 return true;
         }
 
