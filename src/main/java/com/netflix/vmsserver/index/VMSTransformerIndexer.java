@@ -23,7 +23,7 @@ public class VMSTransformerIndexer {
     public static final IndexSpec VIDEO_RIGHTS = new IndexSpec(PRIMARY_KEY, "VideoRights", "movieId", "countryCode.value");
     public static final IndexSpec ROLLOUT_VIDEO_TYPE = new IndexSpec(PRIMARY_KEY, "Rollout", "movieId", "rolloutType.value");
 
-    public static final IndexSpec VIDEO_COUNTRY_FUTURE = new IndexSpec(HASH, "VideoType", "type.element", "videoId", "type.element.countryCode.value");
+    public static final IndexSpec VIDEO_TYPE_COUNTRY = new IndexSpec(HASH, "VideoType", "type.element", "videoId", "type.element.countryCode.value");
 
 
     private final Map<IndexSpec, Object> indexMap;

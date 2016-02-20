@@ -1,5 +1,7 @@
 package com.netflix.vmsserver;
 
+import com.netflix.vmsserver.index.VMSTransformerIndexer;
+
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
@@ -20,7 +22,9 @@ public class SimpleTransformer {
 
     public HollowWriteStateEngine transform(HollowReadStateEngine inputStateEngine, VMSHollowVideoInputAPI api) throws Exception {
 
-        final VideoCollectionsBuilder collectionsBuilder = new VideoCollectionsBuilder(api);
+        VMSTransformerIndexer indexer = new VMSTransformerIndexer(inputStateEngine, new SimultaneousExecutor());
+
+        final VideoCollectionsBuilder collectionsBuilder = new VideoCollectionsBuilder(api, indexer);
 
         HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();  //TODO: Need to define a HashCodeFinder.
         final HollowObjectMapper objectMapper = new HollowObjectMapper(writeStateEngine);

@@ -1,9 +1,13 @@
 package com.netflix.vmsserver.videocollectionsdata;
 
+import static com.netflix.vmsserver.index.VMSTransformerIndexer.ROLLOUT_VIDEO_TYPE;
+import static com.netflix.vmsserver.index.VMSTransformerIndexer.SUPPLEMENTAL;
+import static com.netflix.vmsserver.index.VMSTransformerIndexer.VIDEO_RIGHTS;
+import static com.netflix.vmsserver.index.VMSTransformerIndexer.VIDEO_TYPE_COUNTRY;
+
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.hollowinput.CountryVideoDisplaySetHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.IndividualTrailerHollow;
@@ -19,6 +23,7 @@ import com.netflix.vms.transformer.hollowinput.VideoTypeMediaHollow;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.SupplementalVideo;
 import com.netflix.vms.transformer.hollowoutput.Video;
+import com.netflix.vmsserver.index.VMSTransformerIndexer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,13 +46,12 @@ public class VideoCollectionsBuilder {
     private final HollowPrimaryKeyIndex rolloutVideoTypeIndex;
     private final Set<Integer> supplementalIds;
 
-    public VideoCollectionsBuilder(VMSHollowVideoInputAPI videoAPI) {
+    public VideoCollectionsBuilder(VMSHollowVideoInputAPI videoAPI, VMSTransformerIndexer indexer) {
         this.videoAPI = videoAPI;
-        HollowReadStateEngine stateEngine = (HollowReadStateEngine)videoAPI.getDataAccess();
-        this.supplementalIndex = new HollowPrimaryKeyIndex(stateEngine, "Trailer", "movieId");
-        this.videoTypeCountryIndex = new HollowHashIndex(stateEngine, "VideoType", "type.element", "videoId", "type.element.countryCode.value");
-        this.videoRightsIndex = new HollowPrimaryKeyIndex(stateEngine, "VideoRights", "movieId", "countryCode.value");
-        this.rolloutVideoTypeIndex = new HollowPrimaryKeyIndex(stateEngine, "Rollout", "movieId", "rolloutType.value");
+        this.supplementalIndex = indexer.getPrimaryKeyIndex(SUPPLEMENTAL); //new HollowPrimaryKeyIndex(stateEngine, "Trailer", "movieId");
+        this.videoTypeCountryIndex = indexer.getHashIndex(VIDEO_TYPE_COUNTRY); //new HollowHashIndex(stateEngine, "VideoType", "type.element", "videoId", "type.element.countryCode.value");
+        this.videoRightsIndex = indexer.getPrimaryKeyIndex(VIDEO_RIGHTS); //new HollowPrimaryKeyIndex(stateEngine, "VideoRights", "movieId", "countryCode.value");
+        this.rolloutVideoTypeIndex = indexer.getPrimaryKeyIndex(ROLLOUT_VIDEO_TYPE); //new HollowPrimaryKeyIndex(stateEngine, "Rollout", "movieId", "rolloutType.value");
         this.supplementalIds = findAllSupplementalVideoIds(videoAPI);
     }
 
