@@ -88,6 +88,16 @@ public class SimpleTransformer {
                     }
                 }
             }
+
+            for(Map.Entry<Integer, VideoCollectionsData> supplementalEntry : hierarchy.getSupplementalVideosCollectionsData().entrySet()) {
+                CompleteVideo supplementalNode = new CompleteVideo();
+                supplementalNode.country = country;
+                supplementalNode.id = new Video(supplementalEntry.getKey().intValue());
+                supplementalNode.facetData = new CompleteVideoFacetData();
+                supplementalNode.facetData.videoCollectionsData = supplementalEntry.getValue();
+
+                objectMapper.addObject(supplementalNode);
+            }
         }
     }
 
