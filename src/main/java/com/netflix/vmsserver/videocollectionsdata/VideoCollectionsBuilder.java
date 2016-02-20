@@ -1,10 +1,8 @@
 package com.netflix.vmsserver.videocollectionsdata;
 
-import static com.netflix.vmsserver.index.VMSTransformerIndexer.ROLLOUT_VIDEO_TYPE;
-import static com.netflix.vmsserver.index.VMSTransformerIndexer.SUPPLEMENTAL;
-import static com.netflix.vmsserver.index.VMSTransformerIndexer.VIDEO_RIGHTS;
-import static com.netflix.vmsserver.index.VMSTransformerIndexer.VIDEO_TYPE_COUNTRY;
+import com.netflix.vmsserver.index.IndexSpec;
 
+import com.netflix.vms.transformer.hollowinput.VideoRightsWindowHollow;
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
@@ -48,10 +46,13 @@ public class VideoCollectionsBuilder {
 
     public VideoCollectionsBuilder(VMSHollowVideoInputAPI videoAPI, VMSTransformerIndexer indexer) {
         this.videoAPI = videoAPI;
-        this.supplementalIndex = indexer.getPrimaryKeyIndex(SUPPLEMENTAL); //new HollowPrimaryKeyIndex(stateEngine, "Trailer", "movieId");
-        this.videoTypeCountryIndex = indexer.getHashIndex(VIDEO_TYPE_COUNTRY); //new HollowHashIndex(stateEngine, "VideoType", "type.element", "videoId", "type.element.countryCode.value");
-        this.videoRightsIndex = indexer.getPrimaryKeyIndex(VIDEO_RIGHTS); //new HollowPrimaryKeyIndex(stateEngine, "VideoRights", "movieId", "countryCode.value");
-        this.rolloutVideoTypeIndex = indexer.getPrimaryKeyIndex(ROLLOUT_VIDEO_TYPE); //new HollowPrimaryKeyIndex(stateEngine, "Rollout", "movieId", "rolloutType.value");
+        this.supplementalIndex = indexer.getPrimaryKeyIndex(IndexSpec.SUPPLEMENTAL);
+        this.videoTypeCountryIndex = indexer.getHashIndex(IndexSpec.VIDEO_TYPE_COUNTRY);
+        this.videoRightsIndex = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_RIGHTS);
+        this.rolloutVideoTypeIndex = indexer.getPrimaryKeyIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
+
+        //indexer.getPrimaryKeyIndex()
+
         this.supplementalIds = findAllSupplementalVideoIds(videoAPI);
     }
 
@@ -77,11 +78,6 @@ public class VideoCollectionsBuilder {
 
         for(CountryVideoDisplaySetHollow set : displaySet._getSets()) {
             String countryCode = set._getCountryCode()._getValue();
-
-            if(topNodeId == 70283260L && "AX".equals(countryCode)) {
-                System.out.println("ASDF");
-            }
-
 
             if(!isTopNodeIncluded(topNodeId, countryCode))
                 continue;
@@ -205,7 +201,12 @@ public class VideoCollectionsBuilder {
         if(videoRights._getFlags()._getFirstDisplayDate() != null)
             return true;
 
-        //// TODO: ALSO NEED TO CHECK IF A VALID AVAILABILITY WINDOW EXISTS.  IF SO, RETURN TRUE
+        Set<VideoRightsWindowHollow> windowSet = videoRights._getRights()._getWindows();
+
+        if(!windowSet.isEmpty())
+            return true;
+
+        videoRights._getRights()._getContracts();
 
         return false;
     }

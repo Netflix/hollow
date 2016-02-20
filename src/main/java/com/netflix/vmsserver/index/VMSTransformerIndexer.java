@@ -1,16 +1,10 @@
 package com.netflix.vmsserver.index;
 
-import static com.netflix.vmsserver.index.IndexSpec.IndexType.HASH;
-import static com.netflix.vmsserver.index.IndexSpec.IndexType.PRIMARY_KEY;
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -19,22 +13,13 @@ import java.util.concurrent.Future;
 
 public class VMSTransformerIndexer {
 
-    public static final IndexSpec SUPPLEMENTAL = new IndexSpec(PRIMARY_KEY, "Trailer", "movieId");
-    public static final IndexSpec VIDEO_RIGHTS = new IndexSpec(PRIMARY_KEY, "VideoRights", "movieId", "countryCode.value");
-    public static final IndexSpec ROLLOUT_VIDEO_TYPE = new IndexSpec(PRIMARY_KEY, "Rollout", "movieId", "rolloutType.value");
-
-    public static final IndexSpec VIDEO_TYPE_COUNTRY = new IndexSpec(HASH, "VideoType", "type.element", "videoId", "type.element.countryCode.value");
-
-
     private final Map<IndexSpec, Object> indexMap;
 
     public VMSTransformerIndexer(HollowReadStateEngine stateEngine, ExecutorService executor) {
         try {
-            List<IndexSpec> definedIndexSpecs = retrieveDefinedIndexSpecsViaReflection();
-
             Map<IndexSpec, Object> indexMap = new HashMap<IndexSpec, Object>();
 
-            submitIndexingJobs(stateEngine, executor, definedIndexSpecs, indexMap);
+            submitIndexingJobs(stateEngine, executor, indexMap);
             gatherResultsFromIndexingJobs(indexMap);
 
             this.indexMap = indexMap;
@@ -51,20 +36,8 @@ public class VMSTransformerIndexer {
         return (HollowHashIndex) indexMap.get(spec);
     }
 
-    private List<IndexSpec> retrieveDefinedIndexSpecsViaReflection() throws IllegalAccessException {
-        List<IndexSpec> definedIndexSpecs = new ArrayList<IndexSpec>();
-        Field[] declaredFields = this.getClass().getDeclaredFields();
-
-        for(Field field : declaredFields) {
-            if(field.getType() == IndexSpec.class && Modifier.isStatic(field.getModifiers())) {
-                definedIndexSpecs.add((IndexSpec)field.get(null));
-            }
-        }
-        return definedIndexSpecs;
-    }
-
-    private void submitIndexingJobs(HollowReadStateEngine stateEngine, ExecutorService executor, List<IndexSpec> definedIndexSpecs, Map<IndexSpec, Object> indexMap) {
-        for(IndexSpec spec : definedIndexSpecs) {
+    private void submitIndexingJobs(HollowReadStateEngine stateEngine, ExecutorService executor, Map<IndexSpec, Object> indexMap) {
+        for(IndexSpec spec : IndexSpec.values()) {
             switch(spec.getIndexType()) {
             case PRIMARY_KEY:
                 indexMap.put(spec, primaryKeyIdx(executor, stateEngine, spec));
