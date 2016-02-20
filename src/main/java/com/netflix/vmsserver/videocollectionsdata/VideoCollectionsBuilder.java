@@ -88,11 +88,11 @@ public class VideoCollectionsBuilder {
                 ShowHierarchy showHierarchy = new ShowHierarchy((int)topNodeId, set, countryCode, this);
                 hierarchy = uniqueVideoCollectionsHierarchies.get(showHierarchy);
                 if(hierarchy == null) {
-                    hierarchy = new VideoCollectionsDataHierarchy((int)topNodeId, false, getSupplementalVideos(topNodeId));
+                    hierarchy = new VideoCollectionsDataHierarchy((int)topNodeId, false, getSupplementalVideos(topNodeId, topNodeId, countryCode));
 
                     for(int i=0;i<showHierarchy.getSeasonIds().length;i++) {
                         int seasonId = showHierarchy.getSeasonIds()[i];
-                        hierarchy.addSeason(seasonId, getSupplementalVideos(seasonId));
+                        hierarchy.addSeason(seasonId, getSupplementalVideos(seasonId, topNodeId, countryCode));
 
                         for(int j=0;j<showHierarchy.getEpisodeIds()[i].length;j++) {
                             int episodeId = showHierarchy.getEpisodeIds()[i][j];
@@ -104,7 +104,7 @@ public class VideoCollectionsBuilder {
                 }
             } else if(set._getSetType()._isValueEqual("Standalone")){
                 if(standaloneHierarchy == null)
-                    standaloneHierarchy = new VideoCollectionsDataHierarchy((int)topNodeId, true, getSupplementalVideos(topNodeId));
+                    standaloneHierarchy = new VideoCollectionsDataHierarchy((int)topNodeId, true, getSupplementalVideos(topNodeId, topNodeId, countryCode));
                 hierarchy = standaloneHierarchy;
             }
 
@@ -115,7 +115,7 @@ public class VideoCollectionsBuilder {
         return videoCollectionsDataByCountry;
     }
 
-    private List<SupplementalVideo> getSupplementalVideos(long videoId) {
+    private List<SupplementalVideo> getSupplementalVideos(long videoId, long parentVideoId, String countryCode) {
         int supplementalsOrdinal = supplementalIndex.getMatchingOrdinal(videoId);
 
         if(supplementalsOrdinal == -1)
@@ -125,13 +125,18 @@ public class VideoCollectionsBuilder {
 
         TrailerHollow supplementals = videoAPI.getTrailerHollow(supplementalsOrdinal);
         for(IndividualTrailerHollow supplemental : supplementals._getTrailers()) {
-            SupplementalVideo supp = new SupplementalVideo();
-            supp.id = new Video((int) supplemental._getMovieId());
-            supp.attributes = new HashMap<Strings, Strings>();
-            supp.attributes.put(POST_PLAY, new Strings(supplemental._getPostPlay()._getValue()));
-            supp.attributes.put(TYPE, TRAILER);
-            supp.attributes.put(SUB_TYPE, new Strings(supplemental._getSubType()._getValue()));
-            supplementalVideos.add(supp);
+            if(isChildNodeIncluded(supplemental._getMovieId(), countryCode)) {
+
+                SupplementalVideo supp = new SupplementalVideo();
+                supp.id = new Video((int) supplemental._getMovieId());
+                supp.parent = new Video((int) parentVideoId);
+                supp.attributes = new HashMap<Strings, Strings>();
+                supp.attributes.put(POST_PLAY, new Strings(supplemental._getPostPlay()._getValue()));
+                supp.attributes.put(TYPE, TRAILER);
+                supp.attributes.put(SUB_TYPE, new Strings(supplemental._getSubType()._getValue()));
+                supplementalVideos.add(supp);
+
+            }
        }
 
         return supplementalVideos;
