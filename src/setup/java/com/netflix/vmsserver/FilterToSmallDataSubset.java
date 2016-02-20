@@ -1,5 +1,9 @@
 package com.netflix.vmsserver;
 
+import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
+
+import com.netflix.hollow.index.HollowHashIndexResult;
+import com.netflix.hollow.index.HollowHashIndex;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
@@ -47,6 +51,7 @@ public class FilterToSmallDataSubset {
 
     private HollowReadStateEngine stateEngine;
     private HollowPrimaryKeyIndex globalVideoIdx;
+    private HollowHashIndex completeVideoIdx;
     private VMSRawHollowAPI outputAPI;
 
     private Map<String, BitSet> ordinalsToInclude;
@@ -64,10 +69,12 @@ public class FilterToSmallDataSubset {
 
         outputAPI = new VMSRawHollowAPI(stateEngine);
         globalVideoIdx = new HollowPrimaryKeyIndex(stateEngine, "GlobalVideo", "completeVideo.id.value");
+        completeVideoIdx = new HollowHashIndex(stateEngine, "CompleteVideo", "", "id.value");
         ordinalsToInclude = new HashMap<String, BitSet>();
 
 
         Set<Integer> includedVideoIds = findRandomVideoIds(stateEngine);
+        //includedVideoIds.add(80004761);
 
         BitSet completeVideosToInclude = findIncludedOrdinals("CompleteVideo", includedVideoIds, new VideoIdDeriver() {
             public Integer deriveId(int ordinal) {
@@ -313,26 +320,36 @@ public class FilterToSmallDataSubset {
 
             if(ordinalIsPopulated("GlobalVideo", randomOrdinal)) {
                 GlobalVideoHollow vid = (GlobalVideoHollow)outputAPI.getGlobalVideoHollow(randomOrdinal);
-                VideoCollectionsDataHollow videoCollectionsData = vid._getCompleteVideo()._getFacetData()._getVideoCollectionsData();
-                VideoNodeTypeHollow nodeType = videoCollectionsData._getNodeType();
-                if(nodeType._isValueEqual("SHOW") || nodeType._isValueEqual("MOVIE")) {
-                    Integer videoId = vid._getCompleteVideo()._getId()._getValueBoxed();
-                    topNodeVideoIds.add(videoId);
-                    allVideoIds.add(videoId);
 
-                    for(VideoEpisodeHollow episode : videoCollectionsData._getVideoEpisodes()) {
-                        Integer episodeId = episode._getDeliverableVideo()._getValueBoxed();
-                        allVideoIds.add(episodeId);
-                        addAllSupplementalVideoIds(episodeId, allVideoIds);
+                HollowHashIndexResult completeVideos = completeVideoIdx.findMatches(vid._getCompleteVideo()._getId()._getValueBoxed());
+
+                HollowOrdinalIterator completeVideoIterator = completeVideos.iterator();
+                int completeVideoOrdinal = completeVideoIterator.next();
+
+                while(completeVideoOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+                    VideoCollectionsDataHollow videoCollectionsData = outputAPI.getCompleteVideoHollow(completeVideoOrdinal)._getFacetData()._getVideoCollectionsData();
+                    VideoNodeTypeHollow nodeType = videoCollectionsData._getNodeType();
+                    if(nodeType._isValueEqual("SHOW") || nodeType._isValueEqual("MOVIE")) {
+                        Integer videoId = vid._getCompleteVideo()._getId()._getValueBoxed();
+                        topNodeVideoIds.add(videoId);
+                        allVideoIds.add(videoId);
+
+                        for(VideoEpisodeHollow episode : videoCollectionsData._getVideoEpisodes()) {
+                            Integer episodeId = episode._getDeliverableVideo()._getValueBoxed();
+                            allVideoIds.add(episodeId);
+                            addAllSupplementalVideoIds(episodeId, allVideoIds);
+                        }
+
+                        for(VideoHollow season : videoCollectionsData._getShowChildren()) {
+                            Integer seasonId = season._getValueBoxed();
+                            allVideoIds.add(seasonId);
+                            addAllSupplementalVideoIds(seasonId, allVideoIds);
+                        }
+
+                        addAllSupplementalVideoIds(videoId, allVideoIds);
                     }
 
-                    for(VideoHollow season : videoCollectionsData._getShowChildren()) {
-                        Integer seasonId = season._getValueBoxed();
-                        allVideoIds.add(seasonId);
-                        addAllSupplementalVideoIds(seasonId, allVideoIds);
-                    }
-
-                    addAllSupplementalVideoIds(videoId, allVideoIds);
+                    completeVideoOrdinal = completeVideoIterator.next();
                 }
             }
         }
