@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-import java.util.Set;
 import java.util.Arrays;
+import java.util.Set;
 
 public class EncodingProfileGroup {
 

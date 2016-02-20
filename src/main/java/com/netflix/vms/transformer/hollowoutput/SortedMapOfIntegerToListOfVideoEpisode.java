@@ -1,10 +1,12 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-import java.util.Map;
+import com.netflix.hollow.write.objectmapper.HollowTypeName;
 import java.util.List;
+import java.util.Map;
 
 public class SortedMapOfIntegerToListOfVideoEpisode {
 
+    @HollowTypeName(name="SortedMapOfIntegerToListOfVideoEpisode_map")
     public Map<Integer, List<VideoEpisode>> map;
 
     public SortedMapOfIntegerToListOfVideoEpisode() { }

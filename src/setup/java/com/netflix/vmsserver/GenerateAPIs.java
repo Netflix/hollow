@@ -2,9 +2,13 @@ package com.netflix.vmsserver;
 
 import com.netflix.hollow.HollowSchema;
 import com.netflix.hollow.codegen.HollowAPIGenerator;
+import com.netflix.hollow.codegen.HollowPOJOGenerator;
 import com.netflix.hollow.util.HollowSchemaParser;
 import com.netflix.hollow.util.HollowTypeWriteStateCreator;
 import com.netflix.hollow.write.HollowWriteStateEngine;
+import com.netflix.hollow.zenoadapter.HollowSerializationFramework;
+import com.netflix.videometadata.hollow.VMSObjectHashCodeFinder;
+import com.netflix.videometadata.serializer.framework.VMSSerializerFactory;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collection;
@@ -28,7 +32,7 @@ public class GenerateAPIs {
     }
 
 
-    /*@Test
+    @Test
     public void bootstrapOutputPOJOs() throws IOException {
         HollowSerializationFramework hollowFramework = new HollowSerializationFramework(VMSSerializerFactory.getInstance(), new VMSObjectHashCodeFinder());
         HollowWriteStateEngine stateEngine = hollowFramework.getStateEngine();
@@ -36,6 +40,6 @@ public class GenerateAPIs {
         HollowPOJOGenerator generator = new HollowPOJOGenerator("com.netflix.vms.transformer.hollowoutput", stateEngine);
 
         generator.generateFiles(TRANSFORMER_PROJECT_BASE_DIR + "/src/main/java/com/netflix/vms/transformer/hollowoutput");
-    }*/
+    }
 
 }

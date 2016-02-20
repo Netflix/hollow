@@ -1,9 +1,11 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import com.netflix.hollow.write.objectmapper.HollowTypeName;
 import java.util.List;
 
 public class LinkedHashSetOfStrings {
 
+    @HollowTypeName(name="LinkedHashSetOfStrings_ordinals")
     public List<Strings> ordinals;
 
     public LinkedHashSetOfStrings() { }

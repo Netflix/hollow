@@ -1,9 +1,7 @@
 package com.netflix.vmsserver;
 
-import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
-import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
@@ -15,23 +13,14 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
 import com.netflix.vmsserver.videocollectionsdata.VideoCollectionsBuilder;
 import com.netflix.vmsserver.videocollectionsdata.VideoCollectionsDataHierarchy;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.Test;
 
-public class SimpleServerPrototype {
+public class SimpleTransformer {
 
-    @Test
-    public void test() throws Exception {
-        HollowReadStateEngine videosStateEngine = loadStateEngine("/space/hollowinput/VMSInputVideosData.hollow");
-        VMSHollowVideoInputAPI videosAPI = new VMSHollowVideoInputAPI(videosStateEngine);
+    public HollowWriteStateEngine transform(HollowReadStateEngine inputStateEngine, VMSHollowVideoInputAPI api) throws Exception {
 
-        final VideoCollectionsBuilder collectionsBuilder = new VideoCollectionsBuilder(videosAPI);
+        final VideoCollectionsBuilder collectionsBuilder = new VideoCollectionsBuilder(api);
 
         HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();  //TODO: Need to define a HashCodeFinder.
         final HollowObjectMapper objectMapper = new HollowObjectMapper(writeStateEngine);
@@ -40,7 +29,7 @@ public class SimpleServerPrototype {
 
         long startTime = System.currentTimeMillis();
 
-        for(final VideoDisplaySetHollow displaySet : videosAPI.getAllVideoDisplaySetHollow()) {
+        for(final VideoDisplaySetHollow displaySet : api.getAllVideoDisplaySetHollow()) {
             executor.execute(new Runnable() {
                 public void run() {
                     Map<String, VideoCollectionsDataHierarchy> vcdByCountry = collectionsBuilder.buildVideoCollectionsDataByCountry(displaySet);
@@ -56,23 +45,8 @@ public class SimpleServerPrototype {
         long endTime = System.currentTimeMillis();
         System.out.println("Processed all videos in " + (endTime - startTime) + "ms");
 
-        HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
-        BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream("/space/simplified-server-diff/VideoCollectionsData.hollow"));
-        writer.writeSnapshot(os);
-        os.close();
+        return writeStateEngine;
     }
-
-
-    private HollowReadStateEngine loadStateEngine(String snapshotFilename) throws IOException {
-        HollowReadStateEngine stateEngine = new HollowReadStateEngine();
-
-        HollowBlobReader reader = new HollowBlobReader(stateEngine);
-
-        reader.readSnapshot(new BufferedInputStream(new FileInputStream(snapshotFilename)));
-
-        return stateEngine;
-    }
-
 
     private void writeJustTheVideoCollectionsDatas(Map<String, VideoCollectionsDataHierarchy> vcdByCountry, HollowObjectMapper objectMapper) {
         for(Map.Entry<String, VideoCollectionsDataHierarchy> countryHierarchyEntry : vcdByCountry.entrySet()) {
