@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
 
-public class NFResourceID {
+public class NFResourceID implements Cloneable {
 
     public char[] value = null;
 
@@ -24,6 +24,12 @@ public class NFResourceID {
         NFResourceID o = (NFResourceID) other;
         if(!Arrays.equals(o.value, value)) return false;
         return true;
+    }
+
+    public NFResourceID clone() {
+        try {
+            return (NFResourceID)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

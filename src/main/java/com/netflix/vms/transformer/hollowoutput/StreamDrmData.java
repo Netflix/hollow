@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class StreamDrmData {
+public class StreamDrmData implements Cloneable {
 
     public DrmKey drmKey = null;
     public WmDrmKey wmDrmKey = null;
@@ -19,6 +19,12 @@ public class StreamDrmData {
             if(wmDrmKey != null) return false;
         } else if(!o.wmDrmKey.equals(wmDrmKey)) return false;
         return true;
+    }
+
+    public StreamDrmData clone() {
+        try {
+            return (StreamDrmData)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

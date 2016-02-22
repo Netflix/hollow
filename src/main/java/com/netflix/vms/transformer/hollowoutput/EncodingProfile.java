@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 import java.util.Arrays;
 import java.util.Set;
 
-public class EncodingProfile {
+public class EncodingProfile implements Cloneable {
 
     public int id = java.lang.Integer.MIN_VALUE;
     public char[] name26AndBelowStr = null;
@@ -45,6 +45,12 @@ public class EncodingProfile {
             if(videoDimensionsDescriptor != null) return false;
         } else if(!o.videoDimensionsDescriptor.equals(videoDimensionsDescriptor)) return false;
         return true;
+    }
+
+    public EncodingProfile clone() {
+        try {
+            return (EncodingProfile)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

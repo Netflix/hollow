@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class ICSMReview {
+public class ICSMReview implements Cloneable {
 
     public int movieID = java.lang.Integer.MIN_VALUE;
     public Strings title = null;
@@ -141,6 +141,12 @@ public class ICSMReview {
             if(studio != null) return false;
         } else if(!o.studio.equals(studio)) return false;
         return true;
+    }
+
+    public ICSMReview clone() {
+        try {
+            return (ICSMReview)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

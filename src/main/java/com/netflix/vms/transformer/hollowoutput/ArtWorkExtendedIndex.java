@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.List;
 
-public class ArtWorkExtendedIndex {
+public class ArtWorkExtendedIndex implements Cloneable {
 
     public List<ArtWorkDescriptor> artWorkList = null;
 
@@ -22,6 +22,12 @@ public class ArtWorkExtendedIndex {
             if(artWorkList != null) return false;
         } else if(!o.artWorkList.equals(artWorkList)) return false;
         return true;
+    }
+
+    public ArtWorkExtendedIndex clone() {
+        try {
+            return (ArtWorkExtendedIndex)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

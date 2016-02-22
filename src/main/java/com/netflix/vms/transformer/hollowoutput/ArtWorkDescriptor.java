@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 import java.util.Map;
 import java.util.Set;
 
-public class ArtWorkDescriptor {
+public class ArtWorkDescriptor implements Cloneable {
 
     public NFLocale locale = null;
     public ArtWorkImageFormatEntry format = null;
@@ -53,6 +53,12 @@ public class ArtWorkDescriptor {
         } else if(!o.source.equals(source)) return false;
         if(o.file_seq != file_seq) return false;
         return true;
+    }
+
+    public ArtWorkDescriptor clone() {
+        try {
+            return (ArtWorkDescriptor)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

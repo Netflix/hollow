@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
 
-public class ImageDownloadableDescriptor {
+public class ImageDownloadableDescriptor implements Cloneable {
 
     public int streamProfileId = java.lang.Integer.MIN_VALUE;
     public VideoResolution videoResolution = null;
@@ -28,6 +28,12 @@ public class ImageDownloadableDescriptor {
         } else if(!o.videoFormat.equals(videoFormat)) return false;
         if(!Arrays.equals(o.envBasedDirectory, envBasedDirectory)) return false;
         return true;
+    }
+
+    public ImageDownloadableDescriptor clone() {
+        try {
+            return (ImageDownloadableDescriptor)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

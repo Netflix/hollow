@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class VPerson {
+public class VPerson implements Cloneable {
 
     public int id = java.lang.Integer.MIN_VALUE;
 
@@ -19,6 +19,12 @@ public class VPerson {
         VPerson o = (VPerson) other;
         if(o.id != id) return false;
         return true;
+    }
+
+    public VPerson clone() {
+        try {
+            return (VPerson)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

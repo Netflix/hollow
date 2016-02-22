@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class FileEncodingData {
+public class FileEncodingData implements Cloneable {
 
     public long downloadableId = java.lang.Long.MIN_VALUE;
     public CodecPrivateDataString codecPrivateData = null;
@@ -25,6 +25,12 @@ public class FileEncodingData {
         if(o.dashHeaderSize != dashHeaderSize) return false;
         if(o.dashMediaStartByteOffset != dashMediaStartByteOffset) return false;
         return true;
+    }
+
+    public FileEncodingData clone() {
+        try {
+            return (FileEncodingData)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

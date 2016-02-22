@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class VideoMediaData {
+public class VideoMediaData implements Cloneable {
 
     public boolean isAvailableForED = false;
     public boolean isGoLive = false;
@@ -31,6 +31,12 @@ public class VideoMediaData {
         if(o.approximateRuntimeInSeconds != approximateRuntimeInSeconds) return false;
         if(o.isLanguageOverride != isLanguageOverride) return false;
         return true;
+    }
+
+    public VideoMediaData clone() {
+        try {
+            return (VideoMediaData)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

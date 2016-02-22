@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class AssetLocation {
+public class AssetLocation implements Cloneable {
 
     public Strings recipeDescriptor = null;
     public int cdnId = java.lang.Integer.MIN_VALUE;
@@ -21,6 +21,12 @@ public class AssetLocation {
             if(cdnDirectory != null) return false;
         } else if(!o.cdnDirectory.equals(cdnDirectory)) return false;
         return true;
+    }
+
+    public AssetLocation clone() {
+        try {
+            return (AssetLocation)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

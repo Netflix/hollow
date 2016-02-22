@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Map;
 
-public class VMSAvailabilityWindow {
+public class VMSAvailabilityWindow implements Cloneable {
 
     public Date startDate = null;
     public Date endDate = null;
@@ -26,6 +26,12 @@ public class VMSAvailabilityWindow {
             if(windowInfosByPackageId != null) return false;
         } else if(!o.windowInfosByPackageId.equals(windowInfosByPackageId)) return false;
         return true;
+    }
+
+    public VMSAvailabilityWindow clone() {
+        try {
+            return (VMSAvailabilityWindow)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

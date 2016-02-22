@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class CupKey {
+public class CupKey implements Cloneable {
 
     public Strings token = null;
 
@@ -21,6 +21,12 @@ public class CupKey {
             if(token != null) return false;
         } else if(!o.token.equals(token)) return false;
         return true;
+    }
+
+    public CupKey clone() {
+        try {
+            return (CupKey)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 import com.netflix.hollow.write.objectmapper.HollowTypeName;
 import java.util.List;
 
-public class LinkedHashSetOfStrings {
+public class LinkedHashSetOfStrings implements Cloneable {
 
     @HollowTypeName(name="LinkedHashSetOfStrings_ordinals")
     public List<Strings> ordinals = null;
@@ -24,6 +24,12 @@ public class LinkedHashSetOfStrings {
             if(ordinals != null) return false;
         } else if(!o.ordinals.equals(ordinals)) return false;
         return true;
+    }
+
+    public LinkedHashSetOfStrings clone() {
+        try {
+            return (LinkedHashSetOfStrings)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

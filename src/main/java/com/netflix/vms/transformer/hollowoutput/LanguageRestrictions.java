@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Set;
 
-public class LanguageRestrictions {
+public class LanguageRestrictions implements Cloneable {
 
     public int audioLanguageId = java.lang.Integer.MIN_VALUE;
     public Strings audioLanguage = null;
@@ -28,6 +28,12 @@ public class LanguageRestrictions {
         } else if(!o.disallowedTimedTextBcp47codes.equals(disallowedTimedTextBcp47codes)) return false;
         if(o.requiresForcedSubtitles != requiresForcedSubtitles) return false;
         return true;
+    }
+
+    public LanguageRestrictions clone() {
+        try {
+            return (LanguageRestrictions)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
 
-public class DefaultExtensionRecipe {
+public class DefaultExtensionRecipe implements Cloneable {
 
     public char[] extensionStr = null;
     public char[] recipeNameStr = null;
@@ -16,6 +16,12 @@ public class DefaultExtensionRecipe {
         if(!Arrays.equals(o.extensionStr, extensionStr)) return false;
         if(!Arrays.equals(o.recipeNameStr, recipeNameStr)) return false;
         return true;
+    }
+
+    public DefaultExtensionRecipe clone() {
+        try {
+            return (DefaultExtensionRecipe)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

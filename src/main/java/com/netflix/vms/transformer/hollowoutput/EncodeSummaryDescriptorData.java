@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class EncodeSummaryDescriptorData {
+public class EncodeSummaryDescriptorData implements Cloneable {
 
     public AssetTypeDescriptor assetType = null;
     public TimedTextTypeDescriptor timedTextType = null;
@@ -39,6 +39,12 @@ public class EncodeSummaryDescriptorData {
             if(assetMetaData != null) return false;
         } else if(!o.assetMetaData.equals(assetMetaData)) return false;
         return true;
+    }
+
+    public EncodeSummaryDescriptorData clone() {
+        try {
+            return (EncodeSummaryDescriptorData)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

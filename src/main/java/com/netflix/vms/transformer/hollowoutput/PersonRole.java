@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class PersonRole {
+public class PersonRole implements Cloneable {
 
     public VPerson person = null;
     public VRole roleType = null;
@@ -25,6 +25,12 @@ public class PersonRole {
         } else if(!o.video.equals(video)) return false;
         if(o.weight != weight) return false;
         return true;
+    }
+
+    public PersonRole clone() {
+        try {
+            return (PersonRole)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

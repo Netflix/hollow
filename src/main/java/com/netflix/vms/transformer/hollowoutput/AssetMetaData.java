@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class AssetMetaData {
+public class AssetMetaData implements Cloneable {
 
     public Strings id = null;
 
@@ -21,6 +21,12 @@ public class AssetMetaData {
             if(id != null) return false;
         } else if(!o.id.equals(id)) return false;
         return true;
+    }
+
+    public AssetMetaData clone() {
+        try {
+            return (AssetMetaData)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class VideoAwardType {
+public class VideoAwardType implements Cloneable {
 
     public int id = java.lang.Integer.MIN_VALUE;
     public VideoAwardFestival festival = null;
@@ -17,6 +17,12 @@ public class VideoAwardType {
             if(festival != null) return false;
         } else if(!o.festival.equals(festival)) return false;
         return true;
+    }
+
+    public VideoAwardType clone() {
+        try {
+            return (VideoAwardType)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

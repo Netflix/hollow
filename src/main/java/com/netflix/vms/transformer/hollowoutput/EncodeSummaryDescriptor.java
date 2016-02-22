@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.List;
 
-public class EncodeSummaryDescriptor {
+public class EncodeSummaryDescriptor implements Cloneable {
 
     public boolean fromMuxedOnlyStreams = false;
     public List<Long> downloadableIds = null;
@@ -22,6 +22,12 @@ public class EncodeSummaryDescriptor {
             if(descriptorData != null) return false;
         } else if(!o.descriptorData.equals(descriptorData)) return false;
         return true;
+    }
+
+    public EncodeSummaryDescriptor clone() {
+        try {
+            return (EncodeSummaryDescriptor)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

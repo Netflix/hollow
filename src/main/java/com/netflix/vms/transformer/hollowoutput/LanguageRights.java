@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Map;
 
-public class LanguageRights {
+public class LanguageRights implements Cloneable {
 
     public int contractId = java.lang.Integer.MIN_VALUE;
     public Video videoId = null;
@@ -26,6 +26,12 @@ public class LanguageRights {
             if(fallbackRestrictionsMap != null) return false;
         } else if(!o.fallbackRestrictionsMap.equals(fallbackRestrictionsMap)) return false;
         return true;
+    }
+
+    public LanguageRights clone() {
+        try {
+            return (LanguageRights)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

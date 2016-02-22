@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class NamedCollectionHolder_CountryList {
+public class NamedCollectionHolder_CountryList implements Cloneable {
 
     public ISOCountry country = null;
     public NamedCollectionHolder item = null;
@@ -19,6 +19,12 @@ public class NamedCollectionHolder_CountryList {
             if(item != null) return false;
         } else if(!o.item.equals(item)) return false;
         return true;
+    }
+
+    public NamedCollectionHolder_CountryList clone() {
+        try {
+            return (NamedCollectionHolder_CountryList)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
 
-public class Strings {
+public class Strings implements Cloneable {
 
     public char[] value = null;
 
@@ -24,6 +24,12 @@ public class Strings {
         Strings o = (Strings) other;
         if(!Arrays.equals(o.value, value)) return false;
         return true;
+    }
+
+    public Strings clone() {
+        try {
+            return (Strings)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

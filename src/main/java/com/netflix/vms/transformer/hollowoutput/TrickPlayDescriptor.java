@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class TrickPlayDescriptor {
+public class TrickPlayDescriptor implements Cloneable {
 
     public int width = java.lang.Integer.MIN_VALUE;
     public int height = java.lang.Integer.MIN_VALUE;
@@ -15,6 +15,12 @@ public class TrickPlayDescriptor {
         if(o.width != width) return false;
         if(o.height != height) return false;
         return true;
+    }
+
+    public TrickPlayDescriptor clone() {
+        try {
+            return (TrickPlayDescriptor)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

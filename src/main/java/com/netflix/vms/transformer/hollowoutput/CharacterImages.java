@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.List;
 
-public class CharacterImages {
+public class CharacterImages implements Cloneable {
 
     public int id = java.lang.Integer.MIN_VALUE;
     public List<ArtWorkDescriptor> artWorkDescriptorList = null;
@@ -18,6 +18,12 @@ public class CharacterImages {
             if(artWorkDescriptorList != null) return false;
         } else if(!o.artWorkDescriptorList.equals(artWorkDescriptorList)) return false;
         return true;
+    }
+
+    public CharacterImages clone() {
+        try {
+            return (CharacterImages)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

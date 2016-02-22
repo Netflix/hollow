@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class CompleteVideoFacetData {
+public class CompleteVideoFacetData implements Cloneable {
 
     public VideoMetaData videoMetaData = null;
     public VideoCollectionsData videoCollectionsData = null;
@@ -31,6 +31,12 @@ public class CompleteVideoFacetData {
             if(videoMediaData != null) return false;
         } else if(!o.videoMediaData.equals(videoMediaData)) return false;
         return true;
+    }
+
+    public CompleteVideoFacetData clone() {
+        try {
+            return (CompleteVideoFacetData)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

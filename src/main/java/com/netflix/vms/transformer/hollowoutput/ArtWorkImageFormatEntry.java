@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
 
-public class ArtWorkImageFormatEntry {
+public class ArtWorkImageFormatEntry implements Cloneable {
 
     public char[] nameStr = null;
     public int width = java.lang.Integer.MIN_VALUE;
@@ -18,6 +18,12 @@ public class ArtWorkImageFormatEntry {
         if(o.width != width) return false;
         if(o.height != height) return false;
         return true;
+    }
+
+    public ArtWorkImageFormatEntry clone() {
+        try {
+            return (ArtWorkImageFormatEntry)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

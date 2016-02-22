@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class StreamAdditionalData {
+public class StreamAdditionalData implements Cloneable {
 
     public FrameRate frameRate = null;
     public DownloadLocationSet downloadLocations = null;
@@ -27,6 +27,12 @@ public class StreamAdditionalData {
             if(mostlyConstantData != null) return false;
         } else if(!o.mostlyConstantData.equals(mostlyConstantData)) return false;
         return true;
+    }
+
+    public StreamAdditionalData clone() {
+        try {
+            return (StreamAdditionalData)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

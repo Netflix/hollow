@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class Boolean {
+public class Boolean implements Cloneable {
 
     public boolean val = false;
 
@@ -19,6 +19,12 @@ public class Boolean {
         Boolean o = (Boolean) other;
         if(o.val != val) return false;
         return true;
+    }
+
+    public Boolean clone() {
+        try {
+            return (Boolean)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

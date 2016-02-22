@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
 
-public class CodecPrivateDataString {
+public class CodecPrivateDataString implements Cloneable {
 
     public char[] value = null;
 
@@ -24,6 +24,12 @@ public class CodecPrivateDataString {
         CodecPrivateDataString o = (CodecPrivateDataString) other;
         if(!Arrays.equals(o.value, value)) return false;
         return true;
+    }
+
+    public CodecPrivateDataString clone() {
+        try {
+            return (CodecPrivateDataString)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

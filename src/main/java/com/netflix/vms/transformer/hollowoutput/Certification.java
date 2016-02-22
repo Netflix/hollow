@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class Certification {
+public class Certification implements Cloneable {
 
     public MovieCertification movieCert = null;
     public CertificationSystem certSystem = null;
@@ -19,6 +19,12 @@ public class Certification {
             if(certSystem != null) return false;
         } else if(!o.certSystem.equals(certSystem)) return false;
         return true;
+    }
+
+    public Certification clone() {
+        try {
+            return (Certification)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

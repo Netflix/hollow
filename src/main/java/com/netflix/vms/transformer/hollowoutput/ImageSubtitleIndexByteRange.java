@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class ImageSubtitleIndexByteRange {
+public class ImageSubtitleIndexByteRange implements Cloneable {
 
     public long masterIndexOffset = java.lang.Long.MIN_VALUE;
     public int masterIndexSize = java.lang.Integer.MIN_VALUE;
@@ -15,6 +15,12 @@ public class ImageSubtitleIndexByteRange {
         if(o.masterIndexOffset != masterIndexOffset) return false;
         if(o.masterIndexSize != masterIndexSize) return false;
         return true;
+    }
+
+    public ImageSubtitleIndexByteRange clone() {
+        try {
+            return (ImageSubtitleIndexByteRange)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

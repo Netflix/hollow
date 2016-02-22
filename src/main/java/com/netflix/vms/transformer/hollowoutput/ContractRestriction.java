@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ContractRestriction {
+public class ContractRestriction implements Cloneable {
 
     public Set<Long> excludedDownloadables = null;
     public AvailabilityWindow availabilityWindow = null;
@@ -34,6 +34,12 @@ public class ContractRestriction {
             if(languageBcp47RestrictionsMap != null) return false;
         } else if(!o.languageBcp47RestrictionsMap.equals(languageBcp47RestrictionsMap)) return false;
         return true;
+    }
+
+    public ContractRestriction clone() {
+        try {
+            return (ContractRestriction)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

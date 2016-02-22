@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
 
-public class NFLocale {
+public class NFLocale implements Cloneable {
 
     public char[] value = null;
 
@@ -24,6 +24,12 @@ public class NFLocale {
         NFLocale o = (NFLocale) other;
         if(!Arrays.equals(o.value, value)) return false;
         return true;
+    }
+
+    public NFLocale clone() {
+        try {
+            return (NFLocale)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

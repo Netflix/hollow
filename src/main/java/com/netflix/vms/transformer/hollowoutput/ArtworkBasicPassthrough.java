@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.List;
 
-public class ArtworkBasicPassthrough {
+public class ArtworkBasicPassthrough implements Cloneable {
 
     public List<__passthrough_string> themes = null;
     public PassthroughString tone = null;
@@ -46,6 +46,12 @@ public class ArtworkBasicPassthrough {
         } else if(!o.approval_source.equals(approval_source)) return false;
         if(o.approval_state != approval_state) return false;
         return true;
+    }
+
+    public ArtworkBasicPassthrough clone() {
+        try {
+            return (ArtworkBasicPassthrough)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

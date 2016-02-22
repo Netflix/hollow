@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.List;
 
-public class VideoMiscData {
+public class VideoMiscData implements Cloneable {
 
     public List<VideoAward> videoAwards = null;
     public ICSMReview cSMReview = null;
@@ -20,6 +20,12 @@ public class VideoMiscData {
             if(cSMReview != null) return false;
         } else if(!o.cSMReview.equals(cSMReview)) return false;
         return true;
+    }
+
+    public VideoMiscData clone() {
+        try {
+            return (VideoMiscData)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

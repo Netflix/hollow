@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 import java.util.Arrays;
 import java.util.Set;
 
-public class StorageGroup {
+public class StorageGroup implements Cloneable {
 
     public char[] idStr = null;
     public Set<ISOCountry> countries = null;
@@ -19,6 +19,12 @@ public class StorageGroup {
             if(countries != null) return false;
         } else if(!o.countries.equals(countries)) return false;
         return true;
+    }
+
+    public StorageGroup clone() {
+        try {
+            return (StorageGroup)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

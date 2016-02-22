@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class Episode {
+public class Episode implements Cloneable {
 
     public int id = java.lang.Integer.MIN_VALUE;
 
@@ -19,6 +19,12 @@ public class Episode {
         Episode o = (Episode) other;
         if(o.id != id) return false;
         return true;
+    }
+
+    public Episode clone() {
+        try {
+            return (Episode)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

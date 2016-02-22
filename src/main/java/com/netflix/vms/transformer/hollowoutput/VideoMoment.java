@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.List;
 
-public class VideoMoment {
+public class VideoMoment implements Cloneable {
 
     public Strings videoMomentTypeName = null;
     public int sequenceNumber = java.lang.Integer.MIN_VALUE;
@@ -30,6 +30,12 @@ public class VideoMoment {
         if(o.packageId != packageId) return false;
         if(o.bifIndex != bifIndex) return false;
         return true;
+    }
+
+    public VideoMoment clone() {
+        try {
+            return (VideoMoment)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

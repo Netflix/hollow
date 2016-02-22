@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class VideoEpisode {
+public class VideoEpisode implements Cloneable {
 
     public Video seriesParent = null;
     public Video deliverableVideo = null;
@@ -27,6 +27,12 @@ public class VideoEpisode {
         if(o.seasonSequenceNumber != seasonSequenceNumber) return false;
         if(o.episodeSequenceNumber != episodeSequenceNumber) return false;
         return true;
+    }
+
+    public VideoEpisode clone() {
+        try {
+            return (VideoEpisode)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

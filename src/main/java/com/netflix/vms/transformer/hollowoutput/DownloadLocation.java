@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class DownloadLocation {
+public class DownloadLocation implements Cloneable {
 
     public Strings directory = null;
     public Strings originServerName = null;
@@ -19,6 +19,12 @@ public class DownloadLocation {
             if(originServerName != null) return false;
         } else if(!o.originServerName.equals(originServerName)) return false;
         return true;
+    }
+
+    public DownloadLocation clone() {
+        try {
+            return (DownloadLocation)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

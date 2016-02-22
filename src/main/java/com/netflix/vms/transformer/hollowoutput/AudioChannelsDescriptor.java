@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class AudioChannelsDescriptor {
+public class AudioChannelsDescriptor implements Cloneable {
 
     public int numberOfChannels = java.lang.Integer.MIN_VALUE;
     public Strings name = null;
@@ -21,6 +21,12 @@ public class AudioChannelsDescriptor {
             if(description != null) return false;
         } else if(!o.description.equals(description)) return false;
         return true;
+    }
+
+    public AudioChannelsDescriptor clone() {
+        try {
+            return (AudioChannelsDescriptor)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

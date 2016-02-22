@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 import java.util.List;
 import java.util.Map;
 
-public class SupplementalVideo {
+public class SupplementalVideo implements Cloneable {
 
     public Video id = null;
     public Video parent = null;
@@ -33,6 +33,12 @@ public class SupplementalVideo {
             if(multiValueAttributes != null) return false;
         } else if(!o.multiValueAttributes.equals(multiValueAttributes)) return false;
         return true;
+    }
+
+    public SupplementalVideo clone() {
+        try {
+            return (SupplementalVideo)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

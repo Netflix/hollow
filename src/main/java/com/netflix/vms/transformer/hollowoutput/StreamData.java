@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class StreamData {
+public class StreamData implements Cloneable {
 
     public long downloadableId = java.lang.Long.MIN_VALUE;
     public int packageId = java.lang.Integer.MIN_VALUE;
@@ -39,6 +39,12 @@ public class StreamData {
             if(streamDataDescriptor != null) return false;
         } else if(!o.streamDataDescriptor.equals(streamDataDescriptor)) return false;
         return true;
+    }
+
+    public StreamData clone() {
+        try {
+            return (StreamData)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

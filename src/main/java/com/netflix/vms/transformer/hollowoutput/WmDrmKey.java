@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class WmDrmKey {
+public class WmDrmKey implements Cloneable {
 
     public long downloadableId = java.lang.Long.MIN_VALUE;
     public DrmKeyString contentPackagerPublicKey = null;
@@ -21,6 +21,12 @@ public class WmDrmKey {
             if(encryptedContentKey != null) return false;
         } else if(!o.encryptedContentKey.equals(encryptedContentKey)) return false;
         return true;
+    }
+
+    public WmDrmKey clone() {
+        try {
+            return (WmDrmKey)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

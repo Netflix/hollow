@@ -4,7 +4,7 @@ import com.netflix.hollow.write.objectmapper.HollowTypeName;
 import java.util.List;
 import java.util.Map;
 
-public class SortedMapOfDateWindowToListOfInteger {
+public class SortedMapOfDateWindowToListOfInteger implements Cloneable {
 
     @HollowTypeName(name="SortedMapOfDateWindowToListOfInteger_map")
     public Map<DateWindow, List<Integer>> map = null;
@@ -25,6 +25,12 @@ public class SortedMapOfDateWindowToListOfInteger {
             if(map != null) return false;
         } else if(!o.map.equals(map)) return false;
         return true;
+    }
+
+    public SortedMapOfDateWindowToListOfInteger clone() {
+        try {
+            return (SortedMapOfDateWindowToListOfInteger)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

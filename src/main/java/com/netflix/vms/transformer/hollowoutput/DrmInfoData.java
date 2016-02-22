@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Map;
 
-public class DrmInfoData {
+public class DrmInfoData implements Cloneable {
 
     public int packageId = java.lang.Integer.MIN_VALUE;
     public Map<Long, DrmInfo> downloadableIdToDrmInfoMap = null;
@@ -18,6 +18,12 @@ public class DrmInfoData {
             if(downloadableIdToDrmInfoMap != null) return false;
         } else if(!o.downloadableIdToDrmInfoMap.equals(downloadableIdToDrmInfoMap)) return false;
         return true;
+    }
+
+    public DrmInfoData clone() {
+        try {
+            return (DrmInfoData)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

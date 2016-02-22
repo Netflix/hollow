@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.List;
 
-public class ImageDownloadable {
+public class ImageDownloadable implements Cloneable {
 
     public long downloadableId = java.lang.Long.MIN_VALUE;
     public List<Strings> originServerNames = null;
@@ -22,6 +22,12 @@ public class ImageDownloadable {
             if(descriptor != null) return false;
         } else if(!o.descriptor.equals(descriptor)) return false;
         return true;
+    }
+
+    public ImageDownloadable clone() {
+        try {
+            return (ImageDownloadable)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

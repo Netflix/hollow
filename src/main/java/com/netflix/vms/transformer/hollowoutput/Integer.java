@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class Integer {
+public class Integer implements Cloneable {
 
     public int val = java.lang.Integer.MIN_VALUE;
 
@@ -19,6 +19,12 @@ public class Integer {
         Integer o = (Integer) other;
         if(o.val != val) return false;
         return true;
+    }
+
+    public Integer clone() {
+        try {
+            return (Integer)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.List;
 
-public class BasicPassthroughLists {
+public class BasicPassthroughLists implements Cloneable {
 
     public List<SuperFloat> floatList = null;
 
@@ -22,6 +22,12 @@ public class BasicPassthroughLists {
             if(floatList != null) return false;
         } else if(!o.floatList.equals(floatList)) return false;
         return true;
+    }
+
+    public BasicPassthroughLists clone() {
+        try {
+            return (BasicPassthroughLists)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

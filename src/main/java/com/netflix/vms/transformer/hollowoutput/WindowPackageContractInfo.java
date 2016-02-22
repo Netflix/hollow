@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class WindowPackageContractInfo {
+public class WindowPackageContractInfo implements Cloneable {
 
     public VideoContractInfo videoContractInfo = null;
     public VideoPackageInfo videoPackageInfo = null;
@@ -19,6 +19,12 @@ public class WindowPackageContractInfo {
             if(videoPackageInfo != null) return false;
         } else if(!o.videoPackageInfo.equals(videoPackageInfo)) return false;
         return true;
+    }
+
+    public WindowPackageContractInfo clone() {
+        try {
+            return (WindowPackageContractInfo)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

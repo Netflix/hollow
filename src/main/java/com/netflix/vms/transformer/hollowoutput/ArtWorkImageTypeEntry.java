@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
 
-public class ArtWorkImageTypeEntry {
+public class ArtWorkImageTypeEntry implements Cloneable {
 
     public char[] nameStr = null;
     public char[] unavailableFileNameStr = null;
@@ -20,6 +20,12 @@ public class ArtWorkImageTypeEntry {
         if(o.allowMultiples != allowMultiples) return false;
         if(!Arrays.equals(o.recipeNameStr, recipeNameStr)) return false;
         return true;
+    }
+
+    public ArtWorkImageTypeEntry clone() {
+        try {
+            return (ArtWorkImageTypeEntry)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

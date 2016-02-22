@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
 
-public class L10NStrings {
+public class L10NStrings implements Cloneable {
 
     public char[] value = null;
 
@@ -24,6 +24,12 @@ public class L10NStrings {
         L10NStrings o = (L10NStrings) other;
         if(!Arrays.equals(o.value, value)) return false;
         return true;
+    }
+
+    public L10NStrings clone() {
+        try {
+            return (L10NStrings)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

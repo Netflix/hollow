@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 import java.util.List;
 import java.util.Set;
 
-public class VideoMetaData {
+public class VideoMetaData implements Cloneable {
 
     public boolean isTestTitle = false;
     public Set<Strings> titleTypes = null;
@@ -89,6 +89,12 @@ public class VideoMetaData {
             if(overrideTitle != null) return false;
         } else if(!o.overrideTitle.equals(overrideTitle)) return false;
         return true;
+    }
+
+    public VideoMetaData clone() {
+        try {
+            return (VideoMetaData)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

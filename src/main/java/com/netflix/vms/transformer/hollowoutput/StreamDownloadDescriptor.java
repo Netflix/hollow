@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class StreamDownloadDescriptor {
+public class StreamDownloadDescriptor implements Cloneable {
 
     public ProfileTypeDescriptor profileType = null;
     public int streamProfileId = java.lang.Integer.MIN_VALUE;
@@ -35,6 +35,12 @@ public class StreamDownloadDescriptor {
             if(languageBcp47code != null) return false;
         } else if(!o.languageBcp47code.equals(languageBcp47code)) return false;
         return true;
+    }
+
+    public StreamDownloadDescriptor clone() {
+        try {
+            return (StreamDownloadDescriptor)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

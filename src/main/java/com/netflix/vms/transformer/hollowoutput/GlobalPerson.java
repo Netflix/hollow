@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.List;
 
-public class GlobalPerson {
+public class GlobalPerson implements Cloneable {
 
     public int id = java.lang.Integer.MIN_VALUE;
     public List<Integer> aliasesIds = null;
@@ -22,6 +22,12 @@ public class GlobalPerson {
             if(personRoles != null) return false;
         } else if(!o.personRoles.equals(personRoles)) return false;
         return true;
+    }
+
+    public GlobalPerson clone() {
+        try {
+            return (GlobalPerson)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
 
-public class ChunkDurationsString {
+public class ChunkDurationsString implements Cloneable {
 
     public char[] value = null;
 
@@ -24,6 +24,12 @@ public class ChunkDurationsString {
         ChunkDurationsString o = (ChunkDurationsString) other;
         if(!Arrays.equals(o.value, value)) return false;
         return true;
+    }
+
+    public ChunkDurationsString clone() {
+        try {
+            return (ChunkDurationsString)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

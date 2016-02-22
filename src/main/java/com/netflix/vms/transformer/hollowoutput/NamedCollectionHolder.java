@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 import java.util.Map;
 import java.util.Set;
 
-public class NamedCollectionHolder {
+public class NamedCollectionHolder implements Cloneable {
 
     public ISOCountry country = null;
     public Map<Strings, Set<Video>> videoListMap = null;
@@ -33,6 +33,12 @@ public class NamedCollectionHolder {
             if(resourceIdListMap != null) return false;
         } else if(!o.resourceIdListMap.equals(resourceIdListMap)) return false;
         return true;
+    }
+
+    public NamedCollectionHolder clone() {
+        try {
+            return (NamedCollectionHolder)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

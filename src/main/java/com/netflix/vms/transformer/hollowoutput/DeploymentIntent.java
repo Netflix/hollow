@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class DeploymentIntent {
+public class DeploymentIntent implements Cloneable {
 
     public int profileId = java.lang.Integer.MIN_VALUE;
     public int bitrate = java.lang.Integer.MIN_VALUE;
@@ -19,6 +19,12 @@ public class DeploymentIntent {
             if(country != null) return false;
         } else if(!o.country.equals(country)) return false;
         return true;
+    }
+
+    public DeploymentIntent clone() {
+        try {
+            return (DeploymentIntent)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

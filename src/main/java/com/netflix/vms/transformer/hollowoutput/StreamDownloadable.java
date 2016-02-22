@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.List;
 
-public class StreamDownloadable {
+public class StreamDownloadable implements Cloneable {
 
     public long downloadableId = java.lang.Long.MIN_VALUE;
     public List<Strings> originServerNames = null;
@@ -22,6 +22,12 @@ public class StreamDownloadable {
             if(descriptor != null) return false;
         } else if(!o.descriptor.equals(descriptor)) return false;
         return true;
+    }
+
+    public StreamDownloadable clone() {
+        try {
+            return (StreamDownloadable)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

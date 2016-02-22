@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class MovieCertification {
+public class MovieCertification implements Cloneable {
 
     public Video videoId = null;
     public int certificationSystemId = java.lang.Integer.MIN_VALUE;
@@ -25,6 +25,12 @@ public class MovieCertification {
             if(ratingReason != null) return false;
         } else if(!o.ratingReason.equals(ratingReason)) return false;
         return true;
+    }
+
+    public MovieCertification clone() {
+        try {
+            return (MovieCertification)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

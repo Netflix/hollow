@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class Hook {
+public class Hook implements Cloneable {
 
     public HookType type = null;
     public int rank = java.lang.Integer.MIN_VALUE;
@@ -21,6 +21,12 @@ public class Hook {
             if(video != null) return false;
         } else if(!o.video.equals(video)) return false;
         return true;
+    }
+
+    public Hook clone() {
+        try {
+            return (Hook)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

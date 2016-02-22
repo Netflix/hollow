@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class CompleteVideo {
+public class CompleteVideo implements Cloneable {
 
     public Video id = null;
     public ISOCountry country = null;
@@ -27,6 +27,12 @@ public class CompleteVideo {
             if(countrySpecificData != null) return false;
         } else if(!o.countrySpecificData.equals(countrySpecificData)) return false;
         return true;
+    }
+
+    public CompleteVideo clone() {
+        try {
+            return (CompleteVideo)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

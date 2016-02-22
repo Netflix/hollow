@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class VRole {
+public class VRole implements Cloneable {
 
     public int id = java.lang.Integer.MIN_VALUE;
 
@@ -19,6 +19,12 @@ public class VRole {
         VRole o = (VRole) other;
         if(o.id != id) return false;
         return true;
+    }
+
+    public VRole clone() {
+        try {
+            return (VRole)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

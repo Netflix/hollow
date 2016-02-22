@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class SuperFloat {
+public class SuperFloat implements Cloneable {
 
     public float value = java.lang.Float.NaN;
 
@@ -19,6 +19,12 @@ public class SuperFloat {
         SuperFloat o = (SuperFloat) other;
         if(o.value != value) return false;
         return true;
+    }
+
+    public SuperFloat clone() {
+        try {
+            return (SuperFloat)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

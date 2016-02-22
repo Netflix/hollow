@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
 
-public class RolloutInfo {
+public class RolloutInfo implements Cloneable {
 
     public int rolloutId = java.lang.Integer.MIN_VALUE;
     public Video video = null;
@@ -22,6 +22,12 @@ public class RolloutInfo {
         if(!Arrays.equals(o.type, type)) return false;
         if(!Arrays.equals(o.name, name)) return false;
         return true;
+    }
+
+    public RolloutInfo clone() {
+        try {
+            return (RolloutInfo)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

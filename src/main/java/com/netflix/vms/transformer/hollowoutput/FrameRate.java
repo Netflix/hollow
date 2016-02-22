@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class FrameRate {
+public class FrameRate implements Cloneable {
 
     public float val = java.lang.Float.NaN;
 
@@ -19,6 +19,12 @@ public class FrameRate {
         FrameRate o = (FrameRate) other;
         if(o.val != val) return false;
         return true;
+    }
+
+    public FrameRate clone() {
+        try {
+            return (FrameRate)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

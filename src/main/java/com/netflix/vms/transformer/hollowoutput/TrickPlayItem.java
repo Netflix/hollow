@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class TrickPlayItem {
+public class TrickPlayItem implements Cloneable {
 
     public Video videoId = null;
     public int imageCount = java.lang.Integer.MIN_VALUE;
@@ -21,6 +21,12 @@ public class TrickPlayItem {
             if(trickPlayDownloadable != null) return false;
         } else if(!o.trickPlayDownloadable.equals(trickPlayDownloadable)) return false;
         return true;
+    }
+
+    public TrickPlayItem clone() {
+        try {
+            return (TrickPlayItem)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

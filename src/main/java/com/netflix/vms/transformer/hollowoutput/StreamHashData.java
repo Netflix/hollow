@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class StreamHashData {
+public class StreamHashData implements Cloneable {
 
     public long cRC32Hash = java.lang.Long.MIN_VALUE;
     public long sha1_1 = java.lang.Long.MIN_VALUE;
@@ -19,6 +19,12 @@ public class StreamHashData {
         if(o.sha1_2 != sha1_2) return false;
         if(o.sha1_3 != sha1_3) return false;
         return true;
+    }
+
+    public StreamHashData clone() {
+        try {
+            return (StreamHashData)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

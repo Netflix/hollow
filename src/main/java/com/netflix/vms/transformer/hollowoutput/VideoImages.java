@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.List;
 
-public class VideoImages {
+public class VideoImages implements Cloneable {
 
     public List<ArtWorkDescriptor> artWorkDescriptors = null;
     public ArtWorkIndex artWorkIndex = null;
@@ -20,6 +20,12 @@ public class VideoImages {
             if(artWorkIndex != null) return false;
         } else if(!o.artWorkIndex.equals(artWorkIndex)) return false;
         return true;
+    }
+
+    public VideoImages clone() {
+        try {
+            return (VideoImages)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

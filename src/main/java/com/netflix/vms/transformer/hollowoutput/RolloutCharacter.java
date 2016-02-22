@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 import java.util.List;
 import java.util.Map;
 
-public class RolloutCharacter {
+public class RolloutCharacter implements Cloneable {
 
     public int id = java.lang.Integer.MIN_VALUE;
     public Map<Strings, Strings> rawL10nAttribs = null;
@@ -23,6 +23,12 @@ public class RolloutCharacter {
             if(quotes != null) return false;
         } else if(!o.quotes.equals(quotes)) return false;
         return true;
+    }
+
+    public RolloutCharacter clone() {
+        try {
+            return (RolloutCharacter)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

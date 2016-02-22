@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Set;
 
-public class StreamDataDescriptor {
+public class StreamDataDescriptor implements Cloneable {
 
     public int runTimeInSeconds = java.lang.Integer.MIN_VALUE;
     public int bitrate = java.lang.Integer.MIN_VALUE;
@@ -38,6 +38,12 @@ public class StreamDataDescriptor {
             if(targetDimensions != null) return false;
         } else if(!o.targetDimensions.equals(targetDimensions)) return false;
         return true;
+    }
+
+    public StreamDataDescriptor clone() {
+        try {
+            return (StreamDataDescriptor)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class CertificationSystem {
+public class CertificationSystem implements Cloneable {
 
     public int id = java.lang.Integer.MIN_VALUE;
     public Strings officialURL = null;
@@ -21,6 +21,12 @@ public class CertificationSystem {
             if(country != null) return false;
         } else if(!o.country.equals(country)) return false;
         return true;
+    }
+
+    public CertificationSystem clone() {
+        try {
+            return (CertificationSystem)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

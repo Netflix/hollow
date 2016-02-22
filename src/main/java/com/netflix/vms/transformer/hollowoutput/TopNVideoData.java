@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 import java.util.Arrays;
 import java.util.Map;
 
-public class TopNVideoData {
+public class TopNVideoData implements Cloneable {
 
     public char[] countryId = null;
     public Map<Integer, Float> videoViewHrs1Day = null;
@@ -21,6 +21,12 @@ public class TopNVideoData {
         } else if(!o.videoViewHrs1Day.equals(videoViewHrs1Day)) return false;
         if(o.countryViewHrs1Day != countryViewHrs1Day) return false;
         return true;
+    }
+
+    public TopNVideoData clone() {
+        try {
+            return (TopNVideoData)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

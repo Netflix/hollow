@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.List;
 
-public class MovieRatingReason {
+public class MovieRatingReason implements Cloneable {
 
     public List<Integer> reasonIds = null;
     public boolean isDisplayImageOnly = false;
@@ -20,6 +20,12 @@ public class MovieRatingReason {
         if(o.isDisplayImageOnly != isDisplayImageOnly) return false;
         if(o.isDisplayOrderSpecific != isDisplayOrderSpecific) return false;
         return true;
+    }
+
+    public MovieRatingReason clone() {
+        try {
+            return (MovieRatingReason)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 import java.util.List;
 import java.util.Map;
 
-public class CompleteVideoCountrySpecificData {
+public class CompleteVideoCountrySpecificData implements Cloneable {
 
     public Date metadataAvailabilityDate = null;
     public Date firstDisplayDate = null;
@@ -41,6 +41,12 @@ public class CompleteVideoCountrySpecificData {
             if(imagesAvailabilityWindows != null) return false;
         } else if(!o.imagesAvailabilityWindows.equals(imagesAvailabilityWindows)) return false;
         return true;
+    }
+
+    public CompleteVideoCountrySpecificData clone() {
+        try {
+            return (CompleteVideoCountrySpecificData)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

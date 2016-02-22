@@ -4,7 +4,7 @@ import com.netflix.hollow.write.objectmapper.HollowTypeName;
 import java.util.List;
 import java.util.Map;
 
-public class SortedMapOfIntegerToListOfVideoEpisode {
+public class SortedMapOfIntegerToListOfVideoEpisode implements Cloneable {
 
     @HollowTypeName(name="SortedMapOfIntegerToListOfVideoEpisode_map")
     public Map<Integer, List<VideoEpisode>> map = null;
@@ -25,6 +25,12 @@ public class SortedMapOfIntegerToListOfVideoEpisode {
             if(map != null) return false;
         } else if(!o.map.equals(map)) return false;
         return true;
+    }
+
+    public SortedMapOfIntegerToListOfVideoEpisode clone() {
+        try {
+            return (SortedMapOfIntegerToListOfVideoEpisode)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

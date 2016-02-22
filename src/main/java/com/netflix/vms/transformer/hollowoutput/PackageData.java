@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 import java.util.Map;
 import java.util.Set;
 
-public class PackageData {
+public class PackageData implements Cloneable {
 
     public int id = java.lang.Integer.MIN_VALUE;
     public Video video = null;
@@ -45,6 +45,12 @@ public class PackageData {
             if(allDeployableCountries != null) return false;
         } else if(!o.allDeployableCountries.equals(allDeployableCountries)) return false;
         return true;
+    }
+
+    public PackageData clone() {
+        try {
+            return (PackageData)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

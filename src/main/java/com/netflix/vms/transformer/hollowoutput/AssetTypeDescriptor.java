@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class AssetTypeDescriptor {
+public class AssetTypeDescriptor implements Cloneable {
 
     public int id = java.lang.Integer.MIN_VALUE;
     public Strings name = null;
@@ -21,6 +21,12 @@ public class AssetTypeDescriptor {
             if(description != null) return false;
         } else if(!o.description.equals(description)) return false;
         return true;
+    }
+
+    public AssetTypeDescriptor clone() {
+        try {
+            return (AssetTypeDescriptor)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

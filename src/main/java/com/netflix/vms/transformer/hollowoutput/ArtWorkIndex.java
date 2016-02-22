@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Map;
 
-public class ArtWorkIndex {
+public class ArtWorkIndex implements Cloneable {
 
     public Map<ArtWorkImageTypeEntry, Map<ArtWorkImageFormatEntry, ArtWorkExtendedIndex>> index = null;
 
@@ -22,6 +22,12 @@ public class ArtWorkIndex {
             if(index != null) return false;
         } else if(!o.index.equals(index)) return false;
         return true;
+    }
+
+    public ArtWorkIndex clone() {
+        try {
+            return (ArtWorkIndex)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

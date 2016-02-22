@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class QoEInfo {
+public class QoEInfo implements Cloneable {
 
     public int vmafScore = java.lang.Integer.MIN_VALUE;
     public int scaledPsnrScore = java.lang.Integer.MIN_VALUE;
@@ -15,6 +15,12 @@ public class QoEInfo {
         if(o.vmafScore != vmafScore) return false;
         if(o.scaledPsnrScore != scaledPsnrScore) return false;
         return true;
+    }
+
+    public QoEInfo clone() {
+        try {
+            return (QoEInfo)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

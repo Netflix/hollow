@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
 
-public class TrailerInfo {
+public class TrailerInfo implements Cloneable {
 
     public SupplementalInfoType type = null;
     public char[] imageTag = null;
@@ -36,6 +36,12 @@ public class TrailerInfo {
         if(!Arrays.equals(o.videoValue, videoValue)) return false;
         if(o.priority != priority) return false;
         return true;
+    }
+
+    public TrailerInfo clone() {
+        try {
+            return (TrailerInfo)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

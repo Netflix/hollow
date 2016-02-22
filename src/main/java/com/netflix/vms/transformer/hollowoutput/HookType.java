@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
 
-public class HookType {
+public class HookType implements Cloneable {
 
     public char[] value = null;
 
@@ -24,6 +24,12 @@ public class HookType {
         HookType o = (HookType) other;
         if(!Arrays.equals(o.value, value)) return false;
         return true;
+    }
+
+    public HookType clone() {
+        try {
+            return (HookType)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

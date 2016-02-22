@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
 
-public class Quote {
+public class Quote implements Cloneable {
 
     public int characterId = java.lang.Integer.MIN_VALUE;
     public char[] rawL10nLabel = null;
@@ -18,6 +18,12 @@ public class Quote {
         if(!Arrays.equals(o.rawL10nLabel, rawL10nLabel)) return false;
         if(o.sequenceNumber != sequenceNumber) return false;
         return true;
+    }
+
+    public Quote clone() {
+        try {
+            return (Quote)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

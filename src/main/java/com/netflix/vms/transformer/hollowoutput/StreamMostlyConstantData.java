@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 import java.util.Arrays;
 import java.util.List;
 
-public class StreamMostlyConstantData {
+public class StreamMostlyConstantData implements Cloneable {
 
     public int deploymentLabel = java.lang.Integer.MIN_VALUE;
     public int conformingGroupId = java.lang.Integer.MIN_VALUE;
@@ -29,6 +29,12 @@ public class StreamMostlyConstantData {
         } else if(!o.tags.equals(tags)) return false;
         if(o.deploymentPriority != deploymentPriority) return false;
         return true;
+    }
+
+    public StreamMostlyConstantData clone() {
+        try {
+            return (StreamMostlyConstantData)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

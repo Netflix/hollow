@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class Long {
+public class Long implements Cloneable {
 
     public long val = java.lang.Long.MIN_VALUE;
 
@@ -19,6 +19,12 @@ public class Long {
         Long o = (Long) other;
         if(o.val != val) return false;
         return true;
+    }
+
+    public Long clone() {
+        try {
+            return (Long)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

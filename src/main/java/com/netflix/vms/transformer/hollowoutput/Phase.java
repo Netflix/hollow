@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class Phase {
+public class Phase implements Cloneable {
 
     public int rolloutId = java.lang.Integer.MIN_VALUE;
     public Video video = null;
@@ -61,6 +61,12 @@ public class Phase {
             if(sourceFileIds != null) return false;
         } else if(!o.sourceFileIds.equals(sourceFileIds)) return false;
         return true;
+    }
+
+    public Phase clone() {
+        try {
+            return (Phase)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

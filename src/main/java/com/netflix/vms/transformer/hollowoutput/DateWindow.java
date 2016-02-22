@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class DateWindow {
+public class DateWindow implements Cloneable {
 
     public long startDateTimestamp = java.lang.Long.MIN_VALUE;
     public long endDateTimestamp = java.lang.Long.MIN_VALUE;
@@ -15,6 +15,12 @@ public class DateWindow {
         if(o.startDateTimestamp != startDateTimestamp) return false;
         if(o.endDateTimestamp != endDateTimestamp) return false;
         return true;
+    }
+
+    public DateWindow clone() {
+        try {
+            return (DateWindow)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

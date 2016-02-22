@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class VideoAward {
+public class VideoAward implements Cloneable {
 
     public Video video = null;
     public VideoAwardType awardType = null;
@@ -29,6 +29,12 @@ public class VideoAward {
         if(o.year != year) return false;
         if(o.sequenceNumber != sequenceNumber) return false;
         return true;
+    }
+
+    public VideoAward clone() {
+        try {
+            return (VideoAward)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

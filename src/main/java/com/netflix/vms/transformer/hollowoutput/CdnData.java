@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class CdnData {
+public class CdnData implements Cloneable {
 
     public int id = java.lang.Integer.MIN_VALUE;
     public Strings name = null;
@@ -17,6 +17,12 @@ public class CdnData {
             if(name != null) return false;
         } else if(!o.name.equals(name)) return false;
         return true;
+    }
+
+    public CdnData clone() {
+        try {
+            return (CdnData)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

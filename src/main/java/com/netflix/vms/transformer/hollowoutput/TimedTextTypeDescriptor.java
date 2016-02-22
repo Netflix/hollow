@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
 
-public class TimedTextTypeDescriptor {
+public class TimedTextTypeDescriptor implements Cloneable {
 
     public char[] nameStr = null;
 
@@ -24,6 +24,12 @@ public class TimedTextTypeDescriptor {
         TimedTextTypeDescriptor o = (TimedTextTypeDescriptor) other;
         if(!Arrays.equals(o.nameStr, nameStr)) return false;
         return true;
+    }
+
+    public TimedTextTypeDescriptor clone() {
+        try {
+            return (TimedTextTypeDescriptor)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

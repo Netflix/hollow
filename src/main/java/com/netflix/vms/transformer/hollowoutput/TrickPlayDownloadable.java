@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class TrickPlayDownloadable {
+public class TrickPlayDownloadable implements Cloneable {
 
     public Strings fileName = null;
     public BaseDownloadable baseDownloadable = null;
@@ -23,6 +23,12 @@ public class TrickPlayDownloadable {
             if(descriptor != null) return false;
         } else if(!o.descriptor.equals(descriptor)) return false;
         return true;
+    }
+
+    public TrickPlayDownloadable clone() {
+        try {
+            return (TrickPlayDownloadable)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

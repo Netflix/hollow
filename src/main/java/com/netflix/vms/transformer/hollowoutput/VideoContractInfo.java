@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Set;
 
-public class VideoContractInfo {
+public class VideoContractInfo implements Cloneable {
 
     public int contractId = java.lang.Integer.MIN_VALUE;
     public int primaryPackageId = java.lang.Integer.MIN_VALUE;
@@ -32,6 +32,12 @@ public class VideoContractInfo {
             if(assetBcp47Codes != null) return false;
         } else if(!o.assetBcp47Codes.equals(assetBcp47Codes)) return false;
         return true;
+    }
+
+    public VideoContractInfo clone() {
+        try {
+            return (VideoContractInfo)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

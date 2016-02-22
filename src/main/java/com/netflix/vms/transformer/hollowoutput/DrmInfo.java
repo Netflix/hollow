@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Map;
 
-public class DrmInfo {
+public class DrmInfo implements Cloneable {
 
     public int drmKeyGroup = java.lang.Integer.MIN_VALUE;
     public DrmKey drmKey = null;
@@ -22,6 +22,12 @@ public class DrmInfo {
             if(drmHeaders != null) return false;
         } else if(!o.drmHeaders.equals(drmHeaders)) return false;
         return true;
+    }
+
+    public DrmInfo clone() {
+        try {
+            return (DrmInfo)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 import java.util.Arrays;
 import java.util.List;
 
-public class BaseDownloadable {
+public class BaseDownloadable implements Cloneable {
 
     public long downloadableId = java.lang.Long.MIN_VALUE;
     public int streamProfileId = java.lang.Integer.MIN_VALUE;
@@ -23,6 +23,12 @@ public class BaseDownloadable {
         } else if(!o.originServerNames.equals(originServerNames)) return false;
         if(!Arrays.equals(o.envBasedDirectory, envBasedDirectory)) return false;
         return true;
+    }
+
+    public BaseDownloadable clone() {
+        try {
+            return (BaseDownloadable)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

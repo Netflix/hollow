@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
 
-public class SupplementalInfoType {
+public class SupplementalInfoType implements Cloneable {
 
     public char[] value = null;
 
@@ -24,6 +24,12 @@ public class SupplementalInfoType {
         SupplementalInfoType o = (SupplementalInfoType) other;
         if(!Arrays.equals(o.value, value)) return false;
         return true;
+    }
+
+    public SupplementalInfoType clone() {
+        try {
+            return (SupplementalInfoType)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

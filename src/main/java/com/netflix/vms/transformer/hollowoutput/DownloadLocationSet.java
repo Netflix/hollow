@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.List;
 
-public class DownloadLocationSet {
+public class DownloadLocationSet implements Cloneable {
 
     public Strings filename = null;
     public List<DownloadLocation> locations = null;
@@ -20,6 +20,12 @@ public class DownloadLocationSet {
             if(locations != null) return false;
         } else if(!o.locations.equals(locations)) return false;
         return true;
+    }
+
+    public DownloadLocationSet clone() {
+        try {
+            return (DownloadLocationSet)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

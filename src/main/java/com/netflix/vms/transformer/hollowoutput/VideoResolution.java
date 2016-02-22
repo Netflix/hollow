@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class VideoResolution {
+public class VideoResolution implements Cloneable {
 
     public int height = java.lang.Integer.MIN_VALUE;
     public int width = java.lang.Integer.MIN_VALUE;
@@ -15,6 +15,12 @@ public class VideoResolution {
         if(o.height != height) return false;
         if(o.width != width) return false;
         return true;
+    }
+
+    public VideoResolution clone() {
+        try {
+            return (VideoResolution)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class RolloutPhaseWindow {
+public class RolloutPhaseWindow implements Cloneable {
 
     public int phaseOrdinal = java.lang.Integer.MIN_VALUE;
     public AvailabilityWindow phaseWindow = null;
@@ -17,6 +17,12 @@ public class RolloutPhaseWindow {
             if(phaseWindow != null) return false;
         } else if(!o.phaseWindow.equals(phaseWindow)) return false;
         return true;
+    }
+
+    public RolloutPhaseWindow clone() {
+        try {
+            return (RolloutPhaseWindow)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

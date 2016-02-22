@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.List;
 
-public class VideoCollectionsData {
+public class VideoCollectionsData implements Cloneable {
 
     public VideoNodeType nodeType = null;
     public VideoNodeType topNodeType = null;
@@ -56,6 +56,12 @@ public class VideoCollectionsData {
             if(episodesForSeasonSequenceNumberMap != null) return false;
         } else if(!o.episodesForSeasonSequenceNumberMap.equals(episodesForSeasonSequenceNumberMap)) return false;
         return true;
+    }
+
+    public VideoCollectionsData clone() {
+        try {
+            return (VideoCollectionsData)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

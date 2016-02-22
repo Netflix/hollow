@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class PixelAspect {
+public class PixelAspect implements Cloneable {
 
     public int height = java.lang.Integer.MIN_VALUE;
     public int width = java.lang.Integer.MIN_VALUE;
@@ -15,6 +15,12 @@ public class PixelAspect {
         if(o.height != height) return false;
         if(o.width != width) return false;
         return true;
+    }
+
+    public PixelAspect clone() {
+        try {
+            return (PixelAspect)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

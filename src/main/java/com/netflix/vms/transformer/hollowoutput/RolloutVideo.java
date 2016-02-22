@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Map;
 
-public class RolloutVideo {
+public class RolloutVideo implements Cloneable {
 
     public Video video = null;
     public Map<Strings, RolloutSummary> summaryMap = null;
@@ -20,6 +20,12 @@ public class RolloutVideo {
             if(summaryMap != null) return false;
         } else if(!o.summaryMap.equals(summaryMap)) return false;
         return true;
+    }
+
+    public RolloutVideo clone() {
+        try {
+            return (RolloutVideo)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

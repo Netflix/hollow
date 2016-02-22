@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class VideoDimensionsDescriptor {
+public class VideoDimensionsDescriptor implements Cloneable {
 
     public int dimensions = java.lang.Integer.MIN_VALUE;
     public Strings name = null;
@@ -21,6 +21,12 @@ public class VideoDimensionsDescriptor {
             if(description != null) return false;
         } else if(!o.description.equals(description)) return false;
         return true;
+    }
+
+    public VideoDimensionsDescriptor clone() {
+        try {
+            return (VideoDimensionsDescriptor)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

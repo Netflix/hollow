@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 import java.util.Arrays;
 import java.util.Map;
 
-public class DrmHeader {
+public class DrmHeader implements Cloneable {
 
     public int drmSystemId = java.lang.Integer.MIN_VALUE;
     public byte[] keyId = null;
@@ -23,6 +23,12 @@ public class DrmHeader {
             if(attributes != null) return false;
         } else if(!o.attributes.equals(attributes)) return false;
         return true;
+    }
+
+    public DrmHeader clone() {
+        try {
+            return (DrmHeader)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

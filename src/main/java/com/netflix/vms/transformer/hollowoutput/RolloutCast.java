@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class RolloutCast {
+public class RolloutCast implements Cloneable {
 
     public VPerson person = null;
     public int sequenceNumber = java.lang.Integer.MIN_VALUE;
@@ -17,6 +17,12 @@ public class RolloutCast {
         } else if(!o.person.equals(person)) return false;
         if(o.sequenceNumber != sequenceNumber) return false;
         return true;
+    }
+
+    public RolloutCast clone() {
+        try {
+            return (RolloutCast)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

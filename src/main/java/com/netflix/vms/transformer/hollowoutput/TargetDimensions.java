@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class TargetDimensions {
+public class TargetDimensions implements Cloneable {
 
     public int heightInPixels = java.lang.Integer.MIN_VALUE;
     public int widthInPixels = java.lang.Integer.MIN_VALUE;
@@ -15,6 +15,12 @@ public class TargetDimensions {
         if(o.heightInPixels != heightInPixels) return false;
         if(o.widthInPixels != widthInPixels) return false;
         return true;
+    }
+
+    public TargetDimensions clone() {
+        try {
+            return (TargetDimensions)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

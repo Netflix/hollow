@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class VideoMediaData_CountryList {
+public class VideoMediaData_CountryList implements Cloneable {
 
     public ISOCountry country = null;
     public VideoMediaData item = null;
@@ -19,6 +19,12 @@ public class VideoMediaData_CountryList {
             if(item != null) return false;
         } else if(!o.item.equals(item)) return false;
         return true;
+    }
+
+    public VideoMediaData_CountryList clone() {
+        try {
+            return (VideoMediaData_CountryList)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

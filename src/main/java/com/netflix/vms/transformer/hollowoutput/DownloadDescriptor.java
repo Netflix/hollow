@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class DownloadDescriptor {
+public class DownloadDescriptor implements Cloneable {
 
     public AssetTypeDescriptor assetTypeDescriptor = null;
     public TimedTextTypeDescriptor timedTextTypeDescriptor = null;
@@ -37,6 +37,12 @@ public class DownloadDescriptor {
             if(textLanguageBcp47code != null) return false;
         } else if(!o.textLanguageBcp47code.equals(textLanguageBcp47code)) return false;
         return true;
+    }
+
+    public DownloadDescriptor clone() {
+        try {
+            return (DownloadDescriptor)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

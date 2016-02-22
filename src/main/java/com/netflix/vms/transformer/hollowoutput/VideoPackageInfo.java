@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class VideoPackageInfo {
+public class VideoPackageInfo implements Cloneable {
 
     public int packageId = java.lang.Integer.MIN_VALUE;
     public Set<VideoFormatDescriptor> formats = null;
@@ -48,6 +48,12 @@ public class VideoPackageInfo {
             if(trickPlayMap != null) return false;
         } else if(!o.trickPlayMap.equals(trickPlayMap)) return false;
         return true;
+    }
+
+    public VideoPackageInfo clone() {
+        try {
+            return (VideoPackageInfo)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

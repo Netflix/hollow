@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class Date {
+public class Date implements Cloneable {
 
     public long val = java.lang.Long.MIN_VALUE;
 
@@ -19,6 +19,12 @@ public class Date {
         Date o = (Date) other;
         if(o.val != val) return false;
         return true;
+    }
+
+    public Date clone() {
+        try {
+            return (Date)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

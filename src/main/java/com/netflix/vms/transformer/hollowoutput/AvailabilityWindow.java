@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class AvailabilityWindow {
+public class AvailabilityWindow implements Cloneable {
 
     public Date startDate = null;
     public Date endDate = null;
@@ -19,6 +19,12 @@ public class AvailabilityWindow {
             if(endDate != null) return false;
         } else if(!o.endDate.equals(endDate)) return false;
         return true;
+    }
+
+    public AvailabilityWindow clone() {
+        try {
+            return (AvailabilityWindow)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

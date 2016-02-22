@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class RolloutSummary {
+public class RolloutSummary implements Cloneable {
 
     public char[] type = null;
     public Video video = null;
@@ -32,6 +32,12 @@ public class RolloutSummary {
             if(allPhases != null) return false;
         } else if(!o.allPhases.equals(allPhases)) return false;
         return true;
+    }
+
+    public RolloutSummary clone() {
+        try {
+            return (RolloutSummary)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

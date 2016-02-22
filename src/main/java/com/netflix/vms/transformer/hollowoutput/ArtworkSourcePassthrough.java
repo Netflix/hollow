@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class ArtworkSourcePassthrough {
+public class ArtworkSourcePassthrough implements Cloneable {
 
     public ArtworkSourceString source_file_id = null;
     public ArtworkSourceString original_source_file_id = null;
@@ -19,6 +19,12 @@ public class ArtworkSourcePassthrough {
             if(original_source_file_id != null) return false;
         } else if(!o.original_source_file_id.equals(original_source_file_id)) return false;
         return true;
+    }
+
+    public ArtworkSourcePassthrough clone() {
+        try {
+            return (ArtworkSourcePassthrough)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

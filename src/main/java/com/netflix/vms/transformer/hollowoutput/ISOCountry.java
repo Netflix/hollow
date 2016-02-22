@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
 
-public class ISOCountry {
+public class ISOCountry implements Cloneable {
 
     public char[] id = null;
 
@@ -24,6 +24,12 @@ public class ISOCountry {
         ISOCountry o = (ISOCountry) other;
         if(!Arrays.equals(o.id, id)) return false;
         return true;
+    }
+
+    public ISOCountry clone() {
+        try {
+            return (ISOCountry)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

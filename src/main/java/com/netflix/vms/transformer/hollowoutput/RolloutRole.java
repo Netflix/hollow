@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class RolloutRole {
+public class RolloutRole implements Cloneable {
 
     public int id = java.lang.Integer.MIN_VALUE;
     public int characterId = java.lang.Integer.MIN_VALUE;
@@ -21,6 +21,12 @@ public class RolloutRole {
             if(person != null) return false;
         } else if(!o.person.equals(person)) return false;
         return true;
+    }
+
+    public RolloutRole clone() {
+        try {
+            return (RolloutRole)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

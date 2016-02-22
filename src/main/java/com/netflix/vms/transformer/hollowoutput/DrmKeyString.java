@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
 
-public class DrmKeyString {
+public class DrmKeyString implements Cloneable {
 
     public char[] value = null;
 
@@ -24,6 +24,12 @@ public class DrmKeyString {
         DrmKeyString o = (DrmKeyString) other;
         if(!Arrays.equals(o.value, value)) return false;
         return true;
+    }
+
+    public DrmKeyString clone() {
+        try {
+            return (DrmKeyString)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")

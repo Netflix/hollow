@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
 
-public class OriginServer {
+public class OriginServer implements Cloneable {
 
     public char[] nameStr = null;
     public CdnData cdnData = null;
@@ -22,6 +22,12 @@ public class OriginServer {
             if(storageGroup != null) return false;
         } else if(!o.storageGroup.equals(storageGroup)) return false;
         return true;
+    }
+
+    public OriginServer clone() {
+        try {
+            return (OriginServer)super.clone();
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")
