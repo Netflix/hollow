@@ -1,7 +1,8 @@
 package com.netflix.vmsserver;
 
-import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
+import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
 
+import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowHashIndex;
 import java.io.FileNotFoundException;
@@ -51,7 +52,8 @@ public class FilterToSmallDataSubset {
 
     private HollowReadStateEngine stateEngine;
     private HollowPrimaryKeyIndex globalVideoIdx;
-    private HollowHashIndex completeVideoIdx;
+    private HollowPrimaryKeyIndex completeVideoPrimaryKeyIdx;
+    private HollowHashIndex completeVideoHashIdx;
     private VMSRawHollowAPI outputAPI;
 
     private Map<String, BitSet> ordinalsToInclude;
@@ -69,12 +71,12 @@ public class FilterToSmallDataSubset {
 
         outputAPI = new VMSRawHollowAPI(stateEngine);
         globalVideoIdx = new HollowPrimaryKeyIndex(stateEngine, "GlobalVideo", "completeVideo.id.value");
-        completeVideoIdx = new HollowHashIndex(stateEngine, "CompleteVideo", "", "id.value");
+        completeVideoHashIdx = new HollowHashIndex(stateEngine, "CompleteVideo", "", "id.value");
+        completeVideoPrimaryKeyIdx = new HollowPrimaryKeyIndex(stateEngine, "CompleteVideo", "id.value", "country.id");
         ordinalsToInclude = new HashMap<String, BitSet>();
 
 
         Set<Integer> includedVideoIds = findRandomVideoIds(stateEngine);
-        //includedVideoIds.add(80004761);
 
         BitSet completeVideosToInclude = findIncludedOrdinals("CompleteVideo", includedVideoIds, new VideoIdDeriver() {
             public Integer deriveId(int ordinal) {
@@ -321,46 +323,60 @@ public class FilterToSmallDataSubset {
             if(ordinalIsPopulated("GlobalVideo", randomOrdinal)) {
                 GlobalVideoHollow vid = (GlobalVideoHollow)outputAPI.getGlobalVideoHollow(randomOrdinal);
 
-                HollowHashIndexResult completeVideos = completeVideoIdx.findMatches(vid._getCompleteVideo()._getId()._getValueBoxed());
-
-                HollowOrdinalIterator completeVideoIterator = completeVideos.iterator();
-                int completeVideoOrdinal = completeVideoIterator.next();
-
-                while(completeVideoOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
-                    VideoCollectionsDataHollow videoCollectionsData = outputAPI.getCompleteVideoHollow(completeVideoOrdinal)._getFacetData()._getVideoCollectionsData();
-                    VideoNodeTypeHollow nodeType = videoCollectionsData._getNodeType();
-                    if(nodeType._isValueEqual("SHOW") || nodeType._isValueEqual("MOVIE")) {
-                        Integer videoId = vid._getCompleteVideo()._getId()._getValueBoxed();
-                        topNodeVideoIds.add(videoId);
-                        allVideoIds.add(videoId);
-
-                        for(VideoEpisodeHollow episode : videoCollectionsData._getVideoEpisodes()) {
-                            Integer episodeId = episode._getDeliverableVideo()._getValueBoxed();
-                            allVideoIds.add(episodeId);
-                            addAllSupplementalVideoIds(episodeId, allVideoIds);
-                        }
-
-                        for(VideoHollow season : videoCollectionsData._getShowChildren()) {
-                            Integer seasonId = season._getValueBoxed();
-                            allVideoIds.add(seasonId);
-                            addAllSupplementalVideoIds(seasonId, allVideoIds);
-                        }
-
-                        addAllSupplementalVideoIds(videoId, allVideoIds);
-                    }
-
-                    completeVideoOrdinal = completeVideoIterator.next();
-                }
+                addIdsBasedOnGlobalVideo(topNodeVideoIds, allVideoIds, vid);
             }
         }
+
+        /// The following two topnodes are a strange case: the same episodes are included in two different
+        /// show hierarchies for different countries.
+        GlobalVideoHollow vid = outputAPI.getGlobalVideoHollow(globalVideoIdx.getMatchingOrdinal(80074321));
+        addIdsBasedOnGlobalVideo(topNodeVideoIds, allVideoIds, vid);
+        vid = outputAPI.getGlobalVideoHollow(globalVideoIdx.getMatchingOrdinal(80006146));
+        addIdsBasedOnGlobalVideo(topNodeVideoIds, allVideoIds, vid);
+
         return allVideoIds;
     }
 
-    private void addAllSupplementalVideoIds(Integer videoId, Set<Integer> toSet) {
-        int globalVideoOrdinal = globalVideoIdx.getMatchingOrdinal(videoId);
-        GlobalVideoHollow vid = outputAPI.getGlobalVideoHollow(globalVideoOrdinal);
+    private void addIdsBasedOnGlobalVideo(Set<Integer> topNodeVideoIds, Set<Integer> allVideoIds, GlobalVideoHollow vid) {
+        HollowHashIndexResult completeVideos = completeVideoHashIdx.findMatches(vid._getCompleteVideo()._getId()._getValueBoxed());
 
-        VideoCollectionsDataHollow videoCollectionsData = vid._getCompleteVideo()._getFacetData()._getVideoCollectionsData();
+        HollowOrdinalIterator completeVideoIterator = completeVideos.iterator();
+        int completeVideoOrdinal = completeVideoIterator.next();
+
+        while(completeVideoOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+            CompleteVideoHollow completeVideo = outputAPI.getCompleteVideoHollow(completeVideoOrdinal);
+            String countryCode = completeVideo._getCountry()._getId();
+            VideoCollectionsDataHollow videoCollectionsData = completeVideo._getFacetData()._getVideoCollectionsData();
+            VideoNodeTypeHollow nodeType = videoCollectionsData._getNodeType();
+            if(nodeType._isValueEqual("SHOW") || nodeType._isValueEqual("MOVIE")) {
+                Integer videoId = vid._getCompleteVideo()._getId()._getValueBoxed();
+                topNodeVideoIds.add(videoId);
+                allVideoIds.add(videoId);
+
+                for(VideoEpisodeHollow episode : videoCollectionsData._getVideoEpisodes()) {
+                    Integer episodeId = episode._getDeliverableVideo()._getValueBoxed();
+                    allVideoIds.add(episodeId);
+                    addAllSupplementalVideoIds(episodeId, countryCode, allVideoIds);
+                }
+
+                for(VideoHollow season : videoCollectionsData._getShowChildren()) {
+                    Integer seasonId = season._getValueBoxed();
+                    allVideoIds.add(seasonId);
+                    addAllSupplementalVideoIds(seasonId, countryCode, allVideoIds);
+                }
+
+                addAllSupplementalVideoIds(videoId, countryCode, allVideoIds);
+            }
+
+            completeVideoOrdinal = completeVideoIterator.next();
+        }
+    }
+
+    private void addAllSupplementalVideoIds(Integer videoId, String countryCode, Set<Integer> toSet) {
+        int completeVideoOrdinal = completeVideoPrimaryKeyIdx.getMatchingOrdinal(videoId, countryCode);
+        CompleteVideoHollow vid = outputAPI.getCompleteVideoHollow(completeVideoOrdinal);
+
+        VideoCollectionsDataHollow videoCollectionsData = vid._getFacetData()._getVideoCollectionsData();
 
         for(SupplementalVideoHollow supplemental : videoCollectionsData._getSupplementalVideos()) {
             toSet.add(supplemental._getId()._getValueBoxed());
