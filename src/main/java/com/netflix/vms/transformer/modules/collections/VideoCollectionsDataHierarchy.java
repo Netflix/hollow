@@ -116,7 +116,7 @@ public class VideoCollectionsDataHierarchy {
         videoEpisode.sequenceNumber = sequenceNumber;
         videoEpisode.showSequenceNumber = ++totalAddedEpisodes;
         videoEpisode.seasonSequenceNumber = currentSeasonSequenceNumber;
-        videoEpisode.episodeSequenceNumber = currentSeasonEpisodes.size(); ///TODO: This is just a duplicate of the sequenceNumber field?
+        videoEpisode.episodeSequenceNumber = sequenceNumber; ///TODO: This is just a duplicate of the sequenceNumber field?
         topNodeVideoCollectionsData.videoEpisodes.add(videoEpisode);
         currentSeason.videoEpisodes.add(videoEpisode);
         currentSeasonVideoEpisodesList.add(videoEpisode);
