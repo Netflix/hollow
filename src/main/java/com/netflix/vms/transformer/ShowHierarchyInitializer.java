@@ -44,7 +44,7 @@ public class ShowHierarchyInitializer {
 
         this.supplementalIds = findAllSupplementalVideoIds(videoAPI);
     }
-    
+
     private Set<Integer> findAllSupplementalVideoIds(VMSHollowVideoInputAPI videoAPI) {
         Set<Integer> ids = new HashSet<Integer>();
 
@@ -56,7 +56,7 @@ public class ShowHierarchyInitializer {
 
         return ids;
     }
-    
+
     public Map<String, ShowHierarchy> getShowHierarchiesByCountry(VideoDisplaySetHollow displaySet) {
         long topNodeId = displaySet._getTopNodeId();
         if(supplementalIds.contains((int)topNodeId))
@@ -70,23 +70,25 @@ public class ShowHierarchyInitializer {
 
             if(!isTopNodeIncluded(topNodeId, countryCode))
                 continue;
-            
-            if(!set._getSetType()._isValueEqual("Standalone") && !set._getSetType()._isValueEqual("std_show"))
+
+            boolean isStandalone = set._getSetType()._isValueEqual("Standalone");
+            boolean isShow = set._getSetType()._isValueEqual("std_show");
+            if(!isStandalone && !isShow)
                 continue;
-                
-            ShowHierarchy showHierarchy = new ShowHierarchy((int)topNodeId, set, countryCode, this);
+
+            ShowHierarchy showHierarchy = new ShowHierarchy((int)topNodeId, isStandalone, set, countryCode, this);
             ShowHierarchy canonicalHierarchy = uniqueShowHierarchies.get(showHierarchy);
             if(canonicalHierarchy == null) {
                 canonicalHierarchy = showHierarchy;
                 uniqueShowHierarchies.put(showHierarchy, canonicalHierarchy);
             }
-            
+
             showHierarchiesByCountry.put(countryCode, canonicalHierarchy);
         }
 
         if(showHierarchiesByCountry.isEmpty())
             return null;
-        
+
         return showHierarchiesByCountry;
     }
 
@@ -183,7 +185,7 @@ public class ShowHierarchyInitializer {
 
         return false;
     }
-    
+
     void addSupplementalVideos(long videoId, String countryCode, IntList toList) {
         int supplementalsOrdinal = supplementalIndex.getMatchingOrdinal(videoId);
 
