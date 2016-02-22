@@ -22,6 +22,8 @@ public interface IndividualTrailerDelegate extends HollowObjectDelegate {
 
     public int getThemesOrdinal(int ordinal);
 
+    public int getUsagesOrdinal(int ordinal);
+
     public IndividualTrailerTypeAPI getTypeAPI();
 
 }

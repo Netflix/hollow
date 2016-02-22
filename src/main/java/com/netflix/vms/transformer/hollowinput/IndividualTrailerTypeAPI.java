@@ -15,7 +15,8 @@ public class IndividualTrailerTypeAPI extends HollowObjectTypeAPI {
             "postPlay",
             "subType",
             "aspectRatio",
-            "themes"
+            "themes",
+            "usages"
         });
         this.delegateLookupImpl = new IndividualTrailerDelegateLookupImpl(this);
     }
@@ -108,8 +109,18 @@ public class IndividualTrailerTypeAPI extends HollowObjectTypeAPI {
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[6]);
     }
 
-    public TrailerThemeListTypeAPI getThemesTypeAPI() {
-        return getAPI().getTrailerThemeListTypeAPI();
+    public ListOfStringTypeAPI getThemesTypeAPI() {
+        return getAPI().getListOfStringTypeAPI();
+    }
+
+    public int getUsagesOrdinal(int ordinal) {
+        if(fieldIndex[7] == -1)
+            return missingDataHandler().handleReferencedOrdinal("IndividualTrailer", ordinal, "usages");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[7]);
+    }
+
+    public ListOfStringTypeAPI getUsagesTypeAPI() {
+        return getAPI().getListOfStringTypeAPI();
     }
 
     public IndividualTrailerDelegateLookupImpl getDelegateLookupImpl() {

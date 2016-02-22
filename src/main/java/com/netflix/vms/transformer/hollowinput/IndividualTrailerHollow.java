@@ -53,11 +53,18 @@ public class IndividualTrailerHollow extends HollowObject {
         return  api().getStringHollow(refOrdinal);
     }
 
-    public TrailerThemeListHollow _getThemes() {
+    public ListOfStringHollow _getThemes() {
         int refOrdinal = delegate().getThemesOrdinal(ordinal);
         if(refOrdinal == -1)
             return null;
-        return  api().getTrailerThemeListHollow(refOrdinal);
+        return  api().getListOfStringHollow(refOrdinal);
+    }
+
+    public ListOfStringHollow _getUsages() {
+        int refOrdinal = delegate().getUsagesOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getListOfStringHollow(refOrdinal);
     }
 
     public VMSHollowVideoInputAPI api() {

@@ -5,16 +5,16 @@ import com.netflix.hollow.HollowListSchema;
 import com.netflix.hollow.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
-public class TrailerThemeListHollow extends HollowList<TrailerThemeHollow> {
+public class ListOfStringHollow extends HollowList<StringHollow> {
 
-    public TrailerThemeListHollow(HollowListDelegate delegate, int ordinal) {
+    public ListOfStringHollow(HollowListDelegate delegate, int ordinal) {
         super(delegate, ordinal);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public TrailerThemeHollow instantiateElement(int ordinal) {
-        return (TrailerThemeHollow) api().getTrailerThemeHollow(ordinal);
+    public StringHollow instantiateElement(int ordinal) {
+        return (StringHollow) api().getStringHollow(ordinal);
     }
 
     @Override
@@ -26,8 +26,8 @@ public class TrailerThemeListHollow extends HollowList<TrailerThemeHollow> {
         return typeApi().getAPI();
     }
 
-    public TrailerThemeListTypeAPI typeApi() {
-        return (TrailerThemeListTypeAPI) delegate.getTypeAPI();
+    public ListOfStringTypeAPI typeApi() {
+        return (ListOfStringTypeAPI) delegate.getTypeAPI();
     }
 
 }

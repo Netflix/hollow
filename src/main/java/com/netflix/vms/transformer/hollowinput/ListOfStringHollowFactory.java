@@ -3,19 +3,20 @@ package com.netflix.vms.transformer.hollowinput;
 import com.netflix.hollow.objects.provider.HollowFactory;
 import com.netflix.hollow.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.read.customapi.HollowTypeAPI;
+import com.netflix.hollow.objects.delegate.HollowListCachedDelegate;
 
-public class TrailerThemeHollowFactory<T extends TrailerThemeHollow> extends HollowFactory<T> {
+public class ListOfStringHollowFactory<T extends ListOfStringHollow> extends HollowFactory<T> {
 
     @Override
     @SuppressWarnings("unchecked")
     public T newHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return (T)new TrailerThemeHollow(((TrailerThemeTypeAPI)typeAPI).getDelegateLookupImpl(), ordinal);
+        return (T)new ListOfStringHollow(((ListOfStringTypeAPI)typeAPI).getDelegateLookupImpl(), ordinal);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public T newCachedHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return (T)new TrailerThemeHollow(new TrailerThemeDelegateCachedImpl((TrailerThemeTypeAPI)typeAPI, ordinal), ordinal);
+        return (T)new ListOfStringHollow(new HollowListCachedDelegate((ListOfStringTypeAPI)typeAPI, ordinal), ordinal);
     }
 
 }

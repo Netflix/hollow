@@ -48,6 +48,10 @@ public class IndividualTrailerDelegateLookupImpl extends HollowObjectAbstractDel
         return typeAPI.getThemesOrdinal(ordinal);
     }
 
+    public int getUsagesOrdinal(int ordinal) {
+        return typeAPI.getUsagesOrdinal(ordinal);
+    }
+
     public IndividualTrailerTypeAPI getTypeAPI() {
         return typeAPI;
     }

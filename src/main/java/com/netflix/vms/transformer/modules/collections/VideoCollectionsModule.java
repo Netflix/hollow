@@ -5,14 +5,12 @@ import com.netflix.vms.transformer.ShowHierarchy;
 import com.netflix.vms.transformer.hollowinput.IndividualTrailerHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.TrailerHollow;
-import com.netflix.vms.transformer.hollowinput.TrailerThemeHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.SupplementalVideo;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,20 +38,20 @@ public class VideoCollectionsModule {
     public Map<String, VideoCollectionsDataHierarchy> buildVideoCollectionsDataByCountry(Map<String, ShowHierarchy> showHierarchiesByCountry) {
 
         Map<ShowHierarchy, VideoCollectionsDataHierarchy> uniqueHierarchies = new HashMap<ShowHierarchy, VideoCollectionsDataHierarchy>();
-        
+
         Map<String, VideoCollectionsDataHierarchy> countryHierarchies = new HashMap<String, VideoCollectionsDataHierarchy>();
-        
+
         for(Map.Entry<String, ShowHierarchy> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
             ShowHierarchy showHierarchy = entry.getValue();
             int topNodeId = showHierarchy.getTopNodeId();
-            
+
             VideoCollectionsDataHierarchy alreadyBuiltHierarchy = uniqueHierarchies.get(showHierarchy);
             if(alreadyBuiltHierarchy != null) {
                 countryHierarchies.put(entry.getKey(), alreadyBuiltHierarchy);
                 continue;
             }
-            
+
             VideoCollectionsDataHierarchy hierarchy = new VideoCollectionsDataHierarchy(topNodeId, showHierarchy.isStandalone(), getSupplementalVideos(showHierarchy, topNodeId, topNodeId));
             for(int i=0;i<showHierarchy.getSeasonIds().length;i++) {
                 int seasonId = showHierarchy.getSeasonIds()[i];
@@ -66,11 +64,11 @@ public class VideoCollectionsModule {
                     hierarchy.addEpisode(episodeId, episodeSequenceNumber);
                 }
             }
-            
+
             countryHierarchies.put(countryCode, hierarchy);
             uniqueHierarchies.put(showHierarchy, hierarchy);
         }
-        
+
         return countryHierarchies;
     }
 
@@ -103,27 +101,27 @@ public class VideoCollectionsModule {
                 StringHollow identifier = supplemental._getIdentifier();
                 if(identifier != null)
                     supp.attributes.put(IDENTIFIER, new Strings(identifier._getValue()));
-                // StringHollow usages = supplemental._  ///TODO: What to do about exotic 'attribute' parsing logic?
-                List<Strings> themesList = getThemesList(supplemental);
+                List<Strings> themesList = getListOfStrings(supplemental._getThemes());
                 if(themesList != null)
                     supp.multiValueAttributes.put(THEMES, themesList);
                 supplementalVideos.add(supp);
-
+                List<Strings> usagesList = getListOfStrings(supplemental._getUsages());
+                if(usagesList != null)
+                    supp.multiValueAttributes.put(USAGES, usagesList);
             }
        }
 
         return supplementalVideos;
     }
 
-    private List<Strings> getThemesList(IndividualTrailerHollow trailer) {
-        List<TrailerThemeHollow> themes = trailer._getThemes();
-        if(themes == null || themes.isEmpty())
+    private List<Strings> getListOfStrings(List<StringHollow> themes) {
+        if(themes == null)
             return null;
 
         List<Strings> list = new ArrayList<Strings>();
 
-        for(TrailerThemeHollow theme : themes) {
-            list.add(new Strings(theme._getValue()._getValue()));
+        for(StringHollow theme : themes) {
+            list.add(new Strings(theme._getValue()));
         }
 
         return list;

@@ -15,6 +15,7 @@ public class IndividualTrailerDelegateCachedImpl extends HollowObjectAbstractDel
     private final int subTypeOrdinal;
     private final int aspectRatioOrdinal;
     private final int themesOrdinal;
+    private final int usagesOrdinal;
    private IndividualTrailerTypeAPI typeAPI;
 
     public IndividualTrailerDelegateCachedImpl(IndividualTrailerTypeAPI typeAPI, int ordinal) {
@@ -25,6 +26,7 @@ public class IndividualTrailerDelegateCachedImpl extends HollowObjectAbstractDel
         this.subTypeOrdinal = typeAPI.getSubTypeOrdinal(ordinal);
         this.aspectRatioOrdinal = typeAPI.getAspectRatioOrdinal(ordinal);
         this.themesOrdinal = typeAPI.getThemesOrdinal(ordinal);
+        this.usagesOrdinal = typeAPI.getUsagesOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -62,6 +64,10 @@ public class IndividualTrailerDelegateCachedImpl extends HollowObjectAbstractDel
 
     public int getThemesOrdinal(int ordinal) {
         return themesOrdinal;
+    }
+
+    public int getUsagesOrdinal(int ordinal) {
+        return usagesOrdinal;
     }
 
     @Override
