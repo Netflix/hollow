@@ -52,11 +52,11 @@ public class VideoCollectionsModule {
                 continue;
             }
 
-            VideoCollectionsDataHierarchy hierarchy = new VideoCollectionsDataHierarchy(topNodeId, showHierarchy.isStandalone(), getSupplementalVideos(showHierarchy, topNodeId, topNodeId));
+            VideoCollectionsDataHierarchy hierarchy = new VideoCollectionsDataHierarchy(topNodeId, showHierarchy.isStandalone(), getSupplementalVideos(showHierarchy, topNodeId));
             for(int i=0;i<showHierarchy.getSeasonIds().length;i++) {
                 int seasonId = showHierarchy.getSeasonIds()[i];
                 int seasonSequenceNumber = showHierarchy.getSeasonSequenceNumbers()[i];
-                hierarchy.addSeason(seasonId, seasonSequenceNumber, getSupplementalVideos(showHierarchy, seasonId, topNodeId));
+                hierarchy.addSeason(seasonId, seasonSequenceNumber, getSupplementalVideos(showHierarchy, seasonId));
 
                 for(int j=0;j<showHierarchy.getEpisodeIds()[i].length;j++) {
                     int episodeId = showHierarchy.getEpisodeIds()[i][j];
@@ -72,7 +72,7 @@ public class VideoCollectionsModule {
         return countryHierarchies;
     }
 
-    private List<SupplementalVideo> getSupplementalVideos(ShowHierarchy hierarchy, long videoId, long parentVideoId) {
+    private List<SupplementalVideo> getSupplementalVideos(ShowHierarchy hierarchy, long videoId) {
         int supplementalsOrdinal = supplementalIndex.getMatchingOrdinal(videoId);
 
         if(supplementalsOrdinal == -1)
@@ -87,7 +87,7 @@ public class VideoCollectionsModule {
 
                 SupplementalVideo supp = new SupplementalVideo();
                 supp.id = new Video(supplementalId);
-                supp.parent = new Video((int) parentVideoId);
+                supp.parent = new Video((int) videoId);
                 supp.sequenceNumber = (int)supplemental._getSequenceNumber();
                 //supp.seasonNumber = seasonNumber;
                 supp.attributes = new HashMap<Strings, Strings>();
