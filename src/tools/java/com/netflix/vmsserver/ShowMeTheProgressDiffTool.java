@@ -13,6 +13,7 @@ public class ShowMeTheProgressDiffTool {
     public static void startTheDiff(HollowReadStateEngine expected, HollowReadStateEngine actual) throws Exception {
         HollowDiff diff = new HollowDiff(expected, actual);
         addTypeDiff(diff, "CompleteVideo", "id.value", "country.id");
+        addTypeDiff(diff, "DrmSystem", "id");
 
         diff.calculateDiffs();
 

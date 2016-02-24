@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer;
 
+import com.netflix.vms.transformer.modules.drmsystem.DrmSystemModule;
+
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
@@ -14,7 +16,6 @@ import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHierarchy;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,16 +39,18 @@ public class SimpleTransformer {
             executor.execute(new Runnable() {
                 public void run() {
                     Map<String, ShowHierarchy> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(displaySet);
-                    
+
                     if(showHierarchiesByCountry != null) {
                         Map<String, VideoCollectionsDataHierarchy> vcdByCountry = collectionsBuilder.buildVideoCollectionsDataByCountry(showHierarchiesByCountry);
-    
+
                         if(vcdByCountry != null)
                             writeJustTheVideoCollectionsDatas(vcdByCountry, objectMapper);
                     }
                 }
             });
         }
+
+        new DrmSystemModule(api, objectMapper).transform();
 
         executor.awaitSuccessfulCompletion();
 
