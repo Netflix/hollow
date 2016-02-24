@@ -18,14 +18,14 @@ import java.util.Map;
 
 public class VideoCollectionsModule {
 
-    private static final Strings POST_PLAY = new Strings("postPlay");
-    private static final Strings ASPECT_RATIO = new Strings("aspectRatio");
-    private static final Strings TYPE = new Strings("type");
-    private static final Strings TRAILER = new Strings("trailer");
-    private static final Strings SUB_TYPE = new Strings("subType");
-    private static final Strings IDENTIFIER = new Strings("identifier");
-    private static final Strings THEMES = new Strings("themes");
-    private static final Strings USAGES = new Strings("usages");
+    private final Strings POST_PLAY = new Strings("postPlay");
+    private final Strings ASPECT_RATIO = new Strings("aspectRatio");
+    private final Strings TYPE = new Strings("type");
+    private final Strings TRAILER = new Strings("trailer");
+    private final Strings SUB_TYPE = new Strings("subType");
+    private final Strings IDENTIFIER = new Strings("identifier");
+    private final Strings THEMES = new Strings("themes");
+    private final Strings USAGES = new Strings("usages");
 
     private final VMSHollowVideoInputAPI videoAPI;
     private final HollowPrimaryKeyIndex supplementalIndex;
