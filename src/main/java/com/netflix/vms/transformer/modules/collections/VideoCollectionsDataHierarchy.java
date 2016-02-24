@@ -18,11 +18,11 @@ public class VideoCollectionsDataHierarchy {
 
     public static final SortedMapOfIntegerToListOfVideoEpisode EMPTY_EPISODE_SEQUENCE_NUMBER_MAP = new SortedMapOfIntegerToListOfVideoEpisode(Collections.<com.netflix.vms.transformer.hollowoutput.Integer, List<VideoEpisode>>emptyMap());
 
-    public static final VideoNodeType MOVIE = new VideoNodeType("MOVIE");
-    public static final VideoNodeType SHOW = new VideoNodeType("SHOW");
-    public static final VideoNodeType SEASON = new VideoNodeType("SEASON");
-    public static final VideoNodeType EPISODE = new VideoNodeType("EPISODE");
-    public static final VideoNodeType SUPPLEMENTAL = new VideoNodeType("SUPPLEMENTAL");
+    public static VideoNodeType MOVIE = new VideoNodeType("MOVIE");
+    public static VideoNodeType SHOW = new VideoNodeType("SHOW");
+    public static VideoNodeType SEASON = new VideoNodeType("SEASON");
+    public static VideoNodeType EPISODE = new VideoNodeType("EPISODE");
+    public static VideoNodeType SUPPLEMENTAL = new VideoNodeType("SUPPLEMENTAL");
 
 
     private VideoCollectionsData topNodeVideoCollectionsData;
