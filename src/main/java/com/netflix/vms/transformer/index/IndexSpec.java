@@ -10,6 +10,7 @@ public enum IndexSpec {
     ROLLOUT_VIDEO_TYPE(PRIMARY_KEY, "Rollout", "movieId", "rolloutType.value"),
     VIDEO_TYPE(PRIMARY_KEY, "VideoType", "videoId"),
     VIDEO_GENERAL(PRIMARY_KEY, "VideoGeneral", "videoId"),
+    STORIES_SYNOPSES(PRIMARY_KEY, "Stories_Synopses", "movieId"),
 
 
     VIDEO_DATE(HASH, "VideoDate", "window.element", "videoId", "window.element.countryCode.value"),

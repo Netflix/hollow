@@ -23,13 +23,20 @@ import java.util.Map;
 
 public class SimpleTransformer {
 
-    public HollowWriteStateEngine transform(HollowReadStateEngine inputStateEngine, VMSHollowVideoInputAPI api) throws Exception {
+    private final ThreadLocal<VideoCollectionsModule> collectionsModuleRef = new ThreadLocal<VideoCollectionsModule>();
+    private final ThreadLocal<VideoMetaDataModule> metadataModuleRef = new ThreadLocal<VideoMetaDataModule>();
 
-        VMSTransformerIndexer indexer = new VMSTransformerIndexer(inputStateEngine, new SimultaneousExecutor());
+    private final VMSHollowVideoInputAPI api;
+    private VMSTransformerIndexer indexer;
+
+    public SimpleTransformer(VMSHollowVideoInputAPI api) {
+        this.api = api;
+    }
+
+    public HollowWriteStateEngine transform() throws Exception {
+        indexer = new VMSTransformerIndexer((HollowReadStateEngine)api.getDataAccess(), new SimultaneousExecutor());
 
         final ShowHierarchyInitializer hierarchyInitializer = new ShowHierarchyInitializer(api, indexer);
-        final VideoCollectionsModule collectionsBuilder = new VideoCollectionsModule(api, indexer);
-        final VideoMetaDataModule metadataModule = new VideoMetaDataModule(api, indexer);
 
         HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();  //TODO: Need to define a HashCodeFinder.
         final HollowObjectMapper objectMapper = new HollowObjectMapper(writeStateEngine);
@@ -41,10 +48,13 @@ public class SimpleTransformer {
         for(final VideoDisplaySetHollow displaySet : api.getAllVideoDisplaySetHollow()) {
             executor.execute(new Runnable() {
                 public void run() {
+                    VideoCollectionsModule collectionsModule = getVideoCollectionsModule();
+                    VideoMetaDataModule metadataModule = getVideoMetaDataModule();
+
                     Map<String, ShowHierarchy> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(displaySet);
 
                     if(showHierarchiesByCountry != null) {
-                        Map<String, VideoCollectionsDataHierarchy> vcdByCountry = collectionsBuilder.buildVideoCollectionsDataByCountry(showHierarchiesByCountry);
+                        Map<String, VideoCollectionsDataHierarchy> vcdByCountry = collectionsModule.buildVideoCollectionsDataByCountry(showHierarchiesByCountry);
                         Map<String, Map<Integer, VideoMetaData>> vmdByCountry = metadataModule.buildVideoMetaDataByCountry(showHierarchiesByCountry);
 
                         if(vcdByCountry != null)
@@ -62,6 +72,24 @@ public class SimpleTransformer {
         System.out.println("Processed all videos in " + (endTime - startTime) + "ms");
 
         return writeStateEngine;
+    }
+
+    private VideoCollectionsModule getVideoCollectionsModule() {
+        VideoCollectionsModule module = collectionsModuleRef.get();
+        if(module == null) {
+            module = new VideoCollectionsModule(api, indexer);
+            collectionsModuleRef.set(module);
+        }
+        return module;
+    }
+
+    private VideoMetaDataModule getVideoMetaDataModule() {
+        VideoMetaDataModule module = metadataModuleRef.get();
+        if(module == null) {
+            module = new VideoMetaDataModule(api, indexer);
+            metadataModuleRef.set(module);
+        }
+        return module;
     }
 
     private void writeJustTheCurrentData(Map<String, VideoCollectionsDataHierarchy> vcdByCountry,

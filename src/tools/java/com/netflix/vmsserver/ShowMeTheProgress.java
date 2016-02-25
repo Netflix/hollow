@@ -22,12 +22,11 @@ public class ShowMeTheProgress {
 
     @Test
     public void start() throws Exception {
-        SimpleTransformer transformer = new SimpleTransformer();
+        VMSHollowVideoInputAPI api = new VMSHollowVideoInputAPI(loadStateEngine("/filtered-input.hollow"));
 
-        HollowReadStateEngine inputStateEngine = loadStateEngine("/filtered-input.hollow");
-        VMSHollowVideoInputAPI api = new VMSHollowVideoInputAPI(inputStateEngine);
+        SimpleTransformer transformer = new SimpleTransformer(api);
 
-        HollowWriteStateEngine outputStateEngine = transformer.transform(inputStateEngine, api);
+        HollowWriteStateEngine outputStateEngine = transformer.transform();
         HollowReadStateEngine actualOutputReadStateEngine = roundTripOutputStateEngine(outputStateEngine);
         HollowReadStateEngine expectedOutputStateEngine = loadStateEngine("/expected-output.hollow", getDiffFilter(actualOutputReadStateEngine.getSchemas()));
 
@@ -40,7 +39,7 @@ public class ShowMeTheProgress {
         filter.addFieldRecursive("CompleteVideo", "country", outputSchemas);
         filter.addField("CompleteVideo", "facetData");
         filter.addFieldRecursive("CompleteVideoFacetData", "videoCollectionsData", outputSchemas);
-        filter.addFieldRecursive("CompleteVideoFacetData", "videoMetaData", outputSchemas);
+        //filter.addFieldRecursive("CompleteVideoFacetData", "videoMetaData", outputSchemas);
 
         filter.addTypeRecursive("DrmSystem", outputSchemas);
 
