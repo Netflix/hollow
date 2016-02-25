@@ -9,7 +9,10 @@ public enum IndexSpec {
     VIDEO_RIGHTS(PRIMARY_KEY, "VideoRights", "movieId", "countryCode.value"),
     ROLLOUT_VIDEO_TYPE(PRIMARY_KEY, "Rollout", "movieId", "rolloutType.value"),
     VIDEO_TYPE(PRIMARY_KEY, "VideoType", "videoId"),
+    VIDEO_GENERAL(PRIMARY_KEY, "VideoGeneral", "videoId"),
 
+
+    PERSONS_BY_VIDEO_ID(HASH, "VideoPerson", "", "cast.element.videoId"),
     VIDEO_TYPE_COUNTRY(HASH, "VideoType", "type.element", "videoId", "type.element.countryCode.value");
 
 

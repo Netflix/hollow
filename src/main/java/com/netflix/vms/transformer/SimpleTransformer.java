@@ -1,7 +1,9 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.vms.transformer.modules.drmsystem.DrmSystemModule;
+import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 
+import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
+import com.netflix.vms.transformer.modules.drmsystem.DrmSystemModule;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
@@ -27,6 +29,7 @@ public class SimpleTransformer {
 
         final ShowHierarchyInitializer hierarchyInitializer = new ShowHierarchyInitializer(api, indexer);
         final VideoCollectionsModule collectionsBuilder = new VideoCollectionsModule(api, indexer);
+        final VideoMetaDataModule metadataModule = new VideoMetaDataModule(api, indexer);
 
         HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();  //TODO: Need to define a HashCodeFinder.
         final HollowObjectMapper objectMapper = new HollowObjectMapper(writeStateEngine);
@@ -42,9 +45,10 @@ public class SimpleTransformer {
 
                     if(showHierarchiesByCountry != null) {
                         Map<String, VideoCollectionsDataHierarchy> vcdByCountry = collectionsBuilder.buildVideoCollectionsDataByCountry(showHierarchiesByCountry);
+                        Map<String, Map<Integer, VideoMetaData>> vmdByCountry = metadataModule.buildVideoMetaDataByCountry(showHierarchiesByCountry);
 
                         if(vcdByCountry != null)
-                            writeJustTheVideoCollectionsDatas(vcdByCountry, objectMapper);
+                            writeJustTheCurrentData(vcdByCountry, vmdByCountry, objectMapper);
                     }
                 }
             });
@@ -60,9 +64,13 @@ public class SimpleTransformer {
         return writeStateEngine;
     }
 
-    private void writeJustTheVideoCollectionsDatas(Map<String, VideoCollectionsDataHierarchy> vcdByCountry, HollowObjectMapper objectMapper) {
+    private void writeJustTheCurrentData(Map<String, VideoCollectionsDataHierarchy> vcdByCountry,
+                                         Map<String, Map<Integer, VideoMetaData>> vmdByCountry,
+                                         HollowObjectMapper objectMapper) {
+
         for(Map.Entry<String, VideoCollectionsDataHierarchy> countryHierarchyEntry : vcdByCountry.entrySet()) {
-            ISOCountry country = getCountry(countryHierarchyEntry.getKey());
+            String countryId = countryHierarchyEntry.getKey();
+            ISOCountry country = getCountry(countryId);
             VideoCollectionsDataHierarchy hierarchy = countryHierarchyEntry.getValue();
 
             CompleteVideo topNode = new CompleteVideo();
@@ -70,6 +78,7 @@ public class SimpleTransformer {
             topNode.facetData = new CompleteVideoFacetData();
             topNode.facetData.videoCollectionsData = hierarchy.getTopNode();
             topNode.id = topNode.facetData.videoCollectionsData.topNode;
+            topNode.facetData.videoMetaData = vmdByCountry.get(countryId).get(topNode.id.value);
 
             objectMapper.addObject(topNode);
 
@@ -82,6 +91,7 @@ public class SimpleTransformer {
                     showNode.id = new Video(showEntry.getKey().intValue());
                     showNode.facetData = new CompleteVideoFacetData();
                     showNode.facetData.videoCollectionsData = showEntry.getValue();
+                    showNode.facetData.videoMetaData = vmdByCountry.get(countryId).get(showNode.id.value);
 
                     objectMapper.addObject(showNode);
 
@@ -91,6 +101,7 @@ public class SimpleTransformer {
                         episodeNode.id = new Video(episodeEntry.getKey().intValue());
                         episodeNode.facetData = new CompleteVideoFacetData();
                         episodeNode.facetData.videoCollectionsData = episodeEntry.getValue();
+                        episodeNode.facetData.videoMetaData = vmdByCountry.get(countryId).get(episodeNode.id.value);
 
                         objectMapper.addObject(episodeNode);
                     }

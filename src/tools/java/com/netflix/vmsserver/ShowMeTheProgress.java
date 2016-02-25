@@ -1,5 +1,7 @@
 package com.netflix.vmsserver;
 
+import com.netflix.hollow.util.memory.WastefulRecycler;
+
 import com.netflix.hollow.HollowSchema;
 import com.netflix.hollow.filter.HollowFilterConfig;
 import com.netflix.hollow.read.engine.HollowBlobReader;
@@ -8,14 +10,12 @@ import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
-
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-
 import org.junit.Test;
 
 public class ShowMeTheProgress {
@@ -40,6 +40,7 @@ public class ShowMeTheProgress {
         filter.addFieldRecursive("CompleteVideo", "country", outputSchemas);
         filter.addField("CompleteVideo", "facetData");
         filter.addFieldRecursive("CompleteVideoFacetData", "videoCollectionsData", outputSchemas);
+        filter.addFieldRecursive("CompleteVideoFacetData", "videoMetaData", outputSchemas);
 
         filter.addTypeRecursive("DrmSystem", outputSchemas);
 
@@ -56,7 +57,7 @@ public class ShowMeTheProgress {
     }
 
     private HollowReadStateEngine loadStateEngine(InputStream is, HollowFilterConfig filter) throws IOException {
-        HollowReadStateEngine stateEngine = new HollowReadStateEngine();
+        HollowReadStateEngine stateEngine = new HollowReadStateEngine(WastefulRecycler.DEFAULT_INSTANCE);
 
         HollowBlobReader reader = new HollowBlobReader(stateEngine);
 
