@@ -12,7 +12,9 @@ public enum IndexSpec {
     VIDEO_GENERAL(PRIMARY_KEY, "VideoGeneral", "videoId"),
 
 
+    VIDEO_DATE(HASH, "VideoDate", "window.element", "videoId", "window.element.countryCode.value"),
     PERSONS_BY_VIDEO_ID(HASH, "VideoPerson", "", "cast.element.videoId"),
+    PERSON_ROLES_BY_VIDEO_ID(HASH, "VideoPerson", "cast.element", "personId", "cast.element.videoId"),
     VIDEO_TYPE_COUNTRY(HASH, "VideoType", "type.element", "videoId", "type.element.countryCode.value");
 
 

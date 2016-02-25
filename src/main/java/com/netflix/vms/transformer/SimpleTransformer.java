@@ -114,6 +114,7 @@ public class SimpleTransformer {
                 supplementalNode.id = new Video(supplementalEntry.getKey().intValue());
                 supplementalNode.facetData = new CompleteVideoFacetData();
                 supplementalNode.facetData.videoCollectionsData = supplementalEntry.getValue();
+                supplementalNode.facetData.videoMetaData = vmdByCountry.get(countryId).get(supplementalNode.id.value);
 
                 objectMapper.addObject(supplementalNode);
             }
