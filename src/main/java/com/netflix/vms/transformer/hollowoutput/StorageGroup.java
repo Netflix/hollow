@@ -23,7 +23,9 @@ public class StorageGroup implements Cloneable {
 
     public StorageGroup clone() {
         try {
-            return (StorageGroup)super.clone();
+            StorageGroup clone = (StorageGroup)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

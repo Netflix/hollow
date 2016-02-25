@@ -21,7 +21,9 @@ public class VideoAwardType implements Cloneable {
 
     public VideoAwardType clone() {
         try {
-            return (VideoAwardType)super.clone();
+            VideoAwardType clone = (VideoAwardType)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

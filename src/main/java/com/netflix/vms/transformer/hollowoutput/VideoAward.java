@@ -33,7 +33,9 @@ public class VideoAward implements Cloneable {
 
     public VideoAward clone() {
         try {
-            return (VideoAward)super.clone();
+            VideoAward clone = (VideoAward)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

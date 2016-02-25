@@ -19,7 +19,9 @@ public class TargetDimensions implements Cloneable {
 
     public TargetDimensions clone() {
         try {
-            return (TargetDimensions)super.clone();
+            TargetDimensions clone = (TargetDimensions)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

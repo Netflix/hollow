@@ -23,7 +23,9 @@ public class Date implements Cloneable {
 
     public Date clone() {
         try {
-            return (Date)super.clone();
+            Date clone = (Date)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

@@ -23,7 +23,9 @@ public class Certification implements Cloneable {
 
     public Certification clone() {
         try {
-            return (Certification)super.clone();
+            Certification clone = (Certification)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

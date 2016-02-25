@@ -28,7 +28,9 @@ public class Strings implements Cloneable {
 
     public Strings clone() {
         try {
-            return (Strings)super.clone();
+            Strings clone = (Strings)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

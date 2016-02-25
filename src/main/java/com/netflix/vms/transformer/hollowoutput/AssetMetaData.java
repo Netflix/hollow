@@ -25,7 +25,9 @@ public class AssetMetaData implements Cloneable {
 
     public AssetMetaData clone() {
         try {
-            return (AssetMetaData)super.clone();
+            AssetMetaData clone = (AssetMetaData)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

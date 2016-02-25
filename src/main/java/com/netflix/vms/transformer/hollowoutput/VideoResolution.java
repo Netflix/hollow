@@ -19,7 +19,9 @@ public class VideoResolution implements Cloneable {
 
     public VideoResolution clone() {
         try {
-            return (VideoResolution)super.clone();
+            VideoResolution clone = (VideoResolution)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

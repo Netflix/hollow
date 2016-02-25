@@ -25,7 +25,9 @@ public class VideoDimensionsDescriptor implements Cloneable {
 
     public VideoDimensionsDescriptor clone() {
         try {
-            return (VideoDimensionsDescriptor)super.clone();
+            VideoDimensionsDescriptor clone = (VideoDimensionsDescriptor)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

@@ -28,7 +28,9 @@ public class SupportedCountrySetProviderKey implements Cloneable {
 
     public SupportedCountrySetProviderKey clone() {
         try {
-            return (SupportedCountrySetProviderKey)super.clone();
+            SupportedCountrySetProviderKey clone = (SupportedCountrySetProviderKey)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

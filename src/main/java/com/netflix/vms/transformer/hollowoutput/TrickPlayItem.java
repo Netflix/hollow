@@ -25,7 +25,9 @@ public class TrickPlayItem implements Cloneable {
 
     public TrickPlayItem clone() {
         try {
-            return (TrickPlayItem)super.clone();
+            TrickPlayItem clone = (TrickPlayItem)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

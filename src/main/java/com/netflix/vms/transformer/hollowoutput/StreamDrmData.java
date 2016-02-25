@@ -23,7 +23,9 @@ public class StreamDrmData implements Cloneable {
 
     public StreamDrmData clone() {
         try {
-            return (StreamDrmData)super.clone();
+            StreamDrmData clone = (StreamDrmData)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

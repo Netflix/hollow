@@ -23,7 +23,9 @@ public class Integer implements Cloneable {
 
     public Integer clone() {
         try {
-            return (Integer)super.clone();
+            Integer clone = (Integer)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

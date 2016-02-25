@@ -28,7 +28,9 @@ public class __passthrough_string implements Cloneable {
 
     public __passthrough_string clone() {
         try {
-            return (__passthrough_string)super.clone();
+            __passthrough_string clone = (__passthrough_string)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

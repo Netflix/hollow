@@ -22,7 +22,9 @@ public class DrmInfoData implements Cloneable {
 
     public DrmInfoData clone() {
         try {
-            return (DrmInfoData)super.clone();
+            DrmInfoData clone = (DrmInfoData)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

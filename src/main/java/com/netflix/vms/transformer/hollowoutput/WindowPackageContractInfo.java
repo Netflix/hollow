@@ -23,7 +23,9 @@ public class WindowPackageContractInfo implements Cloneable {
 
     public WindowPackageContractInfo clone() {
         try {
-            return (WindowPackageContractInfo)super.clone();
+            WindowPackageContractInfo clone = (WindowPackageContractInfo)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

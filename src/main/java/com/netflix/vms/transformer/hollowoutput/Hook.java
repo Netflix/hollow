@@ -25,7 +25,9 @@ public class Hook implements Cloneable {
 
     public Hook clone() {
         try {
-            return (Hook)super.clone();
+            Hook clone = (Hook)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

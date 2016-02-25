@@ -38,7 +38,9 @@ public class ContractRestriction implements Cloneable {
 
     public ContractRestriction clone() {
         try {
-            return (ContractRestriction)super.clone();
+            ContractRestriction clone = (ContractRestriction)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

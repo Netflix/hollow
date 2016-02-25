@@ -40,7 +40,9 @@ public class TrailerInfo implements Cloneable {
 
     public TrailerInfo clone() {
         try {
-            return (TrailerInfo)super.clone();
+            TrailerInfo clone = (TrailerInfo)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

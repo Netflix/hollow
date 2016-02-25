@@ -43,7 +43,9 @@ public class EncodeSummaryDescriptorData implements Cloneable {
 
     public EncodeSummaryDescriptorData clone() {
         try {
-            return (EncodeSummaryDescriptorData)super.clone();
+            EncodeSummaryDescriptorData clone = (EncodeSummaryDescriptorData)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

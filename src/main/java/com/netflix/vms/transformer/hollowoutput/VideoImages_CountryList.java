@@ -23,7 +23,9 @@ public class VideoImages_CountryList implements Cloneable {
 
     public VideoImages_CountryList clone() {
         try {
-            return (VideoImages_CountryList)super.clone();
+            VideoImages_CountryList clone = (VideoImages_CountryList)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

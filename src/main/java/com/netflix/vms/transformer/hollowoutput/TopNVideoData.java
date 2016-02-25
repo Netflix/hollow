@@ -25,7 +25,9 @@ public class TopNVideoData implements Cloneable {
 
     public TopNVideoData clone() {
         try {
-            return (TopNVideoData)super.clone();
+            TopNVideoData clone = (TopNVideoData)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

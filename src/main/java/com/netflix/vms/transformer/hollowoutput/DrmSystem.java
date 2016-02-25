@@ -30,7 +30,9 @@ public class DrmSystem implements Cloneable {
 
     public DrmSystem clone() {
         try {
-            return (DrmSystem)super.clone();
+            DrmSystem clone = (DrmSystem)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

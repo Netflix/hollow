@@ -26,7 +26,9 @@ public class StreamDownloadable implements Cloneable {
 
     public StreamDownloadable clone() {
         try {
-            return (StreamDownloadable)super.clone();
+            StreamDownloadable clone = (StreamDownloadable)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

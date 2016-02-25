@@ -28,7 +28,9 @@ public class DrmKeyString implements Cloneable {
 
     public DrmKeyString clone() {
         try {
-            return (DrmKeyString)super.clone();
+            DrmKeyString clone = (DrmKeyString)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

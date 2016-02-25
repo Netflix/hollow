@@ -93,7 +93,9 @@ public class VideoMetaData implements Cloneable {
 
     public VideoMetaData clone() {
         try {
-            return (VideoMetaData)super.clone();
+            VideoMetaData clone = (VideoMetaData)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

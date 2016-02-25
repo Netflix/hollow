@@ -28,7 +28,9 @@ public class NFResourceID implements Cloneable {
 
     public NFResourceID clone() {
         try {
-            return (NFResourceID)super.clone();
+            NFResourceID clone = (NFResourceID)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

@@ -22,7 +22,9 @@ public class PersonImages implements Cloneable {
 
     public PersonImages clone() {
         try {
-            return (PersonImages)super.clone();
+            PersonImages clone = (PersonImages)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

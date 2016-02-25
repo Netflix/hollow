@@ -23,7 +23,9 @@ public class NamedCollectionHolder_CountryList implements Cloneable {
 
     public NamedCollectionHolder_CountryList clone() {
         try {
-            return (NamedCollectionHolder_CountryList)super.clone();
+            NamedCollectionHolder_CountryList clone = (NamedCollectionHolder_CountryList)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

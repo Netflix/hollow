@@ -21,7 +21,9 @@ public class RolloutPhaseWindow implements Cloneable {
 
     public RolloutPhaseWindow clone() {
         try {
-            return (RolloutPhaseWindow)super.clone();
+            RolloutPhaseWindow clone = (RolloutPhaseWindow)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

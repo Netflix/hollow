@@ -27,7 +27,9 @@ public class RolloutCharacter implements Cloneable {
 
     public RolloutCharacter clone() {
         try {
-            return (RolloutCharacter)super.clone();
+            RolloutCharacter clone = (RolloutCharacter)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

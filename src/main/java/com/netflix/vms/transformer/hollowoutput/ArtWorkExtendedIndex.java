@@ -26,7 +26,9 @@ public class ArtWorkExtendedIndex implements Cloneable {
 
     public ArtWorkExtendedIndex clone() {
         try {
-            return (ArtWorkExtendedIndex)super.clone();
+            ArtWorkExtendedIndex clone = (ArtWorkExtendedIndex)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

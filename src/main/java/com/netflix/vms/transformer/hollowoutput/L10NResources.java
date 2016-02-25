@@ -23,7 +23,9 @@ public class L10NResources implements Cloneable {
 
     public L10NResources clone() {
         try {
-            return (L10NResources)super.clone();
+            L10NResources clone = (L10NResources)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

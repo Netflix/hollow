@@ -26,7 +26,9 @@ public class RolloutTrailer implements Cloneable {
 
     public RolloutTrailer clone() {
         try {
-            return (RolloutTrailer)super.clone();
+            RolloutTrailer clone = (RolloutTrailer)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

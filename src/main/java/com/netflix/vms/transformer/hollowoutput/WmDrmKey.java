@@ -25,7 +25,9 @@ public class WmDrmKey implements Cloneable {
 
     public WmDrmKey clone() {
         try {
-            return (WmDrmKey)super.clone();
+            WmDrmKey clone = (WmDrmKey)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

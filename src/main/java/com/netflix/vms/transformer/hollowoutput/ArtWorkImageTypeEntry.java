@@ -24,7 +24,9 @@ public class ArtWorkImageTypeEntry implements Cloneable {
 
     public ArtWorkImageTypeEntry clone() {
         try {
-            return (ArtWorkImageTypeEntry)super.clone();
+            ArtWorkImageTypeEntry clone = (ArtWorkImageTypeEntry)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

@@ -32,7 +32,9 @@ public class ImageDownloadableDescriptor implements Cloneable {
 
     public ImageDownloadableDescriptor clone() {
         try {
-            return (ImageDownloadableDescriptor)super.clone();
+            ImageDownloadableDescriptor clone = (ImageDownloadableDescriptor)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

@@ -28,7 +28,9 @@ public class HookType implements Cloneable {
 
     public HookType clone() {
         try {
-            return (HookType)super.clone();
+            HookType clone = (HookType)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

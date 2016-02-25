@@ -30,7 +30,9 @@ public class VideoClip implements Cloneable {
 
     public VideoClip clone() {
         try {
-            return (VideoClip)super.clone();
+            VideoClip clone = (VideoClip)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

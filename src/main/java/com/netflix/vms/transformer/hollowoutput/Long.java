@@ -23,7 +23,9 @@ public class Long implements Cloneable {
 
     public Long clone() {
         try {
-            return (Long)super.clone();
+            Long clone = (Long)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

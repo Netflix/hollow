@@ -29,7 +29,9 @@ public class FileEncodingData implements Cloneable {
 
     public FileEncodingData clone() {
         try {
-            return (FileEncodingData)super.clone();
+            FileEncodingData clone = (FileEncodingData)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

@@ -30,7 +30,9 @@ public class GlobalVideo implements Cloneable {
 
     public GlobalVideo clone() {
         try {
-            return (GlobalVideo)super.clone();
+            GlobalVideo clone = (GlobalVideo)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

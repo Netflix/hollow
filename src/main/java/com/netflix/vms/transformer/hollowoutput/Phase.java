@@ -65,7 +65,9 @@ public class Phase implements Cloneable {
 
     public Phase clone() {
         try {
-            return (Phase)super.clone();
+            Phase clone = (Phase)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

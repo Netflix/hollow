@@ -21,7 +21,9 @@ public class CdnData implements Cloneable {
 
     public CdnData clone() {
         try {
-            return (CdnData)super.clone();
+            CdnData clone = (CdnData)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

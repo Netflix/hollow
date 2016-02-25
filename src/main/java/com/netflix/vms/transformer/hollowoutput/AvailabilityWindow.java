@@ -23,7 +23,9 @@ public class AvailabilityWindow implements Cloneable {
 
     public AvailabilityWindow clone() {
         try {
-            return (AvailabilityWindow)super.clone();
+            AvailabilityWindow clone = (AvailabilityWindow)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

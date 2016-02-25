@@ -23,7 +23,9 @@ public class SuperFloat implements Cloneable {
 
     public SuperFloat clone() {
         try {
-            return (SuperFloat)super.clone();
+            SuperFloat clone = (SuperFloat)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

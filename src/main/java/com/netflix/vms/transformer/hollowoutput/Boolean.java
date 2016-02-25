@@ -23,7 +23,9 @@ public class Boolean implements Cloneable {
 
     public Boolean clone() {
         try {
-            return (Boolean)super.clone();
+            Boolean clone = (Boolean)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

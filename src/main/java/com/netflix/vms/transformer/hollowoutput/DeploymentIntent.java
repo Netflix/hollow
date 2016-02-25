@@ -23,7 +23,9 @@ public class DeploymentIntent implements Cloneable {
 
     public DeploymentIntent clone() {
         try {
-            return (DeploymentIntent)super.clone();
+            DeploymentIntent clone = (DeploymentIntent)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

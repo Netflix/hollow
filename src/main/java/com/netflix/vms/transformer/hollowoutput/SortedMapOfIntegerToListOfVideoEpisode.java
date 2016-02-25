@@ -29,7 +29,9 @@ public class SortedMapOfIntegerToListOfVideoEpisode implements Cloneable {
 
     public SortedMapOfIntegerToListOfVideoEpisode clone() {
         try {
-            return (SortedMapOfIntegerToListOfVideoEpisode)super.clone();
+            SortedMapOfIntegerToListOfVideoEpisode clone = (SortedMapOfIntegerToListOfVideoEpisode)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

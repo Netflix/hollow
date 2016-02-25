@@ -22,7 +22,9 @@ public class Quote implements Cloneable {
 
     public Quote clone() {
         try {
-            return (Quote)super.clone();
+            Quote clone = (Quote)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

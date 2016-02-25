@@ -28,7 +28,9 @@ public class CodecPrivateDataString implements Cloneable {
 
     public CodecPrivateDataString clone() {
         try {
-            return (CodecPrivateDataString)super.clone();
+            CodecPrivateDataString clone = (CodecPrivateDataString)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

@@ -42,7 +42,9 @@ public class StreamDataDescriptor implements Cloneable {
 
     public StreamDataDescriptor clone() {
         try {
-            return (StreamDataDescriptor)super.clone();
+            StreamDataDescriptor clone = (StreamDataDescriptor)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

@@ -52,7 +52,9 @@ public class VideoPackageInfo implements Cloneable {
 
     public VideoPackageInfo clone() {
         try {
-            return (VideoPackageInfo)super.clone();
+            VideoPackageInfo clone = (VideoPackageInfo)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

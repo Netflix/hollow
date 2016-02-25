@@ -36,7 +36,9 @@ public class RolloutSummary implements Cloneable {
 
     public RolloutSummary clone() {
         try {
-            return (RolloutSummary)super.clone();
+            RolloutSummary clone = (RolloutSummary)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

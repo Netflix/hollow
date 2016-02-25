@@ -28,7 +28,9 @@ public class TimedTextTypeDescriptor implements Cloneable {
 
     public TimedTextTypeDescriptor clone() {
         try {
-            return (TimedTextTypeDescriptor)super.clone();
+            TimedTextTypeDescriptor clone = (TimedTextTypeDescriptor)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

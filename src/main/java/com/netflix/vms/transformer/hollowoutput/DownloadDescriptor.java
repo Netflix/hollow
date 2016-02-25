@@ -41,7 +41,9 @@ public class DownloadDescriptor implements Cloneable {
 
     public DownloadDescriptor clone() {
         try {
-            return (DownloadDescriptor)super.clone();
+            DownloadDescriptor clone = (DownloadDescriptor)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

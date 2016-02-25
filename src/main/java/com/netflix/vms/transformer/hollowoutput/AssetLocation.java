@@ -25,7 +25,9 @@ public class AssetLocation implements Cloneable {
 
     public AssetLocation clone() {
         try {
-            return (AssetLocation)super.clone();
+            AssetLocation clone = (AssetLocation)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

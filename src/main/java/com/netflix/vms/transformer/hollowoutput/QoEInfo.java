@@ -19,7 +19,9 @@ public class QoEInfo implements Cloneable {
 
     public QoEInfo clone() {
         try {
-            return (QoEInfo)super.clone();
+            QoEInfo clone = (QoEInfo)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

@@ -26,7 +26,9 @@ public class RolloutInfo implements Cloneable {
 
     public RolloutInfo clone() {
         try {
-            return (RolloutInfo)super.clone();
+            RolloutInfo clone = (RolloutInfo)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

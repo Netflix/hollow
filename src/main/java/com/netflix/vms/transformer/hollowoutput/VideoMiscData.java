@@ -24,7 +24,9 @@ public class VideoMiscData implements Cloneable {
 
     public VideoMiscData clone() {
         try {
-            return (VideoMiscData)super.clone();
+            VideoMiscData clone = (VideoMiscData)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

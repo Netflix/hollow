@@ -45,7 +45,9 @@ public class CompleteVideoCountrySpecificData implements Cloneable {
 
     public CompleteVideoCountrySpecificData clone() {
         try {
-            return (CompleteVideoCountrySpecificData)super.clone();
+            CompleteVideoCountrySpecificData clone = (CompleteVideoCountrySpecificData)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

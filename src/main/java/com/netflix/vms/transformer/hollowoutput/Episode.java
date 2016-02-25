@@ -23,7 +23,9 @@ public class Episode implements Cloneable {
 
     public Episode clone() {
         try {
-            return (Episode)super.clone();
+            Episode clone = (Episode)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

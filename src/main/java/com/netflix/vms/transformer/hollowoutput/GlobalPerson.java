@@ -26,7 +26,9 @@ public class GlobalPerson implements Cloneable {
 
     public GlobalPerson clone() {
         try {
-            return (GlobalPerson)super.clone();
+            GlobalPerson clone = (GlobalPerson)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

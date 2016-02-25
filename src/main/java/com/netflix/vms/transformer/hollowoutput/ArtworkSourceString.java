@@ -28,7 +28,9 @@ public class ArtworkSourceString implements Cloneable {
 
     public ArtworkSourceString clone() {
         try {
-            return (ArtworkSourceString)super.clone();
+            ArtworkSourceString clone = (ArtworkSourceString)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

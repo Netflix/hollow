@@ -35,7 +35,9 @@ public class CompleteVideoFacetData implements Cloneable {
 
     public CompleteVideoFacetData clone() {
         try {
-            return (CompleteVideoFacetData)super.clone();
+            CompleteVideoFacetData clone = (CompleteVideoFacetData)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

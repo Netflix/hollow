@@ -23,7 +23,9 @@ public class StreamHashData implements Cloneable {
 
     public StreamHashData clone() {
         try {
-            return (StreamHashData)super.clone();
+            StreamHashData clone = (StreamHashData)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

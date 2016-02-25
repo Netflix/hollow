@@ -23,7 +23,9 @@ public class ArtworkSourcePassthrough implements Cloneable {
 
     public ArtworkSourcePassthrough clone() {
         try {
-            return (ArtworkSourcePassthrough)super.clone();
+            ArtworkSourcePassthrough clone = (ArtworkSourcePassthrough)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

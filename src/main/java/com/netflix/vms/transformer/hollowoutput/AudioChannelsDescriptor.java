@@ -25,7 +25,9 @@ public class AudioChannelsDescriptor implements Cloneable {
 
     public AudioChannelsDescriptor clone() {
         try {
-            return (AudioChannelsDescriptor)super.clone();
+            AudioChannelsDescriptor clone = (AudioChannelsDescriptor)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

@@ -25,7 +25,9 @@ public class RolloutRole implements Cloneable {
 
     public RolloutRole clone() {
         try {
-            return (RolloutRole)super.clone();
+            RolloutRole clone = (RolloutRole)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

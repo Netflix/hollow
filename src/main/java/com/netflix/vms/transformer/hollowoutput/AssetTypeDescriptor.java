@@ -25,7 +25,9 @@ public class AssetTypeDescriptor implements Cloneable {
 
     public AssetTypeDescriptor clone() {
         try {
-            return (AssetTypeDescriptor)super.clone();
+            AssetTypeDescriptor clone = (AssetTypeDescriptor)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

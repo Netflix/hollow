@@ -28,7 +28,9 @@ public class L10NStrings implements Cloneable {
 
     public L10NStrings clone() {
         try {
-            return (L10NStrings)super.clone();
+            L10NStrings clone = (L10NStrings)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

@@ -30,7 +30,9 @@ public class LanguageRights implements Cloneable {
 
     public LanguageRights clone() {
         try {
-            return (LanguageRights)super.clone();
+            LanguageRights clone = (LanguageRights)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

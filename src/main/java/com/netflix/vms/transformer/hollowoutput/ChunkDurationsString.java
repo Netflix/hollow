@@ -28,7 +28,9 @@ public class ChunkDurationsString implements Cloneable {
 
     public ChunkDurationsString clone() {
         try {
-            return (ChunkDurationsString)super.clone();
+            ChunkDurationsString clone = (ChunkDurationsString)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

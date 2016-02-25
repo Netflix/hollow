@@ -28,7 +28,9 @@ public class NFLocale implements Cloneable {
 
     public NFLocale clone() {
         try {
-            return (NFLocale)super.clone();
+            NFLocale clone = (NFLocale)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

@@ -25,7 +25,9 @@ public class CupKey implements Cloneable {
 
     public CupKey clone() {
         try {
-            return (CupKey)super.clone();
+            CupKey clone = (CupKey)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

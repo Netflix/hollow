@@ -30,7 +30,9 @@ public class VMSAvailabilityWindow implements Cloneable {
 
     public VMSAvailabilityWindow clone() {
         try {
-            return (VMSAvailabilityWindow)super.clone();
+            VMSAvailabilityWindow clone = (VMSAvailabilityWindow)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

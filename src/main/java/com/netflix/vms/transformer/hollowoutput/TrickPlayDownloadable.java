@@ -27,7 +27,9 @@ public class TrickPlayDownloadable implements Cloneable {
 
     public TrickPlayDownloadable clone() {
         try {
-            return (TrickPlayDownloadable)super.clone();
+            TrickPlayDownloadable clone = (TrickPlayDownloadable)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

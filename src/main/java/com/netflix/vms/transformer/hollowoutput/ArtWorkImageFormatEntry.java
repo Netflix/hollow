@@ -22,7 +22,9 @@ public class ArtWorkImageFormatEntry implements Cloneable {
 
     public ArtWorkImageFormatEntry clone() {
         try {
-            return (ArtWorkImageFormatEntry)super.clone();
+            ArtWorkImageFormatEntry clone = (ArtWorkImageFormatEntry)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

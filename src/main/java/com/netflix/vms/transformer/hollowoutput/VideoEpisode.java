@@ -31,7 +31,9 @@ public class VideoEpisode implements Cloneable {
 
     public VideoEpisode clone() {
         try {
-            return (VideoEpisode)super.clone();
+            VideoEpisode clone = (VideoEpisode)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

@@ -32,7 +32,9 @@ public class LanguageRestrictions implements Cloneable {
 
     public LanguageRestrictions clone() {
         try {
-            return (LanguageRestrictions)super.clone();
+            LanguageRestrictions clone = (LanguageRestrictions)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

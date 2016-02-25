@@ -24,7 +24,9 @@ public class ArtWorkImageRecipe implements Cloneable {
 
     public ArtWorkImageRecipe clone() {
         try {
-            return (ArtWorkImageRecipe)super.clone();
+            ArtWorkImageRecipe clone = (ArtWorkImageRecipe)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

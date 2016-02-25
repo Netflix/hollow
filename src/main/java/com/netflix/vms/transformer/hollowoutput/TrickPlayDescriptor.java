@@ -19,7 +19,9 @@ public class TrickPlayDescriptor implements Cloneable {
 
     public TrickPlayDescriptor clone() {
         try {
-            return (TrickPlayDescriptor)super.clone();
+            TrickPlayDescriptor clone = (TrickPlayDescriptor)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

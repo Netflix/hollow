@@ -43,7 +43,9 @@ public class StreamData implements Cloneable {
 
     public StreamData clone() {
         try {
-            return (StreamData)super.clone();
+            StreamData clone = (StreamData)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

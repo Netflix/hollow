@@ -37,7 +37,9 @@ public class NamedCollectionHolder implements Cloneable {
 
     public NamedCollectionHolder clone() {
         try {
-            return (NamedCollectionHolder)super.clone();
+            NamedCollectionHolder clone = (NamedCollectionHolder)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

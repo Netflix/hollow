@@ -28,7 +28,9 @@ public class TrickPlayType implements Cloneable {
 
     public TrickPlayType clone() {
         try {
-            return (TrickPlayType)super.clone();
+            TrickPlayType clone = (TrickPlayType)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

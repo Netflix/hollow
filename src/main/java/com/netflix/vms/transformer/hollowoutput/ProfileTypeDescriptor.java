@@ -25,7 +25,9 @@ public class ProfileTypeDescriptor implements Cloneable {
 
     public ProfileTypeDescriptor clone() {
         try {
-            return (ProfileTypeDescriptor)super.clone();
+            ProfileTypeDescriptor clone = (ProfileTypeDescriptor)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

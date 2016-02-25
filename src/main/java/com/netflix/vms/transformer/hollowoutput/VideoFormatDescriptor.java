@@ -25,7 +25,9 @@ public class VideoFormatDescriptor implements Cloneable {
 
     public VideoFormatDescriptor clone() {
         try {
-            return (VideoFormatDescriptor)super.clone();
+            VideoFormatDescriptor clone = (VideoFormatDescriptor)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

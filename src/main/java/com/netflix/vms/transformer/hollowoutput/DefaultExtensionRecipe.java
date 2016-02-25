@@ -20,7 +20,9 @@ public class DefaultExtensionRecipe implements Cloneable {
 
     public DefaultExtensionRecipe clone() {
         try {
-            return (DefaultExtensionRecipe)super.clone();
+            DefaultExtensionRecipe clone = (DefaultExtensionRecipe)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

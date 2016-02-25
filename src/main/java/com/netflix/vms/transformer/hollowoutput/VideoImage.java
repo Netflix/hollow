@@ -28,7 +28,9 @@ public class VideoImage implements Cloneable {
 
     public VideoImage clone() {
         try {
-            return (VideoImage)super.clone();
+            VideoImage clone = (VideoImage)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

@@ -24,7 +24,9 @@ public class RolloutVideo implements Cloneable {
 
     public RolloutVideo clone() {
         try {
-            return (RolloutVideo)super.clone();
+            RolloutVideo clone = (RolloutVideo)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

@@ -23,7 +23,9 @@ public class EncodingProfileGroup implements Cloneable {
 
     public EncodingProfileGroup clone() {
         try {
-            return (EncodingProfileGroup)super.clone();
+            EncodingProfileGroup clone = (EncodingProfileGroup)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

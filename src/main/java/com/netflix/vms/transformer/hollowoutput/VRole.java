@@ -23,7 +23,9 @@ public class VRole implements Cloneable {
 
     public VRole clone() {
         try {
-            return (VRole)super.clone();
+            VRole clone = (VRole)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

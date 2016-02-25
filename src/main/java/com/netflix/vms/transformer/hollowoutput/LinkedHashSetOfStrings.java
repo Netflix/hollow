@@ -28,7 +28,9 @@ public class LinkedHashSetOfStrings implements Cloneable {
 
     public LinkedHashSetOfStrings clone() {
         try {
-            return (LinkedHashSetOfStrings)super.clone();
+            LinkedHashSetOfStrings clone = (LinkedHashSetOfStrings)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

@@ -34,7 +34,9 @@ public class VideoMoment implements Cloneable {
 
     public VideoMoment clone() {
         try {
-            return (VideoMoment)super.clone();
+            VideoMoment clone = (VideoMoment)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

@@ -21,7 +21,9 @@ public class RolloutCast implements Cloneable {
 
     public RolloutCast clone() {
         try {
-            return (RolloutCast)super.clone();
+            RolloutCast clone = (RolloutCast)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

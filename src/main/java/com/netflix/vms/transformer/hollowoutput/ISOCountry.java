@@ -28,7 +28,9 @@ public class ISOCountry implements Cloneable {
 
     public ISOCountry clone() {
         try {
-            return (ISOCountry)super.clone();
+            ISOCountry clone = (ISOCountry)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

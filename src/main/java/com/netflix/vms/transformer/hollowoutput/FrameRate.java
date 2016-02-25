@@ -23,7 +23,9 @@ public class FrameRate implements Cloneable {
 
     public FrameRate clone() {
         try {
-            return (FrameRate)super.clone();
+            FrameRate clone = (FrameRate)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

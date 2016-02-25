@@ -145,7 +145,9 @@ public class ICSMReview implements Cloneable {
 
     public ICSMReview clone() {
         try {
-            return (ICSMReview)super.clone();
+            ICSMReview clone = (ICSMReview)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

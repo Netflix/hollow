@@ -28,7 +28,9 @@ public class VideoSetType implements Cloneable {
 
     public VideoSetType clone() {
         try {
-            return (VideoSetType)super.clone();
+            VideoSetType clone = (VideoSetType)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

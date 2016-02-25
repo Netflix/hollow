@@ -37,7 +37,9 @@ public class SupplementalVideo implements Cloneable {
 
     public SupplementalVideo clone() {
         try {
-            return (SupplementalVideo)super.clone();
+            SupplementalVideo clone = (SupplementalVideo)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

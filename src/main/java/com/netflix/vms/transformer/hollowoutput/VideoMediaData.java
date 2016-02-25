@@ -35,7 +35,9 @@ public class VideoMediaData implements Cloneable {
 
     public VideoMediaData clone() {
         try {
-            return (VideoMediaData)super.clone();
+            VideoMediaData clone = (VideoMediaData)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

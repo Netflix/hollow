@@ -28,7 +28,9 @@ public class SupplementalInfoType implements Cloneable {
 
     public SupplementalInfoType clone() {
         try {
-            return (SupplementalInfoType)super.clone();
+            SupplementalInfoType clone = (SupplementalInfoType)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

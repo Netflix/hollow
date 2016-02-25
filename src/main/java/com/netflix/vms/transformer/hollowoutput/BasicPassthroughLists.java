@@ -26,7 +26,9 @@ public class BasicPassthroughLists implements Cloneable {
 
     public BasicPassthroughLists clone() {
         try {
-            return (BasicPassthroughLists)super.clone();
+            BasicPassthroughLists clone = (BasicPassthroughLists)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

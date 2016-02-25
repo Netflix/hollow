@@ -39,7 +39,9 @@ public class StreamDownloadDescriptor implements Cloneable {
 
     public StreamDownloadDescriptor clone() {
         try {
-            return (StreamDownloadDescriptor)super.clone();
+            StreamDownloadDescriptor clone = (StreamDownloadDescriptor)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

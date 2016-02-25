@@ -31,7 +31,9 @@ public class CompleteVideo implements Cloneable {
 
     public CompleteVideo clone() {
         try {
-            return (CompleteVideo)super.clone();
+            CompleteVideo clone = (CompleteVideo)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

@@ -49,7 +49,9 @@ public class PackageData implements Cloneable {
 
     public PackageData clone() {
         try {
-            return (PackageData)super.clone();
+            PackageData clone = (PackageData)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

@@ -26,7 +26,9 @@ public class DrmInfo implements Cloneable {
 
     public DrmInfo clone() {
         try {
-            return (DrmInfo)super.clone();
+            DrmInfo clone = (DrmInfo)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

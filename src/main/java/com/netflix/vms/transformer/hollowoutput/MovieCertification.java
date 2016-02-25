@@ -29,7 +29,9 @@ public class MovieCertification implements Cloneable {
 
     public MovieCertification clone() {
         try {
-            return (MovieCertification)super.clone();
+            MovieCertification clone = (MovieCertification)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

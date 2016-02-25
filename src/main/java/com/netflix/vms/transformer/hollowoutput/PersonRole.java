@@ -29,7 +29,9 @@ public class PersonRole implements Cloneable {
 
     public PersonRole clone() {
         try {
-            return (PersonRole)super.clone();
+            PersonRole clone = (PersonRole)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

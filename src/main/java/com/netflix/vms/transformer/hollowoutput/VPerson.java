@@ -23,7 +23,9 @@ public class VPerson implements Cloneable {
 
     public VPerson clone() {
         try {
-            return (VPerson)super.clone();
+            VPerson clone = (VPerson)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

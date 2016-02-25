@@ -26,7 +26,9 @@ public class ImageDownloadable implements Cloneable {
 
     public ImageDownloadable clone() {
         try {
-            return (ImageDownloadable)super.clone();
+            ImageDownloadable clone = (ImageDownloadable)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

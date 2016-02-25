@@ -28,7 +28,9 @@ public class VideoNodeType implements Cloneable {
 
     public VideoNodeType clone() {
         try {
-            return (VideoNodeType)super.clone();
+            VideoNodeType clone = (VideoNodeType)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

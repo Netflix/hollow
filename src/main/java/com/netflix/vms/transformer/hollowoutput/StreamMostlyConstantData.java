@@ -33,7 +33,9 @@ public class StreamMostlyConstantData implements Cloneable {
 
     public StreamMostlyConstantData clone() {
         try {
-            return (StreamMostlyConstantData)super.clone();
+            StreamMostlyConstantData clone = (StreamMostlyConstantData)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

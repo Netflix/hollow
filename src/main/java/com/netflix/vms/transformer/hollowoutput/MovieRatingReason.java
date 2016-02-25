@@ -24,7 +24,9 @@ public class MovieRatingReason implements Cloneable {
 
     public MovieRatingReason clone() {
         try {
-            return (MovieRatingReason)super.clone();
+            MovieRatingReason clone = (MovieRatingReason)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

@@ -26,7 +26,9 @@ public class EncodeSummaryDescriptor implements Cloneable {
 
     public EncodeSummaryDescriptor clone() {
         try {
-            return (EncodeSummaryDescriptor)super.clone();
+            EncodeSummaryDescriptor clone = (EncodeSummaryDescriptor)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

@@ -19,7 +19,9 @@ public class DateWindow implements Cloneable {
 
     public DateWindow clone() {
         try {
-            return (DateWindow)super.clone();
+            DateWindow clone = (DateWindow)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 

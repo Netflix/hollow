@@ -23,7 +23,9 @@ public class DownloadLocation implements Cloneable {
 
     public DownloadLocation clone() {
         try {
-            return (DownloadLocation)super.clone();
+            DownloadLocation clone = (DownloadLocation)super.clone();
+            clone.__assigned_ordinal = -1;
+            return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
