@@ -4,11 +4,13 @@ import com.netflix.hollow.diff.HollowDiff;
 import com.netflix.hollow.diff.HollowTypeDiff;
 import com.netflix.hollow.diff.ui.jetty.HollowDiffUIServer;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
+
 import java.util.Random;
 
 public class ShowMeTheProgressDiffTool {
-
-    private static final String BROWSER_COMMAND = "google-chrome";
+    private static String OS = System.getProperty("os.name").toLowerCase();
+    private static final boolean isMac = OS != null && (OS.indexOf("mac") >= 0);
+    private static final String BROWSER_COMMAND = isMac ? "open" : "google-chrome";
 
     public static void startTheDiff(HollowReadStateEngine expected, HollowReadStateEngine actual) throws Exception {
         HollowDiff diff = new HollowDiff(expected, actual);
@@ -46,5 +48,4 @@ public class ShowMeTheProgressDiffTool {
     private static int randomPort() {
         return new Random().nextInt(16383) + 16384;
     }
-
 }
