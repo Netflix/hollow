@@ -4,7 +4,6 @@ import com.netflix.hollow.diff.HollowDiff;
 import com.netflix.hollow.diff.HollowTypeDiff;
 import com.netflix.hollow.diff.ui.jetty.HollowDiffUIServer;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
-
 import java.util.Random;
 
 public class ShowMeTheProgressDiffTool {
