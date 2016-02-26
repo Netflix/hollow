@@ -4,27 +4,24 @@ import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.hollowinput.ArtworkRecipeHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageRecipe;
+import com.netflix.vms.transformer.modules.AbstractTransformModule;
 
-public class ArtworkImageRecipeModule {
+public class ArtworkImageRecipeModule extends AbstractTransformModule {
 
-	private final VMSHollowVideoInputAPI api;
-	private final HollowObjectMapper mapper;
-	
-	public ArtworkImageRecipeModule(VMSHollowVideoInputAPI api,
-			HollowObjectMapper mapper) {
-		super();
-		this.api = api;
-		this.mapper = mapper;
-	}
-	
-	 public void transform() {
-	        for(ArtworkRecipeHollow inRecipe : api.getAllArtworkRecipeHollow()) {
-	        	ArtWorkImageRecipe outRecipe = new ArtWorkImageRecipe();
-	        	outRecipe.recipeNameStr = inRecipe._getRecipeName()._getValue().toCharArray();
-	        	outRecipe.extensionStr = inRecipe._getExtension()._getValue().toCharArray();
-	        	outRecipe.cdnFolderStr = inRecipe._getCdnFolder()._getValue().toCharArray();
-	        	outRecipe.hostNameStr = null;
-	        	mapper.addObject(outRecipe);
-	        }
-	 }
+    public ArtworkImageRecipeModule(VMSHollowVideoInputAPI api,
+            HollowObjectMapper mapper) {
+        super(api, mapper);
+    }
+
+    @Override
+    public void transform() {
+        for(ArtworkRecipeHollow inRecipe : api.getAllArtworkRecipeHollow()) {
+            ArtWorkImageRecipe outRecipe = new ArtWorkImageRecipe();
+            outRecipe.recipeNameStr = inRecipe._getRecipeName()._getValue().toCharArray();
+            outRecipe.extensionStr = inRecipe._getExtension()._getValue().toCharArray();
+            outRecipe.cdnFolderStr = inRecipe._getCdnFolder()._getValue().toCharArray();
+            outRecipe.hostNameStr = null;
+            mapper.addObject(outRecipe);
+        }
+    }
 }

@@ -4,17 +4,16 @@ import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.hollowinput.ArtWorkImageFormatHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageFormatEntry;
+import com.netflix.vms.transformer.modules.AbstractTransformModule;
+
 import java.util.Collection;
 
-public class ArtworkFormatModule {
-    private final VMSHollowVideoInputAPI api;
-    private final HollowObjectMapper mapper;
-
+public class ArtworkFormatModule extends AbstractTransformModule {
     public ArtworkFormatModule (VMSHollowVideoInputAPI api, HollowObjectMapper mapper) {
-        this.api = api;
-        this.mapper = mapper;
+        super(api, mapper);
     }
 
+    @Override
     public void transform() {
         Collection<ArtWorkImageFormatHollow> inputs = api.getAllArtWorkImageFormatHollow();
         for (ArtWorkImageFormatHollow input : inputs) {

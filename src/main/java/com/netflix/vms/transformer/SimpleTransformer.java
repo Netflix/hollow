@@ -14,17 +14,21 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.modules.TransformModule;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHierarchy;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
 import com.netflix.vms.transformer.modules.deploymentintent.CacheDeploymentIntentModule;
 import com.netflix.vms.transformer.modules.drmsystem.DrmSystemModule;
 import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
+import com.netflix.vms.transformer.modules.originserver.OriginServersModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkFormatModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkImageRecipeModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkTypeModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.DefaultExtensionRecipeModule;
 import com.netflix.vms.transformer.modules.passthrough.beehive.RolloutCharacterModule;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SimpleTransformer {
@@ -72,13 +76,28 @@ public class SimpleTransformer {
         }
 
         objectMapper.addObject(new DeploymentIntent());
-        new DrmSystemModule(api, objectMapper).transform();
-        new ArtworkFormatModule(api, objectMapper).transform();
-        new CacheDeploymentIntentModule(api, objectMapper).transform();
-        new ArtworkTypeModule(api, objectMapper).transform();
-        new ArtworkImageRecipeModule(api, objectMapper).transform();
-        new DefaultExtensionRecipeModule(api, objectMapper).transform();
-        new RolloutCharacterModule(api, objectMapper).transform();
+
+        // Register Transform Modules
+        List<TransformModule> moduleList = Arrays.<TransformModule>asList(
+                new DrmSystemModule(api, objectMapper),
+                new OriginServersModule(api, objectMapper, indexer),
+
+                new ArtworkFormatModule(api, objectMapper),
+                new CacheDeploymentIntentModule(api, objectMapper),
+                new ArtworkTypeModule(api, objectMapper),
+                new ArtworkImageRecipeModule(api, objectMapper),
+                new DefaultExtensionRecipeModule(api, objectMapper),
+                new RolloutCharacterModule(api, objectMapper));
+
+        // Execute Transform Modules
+        for(TransformModule m : moduleList) {
+            long tStart = System.currentTimeMillis();
+            m.transform();
+            long tDuration = System.currentTimeMillis() - tStart;
+            System.out.println(String.format("Finished Trasform for module=%s, duration=%s", m.getName(), tDuration));
+        }
+
+
         executor.awaitSuccessfulCompletion();
 
         long endTime = System.currentTimeMillis();
@@ -106,8 +125,8 @@ public class SimpleTransformer {
     }
 
     private void writeJustTheCurrentData(Map<String, VideoCollectionsDataHierarchy> vcdByCountry,
-                                         Map<String, Map<Integer, VideoMetaData>> vmdByCountry,
-                                         HollowObjectMapper objectMapper) {
+            Map<String, Map<Integer, VideoMetaData>> vmdByCountry,
+            HollowObjectMapper objectMapper) {
 
         for(Map.Entry<String, VideoCollectionsDataHierarchy> countryHierarchyEntry : vcdByCountry.entrySet()) {
             String countryId = countryHierarchyEntry.getKey();
