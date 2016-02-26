@@ -5,20 +5,18 @@ import com.netflix.vms.transformer.hollowinput.DrmSystemIdentifiersHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowoutput.DrmKeyString;
 import com.netflix.vms.transformer.hollowoutput.DrmSystem;
+import com.netflix.vms.transformer.modules.AbstractTransformModule;
+
 import java.util.HashMap;
 
-public class DrmSystemModule {
+public class DrmSystemModule extends AbstractTransformModule {
 
     private final DrmKeyString HEADER_DATA_AVAILABLE = new DrmKeyString("headerDataAvailable");
     private final DrmKeyString TRUE = new DrmKeyString("true");
     private final DrmKeyString FALSE = new DrmKeyString("false");
 
-    private final VMSHollowVideoInputAPI api;
-    private final HollowObjectMapper mapper;
-
     public DrmSystemModule(VMSHollowVideoInputAPI api, HollowObjectMapper mapper) {
-        this.api = api;
-        this.mapper = mapper;
+        super(api, mapper);
     }
 
     public void transform() {
