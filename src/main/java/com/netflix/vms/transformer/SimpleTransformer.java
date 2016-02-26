@@ -16,15 +16,19 @@ import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.misc.TopNVideoDataModule;
-import com.netflix.vms.transformer.modules.artwork.passthrough.ArtworkFormatModule;
-import com.netflix.vms.transformer.modules.artwork.passthrough.ArtworkImageRecipeModule;
-import com.netflix.vms.transformer.modules.artwork.passthrough.ArtworkTypeModule;
-import com.netflix.vms.transformer.modules.artwork.passthrough.DefaultExtensionRecipeModule;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHierarchy;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
 import com.netflix.vms.transformer.modules.deploymentintent.CacheDeploymentIntentModule;
 import com.netflix.vms.transformer.modules.drmsystem.DrmSystemModule;
+import com.netflix.vms.transformer.modules.drmsystem.DrmSystemModule;
 import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
+import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
+import com.netflix.vms.transformer.modules.originserver.OriginServersModule;
+import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkFormatModule;
+import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkImageRecipeModule;
+import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkTypeModule;
+import com.netflix.vms.transformer.modules.passthrough.artwork.DefaultExtensionRecipeModule;
+import com.netflix.vms.transformer.modules.passthrough.beehive.RolloutCharacterModule;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -75,6 +79,8 @@ public class SimpleTransformer {
 
         objectMapper.addObject(new DeploymentIntent());
         new DrmSystemModule(api, objectMapper).transform();
+        new OriginServersModule(api, objectMapper, indexer).transform();
+
         new ArtworkFormatModule(api, objectMapper).transform();
         new CacheDeploymentIntentModule(api, objectMapper).transform();
         new ArtworkTypeModule(api, objectMapper).transform();
@@ -83,6 +89,8 @@ public class SimpleTransformer {
 //        objectMapper.addObject(new FileEncodingData());
         new TopNVideoDataModule(api, objectMapper).transform();
         
+        new RolloutCharacterModule(api, objectMapper).transform();
+
         executor.awaitSuccessfulCompletion();
 
         long endTime = System.currentTimeMillis();
@@ -110,8 +118,8 @@ public class SimpleTransformer {
     }
 
     private void writeJustTheCurrentData(Map<String, VideoCollectionsDataHierarchy> vcdByCountry,
-                                         Map<String, Map<Integer, VideoMetaData>> vmdByCountry,
-                                         HollowObjectMapper objectMapper) {
+            Map<String, Map<Integer, VideoMetaData>> vmdByCountry,
+            HollowObjectMapper objectMapper) {
 
         for(Map.Entry<String, VideoCollectionsDataHierarchy> countryHierarchyEntry : vcdByCountry.entrySet()) {
             String countryId = countryHierarchyEntry.getKey();

@@ -9,12 +9,14 @@ import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+
 import org.junit.Test;
 
 public class ShowMeTheProgress {
@@ -41,11 +43,13 @@ public class ShowMeTheProgress {
         filter.addFieldRecursive("CompleteVideoFacetData", "videoMetaData", outputSchemas);
 
         filter.addTypeRecursive("DrmSystem", outputSchemas);
+        filter.addTypeRecursive("OriginServer", outputSchemas);
         filter.addTypeRecursive("ArtWorkImageFormatEntry", outputSchemas); // TODO: zero-diff
         filter.addTypeRecursive("DeploymentIntent", outputSchemas);
         
         filter.addTypeRecursive("TopNVideoData", outputSchemas);        
 
+        filter.addTypeRecursive("RolloutCharacter", outputSchemas); // TODO: zero-diff
         return filter;
     }
 
