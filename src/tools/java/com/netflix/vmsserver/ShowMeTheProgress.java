@@ -1,11 +1,10 @@
 package com.netflix.vmsserver;
 
-import com.netflix.hollow.util.memory.WastefulRecycler;
-
 import com.netflix.hollow.HollowSchema;
 import com.netflix.hollow.filter.HollowFilterConfig;
 import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.util.memory.WastefulRecycler;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.SimpleTransformer;
@@ -39,9 +38,11 @@ public class ShowMeTheProgress {
         filter.addFieldRecursive("CompleteVideo", "country", outputSchemas);
         filter.addField("CompleteVideo", "facetData");
         filter.addFieldRecursive("CompleteVideoFacetData", "videoCollectionsData", outputSchemas);
-        //filter.addFieldRecursive("CompleteVideoFacetData", "videoMetaData", outputSchemas);
+        filter.addFieldRecursive("CompleteVideoFacetData", "videoMetaData", outputSchemas);
 
         filter.addTypeRecursive("DrmSystem", outputSchemas);
+        filter.addTypeRecursive("ArtWorkImageFormatEntry", outputSchemas);
+        filter.addTypeRecursive("DeploymentIntent", outputSchemas);
 
         return filter;
     }

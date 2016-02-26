@@ -1,9 +1,5 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
-
-import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
-import com.netflix.vms.transformer.modules.drmsystem.DrmSystemModule;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
@@ -12,12 +8,18 @@ import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoDisplaySetHollow;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
+import com.netflix.vms.transformer.hollowoutput.DeploymentIntent;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
+import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
+import com.netflix.vms.transformer.modules.artworkformat.ArtworkFormatModule;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHierarchy;
+import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
+import com.netflix.vms.transformer.modules.deploymentintent.CacheDeploymentIntentModule;
+import com.netflix.vms.transformer.modules.drmsystem.DrmSystemModule;
+import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,6 +49,7 @@ public class SimpleTransformer {
 
         for(final VideoDisplaySetHollow displaySet : api.getAllVideoDisplaySetHollow()) {
             executor.execute(new Runnable() {
+                @Override
                 public void run() {
                     VideoCollectionsModule collectionsModule = getVideoCollectionsModule();
                     VideoMetaDataModule metadataModule = getVideoMetaDataModule();
@@ -64,7 +67,10 @@ public class SimpleTransformer {
             });
         }
 
+        objectMapper.addObject(new DeploymentIntent());
         new DrmSystemModule(api, objectMapper).transform();
+        new ArtworkFormatModule(api, objectMapper).transform();
+        new CacheDeploymentIntentModule(api, objectMapper).transform();
 
         executor.awaitSuccessfulCompletion();
 
