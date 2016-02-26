@@ -11,37 +11,35 @@ import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowoutput.Float;
 import com.netflix.vms.transformer.hollowoutput.Integer;
 import com.netflix.vms.transformer.hollowoutput.TopNVideoData;
+import com.netflix.vms.transformer.modules.AbstractTransformModule;
 
-public class TopNVideoDataModule {
-	private final VMSHollowVideoInputAPI api;
-	private final HollowObjectMapper mapper;
-	
-	public TopNVideoDataModule(VMSHollowVideoInputAPI api, HollowObjectMapper mapper) {
-		super();
-		this.api = api;
-		this.mapper = mapper;
+public class TopNVideoDataModule extends AbstractTransformModule{
+
+    public TopNVideoDataModule(VMSHollowVideoInputAPI api, HollowObjectMapper mapper) {
+	    super(api, mapper);
 	}
 	
-	 public void transform() {
-	     //Map Video id -> attributes to Country id -> TopNVideoData
-	     Map<String, TopNVideoData> topNVideoDataMap = new HashMap<>();
-	     for(TopNHollow topN : api.getAllTopNHollow()) {
-	         TopNAttributesListHollow attributes = topN._getAttributes();
-	         int videoId = (int) topN._getVideoId();
-	         
-	         for(int index = 0; index < attributes.size(); index++) {
-	             TopNAttributeHollow topNAttribute = attributes.get(index);
-	             String countryId = topNAttribute._getCountry()._getValue();
-	             TopNVideoData topNVideoData = getOrAddTopNVideoData(topNVideoDataMap, topNAttribute, countryId);
-	             float viewShare = java.lang.Float.parseFloat(topNAttribute._getViewShare()._getValue());
-	             topNVideoData.videoViewHrs1Day.put(new Integer(videoId), new Float(viewShare));
-	         }
-	     }
+    @Override
+    public void transform() {
+        //Map Video id -> attributes to Country id -> TopNVideoData
+        Map<String, TopNVideoData> topNVideoDataMap = new HashMap<>();
+        for(TopNHollow topN : api.getAllTopNHollow()) {
+            TopNAttributesListHollow attributes = topN._getAttributes();
+            int videoId = (int) topN._getVideoId();
+             
+            for(int index = 0; index < attributes.size(); index++) {
+                TopNAttributeHollow topNAttribute = attributes.get(index);
+                String countryId = topNAttribute._getCountry()._getValue();
+                TopNVideoData topNVideoData = getOrAddTopNVideoData(topNVideoDataMap, topNAttribute, countryId);
+                float viewShare = java.lang.Float.parseFloat(topNAttribute._getViewShare()._getValue());
+                topNVideoData.videoViewHrs1Day.put(new Integer(videoId), new Float(viewShare));
+            }
+        }
 
-	     for(TopNVideoData topNVideoData : topNVideoDataMap.values()) {
-	         mapper.addObject(topNVideoData);
-	     }
-	 }
+         for(TopNVideoData topNVideoData : topNVideoDataMap.values()) {
+             mapper.addObject(topNVideoData);
+         }
+    }
 
     private TopNVideoData getOrAddTopNVideoData(Map<String, TopNVideoData> topNVideoDataMap,
             TopNAttributeHollow topNAttribute, String countryId) {
