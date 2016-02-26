@@ -50,6 +50,8 @@ public class ShowMeTheProgress {
         filter.addTypeRecursive("DeploymentIntent", outputSchemas);
 
         filter.addTypeRecursive("RolloutCharacter", outputSchemas);
+
+        filter.addTypeRecursive("GlobalPerson", outputSchemas);
         return filter;
     }
 
