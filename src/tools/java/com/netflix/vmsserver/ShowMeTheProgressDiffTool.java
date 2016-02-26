@@ -15,6 +15,7 @@ public class ShowMeTheProgressDiffTool {
         addTypeDiff(diff, "CompleteVideo", "id.value", "country.id");
         addTypeDiff(diff, "DrmSystem", "id");
         addTypeDiff(diff, "OriginServer", "name");
+        addTypeDiff(diff, "EncodingProfile", "id");
 
         addTypeDiff(diff, "ArtWorkImageFormatEntry", "nameStr");
         addTypeDiff(diff, "DeploymentIntent", "profileId", "bitrate", "country.id");
