@@ -1,9 +1,13 @@
 package com.netflix.vms.transformer.modules.meta;
 
+
 public class VideoMetaDataRollupValues {
 
     private boolean doShow = false;
     private boolean doSeason = false;
+
+    private long earliestFirstDisplayDate = Long.MAX_VALUE;
+    private long latestLiveFirstDisplayDate;
 
     private int showLatestYear;
     private int seasonLatestYear;
@@ -22,6 +26,24 @@ public class VideoMetaDataRollupValues {
             seasonLatestYear = latestYear;
         if(latestYear > showLatestYear)
             showLatestYear = latestYear;
+    }
+
+    public void newPotentiallyEarliestFirstDisplayDate(long firstDisplayDate) {
+        if(firstDisplayDate < earliestFirstDisplayDate)
+            earliestFirstDisplayDate = firstDisplayDate;
+    }
+
+    public void newPotentiallyLatestFirstDisplayDate(long firstDisplayDate) {
+        if(firstDisplayDate > latestLiveFirstDisplayDate)
+            latestLiveFirstDisplayDate = firstDisplayDate;
+    }
+
+    public long getEarliestFirstDisplayDate() {
+        return earliestFirstDisplayDate;
+    }
+
+    public long getLatestLiveFirstDisplayDate() {
+        return latestLiveFirstDisplayDate;
     }
 
     public int getSeasonLatestYear() {

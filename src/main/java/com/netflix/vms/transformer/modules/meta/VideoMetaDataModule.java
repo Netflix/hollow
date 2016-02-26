@@ -10,23 +10,23 @@ import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_RIGHTS;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 
-import com.netflix.vms.transformer.hollowinput.VideoRightsFlagsHollow;
-
-import com.netflix.vms.transformer.hollowinput.VideoGeneralAliasListHollow;
-import com.netflix.vms.transformer.hollowinput.VideoGeneralAliasHollow;
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.vms.transformer.ShowHierarchy;
+import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.StoriesSynopsesHookHollow;
 import com.netflix.vms.transformer.hollowinput.Stories_SynopsesHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoDateWindowHollow;
+import com.netflix.vms.transformer.hollowinput.VideoGeneralAliasHollow;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
+import com.netflix.vms.transformer.hollowinput.VideoGeneralTitleTypeHollow;
 import com.netflix.vms.transformer.hollowinput.VideoPersonCastHollow;
 import com.netflix.vms.transformer.hollowinput.VideoPersonHollow;
+import com.netflix.vms.transformer.hollowinput.VideoRightsFlagsHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
@@ -166,6 +166,7 @@ public class VideoMetaDataModule {
         countrySpecificClone.videoSetTypes = countrySpecificKey.videoSetTypes;
         countrySpecificClone.showMemberTypeId = (int) countrySpecificKey.showMemberTypeId;
         countrySpecificClone.copyright = countrySpecificKey.copyright;
+        countrySpecificClone.hasNewContent = countrySpecificKey.hasNewContent;
 
 
         /// return the country specific clone
@@ -183,8 +184,55 @@ public class VideoMetaDataModule {
             rights = api.getVideoRightsHollow(rightsOrdinal);
             countrySpecificKey.isSearchOnly = rights._getFlags()._getSearchOnly();
         }
+
         populateSetTypes(videoId, countryCode, rights, countrySpecificKey);
         populateDates(videoId, countryCode, rollup, rights, countrySpecificKey);
+
+        boolean isGoLive = false;
+        boolean hasFirstDisplayDate = false;
+        boolean isInWindow = false;
+        long firstDisplayTimestamp = -1;
+
+        if(rights != null) {
+            VideoRightsFlagsHollow flags = rights._getFlags();
+            if(flags != null) {
+                isGoLive = flags._getGoLive();
+                DateHollow firstDisplayDate = flags._getFirstDisplayDate();
+                if(firstDisplayDate != null) {
+                    firstDisplayTimestamp = firstDisplayDate._getValue();
+                    hasFirstDisplayDate = true;
+                }
+
+            }
+
+            Set<VideoRightsWindowHollow> windows = rights._getRights()._getWindows();
+            for(VideoRightsWindowHollow window : windows) {
+                if(!window._getOnHold() && window._getStartDate()._getValue() < System.currentTimeMillis() && window._getEndDate()._getValue() > System.currentTimeMillis()) {
+                    isInWindow = true;
+                    break;
+                }
+            }
+        }
+
+        if(isGoLive && hasFirstDisplayDate)
+            rollup.newPotentiallyEarliestFirstDisplayDate(firstDisplayTimestamp);
+        if(isGoLive && isInWindow && hasFirstDisplayDate)
+            rollup.newPotentiallyLatestFirstDisplayDate(firstDisplayTimestamp);
+        if(hasFirstDisplayDate || (isGoLive && isInWindow))
+            rollup.newLatestYear(countrySpecificKey.latestYear);
+
+        if(rollup.doSeason()) {
+            if(rollup.getSeasonLatestYear() != 0)
+                countrySpecificKey.latestYear = rollup.getSeasonLatestYear();
+        } else if(rollup.doShow()) {
+            if(rollup.getShowLatestYear() != 0)
+                countrySpecificKey.latestYear = rollup.getShowLatestYear();
+        }
+
+        countrySpecificKey.hasNewContent = hasNewContent(rollup);
+
+
+
         return countrySpecificKey;
     }
 
@@ -213,7 +261,6 @@ public class VideoMetaDataModule {
         VideoTypeDescriptorHollow typeDescriptor = null;
         if(videoTypeMatches != null)
             typeDescriptor = api.getVideoTypeDescriptorHollow(videoTypeMatches.iterator().next());
-
 
         boolean isInWindow = false;
         boolean isInFuture = false;
@@ -261,7 +308,6 @@ public class VideoMetaDataModule {
 
         StringHollow copyright = typeDescriptor._getCopyright();
         if(copyright != null) {
-            System.out.println(copyright._getValue());
             vmd.copyright = new Strings(copyright._getValue());
         }
     }
@@ -279,7 +325,7 @@ public class VideoMetaDataModule {
             if(origLang != null)
                 vmd.originalLanguageBcp47code = new Strings(origLang._getValue());
 
-            VideoGeneralAliasListHollow inputAliases = general._getAliases();
+            List<VideoGeneralAliasHollow> inputAliases = general._getAliases();
 
             if(inputAliases != null) {
                 Set<Strings> aliasList = new HashSet<Strings>();
@@ -288,6 +334,20 @@ public class VideoMetaDataModule {
                 }
                 vmd.aliases = aliasList;
             }
+
+            List<VideoGeneralTitleTypeHollow>inputTitleTypes = general._getTitleTypes();
+
+            if(inputTitleTypes != null) {
+                Set<Strings> titleTypes = new HashSet<Strings>();
+                for(VideoGeneralTitleTypeHollow titleType : inputTitleTypes) {
+                    titleTypes.add(new Strings(titleType._getValue()._getValue()));
+                }
+
+                vmd.titleTypes = titleTypes;
+            }
+
+
+            vmd.isTestTitle = general._getTestTitle();
         }
     }
 
@@ -300,26 +360,10 @@ public class VideoMetaDataModule {
 
             vmd.isTheatricalRelease = dateWindow._getIsTheatricalRelease();
             vmd.year = dateWindow._getTheatricalReleaseYear();
+            vmd.latestYear = vmd.year;
             if(dateWindow._getTheatricalReleaseDate() != Long.MIN_VALUE)
                 vmd.theatricalReleaseDate = new Date(dateWindow._getTheatricalReleaseDate());
 
-/*            boolean isGoLive = false;
-
-            if(rights != null) {
-                VideoRightsFlagsHollow flags = rights._getFlags();
-                if(flags != null && flags._getGoLive())
-                    isGoLive = true;
-            }
-
-            if(isGoLive)
-*/                rollup.newLatestYear(vmd.year);
-
-            if(rollup.doSeason() /*&& isGoLive*/)
-                vmd.latestYear = rollup.getSeasonLatestYear();
-            else if(rollup.doShow() /*&& isGoLive*/)
-                vmd.latestYear = rollup.getShowLatestYear();
-            else
-                vmd.latestYear = vmd.year;
         } else {
             vmd.year = 0;
             vmd.latestYear = 0;
@@ -392,13 +436,23 @@ public class VideoMetaDataModule {
         }
     }
 
-    private <K, V> Map<K, V> get(ThreadLocal<Map<K, V>> tl) {
-        Map<K, V> map = tl.get();
-        if(map == null) {
-            map = new HashMap<K, V>();
-            tl.set(map);
+
+    private static final int NEW_CONTENT_MIN_DAYS_ON_SITE = 30;
+    private static final int NUM_DAYS_BEFORE_NOT_NEW_CONTENT = 30;
+
+    public boolean hasNewContent(VideoMetaDataRollupValues rollup) {
+        if(rollup.doShow()) {
+            if(daysAgo(rollup.getEarliestFirstDisplayDate()) > NEW_CONTENT_MIN_DAYS_ON_SITE && daysAgo(rollup.getLatestLiveFirstDisplayDate()) <= NUM_DAYS_BEFORE_NOT_NEW_CONTENT)
+                return true;
         }
-        return map;
+
+        return false;
     }
+
+    private int daysAgo(long timestamp) {
+        return (int)((System.currentTimeMillis() - timestamp) / (24 * 60 * 60 * 1000));
+    }
+
+
 
 }
