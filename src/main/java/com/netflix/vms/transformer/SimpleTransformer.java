@@ -18,12 +18,16 @@ import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHiera
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
 import com.netflix.vms.transformer.modules.deploymentintent.CacheDeploymentIntentModule;
 import com.netflix.vms.transformer.modules.drmsystem.DrmSystemModule;
+import com.netflix.vms.transformer.modules.drmsystem.DrmSystemModule;
 import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
+import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
+import com.netflix.vms.transformer.modules.originserver.OriginServersModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkFormatModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkImageRecipeModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkTypeModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.DefaultExtensionRecipeModule;
 import com.netflix.vms.transformer.modules.passthrough.beehive.RolloutCharacterModule;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,12 +77,15 @@ public class SimpleTransformer {
 
         objectMapper.addObject(new DeploymentIntent());
         new DrmSystemModule(api, objectMapper).transform();
+        new OriginServersModule(api, objectMapper, indexer).transform();
+
         new ArtworkFormatModule(api, objectMapper).transform();
         new CacheDeploymentIntentModule(api, objectMapper).transform();
         new ArtworkTypeModule(api, objectMapper).transform();
         new ArtworkImageRecipeModule(api, objectMapper).transform();
         new DefaultExtensionRecipeModule(api, objectMapper).transform();
         new RolloutCharacterModule(api, objectMapper).transform();
+
         executor.awaitSuccessfulCompletion();
 
         long endTime = System.currentTimeMillis();
@@ -106,8 +113,8 @@ public class SimpleTransformer {
     }
 
     private void writeJustTheCurrentData(Map<String, VideoCollectionsDataHierarchy> vcdByCountry,
-                                         Map<String, Map<Integer, VideoMetaData>> vmdByCountry,
-                                         HollowObjectMapper objectMapper) {
+            Map<String, Map<Integer, VideoMetaData>> vmdByCountry,
+            HollowObjectMapper objectMapper) {
 
         for(Map.Entry<String, VideoCollectionsDataHierarchy> countryHierarchyEntry : vcdByCountry.entrySet()) {
             String countryId = countryHierarchyEntry.getKey();
