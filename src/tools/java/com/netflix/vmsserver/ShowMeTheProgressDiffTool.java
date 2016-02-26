@@ -16,6 +16,7 @@ public class ShowMeTheProgressDiffTool {
         addTypeDiff(diff, "DrmSystem", "id");
         addTypeDiff(diff, "ArtWorkImageFormatEntry", "nameStr");
         addTypeDiff(diff, "DeploymentIntent", "profileId", "bitrate", "country.id");
+        addTypeDiff(diff, "TopNVideoData", "countryId");
 
         diff.calculateDiffs();
 
