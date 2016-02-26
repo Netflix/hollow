@@ -35,13 +35,15 @@ public class ShowMeTheProgress {
 
     public static HollowFilterConfig getDiffFilter(Collection<HollowSchema> outputSchemas) {
         HollowFilterConfig filter = new HollowFilterConfig();
-        filter.addFieldRecursive("CompleteVideo", "id", outputSchemas);
+        /*filter.addFieldRecursive("CompleteVideo", "id", outputSchemas);
         filter.addFieldRecursive("CompleteVideo", "country", outputSchemas);
         filter.addField("CompleteVideo", "facetData");
         filter.addFieldRecursive("CompleteVideoFacetData", "videoCollectionsData", outputSchemas);
         //filter.addFieldRecursive("CompleteVideoFacetData", "videoMetaData", outputSchemas);
 
-        filter.addTypeRecursive("DrmSystem", outputSchemas);
+        filter.addTypeRecursive("DrmSystem", outputSchemas);*/
+        //filter.addTypeRecursive("ArtWorkImageTypeEntry", outputSchemas);
+        filter.addTypeRecursive("ArtWorkImageRecipe", outputSchemas);
 
         return filter;
     }
