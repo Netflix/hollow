@@ -1,9 +1,5 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
-
-import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
-import com.netflix.vms.transformer.modules.drmsystem.DrmSystemModule;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
@@ -15,9 +11,15 @@ import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
+import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
+import com.netflix.vms.transformer.modules.artwork.passthrough.ArtworkImageRecipeModule;
+import com.netflix.vms.transformer.modules.artwork.passthrough.ArtworkTypeModule;
+import com.netflix.vms.transformer.modules.artwork.passthrough.DefaultExtensionRecipeModule;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHierarchy;
+import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
+import com.netflix.vms.transformer.modules.drmsystem.DrmSystemModule;
+import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,6 +67,12 @@ public class SimpleTransformer {
         }
 
         new DrmSystemModule(api, objectMapper).transform();
+        
+        new ArtworkTypeModule(api, objectMapper).transform();
+        
+        new ArtworkImageRecipeModule(api, objectMapper).transform();
+        
+        new DefaultExtensionRecipeModule(api, objectMapper).transform();
 
         executor.awaitSuccessfulCompletion();
 
