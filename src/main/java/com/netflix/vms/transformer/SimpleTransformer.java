@@ -97,7 +97,7 @@ public class SimpleTransformer {
             long tStart = System.currentTimeMillis();
             m.transform();
             long tDuration = System.currentTimeMillis() - tStart;
-            System.out.println(String.format("Finished %s, duration=%s", m.getName(), tDuration));
+            System.out.println(String.format("Finished Trasform for module=%s, duration=%s", m.getName(), tDuration));
         }
 
 
