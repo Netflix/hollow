@@ -14,7 +14,10 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.modules.artworkformat.ArtworkFormatModule;
+import com.netflix.vms.transformer.modules.artwork.passthrough.ArtworkFormatModule;
+import com.netflix.vms.transformer.modules.artwork.passthrough.ArtworkImageRecipeModule;
+import com.netflix.vms.transformer.modules.artwork.passthrough.ArtworkTypeModule;
+import com.netflix.vms.transformer.modules.artwork.passthrough.DefaultExtensionRecipeModule;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHierarchy;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
 import com.netflix.vms.transformer.modules.deploymentintent.CacheDeploymentIntentModule;
@@ -71,6 +74,9 @@ public class SimpleTransformer {
         new DrmSystemModule(api, objectMapper).transform();
         new ArtworkFormatModule(api, objectMapper).transform();
         new CacheDeploymentIntentModule(api, objectMapper).transform();
+        new ArtworkTypeModule(api, objectMapper).transform();
+        new ArtworkImageRecipeModule(api, objectMapper).transform();
+        new DefaultExtensionRecipeModule(api, objectMapper).transform();
 
         executor.awaitSuccessfulCompletion();
 
