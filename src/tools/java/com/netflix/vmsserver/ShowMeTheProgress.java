@@ -23,12 +23,11 @@ public class ShowMeTheProgress {
 
     @Test
     public void start() throws Exception {
-        SimpleTransformer transformer = new SimpleTransformer();
+        VMSHollowVideoInputAPI api = new VMSHollowVideoInputAPI(loadStateEngine("/filtered-input.hollow"));
 
-        HollowReadStateEngine inputStateEngine = loadStateEngine("/filtered-input.hollow");
-        VMSHollowVideoInputAPI api = new VMSHollowVideoInputAPI(inputStateEngine);
+        SimpleTransformer transformer = new SimpleTransformer(api);
 
-        HollowWriteStateEngine outputStateEngine = transformer.transform(inputStateEngine, api);
+        HollowWriteStateEngine outputStateEngine = transformer.transform();
         HollowReadStateEngine actualOutputReadStateEngine = roundTripOutputStateEngine(outputStateEngine);
         HollowReadStateEngine expectedOutputStateEngine = loadStateEngine("/expected-output.hollow", getDiffFilter(actualOutputReadStateEngine.getSchemas()));
 
@@ -45,7 +44,10 @@ public class ShowMeTheProgress {
 
         filter.addTypeRecursive("DrmSystem", outputSchemas);
         filter.addTypeRecursive("OriginServer", outputSchemas);
+        filter.addTypeRecursive("ArtWorkImageFormatEntry", outputSchemas); // TODO: zero-diff
+        filter.addTypeRecursive("DeploymentIntent", outputSchemas);
 
+        filter.addTypeRecursive("RolloutCharacter", outputSchemas); // TODO: zero-diff
         return filter;
     }
 

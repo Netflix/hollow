@@ -3,17 +3,24 @@ package com.netflix.vms.transformer.modules.meta;
 import static com.netflix.hollow.read.iterator.HollowOrdinalIterator.NO_MORE_ORDINALS;
 import static com.netflix.vms.transformer.index.IndexSpec.PERSONS_BY_VIDEO_ID;
 import static com.netflix.vms.transformer.index.IndexSpec.PERSON_ROLES_BY_VIDEO_ID;
+import static com.netflix.vms.transformer.index.IndexSpec.STORIES_SYNOPSES;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_DATE;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_RIGHTS;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 
+import com.netflix.vms.transformer.hollowinput.VideoRightsFlagsHollow;
+
+import com.netflix.vms.transformer.hollowinput.VideoGeneralAliasListHollow;
+import com.netflix.vms.transformer.hollowinput.VideoGeneralAliasHollow;
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.vms.transformer.ShowHierarchy;
+import com.netflix.vms.transformer.hollowinput.StoriesSynopsesHookHollow;
+import com.netflix.vms.transformer.hollowinput.Stories_SynopsesHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoDateWindowHollow;
@@ -24,10 +31,13 @@ import com.netflix.vms.transformer.hollowinput.VideoRightsHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
 import com.netflix.vms.transformer.hollowoutput.Date;
+import com.netflix.vms.transformer.hollowoutput.Hook;
+import com.netflix.vms.transformer.hollowoutput.HookType;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.NFLocale;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VPerson;
+import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
@@ -59,10 +69,12 @@ public class VideoMetaDataModule {
     private final HollowHashIndex videoPersonIdx;
     private final HollowHashIndex videoPersonRoleIdx;
     private final HollowPrimaryKeyIndex videoRightsIdx;
+    private final HollowPrimaryKeyIndex storiesSynopsesIdx;
 
-    private final Map<Integer, List<VPerson>> actorLists = new HashMap<Integer, List<VPerson>>();
-    private final Map<Integer, List<VPerson>> directorLists = new HashMap<Integer, List<VPerson>>();
-    private final Map<Integer, List<VPerson>> creatorLists = new HashMap<Integer, List<VPerson>>();
+    Map<Integer, VideoMetaData> countryAgnosticMap = new HashMap<Integer, VideoMetaData>();
+    Map<Integer, Map<VideoMetaDataCountrySpecificDataKey, VideoMetaData>> countrySpecificMap = new HashMap<Integer, Map<VideoMetaDataCountrySpecificDataKey,VideoMetaData>>();
+
+    private final Map<String, HookType> hookTypeMap = new HashMap<String, HookType>();
 
     public VideoMetaDataModule(VMSHollowVideoInputAPI api, VMSTransformerIndexer indexer) {
         this.api = api;
@@ -73,61 +85,130 @@ public class VideoMetaDataModule {
         this.videoDateIdx = indexer.getHashIndex(VIDEO_DATE);
         this.videoRightsIdx = indexer.getPrimaryKeyIndex(VIDEO_RIGHTS);
         this.videoTypeCountryIdx = indexer.getHashIndex(VIDEO_TYPE_COUNTRY);
+        this.storiesSynopsesIdx = indexer.getPrimaryKeyIndex(STORIES_SYNOPSES);
+
+        hookTypeMap.put("TV Ratings Hook", new HookType("TV_RATINGS"));
+        hookTypeMap.put("Awards/Critical Praise Hook", new HookType("AWARDS_CRITICAL_PRAISE"));
+        hookTypeMap.put("Box Office Hook", new HookType("BOX_OFFICE"));
+        hookTypeMap.put("Talent/Actors Hook", new HookType("TALENT_ACTORS"));
+        hookTypeMap.put("Unknown", new HookType("UNKNOWN"));
     }
 
     public Map<String, Map<Integer, VideoMetaData>> buildVideoMetaDataByCountry(Map<String, ShowHierarchy> showHierarchiesByCountry) {
+        countryAgnosticMap.clear();
+        countrySpecificMap.clear();
+
         Map<String, Map<Integer, VideoMetaData>> allVideoMetaDataMap = new HashMap<String, Map<Integer,VideoMetaData>>();
 
         for(Map.Entry<String, ShowHierarchy> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
+            VideoMetaDataRollupValues rollup = new VideoMetaDataRollupValues();
             Map<Integer, VideoMetaData> countryMap = new HashMap<Integer, VideoMetaData>();
             allVideoMetaDataMap.put(entry.getKey(), countryMap);
 
             ShowHierarchy hierarchy = entry.getValue();
 
-            convert(hierarchy.getTopNodeId(), countryCode, countryMap);
-
             for(int i=0;i<hierarchy.getSeasonIds().length;i++) {
+                rollup.newSeason();
+
                 for(int j=0;j<hierarchy.getEpisodeIds()[i].length;j++) {
-                    convert(hierarchy.getEpisodeIds()[i][j], countryCode, countryMap);
+                    convert(hierarchy.getEpisodeIds()[i][j], countryCode, countryMap, rollup);
                 }
 
-                convert(hierarchy.getSeasonIds()[i], countryCode, countryMap);
+                rollup.setDoSeason(true);
+                convert(hierarchy.getSeasonIds()[i], countryCode, countryMap, rollup);
+                rollup.setDoSeason(false);
             }
 
+            rollup.setDoShow(true);
+            convert(hierarchy.getTopNodeId(), countryCode, countryMap, rollup);
+            rollup.setDoShow(false);
+
             for(int i=0;i<hierarchy.getSupplementalIds().length;i++) {
-                convert(hierarchy.getSupplementalIds()[i], countryCode, countryMap);
+                convert(hierarchy.getSupplementalIds()[i], countryCode, countryMap, rollup);
             }
         }
 
         return allVideoMetaDataMap;
     }
 
-    private void convert(Integer videoId, String countryCode, Map<Integer, VideoMetaData> countryMap) {
-        VideoMetaData vmd = new VideoMetaData();
+    /// Here is a good pattern for processing country-specific data
+    private void convert(Integer videoId, String countryCode, Map<Integer, VideoMetaData> countryMap, VideoMetaDataRollupValues rollup) {
+        /// first create the country specific key
+        VideoMetaDataCountrySpecificDataKey countrySpecificKey = createCountrySpecificKey(videoId, countryCode, rollup);
+
+        /// then try to get the country specific clone, return it if it exists
+        Map<VideoMetaDataCountrySpecificDataKey, VideoMetaData> countrySpecificMap = this.countrySpecificMap.get(videoId);
+        if(countrySpecificMap == null) {
+            countrySpecificMap = new HashMap<VideoMetaDataCountrySpecificDataKey, VideoMetaData>();
+            this.countrySpecificMap.put(videoId, countrySpecificMap);
+        }
+
+        VideoMetaData countrySpecificClone = countrySpecificMap.get(countrySpecificKey);
+        if(countrySpecificClone != null) {
+            countryMap.put(videoId, countrySpecificClone);
+            return;
+        }
+
+        /// get the country agnostic data
+        VideoMetaData countryAgnosticVMD = getCountryAgnosticClone(videoId);
+
+        /// clone the country agnostic data
+        countrySpecificClone = countryAgnosticVMD.clone();
+
+
+        /// set the country specific data
+        countrySpecificClone.isSearchOnly = countrySpecificKey.isSearchOnly;
+        countrySpecificClone.isTheatricalRelease = countrySpecificKey.isTheatricalRelease;
+        countrySpecificClone.theatricalReleaseDate = countrySpecificKey.theatricalReleaseDate;
+        countrySpecificClone.year = countrySpecificKey.year;
+        countrySpecificClone.latestYear = countrySpecificKey.latestYear;
+        countrySpecificClone.videoSetTypes = countrySpecificKey.videoSetTypes;
+        countrySpecificClone.showMemberTypeId = (int) countrySpecificKey.showMemberTypeId;
+        countrySpecificClone.copyright = countrySpecificKey.copyright;
+
+
+        /// return the country specific clone
+        countrySpecificMap.put(countrySpecificKey, countrySpecificClone);
+
+        countryMap.put(videoId, countrySpecificClone);
+    }
+
+    private VideoMetaDataCountrySpecificDataKey createCountrySpecificKey(Integer videoId, String countryCode, VideoMetaDataRollupValues rollup) {
+        VideoMetaDataCountrySpecificDataKey countrySpecificKey = new VideoMetaDataCountrySpecificDataKey();
 
         int rightsOrdinal = videoRightsIdx.getMatchingOrdinal((long)videoId, countryCode);
         VideoRightsHollow rights = null;
         if(rightsOrdinal != -1) {
             rights = api.getVideoRightsHollow(rightsOrdinal);
-            vmd.isSearchOnly = rights._getFlags()._getSearchOnly();
+            countrySpecificKey.isSearchOnly = rights._getFlags()._getSearchOnly();
         }
+        populateSetTypes(videoId, countryCode, rights, countrySpecificKey);
+        populateDates(videoId, countryCode, rollup, rights, countrySpecificKey);
+        return countrySpecificKey;
+    }
 
+    private VideoMetaData getCountryAgnosticClone(Integer videoId) {
+        VideoMetaData vmd = countryAgnosticMap.get(videoId);
+        if(vmd != null)
+            return vmd;
+
+        vmd = new VideoMetaData();
+
+        populateGeneral(videoId, vmd);
+        populateCastLists(videoId, vmd);
+        populateHooks(videoId, vmd);
 
         int typeOrdinal = videoTypeIdx.getMatchingOrdinal((long)videoId);
         if(typeOrdinal != -1)
             vmd.isTV = api.getVideoTypeTypeAPI().getIsTV(typeOrdinal);
 
-        populateSetTypes(videoId, countryCode, rights, vmd);
-        populateGeneral(videoId, vmd);
-        populateRights(videoId, countryCode, vmd);
-        populateDates(videoId, countryCode, vmd);
-        populateCastLists(videoId, vmd);
+        countryAgnosticMap.put(videoId, vmd);
 
-        countryMap.put(videoId, vmd);
+        return vmd;
     }
 
-    private void populateSetTypes(Integer videoId, String countryCode, VideoRightsHollow rights, VideoMetaData vmd) {
+    private void populateSetTypes(Integer videoId, String countryCode, VideoRightsHollow rights, VideoMetaDataCountrySpecificDataKey vmd) {
         HollowHashIndexResult videoTypeMatches = videoTypeCountryIdx.findMatches((long)videoId, countryCode);
         VideoTypeDescriptorHollow typeDescriptor = null;
         if(videoTypeMatches != null)
@@ -174,6 +255,15 @@ public class VideoMetaDataModule {
             setOfVideoSetType.add(PAST);
 
         vmd.videoSetTypes = setOfVideoSetType;
+        long showMemberTypeId = typeDescriptor._getShowMemberTypeId();
+        if(showMemberTypeId != Long.MIN_VALUE)
+            vmd.showMemberTypeId = (int)showMemberTypeId;
+
+        StringHollow copyright = typeDescriptor._getCopyright();
+        if(copyright != null) {
+            System.out.println(copyright._getValue());
+            vmd.copyright = new Strings(copyright._getValue());
+        }
     }
 
     private void populateGeneral(Integer videoId, VideoMetaData vmd) {
@@ -184,17 +274,24 @@ public class VideoMetaDataModule {
             StringHollow origCountry = general._getOriginCountryCode();
             if(origCountry != null)
                 vmd.countryOfOrigin = new ISOCountry(origCountry._getValue());
-            vmd.countryOfOriginNameLocale = new NFLocale(general._getCountryOfOriginNameLocale()._getValue());
+            vmd.countryOfOriginNameLocale = new NFLocale(general._getCountryOfOriginNameLocale()._getValue().replace('-', '_'));
             StringHollow origLang = general._getOriginalLanguageBcpCode();
             if(origLang != null)
                 vmd.originalLanguageBcp47code = new Strings(origLang._getValue());
+
+            VideoGeneralAliasListHollow inputAliases = general._getAliases();
+
+            if(inputAliases != null) {
+                Set<Strings> aliasList = new HashSet<Strings>();
+                for(VideoGeneralAliasHollow alias : inputAliases) {
+                    aliasList.add(new Strings(alias._getValue()._getValue()));
+                }
+                vmd.aliases = aliasList;
+            }
         }
     }
 
-    private void populateRights(Integer videoId, String countryCode, VideoMetaData vmd) {
-    }
-
-    private void populateDates(Integer videoId, String countryCode, VideoMetaData vmd) {
+    private void populateDates(Integer videoId, String countryCode, VideoMetaDataRollupValues rollup, VideoRightsHollow rights, VideoMetaDataCountrySpecificDataKey vmd) {
         HollowHashIndexResult dateResult = videoDateIdx.findMatches((long)videoId, countryCode);
 
         if(dateResult != null) {
@@ -205,7 +302,24 @@ public class VideoMetaDataModule {
             vmd.year = dateWindow._getTheatricalReleaseYear();
             if(dateWindow._getTheatricalReleaseDate() != Long.MIN_VALUE)
                 vmd.theatricalReleaseDate = new Date(dateWindow._getTheatricalReleaseDate());
-            vmd.latestYear = vmd.year;
+
+/*            boolean isGoLive = false;
+
+            if(rights != null) {
+                VideoRightsFlagsHollow flags = rights._getFlags();
+                if(flags != null && flags._getGoLive())
+                    isGoLive = true;
+            }
+
+            if(isGoLive)
+*/                rollup.newLatestYear(vmd.year);
+
+            if(rollup.doSeason() /*&& isGoLive*/)
+                vmd.latestYear = rollup.getSeasonLatestYear();
+            else if(rollup.doShow() /*&& isGoLive*/)
+                vmd.latestYear = rollup.getShowLatestYear();
+            else
+                vmd.latestYear = vmd.year;
         } else {
             vmd.year = 0;
             vmd.latestYear = 0;
@@ -213,53 +327,78 @@ public class VideoMetaDataModule {
     }
 
     private void populateCastLists(Integer videoId, VideoMetaData vmd) {
-        List<VPerson> actorList = this.actorLists.get(videoId);
+        List<VPerson> actorList = new ArrayList<VPerson>();
+        List<VPerson> directorList = new ArrayList<VPerson>();
+        List<VPerson> creatorList = new ArrayList<VPerson>();
 
-        if(actorList == null) {
-            actorList = new ArrayList<VPerson>();
-            List<VPerson> directorList = new ArrayList<VPerson>();
-            List<VPerson> creatorList = new ArrayList<VPerson>();
+        HollowHashIndexResult personMatches = videoPersonIdx.findMatches((long)videoId);
+        if(personMatches != null) {
+            HollowOrdinalIterator iter = personMatches.iterator();
 
-            HollowHashIndexResult personMatches = videoPersonIdx.findMatches((long)videoId);
-            if(personMatches != null) {
-                HollowOrdinalIterator iter = personMatches.iterator();
+            int personOrdinal = iter.next();
+            while(personOrdinal != NO_MORE_ORDINALS) {
+                VideoPersonHollow person = api.getVideoPersonHollow(personOrdinal);
 
-                int personOrdinal = iter.next();
-                while(personOrdinal != NO_MORE_ORDINALS) {
-                    VideoPersonHollow person = api.getVideoPersonHollow(personOrdinal);
+                long personId = person._getPersonId();
 
-                    long personId = person._getPersonId();
+                HollowHashIndexResult roleMatches = videoPersonRoleIdx.findMatches(personId, (long)videoId);
+                HollowOrdinalIterator roleIter = roleMatches.iterator();
 
-                    HollowHashIndexResult roleMatches = videoPersonRoleIdx.findMatches(personId, (long)videoId);
-                    HollowOrdinalIterator roleIter = roleMatches.iterator();
+                int roleOrdinal = roleIter.next();
+                while(roleOrdinal != NO_MORE_ORDINALS) {
+                    VideoPersonCastHollow role = api.getVideoPersonCastHollow(roleOrdinal);
 
-                    int roleOrdinal = roleIter.next();
-                    while(roleOrdinal != NO_MORE_ORDINALS) {
-                        VideoPersonCastHollow role = api.getVideoPersonCastHollow(roleOrdinal);
-
-                        if(role._getRoleTypeId() == ACTOR_ROLE_ID) {
-                            actorList.add(new VPerson((int)personId));
-                        } else if(role._getRoleTypeId() == DIRECTOR_ROLE_ID) {
-                            directorList.add(new VPerson((int)personId));
-                        } else if(role._getRoleTypeId() == CREATOR_ROLE_ID) {
-                            creatorList.add(new VPerson((int)personId));
-                        }
-
-                        roleOrdinal = roleIter.next();
+                    if(role._getRoleTypeId() == ACTOR_ROLE_ID) {
+                        actorList.add(new VPerson((int)personId));
+                    } else if(role._getRoleTypeId() == DIRECTOR_ROLE_ID) {
+                        directorList.add(new VPerson((int)personId));
+                    } else if(role._getRoleTypeId() == CREATOR_ROLE_ID) {
+                        creatorList.add(new VPerson((int)personId));
                     }
 
-                    personOrdinal = iter.next();
+                    roleOrdinal = roleIter.next();
                 }
-            }
 
-            this.actorLists.put(videoId, actorList);
-            this.directorLists.put(videoId, directorList);
-            this.creatorLists.put(videoId, creatorList);
+                personOrdinal = iter.next();
+            }
         }
 
         vmd.actorList = actorList;
-        vmd.directorList = directorLists.get(videoId);
-        vmd.creatorList = creatorLists.get(videoId);
+        vmd.directorList = directorList;
+        vmd.creatorList = creatorList;
+    }
+
+    private void populateHooks(Integer videoId, VideoMetaData vmd) {
+        int storiesSynopsesOrdinal = storiesSynopsesIdx.getMatchingOrdinal((long)videoId);
+
+        if(storiesSynopsesOrdinal != -1) {
+            Stories_SynopsesHollow synopses = api.getStories_SynopsesHollow(storiesSynopsesOrdinal);
+
+            List<Hook> hooks = new ArrayList<Hook>();
+
+            for(StoriesSynopsesHookHollow hook : synopses._getHooks()) {
+                String type = hook._getType()._getValue();
+                int rank = Integer.parseInt(hook._getRank()._getValue());
+
+                Hook outputHook = new Hook();
+                outputHook.type = hookTypeMap.get(type);
+                outputHook.rank = rank;
+                outputHook.video = new Video(videoId);
+
+                hooks.add(outputHook);
+            }
+
+            vmd.hooks = hooks;
+        }
+    }
+
+    private <K, V> Map<K, V> get(ThreadLocal<Map<K, V>> tl) {
+        Map<K, V> map = tl.get();
+        if(map == null) {
+            map = new HashMap<K, V>();
+            tl.set(map);
+        }
+        return map;
     }
 
 }

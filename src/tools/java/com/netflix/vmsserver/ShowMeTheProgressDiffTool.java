@@ -17,6 +17,9 @@ public class ShowMeTheProgressDiffTool {
         addTypeDiff(diff, "DrmSystem", "id");
         addTypeDiff(diff, "OriginServer", "name");
 
+        addTypeDiff(diff, "ArtWorkImageFormatEntry", "nameStr");
+        addTypeDiff(diff, "DeploymentIntent", "profileId", "bitrate", "country.id");
+        addTypeDiff(diff, "RolloutCharacter", "id");
         diff.calculateDiffs();
 
         int port = randomPort();

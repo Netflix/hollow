@@ -8,6 +8,7 @@ import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoDisplaySetHollow;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
+import com.netflix.vms.transformer.hollowoutput.DeploymentIntent;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
@@ -15,22 +16,37 @@ import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHierarchy;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
+import com.netflix.vms.transformer.modules.deploymentintent.CacheDeploymentIntentModule;
+import com.netflix.vms.transformer.modules.drmsystem.DrmSystemModule;
 import com.netflix.vms.transformer.modules.drmsystem.DrmSystemModule;
 import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
+import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
 import com.netflix.vms.transformer.modules.originserver.OriginServersModule;
+import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkFormatModule;
+import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkImageRecipeModule;
+import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkTypeModule;
+import com.netflix.vms.transformer.modules.passthrough.artwork.DefaultExtensionRecipeModule;
+import com.netflix.vms.transformer.modules.passthrough.beehive.RolloutCharacterModule;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class SimpleTransformer {
 
-    public HollowWriteStateEngine transform(HollowReadStateEngine inputStateEngine, VMSHollowVideoInputAPI api) throws Exception {
+    private final ThreadLocal<VideoCollectionsModule> collectionsModuleRef = new ThreadLocal<VideoCollectionsModule>();
+    private final ThreadLocal<VideoMetaDataModule> metadataModuleRef = new ThreadLocal<VideoMetaDataModule>();
 
-        VMSTransformerIndexer indexer = new VMSTransformerIndexer(inputStateEngine, new SimultaneousExecutor());
+    private final VMSHollowVideoInputAPI api;
+    private VMSTransformerIndexer indexer;
+
+    public SimpleTransformer(VMSHollowVideoInputAPI api) {
+        this.api = api;
+    }
+
+    public HollowWriteStateEngine transform() throws Exception {
+        indexer = new VMSTransformerIndexer((HollowReadStateEngine)api.getDataAccess(), new SimultaneousExecutor());
 
         final ShowHierarchyInitializer hierarchyInitializer = new ShowHierarchyInitializer(api, indexer);
-        final VideoCollectionsModule collectionsBuilder = new VideoCollectionsModule(api, indexer);
-        final VideoMetaDataModule metadataModule = new VideoMetaDataModule(api, indexer);
 
         HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();  //TODO: Need to define a HashCodeFinder.
         final HollowObjectMapper objectMapper = new HollowObjectMapper(writeStateEngine);
@@ -43,10 +59,13 @@ public class SimpleTransformer {
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
+                    VideoCollectionsModule collectionsModule = getVideoCollectionsModule();
+                    VideoMetaDataModule metadataModule = getVideoMetaDataModule();
+
                     Map<String, ShowHierarchy> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(displaySet);
 
                     if(showHierarchiesByCountry != null) {
-                        Map<String, VideoCollectionsDataHierarchy> vcdByCountry = collectionsBuilder.buildVideoCollectionsDataByCountry(showHierarchiesByCountry);
+                        Map<String, VideoCollectionsDataHierarchy> vcdByCountry = collectionsModule.buildVideoCollectionsDataByCountry(showHierarchiesByCountry);
                         Map<String, Map<Integer, VideoMetaData>> vmdByCountry = metadataModule.buildVideoMetaDataByCountry(showHierarchiesByCountry);
 
                         if(vcdByCountry != null)
@@ -56,8 +75,16 @@ public class SimpleTransformer {
             });
         }
 
+        objectMapper.addObject(new DeploymentIntent());
         new DrmSystemModule(api, objectMapper).transform();
         new OriginServersModule(api, objectMapper, indexer).transform();
+
+        new ArtworkFormatModule(api, objectMapper).transform();
+        new CacheDeploymentIntentModule(api, objectMapper).transform();
+        new ArtworkTypeModule(api, objectMapper).transform();
+        new ArtworkImageRecipeModule(api, objectMapper).transform();
+        new DefaultExtensionRecipeModule(api, objectMapper).transform();
+        new RolloutCharacterModule(api, objectMapper).transform();
 
         executor.awaitSuccessfulCompletion();
 
@@ -65,6 +92,24 @@ public class SimpleTransformer {
         System.out.println("Processed all videos in " + (endTime - startTime) + "ms");
 
         return writeStateEngine;
+    }
+
+    private VideoCollectionsModule getVideoCollectionsModule() {
+        VideoCollectionsModule module = collectionsModuleRef.get();
+        if(module == null) {
+            module = new VideoCollectionsModule(api, indexer);
+            collectionsModuleRef.set(module);
+        }
+        return module;
+    }
+
+    private VideoMetaDataModule getVideoMetaDataModule() {
+        VideoMetaDataModule module = metadataModuleRef.get();
+        if(module == null) {
+            module = new VideoMetaDataModule(api, indexer);
+            metadataModuleRef.set(module);
+        }
+        return module;
     }
 
     private void writeJustTheCurrentData(Map<String, VideoCollectionsDataHierarchy> vcdByCountry,

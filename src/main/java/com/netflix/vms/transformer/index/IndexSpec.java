@@ -12,6 +12,8 @@ public enum IndexSpec {
     VIDEO_GENERAL(PRIMARY_KEY, "VideoGeneral", "videoId"),
     STORAGE_GROUPS(PRIMARY_KEY, "StorageGroups", "id.value"),
     CDNS(PRIMARY_KEY, "Cdns", "id"),
+    STORIES_SYNOPSES(PRIMARY_KEY, "Stories_Synopses", "movieId"),
+
 
     VIDEO_DATE(HASH, "VideoDate", "window.element", "videoId", "window.element.countryCode.value"),
     PERSONS_BY_VIDEO_ID(HASH, "VideoPerson", "", "cast.element.videoId"),
