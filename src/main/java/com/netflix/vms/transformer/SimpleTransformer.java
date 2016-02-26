@@ -22,7 +22,7 @@ import com.netflix.vms.transformer.modules.drmsystem.DrmSystemModule;
 import com.netflix.vms.transformer.modules.drmsystem.DrmSystemModule;
 import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
 import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
-import com.netflix.vms.transformer.modules.originserver.OriginServersModule;
+import com.netflix.vms.transformer.modules.originserver.OriginServerModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkFormatModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkImageRecipeModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkTypeModule;
@@ -83,7 +83,7 @@ public class SimpleTransformer {
         // Register Transform Modules
         List<TransformModule> moduleList = Arrays.asList(
                 new DrmSystemModule(api, objectMapper),
-                new OriginServersModule(api, objectMapper, indexer),
+                new OriginServerModule(api, objectMapper, indexer),
 
                 new ArtworkFormatModule(api, objectMapper),
                 new CacheDeploymentIntentModule(api, objectMapper),
