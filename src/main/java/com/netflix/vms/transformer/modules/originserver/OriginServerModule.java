@@ -16,12 +16,12 @@ import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
 import com.netflix.vms.transformer.util.ISOCountryUtil;
 
-public class OriginServersModule extends AbstractTransformModule {
+public class OriginServerModule extends AbstractTransformModule {
 
     private final HollowPrimaryKeyIndex storageGroupsIndex;
     private final HollowPrimaryKeyIndex cdnsIndex;
 
-    public OriginServersModule(VMSHollowVideoInputAPI api, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+    public OriginServerModule(VMSHollowVideoInputAPI api, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
         super(api, mapper);
         this.storageGroupsIndex = indexer.getPrimaryKeyIndex(IndexSpec.STORAGE_GROUPS);
         this.cdnsIndex = indexer.getPrimaryKeyIndex(IndexSpec.CDNS);
