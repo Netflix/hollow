@@ -1,4 +1,4 @@
-package com.netflix.vms.transformer.modules.originserver;
+package com.netflix.vms.transformer.modules.mpl;
 
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
@@ -13,22 +13,21 @@ import com.netflix.vms.transformer.hollowoutput.StorageGroup;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.modules.AbstractTransformModule;
 import com.netflix.vms.transformer.util.ISOCountryUtil;
 
-public class OriginServersModule {
+public class OriginServerModule extends AbstractTransformModule {
 
-    private final VMSHollowVideoInputAPI api;
-    private final HollowObjectMapper mapper;
     private final HollowPrimaryKeyIndex storageGroupsIndex;
     private final HollowPrimaryKeyIndex cdnsIndex;
 
-    public OriginServersModule(VMSHollowVideoInputAPI api, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
-        this.api = api;
-        this.mapper = mapper;
+    public OriginServerModule(VMSHollowVideoInputAPI api, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+        super(api, mapper);
         this.storageGroupsIndex = indexer.getPrimaryKeyIndex(IndexSpec.STORAGE_GROUPS);
         this.cdnsIndex = indexer.getPrimaryKeyIndex(IndexSpec.CDNS);
     }
 
+    @Override
     public void transform() {
         for (OriginServersHollow input : api.getAllOriginServersHollow()) {
             OriginServer output = new OriginServer();

@@ -1,8 +1,5 @@
 package com.netflix.vms.transformer;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
@@ -13,23 +10,29 @@ import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
 import com.netflix.vms.transformer.hollowoutput.DeploymentIntent;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
-import com.netflix.vms.transformer.hollowoutput.TopNVideoData;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.misc.TopNVideoDataModule;
+import com.netflix.vms.transformer.modules.TransformModule;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHierarchy;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
 import com.netflix.vms.transformer.modules.deploymentintent.CacheDeploymentIntentModule;
-import com.netflix.vms.transformer.modules.drmsystem.DrmSystemModule;
 import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
-import com.netflix.vms.transformer.modules.originserver.OriginServersModule;
+import com.netflix.vms.transformer.modules.mpl.DrmSystemModule;
+import com.netflix.vms.transformer.modules.mpl.EncodingProfileModule;
+import com.netflix.vms.transformer.modules.mpl.OriginServerModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkFormatModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkImageRecipeModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkTypeModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.DefaultExtensionRecipeModule;
 import com.netflix.vms.transformer.modules.passthrough.beehive.RolloutCharacterModule;
+import com.netflix.vms.transformer.modules.person.GlobalPersonModule;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SimpleTransformer {
 
@@ -76,18 +79,29 @@ public class SimpleTransformer {
         }
 
         objectMapper.addObject(new DeploymentIntent());
-        new DrmSystemModule(api, objectMapper).transform();
-        new OriginServersModule(api, objectMapper, indexer).transform();
 
-        new ArtworkFormatModule(api, objectMapper).transform();
-        new CacheDeploymentIntentModule(api, objectMapper).transform();
-        new ArtworkTypeModule(api, objectMapper).transform();
-        new ArtworkImageRecipeModule(api, objectMapper).transform();
-        new DefaultExtensionRecipeModule(api, objectMapper).transform();
-//        objectMapper.addObject(new TopNVideoData());
-        new TopNVideoDataModule(api, objectMapper).transform();
-        
-        new RolloutCharacterModule(api, objectMapper).transform();
+        // Register Transform Modules
+        List<TransformModule> moduleList = Arrays.<TransformModule>asList(
+                new DrmSystemModule(api, objectMapper),
+                new OriginServerModule(api, objectMapper, indexer),
+                new EncodingProfileModule(api, objectMapper, indexer),
+
+                new ArtworkFormatModule(api, objectMapper),
+                new CacheDeploymentIntentModule(api, objectMapper),
+                new ArtworkTypeModule(api, objectMapper),
+                new ArtworkImageRecipeModule(api, objectMapper),
+                new DefaultExtensionRecipeModule(api, objectMapper),
+                new RolloutCharacterModule(api, objectMapper),
+                new GlobalPersonModule(api, objectMapper, indexer));
+
+        // Execute Transform Modules
+        for(TransformModule m : moduleList) {
+            long tStart = System.currentTimeMillis();
+            m.transform();
+            long tDuration = System.currentTimeMillis() - tStart;
+            System.out.println(String.format("Finished Trasform for module=%s, duration=%s", m.getName(), tDuration));
+        }
+
 
         executor.awaitSuccessfulCompletion();
 
