@@ -43,6 +43,8 @@ public class ShowMeTheProgress {
         filter.addTypeRecursive("DrmSystem", outputSchemas);
         filter.addTypeRecursive("ArtWorkImageFormatEntry", outputSchemas); // TODO: zero-diff
         filter.addTypeRecursive("DeploymentIntent", outputSchemas);
+        
+        filter.addTypeRecursive("TopNVideoData", outputSchemas);        
 
         return filter;
     }
