@@ -44,6 +44,7 @@ public class ShowMeTheProgress {
         filter.addTypeRecursive("ArtWorkImageFormatEntry", outputSchemas); // TODO: zero-diff
         filter.addTypeRecursive("DeploymentIntent", outputSchemas);
 
+        filter.addTypeRecursive("RolloutCharacter", outputSchemas); // TODO: fix expected = 0
         return filter;
     }
 
