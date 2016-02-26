@@ -4,12 +4,11 @@ import com.netflix.hollow.diff.HollowDiff;
 import com.netflix.hollow.diff.HollowTypeDiff;
 import com.netflix.hollow.diff.ui.jetty.HollowDiffUIServer;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
-
 import java.util.Random;
 
 public class ShowMeTheProgressDiffTool {
 
-    private static final String BROWSER_COMMAND = "open";
+    private static final String BROWSER_COMMAND = "google-chrome";
 
     public static void startTheDiff(HollowReadStateEngine expected, HollowReadStateEngine actual) throws Exception {
         HollowDiff diff = new HollowDiff(expected, actual);
