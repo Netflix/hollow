@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.modules.meta;
 
 
 import com.netflix.vms.transformer.hollowoutput.Strings;
-
 import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import java.util.Set;
@@ -18,12 +17,15 @@ public class VideoMetaDataCountrySpecificDataKey {
     Set<VideoSetType> videoSetTypes;
     int showMemberTypeId = Integer.MIN_VALUE;
     Strings copyright;
+    boolean hasNewContent;
+
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((copyright == null) ? 0 : copyright.hashCode());
+        result = prime * result + (hasNewContent ? 1231 : 1237);
         result = prime * result + (isSearchOnly ? 1231 : 1237);
         result = prime * result + (isTheatricalRelease ? 1231 : 1237);
         result = prime * result + latestYear;
@@ -33,6 +35,7 @@ public class VideoMetaDataCountrySpecificDataKey {
         result = prime * result + year;
         return result;
     }
+
 
     @Override
     public boolean equals(Object obj) {
@@ -47,6 +50,8 @@ public class VideoMetaDataCountrySpecificDataKey {
             if (other.copyright != null)
                 return false;
         } else if (!copyright.equals(other.copyright))
+            return false;
+        if (hasNewContent != other.hasNewContent)
             return false;
         if (isSearchOnly != other.isSearchOnly)
             return false;
@@ -70,5 +75,6 @@ public class VideoMetaDataCountrySpecificDataKey {
             return false;
         return true;
     }
+
 
 }

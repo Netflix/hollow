@@ -19,8 +19,6 @@ import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHiera
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
 import com.netflix.vms.transformer.modules.deploymentintent.CacheDeploymentIntentModule;
 import com.netflix.vms.transformer.modules.drmsystem.DrmSystemModule;
-import com.netflix.vms.transformer.modules.drmsystem.DrmSystemModule;
-import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
 import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
 import com.netflix.vms.transformer.modules.originserver.OriginServerModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkFormatModule;
@@ -28,7 +26,6 @@ import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkImageRecip
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkTypeModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.DefaultExtensionRecipeModule;
 import com.netflix.vms.transformer.modules.passthrough.beehive.RolloutCharacterModule;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -81,7 +78,7 @@ public class SimpleTransformer {
         objectMapper.addObject(new DeploymentIntent());
 
         // Register Transform Modules
-        List<TransformModule> moduleList = Arrays.asList(
+        List<TransformModule> moduleList = Arrays.<TransformModule>asList(
                 new DrmSystemModule(api, objectMapper),
                 new OriginServerModule(api, objectMapper, indexer),
 
