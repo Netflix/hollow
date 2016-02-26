@@ -8,20 +8,20 @@ import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowoutput.Quote;
 import com.netflix.vms.transformer.hollowoutput.RolloutCharacter;
 import com.netflix.vms.transformer.hollowoutput.Strings;
+import com.netflix.vms.transformer.modules.AbstractTransformModule;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
-public class RolloutCharacterModule {
-    private final VMSHollowVideoInputAPI api;
-    private final HollowObjectMapper mapper;
+public class RolloutCharacterModule extends AbstractTransformModule {
 
     public RolloutCharacterModule(VMSHollowVideoInputAPI api, HollowObjectMapper mapper) {
-        this.api = api;
-        this.mapper = mapper;
+        super(api, mapper);
     }
 
+    @Override
     public void transform() {
         Collection<CharacterHollow> inputs = api.getAllCharacterHollow();
         for (CharacterHollow input : inputs) {
