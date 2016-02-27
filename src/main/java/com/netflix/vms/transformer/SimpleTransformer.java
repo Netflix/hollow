@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer;
 
+import com.netflix.vms.transformer.modules.packages.PackageDataModule;
+
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
@@ -35,6 +37,7 @@ public class SimpleTransformer {
 
     private final ThreadLocal<VideoCollectionsModule> collectionsModuleRef = new ThreadLocal<VideoCollectionsModule>();
     private final ThreadLocal<VideoMetaDataModule> metadataModuleRef = new ThreadLocal<VideoMetaDataModule>();
+    private final ThreadLocal<PackageDataModule> packageDataModuleRef = new ThreadLocal<PackageDataModule>();
 
     private final VMSHollowVideoInputAPI api;
     private VMSTransformerIndexer indexer;
@@ -61,6 +64,7 @@ public class SimpleTransformer {
                 public void run() {
                     VideoCollectionsModule collectionsModule = getVideoCollectionsModule();
                     VideoMetaDataModule metadataModule = getVideoMetaDataModule();
+                    PackageDataModule packageDataModule = getPackageDataModule(objectMapper);
 
                     Map<String, ShowHierarchy> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(displaySet);
 
@@ -70,6 +74,8 @@ public class SimpleTransformer {
 
                         if(vcdByCountry != null)
                             writeJustTheCurrentData(vcdByCountry, vmdByCountry, objectMapper);
+
+                        packageDataModule.transform(showHierarchiesByCountry);
                     }
                 }
             });
@@ -120,6 +126,15 @@ public class SimpleTransformer {
         if(module == null) {
             module = new VideoMetaDataModule(api, indexer);
             metadataModuleRef.set(module);
+        }
+        return module;
+    }
+
+    private PackageDataModule getPackageDataModule(HollowObjectMapper objectMapper) {
+        PackageDataModule module = packageDataModuleRef.get();
+        if(module == null) {
+            module = new PackageDataModule(api, objectMapper, indexer);
+            packageDataModuleRef.set(module);
         }
         return module;
     }

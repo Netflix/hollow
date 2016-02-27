@@ -9,11 +9,12 @@ import java.util.Random;
 
 public class ShowMeTheProgressDiffTool {
 
-    private static final String BROWSER_COMMAND = "open";
+    private static final String BROWSER_COMMAND = "google-chrome";
 
     public static void startTheDiff(HollowReadStateEngine expected, HollowReadStateEngine actual) throws Exception {
         HollowDiff diff = new HollowDiff(expected, actual);
         addTypeDiff(diff, "CompleteVideo", "id.value", "country.id");
+        addTypeDiff(diff, "PackageData", "id");
         addTypeDiff(diff, "DrmSystem", "id");
         addTypeDiff(diff, "OriginServer", "name");
 

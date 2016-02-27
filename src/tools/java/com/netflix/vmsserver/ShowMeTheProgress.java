@@ -42,6 +42,8 @@ public class ShowMeTheProgress {
         filter.addFieldRecursive("CompleteVideoFacetData", "videoCollectionsData", outputSchemas);
         filter.addFieldRecursive("CompleteVideoFacetData", "videoMetaData", outputSchemas);
 
+        filter.addTypeRecursive("PackageData", outputSchemas);
+
         filter.addTypeRecursive("DrmSystem", outputSchemas);
         filter.addTypeRecursive("OriginServer", outputSchemas);
         filter.addTypeRecursive("ArtWorkImageFormatEntry", outputSchemas); // TODO: zero-diff
