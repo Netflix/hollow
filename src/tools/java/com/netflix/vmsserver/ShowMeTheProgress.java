@@ -44,12 +44,13 @@ public class ShowMeTheProgress {
         filter.addTypeRecursive("OriginServer", outputSchemas);
         filter.addTypeRecursive("ArtWorkImageFormatEntry", outputSchemas);
         filter.addTypeRecursive("EncodingProfile", outputSchemas);
-
         filter.addTypeRecursive("ArtWorkImageFormatEntry", outputSchemas);
         filter.addTypeRecursive("DeploymentIntent", outputSchemas);
-
+        filter.addTypeRecursive("TopNVideoData", outputSchemas);
         filter.addTypeRecursive("RolloutCharacter", outputSchemas);
         filter.addTypeRecursive("EncodingProfileGroup", outputSchemas);
+        filter.addTypeRecursive("GlobalPerson", outputSchemas);
+
         return filter;
     }
 

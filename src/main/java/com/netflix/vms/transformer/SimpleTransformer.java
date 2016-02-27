@@ -15,19 +15,22 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.misc.TopNVideoDataModule;
 import com.netflix.vms.transformer.modules.TransformModule;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHierarchy;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
 import com.netflix.vms.transformer.modules.deploymentintent.CacheDeploymentIntentModule;
-import com.netflix.vms.transformer.modules.drmsystem.DrmSystemModule;
 import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
-import com.netflix.vms.transformer.modules.originserver.OriginServerModule;
+import com.netflix.vms.transformer.modules.mpl.DrmSystemModule;
+import com.netflix.vms.transformer.modules.mpl.EncodingProfileModule;
+import com.netflix.vms.transformer.modules.mpl.OriginServerModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkFormatModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkImageRecipeModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkTypeModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.DefaultExtensionRecipeModule;
 import com.netflix.vms.transformer.modules.passthrough.beehive.RolloutCharacterModule;
 import com.netflix.vms.transformer.modules.passthrough.mpl.EncodingProfileGroupModule;
+import com.netflix.vms.transformer.modules.person.GlobalPersonModule;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -84,14 +87,18 @@ public class SimpleTransformer {
         List<TransformModule> moduleList = Arrays.<TransformModule>asList(
                 new DrmSystemModule(api, objectMapper),
                 new OriginServerModule(api, objectMapper, indexer),
-
+                new EncodingProfileModule(api, objectMapper, indexer),
                 new ArtworkFormatModule(api, objectMapper),
                 new CacheDeploymentIntentModule(api, objectMapper),
                 new ArtworkTypeModule(api, objectMapper),
                 new ArtworkImageRecipeModule(api, objectMapper),
                 new DefaultExtensionRecipeModule(api, objectMapper),
                 new RolloutCharacterModule(api, objectMapper),
-                new EncodingProfileGroupModule(api, objectMapper));
+                new EncodingProfileGroupModule(api, objectMapper),
+                new GlobalPersonModule(api, objectMapper, indexer),
+                new TopNVideoDataModule(api, objectMapper)
+                );
+
 
         // Execute Transform Modules
         for(TransformModule m : moduleList) {

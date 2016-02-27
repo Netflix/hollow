@@ -12,6 +12,7 @@ public enum IndexSpec {
     VIDEO_GENERAL(PRIMARY_KEY, "VideoGeneral", "videoId"),
     STORAGE_GROUPS(PRIMARY_KEY, "StorageGroups", "id.value"),
     CDNS(PRIMARY_KEY, "Cdns", "id"),
+    PROTECTION_TYPES(PRIMARY_KEY, "ProtectionTypes", "id"),
     STORIES_SYNOPSES(PRIMARY_KEY, "Stories_Synopses", "movieId"),
 
 

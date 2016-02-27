@@ -1,4 +1,4 @@
-package com.netflix.vms.transformer.modules.originserver;
+package com.netflix.vms.transformer.modules.mpl;
 
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
