@@ -14,6 +14,7 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.misc.TopNVideoDataModule;
 import com.netflix.vms.transformer.modules.TransformModule;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHierarchy;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
@@ -92,7 +93,9 @@ public class SimpleTransformer {
                 new ArtworkImageRecipeModule(api, objectMapper),
                 new DefaultExtensionRecipeModule(api, objectMapper),
                 new RolloutCharacterModule(api, objectMapper),
-                new GlobalPersonModule(api, objectMapper, indexer));
+                new GlobalPersonModule(api, objectMapper, indexer),
+                new TopNVideoDataModule(api, objectMapper)
+                );
 
         // Execute Transform Modules
         for(TransformModule m : moduleList) {
