@@ -9,7 +9,6 @@ import com.netflix.vms.transformer.hollowinput.VideoDisplaySetHollow;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
 import com.netflix.vms.transformer.hollowoutput.DeploymentIntent;
-import com.netflix.vms.transformer.hollowoutput.EncodingProfileGroup;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
@@ -81,7 +80,6 @@ public class SimpleTransformer {
         }
 
         objectMapper.addObject(new DeploymentIntent());
-        objectMapper.addObject(new EncodingProfileGroup());
 
         // Register Transform Modules
         List<TransformModule> moduleList = Arrays.<TransformModule>asList(
