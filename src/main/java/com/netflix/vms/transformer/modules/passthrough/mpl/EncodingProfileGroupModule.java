@@ -10,9 +10,9 @@ import com.netflix.vms.transformer.modules.AbstractTransformModule;
 import java.util.Collection;
 import java.util.HashSet;
 
-public class EncodingProfileGroupGroup extends AbstractTransformModule {
+public class EncodingProfileGroupModule extends AbstractTransformModule {
 
-    public EncodingProfileGroupGroup(VMSHollowVideoInputAPI api, HollowObjectMapper mapper) {
+    public EncodingProfileGroupModule(VMSHollowVideoInputAPI api, HollowObjectMapper mapper) {
         super(api, mapper);
     }
 
