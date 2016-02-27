@@ -42,7 +42,7 @@ public class ShowMeTheProgress {
 
         filter.addTypeRecursive("DrmSystem", outputSchemas);
         filter.addTypeRecursive("OriginServer", outputSchemas);
-        filter.addTypeRecursive("ArtWorkImageFormatEntry", outputSchemas); // TODO: zero-diff
+        filter.addTypeRecursive("ArtWorkImageFormatEntry", outputSchemas);
         filter.addTypeRecursive("EncodingProfile", outputSchemas);
 
         filter.addTypeRecursive("ArtWorkImageFormatEntry", outputSchemas);
