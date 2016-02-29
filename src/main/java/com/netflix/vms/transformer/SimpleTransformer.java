@@ -12,9 +12,11 @@ import com.netflix.vms.transformer.hollowoutput.DeploymentIntent;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
+import com.netflix.vms.transformer.hollowoutput.VideoEpisode_CountryList;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.misc.TopNVideoDataModule;
+import com.netflix.vms.transformer.misc.VideoEpisodeCountryDecoratorModule;
 import com.netflix.vms.transformer.modules.TransformModule;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHierarchy;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
@@ -39,6 +41,7 @@ public class SimpleTransformer {
 
     private final ThreadLocal<VideoCollectionsModule> collectionsModuleRef = new ThreadLocal<VideoCollectionsModule>();
     private final ThreadLocal<VideoMetaDataModule> metadataModuleRef = new ThreadLocal<VideoMetaDataModule>();
+    private final ThreadLocal<VideoEpisodeCountryDecoratorModule> countryDecoratorModuleRef = new ThreadLocal<VideoEpisodeCountryDecoratorModule>();
 
     private final VMSHollowVideoInputAPI api;
     private VMSTransformerIndexer indexer;
@@ -65,6 +68,7 @@ public class SimpleTransformer {
                 public void run() {
                     VideoCollectionsModule collectionsModule = getVideoCollectionsModule();
                     VideoMetaDataModule metadataModule = getVideoMetaDataModule();
+                    VideoEpisodeCountryDecoratorModule countryDecoratorModule = getVideoEpisodeCountryDecoratorModule(objectMapper);
 
                     Map<String, ShowHierarchy> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(displaySet);
 
@@ -74,13 +78,17 @@ public class SimpleTransformer {
 
                         if(vcdByCountry != null)
                             writeJustTheCurrentData(vcdByCountry, vmdByCountry, objectMapper);
+                        
+                        for(String country : vcdByCountry.keySet()) {
+                            countryDecoratorModule.decorateVideoEpisodes(country, vcdByCountry.get(country));
+                        }
                     }
                 }
             });
         }
 
         objectMapper.addObject(new DeploymentIntent());
-
+        
         // Register Transform Modules
         List<TransformModule> moduleList = Arrays.<TransformModule>asList(
                 new DrmSystemModule(api, objectMapper),
@@ -132,6 +140,15 @@ public class SimpleTransformer {
         }
         return module;
     }
+    
+    private VideoEpisodeCountryDecoratorModule getVideoEpisodeCountryDecoratorModule(HollowObjectMapper mapper) {
+        VideoEpisodeCountryDecoratorModule module = countryDecoratorModuleRef.get();
+        if(module == null) {
+            module = new VideoEpisodeCountryDecoratorModule(api, mapper);
+            countryDecoratorModuleRef.set(module);
+        }
+        return module;
+    }    
 
     private void writeJustTheCurrentData(Map<String, VideoCollectionsDataHierarchy> vcdByCountry,
             Map<String, Map<Integer, VideoMetaData>> vmdByCountry,
