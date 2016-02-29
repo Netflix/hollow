@@ -23,10 +23,10 @@ import org.apache.commons.lang.StringUtils;
 
 public class EncodingProfileModule extends AbstractTransformModule {
 
-    private Map<String, ProfileTypeDescriptor> profileTypeMap = new HashMap<>();
-    private Map<Integer, AudioChannelsDescriptor> audioChannelsMap = new HashMap<>();
-    private Map<Integer, VideoDimensionsDescriptor> videoDimensionsMap = new HashMap<>();
-    private Map<String, Strings> stringsMap = new HashMap<>();
+    private ThreadLocal<Map<String, ProfileTypeDescriptor>> profileTypeMapRef = new ThreadLocal<>();
+    private ThreadLocal<Map<Integer, AudioChannelsDescriptor>> audioChannelsMapRef = new ThreadLocal<>();
+    private ThreadLocal<Map<Integer, VideoDimensionsDescriptor>> videoDimensionsMapRef = new ThreadLocal<>();
+    private ThreadLocal<Map<String, Strings>> stringsMapRef = new ThreadLocal<>();
 
     private final HollowPrimaryKeyIndex protectionTypeIndex;
 
@@ -70,7 +70,18 @@ public class EncodingProfileModule extends AbstractTransformModule {
         return str._getValue().toCharArray();
     }
 
+    private <K, V> Map<K, V> getMap(ThreadLocal<Map<K, V>> local) {
+        Map<K, V> map = local.get();
+        if (map == null) {
+            map = new HashMap<>();
+            local.set(map);
+        }
+
+        return map;
+    }
+
     private ProfileTypeDescriptor getProfileType(final String profileTypeName) {
+        Map<String, ProfileTypeDescriptor> profileTypeMap = getMap(profileTypeMapRef);
         ProfileTypeDescriptor result = profileTypeMap.get(profileTypeName);
         if (result != null) return result;
 
@@ -103,6 +114,7 @@ public class EncodingProfileModule extends AbstractTransformModule {
     }
 
     private AudioChannelsDescriptor getAudioChannels(final int channels) {
+        Map<Integer, AudioChannelsDescriptor> audioChannelsMap = getMap(audioChannelsMapRef);
         AudioChannelsDescriptor result = audioChannelsMap.get(channels);
         if (result != null) return result;
 
@@ -139,6 +151,7 @@ public class EncodingProfileModule extends AbstractTransformModule {
     }
 
     private VideoDimensionsDescriptor getVideoDimensions(final int dimensions) {
+        Map<Integer, VideoDimensionsDescriptor> videoDimensionsMap = getMap(videoDimensionsMapRef);
         VideoDimensionsDescriptor result = videoDimensionsMap.get(dimensions);
         if (result != null) return result;
 
@@ -167,6 +180,7 @@ public class EncodingProfileModule extends AbstractTransformModule {
     }
 
     private Strings getStrings(String string) {
+        Map<String, Strings> stringsMap = getMap(stringsMapRef);
         Strings result = stringsMap.get(string);
         if (result == null) result = new Strings(string);
 

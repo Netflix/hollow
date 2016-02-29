@@ -30,8 +30,8 @@ import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkImageRecip
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkTypeModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.DefaultExtensionRecipeModule;
 import com.netflix.vms.transformer.modules.passthrough.beehive.RolloutCharacterModule;
+import com.netflix.vms.transformer.modules.passthrough.mpl.EncodingProfileGroupModule;
 import com.netflix.vms.transformer.modules.person.GlobalPersonModule;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -94,16 +94,17 @@ public class SimpleTransformer {
                 new DrmSystemModule(api, objectMapper),
                 new OriginServerModule(api, objectMapper, indexer),
                 new EncodingProfileModule(api, objectMapper, indexer),
-
                 new ArtworkFormatModule(api, objectMapper),
                 new CacheDeploymentIntentModule(api, objectMapper),
                 new ArtworkTypeModule(api, objectMapper),
                 new ArtworkImageRecipeModule(api, objectMapper),
                 new DefaultExtensionRecipeModule(api, objectMapper),
                 new RolloutCharacterModule(api, objectMapper),
+                new EncodingProfileGroupModule(api, objectMapper),
                 new GlobalPersonModule(api, objectMapper, indexer),
                 new TopNVideoDataModule(api, objectMapper)
                 );
+
 
         // Execute Transform Modules
         for(TransformModule m : moduleList) {

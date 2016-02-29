@@ -4,7 +4,6 @@ import com.netflix.hollow.diff.HollowDiff;
 import com.netflix.hollow.diff.HollowTypeDiff;
 import com.netflix.hollow.diff.ui.jetty.HollowDiffUIServer;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
-
 import java.util.Random;
 
 public class ShowMeTheProgressDiffTool {
@@ -23,7 +22,7 @@ public class ShowMeTheProgressDiffTool {
         addTypeDiff(diff, "DeploymentIntent", "profileId", "bitrate", "country.id");
         addTypeDiff(diff, "TopNVideoData", "countryId");
         addTypeDiff(diff, "RolloutCharacter", "id");
-
+        addTypeDiff(diff, "EncodingProfileGroup", "groupNameStr"); // TODO: zero-diff
         addTypeDiff(diff, "GlobalPerson", "id");
         
         addTypeDiff(diff, "VideoEpisode_CountryList", "country.id", "item.deliverableVideo.value");
