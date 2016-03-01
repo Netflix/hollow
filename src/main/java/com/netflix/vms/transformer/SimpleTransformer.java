@@ -12,6 +12,7 @@ import com.netflix.vms.transformer.hollowoutput.DeploymentIntent;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
+import com.netflix.vms.transformer.hollowoutput.VideoMediaData;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.misc.TopNVideoDataModule;
@@ -19,6 +20,7 @@ import com.netflix.vms.transformer.modules.TransformModule;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHierarchy;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
 import com.netflix.vms.transformer.modules.deploymentintent.CacheDeploymentIntentModule;
+import com.netflix.vms.transformer.modules.media.VideoMediaDataModule;
 import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
 import com.netflix.vms.transformer.modules.mpl.DrmSystemModule;
 import com.netflix.vms.transformer.modules.mpl.EncodingProfileModule;
@@ -39,6 +41,7 @@ public class SimpleTransformer {
 
     private final ThreadLocal<VideoCollectionsModule> collectionsModuleRef = new ThreadLocal<VideoCollectionsModule>();
     private final ThreadLocal<VideoMetaDataModule> metadataModuleRef = new ThreadLocal<VideoMetaDataModule>();
+    private final ThreadLocal<VideoMediaDataModule> mediadataModuleRef = new ThreadLocal<VideoMediaDataModule>();
 
     private final VMSHollowVideoInputAPI api;
     private VMSTransformerIndexer indexer;
@@ -60,20 +63,24 @@ public class SimpleTransformer {
         long startTime = System.currentTimeMillis();
 
         for(final VideoDisplaySetHollow displaySet : api.getAllVideoDisplaySetHollow()) {
+
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
                     VideoCollectionsModule collectionsModule = getVideoCollectionsModule();
                     VideoMetaDataModule metadataModule = getVideoMetaDataModule();
+                    VideoMediaDataModule mediaDataModule = getVideoMediaDataModule();
 
                     Map<String, ShowHierarchy> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(displaySet);
 
-                    if(showHierarchiesByCountry != null) {
+                    if (showHierarchiesByCountry != null) {
+
                         Map<String, VideoCollectionsDataHierarchy> vcdByCountry = collectionsModule.buildVideoCollectionsDataByCountry(showHierarchiesByCountry);
                         Map<String, Map<Integer, VideoMetaData>> vmdByCountry = metadataModule.buildVideoMetaDataByCountry(showHierarchiesByCountry);
+                        Map<String, Map<Integer, VideoMediaData>> mediaDataByCountry = mediaDataModule.buildVideoMediaDataByCountry(showHierarchiesByCountry);
 
                         if(vcdByCountry != null)
-                            writeJustTheCurrentData(vcdByCountry, vmdByCountry, objectMapper);
+                            writeJustTheCurrentData(vcdByCountry, vmdByCountry, mediaDataByCountry, objectMapper);
                     }
                 }
             });
@@ -133,8 +140,18 @@ public class SimpleTransformer {
         return module;
     }
 
+    private VideoMediaDataModule getVideoMediaDataModule() {
+        VideoMediaDataModule module = mediadataModuleRef.get();
+        if (module == null) {
+            module = new VideoMediaDataModule(api, indexer);
+            mediadataModuleRef.set(module);
+        }
+        return module;
+    }
+
     private void writeJustTheCurrentData(Map<String, VideoCollectionsDataHierarchy> vcdByCountry,
             Map<String, Map<Integer, VideoMetaData>> vmdByCountry,
+            Map<String, Map<Integer, VideoMediaData>> mediaDataByCountry,
             HollowObjectMapper objectMapper) {
 
         for(Map.Entry<String, VideoCollectionsDataHierarchy> countryHierarchyEntry : vcdByCountry.entrySet()) {
@@ -148,6 +165,7 @@ public class SimpleTransformer {
             topNode.facetData.videoCollectionsData = hierarchy.getTopNode();
             topNode.id = topNode.facetData.videoCollectionsData.topNode;
             topNode.facetData.videoMetaData = vmdByCountry.get(countryId).get(topNode.id.value);
+            topNode.facetData.videoMediaData = mediaDataByCountry.get(countryId).get(topNode.id.value);
 
             objectMapper.addObject(topNode);
 
@@ -161,6 +179,7 @@ public class SimpleTransformer {
                     showNode.facetData = new CompleteVideoFacetData();
                     showNode.facetData.videoCollectionsData = showEntry.getValue();
                     showNode.facetData.videoMetaData = vmdByCountry.get(countryId).get(showNode.id.value);
+                    showNode.facetData.videoMediaData = mediaDataByCountry.get(countryId).get(showNode.id.value);
 
                     objectMapper.addObject(showNode);
 
@@ -171,7 +190,7 @@ public class SimpleTransformer {
                         episodeNode.facetData = new CompleteVideoFacetData();
                         episodeNode.facetData.videoCollectionsData = episodeEntry.getValue();
                         episodeNode.facetData.videoMetaData = vmdByCountry.get(countryId).get(episodeNode.id.value);
-
+                        episodeNode.facetData.videoMediaData = mediaDataByCountry.get(countryId).get(episodeNode.id.value);
                         objectMapper.addObject(episodeNode);
                     }
                 }
@@ -184,6 +203,7 @@ public class SimpleTransformer {
                 supplementalNode.facetData = new CompleteVideoFacetData();
                 supplementalNode.facetData.videoCollectionsData = supplementalEntry.getValue();
                 supplementalNode.facetData.videoMetaData = vmdByCountry.get(countryId).get(supplementalNode.id.value);
+                supplementalNode.facetData.videoMediaData = mediaDataByCountry.get(countryId).get(supplementalNode.id.value);
 
                 objectMapper.addObject(supplementalNode);
             }
