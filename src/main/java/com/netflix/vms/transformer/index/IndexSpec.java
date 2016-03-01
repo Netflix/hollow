@@ -14,7 +14,9 @@ public enum IndexSpec {
     CDNS(PRIMARY_KEY, "Cdns", "id"),
     PROTECTION_TYPES(PRIMARY_KEY, "ProtectionTypes", "id"),
     STORIES_SYNOPSES(PRIMARY_KEY, "Stories_Synopses", "movieId"),
-
+    VIDEO_AWARD(PRIMARY_KEY, "VideoAward", "videoId"),
+    VMS_AWARD(PRIMARY_KEY, "VMSAward", "awardId"),
+    CSM_REVIEW(PRIMARY_KEY, "CSMReview", "videoId"),
 
     VIDEO_DATE(HASH, "VideoDate", "window.element", "videoId", "window.element.countryCode.value"),
     PERSONS_BY_VIDEO_ID(HASH, "VideoPerson", "", "cast.element.videoId"),
