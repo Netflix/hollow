@@ -1,14 +1,5 @@
 package com.netflix.vms.transformer.modules.packages;
 
-import com.netflix.vms.transformer.hollowinput.VideoRightsContractHollow;
-
-import com.netflix.vms.transformer.hollowinput.VideoRightsContractSetHollow;
-import java.util.Collections;
-import com.netflix.vms.transformer.hollowoutput.Date;
-import com.netflix.vms.transformer.hollowoutput.AvailabilityWindow;
-import com.netflix.vms.transformer.hollowinput.VideoRightsWindowHollow;
-import com.netflix.vms.transformer.hollowinput.VideoRightsWindowsSetHollow;
-import com.netflix.vms.transformer.hollowoutput.ContractRestriction;
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
@@ -21,7 +12,6 @@ import com.netflix.vms.transformer.hollowinput.PackageDrmInfoHollow;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
 import com.netflix.vms.transformer.hollowinput.PackagesHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
-import com.netflix.vms.transformer.hollowinput.VideoRightsHollow;
 import com.netflix.vms.transformer.hollowoutput.DrmKey;
 import com.netflix.vms.transformer.hollowoutput.DrmKeyString;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
@@ -31,6 +21,7 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -45,7 +36,6 @@ public class PackageDataModule {
 
     private final HollowHashIndex packagesByVideoIdx;
     private final HollowPrimaryKeyIndex deployablePackagesIdx;
-    private final HollowHashIndex videoRightsIdx;
 
     private final Map<Integer, Object> drmKeysByGroupId;
 
@@ -57,7 +47,6 @@ public class PackageDataModule {
         this.mapper = objectMapper;
         this.packagesByVideoIdx = indexer.getHashIndex(IndexSpec.PACKAGES_BY_VIDEO);
         this.deployablePackagesIdx = indexer.getPrimaryKeyIndex(IndexSpec.DEPLOYABLE_PACKAGES);
-        this.videoRightsIdx = indexer.getHashIndex(IndexSpec.ALL_VIDEO_RIGHTS);
 
         this.drmKeysByGroupId = new HashMap<Integer, Object>();
 
@@ -109,7 +98,6 @@ public class PackageDataModule {
     }
 
     private void convertPackage(PackagesHollow packages) {
-        long now = System.currentTimeMillis();
         PackageData pkg = new PackageData();
 
         pkg.id = (int)packages._getPackageId();

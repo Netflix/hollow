@@ -44,6 +44,11 @@ public class ContractAssets {
             return false;
         return true;
     }
+    
+    @Override
+    public String toString() {
+        return "[" + assetType + ": " + lang + "]";
+    }
 
 
 }

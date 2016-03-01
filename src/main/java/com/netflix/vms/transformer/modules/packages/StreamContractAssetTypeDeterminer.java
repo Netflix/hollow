@@ -4,10 +4,12 @@ import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
 import com.netflix.vms.transformer.hollowinput.StreamAssetTypeHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
+import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.TextStreamInfoHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +20,7 @@ public class StreamContractAssetTypeDeterminer {
     public static final String CLOSEDCAPTIONING = "Closed Captioning";
     public static final String DESCRIPTIVE_AUDIO = "Descriptive Audio";
     public static final String SECONDARY_AUDIO = "Secondary Audio Source";
-    public static final String NOLANG = "nolanguage";
+    /// public static final String NOLANG = "nolanguage";   /// just return null instead
 
     private final VMSHollowVideoInputAPI api;
     private final HollowPrimaryKeyIndex streamProfileIdx;
@@ -52,11 +54,13 @@ public class StreamContractAssetTypeDeterminer {
             if(textInfo != null && textInfo._getTimedTextType() != null) {
                 return cache(downloadableId, SUBTITLES);
             }
-            return cache(downloadableId, NOLANG);
+            return null;
         } else if(streamProfile._getProfileType()._isValueEqual("AUDIO")) {
             StreamAssetTypeHollow assetType = stream._getAssetType();
-            if(assetType != null && assetType._getAssetTypeId() == 2L) {
-                return cache(downloadableId, DESCRIPTIVE_AUDIO);
+            if(assetType != null) {
+                StringHollow assetTypeStringHollow = assetType._getAssetType();
+                if(assetTypeStringHollow != null && assetTypeStringHollow._isValueEqual("assistive"))
+                    return cache(downloadableId, DESCRIPTIVE_AUDIO);
             }
             return cache(downloadableId, PRIMARYVIDEO_AUDIOMUXED);
         } else if(streamProfile._getProfileType()._isValueEqual("TEXT")) {

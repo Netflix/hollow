@@ -1,21 +1,21 @@
 package com.netflix.vms.transformer.modules.packages;
 
-import com.netflix.vms.transformer.hollowinput.StringHollow;
-
-import com.netflix.vms.transformer.hollowinput.AudioStreamInfoHollow;
-import com.netflix.vms.transformer.hollowinput.StreamNonImageInfoHollow;
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
+import com.netflix.vms.transformer.hollowinput.AudioStreamInfoHollow;
 import com.netflix.vms.transformer.hollowinput.Bcp47CodeHollow;
 import com.netflix.vms.transformer.hollowinput.DisallowedAssetBundleHollow;
 import com.netflix.vms.transformer.hollowinput.DisallowedSubtitleLangCodeHollow;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
 import com.netflix.vms.transformer.hollowinput.PackagesHollow;
+import com.netflix.vms.transformer.hollowinput.StreamNonImageInfoHollow;
+import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractAssetHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractHollow;
+import com.netflix.vms.transformer.hollowinput.VideoRightsContractIdHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsWindowHollow;
 import com.netflix.vms.transformer.hollowoutput.AvailabilityWindow;
@@ -27,6 +27,7 @@ import com.netflix.vms.transformer.hollowoutput.LanguageRestrictions;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,7 +40,6 @@ public class ContractRestrictionModule {
 
     private final HollowHashIndex videoRightsIdx;
     private final HollowPrimaryKeyIndex bcp47CodeIdx;
-    private final HollowPrimaryKeyIndex streamProfileIdx;
 
     private final VMSHollowVideoInputAPI api;
 
@@ -53,7 +53,6 @@ public class ContractRestrictionModule {
         this.api = api;
         this.videoRightsIdx = indexer.getHashIndex(IndexSpec.ALL_VIDEO_RIGHTS);
         this.bcp47CodeIdx = indexer.getPrimaryKeyIndex(IndexSpec.BCP47_CODE);
-        this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
         this.cupKeysMap = new HashMap<String, CupKey>();
         this.bcp47Codes = new HashMap<String, Strings>();
         this.bcp47Ids = new HashMap<String, Integer>();
@@ -77,6 +76,12 @@ public class ContractRestrictionModule {
             Set<VideoRightsWindowHollow> windows = rights._getRights()._getWindows();
             Set<VideoRightsContractHollow> contracts = rights._getRights()._getContracts();
             for(VideoRightsWindowHollow window : windows) {
+                Set<Integer> contractIds = new HashSet<Integer>();
+                
+                for(VideoRightsContractIdHollow contractId : window._getContractIds()) {
+                    contractIds.add(Integer.valueOf((int)contractId._getValue()));
+                }
+                
                 ContractRestriction restriction = new ContractRestriction();
 
                 restriction.availabilityWindow = new AvailabilityWindow();
@@ -89,8 +94,16 @@ public class ContractRestrictionModule {
 
                 VideoRightsContractHollow selectedContract = null;
 
+                Set<ContractAssets> contractAssets = new HashSet<ContractAssets>();
+                
                 for(VideoRightsContractHollow contract : contracts) {
-                    if(contract._getPackageId() == packages._getPackageId()) {
+                    //if(contract._getPackageId() == packages._getPackageId()) {
+                    if(contract._getPackageId() == packages._getPackageId() && contractIds.contains((int) contract._getContractId())) {
+                        
+                        /*for(VideoRightsContractPackageHollow contractPkg : contract._getPackages()) {
+                            contractPkg._getPackageId()
+                        }*/
+                        
                         if(selectedContract == null || contract._getContractId() > selectedContract._getContractId())
                             selectedContract = contract;
 
@@ -121,7 +134,7 @@ public class ContractRestrictionModule {
                         }
 
 
-                        Set<ContractAssets> contractAssets = new HashSet<ContractAssets>();
+                        
                         for(VideoRightsContractAssetHollow asset : contract._getAssets()) {
                             String contractAssetType = asset._getAssetType()._getValue();
 
@@ -134,21 +147,6 @@ public class ContractRestrictionModule {
                         }
 
 
-
-                        for(PackageStreamHollow stream : packages._getDownloadables()) {
-                            String assetType = assetTypeDeterminer.getAssetType(stream);
-
-                            if(assetType == null)
-                                continue;
-
-                            String language = getLanguageForAsset(stream, assetType);
-
-                            if(!contractAssets.contains(new ContractAssets(assetType, language))) {
-                                restriction.excludedDownloadables.add(new com.netflix.vms.transformer.hollowoutput.Long(stream._getDownloadableId()));
-                            }
-
-                        }
-
                         /*if(assets.assetTypeToLanguagesMap.size() > 1)
                             System.out.println(assets.assetTypeToLanguagesMap.size());*/
 
@@ -157,6 +155,25 @@ public class ContractRestrictionModule {
                     }
 
                 }
+                
+                for(PackageStreamHollow stream : packages._getDownloadables()) {
+                    if(stream._getDownloadableId() == 734066790 && "CH".equals(rights._getCountryCode()._getValue())) {
+                        System.out.println("watch");
+                        System.out.println(new java.util.Date(restriction.availabilityWindow.startDate.val));
+                    }
+                    
+                    String assetType = assetTypeDeterminer.getAssetType(stream);
+
+                    if(assetType == null)
+                        continue;
+
+                    String language = getLanguageForAsset(stream, assetType);
+
+                    if(!contractAssets.contains(new ContractAssets(assetType, language))) {
+                        restriction.excludedDownloadables.add(new com.netflix.vms.transformer.hollowoutput.Long(stream._getDownloadableId()));
+                    }
+                }
+
 
                 if(selectedContract != null) {
                     String cupToken = selectedContract._getCupToken()._getValue();
@@ -175,7 +192,8 @@ public class ContractRestrictionModule {
             }
 
 
-            restrictions.put(new ISOCountry(rights._getCountryCode()._getValue()), contractRestrictions);
+            if(!contractRestrictions.isEmpty())
+                restrictions.put(new ISOCountry(rights._getCountryCode()._getValue()), contractRestrictions);
 
             videoRightsOrdinal = iter.next();
         }
