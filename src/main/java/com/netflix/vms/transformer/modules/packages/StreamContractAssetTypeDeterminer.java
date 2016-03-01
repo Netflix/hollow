@@ -51,7 +51,7 @@ public class StreamContractAssetTypeDeterminer {
             return cache(downloadableId, PRIMARYVIDEO_AUDIOMUXED);
         }else if(streamProfile._getProfileType()._isValueEqual("VIDEO")) {
             TextStreamInfoHollow textInfo = stream._getNonImageInfo()._getTextInfo();
-            if(textInfo != null && textInfo._getTimedTextType() != null) {
+            if(textInfo != null && textInfo._getTextLanguageCode() != null) {
                 return cache(downloadableId, SUBTITLES);
             }
             return null;

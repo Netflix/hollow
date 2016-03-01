@@ -16,6 +16,8 @@ import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractAssetHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractIdHollow;
+import com.netflix.vms.transformer.hollowinput.VideoRightsContractPackageHollow;
+import com.netflix.vms.transformer.hollowinput.VideoRightsFlagsHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsWindowHollow;
 import com.netflix.vms.transformer.hollowoutput.AvailabilityWindow;
@@ -61,7 +63,7 @@ public class ContractRestrictionModule {
 
     public Map<ISOCountry, Set<ContractRestriction>> getContractRestrictions(PackagesHollow packages) {
         assetTypeDeterminer.clearCache();
-
+        
         Map<ISOCountry, Set<ContractRestriction>> restrictions = new HashMap<ISOCountry, Set<ContractRestriction>>();
 
         HollowHashIndexResult videoRightsResult = videoRightsIdx.findMatches(packages._getMovieId());
@@ -70,7 +72,13 @@ public class ContractRestrictionModule {
 
         while(videoRightsOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
             VideoRightsHollow rights = api.getVideoRightsHollow(videoRightsOrdinal);
-
+            
+            VideoRightsFlagsHollow rightsFlags = rights._getFlags();
+            if(rightsFlags == null || !rightsFlags._getGoLive()) {
+                videoRightsOrdinal = iter.next();
+                continue;
+            }
+            
             Set<ContractRestriction> contractRestrictions = new HashSet<ContractRestriction>();
 
             Set<VideoRightsWindowHollow> windows = rights._getRights()._getWindows();
@@ -97,12 +105,7 @@ public class ContractRestrictionModule {
                 Set<ContractAssets> contractAssets = new HashSet<ContractAssets>();
                 
                 for(VideoRightsContractHollow contract : contracts) {
-                    //if(contract._getPackageId() == packages._getPackageId()) {
-                    if(contract._getPackageId() == packages._getPackageId() && contractIds.contains((int) contract._getContractId())) {
-                        
-                        /*for(VideoRightsContractPackageHollow contractPkg : contract._getPackages()) {
-                            contractPkg._getPackageId()
-                        }*/
+                    if(contractIds.contains((int) contract._getContractId()) && contractIsApplicableForPackage(contract, packages._getPackageId())) {
                         
                         if(selectedContract == null || contract._getContractId() > selectedContract._getContractId())
                             selectedContract = contract;
@@ -145,23 +148,11 @@ public class ContractRestrictionModule {
 
                             contractAssets.add(new ContractAssets(contractAssetType, asset._getBcp47Code()._getValue()));
                         }
-
-
-                        /*if(assets.assetTypeToLanguagesMap.size() > 1)
-                            System.out.println(assets.assetTypeToLanguagesMap.size());*/
-
-                        //System.out.println(assets);
-
                     }
 
                 }
                 
                 for(PackageStreamHollow stream : packages._getDownloadables()) {
-                    if(stream._getDownloadableId() == 734066790 && "CH".equals(rights._getCountryCode()._getValue())) {
-                        System.out.println("watch");
-                        System.out.println(new java.util.Date(restriction.availabilityWindow.startDate.val));
-                    }
-                    
                     String assetType = assetTypeDeterminer.getAssetType(stream);
 
                     if(assetType == null)
@@ -199,6 +190,18 @@ public class ContractRestrictionModule {
         }
 
         return restrictions;
+    }
+    
+    private boolean contractIsApplicableForPackage(VideoRightsContractHollow contract, long packageId) {
+        if(contract._getPackageId() == packageId)
+            return true;
+        
+        for(VideoRightsContractPackageHollow pkg : contract._getPackages()) {
+            if(pkg._getPackageId() == packageId)
+                return true;
+        }
+        
+        return false;
     }
 
     private String getLanguageForAsset(PackageStreamHollow stream, String assetType) {
