@@ -31,7 +31,6 @@ import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -63,33 +62,48 @@ public class ContractRestrictionModule {
 
     public Map<ISOCountry, Set<ContractRestriction>> getContractRestrictions(PackagesHollow packages) {
         assetTypeDeterminer.clearCache();
-        
+
         Map<ISOCountry, Set<ContractRestriction>> restrictions = new HashMap<ISOCountry, Set<ContractRestriction>>();
 
+        //// build an asset type index to look up excluded downloadables
+        DownloadableAssetTypeIndex assetTypeIdx = new DownloadableAssetTypeIndex();
+
+        for(PackageStreamHollow stream : packages._getDownloadables()) {
+            String assetType = assetTypeDeterminer.getAssetType(stream);
+
+            if(assetType == null)
+                continue;
+
+            String language = getLanguageForAsset(stream, assetType);
+
+            assetTypeIdx.addDownloadableId(new ContractAssetType(assetType, language), stream._getDownloadableId());
+        }
+
+        //// iterate over the VideoRights of every country
         HollowHashIndexResult videoRightsResult = videoRightsIdx.findMatches(packages._getMovieId());
         HollowOrdinalIterator iter = videoRightsResult.iterator();
         int videoRightsOrdinal = iter.next();
 
         while(videoRightsOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
             VideoRightsHollow rights = api.getVideoRightsHollow(videoRightsOrdinal);
-            
+
             VideoRightsFlagsHollow rightsFlags = rights._getFlags();
             if(rightsFlags == null || !rightsFlags._getGoLive()) {
                 videoRightsOrdinal = iter.next();
                 continue;
             }
-            
+
             Set<ContractRestriction> contractRestrictions = new HashSet<ContractRestriction>();
 
             Set<VideoRightsWindowHollow> windows = rights._getRights()._getWindows();
             Set<VideoRightsContractHollow> contracts = rights._getRights()._getContracts();
             for(VideoRightsWindowHollow window : windows) {
                 Set<Integer> contractIds = new HashSet<Integer>();
-                
+
                 for(VideoRightsContractIdHollow contractId : window._getContractIds()) {
                     contractIds.add(Integer.valueOf((int)contractId._getValue()));
                 }
-                
+
                 ContractRestriction restriction = new ContractRestriction();
 
                 restriction.availabilityWindow = new AvailabilityWindow();
@@ -102,11 +116,11 @@ public class ContractRestrictionModule {
 
                 VideoRightsContractHollow selectedContract = null;
 
-                Set<ContractAssets> contractAssets = new HashSet<ContractAssets>();
-                
+                assetTypeIdx.resetMarks();
+
                 for(VideoRightsContractHollow contract : contracts) {
                     if(contractIds.contains((int) contract._getContractId()) && contractIsApplicableForPackage(contract, packages._getPackageId())) {
-                        
+
                         if(selectedContract == null || contract._getContractId() > selectedContract._getContractId())
                             selectedContract = contract;
 
@@ -118,7 +132,6 @@ public class ContractRestrictionModule {
                             langRestriction.audioLanguage = audioLanguage;
                             langRestriction.audioLanguageId = getBcp47CodeId(audioLangStr);
                             langRestriction.requiresForcedSubtitles = disallowedAssetBundle._getForceSubtitle();
-                            langRestriction.disallowedTimedTextBcp47codes = Collections.emptySet();
 
                             Set<Integer> disallowedTimedTextIds = new HashSet<Integer>();
                             Set<Strings> disallowedTimedTextCodes = new HashSet<Strings>();
@@ -136,8 +149,6 @@ public class ContractRestrictionModule {
                                 restriction.languageBcp47RestrictionsMap.put(audioLanguage, langRestriction);
                         }
 
-
-                        
                         for(VideoRightsContractAssetHollow asset : contract._getAssets()) {
                             String contractAssetType = asset._getAssetType()._getValue();
 
@@ -146,25 +157,10 @@ public class ContractRestrictionModule {
                             if(StreamContractAssetTypeDeterminer.SECONDARY_AUDIO.equals(contractAssetType))
                                 contractAssetType = StreamContractAssetTypeDeterminer.PRIMARYVIDEO_AUDIOMUXED;
 
-                            contractAssets.add(new ContractAssets(contractAssetType, asset._getBcp47Code()._getValue()));
+                            assetTypeIdx.mark(new ContractAssetType(contractAssetType, asset._getBcp47Code()._getValue()));
                         }
                     }
-
                 }
-                
-                for(PackageStreamHollow stream : packages._getDownloadables()) {
-                    String assetType = assetTypeDeterminer.getAssetType(stream);
-
-                    if(assetType == null)
-                        continue;
-
-                    String language = getLanguageForAsset(stream, assetType);
-
-                    if(!contractAssets.contains(new ContractAssets(assetType, language))) {
-                        restriction.excludedDownloadables.add(new com.netflix.vms.transformer.hollowoutput.Long(stream._getDownloadableId()));
-                    }
-                }
-
 
                 if(selectedContract != null) {
                     String cupToken = selectedContract._getCupToken()._getValue();
@@ -178,10 +174,11 @@ public class ContractRestrictionModule {
                     if(selectedContract._getPrePromotionDays() != Long.MIN_VALUE)
                         restriction.prePromotionDays = (int)selectedContract._getPrePromotionDays();
 
+                    restriction.excludedDownloadables = assetTypeIdx.getAllUnmarked();
+
                     contractRestrictions.add(restriction);
                 }
             }
-
 
             if(!contractRestrictions.isEmpty())
                 restrictions.put(new ISOCountry(rights._getCountryCode()._getValue()), contractRestrictions);
@@ -191,16 +188,16 @@ public class ContractRestrictionModule {
 
         return restrictions;
     }
-    
+
     private boolean contractIsApplicableForPackage(VideoRightsContractHollow contract, long packageId) {
         if(contract._getPackageId() == packageId)
             return true;
-        
+
         for(VideoRightsContractPackageHollow pkg : contract._getPackages()) {
             if(pkg._getPackageId() == packageId)
                 return true;
         }
-        
+
         return false;
     }
 
@@ -242,6 +239,79 @@ public class ContractRestrictionModule {
         }
 
         return id;
+    }
+
+
+    private static class DownloadableAssetTypeIndex {
+        private final Map<ContractAssetType, DownloadableIdList> downloadableIdsByContract;
+
+        public DownloadableAssetTypeIndex() {
+            this.downloadableIdsByContract = new HashMap<ContractAssetType, DownloadableIdList>();
+        }
+
+        public void addDownloadableId(ContractAssetType assetType, long downloadableId) {
+            DownloadableIdList idList = downloadableIdsByContract.get(assetType);
+            if(idList == null) {
+                idList = new DownloadableIdList();
+                downloadableIdsByContract.put(assetType, idList);
+            }
+
+            idList.addDownloadableId(downloadableId);
+        }
+
+        public void mark(ContractAssetType assetType) {
+            DownloadableIdList idList = downloadableIdsByContract.get(assetType);
+            if(idList != null)
+                idList.mark();
+        }
+
+        public void resetMarks() {
+            for(Map.Entry<ContractAssetType, DownloadableIdList> entry : downloadableIdsByContract.entrySet()) {
+                entry.getValue().resetMark();
+            }
+        }
+
+        public Set<com.netflix.vms.transformer.hollowoutput.Long> getAllUnmarked() {
+            Set<com.netflix.vms.transformer.hollowoutput.Long> set = new HashSet<com.netflix.vms.transformer.hollowoutput.Long>();
+
+            for(Map.Entry<ContractAssetType, DownloadableIdList> entry : downloadableIdsByContract.entrySet()) {
+                if(!entry.getValue().isMarked()) {
+                    set.addAll(entry.getValue().getList());
+                }
+            }
+
+            return set;
+        }
+    }
+
+    private static class DownloadableIdList {
+
+        private final List<com.netflix.vms.transformer.hollowoutput.Long> list;
+        private boolean marked;
+
+        public DownloadableIdList() {
+            this.list = new ArrayList<com.netflix.vms.transformer.hollowoutput.Long>();
+        }
+
+        public void addDownloadableId(long downloadableId) {
+            list.add(new com.netflix.vms.transformer.hollowoutput.Long(downloadableId));
+        }
+
+        public void mark() {
+            this.marked = true;
+        }
+
+        public void resetMark() {
+            this.marked = false;
+        }
+
+        public boolean isMarked() {
+            return marked;
+        }
+
+        public List<com.netflix.vms.transformer.hollowoutput.Long> getList() {
+            return list;
+        }
     }
 
 }
