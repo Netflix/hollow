@@ -1,7 +1,9 @@
 package com.netflix.vms.transformer.modules.packages;
 
-import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.vms.transformer.hollowinput.StreamDeploymentLabelHollow;
 
+import com.netflix.vms.transformer.hollowinput.StreamDeploymentLabelSetHollow;
+import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.hollowinput.StreamProfileIdHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfileGroupsHollow;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
@@ -138,7 +140,13 @@ public class StreamDataModule {
             outputStream.additionalData.qoeInfo.scaledPsnrScore = (int)inputVideoStreamInfo._getScaledPsnrTimesHundred();
         if(inputVideoStreamInfo._getVmafScore() != Long.MIN_VALUE)
             outputStream.additionalData.qoeInfo.vmafScore = (int)inputVideoStreamInfo._getVmafScore();
+
         outputStream.additionalData.mostlyConstantData.deploymentLabel = 0;
+        Set<StreamDeploymentLabelHollow> deploymentLabels = inputStreamDeployment._getDeploymentLabel();
+        if(deploymentLabels != null) {
+            StringHollow label = deploymentLabels.iterator().next()._getValue();
+            ///TODO: DeploymentLabel is a bitset built from offsets specified in KnownDeploymentLabel
+        }
         outputStream.additionalData.mostlyConstantData.deploymentPriority = inputStreamDeployment._getDeploymentPriority() == Integer.MIN_VALUE ? 300 : inputStreamDeployment._getDeploymentPriority();
 
         StringHollow tags = inputStream._getTags();
@@ -216,9 +224,6 @@ public class StreamDataModule {
             int targetHeight = inputStreamDimensions._getTargetHeightInPixels();
             int targetWidth = inputStreamDimensions._getTargetWidthInPixels();
             int bitrate = inputVideoStreamInfo._getVideoBitrateKBPS();
-
-            if(outputStream.downloadableId == 272729633)
-                System.out.println("watch");
 
             outputStream.downloadDescriptor.videoFormatDescriptor = selectVideoFormatDescriptor(encodingProfileId, height, width, targetHeight, targetWidth, new SuperHDIdentifier(encodingProfileId, bitrate));
             outputStream.streamDataDescriptor.bitrate = bitrate;

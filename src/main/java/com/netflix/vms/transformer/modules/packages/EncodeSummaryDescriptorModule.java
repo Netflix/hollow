@@ -65,7 +65,14 @@ public class EncodeSummaryDescriptorModule {
             data.isImageBasedSubtitles = stream.additionalData.mostlyConstantData.imageSubtitleIndexByteRange != null;
 
             if(isAudio(profileType)) {
-                EncodeSummaryDescriptorDataKey key = new EncodeSummaryDescriptorDataKey(data, (int)profile._getAudioChannelCount(), SummaryType.AUDIO);
+                EncodeSummaryDescriptorData audioData = data;
+                if(data.textLanguage != null || data.timedTextType != null) {
+                    audioData = data.clone();
+                    audioData.textLanguage = null;
+                    audioData.timedTextType = null;
+                }
+
+                EncodeSummaryDescriptorDataKey key = new EncodeSummaryDescriptorDataKey(audioData, (int)profile._getAudioChannelCount(), SummaryType.AUDIO);
                 addDownloadableIdToDescriptor(key, stream, descriptorMap);
             }
 
@@ -74,12 +81,17 @@ public class EncodeSummaryDescriptorModule {
                     data = data.clone();
                     data.timedTextType = SUBTITLES;
                 }
-                EncodeSummaryDescriptorDataKey key = new EncodeSummaryDescriptorDataKey(data, (int)profile._getAudioChannelCount(), SummaryType.TEXT);
+
+                EncodeSummaryDescriptorDataKey key = new EncodeSummaryDescriptorDataKey(data, 0, SummaryType.TEXT);
                 addDownloadableIdToDescriptor(key, stream, descriptorMap);
             }
 
             if(isMuxed(profileType)) {
-                EncodeSummaryDescriptorDataKey key = new EncodeSummaryDescriptorDataKey(data, (int)profile._getAudioChannelCount(), SummaryType.MUXED);
+                if(data.timedTextType == null && !"MUXED".equals(profileType)) {
+                    data = data.clone();
+                    data.timedTextType = SUBTITLES;
+                }
+                EncodeSummaryDescriptorDataKey key = new EncodeSummaryDescriptorDataKey(data, 0, SummaryType.MUXED);
                 addDownloadableIdToDescriptor(key, stream, descriptorMap);
             }
         }
