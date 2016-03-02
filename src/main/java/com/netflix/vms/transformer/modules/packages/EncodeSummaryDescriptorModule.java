@@ -21,6 +21,9 @@ import java.util.Map;
 
 public class EncodeSummaryDescriptorModule {
 
+    /// represents bits for "PartiallyDeployedReplacement" and "DoNotPlay" -- see deploymentLabel creation in StreamDataModule.
+    private static final int DEPLOYMENT_LABELS_TO_EXCLUDE_FROM_SUMMARY = 0x11;
+
     private final TimedTextTypeDescriptor SUBTITLES = new TimedTextTypeDescriptor("Subtitles");
 
     private final VMSHollowVideoInputAPI api;
@@ -38,6 +41,14 @@ public class EncodeSummaryDescriptorModule {
         Map<EncodeSummaryDescriptorDataKey, EncodeSummaryDescriptor> descriptorMap = new HashMap<EncodeSummaryDescriptorDataKey, EncodeSummaryDescriptor>();
 
         for(StreamData stream : packageData.streams) {
+
+            /// exclude PartiallyDeployedReplacement,DoNotPlay
+            if((stream.additionalData.mostlyConstantData.deploymentLabel & DEPLOYMENT_LABELS_TO_EXCLUDE_FROM_SUMMARY) != 0)
+                continue;
+
+            if(stream.downloadableId == 1630622299)
+                System.out.println("asdf");
+
             int streamProfileOrdinal = streamProfileIdx.getMatchingOrdinal((long)stream.downloadDescriptor.encodingProfileId);
 
             if(streamProfileOrdinal == -1)
@@ -66,10 +77,11 @@ public class EncodeSummaryDescriptorModule {
 
             if(isAudio(profileType)) {
                 EncodeSummaryDescriptorData audioData = data;
-                if(data.textLanguage != null || data.timedTextType != null) {
+                if(data.textLanguage != null || data.timedTextType != null || data.isSubtitleBurnedIn) {
                     audioData = data.clone();
                     audioData.textLanguage = null;
                     audioData.timedTextType = null;
+                    audioData.isSubtitleBurnedIn = false;
                 }
 
                 EncodeSummaryDescriptorDataKey key = new EncodeSummaryDescriptorDataKey(audioData, (int)profile._getAudioChannelCount(), SummaryType.AUDIO);
@@ -101,12 +113,13 @@ public class EncodeSummaryDescriptorModule {
         packageData.muxAudioStreamSummary = new HashSet<EncodeSummaryDescriptor>();
 
         for(Map.Entry<EncodeSummaryDescriptorDataKey, EncodeSummaryDescriptor> entry : descriptorMap.entrySet()) {
-            if(entry.getKey().getSummaryType() == SummaryType.TEXT)
+            if(entry.getKey().getSummaryType() == SummaryType.TEXT) {
                 packageData.textStreamSummary.add(entry.getValue());
-            if(entry.getKey().getSummaryType() == SummaryType.AUDIO)
+            } else if(entry.getKey().getSummaryType() == SummaryType.AUDIO) {
                 packageData.audioStreamSummary.add(entry.getValue());
-            if(entry.getKey().getSummaryType() == SummaryType.MUXED)
+            } else if(entry.getKey().getSummaryType() == SummaryType.MUXED) {
                 packageData.muxAudioStreamSummary.add(entry.getValue());
+            }
         }
 
     }
@@ -123,6 +136,9 @@ public class EncodeSummaryDescriptorModule {
 
             descriptorMap.put(key, descriptor);
         }
+
+        if(key.data.encodingProfileId < descriptor.descriptorData.encodingProfileId)
+            descriptor.descriptorData.encodingProfileId = key.data.encodingProfileId;
 
         descriptor.downloadableIds.add(new com.netflix.vms.transformer.hollowoutput.Long(stream.downloadableId));
     }
@@ -229,7 +245,7 @@ public class EncodeSummaryDescriptorModule {
                         return false;
                 }
 
-                if(summaryType == SummaryType.TEXT || summaryType == SummaryType.MUXED) {
+                if(summaryType == SummaryType.AUDIO || summaryType == SummaryType.MUXED) {
                     if(audioChannels != other.audioChannels)
                         return false;
 
