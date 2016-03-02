@@ -1,5 +1,9 @@
 package com.netflix.vms.transformer.modules.packages;
 
+import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+
+import com.netflix.vms.transformer.hollowinput.StreamProfileIdHollow;
+import com.netflix.vms.transformer.hollowinput.StreamProfileGroupsHollow;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.hollowinput.AudioStreamInfoHollow;
 import com.netflix.vms.transformer.hollowinput.CdnDeploymentHollow;
@@ -58,24 +62,34 @@ public class StreamDataModule {
     private final Map<String, AssetTypeDescriptor> assetTypeDescriptorMap;
     private final Map<String, VideoFormatDescriptor> videoFormatDescriptorMap;
     private final Map<String, TimedTextTypeDescriptor> timedTextTypeDescriptorMap;
+    private final Set<Integer> ultraHDEncodingProfileIds;
     private final Set<SuperHDIdentifier> validSuperHDIdentifiers;
+    private final Set<TargetResolution> aspectRatioVideoFormatIdentifiers;
     private final Map<String, List<Strings>> tagsLists;
     private final Map<Integer, Object> drmKeysByGroupId;
+
 
     private final HollowPrimaryKeyIndex streamProfileIdx;
 
     private final VMSHollowVideoInputAPI api;
 
-    public StreamDataModule(VMSHollowVideoInputAPI api, VMSTransformerIndexer indexer, Map<Integer, Object> drmKeysByGroupId) {
+    private final HollowObjectMapper objectMapper;
+
+    public StreamDataModule(VMSHollowVideoInputAPI api, VMSTransformerIndexer indexer, HollowObjectMapper objectMapper, Map<Integer, Object> drmKeysByGroupId) {
+        this.api = api;
         this.assetTypeDescriptorMap = getAssetTypeDescriptorMap();
         this.videoFormatDescriptorMap = getVideoFormatDescriptorMap();
+        this.ultraHDEncodingProfileIds = getUltraHDEncodingProfileIds(indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE_GROUP));
         this.validSuperHDIdentifiers = getValidSuperHDIdentifiers();
+        this.aspectRatioVideoFormatIdentifiers = getAspectRatioVideoFormatIdentifiers();
         this.timedTextTypeDescriptorMap = getTimedTextTypeDescriptorMap();
         this.tagsLists = new HashMap<String, List<Strings>>();
-        this.api = api;
         this.drmKeysByGroupId = drmKeysByGroupId;
 
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
+
+        /// only necessary for rogue DrmKeys.
+        this.objectMapper = objectMapper;
 
         EMPTY_DOWNLOAD_LOCATIONS.filename = new Strings("");
         EMPTY_DOWNLOAD_LOCATIONS.locations = Collections.emptyList();
@@ -198,11 +212,15 @@ public class StreamDataModule {
 
         if(inputVideoStreamInfo != null) {
             int height = inputStreamDimensions._getHeightInPixels();
+            int width = inputStreamDimensions._getWidthInPixels();
             int targetHeight = inputStreamDimensions._getTargetHeightInPixels();
             int targetWidth = inputStreamDimensions._getTargetWidthInPixels();
             int bitrate = inputVideoStreamInfo._getVideoBitrateKBPS();
 
-            outputStream.downloadDescriptor.videoFormatDescriptor = selectVideoFormatDescriptor(height, targetHeight, targetWidth, new SuperHDIdentifier(encodingProfileId, bitrate));
+            if(outputStream.downloadableId == 272729633)
+                System.out.println("watch");
+
+            outputStream.downloadDescriptor.videoFormatDescriptor = selectVideoFormatDescriptor(encodingProfileId, height, width, targetHeight, targetWidth, new SuperHDIdentifier(encodingProfileId, bitrate));
             outputStream.streamDataDescriptor.bitrate = bitrate;
 
             if(targetHeight != Integer.MIN_VALUE && targetWidth != Integer.MIN_VALUE) {
@@ -211,16 +229,25 @@ public class StreamDataModule {
                 outputStream.streamDataDescriptor.targetDimensions.widthInPixels = targetWidth;
             }
 
+
+            ////TODO: There is a discrepancy here -- some package-level DrmKeys are NOT available at the streams level
             Integer drmKeyGroup = Integer.valueOf((int)streamProfile._getDrmKeyGroup());
             Object drmKey = drmKeysByGroupId.get(drmKeyGroup);
             if(drmKey != null) {
-                outputStream.drmData = new StreamDrmData();
-                if(drmKeyGroup.intValue() == PackageDataModule.WMDRMKEY_GROUP) {
-                    WmDrmKey wmDrmKey = ((WmDrmKey)drmKey).clone();
-                    wmDrmKey.downloadableId = outputStream.downloadableId;
-                    outputStream.drmData.wmDrmKey = wmDrmKey;
+                ////TODO: Probably get rid of this if/else, then don't need special logic to add DrmKeys to the ObjectMapper
+                if(inputNonImageInfo != null && inputNonImageInfo._getDrmInfo() != null) {
+                    outputStream.drmData = new StreamDrmData();
+                    if(drmKeyGroup.intValue() == PackageDataModule.WMDRMKEY_GROUP) {
+                        WmDrmKey wmDrmKey = ((WmDrmKey)drmKey).clone();
+                        wmDrmKey.downloadableId = outputStream.downloadableId;
+                        outputStream.drmData.wmDrmKey = wmDrmKey;
+                    } else {
+                        outputStream.drmData.drmKey = (DrmKey) drmKey;
+                    }
                 } else {
-                    outputStream.drmData.drmKey = (DrmKey) drmKey;
+                    ///TODO: Why exclude WmDrmKeys?
+                    if(drmKeyGroup.intValue() != PackageDataModule.WMDRMKEY_GROUP)
+                        objectMapper.addObject(drmKey);
                 }
             }
 
@@ -272,11 +299,25 @@ public class StreamDataModule {
         return cachedList;
     }
 
-    private VideoFormatDescriptor selectVideoFormatDescriptor(int height, int targetHeight, int targetWidth, SuperHDIdentifier superHDIdentifier) {
+    private VideoFormatDescriptor selectVideoFormatDescriptor(int encodingProfileId, int height, int width, int targetHeight, int targetWidth, SuperHDIdentifier superHDIdentifier) {
+        if(ultraHDEncodingProfileIds.contains(Integer.valueOf(encodingProfileId)))
+            return videoFormatDescriptorMap.get("Ultra_HD");
+
+        if(targetHeight != Integer.MIN_VALUE && targetWidth != Integer.MIN_VALUE) {
+            if(aspectRatioVideoFormatIdentifiers.contains(new TargetResolution(targetHeight, targetWidth))) {
+                float div = ((float)width / (float)height);
+                final int index = (int)(div * 100) - 100;
+
+                if (index <= 55) return videoFormatDescriptorMap.get("SD");
+
+                return videoFormatDescriptorMap.get("HD");
+            }
+        }
+
         if(height == Integer.MIN_VALUE)
             return videoFormatDescriptorMap.get("unknown");
 
-        if(height < 719)
+        if(height <= 719)
             return videoFormatDescriptorMap.get("SD");
 
         if(validSuperHDIdentifiers.contains(superHDIdentifier))
@@ -316,6 +357,21 @@ public class StreamDataModule {
         return descriptor;
     }
 
+    private Set<Integer> getUltraHDEncodingProfileIds(HollowPrimaryKeyIndex primaryKeyIndex) {
+        Set<Integer> ultraHDEncodingProfiles = new HashSet<Integer>();
+
+        int ordinal = primaryKeyIndex.getMatchingOrdinal("CE4DASHVideo-4K");
+        if(ordinal != -1) {
+            StreamProfileGroupsHollow group = api.getStreamProfileGroupsHollow(ordinal);
+            List<StreamProfileIdHollow>idList = group._getStreamProfileIds();
+            for(StreamProfileIdHollow id : idList) {
+                ultraHDEncodingProfiles.add(Integer.valueOf((int)id._getValue()));
+            }
+        }
+
+        return ultraHDEncodingProfiles;
+    }
+
     private Set<SuperHDIdentifier> getValidSuperHDIdentifiers() {
         Set<SuperHDIdentifier> set = new HashSet<SuperHDIdentifier>();
 
@@ -325,6 +381,37 @@ public class StreamDataModule {
         set.add(new SuperHDIdentifier(214, 5800));
         set.add(new SuperHDIdentifier(214, 5802));
         set.add(new SuperHDIdentifier(67, 5800));
+
+        return set;
+    }
+
+    ///TODO: This seems wrong.  What is the point of checking for these specific target resolutions?
+    private Set<TargetResolution> getAspectRatioVideoFormatIdentifiers() {
+        Set<TargetResolution> set = new HashSet<TargetResolution>();
+
+        set.add(new TargetResolution(0, 0));
+        set.add(new TargetResolution(1080, 0));
+        set.add(new TargetResolution(720, 0));
+        set.add(new TargetResolution(612, 0));
+        set.add(new TargetResolution(480, 0));
+        set.add(new TargetResolution(0, 1536));
+        set.add(new TargetResolution(0, 912));
+        set.add(new TargetResolution(0, 567));
+        set.add(new TargetResolution(0, 350));
+        set.add(new TargetResolution(0, 342));
+        set.add(new TargetResolution(0, 300));
+        set.add(new TargetResolution(0, 260));
+        set.add(new TargetResolution(0, 240));
+        set.add(new TargetResolution(0, 233));
+        set.add(new TargetResolution(0, 180));
+        set.add(new TargetResolution(0, 171));
+        set.add(new TargetResolution(0, 228));
+        set.add(new TargetResolution(0, 114));
+        set.add(new TargetResolution(0, 159));
+        set.add(new TargetResolution(0, 185));
+        set.add(new TargetResolution(0, 370));
+        set.add(new TargetResolution(0, 450));
+        set.add(new TargetResolution(0, 900));
 
         return set;
     }

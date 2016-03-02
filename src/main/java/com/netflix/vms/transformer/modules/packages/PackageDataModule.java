@@ -41,6 +41,7 @@ public class PackageDataModule {
 
     private final StreamDataModule streamDataModule;
     private final ContractRestrictionModule contractRestrictionModule;
+    private final EncodeSummaryDescriptorModule encodeSummaryModule;
 
     public PackageDataModule(VMSHollowVideoInputAPI api, HollowObjectMapper objectMapper, VMSTransformerIndexer indexer) {
         this.api = api;
@@ -50,8 +51,9 @@ public class PackageDataModule {
 
         this.drmKeysByGroupId = new HashMap<Integer, Object>();
 
-        this.streamDataModule = new StreamDataModule(api, indexer, drmKeysByGroupId);
+        this.streamDataModule = new StreamDataModule(api, indexer, objectMapper, drmKeysByGroupId);
         this.contractRestrictionModule = new ContractRestrictionModule(api, indexer);
+        this.encodeSummaryModule = new EncodeSummaryDescriptorModule(api, indexer);
     }
 
     public void transform(Map<String, ShowHierarchy> showHierarchiesByCountry) {
@@ -108,11 +110,18 @@ public class PackageDataModule {
 
         pkg.contractRestrictions = contractRestrictionModule.getContractRestrictions(packages);
 
-
-
         /////////// STREAMS ///////////
 
         pkg.streams = new HashSet<StreamData>();
+
+        for(PackageStreamHollow inputStream : packages._getDownloadables()) {
+            StreamData outputStream = streamDataModule.convertStreamData(packages, inputStream);
+
+            if(outputStream != null)
+                pkg.streams.add(outputStream);
+        }
+
+        //////////// DEPLOYABLE PACKAGES //////////////
 
         int deployablePackagesOrdinal = deployablePackagesIdx.getMatchingOrdinal(packages._getPackageId());
         if(deployablePackagesOrdinal != -1) {
@@ -123,12 +132,9 @@ public class PackageDataModule {
             }
         }
 
-        for(PackageStreamHollow inputStream : packages._getDownloadables()) {
-            StreamData outputStream = streamDataModule.convertStreamData(packages, inputStream);
+        //////////// ENCODE SUMMARY DESCRIPTORS /////////////////
 
-            if(outputStream != null)
-                pkg.streams.add(outputStream);
-        }
+        encodeSummaryModule.summarize(pkg);
 
         mapper.addObject(pkg);
     }

@@ -14,6 +14,7 @@ public enum IndexSpec {
     CDNS(PRIMARY_KEY, "Cdns", "id"),
     STORIES_SYNOPSES(PRIMARY_KEY, "Stories_Synopses", "movieId"),
     STREAM_PROFILE(PRIMARY_KEY, "StreamProfiles", "id"),
+    STREAM_PROFILE_GROUP(PRIMARY_KEY, "StreamProfileGroups", "groupName.value"),
     DEPLOYABLE_PACKAGES(PRIMARY_KEY, "DeployablePackages", "packageId"),
     BCP47_CODE(PRIMARY_KEY, "Bcp47Code", "bcp47Code.value"),
 
