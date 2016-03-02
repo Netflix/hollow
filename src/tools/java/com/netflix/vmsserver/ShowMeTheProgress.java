@@ -9,14 +9,12 @@ import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
-
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-
 import org.junit.Test;
 
 public class ShowMeTheProgress {
@@ -41,15 +39,22 @@ public class ShowMeTheProgress {
         filter.addField("CompleteVideo", "facetData");
         filter.addFieldRecursive("CompleteVideoFacetData", "videoCollectionsData", outputSchemas);
         filter.addFieldRecursive("CompleteVideoFacetData", "videoMetaData", outputSchemas);
+        filter.addFieldRecursive("CompleteVideoFacetData", "videoMediaData", outputSchemas);
+        filter.addFieldRecursive("CompleteVideoFacetData", "videoMiscData", outputSchemas);
 
         filter.addTypeRecursive("PackageData", outputSchemas);
 
         filter.addTypeRecursive("DrmSystem", outputSchemas);
         filter.addTypeRecursive("OriginServer", outputSchemas);
-        filter.addTypeRecursive("ArtWorkImageFormatEntry", outputSchemas); // TODO: zero-diff
+        filter.addTypeRecursive("ArtWorkImageFormatEntry", outputSchemas);
+        filter.addTypeRecursive("EncodingProfile", outputSchemas);
+        filter.addTypeRecursive("ArtWorkImageFormatEntry", outputSchemas);
         filter.addTypeRecursive("DeploymentIntent", outputSchemas);
-
-        filter.addTypeRecursive("RolloutCharacter", outputSchemas); // TODO: zero-diff
+        filter.addTypeRecursive("TopNVideoData", outputSchemas);
+        filter.addTypeRecursive("RolloutCharacter", outputSchemas);
+        filter.addTypeRecursive("EncodingProfileGroup", outputSchemas);
+        filter.addTypeRecursive("GlobalPerson", outputSchemas);
+        filter.addTypeRecursive("VideoEpisode_CountryList", outputSchemas);
         return filter;
     }
 

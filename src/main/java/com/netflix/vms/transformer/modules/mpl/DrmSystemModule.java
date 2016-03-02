@@ -1,4 +1,4 @@
-package com.netflix.vms.transformer.modules.drmsystem;
+package com.netflix.vms.transformer.modules.mpl;
 
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.hollowinput.DrmSystemIdentifiersHollow;

@@ -12,12 +12,15 @@ public enum IndexSpec {
     VIDEO_GENERAL(PRIMARY_KEY, "VideoGeneral", "videoId"),
     STORAGE_GROUPS(PRIMARY_KEY, "StorageGroups", "id.value"),
     CDNS(PRIMARY_KEY, "Cdns", "id"),
+    PROTECTION_TYPES(PRIMARY_KEY, "ProtectionTypes", "id"),
     STORIES_SYNOPSES(PRIMARY_KEY, "Stories_Synopses", "movieId"),
     STREAM_PROFILE(PRIMARY_KEY, "StreamProfiles", "id"),
     STREAM_PROFILE_GROUP(PRIMARY_KEY, "StreamProfileGroups", "groupName.value"),
     DEPLOYABLE_PACKAGES(PRIMARY_KEY, "DeployablePackages", "packageId"),
     BCP47_CODE(PRIMARY_KEY, "Bcp47Code", "bcp47Code.value"),
-
+    VIDEO_AWARD(PRIMARY_KEY, "VideoAward", "videoId"),
+    VMS_AWARD(PRIMARY_KEY, "VMSAward", "awardId"),
+    CSM_REVIEW(PRIMARY_KEY, "CSMReview", "videoId"),
 
     VIDEO_DATE(HASH, "VideoDate", "window.element", "videoId", "window.element.countryCode.value"),
     PERSONS_BY_VIDEO_ID(HASH, "VideoPerson", "", "cast.element.videoId"),
