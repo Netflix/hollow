@@ -22,6 +22,7 @@ public class ShowMeTheProgressDiffTool {
         addTypeDiff(diff, "DeploymentIntent", "profileId", "bitrate", "country.id");
         addTypeDiff(diff, "TopNVideoData", "countryId");
         addTypeDiff(diff, "RolloutCharacter", "id");
+        addTypeDiff(diff, "RolloutVideo", "video.value");
         addTypeDiff(diff, "EncodingProfileGroup", "groupNameStr"); // TODO: zero-diff
         addTypeDiff(diff, "GlobalPerson", "id");
         
