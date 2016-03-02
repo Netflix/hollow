@@ -1,12 +1,7 @@
 package com.netflix.vms.transformer.modules.packages;
 
-import com.netflix.vms.transformer.hollowinput.StreamDeploymentLabelHollow;
-
-import com.netflix.vms.transformer.hollowinput.StreamDeploymentLabelSetHollow;
-import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
-import com.netflix.vms.transformer.hollowinput.StreamProfileIdHollow;
-import com.netflix.vms.transformer.hollowinput.StreamProfileGroupsHollow;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.hollowinput.AudioStreamInfoHollow;
 import com.netflix.vms.transformer.hollowinput.CdnDeploymentHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
@@ -16,9 +11,12 @@ import com.netflix.vms.transformer.hollowinput.PackagesHollow;
 import com.netflix.vms.transformer.hollowinput.StreamAssetTypeHollow;
 import com.netflix.vms.transformer.hollowinput.StreamDeploymentHollow;
 import com.netflix.vms.transformer.hollowinput.StreamDeploymentInfoHollow;
+import com.netflix.vms.transformer.hollowinput.StreamDeploymentLabelHollow;
 import com.netflix.vms.transformer.hollowinput.StreamDimensionsHollow;
 import com.netflix.vms.transformer.hollowinput.StreamFileIdentificationHollow;
 import com.netflix.vms.transformer.hollowinput.StreamNonImageInfoHollow;
+import com.netflix.vms.transformer.hollowinput.StreamProfileGroupsHollow;
+import com.netflix.vms.transformer.hollowinput.StreamProfileIdHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.TextStreamInfoHollow;
@@ -64,6 +62,7 @@ public class StreamDataModule {
     private final Map<String, AssetTypeDescriptor> assetTypeDescriptorMap;
     private final Map<String, VideoFormatDescriptor> videoFormatDescriptorMap;
     private final Map<String, TimedTextTypeDescriptor> timedTextTypeDescriptorMap;
+    private final Map<String, Integer> deploymentLabelBitsetOffsetMap;
     private final Set<Integer> ultraHDEncodingProfileIds;
     private final Set<SuperHDIdentifier> validSuperHDIdentifiers;
     private final Set<TargetResolution> aspectRatioVideoFormatIdentifiers;
@@ -85,6 +84,7 @@ public class StreamDataModule {
         this.validSuperHDIdentifiers = getValidSuperHDIdentifiers();
         this.aspectRatioVideoFormatIdentifiers = getAspectRatioVideoFormatIdentifiers();
         this.timedTextTypeDescriptorMap = getTimedTextTypeDescriptorMap();
+        this.deploymentLabelBitsetOffsetMap = getDeploymentLabelBitsetOffsetMap();
         this.tagsLists = new HashMap<String, List<Strings>>();
         this.drmKeysByGroupId = drmKeysByGroupId;
 
@@ -141,12 +141,16 @@ public class StreamDataModule {
         if(inputVideoStreamInfo._getVmafScore() != Long.MIN_VALUE)
             outputStream.additionalData.qoeInfo.vmafScore = (int)inputVideoStreamInfo._getVmafScore();
 
-        outputStream.additionalData.mostlyConstantData.deploymentLabel = 0;
         Set<StreamDeploymentLabelHollow> deploymentLabels = inputStreamDeployment._getDeploymentLabel();
+        int deploymentLabelBits = 0;
         if(deploymentLabels != null) {
-            StringHollow label = deploymentLabels.iterator().next()._getValue();
-            ///TODO: DeploymentLabel is a bitset built from offsets specified in KnownDeploymentLabel
+            for(StreamDeploymentLabelHollow label : deploymentLabels) {
+                Integer labelBit = deploymentLabelBitsetOffsetMap.get(label._getValue()._getValue());
+                if(labelBit != null)
+                    deploymentLabelBits |= (1 << labelBit.intValue());
+            }
         }
+        outputStream.additionalData.mostlyConstantData.deploymentLabel = deploymentLabelBits;
         outputStream.additionalData.mostlyConstantData.deploymentPriority = inputStreamDeployment._getDeploymentPriority() == Integer.MIN_VALUE ? 300 : inputStreamDeployment._getDeploymentPriority();
 
         StringHollow tags = inputStream._getTags();
@@ -438,6 +442,18 @@ public class StreamDataModule {
         descriptor.name = new Strings(name);
         descriptor.description = new Strings(description);
         return descriptor;
+    }
+
+    private Map<String, Integer> getDeploymentLabelBitsetOffsetMap() {
+        Map<String, Integer> map = new HashMap<String, Integer>();
+
+        map.put("PartiallyDeployedReplacement", Integer.valueOf(0));
+        map.put("FutureLabel", Integer.valueOf(1));
+        map.put("DeployASAP", Integer.valueOf(2));
+        map.put("DeployASAP-ignoreRules", Integer.valueOf(3));
+        map.put("DoNotPlay", Integer.valueOf(4));
+
+        return map;
     }
 
 }
