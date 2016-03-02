@@ -21,6 +21,13 @@ public class EncodingProfileGroup implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (groupNameStr == null ? 1237 : groupNameStr.hashCode());
+        hashCode = hashCode * 31 + (encodingProfileIds == null ? 1237 : encodingProfileIds.hashCode());
+        return hashCode;
+    }
+
     public EncodingProfileGroup clone() {
         try {
             EncodingProfileGroup clone = (EncodingProfileGroup)super.clone();

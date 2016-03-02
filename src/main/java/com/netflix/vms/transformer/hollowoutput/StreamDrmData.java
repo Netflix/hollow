@@ -21,6 +21,13 @@ public class StreamDrmData implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (drmKey == null ? 1237 : drmKey.hashCode());
+        hashCode = hashCode * 31 + (wmDrmKey == null ? 1237 : wmDrmKey.hashCode());
+        return hashCode;
+    }
+
     public StreamDrmData clone() {
         try {
             StreamDrmData clone = (StreamDrmData)super.clone();

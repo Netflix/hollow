@@ -23,6 +23,14 @@ public class VideoDimensionsDescriptor implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + dimensions;
+        hashCode = hashCode * 31 + (name == null ? 1237 : name.hashCode());
+        hashCode = hashCode * 31 + (description == null ? 1237 : description.hashCode());
+        return hashCode;
+    }
+
     public VideoDimensionsDescriptor clone() {
         try {
             VideoDimensionsDescriptor clone = (VideoDimensionsDescriptor)super.clone();

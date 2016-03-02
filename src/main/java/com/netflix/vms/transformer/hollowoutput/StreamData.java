@@ -41,6 +41,20 @@ public class StreamData implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (int) (downloadableId ^ (downloadableId >>> 32));
+        hashCode = hashCode * 31 + packageId;
+        hashCode = hashCode * 31 + (int) (fileSizeInBytes ^ (fileSizeInBytes >>> 32));
+        hashCode = hashCode * 31 + (int) (creationTimeStampInSeconds ^ (creationTimeStampInSeconds >>> 32));
+        hashCode = hashCode * 31 + (drmData == null ? 1237 : drmData.hashCode());
+        hashCode = hashCode * 31 + (hashData == null ? 1237 : hashData.hashCode());
+        hashCode = hashCode * 31 + (additionalData == null ? 1237 : additionalData.hashCode());
+        hashCode = hashCode * 31 + (downloadDescriptor == null ? 1237 : downloadDescriptor.hashCode());
+        hashCode = hashCode * 31 + (streamDataDescriptor == null ? 1237 : streamDataDescriptor.hashCode());
+        return hashCode;
+    }
+
     public StreamData clone() {
         try {
             StreamData clone = (StreamData)super.clone();

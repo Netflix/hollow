@@ -29,6 +29,15 @@ public class CompleteVideo implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (id == null ? 1237 : id.hashCode());
+        hashCode = hashCode * 31 + (country == null ? 1237 : country.hashCode());
+        hashCode = hashCode * 31 + (facetData == null ? 1237 : facetData.hashCode());
+        hashCode = hashCode * 31 + (countrySpecificData == null ? 1237 : countrySpecificData.hashCode());
+        return hashCode;
+    }
+
     public CompleteVideo clone() {
         try {
             CompleteVideo clone = (CompleteVideo)super.clone();

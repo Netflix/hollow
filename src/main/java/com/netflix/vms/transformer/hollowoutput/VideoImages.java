@@ -22,6 +22,13 @@ public class VideoImages implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (artWorkDescriptors == null ? 1237 : artWorkDescriptors.hashCode());
+        hashCode = hashCode * 31 + (artWorkIndex == null ? 1237 : artWorkIndex.hashCode());
+        return hashCode;
+    }
+
     public VideoImages clone() {
         try {
             VideoImages clone = (VideoImages)super.clone();

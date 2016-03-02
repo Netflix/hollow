@@ -31,6 +31,17 @@ public class VideoAward implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (video == null ? 1237 : video.hashCode());
+        hashCode = hashCode * 31 + (awardType == null ? 1237 : awardType.hashCode());
+        hashCode = hashCode * 31 + (person == null ? 1237 : person.hashCode());
+        hashCode = hashCode * 31 + (isWinner? 1231 : 1237);
+        hashCode = hashCode * 31 + year;
+        hashCode = hashCode * 31 + sequenceNumber;
+        return hashCode;
+    }
+
     public VideoAward clone() {
         try {
             VideoAward clone = (VideoAward)super.clone();

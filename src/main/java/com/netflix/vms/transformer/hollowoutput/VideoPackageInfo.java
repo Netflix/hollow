@@ -50,6 +50,21 @@ public class VideoPackageInfo implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + packageId;
+        hashCode = hashCode * 31 + (formats == null ? 1237 : formats.hashCode());
+        hashCode = hashCode * 31 + (isAvailableIn3D? 1231 : 1237);
+        hashCode = hashCode * 31 + runtimeInSeconds;
+        hashCode = hashCode * 31 + (soundTypes == null ? 1237 : soundTypes.hashCode());
+        hashCode = hashCode * 31 + (screenFormats == null ? 1237 : screenFormats.hashCode());
+        hashCode = hashCode * 31 + (phoneSnacks == null ? 1237 : phoneSnacks.hashCode());
+        hashCode = hashCode * 31 + (stillImagesMap == null ? 1237 : stillImagesMap.hashCode());
+        hashCode = hashCode * 31 + (videoClipMap == null ? 1237 : videoClipMap.hashCode());
+        hashCode = hashCode * 31 + (trickPlayMap == null ? 1237 : trickPlayMap.hashCode());
+        return hashCode;
+    }
+
     public VideoPackageInfo clone() {
         try {
             VideoPackageInfo clone = (VideoPackageInfo)super.clone();

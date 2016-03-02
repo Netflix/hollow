@@ -20,6 +20,13 @@ public class DrmInfoData implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + packageId;
+        hashCode = hashCode * 31 + (downloadableIdToDrmInfoMap == null ? 1237 : downloadableIdToDrmInfoMap.hashCode());
+        return hashCode;
+    }
+
     public DrmInfoData clone() {
         try {
             DrmInfoData clone = (DrmInfoData)super.clone();

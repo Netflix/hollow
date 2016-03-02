@@ -19,6 +19,13 @@ public class CdnData implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + id;
+        hashCode = hashCode * 31 + (name == null ? 1237 : name.hashCode());
+        return hashCode;
+    }
+
     public CdnData clone() {
         try {
             CdnData clone = (CdnData)super.clone();
