@@ -21,8 +21,8 @@ public class ArtWorkImageFormatEntry implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
-        hashCode = hashCode * 31 + (nameStr == null ? 1237 : nameStr.hashCode());
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(nameStr);
         hashCode = hashCode * 31 + width;
         hashCode = hashCode * 31 + height;
         return hashCode;

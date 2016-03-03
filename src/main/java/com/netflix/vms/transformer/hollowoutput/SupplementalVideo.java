@@ -36,7 +36,7 @@ public class SupplementalVideo implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (id == null ? 1237 : id.hashCode());
         hashCode = hashCode * 31 + (parent == null ? 1237 : parent.hashCode());
         hashCode = hashCode * 31 + sequenceNumber;

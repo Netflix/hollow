@@ -20,7 +20,7 @@ public class RolloutCast implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (person == null ? 1237 : person.hashCode());
         hashCode = hashCode * 31 + sequenceNumber;
         return hashCode;

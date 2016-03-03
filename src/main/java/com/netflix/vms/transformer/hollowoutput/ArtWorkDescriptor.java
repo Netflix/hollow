@@ -56,7 +56,7 @@ public class ArtWorkDescriptor implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (locale == null ? 1237 : locale.hashCode());
         hashCode = hashCode * 31 + (format == null ? 1237 : format.hashCode());
         hashCode = hashCode * 31 + (isUsDescriptor? 1231 : 1237);

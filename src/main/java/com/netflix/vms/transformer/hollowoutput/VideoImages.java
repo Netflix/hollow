@@ -23,7 +23,7 @@ public class VideoImages implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (artWorkDescriptors == null ? 1237 : artWorkDescriptors.hashCode());
         hashCode = hashCode * 31 + (artWorkIndex == null ? 1237 : artWorkIndex.hashCode());
         return hashCode;

@@ -22,7 +22,7 @@ public class ArtworkSourcePassthrough implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (source_file_id == null ? 1237 : source_file_id.hashCode());
         hashCode = hashCode * 31 + (original_source_file_id == null ? 1237 : original_source_file_id.hashCode());
         return hashCode;

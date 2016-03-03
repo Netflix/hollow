@@ -24,7 +24,7 @@ public class AssetLocation implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (recipeDescriptor == null ? 1237 : recipeDescriptor.hashCode());
         hashCode = hashCode * 31 + cdnId;
         hashCode = hashCode * 31 + (cdnDirectory == null ? 1237 : cdnDirectory.hashCode());

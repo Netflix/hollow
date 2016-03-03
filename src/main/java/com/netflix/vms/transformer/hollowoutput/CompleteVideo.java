@@ -30,7 +30,7 @@ public class CompleteVideo implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (id == null ? 1237 : id.hashCode());
         hashCode = hashCode * 31 + (country == null ? 1237 : country.hashCode());
         hashCode = hashCode * 31 + (facetData == null ? 1237 : facetData.hashCode());

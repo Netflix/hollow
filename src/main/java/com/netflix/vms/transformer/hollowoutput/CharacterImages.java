@@ -21,7 +21,7 @@ public class CharacterImages implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + id;
         hashCode = hashCode * 31 + (artWorkDescriptorList == null ? 1237 : artWorkDescriptorList.hashCode());
         return hashCode;

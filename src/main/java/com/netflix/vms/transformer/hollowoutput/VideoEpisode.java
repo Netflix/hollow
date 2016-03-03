@@ -30,7 +30,7 @@ public class VideoEpisode implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (seriesParent == null ? 1237 : seriesParent.hashCode());
         hashCode = hashCode * 31 + (deliverableVideo == null ? 1237 : deliverableVideo.hashCode());
         hashCode = hashCode * 31 + sequenceNumber;

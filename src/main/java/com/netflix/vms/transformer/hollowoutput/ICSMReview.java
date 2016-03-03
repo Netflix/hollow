@@ -144,7 +144,7 @@ public class ICSMReview implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + movieID;
         hashCode = hashCode * 31 + (title == null ? 1237 : title.hashCode());
         hashCode = hashCode * 31 + (link == null ? 1237 : link.hashCode());

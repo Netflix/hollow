@@ -44,7 +44,7 @@ public class CompleteVideoCountrySpecificData implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (metadataAvailabilityDate == null ? 1237 : metadataAvailabilityDate.hashCode());
         hashCode = hashCode * 31 + (firstDisplayDate == null ? 1237 : firstDisplayDate.hashCode());
         hashCode = hashCode * 31 + (firstDisplayDateByLocale == null ? 1237 : firstDisplayDateByLocale.hashCode());

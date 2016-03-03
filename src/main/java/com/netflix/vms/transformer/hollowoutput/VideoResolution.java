@@ -18,7 +18,7 @@ public class VideoResolution implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + height;
         hashCode = hashCode * 31 + width;
         return hashCode;

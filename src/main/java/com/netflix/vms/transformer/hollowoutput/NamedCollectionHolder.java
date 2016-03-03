@@ -36,7 +36,7 @@ public class NamedCollectionHolder implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (country == null ? 1237 : country.hashCode());
         hashCode = hashCode * 31 + (videoListMap == null ? 1237 : videoListMap.hashCode());
         hashCode = hashCode * 31 + (personListMap == null ? 1237 : personListMap.hashCode());

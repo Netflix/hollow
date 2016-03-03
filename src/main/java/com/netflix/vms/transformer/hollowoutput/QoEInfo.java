@@ -18,7 +18,7 @@ public class QoEInfo implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + vmafScore;
         hashCode = hashCode * 31 + scaledPsnrScore;
         return hashCode;

@@ -23,11 +23,11 @@ public class ArtWorkImageTypeEntry implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
-        hashCode = hashCode * 31 + (nameStr == null ? 1237 : nameStr.hashCode());
-        hashCode = hashCode * 31 + (unavailableFileNameStr == null ? 1237 : unavailableFileNameStr.hashCode());
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(nameStr);
+        hashCode = hashCode * 31 + Arrays.hashCode(unavailableFileNameStr);
         hashCode = hashCode * 31 + (allowMultiples? 1231 : 1237);
-        hashCode = hashCode * 31 + (recipeNameStr == null ? 1237 : recipeNameStr.hashCode());
+        hashCode = hashCode * 31 + Arrays.hashCode(recipeNameStr);
         return hashCode;
     }
 

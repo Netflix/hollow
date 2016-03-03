@@ -35,8 +35,8 @@ public class RolloutSummary implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
-        hashCode = hashCode * 31 + (type == null ? 1237 : type.hashCode());
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(type);
         hashCode = hashCode * 31 + (video == null ? 1237 : video.hashCode());
         hashCode = hashCode * 31 + (rolloutInfoMap == null ? 1237 : rolloutInfoMap.hashCode());
         hashCode = hashCode * 31 + (phaseWindowMap == null ? 1237 : phaseWindowMap.hashCode());

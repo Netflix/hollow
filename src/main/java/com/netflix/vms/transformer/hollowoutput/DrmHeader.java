@@ -26,7 +26,7 @@ public class DrmHeader implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + drmSystemId;
         hashCode = hashCode * 31 + Arrays.hashCode(keyId);
         hashCode = hashCode * 31 + Arrays.hashCode(checksum);

@@ -26,11 +26,11 @@ public class BaseDownloadable implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (int) (downloadableId ^ (downloadableId >>> 32));
         hashCode = hashCode * 31 + streamProfileId;
         hashCode = hashCode * 31 + (originServerNames == null ? 1237 : originServerNames.hashCode());
-        hashCode = hashCode * 31 + (envBasedDirectory == null ? 1237 : envBasedDirectory.hashCode());
+        hashCode = hashCode * 31 + Arrays.hashCode(envBasedDirectory);
         return hashCode;
     }
 

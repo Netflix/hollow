@@ -35,7 +35,7 @@ public class VideoContractInfo implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + contractId;
         hashCode = hashCode * 31 + primaryPackageId;
         hashCode = hashCode * 31 + prePromotionDays;

@@ -29,7 +29,7 @@ public class GlobalVideo implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (completeVideo == null ? 1237 : completeVideo.hashCode());
         hashCode = hashCode * 31 + (aliases == null ? 1237 : aliases.hashCode());
         hashCode = hashCode * 31 + (availableCountries == null ? 1237 : availableCountries.hashCode());

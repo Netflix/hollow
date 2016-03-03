@@ -33,7 +33,7 @@ public class VideoMoment implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (videoMomentTypeName == null ? 1237 : videoMomentTypeName.hashCode());
         hashCode = hashCode * 31 + sequenceNumber;
         hashCode = hashCode * 31 + (int) (msOffset ^ (msOffset >>> 32));

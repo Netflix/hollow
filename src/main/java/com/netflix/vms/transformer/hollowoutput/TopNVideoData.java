@@ -24,8 +24,8 @@ public class TopNVideoData implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
-        hashCode = hashCode * 31 + (countryId == null ? 1237 : countryId.hashCode());
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(countryId);
         hashCode = hashCode * 31 + (videoViewHrs1Day == null ? 1237 : videoViewHrs1Day.hashCode());
         hashCode = hashCode * 31 + java.lang.Float.floatToIntBits(countryViewHrs1Day);
         return hashCode;

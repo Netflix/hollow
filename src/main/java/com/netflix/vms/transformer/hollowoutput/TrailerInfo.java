@@ -39,17 +39,17 @@ public class TrailerInfo implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (type == null ? 1237 : type.hashCode());
-        hashCode = hashCode * 31 + (imageTag == null ? 1237 : imageTag.hashCode());
-        hashCode = hashCode * 31 + (imageBackgroundTone == null ? 1237 : imageBackgroundTone.hashCode());
+        hashCode = hashCode * 31 + Arrays.hashCode(imageTag);
+        hashCode = hashCode * 31 + Arrays.hashCode(imageBackgroundTone);
         hashCode = hashCode * 31 + mapIndex;
         hashCode = hashCode * 31 + seasonNumber;
-        hashCode = hashCode * 31 + (subtitleLocale == null ? 1237 : subtitleLocale.hashCode());
-        hashCode = hashCode * 31 + (video == null ? 1237 : video.hashCode());
+        hashCode = hashCode * 31 + Arrays.hashCode(subtitleLocale);
+        hashCode = hashCode * 31 + Arrays.hashCode(video);
         hashCode = hashCode * 31 + videoLength;
         hashCode = hashCode * 31 + videoOffset;
-        hashCode = hashCode * 31 + (videoValue == null ? 1237 : videoValue.hashCode());
+        hashCode = hashCode * 31 + Arrays.hashCode(videoValue);
         hashCode = hashCode * 31 + priority;
         return hashCode;
     }

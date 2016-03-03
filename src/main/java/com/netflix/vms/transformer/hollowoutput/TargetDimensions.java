@@ -18,7 +18,7 @@ public class TargetDimensions implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + heightInPixels;
         hashCode = hashCode * 31 + widthInPixels;
         return hashCode;

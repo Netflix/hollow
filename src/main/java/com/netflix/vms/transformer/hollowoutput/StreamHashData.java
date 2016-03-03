@@ -22,7 +22,7 @@ public class StreamHashData implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (int) (cRC32Hash ^ (cRC32Hash >>> 32));
         hashCode = hashCode * 31 + (int) (sha1_1 ^ (sha1_1 >>> 32));
         hashCode = hashCode * 31 + (int) (sha1_2 ^ (sha1_2 >>> 32));

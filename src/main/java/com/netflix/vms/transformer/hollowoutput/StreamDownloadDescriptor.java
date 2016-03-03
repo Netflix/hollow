@@ -38,7 +38,7 @@ public class StreamDownloadDescriptor implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (profileType == null ? 1237 : profileType.hashCode());
         hashCode = hashCode * 31 + streamProfileId;
         hashCode = hashCode * 31 + (videoResolution == null ? 1237 : videoResolution.hashCode());

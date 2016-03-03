@@ -59,7 +59,7 @@ public class VideoCollectionsData implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (nodeType == null ? 1237 : nodeType.hashCode());
         hashCode = hashCode * 31 + (topNodeType == null ? 1237 : topNodeType.hashCode());
         hashCode = hashCode * 31 + (videoEpisodes == null ? 1237 : videoEpisodes.hashCode());

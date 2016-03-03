@@ -23,7 +23,7 @@ public class DownloadLocationSet implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (filename == null ? 1237 : filename.hashCode());
         hashCode = hashCode * 31 + (locations == null ? 1237 : locations.hashCode());
         return hashCode;

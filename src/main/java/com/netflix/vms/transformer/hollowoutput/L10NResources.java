@@ -22,8 +22,8 @@ public class L10NResources implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
-        hashCode = hashCode * 31 + (resourceIdStr == null ? 1237 : resourceIdStr.hashCode());
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(resourceIdStr);
         hashCode = hashCode * 31 + (localizedStrings == null ? 1237 : localizedStrings.hashCode());
         return hashCode;
     }

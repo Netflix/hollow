@@ -22,7 +22,7 @@ public class Certification implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (movieCert == null ? 1237 : movieCert.hashCode());
         hashCode = hashCode * 31 + (certSystem == null ? 1237 : certSystem.hashCode());
         return hashCode;

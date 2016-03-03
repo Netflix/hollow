@@ -23,7 +23,7 @@ public class MovieRatingReason implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (reasonIds == null ? 1237 : reasonIds.hashCode());
         hashCode = hashCode * 31 + (isDisplayImageOnly? 1231 : 1237);
         hashCode = hashCode * 31 + (isDisplayOrderSpecific? 1231 : 1237);

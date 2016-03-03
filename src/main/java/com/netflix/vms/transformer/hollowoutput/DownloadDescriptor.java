@@ -40,7 +40,7 @@ public class DownloadDescriptor implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (assetTypeDescriptor == null ? 1237 : assetTypeDescriptor.hashCode());
         hashCode = hashCode * 31 + (timedTextTypeDescriptor == null ? 1237 : timedTextTypeDescriptor.hashCode());
         hashCode = hashCode * 31 + encodingProfileId;
