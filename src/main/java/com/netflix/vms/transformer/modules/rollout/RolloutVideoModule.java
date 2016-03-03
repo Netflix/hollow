@@ -3,6 +3,7 @@ package com.netflix.vms.transformer.modules.rollout;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
+import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkSourceFileIdHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkSourceFileIdListHollow;
@@ -12,8 +13,12 @@ import com.netflix.vms.transformer.hollowinput.RolloutPhaseImageIdHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseListHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseLocalizedMetadataHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseOldArtworkListHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutPhaseTrailerHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutPhaseTrailerListHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutPhaseTrailerSupplementalInfoHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowMapHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutPhasesElementsTrailerSupplementalInfoMapHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowoutput.AvailabilityWindow;
 import com.netflix.vms.transformer.hollowoutput.Date;
@@ -22,8 +27,12 @@ import com.netflix.vms.transformer.hollowoutput.Phase;
 import com.netflix.vms.transformer.hollowoutput.RolloutInfo;
 import com.netflix.vms.transformer.hollowoutput.RolloutPhaseWindow;
 import com.netflix.vms.transformer.hollowoutput.RolloutSummary;
+import com.netflix.vms.transformer.hollowoutput.RolloutTrailer;
 import com.netflix.vms.transformer.hollowoutput.RolloutVideo;
 import com.netflix.vms.transformer.hollowoutput.Strings;
+import com.netflix.vms.transformer.hollowoutput.SupplementalInfoType;
+import com.netflix.vms.transformer.hollowoutput.SupplementalVideo;
+import com.netflix.vms.transformer.hollowoutput.TrailerInfo;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
@@ -92,23 +101,58 @@ public class RolloutVideoModule extends AbstractTransformModule {
                 RolloutPhaseListHollow phaseListHollow = rollout._getPhases();
                 for (RolloutPhaseHollow phaseHollow : phaseListHollow) {
                     Phase phase = new Phase();
-                    phase.rolloutId = info.rolloutId;
-                    phase.video = info.video;
-                    phase.name = phaseHollow._getName()._getValue().toCharArray();
-                    phase.isCoreMetaDataShown = phaseHollow._getShowCoreMetadata();
                     phase.projectedLaunchDates = new HashMap<ISOCountry, Date>(); // !! TODO
                     phase.windowsMap = new HashMap<ISOCountry, AvailabilityWindow>();
                     phase.artWorkImageIds = new HashSet<com.netflix.vms.transformer.hollowoutput.Long>();
                     phase.sourceFileIds = new HashSet<Strings>();
+                    phase.trailers = new ArrayList<RolloutTrailer>();
+                    phase.supplementalVideos = new ArrayList<SupplementalVideo>();
 
+                    phase.rolloutId = info.rolloutId;
+                    phase.video = info.video;
+                    phase.name = phaseHollow._getName()._getValue().toCharArray();
+                    phase.isCoreMetaDataShown = phaseHollow._getShowCoreMetadata();
+
+                    // add artwork ids
                     RolloutPhaseOldArtworkListHollow artworkIdList = phaseHollow._getElements()._getArtwork();
                     for (RolloutPhaseImageIdHollow idHollow : artworkIdList) {
                         phase.artWorkImageIds.add(new com.netflix.vms.transformer.hollowoutput.Long(idHollow._getImageId()));
                     }
 
+                    // add artwork source fields
                     RolloutPhaseArtworkSourceFileIdListHollow artworkSourceFieldList = phaseHollow._getElements()._getArtwork_new()._getSourceFileIds();
                     for (RolloutPhaseArtworkSourceFileIdHollow sourceFieldHollow : artworkSourceFieldList) {
                         phase.sourceFileIds.add(new Strings(sourceFieldHollow._getValue()._getValue()));
+                    }
+
+                    // trailers
+                    RolloutPhaseTrailerListHollow inputTrailerList = phaseHollow._getElements()._getTrailers();
+                    for (RolloutPhaseTrailerHollow phaseTrailer : inputTrailerList) {
+                        RolloutTrailer outputTrailer = new RolloutTrailer();
+                        outputTrailer.sequenceNumber = (int) phaseTrailer._getSequenceNumber();
+                        outputTrailer.video = new Video((int) phaseTrailer._getTrailerMovieId());
+                        outputTrailer.supplementalInfos = new HashMap<SupplementalInfoType, TrailerInfo>();
+                        RolloutPhasesElementsTrailerSupplementalInfoMapHollow inputInfoMap = phaseTrailer._getSupplementalInfo();
+
+                        for (Entry<MapKeyHollow, RolloutPhaseTrailerSupplementalInfoHollow> entry : inputInfoMap.entrySet()) {
+                            SupplementalInfoType typeOut = new SupplementalInfoType(entry.getKey()._getValue());
+                            RolloutPhaseTrailerSupplementalInfoHollow infoIn = entry.getValue();
+
+                            TrailerInfo infoOut = new TrailerInfo();
+                            infoOut.imageBackgroundTone = infoIn._getImageBackgroundTone()._getValue().toCharArray();
+                            infoOut.imageTag = infoIn._getImageTag()._getValue().toCharArray();
+                            infoOut.priority = (int) infoIn._getPriority();
+                            infoOut.seasonNumber = (int) infoIn._getSeasonNumber();
+                            infoOut.subtitleLocale = infoIn._getSubtitleLocale()._getValue().toCharArray();
+                            infoOut.type = typeOut;
+                            infoOut.video = infoIn._getVideo()._getValue().toCharArray();
+                            infoOut.videoLength = (int) infoIn._getVideoLength();
+                            infoOut.videoValue = infoIn._getVideoValue()._getValue().toCharArray();
+
+                            outputTrailer.supplementalInfos.put(typeOut, infoOut);
+                        }
+
+                        phase.trailers.add(outputTrailer);
                     }
 
                     RolloutPhaseWindowMapHollow phaseWindows = phaseHollow._getWindows();
