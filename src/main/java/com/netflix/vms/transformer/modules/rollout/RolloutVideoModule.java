@@ -2,9 +2,14 @@ package com.netflix.vms.transformer.modules.rollout;
 
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutPhaseElementsHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseListHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutPhaseLocalizedMetadataHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowMapHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowoutput.AvailabilityWindow;
 import com.netflix.vms.transformer.hollowoutput.Date;
@@ -22,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class RolloutVideoModule extends AbstractTransformModule {
     private final HollowPrimaryKeyIndex supplementalIndex;
@@ -83,9 +89,27 @@ public class RolloutVideoModule extends AbstractTransformModule {
                     phase.video = info.video;
                     phase.name = phaseHollow._getName()._getValue().toCharArray();
                     phase.isCoreMetaDataShown = phaseHollow._getShowCoreMetadata();
-                    phase.projectedLaunchDates = new HashMap<ISOCountry, Date>();
+                    phase.projectedLaunchDates = new HashMap<ISOCountry, Date>(); // !! TODO
                     phase.windowsMap = new HashMap<ISOCountry, AvailabilityWindow>();
 
+                    RolloutPhaseWindowMapHollow phaseWindows = phaseHollow._getWindows();
+                    for(Entry<ISOCountryHollow, RolloutPhaseWindowHollow> entry : phaseWindows.entrySet()) {
+                        AvailabilityWindow w = new AvailabilityWindow();
+                        w.startDate = new Date(entry.getValue()._getStartDate()._getValue());
+                        w.endDate = new Date(entry.getValue()._getEndDate()._getValue());
+                        phase.windowsMap.put(new ISOCountry(entry.getKey()._getValue()), w);
+                    }
+
+                    phase.rawL10nAttribs = new HashMap<Strings, Strings>();
+                    RolloutPhaseElementsHollow phaseElements = phaseHollow._getElements();
+                    RolloutPhaseLocalizedMetadataHollow localized = phaseElements._getLocalized_metadata();
+
+                    if (localized._getSUPPLEMENTAL_MESSAGE() != null)
+                        phase.rawL10nAttribs.put(new Strings("SUPPLEMENTAL_MESSAGE"), new Strings(localized._getSUPPLEMENTAL_MESSAGE()._getValue()));
+                    if (localized._getTAGLINE() != null)
+                        phase.rawL10nAttribs.put(new Strings("TAGLINE"), new Strings(localized._getTAGLINE()._getValue()));
+
+                    summary.allPhases.add(phase);
                 }
             }
             mapper.addObject(output);
