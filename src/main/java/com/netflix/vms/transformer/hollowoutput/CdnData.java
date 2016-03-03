@@ -20,7 +20,7 @@ public class CdnData implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + id;
         hashCode = hashCode * 31 + (name == null ? 1237 : name.hashCode());
         return hashCode;

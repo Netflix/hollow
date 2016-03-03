@@ -24,7 +24,7 @@ public class CupKey implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (token == null ? 1237 : token.hashCode());
         return hashCode;
     }

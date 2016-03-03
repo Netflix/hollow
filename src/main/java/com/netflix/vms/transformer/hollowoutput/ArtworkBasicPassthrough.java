@@ -49,7 +49,7 @@ public class ArtworkBasicPassthrough implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (themes == null ? 1237 : themes.hashCode());
         hashCode = hashCode * 31 + (tone == null ? 1237 : tone.hashCode());
         hashCode = hashCode * 31 + (awardCampaigns == null ? 1237 : awardCampaigns.hashCode());

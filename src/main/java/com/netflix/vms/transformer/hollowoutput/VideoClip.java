@@ -29,7 +29,7 @@ public class VideoClip implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (videoId == null ? 1237 : videoId.hashCode());
         hashCode = hashCode * 31 + (int) (msDuration ^ (msDuration >>> 32));
         hashCode = hashCode * 31 + (videoMoment == null ? 1237 : videoMoment.hashCode());

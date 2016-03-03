@@ -28,7 +28,7 @@ public class PersonRole implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (person == null ? 1237 : person.hashCode());
         hashCode = hashCode * 31 + (roleType == null ? 1237 : roleType.hashCode());
         hashCode = hashCode * 31 + (video == null ? 1237 : video.hashCode());

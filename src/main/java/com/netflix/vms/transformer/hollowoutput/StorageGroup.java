@@ -22,8 +22,8 @@ public class StorageGroup implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
-        hashCode = hashCode * 31 + (idStr == null ? 1237 : idStr.hashCode());
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(idStr);
         hashCode = hashCode * 31 + (countries == null ? 1237 : countries.hashCode());
         return hashCode;
     }

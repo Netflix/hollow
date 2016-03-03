@@ -24,7 +24,7 @@ public class RolloutRole implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + id;
         hashCode = hashCode * 31 + characterId;
         hashCode = hashCode * 31 + sequenceNumber;

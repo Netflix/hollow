@@ -22,7 +22,7 @@ public class DownloadLocation implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (directory == null ? 1237 : directory.hashCode());
         hashCode = hashCode * 31 + (originServerName == null ? 1237 : originServerName.hashCode());
         return hashCode;

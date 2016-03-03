@@ -26,7 +26,7 @@ public class RolloutCharacter implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + id;
         hashCode = hashCode * 31 + (rawL10nAttribs == null ? 1237 : rawL10nAttribs.hashCode());
         hashCode = hashCode * 31 + (quotes == null ? 1237 : quotes.hashCode());

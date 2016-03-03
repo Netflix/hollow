@@ -21,9 +21,9 @@ public class Quote implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + characterId;
-        hashCode = hashCode * 31 + (rawL10nLabel == null ? 1237 : rawL10nLabel.hashCode());
+        hashCode = hashCode * 31 + Arrays.hashCode(rawL10nLabel);
         hashCode = hashCode * 31 + sequenceNumber;
         return hashCode;
     }

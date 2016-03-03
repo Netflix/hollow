@@ -18,7 +18,7 @@ public class ImageSubtitleIndexByteRange implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (int) (masterIndexOffset ^ (masterIndexOffset >>> 32));
         hashCode = hashCode * 31 + masterIndexSize;
         return hashCode;

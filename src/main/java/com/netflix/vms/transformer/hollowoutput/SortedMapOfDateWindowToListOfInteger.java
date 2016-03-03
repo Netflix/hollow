@@ -28,7 +28,7 @@ public class SortedMapOfDateWindowToListOfInteger implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (map == null ? 1237 : map.hashCode());
         return hashCode;
     }

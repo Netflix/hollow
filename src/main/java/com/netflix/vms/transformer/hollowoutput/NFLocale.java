@@ -27,8 +27,8 @@ public class NFLocale implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
-        hashCode = hashCode * 31 + (value == null ? 1237 : value.hashCode());
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(value);
         return hashCode;
     }
 

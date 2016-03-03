@@ -25,11 +25,11 @@ public class RolloutInfo implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + rolloutId;
         hashCode = hashCode * 31 + (video == null ? 1237 : video.hashCode());
-        hashCode = hashCode * 31 + (type == null ? 1237 : type.hashCode());
-        hashCode = hashCode * 31 + (name == null ? 1237 : name.hashCode());
+        hashCode = hashCode * 31 + Arrays.hashCode(type);
+        hashCode = hashCode * 31 + Arrays.hashCode(name);
         return hashCode;
     }
 

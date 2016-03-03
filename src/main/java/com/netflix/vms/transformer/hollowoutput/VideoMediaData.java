@@ -34,7 +34,7 @@ public class VideoMediaData implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (isAvailableForED? 1231 : 1237);
         hashCode = hashCode * 31 + (isGoLive? 1231 : 1237);
         hashCode = hashCode * 31 + (isOriginal? 1231 : 1237);

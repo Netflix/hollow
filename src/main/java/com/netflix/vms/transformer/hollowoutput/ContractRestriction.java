@@ -37,7 +37,7 @@ public class ContractRestriction implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (excludedDownloadables == null ? 1237 : excludedDownloadables.hashCode());
         hashCode = hashCode * 31 + (availabilityWindow == null ? 1237 : availabilityWindow.hashCode());
         hashCode = hashCode * 31 + (cupKeys == null ? 1237 : cupKeys.hashCode());

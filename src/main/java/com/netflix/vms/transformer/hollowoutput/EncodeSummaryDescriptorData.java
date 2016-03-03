@@ -42,7 +42,7 @@ public class EncodeSummaryDescriptorData implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (assetType == null ? 1237 : assetType.hashCode());
         hashCode = hashCode * 31 + (timedTextType == null ? 1237 : timedTextType.hashCode());
         hashCode = hashCode * 31 + (audioLanguage == null ? 1237 : audioLanguage.hashCode());

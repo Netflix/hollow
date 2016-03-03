@@ -24,7 +24,7 @@ public class WmDrmKey implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (int) (downloadableId ^ (downloadableId >>> 32));
         hashCode = hashCode * 31 + (contentPackagerPublicKey == null ? 1237 : contentPackagerPublicKey.hashCode());
         hashCode = hashCode * 31 + (encryptedContentKey == null ? 1237 : encryptedContentKey.hashCode());

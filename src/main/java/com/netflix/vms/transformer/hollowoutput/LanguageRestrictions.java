@@ -31,7 +31,7 @@ public class LanguageRestrictions implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + audioLanguageId;
         hashCode = hashCode * 31 + (audioLanguage == null ? 1237 : audioLanguage.hashCode());
         hashCode = hashCode * 31 + (disallowedTimedText == null ? 1237 : disallowedTimedText.hashCode());

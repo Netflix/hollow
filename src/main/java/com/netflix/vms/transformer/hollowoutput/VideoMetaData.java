@@ -92,7 +92,7 @@ public class VideoMetaData implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (isTestTitle? 1231 : 1237);
         hashCode = hashCode * 31 + (titleTypes == null ? 1237 : titleTypes.hashCode());
         hashCode = hashCode * 31 + (isSearchOnly? 1231 : 1237);

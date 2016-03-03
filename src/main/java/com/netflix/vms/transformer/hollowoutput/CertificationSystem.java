@@ -24,7 +24,7 @@ public class CertificationSystem implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + id;
         hashCode = hashCode * 31 + (officialURL == null ? 1237 : officialURL.hashCode());
         hashCode = hashCode * 31 + (country == null ? 1237 : country.hashCode());

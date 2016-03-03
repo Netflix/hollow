@@ -19,9 +19,9 @@ public class DefaultExtensionRecipe implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
-        hashCode = hashCode * 31 + (extensionStr == null ? 1237 : extensionStr.hashCode());
-        hashCode = hashCode * 31 + (recipeNameStr == null ? 1237 : recipeNameStr.hashCode());
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(extensionStr);
+        hashCode = hashCode * 31 + Arrays.hashCode(recipeNameStr);
         return hashCode;
     }
 

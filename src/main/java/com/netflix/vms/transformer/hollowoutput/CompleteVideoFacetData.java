@@ -34,7 +34,7 @@ public class CompleteVideoFacetData implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (videoMetaData == null ? 1237 : videoMetaData.hashCode());
         hashCode = hashCode * 31 + (videoCollectionsData == null ? 1237 : videoCollectionsData.hashCode());
         hashCode = hashCode * 31 + (videoMiscData == null ? 1237 : videoMiscData.hashCode());

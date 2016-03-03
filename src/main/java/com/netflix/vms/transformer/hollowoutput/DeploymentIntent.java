@@ -22,7 +22,7 @@ public class DeploymentIntent implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + profileId;
         hashCode = hashCode * 31 + bitrate;
         hashCode = hashCode * 31 + (country == null ? 1237 : country.hashCode());

@@ -25,7 +25,7 @@ public class ArtWorkExtendedIndex implements Cloneable {
     }
 
     public int hashCode() {
-        int hashCode = 0;
+        int hashCode = 1;
         hashCode = hashCode * 31 + (artWorkList == null ? 1237 : artWorkList.hashCode());
         return hashCode;
     }
