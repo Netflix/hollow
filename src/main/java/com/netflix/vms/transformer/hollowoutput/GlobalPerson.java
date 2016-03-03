@@ -24,6 +24,14 @@ public class GlobalPerson implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + id;
+        hashCode = hashCode * 31 + (aliasesIds == null ? 1237 : aliasesIds.hashCode());
+        hashCode = hashCode * 31 + (personRoles == null ? 1237 : personRoles.hashCode());
+        return hashCode;
+    }
+
     public GlobalPerson clone() {
         try {
             GlobalPerson clone = (GlobalPerson)super.clone();

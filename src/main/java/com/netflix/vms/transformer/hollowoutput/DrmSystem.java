@@ -28,6 +28,15 @@ public class DrmSystem implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + id;
+        hashCode = hashCode * 31 + (guid == null ? 1237 : guid.hashCode());
+        hashCode = hashCode * 31 + (name == null ? 1237 : name.hashCode());
+        hashCode = hashCode * 31 + (attributes == null ? 1237 : attributes.hashCode());
+        return hashCode;
+    }
+
     public DrmSystem clone() {
         try {
             DrmSystem clone = (DrmSystem)super.clone();

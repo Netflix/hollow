@@ -20,6 +20,14 @@ public class Quote implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + characterId;
+        hashCode = hashCode * 31 + Arrays.hashCode(rawL10nLabel);
+        hashCode = hashCode * 31 + sequenceNumber;
+        return hashCode;
+    }
+
     public Quote clone() {
         try {
             Quote clone = (Quote)super.clone();

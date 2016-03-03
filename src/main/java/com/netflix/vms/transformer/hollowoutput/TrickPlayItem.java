@@ -23,6 +23,14 @@ public class TrickPlayItem implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (videoId == null ? 1237 : videoId.hashCode());
+        hashCode = hashCode * 31 + imageCount;
+        hashCode = hashCode * 31 + (trickPlayDownloadable == null ? 1237 : trickPlayDownloadable.hashCode());
+        return hashCode;
+    }
+
     public TrickPlayItem clone() {
         try {
             TrickPlayItem clone = (TrickPlayItem)super.clone();

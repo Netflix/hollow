@@ -29,6 +29,17 @@ public class VideoEpisode implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (seriesParent == null ? 1237 : seriesParent.hashCode());
+        hashCode = hashCode * 31 + (deliverableVideo == null ? 1237 : deliverableVideo.hashCode());
+        hashCode = hashCode * 31 + sequenceNumber;
+        hashCode = hashCode * 31 + showSequenceNumber;
+        hashCode = hashCode * 31 + seasonSequenceNumber;
+        hashCode = hashCode * 31 + episodeSequenceNumber;
+        return hashCode;
+    }
+
     public VideoEpisode clone() {
         try {
             VideoEpisode clone = (VideoEpisode)super.clone();

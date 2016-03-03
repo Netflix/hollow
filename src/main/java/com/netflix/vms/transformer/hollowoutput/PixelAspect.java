@@ -17,6 +17,13 @@ public class PixelAspect implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + height;
+        hashCode = hashCode * 31 + width;
+        return hashCode;
+    }
+
     public PixelAspect clone() {
         try {
             PixelAspect clone = (PixelAspect)super.clone();

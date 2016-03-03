@@ -26,6 +26,12 @@ public class ISOCountry implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(id);
+        return hashCode;
+    }
+
     public ISOCountry clone() {
         try {
             ISOCountry clone = (ISOCountry)super.clone();

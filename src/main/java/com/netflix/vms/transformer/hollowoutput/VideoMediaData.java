@@ -33,6 +33,20 @@ public class VideoMediaData implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (isAvailableForED? 1231 : 1237);
+        hashCode = hashCode * 31 + (isGoLive? 1231 : 1237);
+        hashCode = hashCode * 31 + (isOriginal? 1231 : 1237);
+        hashCode = hashCode * 31 + (isAutoPlayEnabled? 1231 : 1237);
+        hashCode = hashCode * 31 + (dvdReleaseDate == null ? 1237 : dvdReleaseDate.hashCode());
+        hashCode = hashCode * 31 + (hasLocalAudio? 1231 : 1237);
+        hashCode = hashCode * 31 + (hasLocalText? 1231 : 1237);
+        hashCode = hashCode * 31 + approximateRuntimeInSeconds;
+        hashCode = hashCode * 31 + (isLanguageOverride? 1231 : 1237);
+        return hashCode;
+    }
+
     public VideoMediaData clone() {
         try {
             VideoMediaData clone = (VideoMediaData)super.clone();

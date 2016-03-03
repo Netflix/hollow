@@ -23,6 +23,14 @@ public class VideoFormatDescriptor implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + id;
+        hashCode = hashCode * 31 + (name == null ? 1237 : name.hashCode());
+        hashCode = hashCode * 31 + (description == null ? 1237 : description.hashCode());
+        return hashCode;
+    }
+
     public VideoFormatDescriptor clone() {
         try {
             VideoFormatDescriptor clone = (VideoFormatDescriptor)super.clone();

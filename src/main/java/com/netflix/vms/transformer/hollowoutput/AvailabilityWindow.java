@@ -21,6 +21,13 @@ public class AvailabilityWindow implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (startDate == null ? 1237 : startDate.hashCode());
+        hashCode = hashCode * 31 + (endDate == null ? 1237 : endDate.hashCode());
+        return hashCode;
+    }
+
     public AvailabilityWindow clone() {
         try {
             AvailabilityWindow clone = (AvailabilityWindow)super.clone();

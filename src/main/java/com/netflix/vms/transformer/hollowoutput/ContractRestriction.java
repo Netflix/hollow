@@ -36,6 +36,17 @@ public class ContractRestriction implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (excludedDownloadables == null ? 1237 : excludedDownloadables.hashCode());
+        hashCode = hashCode * 31 + (availabilityWindow == null ? 1237 : availabilityWindow.hashCode());
+        hashCode = hashCode * 31 + (cupKeys == null ? 1237 : cupKeys.hashCode());
+        hashCode = hashCode * 31 + prePromotionDays;
+        hashCode = hashCode * 31 + postPromotionDays;
+        hashCode = hashCode * 31 + (languageBcp47RestrictionsMap == null ? 1237 : languageBcp47RestrictionsMap.hashCode());
+        return hashCode;
+    }
+
     public ContractRestriction clone() {
         try {
             ContractRestriction clone = (ContractRestriction)super.clone();

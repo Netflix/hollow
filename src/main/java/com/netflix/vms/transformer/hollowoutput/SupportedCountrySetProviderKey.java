@@ -26,6 +26,12 @@ public class SupportedCountrySetProviderKey implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(value);
+        return hashCode;
+    }
+
     public SupportedCountrySetProviderKey clone() {
         try {
             SupportedCountrySetProviderKey clone = (SupportedCountrySetProviderKey)super.clone();

@@ -26,6 +26,12 @@ public class SupplementalInfoType implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(value);
+        return hashCode;
+    }
+
     public SupplementalInfoType clone() {
         try {
             SupplementalInfoType clone = (SupplementalInfoType)super.clone();

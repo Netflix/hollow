@@ -39,6 +39,18 @@ public class DownloadDescriptor implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (assetTypeDescriptor == null ? 1237 : assetTypeDescriptor.hashCode());
+        hashCode = hashCode * 31 + (timedTextTypeDescriptor == null ? 1237 : timedTextTypeDescriptor.hashCode());
+        hashCode = hashCode * 31 + encodingProfileId;
+        hashCode = hashCode * 31 + (videoFormatDescriptor == null ? 1237 : videoFormatDescriptor.hashCode());
+        hashCode = hashCode * 31 + (audioLanguageBcp47code == null ? 1237 : audioLanguageBcp47code.hashCode());
+        hashCode = hashCode * 31 + (assetMetaData == null ? 1237 : assetMetaData.hashCode());
+        hashCode = hashCode * 31 + (textLanguageBcp47code == null ? 1237 : textLanguageBcp47code.hashCode());
+        return hashCode;
+    }
+
     public DownloadDescriptor clone() {
         try {
             DownloadDescriptor clone = (DownloadDescriptor)super.clone();

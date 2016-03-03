@@ -26,6 +26,14 @@ public class VideoImage implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (videoId == null ? 1237 : videoId.hashCode());
+        hashCode = hashCode * 31 + (videoMoment == null ? 1237 : videoMoment.hashCode());
+        hashCode = hashCode * 31 + (downloadableList == null ? 1237 : downloadableList.hashCode());
+        return hashCode;
+    }
+
     public VideoImage clone() {
         try {
             VideoImage clone = (VideoImage)super.clone();

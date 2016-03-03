@@ -24,6 +24,14 @@ public class OriginServer implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(nameStr);
+        hashCode = hashCode * 31 + (cdnData == null ? 1237 : cdnData.hashCode());
+        hashCode = hashCode * 31 + (storageGroup == null ? 1237 : storageGroup.hashCode());
+        return hashCode;
+    }
+
     public OriginServer clone() {
         try {
             OriginServer clone = (OriginServer)super.clone();

@@ -20,6 +20,13 @@ public class PersonImages implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + id;
+        hashCode = hashCode * 31 + (artWorkDescriptors == null ? 1237 : artWorkDescriptors.hashCode());
+        return hashCode;
+    }
+
     public PersonImages clone() {
         try {
             PersonImages clone = (PersonImages)super.clone();

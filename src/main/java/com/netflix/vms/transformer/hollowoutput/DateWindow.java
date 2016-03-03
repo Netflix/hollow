@@ -17,6 +17,13 @@ public class DateWindow implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (int) (startDateTimestamp ^ (startDateTimestamp >>> 32));
+        hashCode = hashCode * 31 + (int) (endDateTimestamp ^ (endDateTimestamp >>> 32));
+        return hashCode;
+    }
+
     public DateWindow clone() {
         try {
             DateWindow clone = (DateWindow)super.clone();

@@ -28,6 +28,15 @@ public class VMSAvailabilityWindow implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (startDate == null ? 1237 : startDate.hashCode());
+        hashCode = hashCode * 31 + (endDate == null ? 1237 : endDate.hashCode());
+        hashCode = hashCode * 31 + bundledAssetsGroupId;
+        hashCode = hashCode * 31 + (windowInfosByPackageId == null ? 1237 : windowInfosByPackageId.hashCode());
+        return hashCode;
+    }
+
     public VMSAvailabilityWindow clone() {
         try {
             VMSAvailabilityWindow clone = (VMSAvailabilityWindow)super.clone();

@@ -21,6 +21,12 @@ public class Boolean implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (val? 1231 : 1237);
+        return hashCode;
+    }
+
     public Boolean clone() {
         try {
             Boolean clone = (Boolean)super.clone();

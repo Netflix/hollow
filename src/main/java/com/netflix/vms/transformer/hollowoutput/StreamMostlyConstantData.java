@@ -31,6 +31,17 @@ public class StreamMostlyConstantData implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + deploymentLabel;
+        hashCode = hashCode * 31 + conformingGroupId;
+        hashCode = hashCode * 31 + Arrays.hashCode(s3FullPath);
+        hashCode = hashCode * 31 + (imageSubtitleIndexByteRange == null ? 1237 : imageSubtitleIndexByteRange.hashCode());
+        hashCode = hashCode * 31 + (tags == null ? 1237 : tags.hashCode());
+        hashCode = hashCode * 31 + deploymentPriority;
+        return hashCode;
+    }
+
     public StreamMostlyConstantData clone() {
         try {
             StreamMostlyConstantData clone = (StreamMostlyConstantData)super.clone();

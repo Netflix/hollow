@@ -23,6 +23,15 @@ public class RolloutRole implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + id;
+        hashCode = hashCode * 31 + characterId;
+        hashCode = hashCode * 31 + sequenceNumber;
+        hashCode = hashCode * 31 + (person == null ? 1237 : person.hashCode());
+        return hashCode;
+    }
+
     public RolloutRole clone() {
         try {
             RolloutRole clone = (RolloutRole)super.clone();

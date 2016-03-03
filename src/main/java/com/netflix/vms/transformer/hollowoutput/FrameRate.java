@@ -21,6 +21,12 @@ public class FrameRate implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + java.lang.Float.floatToIntBits(val);
+        return hashCode;
+    }
+
     public FrameRate clone() {
         try {
             FrameRate clone = (FrameRate)super.clone();

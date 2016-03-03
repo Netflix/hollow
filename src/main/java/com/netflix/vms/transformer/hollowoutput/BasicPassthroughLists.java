@@ -24,6 +24,12 @@ public class BasicPassthroughLists implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (floatList == null ? 1237 : floatList.hashCode());
+        return hashCode;
+    }
+
     public BasicPassthroughLists clone() {
         try {
             BasicPassthroughLists clone = (BasicPassthroughLists)super.clone();

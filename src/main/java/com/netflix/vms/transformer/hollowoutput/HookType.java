@@ -26,6 +26,12 @@ public class HookType implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(value);
+        return hashCode;
+    }
+
     public HookType clone() {
         try {
             HookType clone = (HookType)super.clone();

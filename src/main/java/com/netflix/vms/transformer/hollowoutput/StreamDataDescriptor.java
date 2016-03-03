@@ -40,6 +40,19 @@ public class StreamDataDescriptor implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + runTimeInSeconds;
+        hashCode = hashCode * 31 + bitrate;
+        hashCode = hashCode * 31 + (pixelAspect == null ? 1237 : pixelAspect.hashCode());
+        hashCode = hashCode * 31 + (videoResolution == null ? 1237 : videoResolution.hashCode());
+        hashCode = hashCode * 31 + (cacheDeployedCountries == null ? 1237 : cacheDeployedCountries.hashCode());
+        hashCode = hashCode * 31 + (videoMoment == null ? 1237 : videoMoment.hashCode());
+        hashCode = hashCode * 31 + imageCount;
+        hashCode = hashCode * 31 + (targetDimensions == null ? 1237 : targetDimensions.hashCode());
+        return hashCode;
+    }
+
     public StreamDataDescriptor clone() {
         try {
             StreamDataDescriptor clone = (StreamDataDescriptor)super.clone();

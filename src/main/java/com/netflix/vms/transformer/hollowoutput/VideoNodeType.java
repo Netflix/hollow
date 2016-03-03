@@ -26,6 +26,12 @@ public class VideoNodeType implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(value);
+        return hashCode;
+    }
+
     public VideoNodeType clone() {
         try {
             VideoNodeType clone = (VideoNodeType)super.clone();

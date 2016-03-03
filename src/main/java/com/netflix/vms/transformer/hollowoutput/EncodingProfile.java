@@ -47,6 +47,23 @@ public class EncodingProfile implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + id;
+        hashCode = hashCode * 31 + Arrays.hashCode(name26AndBelowStr);
+        hashCode = hashCode * 31 + Arrays.hashCode(name27AndAboveStr);
+        hashCode = hashCode * 31 + (dRMType == null ? 1237 : dRMType.hashCode());
+        hashCode = hashCode * 31 + drmKeyGroup;
+        hashCode = hashCode * 31 + (profileTypeDescriptor == null ? 1237 : profileTypeDescriptor.hashCode());
+        hashCode = hashCode * 31 + (audioChannelsDescriptor == null ? 1237 : audioChannelsDescriptor.hashCode());
+        hashCode = hashCode * 31 + Arrays.hashCode(fileExtensionStr);
+        hashCode = hashCode * 31 + Arrays.hashCode(mimeTypeStr);
+        hashCode = hashCode * 31 + Arrays.hashCode(descriptionStr);
+        hashCode = hashCode * 31 + (isAdaptiveSwitching? 1231 : 1237);
+        hashCode = hashCode * 31 + (videoDimensionsDescriptor == null ? 1237 : videoDimensionsDescriptor.hashCode());
+        return hashCode;
+    }
+
     public EncodingProfile clone() {
         try {
             EncodingProfile clone = (EncodingProfile)super.clone();

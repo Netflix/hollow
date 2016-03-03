@@ -26,6 +26,12 @@ public class Strings implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(value);
+        return hashCode;
+    }
+
     public Strings clone() {
         try {
             Strings clone = (Strings)super.clone();

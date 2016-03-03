@@ -58,6 +58,22 @@ public class VideoCollectionsData implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (nodeType == null ? 1237 : nodeType.hashCode());
+        hashCode = hashCode * 31 + (topNodeType == null ? 1237 : topNodeType.hashCode());
+        hashCode = hashCode * 31 + (videoEpisodes == null ? 1237 : videoEpisodes.hashCode());
+        hashCode = hashCode * 31 + (showChildren == null ? 1237 : showChildren.hashCode());
+        hashCode = hashCode * 31 + (seasonChildren == null ? 1237 : seasonChildren.hashCode());
+        hashCode = hashCode * 31 + (supplementalVideoParents == null ? 1237 : supplementalVideoParents.hashCode());
+        hashCode = hashCode * 31 + (supplementalVideos == null ? 1237 : supplementalVideos.hashCode());
+        hashCode = hashCode * 31 + (showParent == null ? 1237 : showParent.hashCode());
+        hashCode = hashCode * 31 + (seasonParent == null ? 1237 : seasonParent.hashCode());
+        hashCode = hashCode * 31 + (topNode == null ? 1237 : topNode.hashCode());
+        hashCode = hashCode * 31 + (episodesForSeasonSequenceNumberMap == null ? 1237 : episodesForSeasonSequenceNumberMap.hashCode());
+        return hashCode;
+    }
+
     public VideoCollectionsData clone() {
         try {
             VideoCollectionsData clone = (VideoCollectionsData)super.clone();

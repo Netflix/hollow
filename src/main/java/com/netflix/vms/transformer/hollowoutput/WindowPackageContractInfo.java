@@ -21,6 +21,13 @@ public class WindowPackageContractInfo implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (videoContractInfo == null ? 1237 : videoContractInfo.hashCode());
+        hashCode = hashCode * 31 + (videoPackageInfo == null ? 1237 : videoPackageInfo.hashCode());
+        return hashCode;
+    }
+
     public WindowPackageContractInfo clone() {
         try {
             WindowPackageContractInfo clone = (WindowPackageContractInfo)super.clone();

@@ -26,6 +26,12 @@ public class PassthroughString implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(value);
+        return hashCode;
+    }
+
     public PassthroughString clone() {
         try {
             PassthroughString clone = (PassthroughString)super.clone();

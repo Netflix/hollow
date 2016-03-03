@@ -18,6 +18,13 @@ public class DefaultExtensionRecipe implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(extensionStr);
+        hashCode = hashCode * 31 + Arrays.hashCode(recipeNameStr);
+        return hashCode;
+    }
+
     public DefaultExtensionRecipe clone() {
         try {
             DefaultExtensionRecipe clone = (DefaultExtensionRecipe)super.clone();

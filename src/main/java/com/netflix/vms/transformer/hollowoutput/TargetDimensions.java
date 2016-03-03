@@ -17,6 +17,13 @@ public class TargetDimensions implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + heightInPixels;
+        hashCode = hashCode * 31 + widthInPixels;
+        return hashCode;
+    }
+
     public TargetDimensions clone() {
         try {
             TargetDimensions clone = (TargetDimensions)super.clone();

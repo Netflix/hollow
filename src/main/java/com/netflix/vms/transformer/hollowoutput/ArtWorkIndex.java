@@ -24,6 +24,12 @@ public class ArtWorkIndex implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (index == null ? 1237 : index.hashCode());
+        return hashCode;
+    }
+
     public ArtWorkIndex clone() {
         try {
             ArtWorkIndex clone = (ArtWorkIndex)super.clone();

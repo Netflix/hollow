@@ -25,6 +25,15 @@ public class DrmHeader implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + drmSystemId;
+        hashCode = hashCode * 31 + Arrays.hashCode(keyId);
+        hashCode = hashCode * 31 + Arrays.hashCode(checksum);
+        hashCode = hashCode * 31 + (attributes == null ? 1237 : attributes.hashCode());
+        return hashCode;
+    }
+
     public DrmHeader clone() {
         try {
             DrmHeader clone = (DrmHeader)super.clone();
