@@ -6,12 +6,12 @@ import com.netflix.hollow.HollowObjectSchema;
 import com.netflix.hollow.read.customapi.HollowTypeAPI;
 import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 
-public class VideoArtWorkSourceAttributesDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, VideoArtWorkSourceAttributesDelegate {
+public class ArtworkAttributesDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, ArtworkAttributesDelegate {
 
     private final int passthroughOrdinal;
-   private VideoArtWorkSourceAttributesTypeAPI typeAPI;
+   private ArtworkAttributesTypeAPI typeAPI;
 
-    public VideoArtWorkSourceAttributesDelegateCachedImpl(VideoArtWorkSourceAttributesTypeAPI typeAPI, int ordinal) {
+    public ArtworkAttributesDelegateCachedImpl(ArtworkAttributesTypeAPI typeAPI, int ordinal) {
         this.passthroughOrdinal = typeAPI.getPassthroughOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
@@ -30,12 +30,12 @@ public class VideoArtWorkSourceAttributesDelegateCachedImpl extends HollowObject
         return typeAPI.getTypeDataAccess();
     }
 
-    public VideoArtWorkSourceAttributesTypeAPI getTypeAPI() {
+    public ArtworkAttributesTypeAPI getTypeAPI() {
         return typeAPI;
     }
 
     public void updateTypeAPI(HollowTypeAPI typeAPI) {
-        this.typeAPI = (VideoArtWorkSourceAttributesTypeAPI) typeAPI;
+        this.typeAPI = (ArtworkAttributesTypeAPI) typeAPI;
     }
 
 }

@@ -3,9 +3,9 @@ package com.netflix.vms.transformer.hollowinput;
 import com.netflix.hollow.objects.HollowObject;
 import com.netflix.hollow.HollowObjectSchema;
 
-public class VideoArtWorkSourceAttributesHollow extends HollowObject {
+public class ArtworkAttributesHollow extends HollowObject {
 
-    public VideoArtWorkSourceAttributesHollow(VideoArtWorkSourceAttributesDelegate delegate, int ordinal) {
+    public ArtworkAttributesHollow(ArtworkAttributesDelegate delegate, int ordinal) {
         super(delegate, ordinal);
     }
 
@@ -20,12 +20,12 @@ public class VideoArtWorkSourceAttributesHollow extends HollowObject {
         return typeApi().getAPI();
     }
 
-    public VideoArtWorkSourceAttributesTypeAPI typeApi() {
+    public ArtworkAttributesTypeAPI typeApi() {
         return delegate().getTypeAPI();
     }
 
-    protected VideoArtWorkSourceAttributesDelegate delegate() {
-        return (VideoArtWorkSourceAttributesDelegate)delegate;
+    protected ArtworkAttributesDelegate delegate() {
+        return (ArtworkAttributesDelegate)delegate;
     }
 
 }

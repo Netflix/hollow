@@ -15,7 +15,8 @@ public class CharacterArtworkTypeAPI extends HollowObjectTypeAPI {
             "derivatives",
             "locales",
             "attributes",
-            "ordinalPriority"
+            "ordinalPriority",
+            "fileImageType"
         });
         this.delegateLookupImpl = new CharacterArtworkDelegateLookupImpl(this);
     }
@@ -78,8 +79,8 @@ public class CharacterArtworkTypeAPI extends HollowObjectTypeAPI {
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[3]);
     }
 
-    public CharacterArtworkDerivativeListTypeAPI getDerivativesTypeAPI() {
-        return getAPI().getCharacterArtworkDerivativeListTypeAPI();
+    public ArtworkDerivativeListTypeAPI getDerivativesTypeAPI() {
+        return getAPI().getArtworkDerivativeListTypeAPI();
     }
 
     public int getLocalesOrdinal(int ordinal) {
@@ -88,8 +89,8 @@ public class CharacterArtworkTypeAPI extends HollowObjectTypeAPI {
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[4]);
     }
 
-    public CharacterArtworkLocaleListTypeAPI getLocalesTypeAPI() {
-        return getAPI().getCharacterArtworkLocaleListTypeAPI();
+    public ArtworkLocaleListTypeAPI getLocalesTypeAPI() {
+        return getAPI().getArtworkLocaleListTypeAPI();
     }
 
     public int getAttributesOrdinal(int ordinal) {
@@ -98,8 +99,8 @@ public class CharacterArtworkTypeAPI extends HollowObjectTypeAPI {
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[5]);
     }
 
-    public CharacterArtworkAttributesTypeAPI getAttributesTypeAPI() {
-        return getAPI().getCharacterArtworkAttributesTypeAPI();
+    public ArtworkAttributesTypeAPI getAttributesTypeAPI() {
+        return getAPI().getArtworkAttributesTypeAPI();
     }
 
     public long getOrdinalPriority(int ordinal) {
@@ -122,6 +123,16 @@ public class CharacterArtworkTypeAPI extends HollowObjectTypeAPI {
     }
 
 
+
+    public int getFileImageTypeOrdinal(int ordinal) {
+        if(fieldIndex[7] == -1)
+            return missingDataHandler().handleReferencedOrdinal("CharacterArtwork", ordinal, "fileImageType");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[7]);
+    }
+
+    public StringTypeAPI getFileImageTypeTypeAPI() {
+        return getAPI().getStringTypeAPI();
+    }
 
     public CharacterArtworkDelegateLookupImpl getDelegateLookupImpl() {
         return delegateLookupImpl;

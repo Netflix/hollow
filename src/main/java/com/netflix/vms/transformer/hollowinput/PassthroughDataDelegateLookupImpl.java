@@ -4,19 +4,23 @@ import com.netflix.hollow.objects.delegate.HollowObjectAbstractDelegate;
 import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.HollowObjectSchema;
 
-public class VideoArtWorkSourceAttributesDelegateLookupImpl extends HollowObjectAbstractDelegate implements VideoArtWorkSourceAttributesDelegate {
+public class PassthroughDataDelegateLookupImpl extends HollowObjectAbstractDelegate implements PassthroughDataDelegate {
 
-    private final VideoArtWorkSourceAttributesTypeAPI typeAPI;
+    private final PassthroughDataTypeAPI typeAPI;
 
-    public VideoArtWorkSourceAttributesDelegateLookupImpl(VideoArtWorkSourceAttributesTypeAPI typeAPI) {
+    public PassthroughDataDelegateLookupImpl(PassthroughDataTypeAPI typeAPI) {
         this.typeAPI = typeAPI;
     }
 
-    public int getPassthroughOrdinal(int ordinal) {
-        return typeAPI.getPassthroughOrdinal(ordinal);
+    public int getSingleValuesOrdinal(int ordinal) {
+        return typeAPI.getSingleValuesOrdinal(ordinal);
     }
 
-    public VideoArtWorkSourceAttributesTypeAPI getTypeAPI() {
+    public int getMultiValuesOrdinal(int ordinal) {
+        return typeAPI.getMultiValuesOrdinal(ordinal);
+    }
+
+    public PassthroughDataTypeAPI getTypeAPI() {
         return typeAPI;
     }
 

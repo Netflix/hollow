@@ -14,7 +14,8 @@ public class PackageDrmInfoTypeAPI extends HollowObjectTypeAPI {
             "keyId",
             "drmKeyGroup",
             "key",
-            "drmHeaderInfo"
+            "drmHeaderInfo",
+            "keyDecrypted"
         });
         this.delegateLookupImpl = new PackageDrmInfoDelegateLookupImpl(this);
     }
@@ -100,6 +101,20 @@ public class PackageDrmInfoTypeAPI extends HollowObjectTypeAPI {
     public DrmHeaderInfoListTypeAPI getDrmHeaderInfoTypeAPI() {
         return getAPI().getDrmHeaderInfoListTypeAPI();
     }
+
+    public boolean getKeyDecrypted(int ordinal) {
+        if(fieldIndex[6] == -1)
+            return missingDataHandler().handleBoolean("PackageDrmInfo", ordinal, "keyDecrypted") == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[6]) == Boolean.TRUE;
+    }
+
+    public Boolean getKeyDecryptedBoxed(int ordinal) {
+        if(fieldIndex[6] == -1)
+            return missingDataHandler().handleBoolean("PackageDrmInfo", ordinal, "keyDecrypted");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[6]);
+    }
+
+
 
     public PackageDrmInfoDelegateLookupImpl getDelegateLookupImpl() {
         return delegateLookupImpl;

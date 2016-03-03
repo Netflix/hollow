@@ -4,11 +4,11 @@ import com.netflix.hollow.objects.delegate.HollowObjectAbstractDelegate;
 import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.HollowObjectSchema;
 
-public class VideoArtWorkSourceAttributesDelegateLookupImpl extends HollowObjectAbstractDelegate implements VideoArtWorkSourceAttributesDelegate {
+public class ArtworkAttributesDelegateLookupImpl extends HollowObjectAbstractDelegate implements ArtworkAttributesDelegate {
 
-    private final VideoArtWorkSourceAttributesTypeAPI typeAPI;
+    private final ArtworkAttributesTypeAPI typeAPI;
 
-    public VideoArtWorkSourceAttributesDelegateLookupImpl(VideoArtWorkSourceAttributesTypeAPI typeAPI) {
+    public ArtworkAttributesDelegateLookupImpl(ArtworkAttributesTypeAPI typeAPI) {
         this.typeAPI = typeAPI;
     }
 
@@ -16,7 +16,7 @@ public class VideoArtWorkSourceAttributesDelegateLookupImpl extends HollowObject
         return typeAPI.getPassthroughOrdinal(ordinal);
     }
 
-    public VideoArtWorkSourceAttributesTypeAPI getTypeAPI() {
+    public ArtworkAttributesTypeAPI getTypeAPI() {
         return typeAPI;
     }
 
