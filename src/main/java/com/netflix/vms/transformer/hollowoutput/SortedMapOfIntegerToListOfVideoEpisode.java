@@ -27,6 +27,12 @@ public class SortedMapOfIntegerToListOfVideoEpisode implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (map == null ? 1237 : map.hashCode());
+        return hashCode;
+    }
+
     public SortedMapOfIntegerToListOfVideoEpisode clone() {
         try {
             SortedMapOfIntegerToListOfVideoEpisode clone = (SortedMapOfIntegerToListOfVideoEpisode)super.clone();

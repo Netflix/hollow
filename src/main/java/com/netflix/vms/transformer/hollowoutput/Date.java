@@ -21,6 +21,12 @@ public class Date implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (int) (val ^ (val >>> 32));
+        return hashCode;
+    }
+
     public Date clone() {
         try {
             Date clone = (Date)super.clone();

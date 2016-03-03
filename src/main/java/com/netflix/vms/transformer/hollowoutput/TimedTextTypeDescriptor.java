@@ -26,6 +26,12 @@ public class TimedTextTypeDescriptor implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (nameStr == null ? 1237 : nameStr.hashCode());
+        return hashCode;
+    }
+
     public TimedTextTypeDescriptor clone() {
         try {
             TimedTextTypeDescriptor clone = (TimedTextTypeDescriptor)super.clone();

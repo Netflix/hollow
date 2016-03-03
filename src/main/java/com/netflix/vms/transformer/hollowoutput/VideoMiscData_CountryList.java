@@ -21,6 +21,13 @@ public class VideoMiscData_CountryList implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (country == null ? 1237 : country.hashCode());
+        hashCode = hashCode * 31 + (item == null ? 1237 : item.hashCode());
+        return hashCode;
+    }
+
     public VideoMiscData_CountryList clone() {
         try {
             VideoMiscData_CountryList clone = (VideoMiscData_CountryList)super.clone();

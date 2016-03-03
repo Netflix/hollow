@@ -22,6 +22,15 @@ public class ArtWorkImageTypeEntry implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (nameStr == null ? 1237 : nameStr.hashCode());
+        hashCode = hashCode * 31 + (unavailableFileNameStr == null ? 1237 : unavailableFileNameStr.hashCode());
+        hashCode = hashCode * 31 + (allowMultiples? 1231 : 1237);
+        hashCode = hashCode * 31 + (recipeNameStr == null ? 1237 : recipeNameStr.hashCode());
+        return hashCode;
+    }
+
     public ArtWorkImageTypeEntry clone() {
         try {
             ArtWorkImageTypeEntry clone = (ArtWorkImageTypeEntry)super.clone();

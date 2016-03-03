@@ -24,6 +24,14 @@ public class EncodeSummaryDescriptor implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (fromMuxedOnlyStreams? 1231 : 1237);
+        hashCode = hashCode * 31 + (downloadableIds == null ? 1237 : downloadableIds.hashCode());
+        hashCode = hashCode * 31 + (descriptorData == null ? 1237 : descriptorData.hashCode());
+        return hashCode;
+    }
+
     public EncodeSummaryDescriptor clone() {
         try {
             EncodeSummaryDescriptor clone = (EncodeSummaryDescriptor)super.clone();

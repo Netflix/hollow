@@ -21,6 +21,13 @@ public class Certification implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (movieCert == null ? 1237 : movieCert.hashCode());
+        hashCode = hashCode * 31 + (certSystem == null ? 1237 : certSystem.hashCode());
+        return hashCode;
+    }
+
     public Certification clone() {
         try {
             Certification clone = (Certification)super.clone();

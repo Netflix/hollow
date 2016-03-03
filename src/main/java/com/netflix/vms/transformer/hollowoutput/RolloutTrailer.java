@@ -24,6 +24,14 @@ public class RolloutTrailer implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (video == null ? 1237 : video.hashCode());
+        hashCode = hashCode * 31 + sequenceNumber;
+        hashCode = hashCode * 31 + (supplementalInfos == null ? 1237 : supplementalInfos.hashCode());
+        return hashCode;
+    }
+
     public RolloutTrailer clone() {
         try {
             RolloutTrailer clone = (RolloutTrailer)super.clone();

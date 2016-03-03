@@ -48,6 +48,20 @@ public class ArtworkBasicPassthrough implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (themes == null ? 1237 : themes.hashCode());
+        hashCode = hashCode * 31 + (tone == null ? 1237 : tone.hashCode());
+        hashCode = hashCode * 31 + (awardCampaigns == null ? 1237 : awardCampaigns.hashCode());
+        hashCode = hashCode * 31 + (group_id == null ? 1237 : group_id.hashCode());
+        hashCode = hashCode * 31 + (lists == null ? 1237 : lists.hashCode());
+        hashCode = hashCode * 31 + (design_attribute == null ? 1237 : design_attribute.hashCode());
+        hashCode = hashCode * 31 + (focal_point == null ? 1237 : focal_point.hashCode());
+        hashCode = hashCode * 31 + (approval_source == null ? 1237 : approval_source.hashCode());
+        hashCode = hashCode * 31 + (approval_state? 1231 : 1237);
+        return hashCode;
+    }
+
     public ArtworkBasicPassthrough clone() {
         try {
             ArtworkBasicPassthrough clone = (ArtworkBasicPassthrough)super.clone();

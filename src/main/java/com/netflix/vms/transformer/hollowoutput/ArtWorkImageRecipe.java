@@ -22,6 +22,15 @@ public class ArtWorkImageRecipe implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (recipeNameStr == null ? 1237 : recipeNameStr.hashCode());
+        hashCode = hashCode * 31 + (extensionStr == null ? 1237 : extensionStr.hashCode());
+        hashCode = hashCode * 31 + (cdnFolderStr == null ? 1237 : cdnFolderStr.hashCode());
+        hashCode = hashCode * 31 + (hostNameStr == null ? 1237 : hostNameStr.hashCode());
+        return hashCode;
+    }
+
     public ArtWorkImageRecipe clone() {
         try {
             ArtWorkImageRecipe clone = (ArtWorkImageRecipe)super.clone();
