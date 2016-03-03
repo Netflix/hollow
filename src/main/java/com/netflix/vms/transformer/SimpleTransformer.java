@@ -1,7 +1,8 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.vms.transformer.modules.packages.PackageDataModule;
+import com.netflix.vms.transformer.util.VMSTransformerHashCodeFinder;
 
+import com.netflix.vms.transformer.modules.packages.PackageDataModule;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
@@ -62,7 +63,7 @@ public class SimpleTransformer {
 
         final ShowHierarchyInitializer hierarchyInitializer = new ShowHierarchyInitializer(api, indexer);
 
-        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();  //TODO: Need to define a HashCodeFinder.
+        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine(new VMSTransformerHashCodeFinder());
         final HollowObjectMapper objectMapper = new HollowObjectMapper(writeStateEngine);
 
         SimultaneousExecutor executor = new SimultaneousExecutor();
