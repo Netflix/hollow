@@ -45,6 +45,17 @@ public class NamedCollectionHolder implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("NamedCollectionHolder{");
+        builder.append("country=").append(country);
+        builder.append(",videoListMap=").append(videoListMap);
+        builder.append(",personListMap=").append(personListMap);
+        builder.append(",episodeListMap=").append(episodeListMap);
+        builder.append(",resourceIdListMap=").append(resourceIdListMap);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public NamedCollectionHolder clone() {
         try {
             NamedCollectionHolder clone = (NamedCollectionHolder)super.clone();

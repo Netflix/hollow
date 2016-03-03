@@ -27,6 +27,14 @@ public class CharacterImages implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("CharacterImages{");
+        builder.append("id=").append(id);
+        builder.append(",artWorkDescriptorList=").append(artWorkDescriptorList);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public CharacterImages clone() {
         try {
             CharacterImages clone = (CharacterImages)super.clone();

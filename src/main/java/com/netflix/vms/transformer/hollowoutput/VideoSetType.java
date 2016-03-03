@@ -32,6 +32,13 @@ public class VideoSetType implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoSetType{");
+        builder.append("value=").append(value);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VideoSetType clone() {
         try {
             VideoSetType clone = (VideoSetType)super.clone();

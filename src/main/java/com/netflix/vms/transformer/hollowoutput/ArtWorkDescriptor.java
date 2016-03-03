@@ -73,6 +73,25 @@ public class ArtWorkDescriptor implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ArtWorkDescriptor{");
+        builder.append("locale=").append(locale);
+        builder.append(",format=").append(format);
+        builder.append(",isUsDescriptor=").append(isUsDescriptor);
+        builder.append(",imageType=").append(imageType);
+        builder.append(",imageId=").append(imageId);
+        builder.append(",seqNum=").append(seqNum);
+        builder.append(",effectiveDate=").append(effectiveDate);
+        builder.append(",ordinalPriority=").append(ordinalPriority);
+        builder.append(",recipes=").append(recipes);
+        builder.append(",assetLocationMap=").append(assetLocationMap);
+        builder.append(",basic_passthrough=").append(basic_passthrough);
+        builder.append(",source=").append(source);
+        builder.append(",file_seq=").append(file_seq);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public ArtWorkDescriptor clone() {
         try {
             ArtWorkDescriptor clone = (ArtWorkDescriptor)super.clone();

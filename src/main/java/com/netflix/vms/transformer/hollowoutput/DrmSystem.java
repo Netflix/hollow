@@ -37,6 +37,16 @@ public class DrmSystem implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("DrmSystem{");
+        builder.append("id=").append(id);
+        builder.append(",guid=").append(guid);
+        builder.append(",name=").append(name);
+        builder.append(",attributes=").append(attributes);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public DrmSystem clone() {
         try {
             DrmSystem clone = (DrmSystem)super.clone();

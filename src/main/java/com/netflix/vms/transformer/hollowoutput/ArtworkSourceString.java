@@ -32,6 +32,13 @@ public class ArtworkSourceString implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ArtworkSourceString{");
+        builder.append("value=").append(value);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public ArtworkSourceString clone() {
         try {
             ArtworkSourceString clone = (ArtworkSourceString)super.clone();

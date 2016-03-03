@@ -47,6 +47,21 @@ public class VideoMediaData implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoMediaData{");
+        builder.append("isAvailableForED=").append(isAvailableForED);
+        builder.append(",isGoLive=").append(isGoLive);
+        builder.append(",isOriginal=").append(isOriginal);
+        builder.append(",isAutoPlayEnabled=").append(isAutoPlayEnabled);
+        builder.append(",dvdReleaseDate=").append(dvdReleaseDate);
+        builder.append(",hasLocalAudio=").append(hasLocalAudio);
+        builder.append(",hasLocalText=").append(hasLocalText);
+        builder.append(",approximateRuntimeInSeconds=").append(approximateRuntimeInSeconds);
+        builder.append(",isLanguageOverride=").append(isLanguageOverride);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VideoMediaData clone() {
         try {
             VideoMediaData clone = (VideoMediaData)super.clone();

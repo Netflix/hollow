@@ -44,6 +44,17 @@ public class RolloutSummary implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("RolloutSummary{");
+        builder.append("type=").append(type);
+        builder.append(",video=").append(video);
+        builder.append(",rolloutInfoMap=").append(rolloutInfoMap);
+        builder.append(",phaseWindowMap=").append(phaseWindowMap);
+        builder.append(",allPhases=").append(allPhases);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public RolloutSummary clone() {
         try {
             RolloutSummary clone = (RolloutSummary)super.clone();

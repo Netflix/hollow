@@ -64,6 +64,24 @@ public class EncodingProfile implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("EncodingProfile{");
+        builder.append("id=").append(id);
+        builder.append(",name26AndBelowStr=").append(name26AndBelowStr);
+        builder.append(",name27AndAboveStr=").append(name27AndAboveStr);
+        builder.append(",dRMType=").append(dRMType);
+        builder.append(",drmKeyGroup=").append(drmKeyGroup);
+        builder.append(",profileTypeDescriptor=").append(profileTypeDescriptor);
+        builder.append(",audioChannelsDescriptor=").append(audioChannelsDescriptor);
+        builder.append(",fileExtensionStr=").append(fileExtensionStr);
+        builder.append(",mimeTypeStr=").append(mimeTypeStr);
+        builder.append(",descriptionStr=").append(descriptionStr);
+        builder.append(",isAdaptiveSwitching=").append(isAdaptiveSwitching);
+        builder.append(",videoDimensionsDescriptor=").append(videoDimensionsDescriptor);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public EncodingProfile clone() {
         try {
             EncodingProfile clone = (EncodingProfile)super.clone();

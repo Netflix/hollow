@@ -32,6 +32,15 @@ public class RolloutTrailer implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("RolloutTrailer{");
+        builder.append("video=").append(video);
+        builder.append(",sequenceNumber=").append(sequenceNumber);
+        builder.append(",supplementalInfos=").append(supplementalInfos);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public RolloutTrailer clone() {
         try {
             RolloutTrailer clone = (RolloutTrailer)super.clone();

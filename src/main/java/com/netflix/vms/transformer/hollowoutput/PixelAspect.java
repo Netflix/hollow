@@ -24,6 +24,14 @@ public class PixelAspect implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("PixelAspect{");
+        builder.append("height=").append(height);
+        builder.append(",width=").append(width);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public PixelAspect clone() {
         try {
             PixelAspect clone = (PixelAspect)super.clone();

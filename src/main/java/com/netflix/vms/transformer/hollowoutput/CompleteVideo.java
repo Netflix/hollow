@@ -38,6 +38,16 @@ public class CompleteVideo implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("CompleteVideo{");
+        builder.append("id=").append(id);
+        builder.append(",country=").append(country);
+        builder.append(",facetData=").append(facetData);
+        builder.append(",countrySpecificData=").append(countrySpecificData);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public CompleteVideo clone() {
         try {
             CompleteVideo clone = (CompleteVideo)super.clone();

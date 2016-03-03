@@ -37,6 +37,16 @@ public class GlobalVideo implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("GlobalVideo{");
+        builder.append("completeVideo=").append(completeVideo);
+        builder.append(",aliases=").append(aliases);
+        builder.append(",availableCountries=").append(availableCountries);
+        builder.append(",isSupplementalVideo=").append(isSupplementalVideo);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public GlobalVideo clone() {
         try {
             GlobalVideo clone = (GlobalVideo)super.clone();

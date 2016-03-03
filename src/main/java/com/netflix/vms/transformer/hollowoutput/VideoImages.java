@@ -29,6 +29,14 @@ public class VideoImages implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoImages{");
+        builder.append("artWorkDescriptors=").append(artWorkDescriptors);
+        builder.append(",artWorkIndex=").append(artWorkIndex);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VideoImages clone() {
         try {
             VideoImages clone = (VideoImages)super.clone();

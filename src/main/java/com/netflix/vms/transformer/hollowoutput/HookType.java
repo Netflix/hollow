@@ -32,6 +32,13 @@ public class HookType implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("HookType{");
+        builder.append("value=").append(value);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public HookType clone() {
         try {
             HookType clone = (HookType)super.clone();

@@ -28,6 +28,14 @@ public class DownloadLocation implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("DownloadLocation{");
+        builder.append("directory=").append(directory);
+        builder.append(",originServerName=").append(originServerName);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public DownloadLocation clone() {
         try {
             DownloadLocation clone = (DownloadLocation)super.clone();

@@ -32,6 +32,13 @@ public class ChunkDurationsString implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ChunkDurationsString{");
+        builder.append("value=").append(value);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public ChunkDurationsString clone() {
         try {
             ChunkDurationsString clone = (ChunkDurationsString)super.clone();

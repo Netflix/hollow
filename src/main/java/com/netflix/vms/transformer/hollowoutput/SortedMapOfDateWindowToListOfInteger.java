@@ -33,6 +33,13 @@ public class SortedMapOfDateWindowToListOfInteger implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("SortedMapOfDateWindowToListOfInteger{");
+        builder.append("map=").append(map);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public SortedMapOfDateWindowToListOfInteger clone() {
         try {
             SortedMapOfDateWindowToListOfInteger clone = (SortedMapOfDateWindowToListOfInteger)super.clone();

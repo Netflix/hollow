@@ -44,6 +44,19 @@ public class VideoMoment implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoMoment{");
+        builder.append("videoMomentTypeName=").append(videoMomentTypeName);
+        builder.append(",sequenceNumber=").append(sequenceNumber);
+        builder.append(",msOffset=").append(msOffset);
+        builder.append(",runtimeMs=").append(runtimeMs);
+        builder.append(",momentTags=").append(momentTags);
+        builder.append(",packageId=").append(packageId);
+        builder.append(",bifIndex=").append(bifIndex);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VideoMoment clone() {
         try {
             VideoMoment clone = (VideoMoment)super.clone();

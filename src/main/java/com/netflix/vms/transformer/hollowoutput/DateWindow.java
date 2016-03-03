@@ -24,6 +24,14 @@ public class DateWindow implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("DateWindow{");
+        builder.append("startDateTimestamp=").append(startDateTimestamp);
+        builder.append(",endDateTimestamp=").append(endDateTimestamp);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public DateWindow clone() {
         try {
             DateWindow clone = (DateWindow)super.clone();

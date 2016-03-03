@@ -27,6 +27,13 @@ public class VideoAwardFestival implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoAwardFestival{");
+        builder.append("id=").append(id);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VideoAwardFestival clone() {
         try {
             VideoAwardFestival clone = (VideoAwardFestival)super.clone();
