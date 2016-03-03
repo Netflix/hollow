@@ -23,6 +23,14 @@ public class ProfileTypeDescriptor implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + id;
+        hashCode = hashCode * 31 + (name == null ? 1237 : name.hashCode());
+        hashCode = hashCode * 31 + (description == null ? 1237 : description.hashCode());
+        return hashCode;
+    }
+
     public ProfileTypeDescriptor clone() {
         try {
             ProfileTypeDescriptor clone = (ProfileTypeDescriptor)super.clone();

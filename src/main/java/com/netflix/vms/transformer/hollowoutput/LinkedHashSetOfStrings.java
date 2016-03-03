@@ -26,6 +26,12 @@ public class LinkedHashSetOfStrings implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (ordinals == null ? 1237 : ordinals.hashCode());
+        return hashCode;
+    }
+
     public LinkedHashSetOfStrings clone() {
         try {
             LinkedHashSetOfStrings clone = (LinkedHashSetOfStrings)super.clone();

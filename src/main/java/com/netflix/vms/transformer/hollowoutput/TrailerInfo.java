@@ -38,6 +38,22 @@ public class TrailerInfo implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (type == null ? 1237 : type.hashCode());
+        hashCode = hashCode * 31 + (imageTag == null ? 1237 : imageTag.hashCode());
+        hashCode = hashCode * 31 + (imageBackgroundTone == null ? 1237 : imageBackgroundTone.hashCode());
+        hashCode = hashCode * 31 + mapIndex;
+        hashCode = hashCode * 31 + seasonNumber;
+        hashCode = hashCode * 31 + (subtitleLocale == null ? 1237 : subtitleLocale.hashCode());
+        hashCode = hashCode * 31 + (video == null ? 1237 : video.hashCode());
+        hashCode = hashCode * 31 + videoLength;
+        hashCode = hashCode * 31 + videoOffset;
+        hashCode = hashCode * 31 + (videoValue == null ? 1237 : videoValue.hashCode());
+        hashCode = hashCode * 31 + priority;
+        return hashCode;
+    }
+
     public TrailerInfo clone() {
         try {
             TrailerInfo clone = (TrailerInfo)super.clone();

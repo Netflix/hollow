@@ -26,6 +26,12 @@ public class L10NStrings implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (value == null ? 1237 : value.hashCode());
+        return hashCode;
+    }
+
     public L10NStrings clone() {
         try {
             L10NStrings clone = (L10NStrings)super.clone();

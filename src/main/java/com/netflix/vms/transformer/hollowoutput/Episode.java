@@ -21,6 +21,12 @@ public class Episode implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + id;
+        return hashCode;
+    }
+
     public Episode clone() {
         try {
             Episode clone = (Episode)super.clone();

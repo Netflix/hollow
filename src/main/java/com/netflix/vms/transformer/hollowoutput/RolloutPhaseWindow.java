@@ -19,6 +19,13 @@ public class RolloutPhaseWindow implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + phaseOrdinal;
+        hashCode = hashCode * 31 + (phaseWindow == null ? 1237 : phaseWindow.hashCode());
+        return hashCode;
+    }
+
     public RolloutPhaseWindow clone() {
         try {
             RolloutPhaseWindow clone = (RolloutPhaseWindow)super.clone();

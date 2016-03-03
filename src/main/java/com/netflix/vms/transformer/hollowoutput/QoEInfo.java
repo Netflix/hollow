@@ -17,6 +17,13 @@ public class QoEInfo implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + vmafScore;
+        hashCode = hashCode * 31 + scaledPsnrScore;
+        return hashCode;
+    }
+
     public QoEInfo clone() {
         try {
             QoEInfo clone = (QoEInfo)super.clone();

@@ -27,6 +27,16 @@ public class FileEncodingData implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (int) (downloadableId ^ (downloadableId >>> 32));
+        hashCode = hashCode * 31 + (codecPrivateData == null ? 1237 : codecPrivateData.hashCode());
+        hashCode = hashCode * 31 + (chunkDurations == null ? 1237 : chunkDurations.hashCode());
+        hashCode = hashCode * 31 + (int) (dashHeaderSize ^ (dashHeaderSize >>> 32));
+        hashCode = hashCode * 31 + (int) (dashMediaStartByteOffset ^ (dashMediaStartByteOffset >>> 32));
+        return hashCode;
+    }
+
     public FileEncodingData clone() {
         try {
             FileEncodingData clone = (FileEncodingData)super.clone();

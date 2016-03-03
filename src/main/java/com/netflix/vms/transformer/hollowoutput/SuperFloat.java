@@ -21,6 +21,12 @@ public class SuperFloat implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + java.lang.Float.floatToIntBits(value);
+        return hashCode;
+    }
+
     public SuperFloat clone() {
         try {
             SuperFloat clone = (SuperFloat)super.clone();

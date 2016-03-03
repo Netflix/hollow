@@ -35,6 +35,17 @@ public class SupplementalVideo implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (id == null ? 1237 : id.hashCode());
+        hashCode = hashCode * 31 + (parent == null ? 1237 : parent.hashCode());
+        hashCode = hashCode * 31 + sequenceNumber;
+        hashCode = hashCode * 31 + seasonNumber;
+        hashCode = hashCode * 31 + (attributes == null ? 1237 : attributes.hashCode());
+        hashCode = hashCode * 31 + (multiValueAttributes == null ? 1237 : multiValueAttributes.hashCode());
+        return hashCode;
+    }
+
     public SupplementalVideo clone() {
         try {
             SupplementalVideo clone = (SupplementalVideo)super.clone();

@@ -24,6 +24,15 @@ public class RolloutInfo implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + rolloutId;
+        hashCode = hashCode * 31 + (video == null ? 1237 : video.hashCode());
+        hashCode = hashCode * 31 + (type == null ? 1237 : type.hashCode());
+        hashCode = hashCode * 31 + (name == null ? 1237 : name.hashCode());
+        return hashCode;
+    }
+
     public RolloutInfo clone() {
         try {
             RolloutInfo clone = (RolloutInfo)super.clone();

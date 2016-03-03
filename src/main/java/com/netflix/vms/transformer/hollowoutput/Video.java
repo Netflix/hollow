@@ -21,6 +21,12 @@ public class Video implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + value;
+        return hashCode;
+    }
+
     public Video clone() {
         try {
             Video clone = (Video)super.clone();

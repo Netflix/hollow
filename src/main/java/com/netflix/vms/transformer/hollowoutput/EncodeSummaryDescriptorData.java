@@ -41,6 +41,20 @@ public class EncodeSummaryDescriptorData implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (assetType == null ? 1237 : assetType.hashCode());
+        hashCode = hashCode * 31 + (timedTextType == null ? 1237 : timedTextType.hashCode());
+        hashCode = hashCode * 31 + (audioLanguage == null ? 1237 : audioLanguage.hashCode());
+        hashCode = hashCode * 31 + (textLanguage == null ? 1237 : textLanguage.hashCode());
+        hashCode = hashCode * 31 + (isNative? 1231 : 1237);
+        hashCode = hashCode * 31 + encodingProfileId;
+        hashCode = hashCode * 31 + (isSubtitleBurnedIn? 1231 : 1237);
+        hashCode = hashCode * 31 + (isImageBasedSubtitles? 1231 : 1237);
+        hashCode = hashCode * 31 + (assetMetaData == null ? 1237 : assetMetaData.hashCode());
+        return hashCode;
+    }
+
     public EncodeSummaryDescriptorData clone() {
         try {
             EncodeSummaryDescriptorData clone = (EncodeSummaryDescriptorData)super.clone();

@@ -28,6 +28,15 @@ public class LanguageRights implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + contractId;
+        hashCode = hashCode * 31 + (videoId == null ? 1237 : videoId.hashCode());
+        hashCode = hashCode * 31 + (languageRestrictionsMap == null ? 1237 : languageRestrictionsMap.hashCode());
+        hashCode = hashCode * 31 + (fallbackRestrictionsMap == null ? 1237 : fallbackRestrictionsMap.hashCode());
+        return hashCode;
+    }
+
     public LanguageRights clone() {
         try {
             LanguageRights clone = (LanguageRights)super.clone();

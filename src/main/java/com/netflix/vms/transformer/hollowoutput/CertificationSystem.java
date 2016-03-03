@@ -23,6 +23,14 @@ public class CertificationSystem implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + id;
+        hashCode = hashCode * 31 + (officialURL == null ? 1237 : officialURL.hashCode());
+        hashCode = hashCode * 31 + (country == null ? 1237 : country.hashCode());
+        return hashCode;
+    }
+
     public CertificationSystem clone() {
         try {
             CertificationSystem clone = (CertificationSystem)super.clone();
