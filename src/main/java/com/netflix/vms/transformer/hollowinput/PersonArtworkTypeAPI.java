@@ -15,7 +15,8 @@ public class PersonArtworkTypeAPI extends HollowObjectTypeAPI {
             "ordinalPriority",
             "sourceFileId",
             "attributes",
-            "personId"
+            "personId",
+            "fileImageType"
         });
         this.delegateLookupImpl = new PersonArtworkDelegateLookupImpl(this);
     }
@@ -26,8 +27,8 @@ public class PersonArtworkTypeAPI extends HollowObjectTypeAPI {
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[0]);
     }
 
-    public PersonArtworkDerivativeListTypeAPI getDerivativesTypeAPI() {
-        return getAPI().getPersonArtworkDerivativeListTypeAPI();
+    public ArtworkDerivativeListTypeAPI getDerivativesTypeAPI() {
+        return getAPI().getArtworkDerivativeListTypeAPI();
     }
 
     public int getLocalesOrdinal(int ordinal) {
@@ -36,8 +37,8 @@ public class PersonArtworkTypeAPI extends HollowObjectTypeAPI {
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[1]);
     }
 
-    public PersonArtworkLocaleListTypeAPI getLocalesTypeAPI() {
-        return getAPI().getPersonArtworkLocaleListTypeAPI();
+    public ArtworkLocaleListTypeAPI getLocalesTypeAPI() {
+        return getAPI().getArtworkLocaleListTypeAPI();
     }
 
     public long getSeqNum(int ordinal) {
@@ -98,8 +99,8 @@ public class PersonArtworkTypeAPI extends HollowObjectTypeAPI {
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[5]);
     }
 
-    public PersonArtworkAttributeTypeAPI getAttributesTypeAPI() {
-        return getAPI().getPersonArtworkAttributeTypeAPI();
+    public ArtworkAttributesTypeAPI getAttributesTypeAPI() {
+        return getAPI().getArtworkAttributesTypeAPI();
     }
 
     public long getPersonId(int ordinal) {
@@ -122,6 +123,16 @@ public class PersonArtworkTypeAPI extends HollowObjectTypeAPI {
     }
 
 
+
+    public int getFileImageTypeOrdinal(int ordinal) {
+        if(fieldIndex[7] == -1)
+            return missingDataHandler().handleReferencedOrdinal("PersonArtwork", ordinal, "fileImageType");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[7]);
+    }
+
+    public StringTypeAPI getFileImageTypeTypeAPI() {
+        return getAPI().getStringTypeAPI();
+    }
 
     public PersonArtworkDelegateLookupImpl getDelegateLookupImpl() {
         return delegateLookupImpl;

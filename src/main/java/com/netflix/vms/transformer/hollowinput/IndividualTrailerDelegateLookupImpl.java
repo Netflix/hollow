@@ -32,24 +32,8 @@ public class IndividualTrailerDelegateLookupImpl extends HollowObjectAbstractDel
         return typeAPI.getSequenceNumberBoxed(ordinal);
     }
 
-    public int getPostPlayOrdinal(int ordinal) {
-        return typeAPI.getPostPlayOrdinal(ordinal);
-    }
-
-    public int getSubTypeOrdinal(int ordinal) {
-        return typeAPI.getSubTypeOrdinal(ordinal);
-    }
-
-    public int getAspectRatioOrdinal(int ordinal) {
-        return typeAPI.getAspectRatioOrdinal(ordinal);
-    }
-
-    public int getThemesOrdinal(int ordinal) {
-        return typeAPI.getThemesOrdinal(ordinal);
-    }
-
-    public int getUsagesOrdinal(int ordinal) {
-        return typeAPI.getUsagesOrdinal(ordinal);
+    public int getPassthroughOrdinal(int ordinal) {
+        return typeAPI.getPassthroughOrdinal(ordinal);
     }
 
     public IndividualTrailerTypeAPI getTypeAPI() {

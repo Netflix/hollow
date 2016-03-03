@@ -52,6 +52,10 @@ public class PersonArtworkDelegateLookupImpl extends HollowObjectAbstractDelegat
         return typeAPI.getPersonIdBoxed(ordinal);
     }
 
+    public int getFileImageTypeOrdinal(int ordinal) {
+        return typeAPI.getFileImageTypeOrdinal(ordinal);
+    }
+
     public PersonArtworkTypeAPI getTypeAPI() {
         return typeAPI;
     }

@@ -32,25 +32,25 @@ public class CharacterArtworkHollow extends HollowObject {
         return delegate().getSeqNumBoxed(ordinal);
     }
 
-    public CharacterArtworkDerivativeListHollow _getDerivatives() {
+    public ArtworkDerivativeListHollow _getDerivatives() {
         int refOrdinal = delegate().getDerivativesOrdinal(ordinal);
         if(refOrdinal == -1)
             return null;
-        return  api().getCharacterArtworkDerivativeListHollow(refOrdinal);
+        return  api().getArtworkDerivativeListHollow(refOrdinal);
     }
 
-    public CharacterArtworkLocaleListHollow _getLocales() {
+    public ArtworkLocaleListHollow _getLocales() {
         int refOrdinal = delegate().getLocalesOrdinal(ordinal);
         if(refOrdinal == -1)
             return null;
-        return  api().getCharacterArtworkLocaleListHollow(refOrdinal);
+        return  api().getArtworkLocaleListHollow(refOrdinal);
     }
 
-    public CharacterArtworkAttributesHollow _getAttributes() {
+    public ArtworkAttributesHollow _getAttributes() {
         int refOrdinal = delegate().getAttributesOrdinal(ordinal);
         if(refOrdinal == -1)
             return null;
-        return  api().getCharacterArtworkAttributesHollow(refOrdinal);
+        return  api().getArtworkAttributesHollow(refOrdinal);
     }
 
     public long _getOrdinalPriority() {
@@ -59,6 +59,13 @@ public class CharacterArtworkHollow extends HollowObject {
 
     public Long _getOrdinalPriorityBoxed() {
         return delegate().getOrdinalPriorityBoxed(ordinal);
+    }
+
+    public StringHollow _getFileImageType() {
+        int refOrdinal = delegate().getFileImageTypeOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getStringHollow(refOrdinal);
     }
 
     public VMSHollowVideoInputAPI api() {

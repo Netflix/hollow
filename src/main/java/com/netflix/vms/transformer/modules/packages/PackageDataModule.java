@@ -93,6 +93,7 @@ public class PackageDataModule {
                 drmKey.encryptedContentKey = new DrmKeyString(inputDrmInfo._getKey()._getValue());
                 drmKey.keyDecrypted = false;
                 drmKey.videoId = new Video(videoId);
+                drmKey.keyDecrypted = inputDrmInfo._getKeyDecrypted();
                 drmKeysByGroupId.put(Integer.valueOf(drmKeyGroup), drmKey);
             }
 
