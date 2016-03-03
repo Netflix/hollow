@@ -4,10 +4,14 @@ import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkSourceFileIdHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkSourceFileIdListHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseElementsHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutPhaseImageIdHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseListHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseLocalizedMetadataHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutPhaseOldArtworkListHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowMapHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
@@ -16,6 +20,7 @@ import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.Phase;
 import com.netflix.vms.transformer.hollowoutput.RolloutInfo;
+import com.netflix.vms.transformer.hollowoutput.RolloutPhaseWindow;
 import com.netflix.vms.transformer.hollowoutput.RolloutSummary;
 import com.netflix.vms.transformer.hollowoutput.RolloutVideo;
 import com.netflix.vms.transformer.hollowoutput.Strings;
@@ -25,18 +30,19 @@ import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 public class RolloutVideoModule extends AbstractTransformModule {
-    private final HollowPrimaryKeyIndex supplementalIndex;
+    private final HollowPrimaryKeyIndex supplementalIndex; // !! TODO: not used
     private final HollowPrimaryKeyIndex rolloutVideoTypeIndex;
 
     public RolloutVideoModule(VMSHollowVideoInputAPI api, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
         super(api, mapper);
         this.supplementalIndex = indexer.getPrimaryKeyIndex(IndexSpec.SUPPLEMENTAL);
-        this.rolloutVideoTypeIndex = indexer.getPrimaryKeyIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
+        this.rolloutVideoTypeIndex = indexer.getPrimaryKeyIndex(IndexSpec.ROLLOUT);
     }
 
     @Override
@@ -73,6 +79,7 @@ public class RolloutVideoModule extends AbstractTransformModule {
                     summary.rolloutInfoMap = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, RolloutInfo>();
                     summaryMap.put(rolloutType, summary);
                     summary.allPhases = new ArrayList<Phase>();
+                    summary.phaseWindowMap = new HashMap<ISOCountry, List<RolloutPhaseWindow>>();
                 }
 
                 RolloutInfo info = new RolloutInfo();
@@ -91,13 +98,37 @@ public class RolloutVideoModule extends AbstractTransformModule {
                     phase.isCoreMetaDataShown = phaseHollow._getShowCoreMetadata();
                     phase.projectedLaunchDates = new HashMap<ISOCountry, Date>(); // !! TODO
                     phase.windowsMap = new HashMap<ISOCountry, AvailabilityWindow>();
+                    phase.artWorkImageIds = new HashSet<com.netflix.vms.transformer.hollowoutput.Long>();
+                    phase.sourceFileIds = new HashSet<Strings>();
+
+                    RolloutPhaseOldArtworkListHollow artworkIdList = phaseHollow._getElements()._getArtwork();
+                    for (RolloutPhaseImageIdHollow idHollow : artworkIdList) {
+                        phase.artWorkImageIds.add(new com.netflix.vms.transformer.hollowoutput.Long(idHollow._getImageId()));
+                    }
+
+                    RolloutPhaseArtworkSourceFileIdListHollow artworkSourceFieldList = phaseHollow._getElements()._getArtwork_new()._getSourceFileIds();
+                    for (RolloutPhaseArtworkSourceFileIdHollow sourceFieldHollow : artworkSourceFieldList) {
+                        phase.sourceFileIds.add(new Strings(sourceFieldHollow._getValue()._getValue()));
+                    }
 
                     RolloutPhaseWindowMapHollow phaseWindows = phaseHollow._getWindows();
                     for(Entry<ISOCountryHollow, RolloutPhaseWindowHollow> entry : phaseWindows.entrySet()) {
                         AvailabilityWindow w = new AvailabilityWindow();
-                        w.startDate = new Date(entry.getValue()._getStartDate()._getValue());
-                        w.endDate = new Date(entry.getValue()._getEndDate()._getValue());
-                        phase.windowsMap.put(new ISOCountry(entry.getKey()._getValue()), w);
+                        RolloutPhaseWindowHollow inputPhaseWindow = entry.getValue();
+                        w.startDate = new Date(inputPhaseWindow._getStartDate()._getValue());
+                        w.endDate = new Date(inputPhaseWindow._getEndDate()._getValue());
+                        ISOCountry country = new ISOCountry(entry.getKey()._getValue());
+                        phase.windowsMap.put(country, w);
+
+                        List<RolloutPhaseWindow> phaseWindowList = summary.phaseWindowMap.get(country);
+                        if (phaseWindowList == null) {
+                            phaseWindowList = new ArrayList<RolloutPhaseWindow>();
+                            summary.phaseWindowMap.put(country, phaseWindowList);
+                        }
+                        RolloutPhaseWindow phaseWindow = new RolloutPhaseWindow();
+                        phaseWindow.phaseWindow = w;
+                        phaseWindow.phaseOrdinal = inputPhaseWindow.getOrdinal();
+                        phaseWindowList.add(phaseWindow);
                     }
 
                     phase.rawL10nAttribs = new HashMap<Strings, Strings>();
