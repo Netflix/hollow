@@ -21,6 +21,14 @@ public class DeploymentIntent implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + profileId;
+        hashCode = hashCode * 31 + bitrate;
+        hashCode = hashCode * 31 + (country == null ? 1237 : country.hashCode());
+        return hashCode;
+    }
+
     public DeploymentIntent clone() {
         try {
             DeploymentIntent clone = (DeploymentIntent)super.clone();

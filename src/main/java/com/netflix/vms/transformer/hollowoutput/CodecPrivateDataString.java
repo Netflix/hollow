@@ -26,6 +26,12 @@ public class CodecPrivateDataString implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (value == null ? 1237 : value.hashCode());
+        return hashCode;
+    }
+
     public CodecPrivateDataString clone() {
         try {
             CodecPrivateDataString clone = (CodecPrivateDataString)super.clone();

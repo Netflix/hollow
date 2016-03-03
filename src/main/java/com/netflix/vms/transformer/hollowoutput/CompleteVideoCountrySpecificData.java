@@ -43,6 +43,18 @@ public class CompleteVideoCountrySpecificData implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (metadataAvailabilityDate == null ? 1237 : metadataAvailabilityDate.hashCode());
+        hashCode = hashCode * 31 + (firstDisplayDate == null ? 1237 : firstDisplayDate.hashCode());
+        hashCode = hashCode * 31 + (firstDisplayDateByLocale == null ? 1237 : firstDisplayDateByLocale.hashCode());
+        hashCode = hashCode * 31 + (certificationList == null ? 1237 : certificationList.hashCode());
+        hashCode = hashCode * 31 + (dateWindowWiseSeasonSequenceNumberMap == null ? 1237 : dateWindowWiseSeasonSequenceNumberMap.hashCode());
+        hashCode = hashCode * 31 + (mediaAvailabilityWindows == null ? 1237 : mediaAvailabilityWindows.hashCode());
+        hashCode = hashCode * 31 + (imagesAvailabilityWindows == null ? 1237 : imagesAvailabilityWindows.hashCode());
+        return hashCode;
+    }
+
     public CompleteVideoCountrySpecificData clone() {
         try {
             CompleteVideoCountrySpecificData clone = (CompleteVideoCountrySpecificData)super.clone();

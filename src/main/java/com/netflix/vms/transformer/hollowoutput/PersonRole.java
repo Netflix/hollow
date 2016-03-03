@@ -27,6 +27,15 @@ public class PersonRole implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (person == null ? 1237 : person.hashCode());
+        hashCode = hashCode * 31 + (roleType == null ? 1237 : roleType.hashCode());
+        hashCode = hashCode * 31 + (video == null ? 1237 : video.hashCode());
+        hashCode = hashCode * 31 + weight;
+        return hashCode;
+    }
+
     public PersonRole clone() {
         try {
             PersonRole clone = (PersonRole)super.clone();

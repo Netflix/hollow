@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer;
 
+import com.netflix.vms.transformer.modules.packages.PackageDataModule;
+
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
@@ -13,7 +15,7 @@ import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.PersonImages;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
-import com.netflix.vms.transformer.hollowoutput.VideoEpisode_CountryList;
+import com.netflix.vms.transformer.hollowoutput.VideoMediaData;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.hollowoutput.VideoMiscData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
@@ -24,6 +26,7 @@ import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHiera
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
 import com.netflix.vms.transformer.modules.deploymentintent.CacheDeploymentIntentModule;
 import com.netflix.vms.transformer.modules.images.PersonImagesModule;
+import com.netflix.vms.transformer.modules.media.VideoMediaDataModule;
 import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
 import com.netflix.vms.transformer.modules.meta.VideoMiscDataModule;
 import com.netflix.vms.transformer.modules.mpl.DrmSystemModule;
@@ -36,7 +39,6 @@ import com.netflix.vms.transformer.modules.passthrough.artwork.DefaultExtensionR
 import com.netflix.vms.transformer.modules.passthrough.beehive.RolloutCharacterModule;
 import com.netflix.vms.transformer.modules.passthrough.mpl.EncodingProfileGroupModule;
 import com.netflix.vms.transformer.modules.person.GlobalPersonModule;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +48,8 @@ public class SimpleTransformer {
 
     private final ThreadLocal<VideoCollectionsModule> collectionsModuleRef = new ThreadLocal<VideoCollectionsModule>();
     private final ThreadLocal<VideoMetaDataModule> metadataModuleRef = new ThreadLocal<VideoMetaDataModule>();
+    private final ThreadLocal<PackageDataModule> packageDataModuleRef = new ThreadLocal<PackageDataModule>();
+    private final ThreadLocal<VideoMediaDataModule> mediadataModuleRef = new ThreadLocal<VideoMediaDataModule>();
     private final ThreadLocal<VideoMiscDataModule> miscdataModuleRef = new ThreadLocal<VideoMiscDataModule>();
 
     private final VMSHollowVideoInputAPI api;
@@ -68,35 +72,40 @@ public class SimpleTransformer {
         long startTime = System.currentTimeMillis();
 
         for(final VideoDisplaySetHollow displaySet : api.getAllVideoDisplaySetHollow()) {
+
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
                     VideoCollectionsModule collectionsModule = getVideoCollectionsModule();
                     VideoMetaDataModule metadataModule = getVideoMetaDataModule();
+                    PackageDataModule packageDataModule = getPackageDataModule(objectMapper);
+                    VideoMediaDataModule mediaDataModule = getVideoMediaDataModule();
                     VideoMiscDataModule miscdataModule = getVideoMiscDataModule();
                     VideoEpisodeCountryDecoratorModule countryDecoratorModule = new VideoEpisodeCountryDecoratorModule(api, objectMapper);
 
                     Map<String, ShowHierarchy> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(displaySet);
 
-                    if(showHierarchiesByCountry != null) {
+                    if (showHierarchiesByCountry != null) {
+
                         Map<String, VideoCollectionsDataHierarchy> vcdByCountry = collectionsModule.buildVideoCollectionsDataByCountry(showHierarchiesByCountry);
                         Map<String, Map<Integer, VideoMetaData>> vmdByCountry = metadataModule.buildVideoMetaDataByCountry(showHierarchiesByCountry);
+                        Map<String, Map<Integer, VideoMediaData>> mediaDataByCountry = mediaDataModule.buildVideoMediaDataByCountry(showHierarchiesByCountry);
                         Map<Integer, VideoMiscData> miscData = miscdataModule.buildVideoMiscDataByCountry(showHierarchiesByCountry);
-                        
+
                         if(vcdByCountry != null) {
-                            writeJustTheCurrentData(vcdByCountry, vmdByCountry, miscData, objectMapper);
-                        
+                            writeJustTheCurrentData(vcdByCountry, vmdByCountry, miscData, mediaDataByCountry, objectMapper);
+
                             for(String country : vcdByCountry.keySet()) {
                                 countryDecoratorModule.decorateVideoEpisodes(country, vcdByCountry.get(country));
                             }
                         }
+                        packageDataModule.transform(showHierarchiesByCountry);
                     }
                 }
             });
         }
 
         objectMapper.addObject(new DeploymentIntent());
-        objectMapper.addObject(new PersonImages());
         
         // Register Transform Modules
         List<TransformModule> moduleList = Arrays.<TransformModule>asList(
@@ -150,7 +159,25 @@ public class SimpleTransformer {
         }
         return module;
     }
-    
+
+    private PackageDataModule getPackageDataModule(HollowObjectMapper objectMapper) {
+        PackageDataModule module = packageDataModuleRef.get();
+        if(module == null) {
+            module = new PackageDataModule(api, objectMapper, indexer);
+            packageDataModuleRef.set(module);
+        }
+        return module;
+    }
+
+    private VideoMediaDataModule getVideoMediaDataModule() {
+        VideoMediaDataModule module = mediadataModuleRef.get();
+        if (module == null) {
+            module = new VideoMediaDataModule(api, indexer);
+            mediadataModuleRef.set(module);
+        }
+        return module;
+    }
+
     private VideoMiscDataModule getVideoMiscDataModule() {
         VideoMiscDataModule module = miscdataModuleRef.get();
         if(module == null) {
@@ -159,10 +186,12 @@ public class SimpleTransformer {
         }
         return module;
     }
-    
+
     private void writeJustTheCurrentData(Map<String, VideoCollectionsDataHierarchy> vcdByCountry,
             Map<String, Map<Integer, VideoMetaData>> vmdByCountry,
-            Map<Integer, VideoMiscData> miscData, HollowObjectMapper objectMapper) {
+            Map<Integer, VideoMiscData> miscData,
+            Map<String, Map<Integer, VideoMediaData>> mediaDataByCountry,
+            HollowObjectMapper objectMapper) {
 
         for(Map.Entry<String, VideoCollectionsDataHierarchy> countryHierarchyEntry : vcdByCountry.entrySet()) {
             String countryId = countryHierarchyEntry.getKey();
@@ -175,6 +204,7 @@ public class SimpleTransformer {
             topNode.facetData.videoCollectionsData = hierarchy.getTopNode();
             topNode.id = topNode.facetData.videoCollectionsData.topNode;
             topNode.facetData.videoMetaData = vmdByCountry.get(countryId).get(topNode.id.value);
+            topNode.facetData.videoMediaData = mediaDataByCountry.get(countryId).get(topNode.id.value);
             topNode.facetData.videoMiscData = miscData.get(topNode.id.value);
 
             objectMapper.addObject(topNode);
@@ -189,8 +219,9 @@ public class SimpleTransformer {
                     showNode.facetData = new CompleteVideoFacetData();
                     showNode.facetData.videoCollectionsData = showEntry.getValue();
                     showNode.facetData.videoMetaData = vmdByCountry.get(countryId).get(showNode.id.value);
+                    showNode.facetData.videoMediaData = mediaDataByCountry.get(countryId).get(showNode.id.value);
                     showNode.facetData.videoMiscData = miscData.get(showNode.id.value);
-                    
+
                     objectMapper.addObject(showNode);
 
                     for(Map.Entry<Integer, VideoCollectionsData> episodeEntry : hierarchy.getOrderedSeasonEpisodes(++sequenceNumber).entrySet()) {
@@ -200,8 +231,8 @@ public class SimpleTransformer {
                         episodeNode.facetData = new CompleteVideoFacetData();
                         episodeNode.facetData.videoCollectionsData = episodeEntry.getValue();
                         episodeNode.facetData.videoMetaData = vmdByCountry.get(countryId).get(episodeNode.id.value);
+                        episodeNode.facetData.videoMediaData = mediaDataByCountry.get(countryId).get(episodeNode.id.value);
                         episodeNode.facetData.videoMiscData = miscData.get(episodeNode.id.value);
-
                         objectMapper.addObject(episodeNode);
                     }
                 }
@@ -214,6 +245,7 @@ public class SimpleTransformer {
                 supplementalNode.facetData = new CompleteVideoFacetData();
                 supplementalNode.facetData.videoCollectionsData = supplementalEntry.getValue();
                 supplementalNode.facetData.videoMetaData = vmdByCountry.get(countryId).get(supplementalNode.id.value);
+                supplementalNode.facetData.videoMediaData = mediaDataByCountry.get(countryId).get(supplementalNode.id.value);
 
                 objectMapper.addObject(supplementalNode);
             }

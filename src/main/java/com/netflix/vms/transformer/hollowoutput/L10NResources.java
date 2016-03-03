@@ -21,6 +21,13 @@ public class L10NResources implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (resourceIdStr == null ? 1237 : resourceIdStr.hashCode());
+        hashCode = hashCode * 31 + (localizedStrings == null ? 1237 : localizedStrings.hashCode());
+        return hashCode;
+    }
+
     public L10NResources clone() {
         try {
             L10NResources clone = (L10NResources)super.clone();

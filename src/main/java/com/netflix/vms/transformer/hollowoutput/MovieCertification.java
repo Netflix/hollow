@@ -27,6 +27,16 @@ public class MovieCertification implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (videoId == null ? 1237 : videoId.hashCode());
+        hashCode = hashCode * 31 + certificationSystemId;
+        hashCode = hashCode * 31 + ratingId;
+        hashCode = hashCode * 31 + maturityLevel;
+        hashCode = hashCode * 31 + (ratingReason == null ? 1237 : ratingReason.hashCode());
+        return hashCode;
+    }
+
     public MovieCertification clone() {
         try {
             MovieCertification clone = (MovieCertification)super.clone();

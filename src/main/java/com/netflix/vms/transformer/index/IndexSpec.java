@@ -14,6 +14,10 @@ public enum IndexSpec {
     CDNS(PRIMARY_KEY, "Cdns", "id"),
     PROTECTION_TYPES(PRIMARY_KEY, "ProtectionTypes", "id"),
     STORIES_SYNOPSES(PRIMARY_KEY, "Stories_Synopses", "movieId"),
+    STREAM_PROFILE(PRIMARY_KEY, "StreamProfiles", "id"),
+    STREAM_PROFILE_GROUP(PRIMARY_KEY, "StreamProfileGroups", "groupName.value"),
+    DEPLOYABLE_PACKAGES(PRIMARY_KEY, "DeployablePackages", "packageId"),
+    BCP47_CODE(PRIMARY_KEY, "Bcp47Code", "bcp47Code.value"),
     VIDEO_AWARD(PRIMARY_KEY, "VideoAward", "videoId"),
     VMS_AWARD(PRIMARY_KEY, "VMSAward", "awardId"),
     CSM_REVIEW(PRIMARY_KEY, "CSMReview", "videoId"),
@@ -23,7 +27,9 @@ public enum IndexSpec {
     VIDEO_DATE(HASH, "VideoDate", "window.element", "videoId", "window.element.countryCode.value"),
     PERSONS_BY_VIDEO_ID(HASH, "VideoPerson", "", "cast.element.videoId"),
     PERSON_ROLES_BY_VIDEO_ID(HASH, "VideoPerson", "cast.element", "personId", "cast.element.videoId"),
-    VIDEO_TYPE_COUNTRY(HASH, "VideoType", "type.element", "videoId", "type.element.countryCode.value");
+    VIDEO_TYPE_COUNTRY(HASH, "VideoType", "type.element", "videoId", "type.element.countryCode.value"),
+    PACKAGES_BY_VIDEO(HASH, "Packages", "", "movieId"),
+    ALL_VIDEO_RIGHTS(HASH, "VideoRights", "", "movieId");
 
 
 

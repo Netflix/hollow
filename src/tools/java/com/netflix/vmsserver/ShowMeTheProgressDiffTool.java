@@ -7,6 +7,7 @@ import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import java.util.Random;
 
 public class ShowMeTheProgressDiffTool {
+
     private static String OS = System.getProperty("os.name").toLowerCase();
     private static final boolean isMac = OS != null && (OS.indexOf("mac") >= 0);
     private static final String BROWSER_COMMAND = isMac ? "open" : "google-chrome";
@@ -14,6 +15,7 @@ public class ShowMeTheProgressDiffTool {
     public static void startTheDiff(HollowReadStateEngine expected, HollowReadStateEngine actual) throws Exception {
         HollowDiff diff = new HollowDiff(expected, actual);
         addTypeDiff(diff, "CompleteVideo", "id.value", "country.id");
+        addTypeDiff(diff, "PackageData", "id");
         addTypeDiff(diff, "DrmSystem", "id");
         addTypeDiff(diff, "OriginServer", "name");
         addTypeDiff(diff, "EncodingProfile", "id");
@@ -22,6 +24,9 @@ public class ShowMeTheProgressDiffTool {
         addTypeDiff(diff, "DeploymentIntent", "profileId", "bitrate", "country.id");
         addTypeDiff(diff, "TopNVideoData", "countryId");
         addTypeDiff(diff, "RolloutCharacter", "id");
+        addTypeDiff(diff, "DrmKey", "keyId");
+        addTypeDiff(diff, "WmDrmKey", "downloadableId");
+        addTypeDiff(diff, "DrmInfoData", "packageId");
         addTypeDiff(diff, "EncodingProfileGroup", "groupNameStr"); // TODO: zero-diff
         addTypeDiff(diff, "GlobalPerson", "id");
         addTypeDiff(diff, "PersonImages", "id");

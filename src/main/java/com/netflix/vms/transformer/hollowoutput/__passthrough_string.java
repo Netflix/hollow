@@ -26,6 +26,12 @@ public class __passthrough_string implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (value == null ? 1237 : value.hashCode());
+        return hashCode;
+    }
+
     public __passthrough_string clone() {
         try {
             __passthrough_string clone = (__passthrough_string)super.clone();

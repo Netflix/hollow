@@ -47,6 +47,20 @@ public class PackageData implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + id;
+        hashCode = hashCode * 31 + (video == null ? 1237 : video.hashCode());
+        hashCode = hashCode * 31 + (contractRestrictions == null ? 1237 : contractRestrictions.hashCode());
+        hashCode = hashCode * 31 + (streams == null ? 1237 : streams.hashCode());
+        hashCode = hashCode * 31 + (isPrimaryPackage? 1231 : 1237);
+        hashCode = hashCode * 31 + (audioStreamSummary == null ? 1237 : audioStreamSummary.hashCode());
+        hashCode = hashCode * 31 + (textStreamSummary == null ? 1237 : textStreamSummary.hashCode());
+        hashCode = hashCode * 31 + (muxAudioStreamSummary == null ? 1237 : muxAudioStreamSummary.hashCode());
+        hashCode = hashCode * 31 + (allDeployableCountries == null ? 1237 : allDeployableCountries.hashCode());
+        return hashCode;
+    }
+
     public PackageData clone() {
         try {
             PackageData clone = (PackageData)super.clone();

@@ -32,6 +32,18 @@ public class VideoMoment implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (videoMomentTypeName == null ? 1237 : videoMomentTypeName.hashCode());
+        hashCode = hashCode * 31 + sequenceNumber;
+        hashCode = hashCode * 31 + (int) (msOffset ^ (msOffset >>> 32));
+        hashCode = hashCode * 31 + (int) (runtimeMs ^ (runtimeMs >>> 32));
+        hashCode = hashCode * 31 + (momentTags == null ? 1237 : momentTags.hashCode());
+        hashCode = hashCode * 31 + packageId;
+        hashCode = hashCode * 31 + (int) (bifIndex ^ (bifIndex >>> 32));
+        return hashCode;
+    }
+
     public VideoMoment clone() {
         try {
             VideoMoment clone = (VideoMoment)super.clone();

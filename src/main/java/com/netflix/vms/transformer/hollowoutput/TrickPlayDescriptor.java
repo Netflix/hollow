@@ -17,6 +17,13 @@ public class TrickPlayDescriptor implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + width;
+        hashCode = hashCode * 31 + height;
+        return hashCode;
+    }
+
     public TrickPlayDescriptor clone() {
         try {
             TrickPlayDescriptor clone = (TrickPlayDescriptor)super.clone();

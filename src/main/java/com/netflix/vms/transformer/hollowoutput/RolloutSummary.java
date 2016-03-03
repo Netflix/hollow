@@ -34,6 +34,16 @@ public class RolloutSummary implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = hashCode * 31 + (type == null ? 1237 : type.hashCode());
+        hashCode = hashCode * 31 + (video == null ? 1237 : video.hashCode());
+        hashCode = hashCode * 31 + (rolloutInfoMap == null ? 1237 : rolloutInfoMap.hashCode());
+        hashCode = hashCode * 31 + (phaseWindowMap == null ? 1237 : phaseWindowMap.hashCode());
+        hashCode = hashCode * 31 + (allPhases == null ? 1237 : allPhases.hashCode());
+        return hashCode;
+    }
+
     public RolloutSummary clone() {
         try {
             RolloutSummary clone = (RolloutSummary)super.clone();
