@@ -32,39 +32,11 @@ public class IndividualTrailerHollow extends HollowObject {
         return delegate().getSequenceNumberBoxed(ordinal);
     }
 
-    public StringHollow _getPostPlay() {
-        int refOrdinal = delegate().getPostPlayOrdinal(ordinal);
+    public PassthroughDataHollow _getPassthrough() {
+        int refOrdinal = delegate().getPassthroughOrdinal(ordinal);
         if(refOrdinal == -1)
             return null;
-        return  api().getStringHollow(refOrdinal);
-    }
-
-    public StringHollow _getSubType() {
-        int refOrdinal = delegate().getSubTypeOrdinal(ordinal);
-        if(refOrdinal == -1)
-            return null;
-        return  api().getStringHollow(refOrdinal);
-    }
-
-    public StringHollow _getAspectRatio() {
-        int refOrdinal = delegate().getAspectRatioOrdinal(ordinal);
-        if(refOrdinal == -1)
-            return null;
-        return  api().getStringHollow(refOrdinal);
-    }
-
-    public ListOfStringHollow _getThemes() {
-        int refOrdinal = delegate().getThemesOrdinal(ordinal);
-        if(refOrdinal == -1)
-            return null;
-        return  api().getListOfStringHollow(refOrdinal);
-    }
-
-    public ListOfStringHollow _getUsages() {
-        int refOrdinal = delegate().getUsagesOrdinal(ordinal);
-        if(refOrdinal == -1)
-            return null;
-        return  api().getListOfStringHollow(refOrdinal);
+        return  api().getPassthroughDataHollow(refOrdinal);
     }
 
     public VMSHollowVideoInputAPI api() {

@@ -15,6 +15,7 @@ public class PersonArtworkDelegateCachedImpl extends HollowObjectAbstractDelegat
     private final int sourceFileIdOrdinal;
     private final int attributesOrdinal;
     private final Long personId;
+    private final int fileImageTypeOrdinal;
    private PersonArtworkTypeAPI typeAPI;
 
     public PersonArtworkDelegateCachedImpl(PersonArtworkTypeAPI typeAPI, int ordinal) {
@@ -25,6 +26,7 @@ public class PersonArtworkDelegateCachedImpl extends HollowObjectAbstractDelegat
         this.sourceFileIdOrdinal = typeAPI.getSourceFileIdOrdinal(ordinal);
         this.attributesOrdinal = typeAPI.getAttributesOrdinal(ordinal);
         this.personId = typeAPI.getPersonIdBoxed(ordinal);
+        this.fileImageTypeOrdinal = typeAPI.getFileImageTypeOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -66,6 +68,10 @@ public class PersonArtworkDelegateCachedImpl extends HollowObjectAbstractDelegat
 
     public Long getPersonIdBoxed(int ordinal) {
         return personId;
+    }
+
+    public int getFileImageTypeOrdinal(int ordinal) {
+        return fileImageTypeOrdinal;
     }
 
     @Override

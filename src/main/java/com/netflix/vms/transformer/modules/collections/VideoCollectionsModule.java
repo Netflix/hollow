@@ -3,6 +3,9 @@ package com.netflix.vms.transformer.modules.collections;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.ShowHierarchy;
 import com.netflix.vms.transformer.hollowinput.IndividualTrailerHollow;
+import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
+import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
+import com.netflix.vms.transformer.hollowinput.PassthroughDataHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.TrailerHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
@@ -11,6 +14,7 @@ import com.netflix.vms.transformer.hollowoutput.SupplementalVideo;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,14 +22,9 @@ import java.util.Map;
 
 public class VideoCollectionsModule {
 
-    private final Strings POST_PLAY = new Strings("postPlay");
-    private final Strings ASPECT_RATIO = new Strings("aspectRatio");
     private final Strings TYPE = new Strings("type");
     private final Strings TRAILER = new Strings("trailer");
-    private final Strings SUB_TYPE = new Strings("subType");
     private final Strings IDENTIFIER = new Strings("identifier");
-    private final Strings THEMES = new Strings("themes");
-    private final Strings USAGES = new Strings("usages");
 
     private final VMSHollowVideoInputAPI videoAPI;
     private final HollowPrimaryKeyIndex supplementalIndex;
@@ -92,39 +91,34 @@ public class VideoCollectionsModule {
                 //supp.seasonNumber = seasonNumber;
                 supp.attributes = new HashMap<Strings, Strings>();
                 supp.multiValueAttributes = new HashMap<Strings, List<Strings>>();
-                supp.attributes.put(POST_PLAY, new Strings(supplemental._getPostPlay()._getValue()));
+                
+                PassthroughDataHollow passthrough = supplemental._getPassthrough();
+                
+                for(Map.Entry<MapKeyHollow, ListOfStringHollow> entry : passthrough._getMultiValues().entrySet()) {
+                    List<Strings> valueList = new ArrayList<Strings>();
+                    for(StringHollow str : entry.getValue()) {
+                        valueList.add(new Strings(str._getValue()));
+                    }
+                    
+                    supp.multiValueAttributes.put(new Strings(entry.getKey()._getValue()), valueList);
+                }
+                
+                for(Map.Entry<MapKeyHollow, StringHollow> entry : passthrough._getSingleValues().entrySet()) {
+                    supp.attributes.put(new Strings(entry.getKey()._getValue()), new Strings(entry.getValue()._getValue()));
+                }
+                
                 supp.attributes.put(TYPE, TRAILER);
-                StringHollow aspectRatio = supplemental._getAspectRatio();
-                if(aspectRatio != null)
-                    supp.attributes.put(ASPECT_RATIO, new Strings(aspectRatio._getValue()));
-                supp.attributes.put(SUB_TYPE, new Strings(supplemental._getSubType()._getValue()));
-                StringHollow identifier = supplemental._getIdentifier();
-                if(identifier != null)
-                    supp.attributes.put(IDENTIFIER, new Strings(identifier._getValue()));
-                List<Strings> themesList = getListOfStrings(supplemental._getThemes());
-                if(themesList != null)
-                    supp.multiValueAttributes.put(THEMES, themesList);
+                
+                ////TODO: This should just be a passthrough.
+                if(supplemental._getIdentifier() != null) {
+                    supp.attributes.put(IDENTIFIER, new Strings(supplemental._getIdentifier()._getValue()));
+                }
+
                 supplementalVideos.add(supp);
-                List<Strings> usagesList = getListOfStrings(supplemental._getUsages());
-                if(usagesList != null)
-                    supp.multiValueAttributes.put(USAGES, usagesList);
             }
        }
 
         return supplementalVideos;
-    }
-
-    private List<Strings> getListOfStrings(List<StringHollow> themes) {
-        if(themes == null)
-            return null;
-
-        List<Strings> list = new ArrayList<Strings>();
-
-        for(StringHollow theme : themes) {
-            list.add(new Strings(theme._getValue()));
-        }
-
-        return list;
     }
 
 }

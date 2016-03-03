@@ -12,11 +12,7 @@ public class IndividualTrailerTypeAPI extends HollowObjectTypeAPI {
             "identifier",
             "movieId",
             "sequenceNumber",
-            "postPlay",
-            "subType",
-            "aspectRatio",
-            "themes",
-            "usages"
+            "passthrough"
         });
         this.delegateLookupImpl = new IndividualTrailerDelegateLookupImpl(this);
     }
@@ -73,54 +69,14 @@ public class IndividualTrailerTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public int getPostPlayOrdinal(int ordinal) {
+    public int getPassthroughOrdinal(int ordinal) {
         if(fieldIndex[3] == -1)
-            return missingDataHandler().handleReferencedOrdinal("IndividualTrailer", ordinal, "postPlay");
+            return missingDataHandler().handleReferencedOrdinal("IndividualTrailer", ordinal, "passthrough");
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[3]);
     }
 
-    public StringTypeAPI getPostPlayTypeAPI() {
-        return getAPI().getStringTypeAPI();
-    }
-
-    public int getSubTypeOrdinal(int ordinal) {
-        if(fieldIndex[4] == -1)
-            return missingDataHandler().handleReferencedOrdinal("IndividualTrailer", ordinal, "subType");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[4]);
-    }
-
-    public StringTypeAPI getSubTypeTypeAPI() {
-        return getAPI().getStringTypeAPI();
-    }
-
-    public int getAspectRatioOrdinal(int ordinal) {
-        if(fieldIndex[5] == -1)
-            return missingDataHandler().handleReferencedOrdinal("IndividualTrailer", ordinal, "aspectRatio");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[5]);
-    }
-
-    public StringTypeAPI getAspectRatioTypeAPI() {
-        return getAPI().getStringTypeAPI();
-    }
-
-    public int getThemesOrdinal(int ordinal) {
-        if(fieldIndex[6] == -1)
-            return missingDataHandler().handleReferencedOrdinal("IndividualTrailer", ordinal, "themes");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[6]);
-    }
-
-    public ListOfStringTypeAPI getThemesTypeAPI() {
-        return getAPI().getListOfStringTypeAPI();
-    }
-
-    public int getUsagesOrdinal(int ordinal) {
-        if(fieldIndex[7] == -1)
-            return missingDataHandler().handleReferencedOrdinal("IndividualTrailer", ordinal, "usages");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[7]);
-    }
-
-    public ListOfStringTypeAPI getUsagesTypeAPI() {
-        return getAPI().getListOfStringTypeAPI();
+    public PassthroughDataTypeAPI getPassthroughTypeAPI() {
+        return getAPI().getPassthroughDataTypeAPI();
     }
 
     public IndividualTrailerDelegateLookupImpl getDelegateLookupImpl() {

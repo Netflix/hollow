@@ -7,7 +7,6 @@ public enum IndexSpec {
 
     SUPPLEMENTAL(PRIMARY_KEY, "Trailer", "movieId"),
     VIDEO_RIGHTS(PRIMARY_KEY, "VideoRights", "movieId", "countryCode.value"),
-    ROLLOUT_VIDEO_TYPE(PRIMARY_KEY, "Rollout", "movieId", "rolloutType.value"),
     VIDEO_TYPE(PRIMARY_KEY, "VideoType", "videoId"),
     VIDEO_GENERAL(PRIMARY_KEY, "VideoGeneral", "videoId"),
     STORAGE_GROUPS(PRIMARY_KEY, "StorageGroups", "id.value"),
@@ -27,7 +26,8 @@ public enum IndexSpec {
     PERSON_ROLES_BY_VIDEO_ID(HASH, "VideoPerson", "cast.element", "personId", "cast.element.videoId"),
     VIDEO_TYPE_COUNTRY(HASH, "VideoType", "type.element", "videoId", "type.element.countryCode.value"),
     PACKAGES_BY_VIDEO(HASH, "Packages", "", "movieId"),
-    ALL_VIDEO_RIGHTS(HASH, "VideoRights", "", "movieId");
+    ALL_VIDEO_RIGHTS(HASH, "VideoRights", "", "movieId"),
+    ROLLOUT_VIDEO_TYPE(HASH, "Rollout", "", "movieId", "rolloutType.value");
 
 
 

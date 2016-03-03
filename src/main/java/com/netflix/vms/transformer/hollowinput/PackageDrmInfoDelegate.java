@@ -20,6 +20,10 @@ public interface PackageDrmInfoDelegate extends HollowObjectDelegate {
 
     public int getDrmHeaderInfoOrdinal(int ordinal);
 
+    public boolean getKeyDecrypted(int ordinal);
+
+    public Boolean getKeyDecryptedBoxed(int ordinal);
+
     public PackageDrmInfoTypeAPI getTypeAPI();
 
 }

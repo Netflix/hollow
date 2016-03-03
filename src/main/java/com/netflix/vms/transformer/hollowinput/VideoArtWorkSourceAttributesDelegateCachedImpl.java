@@ -8,100 +8,16 @@ import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 
 public class VideoArtWorkSourceAttributesDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, VideoArtWorkSourceAttributesDelegate {
 
-    private final int REEXPLOREOrdinal;
-    private final int source_file_idOrdinal;
-    private final int original_source_file_idOrdinal;
-    private final int GROUP_IDOrdinal;
-    private final int file_seqOrdinal;
-    private final int TONEOrdinal;
-    private final int LABELOrdinal;
-    private final int AWARD_CAMPAIGNOrdinal;
-    private final int SOURCE_MOVIE_IDOrdinal;
-    private final int APPROVAL_STATEOrdinal;
-    private final int FOCAL_POINTOrdinal;
-    private final int IDENTIFIERSOrdinal;
-    private final int themesOrdinal;
-    private final int AWARD_CAMPAIGNSOrdinal;
-    private final int PERSON_IDSOrdinal;
+    private final int passthroughOrdinal;
    private VideoArtWorkSourceAttributesTypeAPI typeAPI;
 
     public VideoArtWorkSourceAttributesDelegateCachedImpl(VideoArtWorkSourceAttributesTypeAPI typeAPI, int ordinal) {
-        this.REEXPLOREOrdinal = typeAPI.getREEXPLOREOrdinal(ordinal);
-        this.source_file_idOrdinal = typeAPI.getSource_file_idOrdinal(ordinal);
-        this.original_source_file_idOrdinal = typeAPI.getOriginal_source_file_idOrdinal(ordinal);
-        this.GROUP_IDOrdinal = typeAPI.getGROUP_IDOrdinal(ordinal);
-        this.file_seqOrdinal = typeAPI.getFile_seqOrdinal(ordinal);
-        this.TONEOrdinal = typeAPI.getTONEOrdinal(ordinal);
-        this.LABELOrdinal = typeAPI.getLABELOrdinal(ordinal);
-        this.AWARD_CAMPAIGNOrdinal = typeAPI.getAWARD_CAMPAIGNOrdinal(ordinal);
-        this.SOURCE_MOVIE_IDOrdinal = typeAPI.getSOURCE_MOVIE_IDOrdinal(ordinal);
-        this.APPROVAL_STATEOrdinal = typeAPI.getAPPROVAL_STATEOrdinal(ordinal);
-        this.FOCAL_POINTOrdinal = typeAPI.getFOCAL_POINTOrdinal(ordinal);
-        this.IDENTIFIERSOrdinal = typeAPI.getIDENTIFIERSOrdinal(ordinal);
-        this.themesOrdinal = typeAPI.getThemesOrdinal(ordinal);
-        this.AWARD_CAMPAIGNSOrdinal = typeAPI.getAWARD_CAMPAIGNSOrdinal(ordinal);
-        this.PERSON_IDSOrdinal = typeAPI.getPERSON_IDSOrdinal(ordinal);
+        this.passthroughOrdinal = typeAPI.getPassthroughOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
-    public int getREEXPLOREOrdinal(int ordinal) {
-        return REEXPLOREOrdinal;
-    }
-
-    public int getSource_file_idOrdinal(int ordinal) {
-        return source_file_idOrdinal;
-    }
-
-    public int getOriginal_source_file_idOrdinal(int ordinal) {
-        return original_source_file_idOrdinal;
-    }
-
-    public int getGROUP_IDOrdinal(int ordinal) {
-        return GROUP_IDOrdinal;
-    }
-
-    public int getFile_seqOrdinal(int ordinal) {
-        return file_seqOrdinal;
-    }
-
-    public int getTONEOrdinal(int ordinal) {
-        return TONEOrdinal;
-    }
-
-    public int getLABELOrdinal(int ordinal) {
-        return LABELOrdinal;
-    }
-
-    public int getAWARD_CAMPAIGNOrdinal(int ordinal) {
-        return AWARD_CAMPAIGNOrdinal;
-    }
-
-    public int getSOURCE_MOVIE_IDOrdinal(int ordinal) {
-        return SOURCE_MOVIE_IDOrdinal;
-    }
-
-    public int getAPPROVAL_STATEOrdinal(int ordinal) {
-        return APPROVAL_STATEOrdinal;
-    }
-
-    public int getFOCAL_POINTOrdinal(int ordinal) {
-        return FOCAL_POINTOrdinal;
-    }
-
-    public int getIDENTIFIERSOrdinal(int ordinal) {
-        return IDENTIFIERSOrdinal;
-    }
-
-    public int getThemesOrdinal(int ordinal) {
-        return themesOrdinal;
-    }
-
-    public int getAWARD_CAMPAIGNSOrdinal(int ordinal) {
-        return AWARD_CAMPAIGNSOrdinal;
-    }
-
-    public int getPERSON_IDSOrdinal(int ordinal) {
-        return PERSON_IDSOrdinal;
+    public int getPassthroughOrdinal(int ordinal) {
+        return passthroughOrdinal;
     }
 
     @Override
