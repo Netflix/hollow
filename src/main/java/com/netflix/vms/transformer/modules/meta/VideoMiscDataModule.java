@@ -2,7 +2,6 @@ package com.netflix.vms.transformer.modules.meta;
 
 import static com.netflix.vms.transformer.index.IndexSpec.CSM_REVIEW;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_AWARD;
-import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 import static com.netflix.vms.transformer.index.IndexSpec.VMS_AWARD;
 
 import java.util.ArrayList;
@@ -10,11 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.netflix.hollow.index.HollowHashIndex;
-import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.ShowHierarchy;
-import com.netflix.vms.transformer.hollowinput.AwardsHollow;
 import com.netflix.vms.transformer.hollowinput.CSMReviewHollow;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
@@ -23,10 +19,6 @@ import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoAwardHollow;
 import com.netflix.vms.transformer.hollowinput.VideoAwardListHollow;
 import com.netflix.vms.transformer.hollowinput.VideoAwardMappingHollow;
-import com.netflix.vms.transformer.hollowinput.VideoRightsHollow;
-import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
-import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorListHollow;
-import com.netflix.vms.transformer.hollowinput.VideoTypeHollow;
 import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.ICSMReview;
 import com.netflix.vms.transformer.hollowoutput.Strings;

@@ -10,6 +10,7 @@ import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
 import com.netflix.vms.transformer.hollowoutput.DeploymentIntent;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
+import com.netflix.vms.transformer.hollowoutput.PersonImages;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
 import com.netflix.vms.transformer.hollowoutput.VideoEpisode_CountryList;
@@ -22,6 +23,7 @@ import com.netflix.vms.transformer.modules.TransformModule;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHierarchy;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
 import com.netflix.vms.transformer.modules.deploymentintent.CacheDeploymentIntentModule;
+import com.netflix.vms.transformer.modules.images.PersonImagesModule;
 import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
 import com.netflix.vms.transformer.modules.meta.VideoMiscDataModule;
 import com.netflix.vms.transformer.modules.mpl.DrmSystemModule;
@@ -94,6 +96,7 @@ public class SimpleTransformer {
         }
 
         objectMapper.addObject(new DeploymentIntent());
+        objectMapper.addObject(new PersonImages());
         
         // Register Transform Modules
         List<TransformModule> moduleList = Arrays.<TransformModule>asList(
@@ -108,7 +111,8 @@ public class SimpleTransformer {
                 new RolloutCharacterModule(api, objectMapper),
                 new EncodingProfileGroupModule(api, objectMapper),
                 new GlobalPersonModule(api, objectMapper, indexer),
-                new TopNVideoDataModule(api, objectMapper)
+                new TopNVideoDataModule(api, objectMapper),
+                new PersonImagesModule(api, objectMapper, indexer)
                 );
 
 

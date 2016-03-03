@@ -17,6 +17,8 @@ public enum IndexSpec {
     VIDEO_AWARD(PRIMARY_KEY, "VideoAward", "videoId"),
     VMS_AWARD(PRIMARY_KEY, "VMSAward", "awardId"),
     CSM_REVIEW(PRIMARY_KEY, "CSMReview", "videoId"),
+    ARTWORK_IMAGE_FORMAT(PRIMARY_KEY, "ArtWorkImageType", "imageType.value"),
+    ARTWORK_RECIPE(PRIMARY_KEY, "ArtworkRecipe", "recipeName.value"),
 
     VIDEO_DATE(HASH, "VideoDate", "window.element", "videoId", "window.element.countryCode.value"),
     PERSONS_BY_VIDEO_ID(HASH, "VideoPerson", "", "cast.element.videoId"),
