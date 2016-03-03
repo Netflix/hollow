@@ -83,7 +83,7 @@ public class ShowHierarchy {
                         continue;
 
                     initializer.addSupplementalVideos(episode._getMovieId(), countryCode, supplementalIds);
-
+                    
                     episodeIds[seasonCounter][episodeCounter] = (int)episode._getMovieId();
                     episodeSequenceNumbers[seasonCounter][episodeCounter] = episodeSeqNum;
                     hashCode ^= episodeIds[seasonCounter][episodeCounter];
@@ -166,9 +166,18 @@ public class ShowHierarchy {
             return false;
         if(!Arrays.equals(seasonIds, other.seasonIds))
             return false;
+        for(int i=0;i<seasonIds.length;i++) {
+            if(seasonSequenceNumbers[i] != other.seasonSequenceNumbers[i])
+                return false;
+        }
+        
         for(int i=0;i<episodeIds.length;i++) {
             if(!Arrays.equals(episodeIds[i], other.episodeIds[i]))
                 return false;
+            for(int j=0;j<episodeIds[i].length;j++) {
+                if(episodeSequenceNumbers[i][j] != other.episodeSequenceNumbers[i][j])
+                    return false;
+            }
         }
         if(!Arrays.equals(supplementalIds, other.supplementalIds))
             return false;

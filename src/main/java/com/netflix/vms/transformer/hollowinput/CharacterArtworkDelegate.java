@@ -24,6 +24,8 @@ public interface CharacterArtworkDelegate extends HollowObjectDelegate {
 
     public Long getOrdinalPriorityBoxed(int ordinal);
 
+    public int getFileImageTypeOrdinal(int ordinal);
+
     public CharacterArtworkTypeAPI getTypeAPI();
 
 }

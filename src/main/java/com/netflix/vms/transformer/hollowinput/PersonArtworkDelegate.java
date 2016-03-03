@@ -24,6 +24,8 @@ public interface PersonArtworkDelegate extends HollowObjectDelegate {
 
     public Long getPersonIdBoxed(int ordinal);
 
+    public int getFileImageTypeOrdinal(int ordinal);
+
     public PersonArtworkTypeAPI getTypeAPI();
 
 }

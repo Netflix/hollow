@@ -44,6 +44,14 @@ public class PackageDrmInfoDelegateLookupImpl extends HollowObjectAbstractDelega
         return typeAPI.getDrmHeaderInfoOrdinal(ordinal);
     }
 
+    public boolean getKeyDecrypted(int ordinal) {
+        return typeAPI.getKeyDecrypted(ordinal);
+    }
+
+    public Boolean getKeyDecryptedBoxed(int ordinal) {
+        return typeAPI.getKeyDecryptedBoxed(ordinal);
+    }
+
     public PackageDrmInfoTypeAPI getTypeAPI() {
         return typeAPI;
     }

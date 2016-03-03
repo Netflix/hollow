@@ -11,22 +11,14 @@ public class IndividualTrailerDelegateCachedImpl extends HollowObjectAbstractDel
     private final int identifierOrdinal;
     private final Long movieId;
     private final Long sequenceNumber;
-    private final int postPlayOrdinal;
-    private final int subTypeOrdinal;
-    private final int aspectRatioOrdinal;
-    private final int themesOrdinal;
-    private final int usagesOrdinal;
+    private final int passthroughOrdinal;
    private IndividualTrailerTypeAPI typeAPI;
 
     public IndividualTrailerDelegateCachedImpl(IndividualTrailerTypeAPI typeAPI, int ordinal) {
         this.identifierOrdinal = typeAPI.getIdentifierOrdinal(ordinal);
         this.movieId = typeAPI.getMovieIdBoxed(ordinal);
         this.sequenceNumber = typeAPI.getSequenceNumberBoxed(ordinal);
-        this.postPlayOrdinal = typeAPI.getPostPlayOrdinal(ordinal);
-        this.subTypeOrdinal = typeAPI.getSubTypeOrdinal(ordinal);
-        this.aspectRatioOrdinal = typeAPI.getAspectRatioOrdinal(ordinal);
-        this.themesOrdinal = typeAPI.getThemesOrdinal(ordinal);
-        this.usagesOrdinal = typeAPI.getUsagesOrdinal(ordinal);
+        this.passthroughOrdinal = typeAPI.getPassthroughOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -50,24 +42,8 @@ public class IndividualTrailerDelegateCachedImpl extends HollowObjectAbstractDel
         return sequenceNumber;
     }
 
-    public int getPostPlayOrdinal(int ordinal) {
-        return postPlayOrdinal;
-    }
-
-    public int getSubTypeOrdinal(int ordinal) {
-        return subTypeOrdinal;
-    }
-
-    public int getAspectRatioOrdinal(int ordinal) {
-        return aspectRatioOrdinal;
-    }
-
-    public int getThemesOrdinal(int ordinal) {
-        return themesOrdinal;
-    }
-
-    public int getUsagesOrdinal(int ordinal) {
-        return usagesOrdinal;
+    public int getPassthroughOrdinal(int ordinal) {
+        return passthroughOrdinal;
     }
 
     @Override

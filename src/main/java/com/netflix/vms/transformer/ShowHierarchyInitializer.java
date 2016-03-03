@@ -3,6 +3,7 @@ package com.netflix.vms.transformer;
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.util.IntList;
 import com.netflix.vms.transformer.hollowinput.CountryVideoDisplaySetHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
@@ -32,7 +33,7 @@ public class ShowHierarchyInitializer {
     private final HollowPrimaryKeyIndex supplementalIndex;
     private final HollowHashIndex videoTypeCountryIndex;
     private final HollowPrimaryKeyIndex videoRightsIndex;
-    private final HollowPrimaryKeyIndex rolloutVideoTypeIndex;
+    private final HollowHashIndex rolloutVideoTypeIndex;
     private final Set<Integer> supplementalIds;
 
     public ShowHierarchyInitializer(VMSHollowVideoInputAPI videoAPI, VMSTransformerIndexer indexer) {
@@ -40,7 +41,7 @@ public class ShowHierarchyInitializer {
         this.supplementalIndex = indexer.getPrimaryKeyIndex(IndexSpec.SUPPLEMENTAL);
         this.videoTypeCountryIndex = indexer.getHashIndex(IndexSpec.VIDEO_TYPE_COUNTRY);
         this.videoRightsIndex = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_RIGHTS);
-        this.rolloutVideoTypeIndex = indexer.getPrimaryKeyIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
+        this.rolloutVideoTypeIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
 
         this.supplementalIds = findAllSupplementalVideoIds(videoAPI);
     }
@@ -59,6 +60,7 @@ public class ShowHierarchyInitializer {
 
     public Map<String, ShowHierarchy> getShowHierarchiesByCountry(VideoDisplaySetHollow displaySet) {
         long topNodeId = displaySet._getTopNodeId();
+        
         if(supplementalIds.contains((int)topNodeId))
             return null;
 
@@ -168,19 +170,26 @@ public class ShowHierarchyInitializer {
     }
 
     boolean hasCurrentOrFutureRollout(long videoId, String rolloutType, String country) {
-        int rolloutOrdinal = rolloutVideoTypeIndex.getMatchingOrdinal(videoId, rolloutType);
+        HollowHashIndexResult result = rolloutVideoTypeIndex.findMatches(videoId, rolloutType);
 
-        if(rolloutOrdinal == -1)
+        if(result == null)
             return false;
 
-        RolloutHollow rollout = videoAPI.getRolloutHollow(rolloutOrdinal);
+        HollowOrdinalIterator iter = result.iterator();
 
-        for(RolloutPhaseHollow phase : rollout._getPhases()) {
-            for(Map.Entry<ISOCountryHollow, RolloutPhaseWindowHollow> entry : phase._getWindows().entrySet()) {
-                if(entry.getKey()._isValueEqual(country)) {
-                    return entry.getValue()._getEndDate()._getValue() >= System.currentTimeMillis();
+        int rolloutOrdinal = iter.next();
+        while(rolloutOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+            RolloutHollow rollout = videoAPI.getRolloutHollow(rolloutOrdinal);
+    
+            for(RolloutPhaseHollow phase : rollout._getPhases()) {
+                for(Map.Entry<ISOCountryHollow, RolloutPhaseWindowHollow> entry : phase._getWindows().entrySet()) {
+                    if(entry.getKey()._isValueEqual(country)) {
+                        return entry.getValue()._getEndDate()._getValue() >= System.currentTimeMillis();
+                    }
                 }
             }
+            
+            rolloutOrdinal = iter.next();
         }
 
         return false;

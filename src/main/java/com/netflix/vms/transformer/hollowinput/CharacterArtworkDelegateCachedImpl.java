@@ -15,6 +15,7 @@ public class CharacterArtworkDelegateCachedImpl extends HollowObjectAbstractDele
     private final int localesOrdinal;
     private final int attributesOrdinal;
     private final Long ordinalPriority;
+    private final int fileImageTypeOrdinal;
    private CharacterArtworkTypeAPI typeAPI;
 
     public CharacterArtworkDelegateCachedImpl(CharacterArtworkTypeAPI typeAPI, int ordinal) {
@@ -25,6 +26,7 @@ public class CharacterArtworkDelegateCachedImpl extends HollowObjectAbstractDele
         this.localesOrdinal = typeAPI.getLocalesOrdinal(ordinal);
         this.attributesOrdinal = typeAPI.getAttributesOrdinal(ordinal);
         this.ordinalPriority = typeAPI.getOrdinalPriorityBoxed(ordinal);
+        this.fileImageTypeOrdinal = typeAPI.getFileImageTypeOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -66,6 +68,10 @@ public class CharacterArtworkDelegateCachedImpl extends HollowObjectAbstractDele
 
     public Long getOrdinalPriorityBoxed(int ordinal) {
         return ordinalPriority;
+    }
+
+    public int getFileImageTypeOrdinal(int ordinal) {
+        return fileImageTypeOrdinal;
     }
 
     @Override
