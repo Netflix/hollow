@@ -10,6 +10,8 @@ import com.netflix.vms.transformer.hollowinput.MultiValuePassthroughMapHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkSourceFileIdHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkSourceFileIdListHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutPhaseCharacterHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutPhaseCharacterListHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseElementsHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseImageIdHollow;
@@ -32,6 +34,7 @@ import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.Phase;
 import com.netflix.vms.transformer.hollowoutput.RolloutInfo;
 import com.netflix.vms.transformer.hollowoutput.RolloutPhaseWindow;
+import com.netflix.vms.transformer.hollowoutput.RolloutRole;
 import com.netflix.vms.transformer.hollowoutput.RolloutSummary;
 import com.netflix.vms.transformer.hollowoutput.RolloutTrailer;
 import com.netflix.vms.transformer.hollowoutput.RolloutVideo;
@@ -39,6 +42,7 @@ import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.SupplementalInfoType;
 import com.netflix.vms.transformer.hollowoutput.SupplementalVideo;
 import com.netflix.vms.transformer.hollowoutput.TrailerInfo;
+import com.netflix.vms.transformer.hollowoutput.VPerson;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
@@ -240,8 +244,20 @@ public class RolloutVideoModule extends AbstractTransformModule {
                             }
                             sv.multiValueAttributes.put(new Strings(entry.getKey()._getValue()), vals);
                         }
-
                     }
+
+                    phase.roles = new ArrayList<RolloutRole>();
+
+                    RolloutPhaseCharacterListHollow charList = phaseHollow._getElements()._getCharacters();
+                    for (RolloutPhaseCharacterHollow phaseChar : charList) {
+                        RolloutRole role = new RolloutRole();
+                        role.characterId = (int) phaseChar._getCharacterId();
+                        role.id = (int) phaseChar._getRoleId();
+                        role.sequenceNumber = (int) phaseChar._getSequenceNumber();
+                        role.person = new VPerson((int) phaseChar._getPersonId());
+                        phase.roles.add(role);
+                    }
+
                     Collections.sort(phase.supplementalVideos, new SupplementalVideoComparator());
                     summary.allPhases.add(phase);
                 }
