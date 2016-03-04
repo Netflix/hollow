@@ -34,6 +34,15 @@ public class VideoImage implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoImage{");
+        builder.append("videoId=").append(videoId);
+        builder.append(",videoMoment=").append(videoMoment);
+        builder.append(",downloadableList=").append(downloadableList);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VideoImage clone() {
         try {
             VideoImage clone = (VideoImage)super.clone();

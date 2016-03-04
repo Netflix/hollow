@@ -31,6 +31,15 @@ public class AssetLocation implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("AssetLocation{");
+        builder.append("recipeDescriptor=").append(recipeDescriptor);
+        builder.append(",cdnId=").append(cdnId);
+        builder.append(",cdnDirectory=").append(cdnDirectory);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public AssetLocation clone() {
         try {
             AssetLocation clone = (AssetLocation)super.clone();

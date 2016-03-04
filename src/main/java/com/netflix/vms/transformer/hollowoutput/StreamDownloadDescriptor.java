@@ -49,6 +49,19 @@ public class StreamDownloadDescriptor implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("StreamDownloadDescriptor{");
+        builder.append("profileType=").append(profileType);
+        builder.append(",streamProfileId=").append(streamProfileId);
+        builder.append(",videoResolution=").append(videoResolution);
+        builder.append(",pixelAspect=").append(pixelAspect);
+        builder.append(",bitrate=").append(bitrate);
+        builder.append(",envBasedDirectory=").append(envBasedDirectory);
+        builder.append(",languageBcp47code=").append(languageBcp47code);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public StreamDownloadDescriptor clone() {
         try {
             StreamDownloadDescriptor clone = (StreamDownloadDescriptor)super.clone();

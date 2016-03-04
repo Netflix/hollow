@@ -31,6 +31,16 @@ public class ArtWorkImageTypeEntry implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ArtWorkImageTypeEntry{");
+        builder.append("nameStr=").append(nameStr);
+        builder.append(",unavailableFileNameStr=").append(unavailableFileNameStr);
+        builder.append(",allowMultiples=").append(allowMultiples);
+        builder.append(",recipeNameStr=").append(recipeNameStr);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public ArtWorkImageTypeEntry clone() {
         try {
             ArtWorkImageTypeEntry clone = (ArtWorkImageTypeEntry)super.clone();

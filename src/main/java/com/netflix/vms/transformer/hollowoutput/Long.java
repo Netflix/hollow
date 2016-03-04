@@ -27,6 +27,13 @@ public class Long implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("Long{");
+        builder.append("val=").append(val);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public Long clone() {
         try {
             Long clone = (Long)super.clone();

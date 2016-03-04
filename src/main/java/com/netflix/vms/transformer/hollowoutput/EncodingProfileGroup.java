@@ -28,6 +28,14 @@ public class EncodingProfileGroup implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("EncodingProfileGroup{");
+        builder.append("groupNameStr=").append(groupNameStr);
+        builder.append(",encodingProfileIds=").append(encodingProfileIds);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public EncodingProfileGroup clone() {
         try {
             EncodingProfileGroup clone = (EncodingProfileGroup)super.clone();

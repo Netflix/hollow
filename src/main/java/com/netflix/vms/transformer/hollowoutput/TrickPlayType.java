@@ -32,6 +32,13 @@ public class TrickPlayType implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("TrickPlayType{");
+        builder.append("value=").append(value);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public TrickPlayType clone() {
         try {
             TrickPlayType clone = (TrickPlayType)super.clone();

@@ -27,6 +27,14 @@ public class DrmInfoData implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("DrmInfoData{");
+        builder.append("packageId=").append(packageId);
+        builder.append(",downloadableIdToDrmInfoMap=").append(downloadableIdToDrmInfoMap);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public DrmInfoData clone() {
         try {
             DrmInfoData clone = (DrmInfoData)super.clone();

@@ -28,6 +28,14 @@ public class Certification implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("Certification{");
+        builder.append("movieCert=").append(movieCert);
+        builder.append(",certSystem=").append(certSystem);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public Certification clone() {
         try {
             Certification clone = (Certification)super.clone();

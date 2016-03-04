@@ -56,6 +56,8 @@ public class ShowMeTheProgress {
         filter.addTypeRecursive("EncodingProfileGroup", outputSchemas);
         filter.addTypeRecursive("GlobalPerson", outputSchemas);
         filter.addTypeRecursive("VideoEpisode_CountryList", outputSchemas);
+        filter.addTypeRecursive("PersonImages", outputSchemas);
+        filter.addTypeRecursive("CharacterImages", outputSchemas);
         return filter;
     }
 

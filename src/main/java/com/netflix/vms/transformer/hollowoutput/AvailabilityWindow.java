@@ -28,6 +28,14 @@ public class AvailabilityWindow implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("AvailabilityWindow{");
+        builder.append("startDate=").append(startDate);
+        builder.append(",endDate=").append(endDate);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public AvailabilityWindow clone() {
         try {
             AvailabilityWindow clone = (AvailabilityWindow)super.clone();

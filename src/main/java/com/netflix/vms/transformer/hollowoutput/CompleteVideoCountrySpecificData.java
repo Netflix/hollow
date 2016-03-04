@@ -55,6 +55,19 @@ public class CompleteVideoCountrySpecificData implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("CompleteVideoCountrySpecificData{");
+        builder.append("metadataAvailabilityDate=").append(metadataAvailabilityDate);
+        builder.append(",firstDisplayDate=").append(firstDisplayDate);
+        builder.append(",firstDisplayDateByLocale=").append(firstDisplayDateByLocale);
+        builder.append(",certificationList=").append(certificationList);
+        builder.append(",dateWindowWiseSeasonSequenceNumberMap=").append(dateWindowWiseSeasonSequenceNumberMap);
+        builder.append(",mediaAvailabilityWindows=").append(mediaAvailabilityWindows);
+        builder.append(",imagesAvailabilityWindows=").append(imagesAvailabilityWindows);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public CompleteVideoCountrySpecificData clone() {
         try {
             CompleteVideoCountrySpecificData clone = (CompleteVideoCountrySpecificData)super.clone();

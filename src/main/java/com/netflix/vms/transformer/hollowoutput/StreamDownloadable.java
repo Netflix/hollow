@@ -32,6 +32,15 @@ public class StreamDownloadable implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("StreamDownloadable{");
+        builder.append("downloadableId=").append(downloadableId);
+        builder.append(",originServerNames=").append(originServerNames);
+        builder.append(",descriptor=").append(descriptor);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public StreamDownloadable clone() {
         try {
             StreamDownloadable clone = (StreamDownloadable)super.clone();

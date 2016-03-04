@@ -187,6 +187,51 @@ public class ICSMReview implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ICSMReview{");
+        builder.append("movieID=").append(movieID);
+        builder.append(",title=").append(title);
+        builder.append(",link=").append(link);
+        builder.append(",oneLiner=").append(oneLiner);
+        builder.append(",reviewerName=").append(reviewerName);
+        builder.append(",mediaType=").append(mediaType);
+        builder.append(",ageRecommendation=").append(ageRecommendation);
+        builder.append(",ageExplanation=").append(ageExplanation);
+        builder.append(",stars=").append(stars);
+        builder.append(",sexualContent=").append(sexualContent);
+        builder.append(",sexualContentAlert=").append(sexualContentAlert);
+        builder.append(",languageNote=").append(languageNote);
+        builder.append(",languageAlert=").append(languageAlert);
+        builder.append(",violenceNote=").append(violenceNote);
+        builder.append(",violenceAlert=").append(violenceAlert);
+        builder.append(",consumerism=").append(consumerism);
+        builder.append(",consumerismAlert=").append(consumerismAlert);
+        builder.append(",dat=").append(dat);
+        builder.append(",datAlert=").append(datAlert);
+        builder.append(",socialBehavior=").append(socialBehavior);
+        builder.append(",socialBehaviorAlert=").append(socialBehaviorAlert);
+        builder.append(",messageAlert=").append(messageAlert);
+        builder.append(",whatsTheStory=").append(whatsTheStory);
+        builder.append(",isItAnyGood=").append(isItAnyGood);
+        builder.append(",otherChoices=").append(otherChoices);
+        builder.append(",parentsNeedToKnow=").append(parentsNeedToKnow);
+        builder.append(",imgSmall=").append(imgSmall);
+        builder.append(",imgLarge=").append(imgLarge);
+        builder.append(",redEndsAge=").append(redEndsAge);
+        builder.append(",greenBeginsAge=").append(greenBeginsAge);
+        builder.append(",releaseDate=").append(releaseDate);
+        builder.append(",mPAARating=").append(mPAARating);
+        builder.append(",mPAAExplanation=").append(mPAAExplanation);
+        builder.append(",genre=").append(genre);
+        builder.append(",directorNames=").append(directorNames);
+        builder.append(",castMemberNames=").append(castMemberNames);
+        builder.append(",plasticReleaseDate=").append(plasticReleaseDate);
+        builder.append(",runtimeInMins=").append(runtimeInMins);
+        builder.append(",studio=").append(studio);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public ICSMReview clone() {
         try {
             ICSMReview clone = (ICSMReview)super.clone();

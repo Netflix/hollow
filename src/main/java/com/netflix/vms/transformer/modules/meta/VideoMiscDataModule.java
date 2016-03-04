@@ -2,19 +2,16 @@ package com.netflix.vms.transformer.modules.meta;
 
 import static com.netflix.vms.transformer.index.IndexSpec.CSM_REVIEW;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_AWARD;
-import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 import static com.netflix.vms.transformer.index.IndexSpec.VMS_AWARD;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.netflix.hollow.index.HollowHashIndex;
-import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.ShowHierarchy;
-import com.netflix.vms.transformer.hollowinput.AwardsHollow;
 import com.netflix.vms.transformer.hollowinput.CSMReviewHollow;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
@@ -23,10 +20,6 @@ import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoAwardHollow;
 import com.netflix.vms.transformer.hollowinput.VideoAwardListHollow;
 import com.netflix.vms.transformer.hollowinput.VideoAwardMappingHollow;
-import com.netflix.vms.transformer.hollowinput.VideoRightsHollow;
-import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
-import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorListHollow;
-import com.netflix.vms.transformer.hollowinput.VideoTypeHollow;
 import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.ICSMReview;
 import com.netflix.vms.transformer.hollowoutput.Strings;
@@ -80,7 +73,7 @@ public class VideoMiscDataModule {
 
     private VideoMiscData createMiscData(int videoId, String countryCode) {
         VideoMiscData miscData = new VideoMiscData();
-//        miscData.videoAwards = getAwards(videoId);
+        miscData.videoAwards = getAwards(videoId);
         miscData.cSMReview = getCSMReview(videoId);
         return miscData;
     }
@@ -100,8 +93,6 @@ public class VideoMiscDataModule {
             csmReview.directorNames = getStrings(csmReviewHollow._getDirectorNames());
             csmReview.genre = getStrings(csmReviewHollow._getGenre());
             csmReview.greenBeginsAge = (int)csmReviewHollow._getGreenBeginsAge();
-//            csmReview.imgLarge = getStrings(csmReviewHollow._get);
-//            csmReview.imgSmall = getStrings(csmReviewHollow._geti);
             csmReview.isItAnyGood = getStrings(csmReviewHollow._getIsItAnyGood());
             csmReview.languageAlert = (int)csmReviewHollow._getLanguageAlert();
             csmReview.languageNote = getStrings(csmReviewHollow._getLanguageNote());
@@ -151,10 +142,11 @@ public class VideoMiscDataModule {
             awardInput = api.getVideoAwardHollow(videoAwardsOrdinal);
             VideoAwardListHollow awardInfoList = awardInput._getAward();
             if(awardInfoList != null && awardInfoList.size() > 0) {
-                while(awardInfoList.iterator().hasNext()) {
-                    VideoAwardMappingHollow awardInfo = awardInfoList.iterator().next();
+                Iterator<VideoAwardMappingHollow> iterator = awardInfoList.iterator();
+                while(iterator.hasNext()) {
+                    VideoAwardMappingHollow awardInfo = iterator.next();
                     VMSAwardHollow vmsAwardInput = null;
-                    int awardsOrdinal = awardIdx.getMatchingOrdinal((int)awardInfo._getAwardId());
+                    int awardsOrdinal = awardIdx.getMatchingOrdinal(awardInfo._getAwardId());
                     if(awardsOrdinal != -1) {
                         vmsAwardInput = api.getVMSAwardHollow(awardsOrdinal);
                         VideoAward awardOutput = new VideoAward();
@@ -164,9 +156,13 @@ public class VideoMiscDataModule {
                         awardOutput.awardType.festival.id = (int)vmsAwardInput._getFestivalId();
                         awardOutput.isWinner = awardInfo._getWinner();
                         awardOutput.sequenceNumber = (int)awardInfo._getSequenceNumber();
-                        awardOutput.year = (int)awardInfo._getYear();
+                        if((int)awardInfo._getYear() > 0) {
+                            awardOutput.year = (int)awardInfo._getYear();
+                        }
                         awardOutput.video = new Video(videoId);
-                        awardOutput.person = new VPerson((int)awardInfo._getPersonId());
+                        if((int)awardInfo._getPersonId() > 0) {
+                            awardOutput.person = new VPerson((int)awardInfo._getPersonId());
+                        }
                         videoAwards.add(awardOutput);
                     }
                 }

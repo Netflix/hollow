@@ -32,6 +32,15 @@ public class DrmInfo implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("DrmInfo{");
+        builder.append("drmKeyGroup=").append(drmKeyGroup);
+        builder.append(",drmKey=").append(drmKey);
+        builder.append(",drmHeaders=").append(drmHeaders);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public DrmInfo clone() {
         try {
             DrmInfo clone = (DrmInfo)super.clone();

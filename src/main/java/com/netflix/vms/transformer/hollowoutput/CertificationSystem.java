@@ -31,6 +31,15 @@ public class CertificationSystem implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("CertificationSystem{");
+        builder.append("id=").append(id);
+        builder.append(",officialURL=").append(officialURL);
+        builder.append(",country=").append(country);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public CertificationSystem clone() {
         try {
             CertificationSystem clone = (CertificationSystem)super.clone();

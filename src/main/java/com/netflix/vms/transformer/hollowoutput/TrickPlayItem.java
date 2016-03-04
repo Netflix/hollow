@@ -31,6 +31,15 @@ public class TrickPlayItem implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("TrickPlayItem{");
+        builder.append("videoId=").append(videoId);
+        builder.append(",imageCount=").append(imageCount);
+        builder.append(",trickPlayDownloadable=").append(trickPlayDownloadable);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public TrickPlayItem clone() {
         try {
             TrickPlayItem clone = (TrickPlayItem)super.clone();

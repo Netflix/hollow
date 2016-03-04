@@ -29,6 +29,14 @@ public class DownloadLocationSet implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("DownloadLocationSet{");
+        builder.append("filename=").append(filename);
+        builder.append(",locations=").append(locations);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public DownloadLocationSet clone() {
         try {
             DownloadLocationSet clone = (DownloadLocationSet)super.clone();

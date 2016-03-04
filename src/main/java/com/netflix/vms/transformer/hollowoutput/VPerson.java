@@ -27,6 +27,13 @@ public class VPerson implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VPerson{");
+        builder.append("id=").append(id);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VPerson clone() {
         try {
             VPerson clone = (VPerson)super.clone();

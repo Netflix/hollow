@@ -34,6 +34,16 @@ public class DrmKey implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("DrmKey{");
+        builder.append("keyId=").append(keyId);
+        builder.append(",videoId=").append(videoId);
+        builder.append(",encryptedContentKey=").append(encryptedContentKey);
+        builder.append(",keyDecrypted=").append(keyDecrypted);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public DrmKey clone() {
         try {
             DrmKey clone = (DrmKey)super.clone();

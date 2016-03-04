@@ -33,6 +33,15 @@ public class RolloutCharacter implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("RolloutCharacter{");
+        builder.append("id=").append(id);
+        builder.append(",rawL10nAttribs=").append(rawL10nAttribs);
+        builder.append(",quotes=").append(quotes);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public RolloutCharacter clone() {
         try {
             RolloutCharacter clone = (RolloutCharacter)super.clone();

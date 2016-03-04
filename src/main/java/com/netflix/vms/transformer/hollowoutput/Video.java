@@ -27,6 +27,13 @@ public class Video implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("Video{");
+        builder.append("value=").append(value);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public Video clone() {
         try {
             Video clone = (Video)super.clone();

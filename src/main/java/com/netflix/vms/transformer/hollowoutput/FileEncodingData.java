@@ -37,6 +37,17 @@ public class FileEncodingData implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("FileEncodingData{");
+        builder.append("downloadableId=").append(downloadableId);
+        builder.append(",codecPrivateData=").append(codecPrivateData);
+        builder.append(",chunkDurations=").append(chunkDurations);
+        builder.append(",dashHeaderSize=").append(dashHeaderSize);
+        builder.append(",dashMediaStartByteOffset=").append(dashMediaStartByteOffset);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public FileEncodingData clone() {
         try {
             FileEncodingData clone = (FileEncodingData)super.clone();

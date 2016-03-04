@@ -33,6 +33,16 @@ public class RolloutInfo implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("RolloutInfo{");
+        builder.append("rolloutId=").append(rolloutId);
+        builder.append(",video=").append(video);
+        builder.append(",type=").append(type);
+        builder.append(",name=").append(name);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public RolloutInfo clone() {
         try {
             RolloutInfo clone = (RolloutInfo)super.clone();

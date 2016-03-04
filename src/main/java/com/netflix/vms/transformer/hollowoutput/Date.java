@@ -27,6 +27,13 @@ public class Date implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("Date{");
+        builder.append("val=").append(val);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public Date clone() {
         try {
             Date clone = (Date)super.clone();

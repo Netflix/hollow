@@ -32,6 +32,13 @@ public class CodecPrivateDataString implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("CodecPrivateDataString{");
+        builder.append("value=").append(value);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public CodecPrivateDataString clone() {
         try {
             CodecPrivateDataString clone = (CodecPrivateDataString)super.clone();

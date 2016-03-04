@@ -32,6 +32,15 @@ public class EncodeSummaryDescriptor implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("EncodeSummaryDescriptor{");
+        builder.append("fromMuxedOnlyStreams=").append(fromMuxedOnlyStreams);
+        builder.append(",downloadableIds=").append(downloadableIds);
+        builder.append(",descriptorData=").append(descriptorData);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public EncodeSummaryDescriptor clone() {
         try {
             EncodeSummaryDescriptor clone = (EncodeSummaryDescriptor)super.clone();
