@@ -3,6 +3,7 @@ package com.netflix.vms.transformer.modules.rollout;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
+import com.netflix.vms.transformer.hollowinput.IndividualTrailerHollow;
 import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkSourceFileIdHollow;
@@ -19,6 +20,9 @@ import com.netflix.vms.transformer.hollowinput.RolloutPhaseTrailerSupplementalIn
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowMapHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhasesElementsTrailerSupplementalInfoMapHollow;
+import com.netflix.vms.transformer.hollowinput.SingleValuePassthroughMapHollow;
+import com.netflix.vms.transformer.hollowinput.StringHollow;
+import com.netflix.vms.transformer.hollowinput.TrailerHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowoutput.AvailabilityWindow;
 import com.netflix.vms.transformer.hollowoutput.Date;
@@ -38,6 +42,7 @@ import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -67,6 +72,14 @@ public class RolloutVideoModule extends AbstractTransformModule {
                 videoIdToRolloutMap.put(videoId, rolloutList);
             }
             rolloutList.add(input);
+        }
+
+        Map<Integer, IndividualTrailerHollow> trailerIdToTrailerMap = new HashMap<>();
+
+        for (TrailerHollow trailerHollow : api.getAllTrailerHollow()) {
+            for (IndividualTrailerHollow trailer : trailerHollow._getTrailers()) {
+                trailerIdToTrailerMap.put((int) trailer._getMovieId(), trailer);
+            }
         }
 
         for (Integer videoId : videoIdToRolloutMap.keySet()) {
@@ -106,7 +119,6 @@ public class RolloutVideoModule extends AbstractTransformModule {
                     phase.artWorkImageIds = new HashSet<com.netflix.vms.transformer.hollowoutput.Long>();
                     phase.sourceFileIds = new HashSet<Strings>();
                     phase.trailers = new ArrayList<RolloutTrailer>();
-                    phase.supplementalVideos = new ArrayList<SupplementalVideo>();
 
                     phase.rolloutId = info.rolloutId;
                     phase.video = info.video;
@@ -184,11 +196,38 @@ public class RolloutVideoModule extends AbstractTransformModule {
                     if (localized._getTAGLINE() != null)
                         phase.rawL10nAttribs.put(new Strings("TAGLINE"), new Strings(localized._getTAGLINE()._getValue()));
 
+                    phase.supplementalVideos = new ArrayList<SupplementalVideo>();
+
+                    for (RolloutTrailer rolloutTrailer : phase.trailers) {
+                        IndividualTrailerHollow indivTrailerHollow = trailerIdToTrailerMap.get(rolloutTrailer.video.value);
+                        if (indivTrailerHollow == null)
+                            continue;
+
+                        SupplementalVideo sv = new SupplementalVideo();
+                        sv.id = new Video((int) indivTrailerHollow._getMovieId());
+                        sv.parent = new Video(videoId);
+                        sv.sequenceNumber = rolloutTrailer.sequenceNumber; // #cleanup instead of sv's sequence number?
+                        sv.attributes = new HashMap<Strings, Strings>();
+
+                        SingleValuePassthroughMapHollow singleValPassthrough = indivTrailerHollow._getPassthrough()._getSingleValues();
+                        for (Map.Entry<MapKeyHollow, StringHollow> entry : singleValPassthrough.entrySet()) {
+                            sv.attributes.put(new Strings(entry.getKey()._getValue()), new Strings(entry.getValue()._getValue()));
+                        }
+
+                        sv.attributes.put(new Strings("type"), new Strings("trailer"));
+                        sv.attributes.put(new Strings("identifier"), new Strings(indivTrailerHollow._getIdentifier()._getValue()));
+                        phase.supplementalVideos.add(sv);
+                    }
+                    Collections.sort(phase.supplementalVideos, new SupplementalVideoComparator());
                     summary.allPhases.add(phase);
                 }
+
+                // Collections.sort(summary.allPhases, new RolloutPhaseComparator());
             }
             mapper.addObject(output);
         }
     }
+
+
 
 }
