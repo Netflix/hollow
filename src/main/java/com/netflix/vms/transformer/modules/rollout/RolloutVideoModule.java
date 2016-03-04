@@ -56,6 +56,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -174,7 +175,8 @@ public class RolloutVideoModule extends AbstractTransformModule {
                             infoOut.videoValue = infoIn._getVideoValue()._getValue().toCharArray();
 
                             // #for-parity
-                            if(infoOut.seasonNumber == Integer.MIN_VALUE) infoOut.seasonNumber = 1;
+                            if(infoOut.subtitleLocale.length == 0) infoOut.subtitleLocale = null;
+                            if(infoOut.videoLength == 0) infoOut.videoLength = Integer.MIN_VALUE;
 
                             outputTrailer.supplementalInfos.put(typeOut, infoOut);
                         }
@@ -233,6 +235,13 @@ public class RolloutVideoModule extends AbstractTransformModule {
                         sv.parent = new Video(videoId);
                         sv.sequenceNumber = rolloutTrailer.sequenceNumber; // #cleanup instead of sv's sequence number?
                         sv.attributes = new HashMap<Strings, Strings>();
+
+                        if (rolloutTrailer.supplementalInfos != null) {
+                            Iterator<TrailerInfo> it = rolloutTrailer.supplementalInfos.values().iterator();
+                            if (it.hasNext()) {
+                                sv.seasonNumber = it.next().seasonNumber;
+                            }
+                        }
 
                         SingleValuePassthroughMapHollow singleValPassthrough = indivTrailerHollow._getPassthrough()._getSingleValues();
                         for (Map.Entry<MapKeyHollow, StringHollow> entry : singleValPassthrough.entrySet()) {
