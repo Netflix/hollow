@@ -4,7 +4,9 @@ import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.IndividualTrailerHollow;
+import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
 import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
+import com.netflix.vms.transformer.hollowinput.MultiValuePassthroughMapHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkSourceFileIdHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkSourceFileIdListHollow;
@@ -96,12 +98,13 @@ public class RolloutVideoModule extends AbstractTransformModule {
                 if (summary == null) {
                     summary = new RolloutSummary();
                     summary.rolloutInfoMap = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, RolloutInfo>();
-                    summary.type = rollout._getRolloutType()._getValue().toCharArray();
-                    summary.video = output.video;
                     summary.rolloutInfoMap = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, RolloutInfo>();
-                    summaryMap.put(rolloutType, summary);
                     summary.allPhases = new ArrayList<Phase>();
                     summary.phaseWindowMap = new HashMap<ISOCountry, List<RolloutPhaseWindow>>();
+
+                    summary.type = rollout._getRolloutType()._getValue().toCharArray();
+                    summary.video = output.video;
+                    summaryMap.put(rolloutType, summary);
                 }
 
                 RolloutInfo info = new RolloutInfo();
@@ -187,6 +190,16 @@ public class RolloutVideoModule extends AbstractTransformModule {
                         phaseWindowList.add(phaseWindow);
                     }
 
+                    // Sort phaseWindows
+                    for (ISOCountry country : summary.phaseWindowMap.keySet()) {
+                        List<RolloutPhaseWindow> phaseWindowList = summary.phaseWindowMap.get(country);
+                        Collections.sort(phaseWindowList, new RolloutPhaseWindowComparator());
+                        int index = 0;
+                        for (RolloutPhaseWindow window : phaseWindowList) {
+                            window.phaseOrdinal = ++index;
+                        }
+                    }
+
                     phase.rawL10nAttribs = new HashMap<Strings, Strings>();
                     RolloutPhaseElementsHollow phaseElements = phaseHollow._getElements();
                     RolloutPhaseLocalizedMetadataHollow localized = phaseElements._getLocalized_metadata();
@@ -217,6 +230,17 @@ public class RolloutVideoModule extends AbstractTransformModule {
                         sv.attributes.put(new Strings("type"), new Strings("trailer"));
                         sv.attributes.put(new Strings("identifier"), new Strings(indivTrailerHollow._getIdentifier()._getValue()));
                         phase.supplementalVideos.add(sv);
+
+                        sv.multiValueAttributes = new HashMap<Strings, List<Strings>>();
+                        MultiValuePassthroughMapHollow multiValPassthrough = indivTrailerHollow._getPassthrough()._getMultiValues();
+                        for (Map.Entry<MapKeyHollow, ListOfStringHollow> entry : multiValPassthrough.entrySet()) {
+                            List<Strings> vals = new ArrayList<>();
+                            for (StringHollow val : entry.getValue()) {
+                                vals.add(new Strings(val._getValue()));
+                            }
+                            sv.multiValueAttributes.put(new Strings(entry.getKey()._getValue()), vals);
+                        }
+
                     }
                     Collections.sort(phase.supplementalVideos, new SupplementalVideoComparator());
                     summary.allPhases.add(phase);
