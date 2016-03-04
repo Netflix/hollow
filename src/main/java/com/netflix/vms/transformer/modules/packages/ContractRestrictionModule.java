@@ -29,7 +29,6 @@ import com.netflix.vms.transformer.hollowoutput.LanguageRestrictions;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -114,68 +113,15 @@ public class ContractRestrictionModule {
                 restriction.languageBcp47RestrictionsMap = new HashMap<Strings, LanguageRestrictions>();
                 restriction.excludedDownloadables = new HashSet<com.netflix.vms.transformer.hollowoutput.Long>();
 
-                VideoRightsContractHollow selectedContract = null;
-
                 assetTypeIdx.resetMarks();
 
-                for(VideoRightsContractHollow contract : contracts) {
-                    if(contractIds.contains((int) contract._getContractId()) && contractIsApplicableForPackage(contract, packages._getPackageId())) {
+                List<VideoRightsContractHollow> applicableContracts = filterToApplicableContracts(packages, contracts, contractIds);
 
-                        if(selectedContract == null || contract._getContractId() > selectedContract._getContractId())
-                            selectedContract = contract;
-
-                        List<DisallowedAssetBundleHollow> disallowedAssetBundles = contract._getDisallowedAssetBundles();
-                        for(DisallowedAssetBundleHollow disallowedAssetBundle : disallowedAssetBundles) {
-                            LanguageRestrictions langRestriction = new LanguageRestrictions();
-                            String audioLangStr = disallowedAssetBundle._getAudioLanguageCode()._getValue();
-                            Strings audioLanguage = getBcp47Code(audioLangStr);
-                            langRestriction.audioLanguage = audioLanguage;
-                            langRestriction.audioLanguageId = getBcp47CodeId(audioLangStr);
-                            langRestriction.requiresForcedSubtitles = disallowedAssetBundle._getForceSubtitle();
-
-                            Set<Integer> disallowedTimedTextIds = new HashSet<Integer>();
-                            Set<Strings> disallowedTimedTextCodes = new HashSet<Strings>();
-                            List<DisallowedSubtitleLangCodeHollow> disallowedSubtitles = disallowedAssetBundle._getDisallowedSubtitleLangCodes();
-
-                            for(DisallowedSubtitleLangCodeHollow sub : disallowedSubtitles) {
-                                String subLang = sub._getValue()._getValue();
-                                disallowedTimedTextCodes.add(getBcp47Code(subLang));
-                                disallowedTimedTextIds.add(getBcp47CodeId(subLang));
-                            }
-
-                            langRestriction.disallowedTimedTextBcp47codes = disallowedTimedTextCodes;
-
-                            if(langRestriction.requiresForcedSubtitles || !disallowedTimedTextCodes.isEmpty())
-                                restriction.languageBcp47RestrictionsMap.put(audioLanguage, langRestriction);
-                        }
-
-                        for(VideoRightsContractAssetHollow asset : contract._getAssets()) {
-                            String contractAssetType = asset._getAssetType()._getValue();
-
-                            if(StreamContractAssetTypeDeterminer.CLOSEDCAPTIONING.equals(contractAssetType))
-                                contractAssetType = StreamContractAssetTypeDeterminer.SUBTITLES;
-                            if(StreamContractAssetTypeDeterminer.SECONDARY_AUDIO.equals(contractAssetType))
-                                contractAssetType = StreamContractAssetTypeDeterminer.PRIMARYVIDEO_AUDIOMUXED;
-
-                            assetTypeIdx.mark(new ContractAssetType(contractAssetType, asset._getBcp47Code()._getValue()));
-                        }
-                    }
-                }
-
-                if(selectedContract != null) {
-                    String cupToken = selectedContract._getCupToken()._getValue();
-                    CupKey cupKey = cupKeysMap.get(cupToken);
-                    if(cupKey == null) {
-                        cupKey = new CupKey(new Strings(cupToken));
-                        cupKeysMap.put(cupToken, cupKey);
-                    }
-                    restriction.cupKeys.add(cupKey);
-
-                    if(selectedContract._getPrePromotionDays() != Long.MIN_VALUE)
-                        restriction.prePromotionDays = (int)selectedContract._getPrePromotionDays();
-
-                    restriction.excludedDownloadables = assetTypeIdx.getAllUnmarked();
-
+                if(applicableContracts.size() > 0) {
+                    if(applicableContracts.size() == 1)
+                        buildRestrictionBasedOnSingleApplicableContract(assetTypeIdx, restriction, applicableContracts.get(0));
+                    else
+                        buildRestrictionBasedOnMultipleApplicableContracts(assetTypeIdx, restriction, applicableContracts);
                     contractRestrictions.add(restriction);
                 }
             }
@@ -189,6 +135,16 @@ public class ContractRestrictionModule {
         return restrictions;
     }
 
+    private List<VideoRightsContractHollow> filterToApplicableContracts(PackagesHollow packages, Set<VideoRightsContractHollow> contracts, Set<Integer> contractIds) {
+        List<VideoRightsContractHollow> applicableContracts = new ArrayList<VideoRightsContractHollow>(contracts.size());
+        for(VideoRightsContractHollow contract : contracts) {
+            if(contractIds.contains((int) contract._getContractId()) && contractIsApplicableForPackage(contract, packages._getPackageId())) {
+                applicableContracts.add(contract);
+            }
+        }
+        return applicableContracts;
+    }
+
     private boolean contractIsApplicableForPackage(VideoRightsContractHollow contract, long packageId) {
         if(contract._getPackageId() == packageId)
             return true;
@@ -199,6 +155,104 @@ public class ContractRestrictionModule {
         }
 
         return false;
+    }
+
+    private void buildRestrictionBasedOnMultipleApplicableContracts(DownloadableAssetTypeIndex assetTypeIdx, ContractRestriction restriction, List<VideoRightsContractHollow> applicableContracts) {
+        VideoRightsContractHollow selectedContract = null;
+
+        for(VideoRightsContractHollow contract : applicableContracts) {
+
+            if(selectedContract == null || contract._getContractId() > selectedContract._getContractId())
+                selectedContract = contract;
+
+            List<DisallowedAssetBundleHollow> disallowedAssetBundles = contract._getDisallowedAssetBundles();
+            for(DisallowedAssetBundleHollow disallowedAssetBundle : disallowedAssetBundles) {
+                LanguageRestrictions langRestriction = new LanguageRestrictions();
+                String audioLangStr = disallowedAssetBundle._getAudioLanguageCode()._getValue();
+                Strings audioLanguage = getBcp47Code(audioLangStr);
+                langRestriction.audioLanguage = audioLanguage;
+                langRestriction.audioLanguageId = getBcp47CodeId(audioLangStr);
+                langRestriction.requiresForcedSubtitles = disallowedAssetBundle._getForceSubtitle();
+
+                Set<Integer> disallowedTimedTextIds = new HashSet<Integer>();
+                Set<Strings> disallowedTimedTextCodes = new HashSet<Strings>();
+                List<DisallowedSubtitleLangCodeHollow> disallowedSubtitles = disallowedAssetBundle._getDisallowedSubtitleLangCodes();
+
+                for(DisallowedSubtitleLangCodeHollow sub : disallowedSubtitles) {
+                    String subLang = sub._getValue()._getValue();
+                    disallowedTimedTextCodes.add(getBcp47Code(subLang));
+                    disallowedTimedTextIds.add(getBcp47CodeId(subLang));
+                }
+
+                langRestriction.disallowedTimedTextBcp47codes = disallowedTimedTextCodes;
+
+                if(langRestriction.requiresForcedSubtitles || !disallowedTimedTextCodes.isEmpty())
+                    restriction.languageBcp47RestrictionsMap.put(audioLanguage, langRestriction);
+            }
+
+            markAssetTypeIndexForExcludedDownloadablesCalculation(assetTypeIdx, contract);
+        }
+
+        finalizeContractRestriction(assetTypeIdx, restriction, selectedContract);
+    }
+
+    private void buildRestrictionBasedOnSingleApplicableContract(DownloadableAssetTypeIndex assetTypeIdx, ContractRestriction restriction, VideoRightsContractHollow contract) {
+        List<DisallowedAssetBundleHollow> disallowedAssetBundles = contract._getDisallowedAssetBundles();
+        for(DisallowedAssetBundleHollow disallowedAssetBundle : disallowedAssetBundles) {
+            LanguageRestrictions langRestriction = new LanguageRestrictions();
+            String audioLangStr = disallowedAssetBundle._getAudioLanguageCode()._getValue();
+            Strings audioLanguage = getBcp47Code(audioLangStr);
+            langRestriction.audioLanguage = audioLanguage;
+            langRestriction.audioLanguageId = getBcp47CodeId(audioLangStr);
+            langRestriction.requiresForcedSubtitles = disallowedAssetBundle._getForceSubtitle();
+
+            Set<Integer> disallowedTimedTextIds = new HashSet<Integer>();
+            Set<Strings> disallowedTimedTextCodes = new HashSet<Strings>();
+            List<DisallowedSubtitleLangCodeHollow> disallowedSubtitles = disallowedAssetBundle._getDisallowedSubtitleLangCodes();
+
+            for(DisallowedSubtitleLangCodeHollow sub : disallowedSubtitles) {
+                String subLang = sub._getValue()._getValue();
+                disallowedTimedTextCodes.add(getBcp47Code(subLang));
+                disallowedTimedTextIds.add(getBcp47CodeId(subLang));
+            }
+
+            langRestriction.disallowedTimedTextBcp47codes = disallowedTimedTextCodes;
+
+            //if(langRestriction.requiresForcedSubtitles || !disallowedTimedTextCodes.isEmpty())
+            restriction.languageBcp47RestrictionsMap.put(audioLanguage, langRestriction);
+        }
+
+        markAssetTypeIndexForExcludedDownloadablesCalculation(assetTypeIdx, contract);
+
+        finalizeContractRestriction(assetTypeIdx, restriction, contract);
+    }
+
+    private void markAssetTypeIndexForExcludedDownloadablesCalculation(DownloadableAssetTypeIndex assetTypeIdx, VideoRightsContractHollow contract) {
+        for(VideoRightsContractAssetHollow asset : contract._getAssets()) {
+            String contractAssetType = asset._getAssetType()._getValue();
+
+            if(StreamContractAssetTypeDeterminer.CLOSEDCAPTIONING.equals(contractAssetType))
+                contractAssetType = StreamContractAssetTypeDeterminer.SUBTITLES;
+            if(StreamContractAssetTypeDeterminer.SECONDARY_AUDIO.equals(contractAssetType))
+                contractAssetType = StreamContractAssetTypeDeterminer.PRIMARYVIDEO_AUDIOMUXED;
+
+            assetTypeIdx.mark(new ContractAssetType(contractAssetType, asset._getBcp47Code()._getValue()));
+        }
+    }
+
+    private void finalizeContractRestriction(DownloadableAssetTypeIndex assetTypeIdx, ContractRestriction restriction, VideoRightsContractHollow selectedContract) {
+        String cupToken = selectedContract._getCupToken()._getValue();
+        CupKey cupKey = cupKeysMap.get(cupToken);
+        if(cupKey == null) {
+            cupKey = new CupKey(new Strings(cupToken));
+            cupKeysMap.put(cupToken, cupKey);
+        }
+        restriction.cupKeys.add(cupKey);
+
+        if(selectedContract._getPrePromotionDays() != Long.MIN_VALUE)
+            restriction.prePromotionDays = (int)selectedContract._getPrePromotionDays();
+
+        restriction.excludedDownloadables = assetTypeIdx.getAllUnmarked();
     }
 
     private String getLanguageForAsset(PackageStreamHollow stream, String assetType) {
