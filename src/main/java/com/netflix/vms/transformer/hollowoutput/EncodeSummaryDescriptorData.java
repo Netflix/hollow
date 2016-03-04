@@ -55,6 +55,21 @@ public class EncodeSummaryDescriptorData implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("EncodeSummaryDescriptorData{");
+        builder.append("assetType=").append(assetType);
+        builder.append(",timedTextType=").append(timedTextType);
+        builder.append(",audioLanguage=").append(audioLanguage);
+        builder.append(",textLanguage=").append(textLanguage);
+        builder.append(",isNative=").append(isNative);
+        builder.append(",encodingProfileId=").append(encodingProfileId);
+        builder.append(",isSubtitleBurnedIn=").append(isSubtitleBurnedIn);
+        builder.append(",isImageBasedSubtitles=").append(isImageBasedSubtitles);
+        builder.append(",assetMetaData=").append(assetMetaData);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public EncodeSummaryDescriptorData clone() {
         try {
             EncodeSummaryDescriptorData clone = (EncodeSummaryDescriptorData)super.clone();

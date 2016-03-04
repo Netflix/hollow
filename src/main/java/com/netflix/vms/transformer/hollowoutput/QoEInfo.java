@@ -24,6 +24,14 @@ public class QoEInfo implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("QoEInfo{");
+        builder.append("vmafScore=").append(vmafScore);
+        builder.append(",scaledPsnrScore=").append(scaledPsnrScore);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public QoEInfo clone() {
         try {
             QoEInfo clone = (QoEInfo)super.clone();

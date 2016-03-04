@@ -55,6 +55,21 @@ public class StreamData implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("StreamData{");
+        builder.append("downloadableId=").append(downloadableId);
+        builder.append(",packageId=").append(packageId);
+        builder.append(",fileSizeInBytes=").append(fileSizeInBytes);
+        builder.append(",creationTimeStampInSeconds=").append(creationTimeStampInSeconds);
+        builder.append(",drmData=").append(drmData);
+        builder.append(",hashData=").append(hashData);
+        builder.append(",additionalData=").append(additionalData);
+        builder.append(",downloadDescriptor=").append(downloadDescriptor);
+        builder.append(",streamDataDescriptor=").append(streamDataDescriptor);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public StreamData clone() {
         try {
             StreamData clone = (StreamData)super.clone();

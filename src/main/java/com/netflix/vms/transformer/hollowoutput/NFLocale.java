@@ -32,6 +32,13 @@ public class NFLocale implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("NFLocale{");
+        builder.append("value=").append(value);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public NFLocale clone() {
         try {
             NFLocale clone = (NFLocale)super.clone();

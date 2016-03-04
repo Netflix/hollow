@@ -51,6 +51,19 @@ public class DownloadDescriptor implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("DownloadDescriptor{");
+        builder.append("assetTypeDescriptor=").append(assetTypeDescriptor);
+        builder.append(",timedTextTypeDescriptor=").append(timedTextTypeDescriptor);
+        builder.append(",encodingProfileId=").append(encodingProfileId);
+        builder.append(",videoFormatDescriptor=").append(videoFormatDescriptor);
+        builder.append(",audioLanguageBcp47code=").append(audioLanguageBcp47code);
+        builder.append(",assetMetaData=").append(assetMetaData);
+        builder.append(",textLanguageBcp47code=").append(textLanguageBcp47code);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public DownloadDescriptor clone() {
         try {
             DownloadDescriptor clone = (DownloadDescriptor)super.clone();

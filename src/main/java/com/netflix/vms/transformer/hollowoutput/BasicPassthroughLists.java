@@ -30,6 +30,13 @@ public class BasicPassthroughLists implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("BasicPassthroughLists{");
+        builder.append("floatList=").append(floatList);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public BasicPassthroughLists clone() {
         try {
             BasicPassthroughLists clone = (BasicPassthroughLists)super.clone();

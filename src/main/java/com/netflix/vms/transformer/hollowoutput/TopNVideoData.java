@@ -31,6 +31,15 @@ public class TopNVideoData implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("TopNVideoData{");
+        builder.append("countryId=").append(countryId);
+        builder.append(",videoViewHrs1Day=").append(videoViewHrs1Day);
+        builder.append(",countryViewHrs1Day=").append(countryViewHrs1Day);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public TopNVideoData clone() {
         try {
             TopNVideoData clone = (TopNVideoData)super.clone();

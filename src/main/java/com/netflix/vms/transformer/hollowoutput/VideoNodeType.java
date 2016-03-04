@@ -32,6 +32,13 @@ public class VideoNodeType implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoNodeType{");
+        builder.append("value=").append(value);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VideoNodeType clone() {
         try {
             VideoNodeType clone = (VideoNodeType)super.clone();

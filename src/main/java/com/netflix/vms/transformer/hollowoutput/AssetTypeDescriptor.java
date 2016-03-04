@@ -31,6 +31,15 @@ public class AssetTypeDescriptor implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("AssetTypeDescriptor{");
+        builder.append("id=").append(id);
+        builder.append(",name=").append(name);
+        builder.append(",description=").append(description);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public AssetTypeDescriptor clone() {
         try {
             AssetTypeDescriptor clone = (AssetTypeDescriptor)super.clone();

@@ -30,6 +30,15 @@ public class MovieRatingReason implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("MovieRatingReason{");
+        builder.append("reasonIds=").append(reasonIds);
+        builder.append(",isDisplayImageOnly=").append(isDisplayImageOnly);
+        builder.append(",isDisplayOrderSpecific=").append(isDisplayOrderSpecific);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public MovieRatingReason clone() {
         try {
             MovieRatingReason clone = (MovieRatingReason)super.clone();

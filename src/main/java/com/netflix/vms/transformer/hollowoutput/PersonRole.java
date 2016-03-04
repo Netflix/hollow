@@ -36,6 +36,16 @@ public class PersonRole implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("PersonRole{");
+        builder.append("person=").append(person);
+        builder.append(",roleType=").append(roleType);
+        builder.append(",video=").append(video);
+        builder.append(",weight=").append(weight);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public PersonRole clone() {
         try {
             PersonRole clone = (PersonRole)super.clone();

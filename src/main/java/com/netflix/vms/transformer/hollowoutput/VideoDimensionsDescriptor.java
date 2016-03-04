@@ -31,6 +31,15 @@ public class VideoDimensionsDescriptor implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoDimensionsDescriptor{");
+        builder.append("dimensions=").append(dimensions);
+        builder.append(",name=").append(name);
+        builder.append(",description=").append(description);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VideoDimensionsDescriptor clone() {
         try {
             VideoDimensionsDescriptor clone = (VideoDimensionsDescriptor)super.clone();

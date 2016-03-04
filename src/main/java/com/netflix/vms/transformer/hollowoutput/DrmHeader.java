@@ -34,6 +34,16 @@ public class DrmHeader implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("DrmHeader{");
+        builder.append("drmSystemId=").append(drmSystemId);
+        builder.append(",keyId=").append(keyId);
+        builder.append(",checksum=").append(checksum);
+        builder.append(",attributes=").append(attributes);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public DrmHeader clone() {
         try {
             DrmHeader clone = (DrmHeader)super.clone();

@@ -40,6 +40,18 @@ public class VideoEpisode implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoEpisode{");
+        builder.append("seriesParent=").append(seriesParent);
+        builder.append(",deliverableVideo=").append(deliverableVideo);
+        builder.append(",sequenceNumber=").append(sequenceNumber);
+        builder.append(",showSequenceNumber=").append(showSequenceNumber);
+        builder.append(",seasonSequenceNumber=").append(seasonSequenceNumber);
+        builder.append(",episodeSequenceNumber=").append(episodeSequenceNumber);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VideoEpisode clone() {
         try {
             VideoEpisode clone = (VideoEpisode)super.clone();

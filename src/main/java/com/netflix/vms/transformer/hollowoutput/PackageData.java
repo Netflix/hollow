@@ -61,6 +61,21 @@ public class PackageData implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("PackageData{");
+        builder.append("id=").append(id);
+        builder.append(",video=").append(video);
+        builder.append(",contractRestrictions=").append(contractRestrictions);
+        builder.append(",streams=").append(streams);
+        builder.append(",isPrimaryPackage=").append(isPrimaryPackage);
+        builder.append(",audioStreamSummary=").append(audioStreamSummary);
+        builder.append(",textStreamSummary=").append(textStreamSummary);
+        builder.append(",muxAudioStreamSummary=").append(muxAudioStreamSummary);
+        builder.append(",allDeployableCountries=").append(allDeployableCountries);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public PackageData clone() {
         try {
             PackageData clone = (PackageData)super.clone();

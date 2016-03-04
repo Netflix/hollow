@@ -27,6 +27,13 @@ public class VRole implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VRole{");
+        builder.append("id=").append(id);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VRole clone() {
         try {
             VRole clone = (VRole)super.clone();

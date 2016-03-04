@@ -1,7 +1,8 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.vms.transformer.modules.packages.PackageDataModule;
+import com.netflix.vms.transformer.util.VMSTransformerHashCodeFinder;
 
+import com.netflix.vms.transformer.modules.packages.PackageDataModule;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
@@ -21,6 +22,8 @@ import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.misc.TopNVideoDataModule;
 import com.netflix.vms.transformer.misc.VideoEpisodeCountryDecoratorModule;
 import com.netflix.vms.transformer.modules.TransformModule;
+import com.netflix.vms.transformer.modules.artwork.CharacterImagesModule;
+import com.netflix.vms.transformer.modules.artwork.PersonImagesModule;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHierarchy;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
 import com.netflix.vms.transformer.modules.deploymentintent.CacheDeploymentIntentModule;
@@ -37,6 +40,7 @@ import com.netflix.vms.transformer.modules.passthrough.artwork.DefaultExtensionR
 import com.netflix.vms.transformer.modules.passthrough.beehive.RolloutCharacterModule;
 import com.netflix.vms.transformer.modules.passthrough.mpl.EncodingProfileGroupModule;
 import com.netflix.vms.transformer.modules.person.GlobalPersonModule;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +66,7 @@ public class SimpleTransformer {
 
         final ShowHierarchyInitializer hierarchyInitializer = new ShowHierarchyInitializer(api, indexer);
 
-        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();  //TODO: Need to define a HashCodeFinder.
+        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine(new VMSTransformerHashCodeFinder());
         final HollowObjectMapper objectMapper = new HollowObjectMapper(writeStateEngine);
 
         SimultaneousExecutor executor = new SimultaneousExecutor();
@@ -104,7 +108,7 @@ public class SimpleTransformer {
         }
 
         objectMapper.addObject(new DeploymentIntent());
-
+        
         // Register Transform Modules
         List<TransformModule> moduleList = Arrays.<TransformModule>asList(
                 new DrmSystemModule(api, objectMapper),
@@ -113,12 +117,15 @@ public class SimpleTransformer {
                 new ArtworkFormatModule(api, objectMapper),
                 new CacheDeploymentIntentModule(api, objectMapper),
                 new ArtworkTypeModule(api, objectMapper),
+                
                 new ArtworkImageRecipeModule(api, objectMapper),
                 new DefaultExtensionRecipeModule(api, objectMapper),
                 new RolloutCharacterModule(api, objectMapper),
                 new EncodingProfileGroupModule(api, objectMapper),
                 new GlobalPersonModule(api, objectMapper, indexer),
-                new TopNVideoDataModule(api, objectMapper)
+                new TopNVideoDataModule(api, objectMapper),
+                new PersonImagesModule(api, objectMapper, indexer),
+                new CharacterImagesModule(api, objectMapper, indexer)
                 );
 
 
@@ -194,59 +201,48 @@ public class SimpleTransformer {
             String countryId = countryHierarchyEntry.getKey();
             ISOCountry country = getCountry(countryId);
             VideoCollectionsDataHierarchy hierarchy = countryHierarchyEntry.getValue();
+            VideoCollectionsData videoCollectionsData = hierarchy.getTopNode();
 
-            CompleteVideo topNode = new CompleteVideo();
-            topNode.country = country;
-            topNode.facetData = new CompleteVideoFacetData();
-            topNode.facetData.videoCollectionsData = hierarchy.getTopNode();
-            topNode.id = topNode.facetData.videoCollectionsData.topNode;
-            topNode.facetData.videoMetaData = vmdByCountry.get(countryId).get(topNode.id.value);
-            topNode.facetData.videoMediaData = mediaDataByCountry.get(countryId).get(topNode.id.value);
-            topNode.facetData.videoMiscData = miscData.get(topNode.id.value);
-
-            objectMapper.addObject(topNode);
+            CompleteVideo topNode = addCompleteVideo(vmdByCountry, miscData, mediaDataByCountry,
+                    objectMapper, country, countryId, videoCollectionsData, hierarchy.getTopNode().topNode);
 
             if(topNode.facetData.videoCollectionsData.nodeType == VideoCollectionsDataHierarchy.SHOW) {
                 int sequenceNumber = 0;
 
                 for(Map.Entry<Integer, VideoCollectionsData> showEntry : hierarchy.getOrderedSeasons().entrySet()) {
-                    CompleteVideo showNode = new CompleteVideo();
-                    showNode.country = country;
-                    showNode.id = new Video(showEntry.getKey().intValue());
-                    showNode.facetData = new CompleteVideoFacetData();
-                    showNode.facetData.videoCollectionsData = showEntry.getValue();
-                    showNode.facetData.videoMetaData = vmdByCountry.get(countryId).get(showNode.id.value);
-                    showNode.facetData.videoMediaData = mediaDataByCountry.get(countryId).get(showNode.id.value);
-                    showNode.facetData.videoMiscData = miscData.get(showNode.id.value);
-
-                    objectMapper.addObject(showNode);
-
+                    addCompleteVideo(vmdByCountry, miscData, mediaDataByCountry,
+                            objectMapper, country, countryId, showEntry.getValue(), new Video(showEntry.getKey().intValue()));
+                    
                     for(Map.Entry<Integer, VideoCollectionsData> episodeEntry : hierarchy.getOrderedSeasonEpisodes(++sequenceNumber).entrySet()) {
-                        CompleteVideo episodeNode = new CompleteVideo();
-                        episodeNode.country = country;
-                        episodeNode.id = new Video(episodeEntry.getKey().intValue());
-                        episodeNode.facetData = new CompleteVideoFacetData();
-                        episodeNode.facetData.videoCollectionsData = episodeEntry.getValue();
-                        episodeNode.facetData.videoMetaData = vmdByCountry.get(countryId).get(episodeNode.id.value);
-                        episodeNode.facetData.videoMediaData = mediaDataByCountry.get(countryId).get(episodeNode.id.value);
-                        episodeNode.facetData.videoMiscData = miscData.get(episodeNode.id.value);
-                        objectMapper.addObject(episodeNode);
+                        addCompleteVideo(vmdByCountry, miscData, mediaDataByCountry,
+                                objectMapper, country, countryId, episodeEntry.getValue(), new Video(episodeEntry.getKey().intValue()));
                     }
                 }
             }
 
             for(Map.Entry<Integer, VideoCollectionsData> supplementalEntry : hierarchy.getSupplementalVideosCollectionsData().entrySet()) {
-                CompleteVideo supplementalNode = new CompleteVideo();
-                supplementalNode.country = country;
-                supplementalNode.id = new Video(supplementalEntry.getKey().intValue());
-                supplementalNode.facetData = new CompleteVideoFacetData();
-                supplementalNode.facetData.videoCollectionsData = supplementalEntry.getValue();
-                supplementalNode.facetData.videoMetaData = vmdByCountry.get(countryId).get(supplementalNode.id.value);
-                supplementalNode.facetData.videoMediaData = mediaDataByCountry.get(countryId).get(supplementalNode.id.value);
-
-                objectMapper.addObject(supplementalNode);
+                addCompleteVideo(vmdByCountry, miscData, mediaDataByCountry,
+                        objectMapper, country, countryId, supplementalEntry.getValue(), new Video(supplementalEntry.getKey().intValue()));
             }
         }
+    }
+
+    private CompleteVideo addCompleteVideo(
+            Map<String, Map<Integer, VideoMetaData>> vmdByCountry,
+            Map<Integer, VideoMiscData> miscData,
+            Map<String, Map<Integer, VideoMediaData>> mediaDataByCountry,
+            HollowObjectMapper objectMapper, ISOCountry country, String countryId,
+            VideoCollectionsData videoCollectionsData, Video video) {
+        CompleteVideo completeVideo = new CompleteVideo();
+        completeVideo.id = video;
+        completeVideo.country = country;
+        completeVideo.facetData = new CompleteVideoFacetData();
+        completeVideo.facetData.videoCollectionsData = videoCollectionsData;
+        completeVideo.facetData.videoMetaData = vmdByCountry.get(countryId).get(completeVideo.id.value);
+        completeVideo.facetData.videoMediaData = mediaDataByCountry.get(countryId).get(completeVideo.id.value);
+        completeVideo.facetData.videoMiscData = miscData.get(completeVideo.id.value);
+        objectMapper.addObject(completeVideo);
+        return completeVideo;
     }
 
     private Map<String, ISOCountry> countries = new HashMap<String, ISOCountry>();

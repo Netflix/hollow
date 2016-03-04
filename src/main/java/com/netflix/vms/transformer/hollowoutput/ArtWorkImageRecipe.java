@@ -31,6 +31,16 @@ public class ArtWorkImageRecipe implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ArtWorkImageRecipe{");
+        builder.append("recipeNameStr=").append(recipeNameStr);
+        builder.append(",extensionStr=").append(extensionStr);
+        builder.append(",cdnFolderStr=").append(cdnFolderStr);
+        builder.append(",hostNameStr=").append(hostNameStr);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public ArtWorkImageRecipe clone() {
         try {
             ArtWorkImageRecipe clone = (ArtWorkImageRecipe)super.clone();

@@ -31,6 +31,15 @@ public class VideoFormatDescriptor implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoFormatDescriptor{");
+        builder.append("id=").append(id);
+        builder.append(",name=").append(name);
+        builder.append(",description=").append(description);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VideoFormatDescriptor clone() {
         try {
             VideoFormatDescriptor clone = (VideoFormatDescriptor)super.clone();

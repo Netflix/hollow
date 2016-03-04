@@ -47,6 +47,18 @@ public class ContractRestriction implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ContractRestriction{");
+        builder.append("excludedDownloadables=").append(excludedDownloadables);
+        builder.append(",availabilityWindow=").append(availabilityWindow);
+        builder.append(",cupKeys=").append(cupKeys);
+        builder.append(",prePromotionDays=").append(prePromotionDays);
+        builder.append(",postPromotionDays=").append(postPromotionDays);
+        builder.append(",languageBcp47RestrictionsMap=").append(languageBcp47RestrictionsMap);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public ContractRestriction clone() {
         try {
             ContractRestriction clone = (ContractRestriction)super.clone();

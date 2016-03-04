@@ -28,6 +28,14 @@ public class WindowPackageContractInfo implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("WindowPackageContractInfo{");
+        builder.append("videoContractInfo=").append(videoContractInfo);
+        builder.append(",videoPackageInfo=").append(videoPackageInfo);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public WindowPackageContractInfo clone() {
         try {
             WindowPackageContractInfo clone = (WindowPackageContractInfo)super.clone();

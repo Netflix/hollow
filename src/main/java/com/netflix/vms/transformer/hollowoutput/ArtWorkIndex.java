@@ -30,6 +30,13 @@ public class ArtWorkIndex implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ArtWorkIndex{");
+        builder.append("index=").append(index);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public ArtWorkIndex clone() {
         try {
             ArtWorkIndex clone = (ArtWorkIndex)super.clone();

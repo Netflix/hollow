@@ -27,6 +27,13 @@ public class Float implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("Float{");
+        builder.append("val=").append(val);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public Float clone() {
         try {
             Float clone = (Float)super.clone();

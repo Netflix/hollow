@@ -29,6 +29,13 @@ public class AssetMetaData implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("AssetMetaData{");
+        builder.append("id=").append(id);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public AssetMetaData clone() {
         try {
             AssetMetaData clone = (AssetMetaData)super.clone();

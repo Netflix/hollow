@@ -54,6 +54,23 @@ public class TrailerInfo implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("TrailerInfo{");
+        builder.append("type=").append(type);
+        builder.append(",imageTag=").append(imageTag);
+        builder.append(",imageBackgroundTone=").append(imageBackgroundTone);
+        builder.append(",mapIndex=").append(mapIndex);
+        builder.append(",seasonNumber=").append(seasonNumber);
+        builder.append(",subtitleLocale=").append(subtitleLocale);
+        builder.append(",video=").append(video);
+        builder.append(",videoLength=").append(videoLength);
+        builder.append(",videoOffset=").append(videoOffset);
+        builder.append(",videoValue=").append(videoValue);
+        builder.append(",priority=").append(priority);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public TrailerInfo clone() {
         try {
             TrailerInfo clone = (TrailerInfo)super.clone();

@@ -27,6 +27,13 @@ public class SuperFloat implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("SuperFloat{");
+        builder.append("value=").append(value);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public SuperFloat clone() {
         try {
             SuperFloat clone = (SuperFloat)super.clone();

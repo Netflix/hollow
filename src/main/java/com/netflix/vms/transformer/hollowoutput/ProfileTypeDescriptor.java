@@ -31,6 +31,15 @@ public class ProfileTypeDescriptor implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ProfileTypeDescriptor{");
+        builder.append("id=").append(id);
+        builder.append(",name=").append(name);
+        builder.append(",description=").append(description);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public ProfileTypeDescriptor clone() {
         try {
             ProfileTypeDescriptor clone = (ProfileTypeDescriptor)super.clone();

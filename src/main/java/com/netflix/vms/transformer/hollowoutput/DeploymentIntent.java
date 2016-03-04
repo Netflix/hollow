@@ -29,6 +29,15 @@ public class DeploymentIntent implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("DeploymentIntent{");
+        builder.append("profileId=").append(profileId);
+        builder.append(",bitrate=").append(bitrate);
+        builder.append(",country=").append(country);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public DeploymentIntent clone() {
         try {
             DeploymentIntent clone = (DeploymentIntent)super.clone();

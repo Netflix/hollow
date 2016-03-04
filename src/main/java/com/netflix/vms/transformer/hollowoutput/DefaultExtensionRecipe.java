@@ -25,6 +25,14 @@ public class DefaultExtensionRecipe implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("DefaultExtensionRecipe{");
+        builder.append("extensionStr=").append(extensionStr);
+        builder.append(",recipeNameStr=").append(recipeNameStr);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public DefaultExtensionRecipe clone() {
         try {
             DefaultExtensionRecipe clone = (DefaultExtensionRecipe)super.clone();

@@ -81,6 +81,25 @@ public class Phase implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("Phase{");
+        builder.append("rolloutId=").append(rolloutId);
+        builder.append(",video=").append(video);
+        builder.append(",name=").append(name);
+        builder.append(",isCoreMetaDataShown=").append(isCoreMetaDataShown);
+        builder.append(",projectedLaunchDates=").append(projectedLaunchDates);
+        builder.append(",windowsMap=").append(windowsMap);
+        builder.append(",rawL10nAttribs=").append(rawL10nAttribs);
+        builder.append(",trailers=").append(trailers);
+        builder.append(",casts=").append(casts);
+        builder.append(",roles=").append(roles);
+        builder.append(",supplementalVideos=").append(supplementalVideos);
+        builder.append(",artWorkImageIds=").append(artWorkImageIds);
+        builder.append(",sourceFileIds=").append(sourceFileIds);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public Phase clone() {
         try {
             Phase clone = (Phase)super.clone();

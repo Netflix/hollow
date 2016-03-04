@@ -27,6 +27,13 @@ public class FrameRate implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("FrameRate{");
+        builder.append("val=").append(val);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public FrameRate clone() {
         try {
             FrameRate clone = (FrameRate)super.clone();

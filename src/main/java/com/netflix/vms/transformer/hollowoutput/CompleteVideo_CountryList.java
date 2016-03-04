@@ -28,6 +28,14 @@ public class CompleteVideo_CountryList implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("CompleteVideo_CountryList{");
+        builder.append("country=").append(country);
+        builder.append(",item=").append(item);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public CompleteVideo_CountryList clone() {
         try {
             CompleteVideo_CountryList clone = (CompleteVideo_CountryList)super.clone();

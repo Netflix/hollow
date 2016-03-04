@@ -32,6 +32,15 @@ public class GlobalPerson implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("GlobalPerson{");
+        builder.append("id=").append(id);
+        builder.append(",aliasesIds=").append(aliasesIds);
+        builder.append(",personRoles=").append(personRoles);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public GlobalPerson clone() {
         try {
             GlobalPerson clone = (GlobalPerson)super.clone();

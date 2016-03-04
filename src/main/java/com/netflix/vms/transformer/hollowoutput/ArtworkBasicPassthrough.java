@@ -62,6 +62,21 @@ public class ArtworkBasicPassthrough implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ArtworkBasicPassthrough{");
+        builder.append("themes=").append(themes);
+        builder.append(",tone=").append(tone);
+        builder.append(",awardCampaigns=").append(awardCampaigns);
+        builder.append(",group_id=").append(group_id);
+        builder.append(",lists=").append(lists);
+        builder.append(",design_attribute=").append(design_attribute);
+        builder.append(",focal_point=").append(focal_point);
+        builder.append(",approval_source=").append(approval_source);
+        builder.append(",approval_state=").append(approval_state);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public ArtworkBasicPassthrough clone() {
         try {
             ArtworkBasicPassthrough clone = (ArtworkBasicPassthrough)super.clone();
