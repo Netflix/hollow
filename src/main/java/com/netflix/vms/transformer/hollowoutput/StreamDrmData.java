@@ -28,6 +28,14 @@ public class StreamDrmData implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("StreamDrmData{");
+        builder.append("drmKey=").append(drmKey);
+        builder.append(",wmDrmKey=").append(wmDrmKey);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public StreamDrmData clone() {
         try {
             StreamDrmData clone = (StreamDrmData)super.clone();

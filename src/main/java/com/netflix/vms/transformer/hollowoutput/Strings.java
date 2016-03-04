@@ -32,6 +32,13 @@ public class Strings implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("Strings{");
+        builder.append("value=").append(value);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public Strings clone() {
         try {
             Strings clone = (Strings)super.clone();

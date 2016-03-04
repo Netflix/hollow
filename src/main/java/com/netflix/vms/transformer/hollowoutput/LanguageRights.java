@@ -37,6 +37,16 @@ public class LanguageRights implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("LanguageRights{");
+        builder.append("contractId=").append(contractId);
+        builder.append(",videoId=").append(videoId);
+        builder.append(",languageRestrictionsMap=").append(languageRestrictionsMap);
+        builder.append(",fallbackRestrictionsMap=").append(fallbackRestrictionsMap);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public LanguageRights clone() {
         try {
             LanguageRights clone = (LanguageRights)super.clone();

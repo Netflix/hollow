@@ -46,6 +46,18 @@ public class SupplementalVideo implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("SupplementalVideo{");
+        builder.append("id=").append(id);
+        builder.append(",parent=").append(parent);
+        builder.append(",sequenceNumber=").append(sequenceNumber);
+        builder.append(",seasonNumber=").append(seasonNumber);
+        builder.append(",attributes=").append(attributes);
+        builder.append(",multiValueAttributes=").append(multiValueAttributes);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public SupplementalVideo clone() {
         try {
             SupplementalVideo clone = (SupplementalVideo)super.clone();

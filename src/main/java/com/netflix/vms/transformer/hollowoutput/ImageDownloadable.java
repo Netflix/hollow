@@ -32,6 +32,15 @@ public class ImageDownloadable implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ImageDownloadable{");
+        builder.append("downloadableId=").append(downloadableId);
+        builder.append(",originServerNames=").append(originServerNames);
+        builder.append(",descriptor=").append(descriptor);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public ImageDownloadable clone() {
         try {
             ImageDownloadable clone = (ImageDownloadable)super.clone();

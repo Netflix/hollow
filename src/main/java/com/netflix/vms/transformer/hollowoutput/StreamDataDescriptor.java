@@ -53,6 +53,20 @@ public class StreamDataDescriptor implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("StreamDataDescriptor{");
+        builder.append("runTimeInSeconds=").append(runTimeInSeconds);
+        builder.append(",bitrate=").append(bitrate);
+        builder.append(",pixelAspect=").append(pixelAspect);
+        builder.append(",videoResolution=").append(videoResolution);
+        builder.append(",cacheDeployedCountries=").append(cacheDeployedCountries);
+        builder.append(",videoMoment=").append(videoMoment);
+        builder.append(",imageCount=").append(imageCount);
+        builder.append(",targetDimensions=").append(targetDimensions);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public StreamDataDescriptor clone() {
         try {
             StreamDataDescriptor clone = (StreamDataDescriptor)super.clone();

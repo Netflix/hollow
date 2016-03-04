@@ -31,6 +31,15 @@ public class Hook implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("Hook{");
+        builder.append("type=").append(type);
+        builder.append(",rank=").append(rank);
+        builder.append(",video=").append(video);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public Hook clone() {
         try {
             Hook clone = (Hook)super.clone();

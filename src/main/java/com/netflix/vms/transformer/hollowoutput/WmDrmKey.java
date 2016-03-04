@@ -31,6 +31,15 @@ public class WmDrmKey implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("WmDrmKey{");
+        builder.append("downloadableId=").append(downloadableId);
+        builder.append(",contentPackagerPublicKey=").append(contentPackagerPublicKey);
+        builder.append(",encryptedContentKey=").append(encryptedContentKey);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public WmDrmKey clone() {
         try {
             WmDrmKey clone = (WmDrmKey)super.clone();

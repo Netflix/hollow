@@ -40,6 +40,17 @@ public class ImageDownloadableDescriptor implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ImageDownloadableDescriptor{");
+        builder.append("streamProfileId=").append(streamProfileId);
+        builder.append(",videoResolution=").append(videoResolution);
+        builder.append(",targetDimensions=").append(targetDimensions);
+        builder.append(",videoFormat=").append(videoFormat);
+        builder.append(",envBasedDirectory=").append(envBasedDirectory);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public ImageDownloadableDescriptor clone() {
         try {
             ImageDownloadableDescriptor clone = (ImageDownloadableDescriptor)super.clone();

@@ -28,6 +28,14 @@ public class NamedCollectionHolder_CountryList implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("NamedCollectionHolder_CountryList{");
+        builder.append("country=").append(country);
+        builder.append(",item=").append(item);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public NamedCollectionHolder_CountryList clone() {
         try {
             NamedCollectionHolder_CountryList clone = (NamedCollectionHolder_CountryList)super.clone();

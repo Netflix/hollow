@@ -37,6 +37,17 @@ public class MovieCertification implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("MovieCertification{");
+        builder.append("videoId=").append(videoId);
+        builder.append(",certificationSystemId=").append(certificationSystemId);
+        builder.append(",ratingId=").append(ratingId);
+        builder.append(",maturityLevel=").append(maturityLevel);
+        builder.append(",ratingReason=").append(ratingReason);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public MovieCertification clone() {
         try {
             MovieCertification clone = (MovieCertification)super.clone();

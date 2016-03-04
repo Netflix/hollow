@@ -42,6 +42,18 @@ public class VideoAward implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoAward{");
+        builder.append("video=").append(video);
+        builder.append(",awardType=").append(awardType);
+        builder.append(",person=").append(person);
+        builder.append(",isWinner=").append(isWinner);
+        builder.append(",year=").append(year);
+        builder.append(",sequenceNumber=").append(sequenceNumber);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VideoAward clone() {
         try {
             VideoAward clone = (VideoAward)super.clone();

@@ -74,6 +74,23 @@ public class VideoCollectionsData implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoCollectionsData{");
+        builder.append("nodeType=").append(nodeType);
+        builder.append(",topNodeType=").append(topNodeType);
+        builder.append(",videoEpisodes=").append(videoEpisodes);
+        builder.append(",showChildren=").append(showChildren);
+        builder.append(",seasonChildren=").append(seasonChildren);
+        builder.append(",supplementalVideoParents=").append(supplementalVideoParents);
+        builder.append(",supplementalVideos=").append(supplementalVideos);
+        builder.append(",showParent=").append(showParent);
+        builder.append(",seasonParent=").append(seasonParent);
+        builder.append(",topNode=").append(topNode);
+        builder.append(",episodesForSeasonSequenceNumberMap=").append(episodesForSeasonSequenceNumberMap);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VideoCollectionsData clone() {
         try {
             VideoCollectionsData clone = (VideoCollectionsData)super.clone();

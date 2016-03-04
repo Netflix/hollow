@@ -32,6 +32,13 @@ public class SupplementalInfoType implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("SupplementalInfoType{");
+        builder.append("value=").append(value);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public SupplementalInfoType clone() {
         try {
             SupplementalInfoType clone = (SupplementalInfoType)super.clone();

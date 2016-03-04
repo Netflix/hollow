@@ -29,6 +29,14 @@ public class VideoPackageData implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoPackageData{");
+        builder.append("videoId=").append(videoId);
+        builder.append(",packages=").append(packages);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VideoPackageData clone() {
         try {
             VideoPackageData clone = (VideoPackageData)super.clone();

@@ -29,6 +29,14 @@ public class VideoMiscData implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoMiscData{");
+        builder.append("videoAwards=").append(videoAwards);
+        builder.append(",cSMReview=").append(cSMReview);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VideoMiscData clone() {
         try {
             VideoMiscData clone = (VideoMiscData)super.clone();

@@ -65,6 +65,22 @@ public class VideoPackageInfo implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoPackageInfo{");
+        builder.append("packageId=").append(packageId);
+        builder.append(",formats=").append(formats);
+        builder.append(",isAvailableIn3D=").append(isAvailableIn3D);
+        builder.append(",runtimeInSeconds=").append(runtimeInSeconds);
+        builder.append(",soundTypes=").append(soundTypes);
+        builder.append(",screenFormats=").append(screenFormats);
+        builder.append(",phoneSnacks=").append(phoneSnacks);
+        builder.append(",stillImagesMap=").append(stillImagesMap);
+        builder.append(",videoClipMap=").append(videoClipMap);
+        builder.append(",trickPlayMap=").append(trickPlayMap);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VideoPackageInfo clone() {
         try {
             VideoPackageInfo clone = (VideoPackageInfo)super.clone();

@@ -33,6 +33,13 @@ public class SortedMapOfIntegerToListOfVideoEpisode implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("SortedMapOfIntegerToListOfVideoEpisode{");
+        builder.append("map=").append(map);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public SortedMapOfIntegerToListOfVideoEpisode clone() {
         try {
             SortedMapOfIntegerToListOfVideoEpisode clone = (SortedMapOfIntegerToListOfVideoEpisode)super.clone();

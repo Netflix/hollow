@@ -43,6 +43,17 @@ public class CompleteVideoFacetData implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("CompleteVideoFacetData{");
+        builder.append("videoMetaData=").append(videoMetaData);
+        builder.append(",videoCollectionsData=").append(videoCollectionsData);
+        builder.append(",videoMiscData=").append(videoMiscData);
+        builder.append(",videoImages=").append(videoImages);
+        builder.append(",videoMediaData=").append(videoMediaData);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public CompleteVideoFacetData clone() {
         try {
             CompleteVideoFacetData clone = (CompleteVideoFacetData)super.clone();

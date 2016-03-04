@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer;
 
+import com.netflix.vms.transformer.util.VMSTransformerHashCodeFinder;
+
 import com.netflix.vms.transformer.modules.packages.PackageDataModule;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
@@ -11,7 +13,6 @@ import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
 import com.netflix.vms.transformer.hollowoutput.DeploymentIntent;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
-import com.netflix.vms.transformer.hollowoutput.PersonImages;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
 import com.netflix.vms.transformer.hollowoutput.VideoMediaData;
@@ -65,7 +66,7 @@ public class SimpleTransformer {
 
         final ShowHierarchyInitializer hierarchyInitializer = new ShowHierarchyInitializer(api, indexer);
 
-        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();  //TODO: Need to define a HashCodeFinder.
+        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine(new VMSTransformerHashCodeFinder());
         final HollowObjectMapper objectMapper = new HollowObjectMapper(writeStateEngine);
 
         SimultaneousExecutor executor = new SimultaneousExecutor();
@@ -116,6 +117,7 @@ public class SimpleTransformer {
                 new ArtworkFormatModule(api, objectMapper),
                 new CacheDeploymentIntentModule(api, objectMapper),
                 new ArtworkTypeModule(api, objectMapper),
+                
                 new ArtworkImageRecipeModule(api, objectMapper),
                 new DefaultExtensionRecipeModule(api, objectMapper),
                 new RolloutCharacterModule(api, objectMapper),

@@ -32,6 +32,15 @@ public class OriginServer implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("OriginServer{");
+        builder.append("nameStr=").append(nameStr);
+        builder.append(",cdnData=").append(cdnData);
+        builder.append(",storageGroup=").append(storageGroup);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public OriginServer clone() {
         try {
             OriginServer clone = (OriginServer)super.clone();

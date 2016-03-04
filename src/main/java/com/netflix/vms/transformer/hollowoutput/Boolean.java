@@ -27,6 +27,13 @@ public class Boolean implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("Boolean{");
+        builder.append("val=").append(val);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public Boolean clone() {
         try {
             Boolean clone = (Boolean)super.clone();

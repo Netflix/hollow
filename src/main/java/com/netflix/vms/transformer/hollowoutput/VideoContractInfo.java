@@ -47,6 +47,20 @@ public class VideoContractInfo implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoContractInfo{");
+        builder.append("contractId=").append(contractId);
+        builder.append(",primaryPackageId=").append(primaryPackageId);
+        builder.append(",prePromotionDays=").append(prePromotionDays);
+        builder.append(",postPromotionDays=").append(postPromotionDays);
+        builder.append(",isDayAfterBroadcast=").append(isDayAfterBroadcast);
+        builder.append(",hasRollingEpisodes=").append(hasRollingEpisodes);
+        builder.append(",cupTokens=").append(cupTokens);
+        builder.append(",assetBcp47Codes=").append(assetBcp47Codes);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VideoContractInfo clone() {
         try {
             VideoContractInfo clone = (VideoContractInfo)super.clone();

@@ -28,6 +28,14 @@ public class StorageGroup implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("StorageGroup{");
+        builder.append("idStr=").append(idStr);
+        builder.append(",countries=").append(countries);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public StorageGroup clone() {
         try {
             StorageGroup clone = (StorageGroup)super.clone();

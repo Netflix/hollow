@@ -29,6 +29,13 @@ public class CupKey implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("CupKey{");
+        builder.append("token=").append(token);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public CupKey clone() {
         try {
             CupKey clone = (CupKey)super.clone();

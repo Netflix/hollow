@@ -27,6 +27,13 @@ public class Integer implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("Integer{");
+        builder.append("val=").append(val);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public Integer clone() {
         try {
             Integer clone = (Integer)super.clone();

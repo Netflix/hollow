@@ -32,6 +32,13 @@ public class LinkedHashSetOfStrings implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("LinkedHashSetOfStrings{");
+        builder.append("ordinals=").append(ordinals);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public LinkedHashSetOfStrings clone() {
         try {
             LinkedHashSetOfStrings clone = (LinkedHashSetOfStrings)super.clone();

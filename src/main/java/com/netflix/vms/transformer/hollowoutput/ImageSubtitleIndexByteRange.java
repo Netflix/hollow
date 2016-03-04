@@ -24,6 +24,14 @@ public class ImageSubtitleIndexByteRange implements Cloneable {
         return hashCode;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ImageSubtitleIndexByteRange{");
+        builder.append("masterIndexOffset=").append(masterIndexOffset);
+        builder.append(",masterIndexSize=").append(masterIndexSize);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public ImageSubtitleIndexByteRange clone() {
         try {
             ImageSubtitleIndexByteRange clone = (ImageSubtitleIndexByteRange)super.clone();
