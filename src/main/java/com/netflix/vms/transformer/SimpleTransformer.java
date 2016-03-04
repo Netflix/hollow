@@ -1,8 +1,5 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.vms.transformer.util.VMSTransformerHashCodeFinder;
-
-import com.netflix.vms.transformer.modules.packages.PackageDataModule;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
@@ -13,6 +10,7 @@ import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
 import com.netflix.vms.transformer.hollowoutput.DeploymentIntent;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
+import com.netflix.vms.transformer.hollowoutput.RolloutVideo;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
 import com.netflix.vms.transformer.hollowoutput.VideoMediaData;
@@ -33,6 +31,7 @@ import com.netflix.vms.transformer.modules.meta.VideoMiscDataModule;
 import com.netflix.vms.transformer.modules.mpl.DrmSystemModule;
 import com.netflix.vms.transformer.modules.mpl.EncodingProfileModule;
 import com.netflix.vms.transformer.modules.mpl.OriginServerModule;
+import com.netflix.vms.transformer.modules.packages.PackageDataModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkFormatModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkImageRecipeModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkTypeModule;
@@ -40,7 +39,8 @@ import com.netflix.vms.transformer.modules.passthrough.artwork.DefaultExtensionR
 import com.netflix.vms.transformer.modules.passthrough.beehive.RolloutCharacterModule;
 import com.netflix.vms.transformer.modules.passthrough.mpl.EncodingProfileGroupModule;
 import com.netflix.vms.transformer.modules.person.GlobalPersonModule;
-
+import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
+import com.netflix.vms.transformer.util.VMSTransformerHashCodeFinder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -108,7 +108,11 @@ public class SimpleTransformer {
         }
 
         objectMapper.addObject(new DeploymentIntent());
-        
+        RolloutVideo rolloutVideoForSpec = new RolloutVideo();
+        rolloutVideoForSpec.video = new Video(-1);
+        objectMapper.addObject(rolloutVideoForSpec);
+        // @formatter:off
+
         // Register Transform Modules
         List<TransformModule> moduleList = Arrays.<TransformModule>asList(
                 new DrmSystemModule(api, objectMapper),
@@ -121,6 +125,7 @@ public class SimpleTransformer {
                 new ArtworkImageRecipeModule(api, objectMapper),
                 new DefaultExtensionRecipeModule(api, objectMapper),
                 new RolloutCharacterModule(api, objectMapper),
+                new RolloutVideoModule(api, objectMapper, indexer),
                 new EncodingProfileGroupModule(api, objectMapper),
                 new GlobalPersonModule(api, objectMapper, indexer),
                 new TopNVideoDataModule(api, objectMapper),
@@ -128,7 +133,7 @@ public class SimpleTransformer {
                 new CharacterImagesModule(api, objectMapper, indexer)
                 );
 
-
+        // @formatter:on
         // Execute Transform Modules
         for(TransformModule m : moduleList) {
             long tStart = System.currentTimeMillis();

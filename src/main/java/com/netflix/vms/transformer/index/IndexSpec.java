@@ -31,8 +31,6 @@ public enum IndexSpec {
     ALL_VIDEO_RIGHTS(HASH, "VideoRights", "", "movieId"),
     ROLLOUT_VIDEO_TYPE(HASH, "Rollout", "", "movieId", "rolloutType.value");
 
-
-
     private final IndexType indexType;
     private final String parameters[];
 

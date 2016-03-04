@@ -52,6 +52,7 @@ public class ShowMeTheProgress {
         filter.addTypeRecursive("DeploymentIntent", outputSchemas);
         filter.addTypeRecursive("TopNVideoData", outputSchemas);
         filter.addTypeRecursive("RolloutCharacter", outputSchemas);
+        filter.addTypeRecursive("RolloutVideo", outputSchemas);
         filter.addTypeRecursive("EncodingProfileGroup", outputSchemas);
         filter.addTypeRecursive("GlobalPerson", outputSchemas);
         filter.addTypeRecursive("VideoEpisode_CountryList", outputSchemas);
