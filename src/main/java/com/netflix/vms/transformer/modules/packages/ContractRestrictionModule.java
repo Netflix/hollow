@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.packages;
 
+import java.util.Collections;
+import com.netflix.vms.transformer.hollowinput.DisallowedSubtitleLangCodesListHollow;
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
@@ -36,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/// Documentation of this logic available at: https://docs.google.com/document/d/15eGhbVPcEK_ARZA8OrtXpPAzrTalVqmZnKuzK_hrZAA/edit
 public class ContractRestrictionModule {
 
     private final HollowHashIndex videoRightsIdx;
@@ -45,7 +48,7 @@ public class ContractRestrictionModule {
 
     private final Map<String, CupKey> cupKeysMap;
     private final Map<String, Strings> bcp47Codes;
-    private final Map<String, Integer> bcp47Ids;
+    private final Map<String, com.netflix.vms.transformer.hollowoutput.Integer> bcp47Ids;
 
     private final StreamContractAssetTypeDeterminer assetTypeDeterminer;
 
@@ -55,7 +58,7 @@ public class ContractRestrictionModule {
         this.bcp47CodeIdx = indexer.getPrimaryKeyIndex(IndexSpec.BCP47_CODE);
         this.cupKeysMap = new HashMap<String, CupKey>();
         this.bcp47Codes = new HashMap<String, Strings>();
-        this.bcp47Ids = new HashMap<String, Integer>();
+        this.bcp47Ids = new HashMap<String, com.netflix.vms.transformer.hollowoutput.Integer>();
         this.assetTypeDeterminer = new StreamContractAssetTypeDeterminer(api, indexer);
     }
 
@@ -117,6 +120,9 @@ public class ContractRestrictionModule {
 
                 List<VideoRightsContractHollow> applicableContracts = filterToApplicableContracts(packages, contracts, contractIds);
 
+                if(packages._getPackageId() == 334836 && rights._getCountryCode()._isValueEqual("MQ"))
+                    System.out.println("asdf");
+
                 if(applicableContracts.size() > 0) {
                     if(applicableContracts.size() == 1)
                         buildRestrictionBasedOnSingleApplicableContract(assetTypeIdx, restriction, applicableContracts.get(0));
@@ -157,43 +163,149 @@ public class ContractRestrictionModule {
         return false;
     }
 
+    /// we need to merge both the allowed asset types (for excluded downloadable calculations) and the language bundle restrictions
+    /// the language bundle restrictions logic is complicated and broken down into steps indicated in the comments.
     private void buildRestrictionBasedOnMultipleApplicableContracts(DownloadableAssetTypeIndex assetTypeIdx, ContractRestriction restriction, List<VideoRightsContractHollow> applicableContracts) {
         VideoRightsContractHollow selectedContract = null;
 
+        /// Step 1: gather all of the audio languages which have language bundle restrictions
+        Set<String> audioLanguagesWithDisallowedAssetBundles = new HashSet<String>();
+        Set<String> audioLanguagesWhichRequireForcedSubtitles = new HashSet<String>();
         for(VideoRightsContractHollow contract : applicableContracts) {
-
+            //// for unmerged fields, select the contract with the highest ID.
             if(selectedContract == null || contract._getContractId() > selectedContract._getContractId())
                 selectedContract = contract;
 
-            List<DisallowedAssetBundleHollow> disallowedAssetBundles = contract._getDisallowedAssetBundles();
-            for(DisallowedAssetBundleHollow disallowedAssetBundle : disallowedAssetBundles) {
-                LanguageRestrictions langRestriction = new LanguageRestrictions();
-                String audioLangStr = disallowedAssetBundle._getAudioLanguageCode()._getValue();
-                Strings audioLanguage = getBcp47Code(audioLangStr);
-                langRestriction.audioLanguage = audioLanguage;
-                langRestriction.audioLanguageId = getBcp47CodeId(audioLangStr);
-                langRestriction.requiresForcedSubtitles = disallowedAssetBundle._getForceSubtitle();
+            markAssetTypeIndexForExcludedDownloadablesCalculation(assetTypeIdx, contract);
 
-                Set<Integer> disallowedTimedTextIds = new HashSet<Integer>();
-                Set<Strings> disallowedTimedTextCodes = new HashSet<Strings>();
-                List<DisallowedSubtitleLangCodeHollow> disallowedSubtitles = disallowedAssetBundle._getDisallowedSubtitleLangCodes();
+            for(DisallowedAssetBundleHollow disallowedAssetBundle : contract._getDisallowedAssetBundles()) {
+                String audioLang = disallowedAssetBundle._getAudioLanguageCode()._getValue();
 
-                for(DisallowedSubtitleLangCodeHollow sub : disallowedSubtitles) {
-                    String subLang = sub._getValue()._getValue();
-                    disallowedTimedTextCodes.add(getBcp47Code(subLang));
-                    disallowedTimedTextIds.add(getBcp47CodeId(subLang));
+                if(!disallowedAssetBundle._getDisallowedSubtitleLangCodes().isEmpty()) {
+                    audioLanguagesWithDisallowedAssetBundles.add(audioLang);
                 }
 
-                langRestriction.disallowedTimedTextBcp47codes = disallowedTimedTextCodes;
+                audioLanguagesWhichRequireForcedSubtitles.add(audioLang);
+            }
+        }
 
-                if(langRestriction.requiresForcedSubtitles || !disallowedTimedTextCodes.isEmpty())
-                    restriction.languageBcp47RestrictionsMap.put(audioLanguage, langRestriction);
+
+        /// Step 2: if any audio languages have language bundle restrictions, then determine the merged set of disallowed text languages for each
+        /// for the purposes of merging, we aim to minimize the number of restrictions -- if an asset combination is disallowed via one contract,
+        /// but allowed via another contract, then we ultimately want to *allow* that combination.
+        Map<String, MergeableTextLanguageBundleRestriction> mergedTextLangaugeRestrictions = Collections.emptyMap();
+
+        if(!audioLanguagesWithDisallowedAssetBundles.isEmpty()) {
+            Map<String, MergeableTextLanguageBundleRestriction> mergedTextLanguageRestrictions = new HashMap<String, MergeableTextLanguageBundleRestriction>();
+            for(VideoRightsContractHollow contract : applicableContracts) {
+                /// find the set of allowed text languages from this contract.
+                Set<String> overallContractAllowedTextLanguages = new HashSet<String>();
+                for(VideoRightsContractAssetHollow asset : contract._getAssets()) {
+                    String contractAssetType = asset._getAssetType()._getValue();
+
+                    if(StreamContractAssetTypeDeterminer.CLOSEDCAPTIONING.equals(contractAssetType)
+                            || StreamContractAssetTypeDeterminer.SUBTITLES.equals(contractAssetType)) {
+                        overallContractAllowedTextLanguages.add(asset._getBcp47Code()._getValue());
+                    }
+                }
+
+                /// for each audio language where there is a disallowed asset bundle,
+                /// merge the disallowed text languages, AND all available text languages
+                /// which were *not* disallowed, are allowed.
+                Set<String> bundleRestrictedAudioLanguagesFromThisContract = new HashSet<String>();
+                for(DisallowedAssetBundleHollow disallowedAssetBundle : contract._getDisallowedAssetBundles()) {
+                    String audioLang = disallowedAssetBundle._getAudioLanguageCode()._getValue();
+                    MergeableTextLanguageBundleRestriction textRestriction = getMergeableTextRestrictionsByAudioLang(mergedTextLanguageRestrictions, audioLang);
+
+                    DisallowedSubtitleLangCodesListHollow disallowedSubtitleLangCodes = disallowedAssetBundle._getDisallowedSubtitleLangCodes();
+                    if(!disallowedSubtitleLangCodes.isEmpty()) {
+                        /// For this audio language, we need to modify the text languages allowed for this contract by removing each
+                        /// disallowed text language from the set.
+                        Set<String> thisAudioLanguageAllowedTextLanguages = new HashSet<String>(overallContractAllowedTextLanguages);
+                        for(DisallowedSubtitleLangCodeHollow lang : disallowedSubtitleLangCodes) {
+                            String textLang = lang._getValue()._getValue();
+                            thisAudioLanguageAllowedTextLanguages.remove(textLang);
+                            textRestriction.addDisallowedTextLanguage(textLang);
+                        }
+
+                        textRestriction.addAllowedTextLanguages(thisAudioLanguageAllowedTextLanguages);
+                        //// don't process this audio language for this contract again.
+                        bundleRestrictedAudioLanguagesFromThisContract.add(disallowedAssetBundle._getAudioLanguageCode()._getValue());
+                    }
+                }
+
+                /// for each audio language where there was *not* a disallowed asset bundle, all available text
+                /// languages for the contract are allowed.
+                for(String audioLanguage : audioLanguagesWithDisallowedAssetBundles) {
+                    if(!bundleRestrictedAudioLanguagesFromThisContract.contains(audioLanguage)) {
+                        MergeableTextLanguageBundleRestriction textRestriction = getMergeableTextRestrictionsByAudioLang(mergedTextLanguageRestrictions, audioLanguage);
+                        textRestriction.addAllowedTextLanguages(overallContractAllowedTextLanguages);
+                    }
+                }
+            }
+        }
+
+
+        /// Step 3: If any contract doesn't require forced subtitles for a particular language, then don't
+        /// require forced subtitles for that language
+        if(!audioLanguagesWhichRequireForcedSubtitles.isEmpty()) {
+            for(VideoRightsContractHollow contract : applicableContracts) {
+                Set<String> forcedSubtitleLanguagesForThisContract = new HashSet<String>();
+
+                for(DisallowedAssetBundleHollow assetBundle : contract._getDisallowedAssetBundles()) {
+                    if(assetBundle._getForceSubtitle())
+                        forcedSubtitleLanguagesForThisContract.add(assetBundle._getAudioLanguageCode()._getValue());
+                }
+
+                audioLanguagesWhichRequireForcedSubtitles.retainAll(forcedSubtitleLanguagesForThisContract);
+            }
+        }
+
+        Set<String> restrictedAudioLanguages = audioLanguagesWithDisallowedAssetBundles;
+        restrictedAudioLanguages.addAll(audioLanguagesWhichRequireForcedSubtitles);
+
+        for(String audioLang : restrictedAudioLanguages) {
+            Set<String> disallowedTextLangauges = Collections.emptySet();
+
+            MergeableTextLanguageBundleRestriction mergeableTextLanguageBundleRestriction = mergedTextLangaugeRestrictions.get(audioLang);
+            if(mergeableTextLanguageBundleRestriction != null) {
+                disallowedTextLangauges = mergeableTextLanguageBundleRestriction.getFinalDisallowedTextLanguages();
             }
 
-            markAssetTypeIndexForExcludedDownloadablesCalculation(assetTypeIdx, contract);
+            boolean requiresForcedSubtitles = audioLanguagesWhichRequireForcedSubtitles.contains(audioLang);
+
+            if(requiresForcedSubtitles || !disallowedTextLangauges.isEmpty()) {
+                LanguageRestrictions langRestriction = new LanguageRestrictions();
+                langRestriction.audioLanguage = getBcp47Code(audioLang);
+                langRestriction.audioLanguageId = getBcp47CodeId(audioLang).val;
+                langRestriction.requiresForcedSubtitles = requiresForcedSubtitles;
+
+                Set<com.netflix.vms.transformer.hollowoutput.Integer> disallowedTimedTextIds = new HashSet<com.netflix.vms.transformer.hollowoutput.Integer>();
+                Set<Strings> disallowedTimedTextCodes = new HashSet<Strings>();
+
+                for(String textLang : disallowedTextLangauges) {
+                    disallowedTimedTextCodes.add(getBcp47Code(textLang));
+                    disallowedTimedTextIds.add(getBcp47CodeId(textLang));
+                }
+
+                langRestriction.disallowedTimedText = disallowedTimedTextIds;
+                langRestriction.disallowedTimedTextBcp47codes = disallowedTimedTextCodes;
+
+                restriction.languageBcp47RestrictionsMap.put(langRestriction.audioLanguage, langRestriction);
+            }
+
         }
 
         finalizeContractRestriction(assetTypeIdx, restriction, selectedContract);
+    }
+
+    private MergeableTextLanguageBundleRestriction getMergeableTextRestrictionsByAudioLang(Map<String, MergeableTextLanguageBundleRestriction> mergedLanguageBundleRestrictions, String audioLanguageCode) {
+        MergeableTextLanguageBundleRestriction mergeableRestriction = mergedLanguageBundleRestrictions.get(audioLanguageCode);
+        if(mergeableRestriction == null) {
+            mergeableRestriction = new MergeableTextLanguageBundleRestriction();
+            mergedLanguageBundleRestrictions.put(audioLanguageCode, mergeableRestriction);
+        }
+        return mergeableRestriction;
     }
 
     private void buildRestrictionBasedOnSingleApplicableContract(DownloadableAssetTypeIndex assetTypeIdx, ContractRestriction restriction, VideoRightsContractHollow contract) {
@@ -203,10 +315,10 @@ public class ContractRestrictionModule {
             String audioLangStr = disallowedAssetBundle._getAudioLanguageCode()._getValue();
             Strings audioLanguage = getBcp47Code(audioLangStr);
             langRestriction.audioLanguage = audioLanguage;
-            langRestriction.audioLanguageId = getBcp47CodeId(audioLangStr);
+            langRestriction.audioLanguageId = getBcp47CodeId(audioLangStr).val;
             langRestriction.requiresForcedSubtitles = disallowedAssetBundle._getForceSubtitle();
 
-            Set<Integer> disallowedTimedTextIds = new HashSet<Integer>();
+            Set<com.netflix.vms.transformer.hollowoutput.Integer> disallowedTimedTextIds = new HashSet<com.netflix.vms.transformer.hollowoutput.Integer>();
             Set<Strings> disallowedTimedTextCodes = new HashSet<Strings>();
             List<DisallowedSubtitleLangCodeHollow> disallowedSubtitles = disallowedAssetBundle._getDisallowedSubtitleLangCodes();
 
@@ -216,6 +328,7 @@ public class ContractRestrictionModule {
                 disallowedTimedTextIds.add(getBcp47CodeId(subLang));
             }
 
+            langRestriction.disallowedTimedText = disallowedTimedTextIds;
             langRestriction.disallowedTimedTextBcp47codes = disallowedTimedTextCodes;
 
             //if(langRestriction.requiresForcedSubtitles || !disallowedTimedTextCodes.isEmpty())
@@ -282,13 +395,13 @@ public class ContractRestrictionModule {
         return bcp47Code;
     }
 
-    private Integer getBcp47CodeId(String code) {
-        Integer id = bcp47Ids.get(code);
+    private com.netflix.vms.transformer.hollowoutput.Integer getBcp47CodeId(String code) {
+        com.netflix.vms.transformer.hollowoutput.Integer id = bcp47Ids.get(code);
         if(id == null) {
             int bcp47Ordinal = bcp47CodeIdx.getMatchingOrdinal(code);
             Bcp47CodeHollow bcp47CodeHollow = api.getBcp47CodeHollow(bcp47Ordinal);
 
-            id = Integer.valueOf((int)bcp47CodeHollow._getLanguageId());
+            id = new com.netflix.vms.transformer.hollowoutput.Integer((int)bcp47CodeHollow._getLanguageId());
             bcp47Ids.put(code, id);
         }
 
