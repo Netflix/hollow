@@ -29,6 +29,9 @@ public class ShowMeTheProgressDiffTool {
         addTypeDiff(diff, "DrmInfoData", "packageId");
         addTypeDiff(diff, "EncodingProfileGroup", "groupNameStr"); // TODO: zero-diff
         addTypeDiff(diff, "GlobalPerson", "id");
+        addTypeDiff(diff, "PersonImages", "id");
+        addTypeDiff(diff, "CharacterImages", "id");
+        
         addTypeDiff(diff, "VideoEpisode_CountryList", "country.id", "item.deliverableVideo.value");
 
         diff.calculateDiffs();
