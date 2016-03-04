@@ -1,5 +1,7 @@
-package com.netflix.vms.transformer.modules.packages;
+package com.netflix.vms.transformer.modules.packages.contracts;
 
+import java.util.LinkedHashSet;
+import java.util.TreeMap;
 import java.util.Collections;
 import com.netflix.vms.transformer.hollowinput.DisallowedSubtitleLangCodesListHollow;
 import com.netflix.hollow.index.HollowHashIndex;
@@ -120,9 +122,6 @@ public class ContractRestrictionModule {
 
                 List<VideoRightsContractHollow> applicableContracts = filterToApplicableContracts(packages, contracts, contractIds);
 
-                if(packages._getPackageId() == 334836 && rights._getCountryCode()._isValueEqual("MQ"))
-                    System.out.println("asdf");
-
                 if(applicableContracts.size() > 0) {
                     if(applicableContracts.size() == 1)
                         buildRestrictionBasedOnSingleApplicableContract(assetTypeIdx, restriction, applicableContracts.get(0));
@@ -163,14 +162,52 @@ public class ContractRestrictionModule {
         return false;
     }
 
+    private void buildRestrictionBasedOnSingleApplicableContract(DownloadableAssetTypeIndex assetTypeIdx, ContractRestriction restriction, VideoRightsContractHollow contract) {
+        List<DisallowedAssetBundleHollow> disallowedAssetBundles = contract._getDisallowedAssetBundles();
+        for(DisallowedAssetBundleHollow disallowedAssetBundle : disallowedAssetBundles) {
+            LanguageRestrictions langRestriction = new LanguageRestrictions();
+            String audioLangStr = disallowedAssetBundle._getAudioLanguageCode()._getValue();
+            Strings audioLanguage = getBcp47Code(audioLangStr);
+            langRestriction.audioLanguage = audioLanguage;
+            langRestriction.audioLanguageId = getBcp47CodeId(audioLangStr).val;
+            langRestriction.requiresForcedSubtitles = disallowedAssetBundle._getForceSubtitle();
+
+            Set<com.netflix.vms.transformer.hollowoutput.Integer> disallowedTimedTextIds = new HashSet<com.netflix.vms.transformer.hollowoutput.Integer>();
+            Set<Strings> disallowedTimedTextCodes = new HashSet<Strings>();
+            List<DisallowedSubtitleLangCodeHollow> disallowedSubtitles = disallowedAssetBundle._getDisallowedSubtitleLangCodes();
+
+            for(DisallowedSubtitleLangCodeHollow sub : disallowedSubtitles) {
+                String subLang = sub._getValue()._getValue();
+                disallowedTimedTextCodes.add(getBcp47Code(subLang));
+                disallowedTimedTextIds.add(getBcp47CodeId(subLang));
+            }
+
+            langRestriction.disallowedTimedText = disallowedTimedTextIds;
+            langRestriction.disallowedTimedTextBcp47codes = disallowedTimedTextCodes;
+
+            //if(langRestriction.requiresForcedSubtitles || !disallowedTimedTextCodes.isEmpty())
+            restriction.languageBcp47RestrictionsMap.put(audioLanguage, langRestriction);
+        }
+
+        markAssetTypeIndexForExcludedDownloadablesCalculation(assetTypeIdx, contract);
+
+        String cupToken = contract._getCupToken()._getValue();
+        restriction.cupKeys.add(getCupKey(cupToken));
+
+        finalizeContractRestriction(assetTypeIdx, restriction, contract);
+    }
+
     /// we need to merge both the allowed asset types (for excluded downloadable calculations) and the language bundle restrictions
     /// the language bundle restrictions logic is complicated and broken down into steps indicated in the comments.
     private void buildRestrictionBasedOnMultipleApplicableContracts(DownloadableAssetTypeIndex assetTypeIdx, ContractRestriction restriction, List<VideoRightsContractHollow> applicableContracts) {
         VideoRightsContractHollow selectedContract = null;
 
+
         /// Step 1: gather all of the audio languages which have language bundle restrictions
         Set<String> audioLanguagesWithDisallowedAssetBundles = new HashSet<String>();
         Set<String> audioLanguagesWhichRequireForcedSubtitles = new HashSet<String>();
+        Map<Integer, String> orderedContractIdCupKeyMap = new TreeMap<Integer, String>();
+
         for(VideoRightsContractHollow contract : applicableContracts) {
             //// for unmerged fields, select the contract with the highest ID.
             if(selectedContract == null || contract._getContractId() > selectedContract._getContractId())
@@ -187,6 +224,9 @@ public class ContractRestrictionModule {
 
                 audioLanguagesWhichRequireForcedSubtitles.add(audioLang);
             }
+
+            StringHollow cupKey = contract._getCupToken();
+            orderedContractIdCupKeyMap.put((int)contract._getContractId(), cupKey == null ? "default" : cupKey._getValue());
         }
 
 
@@ -296,6 +336,9 @@ public class ContractRestrictionModule {
 
         }
 
+        for(String cupToken : new LinkedHashSet<String>(orderedContractIdCupKeyMap.values()))
+            restriction.cupKeys.add(getCupKey(cupToken));
+
         finalizeContractRestriction(assetTypeIdx, restriction, selectedContract);
     }
 
@@ -308,36 +351,13 @@ public class ContractRestrictionModule {
         return mergeableRestriction;
     }
 
-    private void buildRestrictionBasedOnSingleApplicableContract(DownloadableAssetTypeIndex assetTypeIdx, ContractRestriction restriction, VideoRightsContractHollow contract) {
-        List<DisallowedAssetBundleHollow> disallowedAssetBundles = contract._getDisallowedAssetBundles();
-        for(DisallowedAssetBundleHollow disallowedAssetBundle : disallowedAssetBundles) {
-            LanguageRestrictions langRestriction = new LanguageRestrictions();
-            String audioLangStr = disallowedAssetBundle._getAudioLanguageCode()._getValue();
-            Strings audioLanguage = getBcp47Code(audioLangStr);
-            langRestriction.audioLanguage = audioLanguage;
-            langRestriction.audioLanguageId = getBcp47CodeId(audioLangStr).val;
-            langRestriction.requiresForcedSubtitles = disallowedAssetBundle._getForceSubtitle();
-
-            Set<com.netflix.vms.transformer.hollowoutput.Integer> disallowedTimedTextIds = new HashSet<com.netflix.vms.transformer.hollowoutput.Integer>();
-            Set<Strings> disallowedTimedTextCodes = new HashSet<Strings>();
-            List<DisallowedSubtitleLangCodeHollow> disallowedSubtitles = disallowedAssetBundle._getDisallowedSubtitleLangCodes();
-
-            for(DisallowedSubtitleLangCodeHollow sub : disallowedSubtitles) {
-                String subLang = sub._getValue()._getValue();
-                disallowedTimedTextCodes.add(getBcp47Code(subLang));
-                disallowedTimedTextIds.add(getBcp47CodeId(subLang));
-            }
-
-            langRestriction.disallowedTimedText = disallowedTimedTextIds;
-            langRestriction.disallowedTimedTextBcp47codes = disallowedTimedTextCodes;
-
-            //if(langRestriction.requiresForcedSubtitles || !disallowedTimedTextCodes.isEmpty())
-            restriction.languageBcp47RestrictionsMap.put(audioLanguage, langRestriction);
+    private CupKey getCupKey(String cupToken) {
+        CupKey cupKey = cupKeysMap.get(cupToken);
+        if(cupKey == null) {
+            cupKey = new CupKey(new Strings(cupToken));
+            cupKeysMap.put(cupToken, cupKey);
         }
-
-        markAssetTypeIndexForExcludedDownloadablesCalculation(assetTypeIdx, contract);
-
-        finalizeContractRestriction(assetTypeIdx, restriction, contract);
+        return cupKey;
     }
 
     private void markAssetTypeIndexForExcludedDownloadablesCalculation(DownloadableAssetTypeIndex assetTypeIdx, VideoRightsContractHollow contract) {
@@ -354,14 +374,6 @@ public class ContractRestrictionModule {
     }
 
     private void finalizeContractRestriction(DownloadableAssetTypeIndex assetTypeIdx, ContractRestriction restriction, VideoRightsContractHollow selectedContract) {
-        String cupToken = selectedContract._getCupToken()._getValue();
-        CupKey cupKey = cupKeysMap.get(cupToken);
-        if(cupKey == null) {
-            cupKey = new CupKey(new Strings(cupToken));
-            cupKeysMap.put(cupToken, cupKey);
-        }
-        restriction.cupKeys.add(cupKey);
-
         if(selectedContract._getPrePromotionDays() != Long.MIN_VALUE)
             restriction.prePromotionDays = (int)selectedContract._getPrePromotionDays();
 
@@ -409,76 +421,5 @@ public class ContractRestrictionModule {
     }
 
 
-    private static class DownloadableAssetTypeIndex {
-        private final Map<ContractAssetType, DownloadableIdList> downloadableIdsByContract;
-
-        public DownloadableAssetTypeIndex() {
-            this.downloadableIdsByContract = new HashMap<ContractAssetType, DownloadableIdList>();
-        }
-
-        public void addDownloadableId(ContractAssetType assetType, long downloadableId) {
-            DownloadableIdList idList = downloadableIdsByContract.get(assetType);
-            if(idList == null) {
-                idList = new DownloadableIdList();
-                downloadableIdsByContract.put(assetType, idList);
-            }
-
-            idList.addDownloadableId(downloadableId);
-        }
-
-        public void mark(ContractAssetType assetType) {
-            DownloadableIdList idList = downloadableIdsByContract.get(assetType);
-            if(idList != null)
-                idList.mark();
-        }
-
-        public void resetMarks() {
-            for(Map.Entry<ContractAssetType, DownloadableIdList> entry : downloadableIdsByContract.entrySet()) {
-                entry.getValue().resetMark();
-            }
-        }
-
-        public Set<com.netflix.vms.transformer.hollowoutput.Long> getAllUnmarked() {
-            Set<com.netflix.vms.transformer.hollowoutput.Long> set = new HashSet<com.netflix.vms.transformer.hollowoutput.Long>();
-
-            for(Map.Entry<ContractAssetType, DownloadableIdList> entry : downloadableIdsByContract.entrySet()) {
-                if(!entry.getValue().isMarked()) {
-                    set.addAll(entry.getValue().getList());
-                }
-            }
-
-            return set;
-        }
-    }
-
-    private static class DownloadableIdList {
-
-        private final List<com.netflix.vms.transformer.hollowoutput.Long> list;
-        private boolean marked;
-
-        public DownloadableIdList() {
-            this.list = new ArrayList<com.netflix.vms.transformer.hollowoutput.Long>();
-        }
-
-        public void addDownloadableId(long downloadableId) {
-            list.add(new com.netflix.vms.transformer.hollowoutput.Long(downloadableId));
-        }
-
-        public void mark() {
-            this.marked = true;
-        }
-
-        public void resetMark() {
-            this.marked = false;
-        }
-
-        public boolean isMarked() {
-            return marked;
-        }
-
-        public List<com.netflix.vms.transformer.hollowoutput.Long> getList() {
-            return list;
-        }
-    }
 
 }

@@ -1,4 +1,4 @@
-package com.netflix.vms.transformer.modules.packages;
+package com.netflix.vms.transformer.modules.packages.contracts;
 
 import java.util.HashSet;
 import java.util.Set;

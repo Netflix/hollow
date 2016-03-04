@@ -1,0 +1,88 @@
+package com.netflix.vms.transformer.modules.packages.contracts;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+public class DownloadableAssetTypeIndex {
+    private final Map<ContractAssetType, DownloadableIdList> downloadableIdsByContract;
+
+    public DownloadableAssetTypeIndex() {
+        this.downloadableIdsByContract = new HashMap<ContractAssetType, DownloadableIdList>();
+    }
+
+    public void addDownloadableId(ContractAssetType assetType, long downloadableId) {
+        DownloadableIdList idList = downloadableIdsByContract.get(assetType);
+        if(idList == null) {
+            idList = new DownloadableIdList();
+            downloadableIdsByContract.put(assetType, idList);
+        }
+
+        idList.addDownloadableId(downloadableId);
+    }
+
+    public void mark(ContractAssetType assetType) {
+        DownloadableIdList idList = downloadableIdsByContract.get(assetType);
+        if(idList != null)
+            idList.mark();
+    }
+
+    public void resetMarks() {
+        for(Map.Entry<ContractAssetType, DownloadableIdList> entry : downloadableIdsByContract.entrySet()) {
+            entry.getValue().resetMark();
+        }
+    }
+
+    public Set<com.netflix.vms.transformer.hollowoutput.Long> getAllUnmarked() {
+        Set<com.netflix.vms.transformer.hollowoutput.Long> set = new HashSet<com.netflix.vms.transformer.hollowoutput.Long>();
+        boolean anyMarks = false;
+
+        for(Map.Entry<ContractAssetType, DownloadableIdList> entry : downloadableIdsByContract.entrySet()) {
+            if(!entry.getValue().isMarked()) {
+                set.addAll(entry.getValue().getList());
+            } else {
+                anyMarks = true;
+            }
+        }
+
+        ///TODO: If we have no assets for a contract, we exclude no downloadables.
+        /// Is this really the right thing to do?  It's what happened in the old pipeline, but is it right?
+        if(!anyMarks)
+            return Collections.emptySet();
+        return set;
+    }
+
+    private static class DownloadableIdList {
+
+        private final List<com.netflix.vms.transformer.hollowoutput.Long> list;
+        private boolean marked;
+
+        public DownloadableIdList() {
+            this.list = new ArrayList<com.netflix.vms.transformer.hollowoutput.Long>();
+        }
+
+        public void addDownloadableId(long downloadableId) {
+            list.add(new com.netflix.vms.transformer.hollowoutput.Long(downloadableId));
+        }
+
+        public void mark() {
+            this.marked = true;
+        }
+
+        public void resetMark() {
+            this.marked = false;
+        }
+
+        public boolean isMarked() {
+            return marked;
+        }
+
+        public List<com.netflix.vms.transformer.hollowoutput.Long> getList() {
+            return list;
+        }
+    }
+}

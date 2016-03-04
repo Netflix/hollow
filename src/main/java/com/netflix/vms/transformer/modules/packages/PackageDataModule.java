@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.packages;
 
+import com.netflix.vms.transformer.modules.packages.contracts.ContractRestrictionModule;
+
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
@@ -21,7 +23,6 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
