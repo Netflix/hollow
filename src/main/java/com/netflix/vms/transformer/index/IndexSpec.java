@@ -27,9 +27,7 @@ public enum IndexSpec {
     VIDEO_TYPE_COUNTRY(HASH, "VideoType", "type.element", "videoId", "type.element.countryCode.value"),
     PACKAGES_BY_VIDEO(HASH, "Packages", "", "movieId"),
     ALL_VIDEO_RIGHTS(HASH, "VideoRights", "", "movieId"),
-    ROLLOUT_VIDEO_TYPE(HASH, "Rollout", "", "movieId", "rolloutType.value"),
-    ROLLOUT(PRIMARY_KEY, "Rollout", "movieId", "rolloutType.value");
-
+    ROLLOUT_VIDEO_TYPE(HASH, "Rollout", "", "movieId", "rolloutType.value");
 
     private final IndexType indexType;
     private final String parameters[];
