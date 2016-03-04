@@ -2,12 +2,14 @@ package com.netflix.vms.transformer.modules.rollout;
 
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.IndividualTrailerHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
 import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
 import com.netflix.vms.transformer.hollowinput.MultiValuePassthroughMapHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutMapOfLaunchDatesHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkSourceFileIdHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkSourceFileIdListHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseCharacterHollow;
@@ -168,6 +170,9 @@ public class RolloutVideoModule extends AbstractTransformModule {
                             infoOut.videoLength = (int) infoIn._getVideoLength();
                             infoOut.videoValue = infoIn._getVideoValue()._getValue().toCharArray();
 
+                            // #for-parity
+                            if(infoOut.seasonNumber == Integer.MIN_VALUE) infoOut.seasonNumber = 1;
+
                             outputTrailer.supplementalInfos.put(typeOut, infoOut);
                         }
 
@@ -258,11 +263,17 @@ public class RolloutVideoModule extends AbstractTransformModule {
                         phase.roles.add(role);
                     }
 
+                    phase.projectedLaunchDates = new HashMap<ISOCountry, Date>();
+                    // #cleanup: launch-dates are pulled down, and duplicated for every phase level
+                    RolloutMapOfLaunchDatesHollow launchMap = rollout._getLaunchDates();
+                    for (Map.Entry<ISOCountryHollow, DateHollow> entry : launchMap.entrySet()) {
+                        phase.projectedLaunchDates.put(new ISOCountry(entry.getKey()._getValue()), new Date(entry.getValue()._getValue()));
+                    }
+
                     Collections.sort(phase.supplementalVideos, new SupplementalVideoComparator());
                     summary.allPhases.add(phase);
                 }
 
-                // Collections.sort(summary.allPhases, new RolloutPhaseComparator());
             }
             mapper.addObject(output);
         }
