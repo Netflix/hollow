@@ -1,4 +1,4 @@
-package com.netflix.vms.transformer.modules.packages;
+package com.netflix.vms.transformer.modules.packages.contracts;
 
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
