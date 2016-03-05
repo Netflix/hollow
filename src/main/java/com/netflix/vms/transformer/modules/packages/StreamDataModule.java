@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.packages;
 
+import com.netflix.vms.transformer.hollowoutput.DrmInfo;
+import com.netflix.vms.transformer.hollowoutput.DrmInfoData;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.hollowinput.AudioStreamInfoHollow;
@@ -68,6 +70,7 @@ public class StreamDataModule {
     private final Set<TargetResolution> aspectRatioVideoFormatIdentifiers;
     private final Map<String, List<Strings>> tagsLists;
     private final Map<Integer, Object> drmKeysByGroupId;
+    private final Map<Integer, DrmInfo> drmInfoByGroupId;
 
 
     private final HollowPrimaryKeyIndex streamProfileIdx;
@@ -76,7 +79,7 @@ public class StreamDataModule {
 
     private final HollowObjectMapper objectMapper;
 
-    public StreamDataModule(VMSHollowVideoInputAPI api, VMSTransformerIndexer indexer, HollowObjectMapper objectMapper, Map<Integer, Object> drmKeysByGroupId) {
+    public StreamDataModule(VMSHollowVideoInputAPI api, VMSTransformerIndexer indexer, HollowObjectMapper objectMapper, Map<Integer, Object> drmKeysByGroupId, Map<Integer, DrmInfo> drmInfoByGroupId) {
         this.api = api;
         this.assetTypeDescriptorMap = getAssetTypeDescriptorMap();
         this.videoFormatDescriptorMap = getVideoFormatDescriptorMap();
@@ -87,6 +90,7 @@ public class StreamDataModule {
         this.deploymentLabelBitsetOffsetMap = getDeploymentLabelBitsetOffsetMap();
         this.tagsLists = new HashMap<String, List<Strings>>();
         this.drmKeysByGroupId = drmKeysByGroupId;
+        this.drmInfoByGroupId = drmInfoByGroupId;
 
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
 
@@ -97,7 +101,7 @@ public class StreamDataModule {
         EMPTY_DOWNLOAD_LOCATIONS.locations = Collections.emptyList();
     }
 
-    StreamData convertStreamData(PackagesHollow packages, PackageStreamHollow inputStream) {
+    StreamData convertStreamData(PackagesHollow packages, PackageStreamHollow inputStream, DrmInfoData drmInfoData) {
         int encodingProfileId = (int) inputStream._getStreamProfileId();
         int streamProfileOrdinal = streamProfileIdx.getMatchingOrdinal(Long.valueOf(encodingProfileId));
         StreamProfilesHollow streamProfile = api.getStreamProfilesHollow(streamProfileOrdinal);
@@ -257,6 +261,11 @@ public class StreamDataModule {
                     ///TODO: Why exclude WmDrmKeys?
                     if(drmKeyGroup.intValue() != PackageDataModule.WMDRMKEY_GROUP)
                         objectMapper.addObject(drmKey);
+                }
+
+                DrmInfo drmInfo = drmInfoByGroupId.get(drmKeyGroup);
+                if(drmInfo != null) {
+                    drmInfoData.downloadableIdToDrmInfoMap.put(new com.netflix.vms.transformer.hollowoutput.Long(outputStream.downloadableId), drmInfo);
                 }
             }
 
