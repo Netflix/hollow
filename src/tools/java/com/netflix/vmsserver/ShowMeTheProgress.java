@@ -59,6 +59,7 @@ public class ShowMeTheProgress {
         filter.addTypeRecursive("PersonImages", outputSchemas);
         filter.addTypeRecursive("CharacterImages", outputSchemas);
         filter.addTypeRecursive("DrmInfoData", outputSchemas);
+        filter.addTypeRecursive("FileEncodingData", outputSchemas);
         return filter;
     }
 

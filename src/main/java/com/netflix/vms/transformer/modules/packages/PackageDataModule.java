@@ -1,27 +1,32 @@
 package com.netflix.vms.transformer.modules.packages;
 
-import javax.xml.bind.DatatypeConverter;
-
-import com.netflix.vms.transformer.hollowinput.StringHollow;
-import com.netflix.vms.transformer.hollowinput.DrmHeaderInfoListHollow;
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.ShowHierarchy;
+import com.netflix.vms.transformer.hollowinput.ChunkDurationsStringHollow;
+import com.netflix.vms.transformer.hollowinput.CodecPrivateDataStringHollow;
 import com.netflix.vms.transformer.hollowinput.DeployablePackagesHollow;
 import com.netflix.vms.transformer.hollowinput.DrmHeaderInfoHollow;
+import com.netflix.vms.transformer.hollowinput.DrmHeaderInfoListHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.PackageDrmInfoHollow;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
 import com.netflix.vms.transformer.hollowinput.PackagesHollow;
+import com.netflix.vms.transformer.hollowinput.StreamNonImageInfoHollow;
+import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VideoStreamInfoHollow;
+import com.netflix.vms.transformer.hollowoutput.ChunkDurationsString;
+import com.netflix.vms.transformer.hollowoutput.CodecPrivateDataString;
 import com.netflix.vms.transformer.hollowoutput.DrmHeader;
 import com.netflix.vms.transformer.hollowoutput.DrmInfo;
 import com.netflix.vms.transformer.hollowoutput.DrmInfoData;
 import com.netflix.vms.transformer.hollowoutput.DrmKey;
 import com.netflix.vms.transformer.hollowoutput.DrmKeyString;
+import com.netflix.vms.transformer.hollowoutput.FileEncodingData;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
 import com.netflix.vms.transformer.hollowoutput.StreamData;
@@ -34,6 +39,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.xml.bind.DatatypeConverter;
 
 public class PackageDataModule {
 
@@ -155,6 +161,8 @@ public class PackageDataModule {
 
             if(outputStream != null)
                 pkg.streams.add(outputStream);
+
+            addFileEncodingDataForStream(inputStream);
         }
 
         //////////// DEPLOYABLE PACKAGES //////////////
@@ -176,6 +184,29 @@ public class PackageDataModule {
         mapper.addObject(drmInfoData);
     }
 
+    private void addFileEncodingDataForStream(PackageStreamHollow inputStream) {
+        StreamNonImageInfoHollow nonImageInfo = inputStream._getNonImageInfo();
+        if(nonImageInfo != null) {
+            FileEncodingData encodingData = new FileEncodingData();
+            encodingData.downloadableId = inputStream._getDownloadableId();
+            CodecPrivateDataStringHollow codecPrivateData = nonImageInfo._getCodecPrivateData();
+            ChunkDurationsStringHollow chunkDurations = nonImageInfo._getChunkDurations();
+
+            if(codecPrivateData != null)
+                encodingData.codecPrivateData = new CodecPrivateDataString(codecPrivateData._getValue());
+            if(chunkDurations != null)
+                encodingData.chunkDurations = new ChunkDurationsString(chunkDurations._getValue());
+
+            VideoStreamInfoHollow videoInfo = nonImageInfo._getVideoInfo();
+            if(videoInfo != null) {
+                encodingData.dashHeaderSize = videoInfo._getDashHeaderSize();
+                encodingData.dashMediaStartByteOffset = videoInfo._getDashMediaStartByteOffset();
+            }
+
+            if(encodingData.codecPrivateData != null || encodingData.chunkDurations != null)
+                mapper.addObject(encodingData);
+        }
+    }
 
     private Set<Integer> gatherVideoIds(Map<String, ShowHierarchy> showHierarchyByCountry) {
         Set<Integer> videoIds = new HashSet<Integer>();

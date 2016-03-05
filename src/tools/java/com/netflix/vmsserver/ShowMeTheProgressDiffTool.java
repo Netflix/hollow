@@ -32,7 +32,8 @@ public class ShowMeTheProgressDiffTool {
         addTypeDiff(diff, "GlobalPerson", "id");
         addTypeDiff(diff, "PersonImages", "id");
         addTypeDiff(diff, "CharacterImages", "id");
-        
+        addTypeDiff(diff, "FileEncodingData", "downloadableId");
+
         addTypeDiff(diff, "VideoEpisode_CountryList", "country.id", "item.deliverableVideo.value");
 
         diff.calculateDiffs();
