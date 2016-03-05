@@ -1,9 +1,11 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import com.netflix.hollow.write.objectmapper.NullablePrimitiveBoolean;
+
 
 public class VideoMediaData implements Cloneable {
 
-    public boolean isAvailableForED = false;
+    public NullablePrimitiveBoolean isAvailableForED = null;
     public boolean isGoLive = false;
     public boolean isOriginal = false;
     public boolean isAutoPlayEnabled = false;
@@ -35,7 +37,7 @@ public class VideoMediaData implements Cloneable {
 
     public int hashCode() {
         int hashCode = 1;
-        hashCode = hashCode * 31 + (isAvailableForED? 1231 : 1237);
+        hashCode = hashCode * 31 + (isAvailableForED == null ? 1237 : isAvailableForED.hashCode());
         hashCode = hashCode * 31 + (isGoLive? 1231 : 1237);
         hashCode = hashCode * 31 + (isOriginal? 1231 : 1237);
         hashCode = hashCode * 31 + (isAutoPlayEnabled? 1231 : 1237);
