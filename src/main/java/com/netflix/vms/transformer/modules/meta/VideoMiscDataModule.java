@@ -4,12 +4,6 @@ import static com.netflix.vms.transformer.index.IndexSpec.CSM_REVIEW;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_AWARD;
 import static com.netflix.vms.transformer.index.IndexSpec.VMS_AWARD;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.ShowHierarchy;
 import com.netflix.vms.transformer.hollowinput.CSMReviewHollow;
@@ -30,6 +24,11 @@ import com.netflix.vms.transformer.hollowoutput.VideoAwardFestival;
 import com.netflix.vms.transformer.hollowoutput.VideoAwardType;
 import com.netflix.vms.transformer.hollowoutput.VideoMiscData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class VideoMiscDataModule {
     private final VMSHollowVideoInputAPI api;
@@ -37,7 +36,7 @@ public class VideoMiscDataModule {
     private final HollowPrimaryKeyIndex videoAwardIdx;
     private final HollowPrimaryKeyIndex csmReviewIdx;
     private final HollowPrimaryKeyIndex awardIdx;
-    
+
     public VideoMiscDataModule(VMSHollowVideoInputAPI api, VMSTransformerIndexer indexer) {
         this.api = api;
         this.videoAwardIdx = indexer.getPrimaryKeyIndex(VIDEO_AWARD);
@@ -47,16 +46,21 @@ public class VideoMiscDataModule {
 
     public Map<Integer, VideoMiscData> buildVideoMiscDataByCountry(Map<String, ShowHierarchy> showHierarchiesByCountry) {
         videoMiscMap.clear();
-        
+
         for(Map.Entry<String, ShowHierarchy> entry : showHierarchiesByCountry.entrySet()) {
             ShowHierarchy showHierarchy = entry.getValue();
             addVideoMiscData(showHierarchy.getTopNodeId(), entry.getKey());
             int[][] seasonEpisodesIds = showHierarchy.getEpisodeIds();
             for(int seasonIdx = 0; seasonIdx < showHierarchy.getSeasonIds().length; seasonIdx++) {
+                addVideoMiscData(showHierarchy.getSeasonIds()[seasonIdx], entry.getKey());
+
                 for(int episodeIdx = 0; episodeIdx < seasonEpisodesIds[seasonIdx].length; episodeIdx++) {
-                    int episodeId = seasonEpisodesIds[seasonIdx][episodeIdx];
-                    addVideoMiscData(episodeId, entry.getKey());
+                    addVideoMiscData(seasonEpisodesIds[seasonIdx][episodeIdx], entry.getKey());
                 }
+            }
+
+            for(int i=0;i<showHierarchy.getSupplementalIds().length;i++) {
+                addVideoMiscData(showHierarchy.getSupplementalIds()[i], entry.getKey());
             }
         }
 
@@ -84,7 +88,7 @@ public class VideoMiscDataModule {
             CSMReviewHollow csmReviewHollow = api.getCSMReviewHollow(csmReviewOrdinal);
             ICSMReview csmReview = new ICSMReview();
             csmReview.ageExplanation = getStrings(csmReviewHollow._getAgeExplanation());
-            csmReview.ageRecommendation = (int)csmReviewHollow._getAgeRecommendation(); 
+            csmReview.ageRecommendation = (int)csmReviewHollow._getAgeRecommendation();
             csmReview.castMemberNames = getStrings(csmReviewHollow._getCastMemberNames());
             csmReview.consumerism = getStrings(csmReviewHollow._getConsumerism());
             csmReview.consumerismAlert = (int)csmReviewHollow._getConsumerismAlert();
@@ -122,20 +126,20 @@ public class VideoMiscDataModule {
             csmReview.whatsTheStory = getStrings(csmReviewHollow._getWhatsTheStory());
             return csmReview;
         }
-        
+
         return null;
     }
-    
+
     private Date getDate(DateHollow dateHollow) {
         return dateHollow != null ? new Date(dateHollow._getValue()) : null;
     }
-    
+
     private Strings getStrings(StringHollow stringHollow) {
         return (stringHollow != null && stringHollow._getValue() != null) ? new Strings(stringHollow._getValue().toCharArray()) : null;
     }
 
     private List<VideoAward> getAwards(int videoId) {
-        List<VideoAward> videoAwards = new ArrayList<>(); 
+        List<VideoAward> videoAwards = new ArrayList<>();
         int videoAwardsOrdinal = videoAwardIdx.getMatchingOrdinal((long)videoId);
         VideoAwardHollow awardInput = null;
         if(videoAwardsOrdinal != -1) {
@@ -170,4 +174,5 @@ public class VideoMiscDataModule {
         }
         return videoAwards;
     }
+
 }
