@@ -22,6 +22,7 @@ public enum IndexSpec {
     CSM_REVIEW(PRIMARY_KEY, "CSMReview", "videoId"),
     ARTWORK_IMAGE_FORMAT(PRIMARY_KEY, "ArtWorkImageType", "imageType.value"),
     ARTWORK_RECIPE(PRIMARY_KEY, "ArtworkRecipe", "recipeName.value"),
+    CONSOLIDATED_VIDEO_RATINGS(PRIMARY_KEY, "ConsolidatedVideoRatings", "videoId"),
 
     VIDEO_DATE(HASH, "VideoDate", "window.element", "videoId", "window.element.countryCode.value"),
     PERSONS_BY_VIDEO_ID(HASH, "VideoPerson", "", "cast.element.videoId"),
@@ -30,6 +31,8 @@ public enum IndexSpec {
     PACKAGES_BY_VIDEO(HASH, "Packages", "", "movieId"),
     ALL_VIDEO_RIGHTS(HASH, "VideoRights", "", "movieId"),
     ROLLOUT_VIDEO_TYPE(HASH, "Rollout", "", "movieId", "rolloutType.value");
+
+
 
     private final IndexType indexType;
     private final String parameters[];

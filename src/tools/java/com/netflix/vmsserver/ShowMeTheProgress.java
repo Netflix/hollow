@@ -41,8 +41,9 @@ public class ShowMeTheProgress {
         filter.addFieldRecursive("CompleteVideoFacetData", "videoMetaData", outputSchemas);
         filter.addFieldRecursive("CompleteVideoFacetData", "videoMediaData", outputSchemas);
         filter.addFieldRecursive("CompleteVideoFacetData", "videoMiscData", outputSchemas);
+        filter.addFieldRecursive("CompleteVideo", "countrySpecificData", outputSchemas);
 
-        filter.addTypeRecursive("PackageData", outputSchemas);
+        //filter.addTypeRecursive("PackageData", outputSchemas);
 
         filter.addTypeRecursive("DrmSystem", outputSchemas);
         filter.addTypeRecursive("OriginServer", outputSchemas);
@@ -58,8 +59,8 @@ public class ShowMeTheProgress {
         filter.addTypeRecursive("VideoEpisode_CountryList", outputSchemas);
         filter.addTypeRecursive("PersonImages", outputSchemas);
         filter.addTypeRecursive("CharacterImages", outputSchemas);
-        filter.addTypeRecursive("DrmInfoData", outputSchemas);
-        filter.addTypeRecursive("FileEncodingData", outputSchemas);
+        //filter.addTypeRecursive("DrmInfoData", outputSchemas);
+        //filter.addTypeRecursive("FileEncodingData", outputSchemas);
         return filter;
     }
 
