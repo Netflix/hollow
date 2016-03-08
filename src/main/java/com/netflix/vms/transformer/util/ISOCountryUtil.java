@@ -1,6 +1,5 @@
 package com.netflix.vms.transformer.util;
 
-import com.netflix.type.NFCountry;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryListHollow;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
@@ -20,8 +19,7 @@ public class ISOCountryUtil {
         while(iter.hasNext()) {
             ISOCountryHollow item = iter.next();
 
-            NFCountry country = NFCountry.findInstance(item._getValue());
-            result.add(new ISOCountry(country.getId()));
+            result.add(new ISOCountry(item._getValue()));
         }
 
         return result;
