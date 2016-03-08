@@ -20,6 +20,23 @@ public class Quote implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + characterId;
+        hashCode = hashCode * 31 + Arrays.hashCode(rawL10nLabel);
+        hashCode = hashCode * 31 + sequenceNumber;
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("Quote{");
+        builder.append("characterId=").append(characterId);
+        builder.append(",rawL10nLabel=").append(rawL10nLabel);
+        builder.append(",sequenceNumber=").append(sequenceNumber);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public Quote clone() {
         try {
             Quote clone = (Quote)super.clone();

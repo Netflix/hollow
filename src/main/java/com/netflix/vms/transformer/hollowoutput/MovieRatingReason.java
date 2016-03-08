@@ -22,6 +22,23 @@ public class MovieRatingReason implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (reasonIds == null ? 1237 : reasonIds.hashCode());
+        hashCode = hashCode * 31 + (isDisplayImageOnly? 1231 : 1237);
+        hashCode = hashCode * 31 + (isDisplayOrderSpecific? 1231 : 1237);
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("MovieRatingReason{");
+        builder.append("reasonIds=").append(reasonIds);
+        builder.append(",isDisplayImageOnly=").append(isDisplayImageOnly);
+        builder.append(",isDisplayOrderSpecific=").append(isDisplayOrderSpecific);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public MovieRatingReason clone() {
         try {
             MovieRatingReason clone = (MovieRatingReason)super.clone();

@@ -22,6 +22,21 @@ public class RolloutVideo implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (video == null ? 1237 : video.hashCode());
+        hashCode = hashCode * 31 + (summaryMap == null ? 1237 : summaryMap.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("RolloutVideo{");
+        builder.append("video=").append(video);
+        builder.append(",summaryMap=").append(summaryMap);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public RolloutVideo clone() {
         try {
             RolloutVideo clone = (RolloutVideo)super.clone();

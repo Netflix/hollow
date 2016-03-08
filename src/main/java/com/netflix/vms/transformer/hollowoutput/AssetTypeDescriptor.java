@@ -23,6 +23,23 @@ public class AssetTypeDescriptor implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + id;
+        hashCode = hashCode * 31 + (name == null ? 1237 : name.hashCode());
+        hashCode = hashCode * 31 + (description == null ? 1237 : description.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("AssetTypeDescriptor{");
+        builder.append("id=").append(id);
+        builder.append(",name=").append(name);
+        builder.append(",description=").append(description);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public AssetTypeDescriptor clone() {
         try {
             AssetTypeDescriptor clone = (AssetTypeDescriptor)super.clone();

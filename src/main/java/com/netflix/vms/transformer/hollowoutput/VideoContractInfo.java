@@ -34,6 +34,33 @@ public class VideoContractInfo implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + contractId;
+        hashCode = hashCode * 31 + primaryPackageId;
+        hashCode = hashCode * 31 + prePromotionDays;
+        hashCode = hashCode * 31 + postPromotionDays;
+        hashCode = hashCode * 31 + (isDayAfterBroadcast? 1231 : 1237);
+        hashCode = hashCode * 31 + (hasRollingEpisodes? 1231 : 1237);
+        hashCode = hashCode * 31 + (cupTokens == null ? 1237 : cupTokens.hashCode());
+        hashCode = hashCode * 31 + (assetBcp47Codes == null ? 1237 : assetBcp47Codes.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoContractInfo{");
+        builder.append("contractId=").append(contractId);
+        builder.append(",primaryPackageId=").append(primaryPackageId);
+        builder.append(",prePromotionDays=").append(prePromotionDays);
+        builder.append(",postPromotionDays=").append(postPromotionDays);
+        builder.append(",isDayAfterBroadcast=").append(isDayAfterBroadcast);
+        builder.append(",hasRollingEpisodes=").append(hasRollingEpisodes);
+        builder.append(",cupTokens=").append(cupTokens);
+        builder.append(",assetBcp47Codes=").append(assetBcp47Codes);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VideoContractInfo clone() {
         try {
             VideoContractInfo clone = (VideoContractInfo)super.clone();

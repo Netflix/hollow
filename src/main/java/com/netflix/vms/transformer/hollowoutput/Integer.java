@@ -21,6 +21,19 @@ public class Integer implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + val;
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("Integer{");
+        builder.append("val=").append(val);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public Integer clone() {
         try {
             Integer clone = (Integer)super.clone();

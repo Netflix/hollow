@@ -55,6 +55,43 @@ public class ArtWorkDescriptor implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (locale == null ? 1237 : locale.hashCode());
+        hashCode = hashCode * 31 + (format == null ? 1237 : format.hashCode());
+        hashCode = hashCode * 31 + (isUsDescriptor? 1231 : 1237);
+        hashCode = hashCode * 31 + (imageType == null ? 1237 : imageType.hashCode());
+        hashCode = hashCode * 31 + (int) (imageId ^ (imageId >>> 32));
+        hashCode = hashCode * 31 + seqNum;
+        hashCode = hashCode * 31 + (int) (effectiveDate ^ (effectiveDate >>> 32));
+        hashCode = hashCode * 31 + ordinalPriority;
+        hashCode = hashCode * 31 + (recipes == null ? 1237 : recipes.hashCode());
+        hashCode = hashCode * 31 + (assetLocationMap == null ? 1237 : assetLocationMap.hashCode());
+        hashCode = hashCode * 31 + (basic_passthrough == null ? 1237 : basic_passthrough.hashCode());
+        hashCode = hashCode * 31 + (source == null ? 1237 : source.hashCode());
+        hashCode = hashCode * 31 + file_seq;
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ArtWorkDescriptor{");
+        builder.append("locale=").append(locale);
+        builder.append(",format=").append(format);
+        builder.append(",isUsDescriptor=").append(isUsDescriptor);
+        builder.append(",imageType=").append(imageType);
+        builder.append(",imageId=").append(imageId);
+        builder.append(",seqNum=").append(seqNum);
+        builder.append(",effectiveDate=").append(effectiveDate);
+        builder.append(",ordinalPriority=").append(ordinalPriority);
+        builder.append(",recipes=").append(recipes);
+        builder.append(",assetLocationMap=").append(assetLocationMap);
+        builder.append(",basic_passthrough=").append(basic_passthrough);
+        builder.append(",source=").append(source);
+        builder.append(",file_seq=").append(file_seq);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public ArtWorkDescriptor clone() {
         try {
             ArtWorkDescriptor clone = (ArtWorkDescriptor)super.clone();

@@ -29,6 +29,25 @@ public class StreamAdditionalData implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (frameRate == null ? 1237 : frameRate.hashCode());
+        hashCode = hashCode * 31 + (downloadLocations == null ? 1237 : downloadLocations.hashCode());
+        hashCode = hashCode * 31 + (qoeInfo == null ? 1237 : qoeInfo.hashCode());
+        hashCode = hashCode * 31 + (mostlyConstantData == null ? 1237 : mostlyConstantData.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("StreamAdditionalData{");
+        builder.append("frameRate=").append(frameRate);
+        builder.append(",downloadLocations=").append(downloadLocations);
+        builder.append(",qoeInfo=").append(qoeInfo);
+        builder.append(",mostlyConstantData=").append(mostlyConstantData);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public StreamAdditionalData clone() {
         try {
             StreamAdditionalData clone = (StreamAdditionalData)super.clone();

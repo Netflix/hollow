@@ -23,6 +23,23 @@ public class TrickPlayItem implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (videoId == null ? 1237 : videoId.hashCode());
+        hashCode = hashCode * 31 + imageCount;
+        hashCode = hashCode * 31 + (trickPlayDownloadable == null ? 1237 : trickPlayDownloadable.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("TrickPlayItem{");
+        builder.append("videoId=").append(videoId);
+        builder.append(",imageCount=").append(imageCount);
+        builder.append(",trickPlayDownloadable=").append(trickPlayDownloadable);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public TrickPlayItem clone() {
         try {
             TrickPlayItem clone = (TrickPlayItem)super.clone();

@@ -25,6 +25,23 @@ public class RolloutCharacter implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + id;
+        hashCode = hashCode * 31 + (rawL10nAttribs == null ? 1237 : rawL10nAttribs.hashCode());
+        hashCode = hashCode * 31 + (quotes == null ? 1237 : quotes.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("RolloutCharacter{");
+        builder.append("id=").append(id);
+        builder.append(",rawL10nAttribs=").append(rawL10nAttribs);
+        builder.append(",quotes=").append(quotes);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public RolloutCharacter clone() {
         try {
             RolloutCharacter clone = (RolloutCharacter)super.clone();

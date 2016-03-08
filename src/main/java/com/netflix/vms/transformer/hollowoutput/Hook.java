@@ -23,6 +23,23 @@ public class Hook implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (type == null ? 1237 : type.hashCode());
+        hashCode = hashCode * 31 + rank;
+        hashCode = hashCode * 31 + (video == null ? 1237 : video.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("Hook{");
+        builder.append("type=").append(type);
+        builder.append(",rank=").append(rank);
+        builder.append(",video=").append(video);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public Hook clone() {
         try {
             Hook clone = (Hook)super.clone();

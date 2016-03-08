@@ -17,6 +17,21 @@ public class VideoResolution implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + height;
+        hashCode = hashCode * 31 + width;
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoResolution{");
+        builder.append("height=").append(height);
+        builder.append(",width=").append(width);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VideoResolution clone() {
         try {
             VideoResolution clone = (VideoResolution)super.clone();

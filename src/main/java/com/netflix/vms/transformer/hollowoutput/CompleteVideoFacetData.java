@@ -33,6 +33,27 @@ public class CompleteVideoFacetData implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (videoMetaData == null ? 1237 : videoMetaData.hashCode());
+        hashCode = hashCode * 31 + (videoCollectionsData == null ? 1237 : videoCollectionsData.hashCode());
+        hashCode = hashCode * 31 + (videoMiscData == null ? 1237 : videoMiscData.hashCode());
+        hashCode = hashCode * 31 + (videoImages == null ? 1237 : videoImages.hashCode());
+        hashCode = hashCode * 31 + (videoMediaData == null ? 1237 : videoMediaData.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("CompleteVideoFacetData{");
+        builder.append("videoMetaData=").append(videoMetaData);
+        builder.append(",videoCollectionsData=").append(videoCollectionsData);
+        builder.append(",videoMiscData=").append(videoMiscData);
+        builder.append(",videoImages=").append(videoImages);
+        builder.append(",videoMediaData=").append(videoMediaData);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public CompleteVideoFacetData clone() {
         try {
             CompleteVideoFacetData clone = (CompleteVideoFacetData)super.clone();

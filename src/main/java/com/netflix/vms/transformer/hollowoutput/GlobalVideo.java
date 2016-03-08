@@ -28,6 +28,25 @@ public class GlobalVideo implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (completeVideo == null ? 1237 : completeVideo.hashCode());
+        hashCode = hashCode * 31 + (aliases == null ? 1237 : aliases.hashCode());
+        hashCode = hashCode * 31 + (availableCountries == null ? 1237 : availableCountries.hashCode());
+        hashCode = hashCode * 31 + (isSupplementalVideo? 1231 : 1237);
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("GlobalVideo{");
+        builder.append("completeVideo=").append(completeVideo);
+        builder.append(",aliases=").append(aliases);
+        builder.append(",availableCountries=").append(availableCountries);
+        builder.append(",isSupplementalVideo=").append(isSupplementalVideo);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public GlobalVideo clone() {
         try {
             GlobalVideo clone = (GlobalVideo)super.clone();

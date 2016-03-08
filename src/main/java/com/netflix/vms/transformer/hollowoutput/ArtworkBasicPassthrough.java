@@ -48,6 +48,35 @@ public class ArtworkBasicPassthrough implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (themes == null ? 1237 : themes.hashCode());
+        hashCode = hashCode * 31 + (tone == null ? 1237 : tone.hashCode());
+        hashCode = hashCode * 31 + (awardCampaigns == null ? 1237 : awardCampaigns.hashCode());
+        hashCode = hashCode * 31 + (group_id == null ? 1237 : group_id.hashCode());
+        hashCode = hashCode * 31 + (lists == null ? 1237 : lists.hashCode());
+        hashCode = hashCode * 31 + (design_attribute == null ? 1237 : design_attribute.hashCode());
+        hashCode = hashCode * 31 + (focal_point == null ? 1237 : focal_point.hashCode());
+        hashCode = hashCode * 31 + (approval_source == null ? 1237 : approval_source.hashCode());
+        hashCode = hashCode * 31 + (approval_state? 1231 : 1237);
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ArtworkBasicPassthrough{");
+        builder.append("themes=").append(themes);
+        builder.append(",tone=").append(tone);
+        builder.append(",awardCampaigns=").append(awardCampaigns);
+        builder.append(",group_id=").append(group_id);
+        builder.append(",lists=").append(lists);
+        builder.append(",design_attribute=").append(design_attribute);
+        builder.append(",focal_point=").append(focal_point);
+        builder.append(",approval_source=").append(approval_source);
+        builder.append(",approval_state=").append(approval_state);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public ArtworkBasicPassthrough clone() {
         try {
             ArtworkBasicPassthrough clone = (ArtworkBasicPassthrough)super.clone();

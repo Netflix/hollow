@@ -19,6 +19,21 @@ public class RolloutCast implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (person == null ? 1237 : person.hashCode());
+        hashCode = hashCode * 31 + sequenceNumber;
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("RolloutCast{");
+        builder.append("person=").append(person);
+        builder.append(",sequenceNumber=").append(sequenceNumber);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public RolloutCast clone() {
         try {
             RolloutCast clone = (RolloutCast)super.clone();

@@ -21,6 +21,19 @@ public class Episode implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + id;
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("Episode{");
+        builder.append("id=").append(id);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public Episode clone() {
         try {
             Episode clone = (Episode)super.clone();

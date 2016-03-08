@@ -22,6 +22,25 @@ public class ArtWorkImageRecipe implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(recipeNameStr);
+        hashCode = hashCode * 31 + Arrays.hashCode(extensionStr);
+        hashCode = hashCode * 31 + Arrays.hashCode(cdnFolderStr);
+        hashCode = hashCode * 31 + Arrays.hashCode(hostNameStr);
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ArtWorkImageRecipe{");
+        builder.append("recipeNameStr=").append(recipeNameStr);
+        builder.append(",extensionStr=").append(extensionStr);
+        builder.append(",cdnFolderStr=").append(cdnFolderStr);
+        builder.append(",hostNameStr=").append(hostNameStr);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public ArtWorkImageRecipe clone() {
         try {
             ArtWorkImageRecipe clone = (ArtWorkImageRecipe)super.clone();

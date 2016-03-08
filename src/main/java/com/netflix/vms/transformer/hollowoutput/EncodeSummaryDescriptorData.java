@@ -41,6 +41,35 @@ public class EncodeSummaryDescriptorData implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (assetType == null ? 1237 : assetType.hashCode());
+        hashCode = hashCode * 31 + (timedTextType == null ? 1237 : timedTextType.hashCode());
+        hashCode = hashCode * 31 + (audioLanguage == null ? 1237 : audioLanguage.hashCode());
+        hashCode = hashCode * 31 + (textLanguage == null ? 1237 : textLanguage.hashCode());
+        hashCode = hashCode * 31 + (isNative? 1231 : 1237);
+        hashCode = hashCode * 31 + encodingProfileId;
+        hashCode = hashCode * 31 + (isSubtitleBurnedIn? 1231 : 1237);
+        hashCode = hashCode * 31 + (isImageBasedSubtitles? 1231 : 1237);
+        hashCode = hashCode * 31 + (assetMetaData == null ? 1237 : assetMetaData.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("EncodeSummaryDescriptorData{");
+        builder.append("assetType=").append(assetType);
+        builder.append(",timedTextType=").append(timedTextType);
+        builder.append(",audioLanguage=").append(audioLanguage);
+        builder.append(",textLanguage=").append(textLanguage);
+        builder.append(",isNative=").append(isNative);
+        builder.append(",encodingProfileId=").append(encodingProfileId);
+        builder.append(",isSubtitleBurnedIn=").append(isSubtitleBurnedIn);
+        builder.append(",isImageBasedSubtitles=").append(isImageBasedSubtitles);
+        builder.append(",assetMetaData=").append(assetMetaData);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public EncodeSummaryDescriptorData clone() {
         try {
             EncodeSummaryDescriptorData clone = (EncodeSummaryDescriptorData)super.clone();

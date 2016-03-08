@@ -35,6 +35,27 @@ public class NamedCollectionHolder implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (country == null ? 1237 : country.hashCode());
+        hashCode = hashCode * 31 + (videoListMap == null ? 1237 : videoListMap.hashCode());
+        hashCode = hashCode * 31 + (personListMap == null ? 1237 : personListMap.hashCode());
+        hashCode = hashCode * 31 + (episodeListMap == null ? 1237 : episodeListMap.hashCode());
+        hashCode = hashCode * 31 + (resourceIdListMap == null ? 1237 : resourceIdListMap.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("NamedCollectionHolder{");
+        builder.append("country=").append(country);
+        builder.append(",videoListMap=").append(videoListMap);
+        builder.append(",personListMap=").append(personListMap);
+        builder.append(",episodeListMap=").append(episodeListMap);
+        builder.append(",resourceIdListMap=").append(resourceIdListMap);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public NamedCollectionHolder clone() {
         try {
             NamedCollectionHolder clone = (NamedCollectionHolder)super.clone();

@@ -7,6 +7,7 @@ nebula {
 
 dependencies {
     compile 'com.netflix.hollow:netflix-hollow:latest.release'
+    compile 'com.google.guava:guava:14.0.1'
 
     testCompile 'junit:junit:4.11'
     testCompile 'com.netflix.hollow:netflix-hollow-diff-ui:latest.release'

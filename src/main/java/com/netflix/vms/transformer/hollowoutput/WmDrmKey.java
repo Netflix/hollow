@@ -23,6 +23,23 @@ public class WmDrmKey implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (int) (downloadableId ^ (downloadableId >>> 32));
+        hashCode = hashCode * 31 + (contentPackagerPublicKey == null ? 1237 : contentPackagerPublicKey.hashCode());
+        hashCode = hashCode * 31 + (encryptedContentKey == null ? 1237 : encryptedContentKey.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("WmDrmKey{");
+        builder.append("downloadableId=").append(downloadableId);
+        builder.append(",contentPackagerPublicKey=").append(contentPackagerPublicKey);
+        builder.append(",encryptedContentKey=").append(encryptedContentKey);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public WmDrmKey clone() {
         try {
             WmDrmKey clone = (WmDrmKey)super.clone();

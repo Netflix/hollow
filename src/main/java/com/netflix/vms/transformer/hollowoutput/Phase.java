@@ -63,6 +63,43 @@ public class Phase implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + rolloutId;
+        hashCode = hashCode * 31 + (video == null ? 1237 : video.hashCode());
+        hashCode = hashCode * 31 + Arrays.hashCode(name);
+        hashCode = hashCode * 31 + (isCoreMetaDataShown? 1231 : 1237);
+        hashCode = hashCode * 31 + (projectedLaunchDates == null ? 1237 : projectedLaunchDates.hashCode());
+        hashCode = hashCode * 31 + (windowsMap == null ? 1237 : windowsMap.hashCode());
+        hashCode = hashCode * 31 + (rawL10nAttribs == null ? 1237 : rawL10nAttribs.hashCode());
+        hashCode = hashCode * 31 + (trailers == null ? 1237 : trailers.hashCode());
+        hashCode = hashCode * 31 + (casts == null ? 1237 : casts.hashCode());
+        hashCode = hashCode * 31 + (roles == null ? 1237 : roles.hashCode());
+        hashCode = hashCode * 31 + (supplementalVideos == null ? 1237 : supplementalVideos.hashCode());
+        hashCode = hashCode * 31 + (artWorkImageIds == null ? 1237 : artWorkImageIds.hashCode());
+        hashCode = hashCode * 31 + (sourceFileIds == null ? 1237 : sourceFileIds.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("Phase{");
+        builder.append("rolloutId=").append(rolloutId);
+        builder.append(",video=").append(video);
+        builder.append(",name=").append(name);
+        builder.append(",isCoreMetaDataShown=").append(isCoreMetaDataShown);
+        builder.append(",projectedLaunchDates=").append(projectedLaunchDates);
+        builder.append(",windowsMap=").append(windowsMap);
+        builder.append(",rawL10nAttribs=").append(rawL10nAttribs);
+        builder.append(",trailers=").append(trailers);
+        builder.append(",casts=").append(casts);
+        builder.append(",roles=").append(roles);
+        builder.append(",supplementalVideos=").append(supplementalVideos);
+        builder.append(",artWorkImageIds=").append(artWorkImageIds);
+        builder.append(",sourceFileIds=").append(sourceFileIds);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public Phase clone() {
         try {
             Phase clone = (Phase)super.clone();

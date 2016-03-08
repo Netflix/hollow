@@ -14,15 +14,7 @@ public interface IndividualTrailerDelegate extends HollowObjectDelegate {
 
     public Long getSequenceNumberBoxed(int ordinal);
 
-    public int getPostPlayOrdinal(int ordinal);
-
-    public int getSubTypeOrdinal(int ordinal);
-
-    public int getAspectRatioOrdinal(int ordinal);
-
-    public int getThemesOrdinal(int ordinal);
-
-    public int getUsagesOrdinal(int ordinal);
+    public int getPassthroughOrdinal(int ordinal);
 
     public IndividualTrailerTypeAPI getTypeAPI();
 

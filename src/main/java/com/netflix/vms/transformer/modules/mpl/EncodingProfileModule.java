@@ -50,7 +50,7 @@ public class EncodingProfileModule extends AbstractTransformModule {
             long drmType = input._getDrmType();
             int protectionTypeOrdinal = protectionTypeIndex.getMatchingOrdinal(drmType);
             ProtectionTypesHollow protectionTypes = api.getProtectionTypesHollow(protectionTypeOrdinal);
-            output.dRMType = protectionTypes != null ? Collections.singleton(getStrings(protectionTypes._getName()._getValue())) : Collections.emptySet();
+            output.dRMType = protectionTypes != null ? Collections.<Strings>singleton(getStrings(protectionTypes._getName()._getValue())) : Collections.<Strings>emptySet();
 
             output.fileExtensionStr = toCharArray(input._getFileExtension());
             output.mimeTypeStr = toCharArray(input._getMimeType());

@@ -26,6 +26,19 @@ public class NFResourceID implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(value);
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("NFResourceID{");
+        builder.append("value=").append(value);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public NFResourceID clone() {
         try {
             NFResourceID clone = (NFResourceID)super.clone();

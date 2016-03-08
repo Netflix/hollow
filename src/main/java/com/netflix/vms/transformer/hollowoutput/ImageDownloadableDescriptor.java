@@ -30,6 +30,27 @@ public class ImageDownloadableDescriptor implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + streamProfileId;
+        hashCode = hashCode * 31 + (videoResolution == null ? 1237 : videoResolution.hashCode());
+        hashCode = hashCode * 31 + (targetDimensions == null ? 1237 : targetDimensions.hashCode());
+        hashCode = hashCode * 31 + (videoFormat == null ? 1237 : videoFormat.hashCode());
+        hashCode = hashCode * 31 + Arrays.hashCode(envBasedDirectory);
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ImageDownloadableDescriptor{");
+        builder.append("streamProfileId=").append(streamProfileId);
+        builder.append(",videoResolution=").append(videoResolution);
+        builder.append(",targetDimensions=").append(targetDimensions);
+        builder.append(",videoFormat=").append(videoFormat);
+        builder.append(",envBasedDirectory=").append(envBasedDirectory);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public ImageDownloadableDescriptor clone() {
         try {
             ImageDownloadableDescriptor clone = (ImageDownloadableDescriptor)super.clone();

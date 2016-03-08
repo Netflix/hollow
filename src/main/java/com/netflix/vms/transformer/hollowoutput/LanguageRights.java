@@ -28,6 +28,25 @@ public class LanguageRights implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + contractId;
+        hashCode = hashCode * 31 + (videoId == null ? 1237 : videoId.hashCode());
+        hashCode = hashCode * 31 + (languageRestrictionsMap == null ? 1237 : languageRestrictionsMap.hashCode());
+        hashCode = hashCode * 31 + (fallbackRestrictionsMap == null ? 1237 : fallbackRestrictionsMap.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("LanguageRights{");
+        builder.append("contractId=").append(contractId);
+        builder.append(",videoId=").append(videoId);
+        builder.append(",languageRestrictionsMap=").append(languageRestrictionsMap);
+        builder.append(",fallbackRestrictionsMap=").append(fallbackRestrictionsMap);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public LanguageRights clone() {
         try {
             LanguageRights clone = (LanguageRights)super.clone();

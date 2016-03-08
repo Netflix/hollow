@@ -21,6 +21,23 @@ public class DeploymentIntent implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + profileId;
+        hashCode = hashCode * 31 + bitrate;
+        hashCode = hashCode * 31 + (country == null ? 1237 : country.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("DeploymentIntent{");
+        builder.append("profileId=").append(profileId);
+        builder.append(",bitrate=").append(bitrate);
+        builder.append(",country=").append(country);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public DeploymentIntent clone() {
         try {
             DeploymentIntent clone = (DeploymentIntent)super.clone();

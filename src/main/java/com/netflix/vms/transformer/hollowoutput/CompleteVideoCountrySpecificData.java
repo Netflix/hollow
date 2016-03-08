@@ -43,6 +43,31 @@ public class CompleteVideoCountrySpecificData implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (metadataAvailabilityDate == null ? 1237 : metadataAvailabilityDate.hashCode());
+        hashCode = hashCode * 31 + (firstDisplayDate == null ? 1237 : firstDisplayDate.hashCode());
+        hashCode = hashCode * 31 + (firstDisplayDateByLocale == null ? 1237 : firstDisplayDateByLocale.hashCode());
+        hashCode = hashCode * 31 + (certificationList == null ? 1237 : certificationList.hashCode());
+        hashCode = hashCode * 31 + (dateWindowWiseSeasonSequenceNumberMap == null ? 1237 : dateWindowWiseSeasonSequenceNumberMap.hashCode());
+        hashCode = hashCode * 31 + (mediaAvailabilityWindows == null ? 1237 : mediaAvailabilityWindows.hashCode());
+        hashCode = hashCode * 31 + (imagesAvailabilityWindows == null ? 1237 : imagesAvailabilityWindows.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("CompleteVideoCountrySpecificData{");
+        builder.append("metadataAvailabilityDate=").append(metadataAvailabilityDate);
+        builder.append(",firstDisplayDate=").append(firstDisplayDate);
+        builder.append(",firstDisplayDateByLocale=").append(firstDisplayDateByLocale);
+        builder.append(",certificationList=").append(certificationList);
+        builder.append(",dateWindowWiseSeasonSequenceNumberMap=").append(dateWindowWiseSeasonSequenceNumberMap);
+        builder.append(",mediaAvailabilityWindows=").append(mediaAvailabilityWindows);
+        builder.append(",imagesAvailabilityWindows=").append(imagesAvailabilityWindows);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public CompleteVideoCountrySpecificData clone() {
         try {
             CompleteVideoCountrySpecificData clone = (CompleteVideoCountrySpecificData)super.clone();

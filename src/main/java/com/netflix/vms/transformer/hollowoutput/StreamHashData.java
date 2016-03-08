@@ -21,6 +21,25 @@ public class StreamHashData implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (int) (cRC32Hash ^ (cRC32Hash >>> 32));
+        hashCode = hashCode * 31 + (int) (sha1_1 ^ (sha1_1 >>> 32));
+        hashCode = hashCode * 31 + (int) (sha1_2 ^ (sha1_2 >>> 32));
+        hashCode = hashCode * 31 + (int) (sha1_3 ^ (sha1_3 >>> 32));
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("StreamHashData{");
+        builder.append("cRC32Hash=").append(cRC32Hash);
+        builder.append(",sha1_1=").append(sha1_1);
+        builder.append(",sha1_2=").append(sha1_2);
+        builder.append(",sha1_3=").append(sha1_3);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public StreamHashData clone() {
         try {
             StreamHashData clone = (StreamHashData)super.clone();

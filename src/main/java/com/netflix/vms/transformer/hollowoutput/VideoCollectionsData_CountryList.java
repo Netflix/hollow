@@ -21,6 +21,21 @@ public class VideoCollectionsData_CountryList implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (country == null ? 1237 : country.hashCode());
+        hashCode = hashCode * 31 + (item == null ? 1237 : item.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoCollectionsData_CountryList{");
+        builder.append("country=").append(country);
+        builder.append(",item=").append(item);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VideoCollectionsData_CountryList clone() {
         try {
             VideoCollectionsData_CountryList clone = (VideoCollectionsData_CountryList)super.clone();

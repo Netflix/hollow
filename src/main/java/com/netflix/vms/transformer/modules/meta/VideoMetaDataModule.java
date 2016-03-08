@@ -359,7 +359,8 @@ public class VideoMetaDataModule {
             VideoDateWindowHollow dateWindow = api.getVideoDateWindowHollow(ordinal);
 
             vmd.isTheatricalRelease = dateWindow._getIsTheatricalRelease();
-            vmd.year = dateWindow._getTheatricalReleaseYear();
+            int theatricalReleaseYear = dateWindow._getTheatricalReleaseYear();
+            vmd.year = theatricalReleaseYear == Integer.MIN_VALUE ? 0 : theatricalReleaseYear;
             vmd.latestYear = vmd.year;
             if(dateWindow._getTheatricalReleaseDate() != Long.MIN_VALUE)
                 vmd.theatricalReleaseDate = new Date(dateWindow._getTheatricalReleaseDate());

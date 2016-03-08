@@ -29,6 +29,25 @@ public class CompleteVideo implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (id == null ? 1237 : id.hashCode());
+        hashCode = hashCode * 31 + (country == null ? 1237 : country.hashCode());
+        hashCode = hashCode * 31 + (facetData == null ? 1237 : facetData.hashCode());
+        hashCode = hashCode * 31 + (countrySpecificData == null ? 1237 : countrySpecificData.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("CompleteVideo{");
+        builder.append("id=").append(id);
+        builder.append(",country=").append(country);
+        builder.append(",facetData=").append(facetData);
+        builder.append(",countrySpecificData=").append(countrySpecificData);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public CompleteVideo clone() {
         try {
             CompleteVideo clone = (CompleteVideo)super.clone();

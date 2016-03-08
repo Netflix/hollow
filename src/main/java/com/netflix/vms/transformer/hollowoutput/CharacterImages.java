@@ -20,6 +20,21 @@ public class CharacterImages implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + id;
+        hashCode = hashCode * 31 + (artWorkDescriptorList == null ? 1237 : artWorkDescriptorList.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("CharacterImages{");
+        builder.append("id=").append(id);
+        builder.append(",artWorkDescriptorList=").append(artWorkDescriptorList);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public CharacterImages clone() {
         try {
             CharacterImages clone = (CharacterImages)super.clone();

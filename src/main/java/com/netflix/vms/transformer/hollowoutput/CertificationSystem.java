@@ -23,6 +23,23 @@ public class CertificationSystem implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + id;
+        hashCode = hashCode * 31 + (officialURL == null ? 1237 : officialURL.hashCode());
+        hashCode = hashCode * 31 + (country == null ? 1237 : country.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("CertificationSystem{");
+        builder.append("id=").append(id);
+        builder.append(",officialURL=").append(officialURL);
+        builder.append(",country=").append(country);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public CertificationSystem clone() {
         try {
             CertificationSystem clone = (CertificationSystem)super.clone();

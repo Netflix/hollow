@@ -25,6 +25,23 @@ public class TrickPlayDownloadable implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (fileName == null ? 1237 : fileName.hashCode());
+        hashCode = hashCode * 31 + (baseDownloadable == null ? 1237 : baseDownloadable.hashCode());
+        hashCode = hashCode * 31 + (descriptor == null ? 1237 : descriptor.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("TrickPlayDownloadable{");
+        builder.append("fileName=").append(fileName);
+        builder.append(",baseDownloadable=").append(baseDownloadable);
+        builder.append(",descriptor=").append(descriptor);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public TrickPlayDownloadable clone() {
         try {
             TrickPlayDownloadable clone = (TrickPlayDownloadable)super.clone();

@@ -19,6 +19,21 @@ public class RolloutPhaseWindow implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + phaseOrdinal;
+        hashCode = hashCode * 31 + (phaseWindow == null ? 1237 : phaseWindow.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("RolloutPhaseWindow{");
+        builder.append("phaseOrdinal=").append(phaseOrdinal);
+        builder.append(",phaseWindow=").append(phaseWindow);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public RolloutPhaseWindow clone() {
         try {
             RolloutPhaseWindow clone = (RolloutPhaseWindow)super.clone();

@@ -17,6 +17,21 @@ public class ImageSubtitleIndexByteRange implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (int) (masterIndexOffset ^ (masterIndexOffset >>> 32));
+        hashCode = hashCode * 31 + masterIndexSize;
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ImageSubtitleIndexByteRange{");
+        builder.append("masterIndexOffset=").append(masterIndexOffset);
+        builder.append(",masterIndexSize=").append(masterIndexSize);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public ImageSubtitleIndexByteRange clone() {
         try {
             ImageSubtitleIndexByteRange clone = (ImageSubtitleIndexByteRange)super.clone();

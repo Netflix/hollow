@@ -26,6 +26,19 @@ public class DrmKeyString implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(value);
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("DrmKeyString{");
+        builder.append("value=").append(value);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public DrmKeyString clone() {
         try {
             DrmKeyString clone = (DrmKeyString)super.clone();

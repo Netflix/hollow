@@ -114,28 +114,33 @@ public class FilterToSmallDataSubset {
         includeAll("DeploymentIntent");
         includeAll("DrmSystem");
         includeAll("EncodingProfileGroup");
+        includeAll("RolloutCharacter");
+        includeAll("ArtWorkImageFormatEntry");
+        includeAll("ArtWorkImageTypeEntry");
+        includeAll("ArtWorkImageRecipe");
+        includeAll("DefaultExtensionRecipe");
+        includeAll("CharacterImages");
+        includeAll("PersonImages");
+        includeAll("TopNVideoData");
+        includeAll("GlobalPerson");
 
         ordinalsToInclude.put("L10NResources", findIncludedL10NOrdinals(includedVideoIds));
 
-        joinIncludedOrdinals(completeVideosToInclude,
+        /*joinIncludedOrdinals(completeVideosToInclude,
                 "GlobalPerson", "id",
                 "CompleteVideo", "facetData.videoMetaData.actorList.element.id",
                                  "facetData.videoMetaData.directorList.element.id",
-                                 "facetData.videoMetaData.creatorList.element.id");
+                                 "facetData.videoMetaData.creatorList.element.id");*/
 
-        joinIncludedOrdinals(completeVideosToInclude,
+        /*joinIncludedOrdinals(completeVideosToInclude,
                         "PersonImages", "id",
                         "CompleteVideo", "facetData.videoMetaData.actorList.element.id",
                                          "facetData.videoMetaData.directorList.element.id",
-                                         "facetData.videoMetaData.creatorList.element.id");
+                                         "facetData.videoMetaData.creatorList.element.id");*/
 
-        joinIncludedOrdinals(rolloutVideosToInclude,
+        /*joinIncludedOrdinals(rolloutVideosToInclude,
                         "CharacterImages", "id",
-                        "RolloutVideo", "summaryMap.value.allPhases.element.roles.element.characterId");
-
-        joinIncludedOrdinals(rolloutVideosToInclude,
-                        "RolloutCharacter", "id",
-                        "RolloutVideo", "summaryMap.value.allPhases.element.roles.element.characterId");
+                        "RolloutVideo", "summaryMap.value.allPhases.element.roles.element.characterId");*/
 
         joinIncludedOrdinals(packagesToInclude,
                         "FileEncodingData", "downloadableId",

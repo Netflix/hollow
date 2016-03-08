@@ -24,6 +24,23 @@ public class ImageDownloadable implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (int) (downloadableId ^ (downloadableId >>> 32));
+        hashCode = hashCode * 31 + (originServerNames == null ? 1237 : originServerNames.hashCode());
+        hashCode = hashCode * 31 + (descriptor == null ? 1237 : descriptor.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ImageDownloadable{");
+        builder.append("downloadableId=").append(downloadableId);
+        builder.append(",originServerNames=").append(originServerNames);
+        builder.append(",descriptor=").append(descriptor);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public ImageDownloadable clone() {
         try {
             ImageDownloadable clone = (ImageDownloadable)super.clone();

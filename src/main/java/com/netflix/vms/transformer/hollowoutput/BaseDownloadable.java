@@ -25,6 +25,25 @@ public class BaseDownloadable implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (int) (downloadableId ^ (downloadableId >>> 32));
+        hashCode = hashCode * 31 + streamProfileId;
+        hashCode = hashCode * 31 + (originServerNames == null ? 1237 : originServerNames.hashCode());
+        hashCode = hashCode * 31 + Arrays.hashCode(envBasedDirectory);
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("BaseDownloadable{");
+        builder.append("downloadableId=").append(downloadableId);
+        builder.append(",streamProfileId=").append(streamProfileId);
+        builder.append(",originServerNames=").append(originServerNames);
+        builder.append(",envBasedDirectory=").append(envBasedDirectory);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public BaseDownloadable clone() {
         try {
             BaseDownloadable clone = (BaseDownloadable)super.clone();

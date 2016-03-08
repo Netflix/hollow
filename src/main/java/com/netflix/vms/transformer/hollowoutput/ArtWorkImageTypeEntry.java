@@ -22,6 +22,25 @@ public class ArtWorkImageTypeEntry implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(nameStr);
+        hashCode = hashCode * 31 + Arrays.hashCode(unavailableFileNameStr);
+        hashCode = hashCode * 31 + (allowMultiples? 1231 : 1237);
+        hashCode = hashCode * 31 + Arrays.hashCode(recipeNameStr);
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ArtWorkImageTypeEntry{");
+        builder.append("nameStr=").append(nameStr);
+        builder.append(",unavailableFileNameStr=").append(unavailableFileNameStr);
+        builder.append(",allowMultiples=").append(allowMultiples);
+        builder.append(",recipeNameStr=").append(recipeNameStr);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public ArtWorkImageTypeEntry clone() {
         try {
             ArtWorkImageTypeEntry clone = (ArtWorkImageTypeEntry)super.clone();

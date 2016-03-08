@@ -91,6 +91,63 @@ public class VideoMetaData implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (isTestTitle? 1231 : 1237);
+        hashCode = hashCode * 31 + (titleTypes == null ? 1237 : titleTypes.hashCode());
+        hashCode = hashCode * 31 + (isSearchOnly? 1231 : 1237);
+        hashCode = hashCode * 31 + (isTV? 1231 : 1237);
+        hashCode = hashCode * 31 + (hasNewContent? 1231 : 1237);
+        hashCode = hashCode * 31 + year;
+        hashCode = hashCode * 31 + latestYear;
+        hashCode = hashCode * 31 + (isTheatricalRelease? 1231 : 1237);
+        hashCode = hashCode * 31 + (theatricalReleaseDate == null ? 1237 : theatricalReleaseDate.hashCode());
+        hashCode = hashCode * 31 + (actorList == null ? 1237 : actorList.hashCode());
+        hashCode = hashCode * 31 + (directorList == null ? 1237 : directorList.hashCode());
+        hashCode = hashCode * 31 + (creatorList == null ? 1237 : creatorList.hashCode());
+        hashCode = hashCode * 31 + showMemberTypeId;
+        hashCode = hashCode * 31 + (showMemberSequenceLabel == null ? 1237 : showMemberSequenceLabel.hashCode());
+        hashCode = hashCode * 31 + (copyright == null ? 1237 : copyright.hashCode());
+        hashCode = hashCode * 31 + (videoSetTypes == null ? 1237 : videoSetTypes.hashCode());
+        hashCode = hashCode * 31 + (countryOfOrigin == null ? 1237 : countryOfOrigin.hashCode());
+        hashCode = hashCode * 31 + (countryOfOriginNameLocale == null ? 1237 : countryOfOriginNameLocale.hashCode());
+        hashCode = hashCode * 31 + (originalLanguageBcp47code == null ? 1237 : originalLanguageBcp47code.hashCode());
+        hashCode = hashCode * 31 + (aliases == null ? 1237 : aliases.hashCode());
+        hashCode = hashCode * 31 + (episodeTypes == null ? 1237 : episodeTypes.hashCode());
+        hashCode = hashCode * 31 + (hooks == null ? 1237 : hooks.hashCode());
+        hashCode = hashCode * 31 + (overrideTitle == null ? 1237 : overrideTitle.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoMetaData{");
+        builder.append("isTestTitle=").append(isTestTitle);
+        builder.append(",titleTypes=").append(titleTypes);
+        builder.append(",isSearchOnly=").append(isSearchOnly);
+        builder.append(",isTV=").append(isTV);
+        builder.append(",hasNewContent=").append(hasNewContent);
+        builder.append(",year=").append(year);
+        builder.append(",latestYear=").append(latestYear);
+        builder.append(",isTheatricalRelease=").append(isTheatricalRelease);
+        builder.append(",theatricalReleaseDate=").append(theatricalReleaseDate);
+        builder.append(",actorList=").append(actorList);
+        builder.append(",directorList=").append(directorList);
+        builder.append(",creatorList=").append(creatorList);
+        builder.append(",showMemberTypeId=").append(showMemberTypeId);
+        builder.append(",showMemberSequenceLabel=").append(showMemberSequenceLabel);
+        builder.append(",copyright=").append(copyright);
+        builder.append(",videoSetTypes=").append(videoSetTypes);
+        builder.append(",countryOfOrigin=").append(countryOfOrigin);
+        builder.append(",countryOfOriginNameLocale=").append(countryOfOriginNameLocale);
+        builder.append(",originalLanguageBcp47code=").append(originalLanguageBcp47code);
+        builder.append(",aliases=").append(aliases);
+        builder.append(",episodeTypes=").append(episodeTypes);
+        builder.append(",hooks=").append(hooks);
+        builder.append(",overrideTitle=").append(overrideTitle);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VideoMetaData clone() {
         try {
             VideoMetaData clone = (VideoMetaData)super.clone();

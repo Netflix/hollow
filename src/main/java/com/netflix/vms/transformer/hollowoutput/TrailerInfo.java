@@ -38,6 +38,39 @@ public class TrailerInfo implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (type == null ? 1237 : type.hashCode());
+        hashCode = hashCode * 31 + Arrays.hashCode(imageTag);
+        hashCode = hashCode * 31 + Arrays.hashCode(imageBackgroundTone);
+        hashCode = hashCode * 31 + mapIndex;
+        hashCode = hashCode * 31 + seasonNumber;
+        hashCode = hashCode * 31 + Arrays.hashCode(subtitleLocale);
+        hashCode = hashCode * 31 + Arrays.hashCode(video);
+        hashCode = hashCode * 31 + videoLength;
+        hashCode = hashCode * 31 + videoOffset;
+        hashCode = hashCode * 31 + Arrays.hashCode(videoValue);
+        hashCode = hashCode * 31 + priority;
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("TrailerInfo{");
+        builder.append("type=").append(type);
+        builder.append(",imageTag=").append(imageTag);
+        builder.append(",imageBackgroundTone=").append(imageBackgroundTone);
+        builder.append(",mapIndex=").append(mapIndex);
+        builder.append(",seasonNumber=").append(seasonNumber);
+        builder.append(",subtitleLocale=").append(subtitleLocale);
+        builder.append(",video=").append(video);
+        builder.append(",videoLength=").append(videoLength);
+        builder.append(",videoOffset=").append(videoOffset);
+        builder.append(",videoValue=").append(videoValue);
+        builder.append(",priority=").append(priority);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public TrailerInfo clone() {
         try {
             TrailerInfo clone = (TrailerInfo)super.clone();

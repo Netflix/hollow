@@ -20,6 +20,23 @@ public class ArtWorkImageFormatEntry implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(nameStr);
+        hashCode = hashCode * 31 + width;
+        hashCode = hashCode * 31 + height;
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ArtWorkImageFormatEntry{");
+        builder.append("nameStr=").append(nameStr);
+        builder.append(",width=").append(width);
+        builder.append(",height=").append(height);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public ArtWorkImageFormatEntry clone() {
         try {
             ArtWorkImageFormatEntry clone = (ArtWorkImageFormatEntry)super.clone();

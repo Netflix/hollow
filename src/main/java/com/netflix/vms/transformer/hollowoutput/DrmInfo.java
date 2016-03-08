@@ -24,6 +24,23 @@ public class DrmInfo implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + drmKeyGroup;
+        hashCode = hashCode * 31 + (drmKey == null ? 1237 : drmKey.hashCode());
+        hashCode = hashCode * 31 + (drmHeaders == null ? 1237 : drmHeaders.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("DrmInfo{");
+        builder.append("drmKeyGroup=").append(drmKeyGroup);
+        builder.append(",drmKey=").append(drmKey);
+        builder.append(",drmHeaders=").append(drmHeaders);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public DrmInfo clone() {
         try {
             DrmInfo clone = (DrmInfo)super.clone();

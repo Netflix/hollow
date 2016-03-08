@@ -30,6 +30,27 @@ public class LanguageRestrictions implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + audioLanguageId;
+        hashCode = hashCode * 31 + (audioLanguage == null ? 1237 : audioLanguage.hashCode());
+        hashCode = hashCode * 31 + (disallowedTimedText == null ? 1237 : disallowedTimedText.hashCode());
+        hashCode = hashCode * 31 + (disallowedTimedTextBcp47codes == null ? 1237 : disallowedTimedTextBcp47codes.hashCode());
+        hashCode = hashCode * 31 + (requiresForcedSubtitles? 1231 : 1237);
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("LanguageRestrictions{");
+        builder.append("audioLanguageId=").append(audioLanguageId);
+        builder.append(",audioLanguage=").append(audioLanguage);
+        builder.append(",disallowedTimedText=").append(disallowedTimedText);
+        builder.append(",disallowedTimedTextBcp47codes=").append(disallowedTimedTextBcp47codes);
+        builder.append(",requiresForcedSubtitles=").append(requiresForcedSubtitles);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public LanguageRestrictions clone() {
         try {
             LanguageRestrictions clone = (LanguageRestrictions)super.clone();

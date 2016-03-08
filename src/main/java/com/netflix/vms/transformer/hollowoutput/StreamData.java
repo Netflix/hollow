@@ -41,6 +41,35 @@ public class StreamData implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (int) (downloadableId ^ (downloadableId >>> 32));
+        hashCode = hashCode * 31 + packageId;
+        hashCode = hashCode * 31 + (int) (fileSizeInBytes ^ (fileSizeInBytes >>> 32));
+        hashCode = hashCode * 31 + (int) (creationTimeStampInSeconds ^ (creationTimeStampInSeconds >>> 32));
+        hashCode = hashCode * 31 + (drmData == null ? 1237 : drmData.hashCode());
+        hashCode = hashCode * 31 + (hashData == null ? 1237 : hashData.hashCode());
+        hashCode = hashCode * 31 + (additionalData == null ? 1237 : additionalData.hashCode());
+        hashCode = hashCode * 31 + (downloadDescriptor == null ? 1237 : downloadDescriptor.hashCode());
+        hashCode = hashCode * 31 + (streamDataDescriptor == null ? 1237 : streamDataDescriptor.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("StreamData{");
+        builder.append("downloadableId=").append(downloadableId);
+        builder.append(",packageId=").append(packageId);
+        builder.append(",fileSizeInBytes=").append(fileSizeInBytes);
+        builder.append(",creationTimeStampInSeconds=").append(creationTimeStampInSeconds);
+        builder.append(",drmData=").append(drmData);
+        builder.append(",hashData=").append(hashData);
+        builder.append(",additionalData=").append(additionalData);
+        builder.append(",downloadDescriptor=").append(downloadDescriptor);
+        builder.append(",streamDataDescriptor=").append(streamDataDescriptor);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public StreamData clone() {
         try {
             StreamData clone = (StreamData)super.clone();

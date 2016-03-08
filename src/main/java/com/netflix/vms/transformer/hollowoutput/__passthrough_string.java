@@ -26,6 +26,19 @@ public class __passthrough_string implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + Arrays.hashCode(value);
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("__passthrough_string{");
+        builder.append("value=").append(value);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public __passthrough_string clone() {
         try {
             __passthrough_string clone = (__passthrough_string)super.clone();

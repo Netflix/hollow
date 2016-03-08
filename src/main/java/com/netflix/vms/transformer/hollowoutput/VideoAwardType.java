@@ -19,6 +19,21 @@ public class VideoAwardType implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + id;
+        hashCode = hashCode * 31 + (festival == null ? 1237 : festival.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoAwardType{");
+        builder.append("id=").append(id);
+        builder.append(",festival=").append(festival);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VideoAwardType clone() {
         try {
             VideoAwardType clone = (VideoAwardType)super.clone();

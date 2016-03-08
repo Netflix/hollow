@@ -53,6 +53,14 @@ public class PackageDrmInfoHollow extends HollowObject {
         return  api().getDrmHeaderInfoListHollow(refOrdinal);
     }
 
+    public boolean _getKeyDecrypted() {
+        return delegate().getKeyDecrypted(ordinal);
+    }
+
+    public Boolean _getKeyDecryptedBoxed() {
+        return delegate().getKeyDecryptedBoxed(ordinal);
+    }
+
     public VMSHollowVideoInputAPI api() {
         return typeApi().getAPI();
     }

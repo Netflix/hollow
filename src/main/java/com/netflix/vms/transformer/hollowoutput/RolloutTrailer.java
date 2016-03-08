@@ -24,6 +24,23 @@ public class RolloutTrailer implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (video == null ? 1237 : video.hashCode());
+        hashCode = hashCode * 31 + sequenceNumber;
+        hashCode = hashCode * 31 + (supplementalInfos == null ? 1237 : supplementalInfos.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("RolloutTrailer{");
+        builder.append("video=").append(video);
+        builder.append(",sequenceNumber=").append(sequenceNumber);
+        builder.append(",supplementalInfos=").append(supplementalInfos);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public RolloutTrailer clone() {
         try {
             RolloutTrailer clone = (RolloutTrailer)super.clone();

@@ -143,6 +143,95 @@ public class ICSMReview implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + movieID;
+        hashCode = hashCode * 31 + (title == null ? 1237 : title.hashCode());
+        hashCode = hashCode * 31 + (link == null ? 1237 : link.hashCode());
+        hashCode = hashCode * 31 + (oneLiner == null ? 1237 : oneLiner.hashCode());
+        hashCode = hashCode * 31 + (reviewerName == null ? 1237 : reviewerName.hashCode());
+        hashCode = hashCode * 31 + (mediaType == null ? 1237 : mediaType.hashCode());
+        hashCode = hashCode * 31 + ageRecommendation;
+        hashCode = hashCode * 31 + (ageExplanation == null ? 1237 : ageExplanation.hashCode());
+        hashCode = hashCode * 31 + stars;
+        hashCode = hashCode * 31 + (sexualContent == null ? 1237 : sexualContent.hashCode());
+        hashCode = hashCode * 31 + sexualContentAlert;
+        hashCode = hashCode * 31 + (languageNote == null ? 1237 : languageNote.hashCode());
+        hashCode = hashCode * 31 + languageAlert;
+        hashCode = hashCode * 31 + (violenceNote == null ? 1237 : violenceNote.hashCode());
+        hashCode = hashCode * 31 + violenceAlert;
+        hashCode = hashCode * 31 + (consumerism == null ? 1237 : consumerism.hashCode());
+        hashCode = hashCode * 31 + consumerismAlert;
+        hashCode = hashCode * 31 + (dat == null ? 1237 : dat.hashCode());
+        hashCode = hashCode * 31 + datAlert;
+        hashCode = hashCode * 31 + (socialBehavior == null ? 1237 : socialBehavior.hashCode());
+        hashCode = hashCode * 31 + socialBehaviorAlert;
+        hashCode = hashCode * 31 + messageAlert;
+        hashCode = hashCode * 31 + (whatsTheStory == null ? 1237 : whatsTheStory.hashCode());
+        hashCode = hashCode * 31 + (isItAnyGood == null ? 1237 : isItAnyGood.hashCode());
+        hashCode = hashCode * 31 + (otherChoices == null ? 1237 : otherChoices.hashCode());
+        hashCode = hashCode * 31 + (parentsNeedToKnow == null ? 1237 : parentsNeedToKnow.hashCode());
+        hashCode = hashCode * 31 + (imgSmall == null ? 1237 : imgSmall.hashCode());
+        hashCode = hashCode * 31 + (imgLarge == null ? 1237 : imgLarge.hashCode());
+        hashCode = hashCode * 31 + redEndsAge;
+        hashCode = hashCode * 31 + greenBeginsAge;
+        hashCode = hashCode * 31 + (releaseDate == null ? 1237 : releaseDate.hashCode());
+        hashCode = hashCode * 31 + (mPAARating == null ? 1237 : mPAARating.hashCode());
+        hashCode = hashCode * 31 + (mPAAExplanation == null ? 1237 : mPAAExplanation.hashCode());
+        hashCode = hashCode * 31 + (genre == null ? 1237 : genre.hashCode());
+        hashCode = hashCode * 31 + (directorNames == null ? 1237 : directorNames.hashCode());
+        hashCode = hashCode * 31 + (castMemberNames == null ? 1237 : castMemberNames.hashCode());
+        hashCode = hashCode * 31 + (plasticReleaseDate == null ? 1237 : plasticReleaseDate.hashCode());
+        hashCode = hashCode * 31 + runtimeInMins;
+        hashCode = hashCode * 31 + (studio == null ? 1237 : studio.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ICSMReview{");
+        builder.append("movieID=").append(movieID);
+        builder.append(",title=").append(title);
+        builder.append(",link=").append(link);
+        builder.append(",oneLiner=").append(oneLiner);
+        builder.append(",reviewerName=").append(reviewerName);
+        builder.append(",mediaType=").append(mediaType);
+        builder.append(",ageRecommendation=").append(ageRecommendation);
+        builder.append(",ageExplanation=").append(ageExplanation);
+        builder.append(",stars=").append(stars);
+        builder.append(",sexualContent=").append(sexualContent);
+        builder.append(",sexualContentAlert=").append(sexualContentAlert);
+        builder.append(",languageNote=").append(languageNote);
+        builder.append(",languageAlert=").append(languageAlert);
+        builder.append(",violenceNote=").append(violenceNote);
+        builder.append(",violenceAlert=").append(violenceAlert);
+        builder.append(",consumerism=").append(consumerism);
+        builder.append(",consumerismAlert=").append(consumerismAlert);
+        builder.append(",dat=").append(dat);
+        builder.append(",datAlert=").append(datAlert);
+        builder.append(",socialBehavior=").append(socialBehavior);
+        builder.append(",socialBehaviorAlert=").append(socialBehaviorAlert);
+        builder.append(",messageAlert=").append(messageAlert);
+        builder.append(",whatsTheStory=").append(whatsTheStory);
+        builder.append(",isItAnyGood=").append(isItAnyGood);
+        builder.append(",otherChoices=").append(otherChoices);
+        builder.append(",parentsNeedToKnow=").append(parentsNeedToKnow);
+        builder.append(",imgSmall=").append(imgSmall);
+        builder.append(",imgLarge=").append(imgLarge);
+        builder.append(",redEndsAge=").append(redEndsAge);
+        builder.append(",greenBeginsAge=").append(greenBeginsAge);
+        builder.append(",releaseDate=").append(releaseDate);
+        builder.append(",mPAARating=").append(mPAARating);
+        builder.append(",mPAAExplanation=").append(mPAAExplanation);
+        builder.append(",genre=").append(genre);
+        builder.append(",directorNames=").append(directorNames);
+        builder.append(",castMemberNames=").append(castMemberNames);
+        builder.append(",plasticReleaseDate=").append(plasticReleaseDate);
+        builder.append(",runtimeInMins=").append(runtimeInMins);
+        builder.append(",studio=").append(studio);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public ICSMReview clone() {
         try {
             ICSMReview clone = (ICSMReview)super.clone();

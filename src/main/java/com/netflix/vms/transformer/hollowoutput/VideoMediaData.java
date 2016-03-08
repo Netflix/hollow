@@ -1,9 +1,11 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import com.netflix.hollow.write.objectmapper.NullablePrimitiveBoolean;
+
 
 public class VideoMediaData implements Cloneable {
 
-    public boolean isAvailableForED = false;
+    public NullablePrimitiveBoolean isAvailableForED = null;
     public boolean isGoLive = false;
     public boolean isOriginal = false;
     public boolean isAutoPlayEnabled = false;
@@ -31,6 +33,35 @@ public class VideoMediaData implements Cloneable {
         if(o.approximateRuntimeInSeconds != approximateRuntimeInSeconds) return false;
         if(o.isLanguageOverride != isLanguageOverride) return false;
         return true;
+    }
+
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (isAvailableForED == null ? 1237 : isAvailableForED.hashCode());
+        hashCode = hashCode * 31 + (isGoLive? 1231 : 1237);
+        hashCode = hashCode * 31 + (isOriginal? 1231 : 1237);
+        hashCode = hashCode * 31 + (isAutoPlayEnabled? 1231 : 1237);
+        hashCode = hashCode * 31 + (dvdReleaseDate == null ? 1237 : dvdReleaseDate.hashCode());
+        hashCode = hashCode * 31 + (hasLocalAudio? 1231 : 1237);
+        hashCode = hashCode * 31 + (hasLocalText? 1231 : 1237);
+        hashCode = hashCode * 31 + approximateRuntimeInSeconds;
+        hashCode = hashCode * 31 + (isLanguageOverride? 1231 : 1237);
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoMediaData{");
+        builder.append("isAvailableForED=").append(isAvailableForED);
+        builder.append(",isGoLive=").append(isGoLive);
+        builder.append(",isOriginal=").append(isOriginal);
+        builder.append(",isAutoPlayEnabled=").append(isAutoPlayEnabled);
+        builder.append(",dvdReleaseDate=").append(dvdReleaseDate);
+        builder.append(",hasLocalAudio=").append(hasLocalAudio);
+        builder.append(",hasLocalText=").append(hasLocalText);
+        builder.append(",approximateRuntimeInSeconds=").append(approximateRuntimeInSeconds);
+        builder.append(",isLanguageOverride=").append(isLanguageOverride);
+        builder.append("}");
+        return builder.toString();
     }
 
     public VideoMediaData clone() {

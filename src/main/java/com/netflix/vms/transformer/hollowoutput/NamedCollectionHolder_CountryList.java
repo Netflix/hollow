@@ -21,6 +21,21 @@ public class NamedCollectionHolder_CountryList implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (country == null ? 1237 : country.hashCode());
+        hashCode = hashCode * 31 + (item == null ? 1237 : item.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("NamedCollectionHolder_CountryList{");
+        builder.append("country=").append(country);
+        builder.append(",item=").append(item);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public NamedCollectionHolder_CountryList clone() {
         try {
             NamedCollectionHolder_CountryList clone = (NamedCollectionHolder_CountryList)super.clone();

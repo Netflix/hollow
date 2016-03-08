@@ -22,6 +22,21 @@ public class VideoMiscData implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (videoAwards == null ? 1237 : videoAwards.hashCode());
+        hashCode = hashCode * 31 + (cSMReview == null ? 1237 : cSMReview.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoMiscData{");
+        builder.append("videoAwards=").append(videoAwards);
+        builder.append(",cSMReview=").append(cSMReview);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public VideoMiscData clone() {
         try {
             VideoMiscData clone = (VideoMiscData)super.clone();

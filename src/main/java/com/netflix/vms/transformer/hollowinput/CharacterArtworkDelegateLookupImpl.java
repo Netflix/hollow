@@ -52,6 +52,10 @@ public class CharacterArtworkDelegateLookupImpl extends HollowObjectAbstractDele
         return typeAPI.getOrdinalPriorityBoxed(ordinal);
     }
 
+    public int getFileImageTypeOrdinal(int ordinal) {
+        return typeAPI.getFileImageTypeOrdinal(ordinal);
+    }
+
     public CharacterArtworkTypeAPI getTypeAPI() {
         return typeAPI;
     }

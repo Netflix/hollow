@@ -21,6 +21,21 @@ public class DownloadLocation implements Cloneable {
         return true;
     }
 
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (directory == null ? 1237 : directory.hashCode());
+        hashCode = hashCode * 31 + (originServerName == null ? 1237 : originServerName.hashCode());
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("DownloadLocation{");
+        builder.append("directory=").append(directory);
+        builder.append(",originServerName=").append(originServerName);
+        builder.append("}");
+        return builder.toString();
+    }
+
     public DownloadLocation clone() {
         try {
             DownloadLocation clone = (DownloadLocation)super.clone();
