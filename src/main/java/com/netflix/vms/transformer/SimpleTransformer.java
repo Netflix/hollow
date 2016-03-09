@@ -1,7 +1,8 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.vms.transformer.hollowinput.VideoArtworkHollow;
+import com.netflix.vms.transformer.hollowoutput.PackageData;
 
+import com.netflix.vms.transformer.hollowinput.VideoArtworkHollow;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
 import com.netflix.vms.transformer.modules.countryspecific.CountrySpecificDataModule;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
@@ -97,11 +98,13 @@ public class SimpleTransformer {
 
                     if (showHierarchiesByCountry != null) {
 
+                        Map<Integer, List<PackageData>> transformedPackageData = packageDataModule.transform(showHierarchiesByCountry);
+
                         Map<String, VideoCollectionsDataHierarchy> vcdByCountry = collectionsModule.buildVideoCollectionsDataByCountry(showHierarchiesByCountry);
                         Map<String, Map<Integer, VideoMetaData>> vmdByCountry = metadataModule.buildVideoMetaDataByCountry(showHierarchiesByCountry);
                         Map<String, Map<Integer, VideoMediaData>> mediaDataByCountry = mediaDataModule.buildVideoMediaDataByCountry(showHierarchiesByCountry);
                         Map<Integer, VideoMiscData> miscData = miscdataModule.buildVideoMiscDataByCountry(showHierarchiesByCountry);
-                        Map<String, Map<Integer, CompleteVideoCountrySpecificData>> countrySpecificByCountry = countrySpecificModule.buildCountrySpecificDataByCountry(showHierarchiesByCountry);
+                        Map<String, Map<Integer, CompleteVideoCountrySpecificData>> countrySpecificByCountry = countrySpecificModule.buildCountrySpecificDataByCountry(showHierarchiesByCountry, transformedPackageData);
 
                         if(vcdByCountry != null) {
                             writeJustTheCurrentData(vcdByCountry, vmdByCountry, miscData, mediaDataByCountry, countrySpecificByCountry, objectMapper);
@@ -110,7 +113,7 @@ public class SimpleTransformer {
                                 countryDecoratorModule.decorateVideoEpisodes(country, vcdByCountry.get(country));
                             }
                         }
-                        //packageDataModule.transform(showHierarchiesByCountry);
+
                     }
                 }
             });
