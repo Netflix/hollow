@@ -15,24 +15,24 @@ public class ShowMeTheProgressDiffTool {
     public static void startTheDiff(HollowReadStateEngine expected, HollowReadStateEngine actual) throws Exception {
         HollowDiff diff = new HollowDiff(expected, actual);
         addTypeDiff(diff, "CompleteVideo", "id.value", "country.id");
-        addTypeDiff(diff, "PackageData", "id");
-        addTypeDiff(diff, "DrmSystem", "id");
+        //addTypeDiff(diff, "PackageData", "id");
+        //addTypeDiff(diff, "DrmSystem", "id");
         addTypeDiff(diff, "OriginServer", "name");
-        addTypeDiff(diff, "EncodingProfile", "id");
+        //addTypeDiff(diff, "EncodingProfile", "id");
 
         addTypeDiff(diff, "ArtWorkImageFormatEntry", "nameStr");
         addTypeDiff(diff, "DeploymentIntent", "profileId", "bitrate", "country.id");
         addTypeDiff(diff, "TopNVideoData", "countryId");
         addTypeDiff(diff, "RolloutCharacter", "id");
         addTypeDiff(diff, "RolloutVideo", "video.value");
-        addTypeDiff(diff, "DrmKey", "keyId");
-        addTypeDiff(diff, "WmDrmKey", "downloadableId");
-        addTypeDiff(diff, "DrmInfoData", "packageId");
-        addTypeDiff(diff, "EncodingProfileGroup", "groupNameStr"); // TODO: zero-diff
+        //addTypeDiff(diff, "DrmKey", "keyId");
+        //addTypeDiff(diff, "WmDrmKey", "downloadableId");
+        //addTypeDiff(diff, "DrmInfoData", "packageId");
+        //addTypeDiff(diff, "EncodingProfileGroup", "groupNameStr"); // TODO: zero-diff
         addTypeDiff(diff, "GlobalPerson", "id");
         addTypeDiff(diff, "PersonImages", "id");
         addTypeDiff(diff, "CharacterImages", "id");
-        addTypeDiff(diff, "FileEncodingData", "downloadableId");
+        //addTypeDiff(diff, "FileEncodingData", "downloadableId");
 
         addTypeDiff(diff, "VideoEpisode_CountryList", "country.id", "item.deliverableVideo.value");
 
