@@ -1,16 +1,13 @@
 package com.netflix.vms.transformer.modules.packages;
 
-import com.netflix.vms.transformer.hollowinput.PackagesHollow;
-
-import com.netflix.vms.transformer.hollowinput.VideoStreamInfoHollow;
-import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
-import com.netflix.vms.transformer.hollowinput.StreamNonImageInfoHollow;
-import com.netflix.vms.transformer.hollowinput.StreamDimensionsHollow;
-import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
+import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
+import com.netflix.vms.transformer.hollowinput.StreamDimensionsHollow;
+import com.netflix.vms.transformer.hollowinput.StreamNonImageInfoHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfileGroupsHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfileIdHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VideoStreamInfoHollow;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.index.IndexSpec;
@@ -23,19 +20,13 @@ import java.util.Set;
 
 public class VideoFormatDescriptorIdentifier {
 
-    private final VMSHollowVideoInputAPI api;
-
     private final Map<String, VideoFormatDescriptor> videoFormatDescriptorMap;
     private final Set<Integer> ultraHDEncodingProfileIds;
     private final Set<SuperHDIdentifier> validSuperHDIdentifiers;
     private final Set<TargetResolution> aspectRatioVideoFormatIdentifiers;
 
-    private final HollowPrimaryKeyIndex streamProfileIdx;
-
 
     public VideoFormatDescriptorIdentifier(VMSHollowVideoInputAPI api, VMSTransformerIndexer indexer) {
-        this.api = api;
-        this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
         this.videoFormatDescriptorMap = getVideoFormatDescriptorMap();
         this.ultraHDEncodingProfileIds = getUltraHDEncodingProfileIds(api, indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE_GROUP));
         this.validSuperHDIdentifiers = getValidSuperHDIdentifiers();
@@ -159,11 +150,11 @@ public class VideoFormatDescriptorIdentifier {
         set.add(new TargetResolution(0, 171));
         set.add(new TargetResolution(0, 228));
         set.add(new TargetResolution(0, 114));
-        set.add(new TargetResolution(0, 159));
-        set.add(new TargetResolution(0, 185));
-        set.add(new TargetResolution(0, 370));
-        set.add(new TargetResolution(0, 450));
-        set.add(new TargetResolution(0, 900));
+        set.add(new TargetResolution(159, 0));
+        set.add(new TargetResolution(185, 0));
+        set.add(new TargetResolution(370, 0));
+        set.add(new TargetResolution(450, 0));
+        set.add(new TargetResolution(900, 0));
 
         return set;
     }

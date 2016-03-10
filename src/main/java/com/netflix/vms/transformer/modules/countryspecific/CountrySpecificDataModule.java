@@ -1,28 +1,28 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
-import java.util.Arrays;
-
-import com.netflix.vms.transformer.hollowoutput.StreamData;
-import com.netflix.vms.transformer.hollowoutput.PackageData;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.ShowHierarchy;
+import com.netflix.vms.transformer.hollowinput.CdnDeploymentHollow;
 import com.netflix.vms.transformer.hollowinput.ConsolidatedCertSystemRatingHollow;
 import com.netflix.vms.transformer.hollowinput.ConsolidatedCertificationSystemsHollow;
 import com.netflix.vms.transformer.hollowinput.ConsolidatedVideoCountryRatingHollow;
 import com.netflix.vms.transformer.hollowinput.ConsolidatedVideoRatingHollow;
 import com.netflix.vms.transformer.hollowinput.ConsolidatedVideoRatingsHollow;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
+import com.netflix.vms.transformer.hollowinput.DownloadableIdHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
 import com.netflix.vms.transformer.hollowinput.MapOfFirstDisplayDatesHollow;
+import com.netflix.vms.transformer.hollowinput.PackageMomentHollow;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
 import com.netflix.vms.transformer.hollowinput.PackagesHollow;
-import com.netflix.vms.transformer.hollowinput.StreamNonImageInfoHollow;
+import com.netflix.vms.transformer.hollowinput.StreamDimensionsHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoRatingAdvisoriesHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRatingAdvisoryIdHollow;
+import com.netflix.vms.transformer.hollowinput.VideoRightsContractAssetHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractIdHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractPackageHollow;
@@ -33,19 +33,29 @@ import com.netflix.vms.transformer.hollowinput.VideoRightsWindowHollow;
 import com.netflix.vms.transformer.hollowoutput.Certification;
 import com.netflix.vms.transformer.hollowoutput.CertificationSystem;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
+import com.netflix.vms.transformer.hollowoutput.ContractRestriction;
 import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
+import com.netflix.vms.transformer.hollowoutput.ImageDownloadable;
+import com.netflix.vms.transformer.hollowoutput.ImageDownloadableDescriptor;
 import com.netflix.vms.transformer.hollowoutput.LinkedHashSetOfStrings;
 import com.netflix.vms.transformer.hollowoutput.MovieCertification;
 import com.netflix.vms.transformer.hollowoutput.MovieRatingReason;
 import com.netflix.vms.transformer.hollowoutput.NFLocale;
+import com.netflix.vms.transformer.hollowoutput.PackageData;
+import com.netflix.vms.transformer.hollowoutput.PixelAspect;
 import com.netflix.vms.transformer.hollowoutput.SortedMapOfDateWindowToListOfInteger;
+import com.netflix.vms.transformer.hollowoutput.StreamData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
+import com.netflix.vms.transformer.hollowoutput.TargetDimensions;
 import com.netflix.vms.transformer.hollowoutput.VMSAvailabilityWindow;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoContractInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
+import com.netflix.vms.transformer.hollowoutput.VideoImage;
+import com.netflix.vms.transformer.hollowoutput.VideoMoment;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
+import com.netflix.vms.transformer.hollowoutput.VideoResolution;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
@@ -57,6 +67,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class CountrySpecificDataModule {
 
@@ -73,6 +85,7 @@ public class CountrySpecificDataModule {
 
     private final VideoFormatDescriptorIdentifier videoFormatIdentifier;
 
+    private final Map<Integer, Strings> soundTypesMap;
 
     private Map<Integer, Map<String, List<Certification>>> perCountryCertificationLists;
     private Map<Integer, List<PackageData>> transformedPackageData;
@@ -85,12 +98,24 @@ public class CountrySpecificDataModule {
         this.certSystemRatingIdx = indexer.getPrimaryKeyIndex(IndexSpec.CERT_SYSTEM_RATING);
         this.packageIdx = indexer.getPrimaryKeyIndex(IndexSpec.PACKAGES);
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
+        this.soundTypesMap = getSoundTypesMap();
 
         this.perCountryCertificationLists = new HashMap<Integer, Map<String,List<Certification>>>();
 
         this.videoFormatIdentifier = new VideoFormatDescriptorIdentifier(api, indexer);
 
         FILTERED_VIDEO_PACKAGE_INFO = getFilteredVideoPackageInfo();
+    }
+
+    private Map<Integer, Strings> getSoundTypesMap() {
+        Map<Integer, Strings> map = new HashMap<Integer, Strings>();
+
+        map.put(1, new Strings("1.0"));
+        map.put(2, new Strings("2.0"));
+        map.put(6, new Strings("5.1"));
+        map.put(8, new Strings("8.1"));
+
+        return map;
     }
 
     public Map<String, Map<Integer, CompleteVideoCountrySpecificData>> buildCountrySpecificDataByCountry(Map<String, ShowHierarchy> showHierarchiesByCountry, Map<Integer, List<PackageData>> transformedPackageData) {
@@ -157,12 +182,12 @@ public class CountrySpecificDataModule {
         if(rightsOrdinal != -1) {
             VideoRightsHollow rights = api.getVideoRightsHollow(rightsOrdinal);
 
-            populateWindowData(videoId, data, rights);
+            populateWindowData(videoId, countryCode, data, rights);
             populateFirstDisplayDateData(data, rights);
         }
     }
 
-    private void populateWindowData(Integer videoId, CompleteVideoCountrySpecificData data, VideoRightsHollow videoRights) {
+    private void populateWindowData(Integer videoId, String country, CompleteVideoCountrySpecificData data, VideoRightsHollow videoRights) {
         List<VMSAvailabilityWindow> availabilityWindows = new ArrayList<VMSAvailabilityWindow>();
 
         boolean isGoLive = isGoLive(videoRights);
@@ -189,7 +214,7 @@ public class CountrySpecificDataModule {
                         WindowPackageContractInfo windowPackageContractInfo = outputWindow.windowInfosByPackageId.get(packageId);
                         if(windowPackageContractInfo != null) {
                             VideoPackageInfo videoPackageInfo = windowPackageContractInfo.videoPackageInfo;
-                            //VideoContractInfo contractInfo = mergeMultiple
+                            // MERGE MULTIPLE CONTRACTS
 
 
                         } else {
@@ -198,7 +223,7 @@ public class CountrySpecificDataModule {
                                 if(shouldFilterOutWindowInfo(isGoLive, contract))
                                     outputWindow.windowInfosByPackageId.put(ZERO, buildFilteredWindowPackageContractInfo((int) contractIdHollow._getValue()));
                                 else
-                                    outputWindow.windowInfosByPackageId.put(packageId, buildWindowPackageContractInfo(packageData, contract));
+                                    outputWindow.windowInfosByPackageId.put(packageId, buildWindowPackageContractInfo(packageData, contract, country));
                             }
                         }
 
@@ -257,7 +282,49 @@ public class CountrySpecificDataModule {
         return info;
     }
 
-    private WindowPackageContractInfo buildWindowPackageContractInfo(PackageData packageData, VideoRightsContractHollow contract) {
+    private WindowPackageContractInfo buildWindowPackageContractInfo(PackageData packageData, VideoRightsContractHollow contract, String country) {
+        PackagesHollow inputPackage = api.getPackagesHollow(packageIdx.getMatchingOrdinal((long)packageData.id));
+
+        Map<Long, List<VideoMoment>> downloadableIdsToVideoMoments = new HashMap<Long, List<VideoMoment>>();
+        for(PackageMomentHollow packageMoment : inputPackage._getMoments()) {
+            List<DownloadableIdHollow> downloadableIdList = packageMoment._getDownloadableIds();
+
+            if(downloadableIdList != null) {
+                VideoMoment videoMoment = new VideoMoment();
+                videoMoment.bifIndex = packageMoment._getBifIndex();
+                videoMoment.msOffset = packageMoment._getOffsetMillis();
+                videoMoment.packageId = packageData.id;
+                videoMoment.runtimeMs = packageMoment._getClipSpecRuntimeMillis();
+                videoMoment.sequenceNumber = (int) packageMoment._getMomentSeqNumber();
+                videoMoment.videoMomentTypeName = new Strings(packageMoment._getMomentType()._getValue());
+
+                StringHollow packageMomentTags = packageMoment._getTags();
+                if(packageMomentTags != null) {
+                    String tags = packageMomentTags._getValue();
+                    if(!"".equals(tags)) {
+                        videoMoment.momentTags = new ArrayList<Strings>();
+                        for(String tag : tags.split(",")) {
+                            videoMoment.momentTags.add(new Strings(tag));
+                        }
+                    }
+                }
+
+                if(videoMoment.momentTags == null)
+                    videoMoment.momentTags = Collections.emptyList();
+
+                for(DownloadableIdHollow id : downloadableIdList) {
+                    Long downloadableId = id._getValueBoxed();
+                    List<VideoMoment> list = downloadableIdsToVideoMoments.get(downloadableId);
+                    if(list == null) {
+                        list = new ArrayList<VideoMoment>();
+                        downloadableIdsToVideoMoments.put(downloadableId, list);
+                    }
+                    list.add(videoMoment);
+                }
+            }
+        }
+
+
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
         info.videoContractInfo.contractId = (int) contract._getContractId();
@@ -267,11 +334,21 @@ public class CountrySpecificDataModule {
         info.videoContractInfo.isDayAfterBroadcast = contract._getDayAfterBroadcast();
         info.videoContractInfo.hasRollingEpisodes = contract._getDayAfterBroadcast();
         info.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(Collections.singletonList(new Strings(contract._getCupToken()._getValue())));
+        info.videoContractInfo.assetBcp47Codes = new HashSet<Strings>();
 
-
+        for(VideoRightsContractAssetHollow asset : contract._getAssets()) {
+            info.videoContractInfo.assetBcp47Codes.add(new Strings(asset._getBcp47Code()._getValue()));
+        }
 
         info.videoPackageInfo = new VideoPackageInfo();
+        info.videoPackageInfo.packageId = packageData.id;
         info.videoPackageInfo.formats = new HashSet<VideoFormatDescriptor>();
+        info.videoPackageInfo.soundTypes = new ArrayList<Strings>();
+
+        Set<com.netflix.vms.transformer.hollowoutput.Long> excludedDownloadables = findRelevantExcludedDownloadables(packageData, country);
+
+        Set<Integer> soundTypesAudioChannels = new TreeSet<Integer>();
+        Set<String> screenFormats = new TreeSet<String>();
 
         long longestRuntimeInSeconds = 0;
 
@@ -285,17 +362,136 @@ public class CountrySpecificDataModule {
             if(descriptor.id == 1 || descriptor.id == 3 || descriptor.id == 4)  // Only interested in HD or better
                 info.videoPackageInfo.formats.add(descriptor);
 
-            if("VIDEO".equals(streamProfileType)) {
+            if("VIDEO".equals(streamProfileType) || "MUXED".equals(streamProfileType)) {
                 if(streamData.streamDataDescriptor.runTimeInSeconds > longestRuntimeInSeconds)
                     longestRuntimeInSeconds = streamData.streamDataDescriptor.runTimeInSeconds;
+
+                PixelAspect pixelAspect = streamData.streamDataDescriptor.pixelAspect;
+                VideoResolution videoResolution = streamData.streamDataDescriptor.videoResolution;
+
+                if(pixelAspect != null && videoResolution != null && videoResolution.height != 0 && videoResolution.width != 0) {
+                    int parHeight = Math.max(pixelAspect.height, 1);
+                    int parWidth = Math.max(pixelAspect.width, 1);
+
+                    float screenFormat = ((float) (videoResolution.width * parWidth)) / (videoResolution.height * parHeight);
+                    screenFormats.add(String.format("%.2f:1", screenFormat));
+                }
+
             } else if("AUDIO".equals(streamProfileType)) {
-                profile._getAudioChannelCount();
+                if(excludedDownloadables != null && !excludedDownloadables.contains(new com.netflix.vms.transformer.hollowoutput.Long(streamData.downloadableId)))
+                    soundTypesAudioChannels.add(Integer.valueOf((int)profile._getAudioChannelCount()));
             }
         }
+
+        Map<VideoMoment, List<ImageDownloadable>> videoMomentToDownloadableListMap = buildVideoMomentToDownloadableListMap(inputPackage, downloadableIdsToVideoMoments);
+
+        info.videoPackageInfo.stillImagesMap = new HashMap<Strings, List<VideoImage>>();
+        for(Map.Entry<VideoMoment, List<ImageDownloadable>> entry : videoMomentToDownloadableListMap.entrySet()) {
+            VideoMoment moment = entry.getKey();
+
+            List<VideoImage> list = info.videoPackageInfo.stillImagesMap.get(moment.videoMomentTypeName);
+            if(list == null) {
+                list = new ArrayList<VideoImage>();
+                info.videoPackageInfo.stillImagesMap.put(moment.videoMomentTypeName, list);
+            }
+
+            VideoImage image = new VideoImage();
+            image.videoId = packageData.video;
+            image.videoMoment = moment;
+            image.downloadableList = entry.getValue();
+
+            list.add(image);
+        }
+
+        info.videoPackageInfo.screenFormats = new ArrayList<Strings>(screenFormats.size());
+        for(String screenFormat : screenFormats) {
+            info.videoPackageInfo.screenFormats.add(new Strings(screenFormat));
+        }
+
+        info.videoPackageInfo.soundTypes = new ArrayList<Strings>(soundTypesAudioChannels.size());
+        for(Integer soundType : soundTypesAudioChannels) {
+            Strings soundTypeStr= soundTypesMap.get(soundType);
+            if(soundTypeStr != null)
+                info.videoPackageInfo.soundTypes.add(soundTypeStr);
+        }
+
 
         info.videoPackageInfo.runtimeInSeconds = (int) longestRuntimeInSeconds;
 
         return info;
+    }
+
+    private Map<VideoMoment, List<ImageDownloadable>> buildVideoMomentToDownloadableListMap(PackagesHollow inputPackage, Map<Long, List<VideoMoment>> downloadableIdsToVideoMoments) {
+        Map<VideoMoment, List<ImageDownloadable>> videoMomentToDownloadableListMap = new HashMap<VideoMoment, List<ImageDownloadable>>();
+        for(PackageStreamHollow stream : inputPackage._getDownloadables()) {
+            int streamProfileOrdinal = streamProfileIdx.getMatchingOrdinal(stream._getStreamProfileId());
+            StreamProfilesHollow profile = api.getStreamProfilesHollow(streamProfileOrdinal);
+            String streamProfileType = profile._getProfileType()._getValue();
+
+            if("MERCHSTILL".equals(streamProfileType)) {
+                ImageDownloadable downloadable = new ImageDownloadable();
+
+                downloadable.downloadableId = stream._getDownloadableId();
+
+                downloadable.originServerNames = new ArrayList<Strings>();
+                Set<CdnDeploymentHollow> cdnDeployments = stream._getDeployment()._getDeploymentInfo()._getCdnDeployments();
+                for(CdnDeploymentHollow deployment : cdnDeployments) {
+                    downloadable.originServerNames.add(new Strings(deployment._getOriginServer()._getValue()));
+                }
+
+                downloadable.descriptor = new ImageDownloadableDescriptor();
+                downloadable.descriptor.streamProfileId = (int) stream._getStreamProfileId();
+                downloadable.descriptor.videoFormat = videoFormatIdentifier.selectVideoFormatDescriptor(stream);
+
+                StreamDimensionsHollow dimensions = stream._getDimensions();
+                if(dimensions != null) {
+                    downloadable.descriptor.videoResolution = new VideoResolution();
+                    downloadable.descriptor.targetDimensions = new TargetDimensions();
+                    downloadable.descriptor.videoResolution.height = dimensions._getHeightInPixels();
+                    downloadable.descriptor.videoResolution.width = dimensions._getWidthInPixels();
+                    downloadable.descriptor.targetDimensions.heightInPixels = dimensions._getTargetHeightInPixels();
+                    downloadable.descriptor.targetDimensions.widthInPixels = dimensions._getTargetWidthInPixels();
+                }
+
+                List<VideoMoment> videoMomentList = downloadableIdsToVideoMoments.get(stream._getDownloadableId());
+                if(videoMomentList != null) {
+                    for(VideoMoment moment : videoMomentList) {
+                        List<ImageDownloadable> list = videoMomentToDownloadableListMap.get(moment);
+                        if(list == null) {
+                            list = new ArrayList<ImageDownloadable>();
+                            videoMomentToDownloadableListMap.put(moment, list);
+                        }
+                        list.add(downloadable);
+                    }
+                }
+            }
+        }
+        return videoMomentToDownloadableListMap;
+    }
+
+    private Set<com.netflix.vms.transformer.hollowoutput.Long> findRelevantExcludedDownloadables(PackageData packageData, String country) {
+        Set<ContractRestriction> countryContractRestrictions = packageData.contractRestrictions.get(new ISOCountry(country));
+
+        if(countryContractRestrictions == null)
+            return null;
+
+        long now = System.currentTimeMillis();
+
+        Set<com.netflix.vms.transformer.hollowoutput.Long> nextExcludedDownloadables = Collections.emptySet();
+        long nextStartDate = Long.MAX_VALUE;
+
+        for(ContractRestriction restriction : countryContractRestrictions) {
+            if(now > restriction.availabilityWindow.startDate.val && now < restriction.availabilityWindow.endDate.val) {
+                return restriction.excludedDownloadables;
+            } else if(now < restriction.availabilityWindow.startDate.val) {
+                if(nextStartDate > restriction.availabilityWindow.startDate.val) {
+                    nextStartDate = restriction.availabilityWindow.startDate.val;
+                    nextExcludedDownloadables = restriction.excludedDownloadables;
+                }
+            }
+        }
+
+        return nextExcludedDownloadables;
     }
 
     private VideoRightsContractHollow getContract(VideoRightsRightsHollow rights, long contractId) {
