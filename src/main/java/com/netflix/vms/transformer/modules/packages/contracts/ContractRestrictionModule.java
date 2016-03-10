@@ -185,7 +185,6 @@ public class ContractRestrictionModule {
             langRestriction.disallowedTimedText = disallowedTimedTextIds;
             langRestriction.disallowedTimedTextBcp47codes = disallowedTimedTextCodes;
 
-            //if(langRestriction.requiresForcedSubtitles || !disallowedTimedTextCodes.isEmpty())
             restriction.languageBcp47RestrictionsMap.put(audioLanguage, langRestriction);
         }
 

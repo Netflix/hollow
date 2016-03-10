@@ -1,10 +1,9 @@
 package com.netflix.vms.transformer.modules.meta;
 
+import com.netflix.vms.transformer.util.RollupValues;
 
-public class VideoMetaDataRollupValues {
 
-    private boolean doShow = false;
-    private boolean doSeason = false;
+public class VideoMetaDataRollupValues extends RollupValues {
 
     private long earliestFirstDisplayDate = Long.MAX_VALUE;
     private long latestLiveFirstDisplayDate;
@@ -13,12 +12,7 @@ public class VideoMetaDataRollupValues {
     private int seasonLatestYear;
 
     public void newSeason() {
-        this.doSeason = false;
         seasonLatestYear = 0;
-    }
-
-    public void newShow() {
-        this.doShow = false;
     }
 
     public void newLatestYear(int latestYear) {
@@ -52,22 +46,6 @@ public class VideoMetaDataRollupValues {
 
     public int getShowLatestYear() {
         return showLatestYear;
-    }
-
-    public void setDoShow(boolean doShow) {
-        this.doShow = doShow;
-    }
-
-    public boolean doShow() {
-        return this.doShow;
-    }
-
-    public void setDoSeason(boolean doSeason) {
-        this.doSeason = doSeason;
-    }
-
-    public boolean doSeason() {
-        return this.doSeason;
     }
 
 }
