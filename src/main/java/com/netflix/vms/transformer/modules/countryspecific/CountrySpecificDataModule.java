@@ -27,7 +27,7 @@ public class CountrySpecificDataModule {
 
     private final CertificationListsModule certificationListsModule;
     private final VMSAvailabilityWindowModule availabilityWindowModule;
-    
+
 
 
     public CountrySpecificDataModule(VMSHollowVideoInputAPI api, VMSTransformerIndexer indexer) {
@@ -40,12 +40,13 @@ public class CountrySpecificDataModule {
 
     public Map<String, Map<Integer, CompleteVideoCountrySpecificData>> buildCountrySpecificDataByCountry(Map<String, ShowHierarchy> showHierarchiesByCountry, Map<Integer, List<PackageData>> transformedPackageData) {
         this.availabilityWindowModule.setTransformedPackageData(transformedPackageData);
-        
+
         Map<String, Map<Integer, CompleteVideoCountrySpecificData>> allCountrySpecificDataMap = new HashMap<String, Map<Integer,CompleteVideoCountrySpecificData>>();
         CountrySpecificRollupValues rollup = new CountrySpecificRollupValues();
-        
+
         for(Map.Entry<String, ShowHierarchy> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
+
             Map<Integer, CompleteVideoCountrySpecificData> countryMap = new HashMap<Integer, CompleteVideoCountrySpecificData>();
             allCountrySpecificDataMap.put(entry.getKey(), countryMap);
 
@@ -71,11 +72,14 @@ public class CountrySpecificDataModule {
                 convert(hierarchy.getSupplementalIds()[i], countryCode, countryMap, rollup);
             }
 
+            rollup.setDoSeason(false);
+            rollup.setDoShow(false);
+
         }
 
         certificationListsModule.reset();
         availabilityWindowModule.reset();
-        
+
         return allCountrySpecificDataMap;
     }
 
