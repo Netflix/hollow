@@ -62,19 +62,19 @@ public class CountrySpecificDataModule {
                 rollup.setDoSeason(true);
                 convert(hierarchy.getSeasonIds()[i], countryCode, countryMap, rollup);
                 rollup.setDoSeason(false);
+                rollup.resetSeason();
             }
 
             rollup.setDoShow(true);
             convert(hierarchy.getTopNodeId(), countryCode, countryMap, rollup);
             rollup.setDoShow(false);
+            rollup.resetShow();
 
             for(int i=0;i<hierarchy.getSupplementalIds().length;i++) {
                 convert(hierarchy.getSupplementalIds()[i], countryCode, countryMap, rollup);
             }
 
-            rollup.setDoSeason(false);
-            rollup.setDoShow(false);
-
+            rollup.reset();
         }
 
         certificationListsModule.reset();

@@ -1,10 +1,11 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
-import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
-
-import com.netflix.memory.tool.HashSet;
+import com.netflix.vms.transformer.hollowoutput.LinkedHashSetOfStrings;
 import com.netflix.vms.transformer.hollowoutput.Strings;
+import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.util.RollupValues;
+
+import java.util.HashSet;
 import java.util.Set;
 
 public class CountrySpecificRollupValues extends RollupValues {
@@ -22,25 +23,32 @@ public class CountrySpecificRollupValues extends RollupValues {
 
     private Set<VideoFormatDescriptor> showVideoFormatDescriptors = new HashSet<VideoFormatDescriptor>();
     private Set<VideoFormatDescriptor> seasonVideoFormatDescriptors = new HashSet<VideoFormatDescriptor>();
+    
+    private LinkedHashSetOfStrings showCupTokensFromFirstStreamableEpisode = null;
+    private LinkedHashSetOfStrings seasonCupTokensFromFirstStreamableEpisode = null;
+    
+    int showPrePromoDays = 0;
+    int seasonPrePromoDays = 0;
 
-    @Override
-    public void setDoShow(boolean doShow) {
-        super.setDoShow(doShow);
-        if(!doShow) {
-            showEpisodeFound = false;
-            aggregatedShowAssetCodes = new HashSet<Strings>();
-            showVideoFormatDescriptors = new HashSet<VideoFormatDescriptor>();
-        }
+    public void reset() {
+        resetSeason();
+        resetShow();
     }
-
-    @Override
-    public void setDoSeason(boolean doSeason) {
-        super.setDoSeason(doSeason);
-        if(!doSeason) {
-            seasonEpisodeFound = false;
-            aggregatedSeasonAssetCodes = new HashSet<Strings>();
-            seasonVideoFormatDescriptors = new HashSet<VideoFormatDescriptor>();
-        }
+    
+    public void resetSeason() {
+        seasonEpisodeFound = false;
+        aggregatedSeasonAssetCodes = new HashSet<Strings>();
+        seasonVideoFormatDescriptors = new HashSet<VideoFormatDescriptor>();
+        seasonPrePromoDays = 0;
+        seasonCupTokensFromFirstStreamableEpisode = null;
+    }
+    
+    public void resetShow() {
+        showEpisodeFound = false;
+        aggregatedShowAssetCodes = new HashSet<Strings>();
+        showVideoFormatDescriptors = new HashSet<VideoFormatDescriptor>();
+        showPrePromoDays = 0;
+        showCupTokensFromFirstStreamableEpisode = null;
     }
 
     public void episodeFound() {
@@ -79,6 +87,20 @@ public class CountrySpecificRollupValues extends RollupValues {
                 seasonBundledAssetFromFirstUnavailableEpisode = bundledAssetId;
         }
     }
+    
+    public void newPrePromoDays(int prePromoDays) {
+        if(showPrePromoDays == 0 || prePromoDays < showPrePromoDays)
+            showPrePromoDays = prePromoDays;
+        if(seasonPrePromoDays == 0 || prePromoDays < seasonPrePromoDays)
+            seasonPrePromoDays = prePromoDays;
+    }
+    
+    public void newCupTokens(LinkedHashSetOfStrings cupTokens) {
+        if(showCupTokensFromFirstStreamableEpisode == null)
+            showCupTokensFromFirstStreamableEpisode = cupTokens;
+        if(seasonCupTokensFromFirstStreamableEpisode == null)
+            seasonCupTokensFromFirstStreamableEpisode = cupTokens;
+    }
 
     public int getFirstEpisodeBundledAssetId() {
         if(doSeason()) {
@@ -102,6 +124,18 @@ public class CountrySpecificRollupValues extends RollupValues {
         if(doSeason())
             return seasonVideoFormatDescriptors;
         return showVideoFormatDescriptors;
+    }
+    
+    public int getPrePromoDays() {
+        if(doSeason())
+            return seasonPrePromoDays;
+        return showPrePromoDays;
+    }
+    
+    public LinkedHashSetOfStrings getCupTokens() {
+        if(doSeason())
+            return seasonCupTokensFromFirstStreamableEpisode;
+        return showCupTokensFromFirstStreamableEpisode;
     }
 
 }
