@@ -2,8 +2,6 @@ package com.netflix.vms.transformer.modules.countryspecific;
 
 import com.netflix.vms.transformer.hollowinput.CdnDeploymentSetHollow;
 
-import com.netflix.videometadata.image.ArchiveType;
-import com.netflix.videometadata.image.TrickPlayFormat;
 import com.netflix.vms.transformer.hollowoutput.BaseDownloadable;
 import com.netflix.vms.transformer.hollowoutput.TrickPlayDescriptor;
 import com.netflix.vms.transformer.hollowoutput.Video;
@@ -128,7 +126,7 @@ public class VMSAvailabilityWindowModule {
     public void populateWindowData(Integer videoId, String country, CompleteVideoCountrySpecificData data, VideoRightsHollow videoRights, CountrySpecificRollupValues rollup) {
         boolean isGoLive = isGoLive(videoRights);
 
-        if(videoId == 70286188 && "CO".equals(country))
+        if(videoId == 70286188 && "MQ".equals(country))
             System.out.println("asdf");
 
         VideoRightsRightsHollow rights = videoRights._getRights();
@@ -302,45 +300,7 @@ public class VMSAvailabilityWindowModule {
     private WindowPackageContractInfo buildWindowPackageContractInfo(PackageData packageData, VideoRightsContractHollow contract, String country) {
         PackagesHollow inputPackage = api.getPackagesHollow(packageIdx.getMatchingOrdinal((long)packageData.id));
 
-        Map<Long, List<VideoMoment>> downloadableIdsToVideoMoments = new HashMap<Long, List<VideoMoment>>();
-        for(PackageMomentHollow packageMoment : inputPackage._getMoments()) {
-            List<DownloadableIdHollow> downloadableIdList = packageMoment._getDownloadableIds();
-
-            if(downloadableIdList != null) {
-                VideoMoment videoMoment = new VideoMoment();
-                videoMoment.bifIndex = packageMoment._getBifIndex();
-                videoMoment.msOffset = packageMoment._getOffsetMillis();
-                videoMoment.packageId = packageData.id;
-                videoMoment.runtimeMs = packageMoment._getClipSpecRuntimeMillis();
-                videoMoment.sequenceNumber = (int) packageMoment._getMomentSeqNumber();
-                videoMoment.videoMomentTypeName = new Strings(packageMoment._getMomentType()._getValue());
-
-                StringHollow packageMomentTags = packageMoment._getTags();
-                if(packageMomentTags != null) {
-                    String tags = packageMomentTags._getValue();
-                    if(!"".equals(tags)) {
-                        videoMoment.momentTags = new ArrayList<Strings>();
-                        for(String tag : tags.split(",")) {
-                            videoMoment.momentTags.add(new Strings(tag));
-                        }
-                    }
-                }
-
-                if(videoMoment.momentTags == null)
-                    videoMoment.momentTags = Collections.emptyList();
-
-                for(DownloadableIdHollow id : downloadableIdList) {
-                    Long downloadableId = id._getValueBoxed();
-                    List<VideoMoment> list = downloadableIdsToVideoMoments.get(downloadableId);
-                    if(list == null) {
-                        list = new ArrayList<VideoMoment>();
-                        downloadableIdsToVideoMoments.put(downloadableId, list);
-                    }
-                    list.add(videoMoment);
-                }
-            }
-        }
-
+        Map<Long, VideoMoment> downloadableIdsToVideoMoments = buildDownloadableIdsToVideoMomentsMap(packageData, inputPackage);
 
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
@@ -402,23 +362,7 @@ public class VMSAvailabilityWindowModule {
 
         IndexedPackageImageResult indexedPackageImageStuff = buildIndexedPackageImageResult(inputPackage, downloadableIdsToVideoMoments);
 
-        info.videoPackageInfo.stillImagesMap = new HashMap<Strings, List<VideoImage>>();
-        for(Map.Entry<VideoMoment, List<ImageDownloadable>> entry : indexedPackageImageStuff.videoMomentToDownloadableListMap.entrySet()) {
-            VideoMoment moment = entry.getKey();
-
-            List<VideoImage> list = info.videoPackageInfo.stillImagesMap.get(moment.videoMomentTypeName);
-            if(list == null) {
-                list = new ArrayList<VideoImage>();
-                info.videoPackageInfo.stillImagesMap.put(moment.videoMomentTypeName, list);
-            }
-
-            VideoImage image = new VideoImage();
-            image.videoId = packageData.video;
-            image.videoMoment = moment;
-            image.downloadableList = entry.getValue();
-
-            list.add(image);
-        }
+        info.videoPackageInfo.stillImagesMap = buildStillImagesMap(packageData, indexedPackageImageStuff);
 
         info.videoPackageInfo.screenFormats = new ArrayList<Strings>(screenFormats.size());
         for(String screenFormat : screenFormats) {
@@ -437,6 +381,69 @@ public class VMSAvailabilityWindowModule {
         info.videoPackageInfo.runtimeInSeconds = (int) longestRuntimeInSeconds;
 
         return info;
+    }
+
+
+    private Map<Strings, List<VideoImage>> buildStillImagesMap(PackageData packageData, IndexedPackageImageResult indexedPackageImageStuff) {
+        Map<Strings, List<VideoImage>> stillImagesMap = new HashMap<Strings, List<VideoImage>>();
+        for(Map.Entry<VideoMoment, List<ImageDownloadable>> entry : indexedPackageImageStuff.videoMomentToDownloadableListMap.entrySet()) {
+            VideoMoment moment = entry.getKey();
+
+            List<VideoImage> list = stillImagesMap.get(moment.videoMomentTypeName);
+            if(list == null) {
+                list = new ArrayList<VideoImage>();
+                stillImagesMap.put(moment.videoMomentTypeName, list);
+            }
+
+            VideoImage image = new VideoImage();
+            image.videoId = packageData.video;
+            image.videoMoment = moment;
+            image.downloadableList = entry.getValue();
+
+            list.add(image);
+        }
+        return stillImagesMap;
+    }
+
+
+    private Map<Long, VideoMoment> buildDownloadableIdsToVideoMomentsMap(PackageData packageData, PackagesHollow inputPackage) {
+        Map<Long, VideoMoment> downloadableIdsToVideoMoments = new HashMap<Long, VideoMoment>();
+        for(PackageMomentHollow packageMoment : inputPackage._getMoments()) {
+            List<DownloadableIdHollow> downloadableIdList = packageMoment._getDownloadableIds();
+
+            if(downloadableIdList != null) {
+                VideoMoment videoMoment = new VideoMoment();
+                videoMoment.bifIndex = packageMoment._getBifIndex();
+                videoMoment.msOffset = packageMoment._getOffsetMillis();
+                videoMoment.packageId = packageData.id;
+                videoMoment.runtimeMs = packageMoment._getClipSpecRuntimeMillis();
+                videoMoment.sequenceNumber = (int) packageMoment._getMomentSeqNumber();
+                videoMoment.videoMomentTypeName = new Strings(packageMoment._getMomentType()._getValue());
+
+                StringHollow packageMomentTags = packageMoment._getTags();
+                if(packageMomentTags != null) {
+                    String tags = packageMomentTags._getValue();
+                    if(!"".equals(tags)) {
+                        videoMoment.momentTags = new ArrayList<Strings>();
+                        for(String tag : tags.split(",")) {
+                            videoMoment.momentTags.add(new Strings(tag));
+                        }
+                    }
+                }
+
+                if(videoMoment.momentTags == null)
+                    videoMoment.momentTags = Collections.emptyList();
+
+                for(DownloadableIdHollow id : downloadableIdList) {
+                    Long downloadableId = id._getValueBoxed();
+                    if(!downloadableIdsToVideoMoments.containsKey(downloadableId)) {
+                        downloadableIdsToVideoMoments.put(downloadableId, videoMoment);
+                    }
+                    //list.add(videoMoment);
+                }
+            }
+        }
+        return downloadableIdsToVideoMoments;
     }
 
     private VideoRightsContractHollow getContract(VideoRightsRightsHollow rights, long contractId) {
@@ -482,7 +489,7 @@ public class VMSAvailabilityWindowModule {
         return info;
     }
 
-    private IndexedPackageImageResult buildIndexedPackageImageResult(PackagesHollow inputPackage, Map<Long, List<VideoMoment>> downloadableIdsToVideoMoments) {
+    private IndexedPackageImageResult buildIndexedPackageImageResult(PackagesHollow inputPackage, Map<Long, VideoMoment> downloadableIdsToVideoMoments) {
         IndexedPackageImageResult result = new IndexedPackageImageResult();
 
         for(PackageStreamHollow stream : inputPackage._getDownloadables()) {
@@ -516,16 +523,17 @@ public class VMSAvailabilityWindowModule {
                     downloadable.descriptor.targetDimensions.widthInPixels = dimensions._getTargetWidthInPixels();
                 }
 
-                List<VideoMoment> videoMomentList = downloadableIdsToVideoMoments.get(stream._getDownloadableId());
-                if(videoMomentList != null) {
-                    for(VideoMoment moment : videoMomentList) {
+                VideoMoment moment = downloadableIdsToVideoMoments.get(stream._getDownloadableId());
+                if(moment != null) {
+                    //VideoMoment moment = videoMomentList.get(0);
+                    //for(VideoMoment moment : videoMomentList) {
                         List<ImageDownloadable> list = result.videoMomentToDownloadableListMap.get(moment);
                         if(list == null) {
                             list = new ArrayList<ImageDownloadable>();
                             result.videoMomentToDownloadableListMap.put(moment, list);
                         }
                         list.add(downloadable);
-                    }
+                    //}
                 }
             } else if("TRICKPLAY".equals(streamProfileType)) {
                 TrickPlayItem trickplay = new TrickPlayItem();
