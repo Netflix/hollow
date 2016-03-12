@@ -1,7 +1,5 @@
 package com.netflix.vms.transformer.modules.packages;
 
-import com.netflix.vms.transformer.hollowoutput.DrmInfo;
-import com.netflix.vms.transformer.hollowoutput.DrmInfoData;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.hollowinput.AudioStreamInfoHollow;
@@ -17,8 +15,6 @@ import com.netflix.vms.transformer.hollowinput.StreamDeploymentLabelHollow;
 import com.netflix.vms.transformer.hollowinput.StreamDimensionsHollow;
 import com.netflix.vms.transformer.hollowinput.StreamFileIdentificationHollow;
 import com.netflix.vms.transformer.hollowinput.StreamNonImageInfoHollow;
-import com.netflix.vms.transformer.hollowinput.StreamProfileGroupsHollow;
-import com.netflix.vms.transformer.hollowinput.StreamProfileIdHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.TextStreamInfoHollow;
@@ -28,6 +24,8 @@ import com.netflix.vms.transformer.hollowoutput.AssetTypeDescriptor;
 import com.netflix.vms.transformer.hollowoutput.DownloadDescriptor;
 import com.netflix.vms.transformer.hollowoutput.DownloadLocation;
 import com.netflix.vms.transformer.hollowoutput.DownloadLocationSet;
+import com.netflix.vms.transformer.hollowoutput.DrmInfo;
+import com.netflix.vms.transformer.hollowoutput.DrmInfoData;
 import com.netflix.vms.transformer.hollowoutput.DrmKey;
 import com.netflix.vms.transformer.hollowoutput.FrameRate;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
@@ -43,7 +41,6 @@ import com.netflix.vms.transformer.hollowoutput.StreamMostlyConstantData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.TargetDimensions;
 import com.netflix.vms.transformer.hollowoutput.TimedTextTypeDescriptor;
-import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoResolution;
 import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
 import com.netflix.vms.transformer.index.IndexSpec;
@@ -55,6 +52,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class StreamDataModule {
 
@@ -104,8 +102,9 @@ public class StreamDataModule {
         if(streamProfile == null)
             return null;
 
-        if(streamProfile._getProfileType()._isValueEqual("MERCHSTILL"))
+        if(streamProfile._getProfileType()._isValueEqual("MERCHSTILL")) {
             return null;
+        }
 
         ImageStreamInfoHollow inputStreamImageInfo = inputStream._getImageInfo();
         StreamFileIdentificationHollow inputStreamIdentity = inputStream._getFileIdentification();

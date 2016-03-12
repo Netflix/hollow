@@ -1,5 +1,15 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import com.netflix.vms.transformer.hollowinput.CdnDeploymentSetHollow;
+
+import com.netflix.videometadata.image.ArchiveType;
+import com.netflix.videometadata.image.TrickPlayFormat;
+import com.netflix.vms.transformer.hollowoutput.BaseDownloadable;
+import com.netflix.vms.transformer.hollowoutput.TrickPlayDescriptor;
+import com.netflix.vms.transformer.hollowoutput.Video;
+import com.netflix.vms.transformer.hollowoutput.TrickPlayItem;
+import com.netflix.vms.transformer.hollowoutput.TrickPlayDownloadable;
+import com.netflix.vms.transformer.hollowoutput.TrickPlayType;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.hollowinput.CdnDeploymentHollow;
 import com.netflix.vms.transformer.hollowinput.DownloadableIdHollow;
@@ -41,7 +51,6 @@ import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.VideoFormatDescriptorIdentifier;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -63,8 +72,10 @@ public class VMSAvailabilityWindowModule {
     private final VideoFormatDescriptorIdentifier videoFormatIdentifier;
 
     private final Map<Integer, Strings> soundTypesMap;
+    private final Map<Integer, TrickPlayType> trickPlayTypeMap;
     private final com.netflix.vms.transformer.hollowoutput.Integer ZERO = new com.netflix.vms.transformer.hollowoutput.Integer(0);
     private final VideoPackageInfo FILTERED_VIDEO_PACKAGE_INFO;
+    private final LinkedHashSetOfStrings EMPTY_CUP_TOKENS;
 
     private Map<Integer, List<PackageData>> transformedPackageData;
 
@@ -77,11 +88,28 @@ public class VMSAvailabilityWindowModule {
         this.videoFormatIdentifier = new VideoFormatDescriptorIdentifier(api, indexer);
 
         this.soundTypesMap = getSoundTypesMap();
+        this.trickPlayTypeMap = getTrickPlayTypeMap();
         FILTERED_VIDEO_PACKAGE_INFO = getFilteredVideoPackageInfo();
+        EMPTY_CUP_TOKENS = new LinkedHashSetOfStrings();
+        EMPTY_CUP_TOKENS.ordinals = Collections.emptyList();
     }
+
 
     public void setTransformedPackageData(Map<Integer, List<PackageData>> data) {
         this.transformedPackageData = data;
+    }
+
+    private Map<Integer, TrickPlayType> getTrickPlayTypeMap() {
+        Map<Integer, TrickPlayType> map = new HashMap<Integer, TrickPlayType>();
+
+        map.put(241, new TrickPlayType("BIF_W240"));
+        map.put(321, new TrickPlayType("BIF_W320"));
+        map.put(641, new TrickPlayType("BIF_W640"));
+        map.put(242, new TrickPlayType("ZIP_W240"));
+        map.put(322, new TrickPlayType("ZIP_W320"));
+        map.put(642, new TrickPlayType("ZIP_W640"));
+
+        return map;
     }
 
     private Map<Integer, Strings> getSoundTypesMap() {
@@ -98,11 +126,10 @@ public class VMSAvailabilityWindowModule {
 
 
     public void populateWindowData(Integer videoId, String country, CompleteVideoCountrySpecificData data, VideoRightsHollow videoRights, CountrySpecificRollupValues rollup) {
-        List<VMSAvailabilityWindow> availabilityWindows;
         boolean isGoLive = isGoLive(videoRights);
 
-        /*if(videoId == 80011215 && "VC".equals(country))
-            System.out.println("asdf");*/
+        if(videoId == 70286188 && "CO".equals(country))
+            System.out.println("asdf");
 
         VideoRightsRightsHollow rights = videoRights._getRights();
         if((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
@@ -123,34 +150,31 @@ public class VMSAvailabilityWindowModule {
             outputWindow.startDate = new Date(minStartDate);
             outputWindow.endDate = new Date(maxEndDate);
             outputWindow.bundledAssetsGroupId = rollup.getFirstEpisodeBundledAssetId();
-            outputWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
 
-            WindowPackageContractInfo contractInfo = new WindowPackageContractInfo();
-            contractInfo.videoContractInfo = new VideoContractInfo();
-            contractInfo.videoContractInfo.contractId = outputWindow.bundledAssetsGroupId;
-            contractInfo.videoContractInfo.assetBcp47Codes = rollup.getAssetBcp47Codes();
-            contractInfo.videoContractInfo.primaryPackageId = 0;
-            contractInfo.videoContractInfo.prePromotionDays = rollup.getPrePromoDays();
-            contractInfo.videoContractInfo.postPromotionDays = 0;
-            contractInfo.videoContractInfo.cupTokens = rollup.getCupTokens();
+            WindowPackageContractInfo videoImagesContractInfo = createEmptyContractInfoForRollup(outputWindow);
+            WindowPackageContractInfo videoMediaContractInfo = createEmptyContractInfoForRollup(outputWindow);
 
-            contractInfo.videoPackageInfo = new VideoPackageInfo();
-            contractInfo.videoPackageInfo.packageId = 0;
-            contractInfo.videoPackageInfo.formats = rollup.getVideoFormatDescriptors();
-            contractInfo.videoPackageInfo.runtimeInSeconds = 0;
-            contractInfo.videoPackageInfo.soundTypes = Collections.emptyList();
-            contractInfo.videoPackageInfo.screenFormats = Collections.emptyList();
-            contractInfo.videoPackageInfo.phoneSnacks = Collections.emptyList();
-            contractInfo.videoPackageInfo.stillImagesMap = Collections.emptyMap();
-            contractInfo.videoPackageInfo.videoClipMap = Collections.emptyMap();
-            contractInfo.videoPackageInfo.trickPlayMap = Collections.emptyMap();
+            VMSAvailabilityWindow videoImagesAvailabilityWindow = outputWindow.clone();
+            VMSAvailabilityWindow videoMediaAvailabilityWindow = outputWindow.clone();
 
-            outputWindow.windowInfosByPackageId.put(ZERO, contractInfo);
+            videoImagesAvailabilityWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
+            videoMediaAvailabilityWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
 
-            availabilityWindows = Collections.singletonList(outputWindow);
+            videoImagesAvailabilityWindow.windowInfosByPackageId.put(ZERO, videoImagesContractInfo);
+            videoMediaAvailabilityWindow.windowInfosByPackageId.put(ZERO, videoMediaContractInfo);
 
+            videoMediaContractInfo.videoContractInfo.assetBcp47Codes = rollup.getAssetBcp47Codes();
+            videoMediaContractInfo.videoContractInfo.prePromotionDays = rollup.getPrePromoDays();
+            videoMediaContractInfo.videoContractInfo.postPromotionDays = 0;
+            videoMediaContractInfo.videoContractInfo.cupTokens = rollup.getCupTokens() != null ? rollup.getCupTokens() : EMPTY_CUP_TOKENS;
+            videoMediaContractInfo.videoPackageInfo.formats = rollup.getVideoFormatDescriptors();
+
+            videoImagesContractInfo.videoPackageInfo.stillImagesMap = rollup.getVideoImageMap();
+
+            data.mediaAvailabilityWindows = Collections.singletonList(videoMediaAvailabilityWindow);
+            data.imagesAvailabilityWindows = Collections.singletonList(videoImagesAvailabilityWindow);
         } else {
-            availabilityWindows = new ArrayList<VMSAvailabilityWindow>();
+            List<VMSAvailabilityWindow> availabilityWindows = new ArrayList<VMSAvailabilityWindow>();
 
             long minWindowStartDate = Long.MAX_VALUE;
             VMSAvailabilityWindow currentOrFirstFutureWindow = null;
@@ -198,7 +222,7 @@ public class VMSAvailabilityWindowModule {
                                         if(window._getEndDate()._getValue() > System.currentTimeMillis() && window._getStartDate()._getValue() < minWindowStartDate) {
                                             minWindowStartDate = window._getStartDate()._getValue();
                                             currentOrFirstFutureWindow = outputWindow;
-                                            
+
                                             if(isGoLive && window._getStartDate()._getValue() < System.currentTimeMillis())
                                                 isInWindow = true;
                                         }
@@ -220,6 +244,7 @@ public class VMSAvailabilityWindowModule {
                     Set<VideoFormatDescriptor> videoFormatDescriptorsFromMaxPackageId = null;
                     int prePromoDays = 0;
                     LinkedHashSetOfStrings cupTokens = null;
+                    Map<Strings, List<VideoImage>> stillImagesByTypeMap = Collections.emptyMap();
 
                     for(Map.Entry<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo> entry : currentOrFirstFutureWindow.windowInfosByPackageId.entrySet()) {
                         if(entry.getKey().val > maxPackageId) {
@@ -228,6 +253,8 @@ public class VMSAvailabilityWindowModule {
                             videoFormatDescriptorsFromMaxPackageId = entry.getValue().videoPackageInfo.formats;
                             prePromoDays = entry.getValue().videoContractInfo.prePromotionDays;
                             cupTokens = entry.getValue().videoContractInfo.cupTokens;
+                            if(isGoLive && isInWindow)
+                                stillImagesByTypeMap = entry.getValue().videoPackageInfo.stillImagesMap;
                         }
                     }
 
@@ -235,6 +262,7 @@ public class VMSAvailabilityWindowModule {
                     rollup.newVideoFormatDescriptors(videoFormatDescriptorsFromMaxPackageId);
                     rollup.newPrePromoDays(prePromoDays);
                     rollup.newCupTokens(cupTokens);
+                    rollup.newEpisodeStillImagesByTypeMap(stillImagesByTypeMap);
                 }
 
 
@@ -247,11 +275,28 @@ public class VMSAvailabilityWindowModule {
                     return Long.compare(o1.startDate.val, o2.startDate.val);
                 }
             });
+
+            data.mediaAvailabilityWindows = availabilityWindows;
+            data.imagesAvailabilityWindows = availabilityWindows;
         }
 
+    }
 
-        data.mediaAvailabilityWindows = availabilityWindows;
-        data.imagesAvailabilityWindows = availabilityWindows;
+    private WindowPackageContractInfo createEmptyContractInfoForRollup(VMSAvailabilityWindow outputWindow) {
+        WindowPackageContractInfo contractInfo = new WindowPackageContractInfo();
+        contractInfo.videoContractInfo = new VideoContractInfo();
+        contractInfo.videoContractInfo.contractId = outputWindow.bundledAssetsGroupId;
+        contractInfo.videoContractInfo.primaryPackageId = 0;
+
+        contractInfo.videoPackageInfo = new VideoPackageInfo();
+        contractInfo.videoPackageInfo.packageId = 0;
+        contractInfo.videoPackageInfo.runtimeInSeconds = 0;
+        contractInfo.videoPackageInfo.soundTypes = Collections.emptyList();
+        contractInfo.videoPackageInfo.screenFormats = Collections.emptyList();
+        contractInfo.videoPackageInfo.phoneSnacks = Collections.emptyList();
+        contractInfo.videoPackageInfo.videoClipMap = Collections.emptyMap();
+        contractInfo.videoPackageInfo.trickPlayMap = Collections.emptyMap();
+        return contractInfo;
     }
 
     private WindowPackageContractInfo buildWindowPackageContractInfo(PackageData packageData, VideoRightsContractHollow contract, String country) {
@@ -355,10 +400,10 @@ public class VMSAvailabilityWindowModule {
             }
         }
 
-        Map<VideoMoment, List<ImageDownloadable>> videoMomentToDownloadableListMap = buildVideoMomentToDownloadableListMap(inputPackage, downloadableIdsToVideoMoments);
+        IndexedPackageImageResult indexedPackageImageStuff = buildIndexedPackageImageResult(inputPackage, downloadableIdsToVideoMoments);
 
         info.videoPackageInfo.stillImagesMap = new HashMap<Strings, List<VideoImage>>();
-        for(Map.Entry<VideoMoment, List<ImageDownloadable>> entry : videoMomentToDownloadableListMap.entrySet()) {
+        for(Map.Entry<VideoMoment, List<ImageDownloadable>> entry : indexedPackageImageStuff.videoMomentToDownloadableListMap.entrySet()) {
             VideoMoment moment = entry.getKey();
 
             List<VideoImage> list = info.videoPackageInfo.stillImagesMap.get(moment.videoMomentTypeName);
@@ -387,6 +432,7 @@ public class VMSAvailabilityWindowModule {
                 info.videoPackageInfo.soundTypes.add(soundTypeStr);
         }
 
+        info.videoPackageInfo.trickPlayMap = indexedPackageImageStuff.trickPlayItemMap;
 
         info.videoPackageInfo.runtimeInSeconds = (int) longestRuntimeInSeconds;
 
@@ -436,27 +482,28 @@ public class VMSAvailabilityWindowModule {
         return info;
     }
 
+    private IndexedPackageImageResult buildIndexedPackageImageResult(PackagesHollow inputPackage, Map<Long, List<VideoMoment>> downloadableIdsToVideoMoments) {
+        IndexedPackageImageResult result = new IndexedPackageImageResult();
 
-    private Map<VideoMoment, List<ImageDownloadable>> buildVideoMomentToDownloadableListMap(PackagesHollow inputPackage, Map<Long, List<VideoMoment>> downloadableIdsToVideoMoments) {
-        Map<VideoMoment, List<ImageDownloadable>> videoMomentToDownloadableListMap = new HashMap<VideoMoment, List<ImageDownloadable>>();
         for(PackageStreamHollow stream : inputPackage._getDownloadables()) {
-            int streamProfileOrdinal = streamProfileIdx.getMatchingOrdinal(stream._getStreamProfileId());
+            long streamProfileId = stream._getStreamProfileId();
+            int streamProfileOrdinal = streamProfileIdx.getMatchingOrdinal(streamProfileId);
             StreamProfilesHollow profile = api.getStreamProfilesHollow(streamProfileOrdinal);
             String streamProfileType = profile._getProfileType()._getValue();
 
             if("MERCHSTILL".equals(streamProfileType)) {
+                if(stream._getNonImageInfo() != null && stream._getNonImageInfo()._getRuntimeSeconds() != Long.MIN_VALUE)
+                    continue;
+
                 ImageDownloadable downloadable = new ImageDownloadable();
 
                 downloadable.downloadableId = stream._getDownloadableId();
 
                 downloadable.originServerNames = new ArrayList<Strings>();
-                Set<CdnDeploymentHollow> cdnDeployments = stream._getDeployment()._getDeploymentInfo()._getCdnDeployments();
-                for(CdnDeploymentHollow deployment : cdnDeployments) {
-                    downloadable.originServerNames.add(new Strings(deployment._getOriginServer()._getValue()));
-                }
+                convertCdnDeploymentsAndAddToList(stream, downloadable.originServerNames);
 
                 downloadable.descriptor = new ImageDownloadableDescriptor();
-                downloadable.descriptor.streamProfileId = (int) stream._getStreamProfileId();
+                downloadable.descriptor.streamProfileId = (int) streamProfileId;
                 downloadable.descriptor.videoFormat = videoFormatIdentifier.selectVideoFormatDescriptor(stream);
 
                 StreamDimensionsHollow dimensions = stream._getDimensions();
@@ -472,17 +519,49 @@ public class VMSAvailabilityWindowModule {
                 List<VideoMoment> videoMomentList = downloadableIdsToVideoMoments.get(stream._getDownloadableId());
                 if(videoMomentList != null) {
                     for(VideoMoment moment : videoMomentList) {
-                        List<ImageDownloadable> list = videoMomentToDownloadableListMap.get(moment);
+                        List<ImageDownloadable> list = result.videoMomentToDownloadableListMap.get(moment);
                         if(list == null) {
                             list = new ArrayList<ImageDownloadable>();
-                            videoMomentToDownloadableListMap.put(moment, list);
+                            result.videoMomentToDownloadableListMap.put(moment, list);
                         }
                         list.add(downloadable);
                     }
                 }
+            } else if("TRICKPLAY".equals(streamProfileType)) {
+                TrickPlayItem trickplay = new TrickPlayItem();
+                trickplay.imageCount = stream._getImageInfo()._getImageCount();
+                trickplay.videoId = new Video((int)inputPackage._getMovieId());
+                trickplay.trickPlayDownloadable = new TrickPlayDownloadable();
+                trickplay.trickPlayDownloadable.fileName = new Strings(stream._getFileIdentification()._getFilename());
+                trickplay.trickPlayDownloadable.descriptor = new TrickPlayDescriptor();
+                trickplay.trickPlayDownloadable.descriptor.height = stream._getDimensions()._getHeightInPixels();
+                trickplay.trickPlayDownloadable.descriptor.width = stream._getDimensions()._getWidthInPixels();
+                trickplay.trickPlayDownloadable.baseDownloadable = new BaseDownloadable();
+                trickplay.trickPlayDownloadable.baseDownloadable.downloadableId = stream._getDownloadableId();
+                trickplay.trickPlayDownloadable.baseDownloadable.streamProfileId = (int)streamProfileId;
+                trickplay.trickPlayDownloadable.baseDownloadable.originServerNames = new ArrayList<Strings>();
+
+                convertCdnDeploymentsAndAddToList(stream, trickplay.trickPlayDownloadable.baseDownloadable.originServerNames);
+
+                Set<CdnDeploymentHollow> cdnDeployments = stream._getDeployment()._getDeploymentInfo()._getCdnDeployments();
+                // trickplay.trickPlayDownloadable.baseDownloadable.envBasedDirectory
+                // trickplay.trickPlayDownloadable.baseDownloadable.originServerNames = stream
+
+
+
+                result.trickPlayItemMap.put(trickPlayTypeMap.get((int) streamProfileId), trickplay);
             }
         }
-        return videoMomentToDownloadableListMap;
+
+        return result;
+    }
+
+
+    private void convertCdnDeploymentsAndAddToList(PackageStreamHollow stream, List<Strings> originServerNames) {
+        Set<CdnDeploymentHollow> cdnDeployments = stream._getDeployment()._getDeploymentInfo()._getCdnDeployments();
+        for(CdnDeploymentHollow deployment : cdnDeployments) {
+            originServerNames.add(new Strings(deployment._getOriginServer()._getValue()));
+        }
     }
 
     private Set<com.netflix.vms.transformer.hollowoutput.Long> findRelevantExcludedDownloadables(PackageData packageData, String country) {

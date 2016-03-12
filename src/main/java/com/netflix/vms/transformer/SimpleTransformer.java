@@ -83,6 +83,10 @@ public class SimpleTransformer {
 
         for(final VideoDisplaySetHollow displaySet : api.getAllVideoDisplaySetHollow()) {
 
+            if(displaySet._getTopNodeId() != 70286431)
+                continue;
+
+
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -139,9 +143,9 @@ public class SimpleTransformer {
                 new RolloutCharacterModule(api, objectMapper),
                 new RolloutVideoModule(api, objectMapper, indexer),
                 new EncodingProfileGroupModule(api, objectMapper),
-                new GlobalPersonModule(api, objectMapper, indexer),
-                new TopNVideoDataModule(api, objectMapper),
-                new PersonImagesModule(api, objectMapper, indexer),
+                //new GlobalPersonModule(api, objectMapper, indexer),
+                //new TopNVideoDataModule(api, objectMapper),
+                //new PersonImagesModule(api, objectMapper, indexer),
                 new CharacterImagesModule(api, objectMapper, indexer)
                 );
 
