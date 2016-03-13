@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.vms.transformer.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeListHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
@@ -21,8 +22,8 @@ import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 
 public class PersonImagesModule extends ArtWorkModule{
 
-    public PersonImagesModule(VMSHollowVideoInputAPI api, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
-	    super(api, mapper, indexer);
+    public PersonImagesModule(VMSHollowVideoInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+	    super(api, ctx, mapper, indexer);
 	}
 
     @Override
@@ -56,7 +57,7 @@ public class PersonImagesModule extends ArtWorkModule{
             Integer id = entry.getKey();
             List<ArtWorkDescriptor> descriptorList = new ArrayList<>(entry.getValue());
             // Sort descriptor necessary for client artwork resolver
-            Collections.sort(descriptorList, new ArtWorkComparator());
+            Collections.sort(descriptorList, new ArtWorkComparator(ctx));
             
             PersonImages images = new PersonImages();
             images.artWorkDescriptors = descriptorList;

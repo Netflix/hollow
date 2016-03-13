@@ -62,17 +62,19 @@ public class SimpleTransformer {
     private final ThreadLocal<CountrySpecificDataModule> countrySpecificModuleRef = new ThreadLocal<CountrySpecificDataModule>();
 
     private final VMSHollowVideoInputAPI api;
+    private final TransformerContext ctx;
     private VMSTransformerIndexer indexer;
 
     public SimpleTransformer(VMSHollowVideoInputAPI api) {
         this.api = api;
+        this.ctx = new TransformerContext();
+        ctx.setNowMillis(1457384787807L);
     }
 
     public HollowWriteStateEngine transform() throws Exception {
         indexer = new VMSTransformerIndexer((HollowReadStateEngine)api.getDataAccess(), new SimultaneousExecutor());
 
-
-        final ShowHierarchyInitializer hierarchyInitializer = new ShowHierarchyInitializer(api, indexer);
+        final ShowHierarchyInitializer hierarchyInitializer = new ShowHierarchyInitializer(api, indexer, ctx);
 
         HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine(new VMSTransformerHashCodeFinder());
         final HollowObjectMapper objectMapper = new HollowObjectMapper(writeStateEngine);
@@ -82,10 +84,6 @@ public class SimpleTransformer {
         long startTime = System.currentTimeMillis();
 
         for(final VideoDisplaySetHollow displaySet : api.getAllVideoDisplaySetHollow()) {
-
-            if(displaySet._getTopNodeId() != 70286431)
-                continue;
-
 
             executor.execute(new Runnable() {
                 @Override
@@ -131,22 +129,22 @@ public class SimpleTransformer {
 
         // Register Transform Modules
         List<TransformModule> moduleList = Arrays.<TransformModule>asList(
-                new DrmSystemModule(api, objectMapper),
-                new OriginServerModule(api, objectMapper, indexer),
-                new EncodingProfileModule(api, objectMapper, indexer),
-                new ArtworkFormatModule(api, objectMapper),
-                new CacheDeploymentIntentModule(api, objectMapper),
-                new ArtworkTypeModule(api, objectMapper),
+                new DrmSystemModule(api, ctx, objectMapper),
+                new OriginServerModule(api, ctx, objectMapper, indexer),
+                new EncodingProfileModule(api, ctx, objectMapper, indexer),
+                new ArtworkFormatModule(api, ctx, objectMapper),
+                new CacheDeploymentIntentModule(api, ctx, objectMapper),
+                new ArtworkTypeModule(api, ctx, objectMapper),
 
-                new ArtworkImageRecipeModule(api, objectMapper),
-                new DefaultExtensionRecipeModule(api, objectMapper),
-                new RolloutCharacterModule(api, objectMapper),
-                new RolloutVideoModule(api, objectMapper, indexer),
-                new EncodingProfileGroupModule(api, objectMapper),
-                //new GlobalPersonModule(api, objectMapper, indexer),
-                //new TopNVideoDataModule(api, objectMapper),
-                //new PersonImagesModule(api, objectMapper, indexer),
-                new CharacterImagesModule(api, objectMapper, indexer)
+                new ArtworkImageRecipeModule(api, ctx, objectMapper),
+                new DefaultExtensionRecipeModule(api, ctx, objectMapper),
+                new RolloutCharacterModule(api, ctx, objectMapper),
+                new RolloutVideoModule(api, ctx, objectMapper, indexer),
+                new EncodingProfileGroupModule(api, ctx, objectMapper),
+                //new GlobalPersonModule(api, ctx, objectMapper, indexer),
+                //new TopNVideoDataModule(api, ctx, objectMapper),
+                //new PersonImagesModule(api, ctx, objectMapper, indexer),
+                new CharacterImagesModule(api, ctx, objectMapper, indexer)
                 );
 
         // @formatter:on
@@ -179,7 +177,7 @@ public class SimpleTransformer {
     private VideoMetaDataModule getVideoMetaDataModule() {
         VideoMetaDataModule module = metadataModuleRef.get();
         if(module == null) {
-            module = new VideoMetaDataModule(api, indexer);
+            module = new VideoMetaDataModule(api, ctx, indexer);
             metadataModuleRef.set(module);
         }
         return module;
@@ -215,7 +213,7 @@ public class SimpleTransformer {
     private CountrySpecificDataModule getCountrySpecificDataModule() {
         CountrySpecificDataModule module = countrySpecificModuleRef.get();
         if(module == null) {
-            module = new CountrySpecificDataModule(api, indexer);
+            module = new CountrySpecificDataModule(api, ctx, indexer);
             countrySpecificModuleRef.set(module);
         }
         return module;

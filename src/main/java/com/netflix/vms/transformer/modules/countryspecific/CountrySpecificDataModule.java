@@ -2,6 +2,7 @@ package com.netflix.vms.transformer.modules.countryspecific;
 
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.ShowHierarchy;
+import com.netflix.vms.transformer.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
 import com.netflix.vms.transformer.hollowinput.MapOfFirstDisplayDatesHollow;
@@ -31,12 +32,12 @@ public class CountrySpecificDataModule {
 
 
 
-    public CountrySpecificDataModule(VMSHollowVideoInputAPI api, VMSTransformerIndexer indexer) {
+    public CountrySpecificDataModule(VMSHollowVideoInputAPI api, TransformerContext ctx, VMSTransformerIndexer indexer) {
         this.api = api;
         this.videoRightsIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_RIGHTS);
 
         this.certificationListsModule = new CertificationListsModule(api, indexer);
-        this.availabilityWindowModule = new VMSAvailabilityWindowModule(api, indexer);
+        this.availabilityWindowModule = new VMSAvailabilityWindowModule(api, ctx, indexer);
     }
 
     public Map<String, Map<Integer, CompleteVideoCountrySpecificData>> buildCountrySpecificDataByCountry(Map<String, ShowHierarchy> showHierarchiesByCountry, Map<Integer, List<PackageData>> transformedPackageData) {

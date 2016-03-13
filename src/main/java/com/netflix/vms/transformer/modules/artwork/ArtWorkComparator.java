@@ -2,6 +2,7 @@ package com.netflix.vms.transformer.modules.artwork;
 
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
+import com.netflix.vms.transformer.TransformerContext;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkDescriptor;
 import com.netflix.vms.transformer.hollowoutput.AssetLocation;
 import com.netflix.vms.transformer.hollowoutput.Strings;
@@ -12,6 +13,12 @@ import java.util.Map;
 public class ArtWorkComparator implements Comparator<ArtWorkDescriptor>{
     private Boolean _isOrdinalPriorityForTestingEnabled;
     private static final FilenameComparator filenameComparator = new FilenameComparator();
+    
+    private final TransformerContext ctx;
+    
+    public ArtWorkComparator(TransformerContext ctx) {
+        this.ctx = ctx;
+    }
 
     protected void setOrdinalPriorityForTestingEnabled(boolean flag) {
         _isOrdinalPriorityForTestingEnabled = flag;
@@ -88,7 +95,7 @@ public class ArtWorkComparator implements Comparator<ArtWorkDescriptor>{
     private int compareArtWorkEffectiveDate(final ArtWorkDescriptor o1, ArtWorkDescriptor o2) {
         // Current artwork with most recent effective date should be on the top.
 //        final Long now = VMSDataClock.getInstance().currentTimeMillis();
-        final Long now = Long.valueOf(System.currentTimeMillis());
+        final Long now = Long.valueOf(ctx.getNowMillis());
 
         final Long t1 = Long.valueOf(o1.effectiveDate);
         final Long t2 = Long.valueOf(o2.effectiveDate);

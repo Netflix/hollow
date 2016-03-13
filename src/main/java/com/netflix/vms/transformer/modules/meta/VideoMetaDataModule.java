@@ -15,6 +15,7 @@ import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.vms.transformer.ShowHierarchy;
+import com.netflix.vms.transformer.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.StoriesSynopsesHookHollow;
 import com.netflix.vms.transformer.hollowinput.Stories_SynopsesHollow;
@@ -41,6 +42,7 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,6 +63,7 @@ public class VideoMetaDataModule {
     private final VideoSetType EXTENDED = new VideoSetType("Extended");
 
     private final VMSHollowVideoInputAPI api;
+    private final TransformerContext ctx;
 
     private final HollowPrimaryKeyIndex videoGeneralIdx;
     private final HollowPrimaryKeyIndex videoTypeIdx;
@@ -76,8 +79,9 @@ public class VideoMetaDataModule {
 
     private final Map<String, HookType> hookTypeMap = new HashMap<String, HookType>();
 
-    public VideoMetaDataModule(VMSHollowVideoInputAPI api, VMSTransformerIndexer indexer) {
+    public VideoMetaDataModule(VMSHollowVideoInputAPI api, TransformerContext ctx, VMSTransformerIndexer indexer) {
         this.api = api;
+        this.ctx = ctx;
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(VIDEO_GENERAL);
         this.videoTypeIdx = indexer.getPrimaryKeyIndex(VIDEO_TYPE);
         this.videoPersonIdx = indexer.getHashIndex(PERSONS_BY_VIDEO_ID);
@@ -207,7 +211,7 @@ public class VideoMetaDataModule {
 
             Set<VideoRightsWindowHollow> windows = rights._getRights()._getWindows();
             for(VideoRightsWindowHollow window : windows) {
-                if(!window._getOnHold() && window._getStartDate()._getValue() < System.currentTimeMillis() && window._getEndDate()._getValue() > System.currentTimeMillis()) {
+                if(!window._getOnHold() && window._getStartDate()._getValue() < ctx.getNowMillis() && window._getEndDate()._getValue() > ctx.getNowMillis()) {
                     isInWindow = true;
                     break;
                 }
@@ -271,10 +275,10 @@ public class VideoMetaDataModule {
             Set<VideoRightsWindowHollow> windows = rights._getRights()._getWindows();
             for(VideoRightsWindowHollow window : windows) {
                 long windowStart = window._getStartDate()._getValue();
-                if(windowStart < System.currentTimeMillis() && window._getEndDate()._getValue() > System.currentTimeMillis()) {
+                if(windowStart < ctx.getNowMillis() && window._getEndDate()._getValue() > ctx.getNowMillis()) {
                     isInWindow = true;
                     break;
-                } else if(windowStart > System.currentTimeMillis()) {
+                } else if(windowStart > ctx.getNowMillis()) {
                     isInFuture = true;
                 }
             }
@@ -451,7 +455,7 @@ public class VideoMetaDataModule {
     }
 
     private int daysAgo(long timestamp) {
-        return (int)((System.currentTimeMillis() - timestamp) / (24 * 60 * 60 * 1000));
+        return (int)((ctx.getNowMillis() - timestamp) / (24 * 60 * 60 * 1000));
     }
 
 

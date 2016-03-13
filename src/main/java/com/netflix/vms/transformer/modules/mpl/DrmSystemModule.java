@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.modules.mpl;
 
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.vms.transformer.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.DrmSystemIdentifiersHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowoutput.DrmKeyString;
@@ -15,8 +16,8 @@ public class DrmSystemModule extends AbstractTransformModule {
     private final DrmKeyString TRUE = new DrmKeyString("true");
     private final DrmKeyString FALSE = new DrmKeyString("false");
 
-    public DrmSystemModule(VMSHollowVideoInputAPI api, HollowObjectMapper mapper) {
-        super(api, mapper);
+    public DrmSystemModule(VMSHollowVideoInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
+        super(api, ctx, mapper);
     }
 
     public void transform() {

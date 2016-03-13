@@ -2,6 +2,7 @@ package com.netflix.vms.transformer.modules.mpl;
 
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.vms.transformer.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.CdnsHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryListHollow;
 import com.netflix.vms.transformer.hollowinput.OriginServersHollow;
@@ -21,8 +22,8 @@ public class OriginServerModule extends AbstractTransformModule {
     private final HollowPrimaryKeyIndex storageGroupsIndex;
     private final HollowPrimaryKeyIndex cdnsIndex;
 
-    public OriginServerModule(VMSHollowVideoInputAPI api, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
-        super(api, mapper);
+    public OriginServerModule(VMSHollowVideoInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+        super(api, ctx, mapper);
         this.storageGroupsIndex = indexer.getPrimaryKeyIndex(IndexSpec.STORAGE_GROUPS);
         this.cdnsIndex = indexer.getPrimaryKeyIndex(IndexSpec.CDNS);
     }

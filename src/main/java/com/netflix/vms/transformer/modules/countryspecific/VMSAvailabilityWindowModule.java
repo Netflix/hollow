@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import com.netflix.vms.transformer.TransformerContext;
 import com.netflix.vms.transformer.hollowoutput.BaseDownloadable;
 import com.netflix.vms.transformer.hollowoutput.TrickPlayDescriptor;
 import com.netflix.vms.transformer.hollowoutput.Video;
@@ -47,6 +48,7 @@ import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.VideoFormatDescriptorIdentifier;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -61,6 +63,7 @@ public class VMSAvailabilityWindowModule {
 
 
     private final VMSHollowVideoInputAPI api;
+    private final TransformerContext ctx;
 
 
     private final HollowPrimaryKeyIndex packageIdx;
@@ -75,8 +78,9 @@ public class VMSAvailabilityWindowModule {
 
     private Map<Integer, List<PackageData>> transformedPackageData;
 
-    public VMSAvailabilityWindowModule(VMSHollowVideoInputAPI api, VMSTransformerIndexer indexer) {
+    public VMSAvailabilityWindowModule(VMSHollowVideoInputAPI api, TransformerContext ctx, VMSTransformerIndexer indexer) {
         this.api = api;
+        this.ctx = ctx;
 
         this.packageIdx = indexer.getPrimaryKeyIndex(IndexSpec.PACKAGES);
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
@@ -220,11 +224,11 @@ public class VMSAvailabilityWindowModule {
                                             bundledAssetsGroupId = (int)contractId;
                                         }
 
-                                        if(window._getEndDate()._getValue() > System.currentTimeMillis() && window._getStartDate()._getValue() < minWindowStartDate) {
+                                        if(window._getEndDate()._getValue() > ctx.getNowMillis() && window._getStartDate()._getValue() < minWindowStartDate) {
                                             minWindowStartDate = window._getStartDate()._getValue();
                                             currentOrFirstFutureWindow = outputWindow;
 
-                                            if(isGoLive && window._getStartDate()._getValue() < System.currentTimeMillis())
+                                            if(isGoLive && window._getStartDate()._getValue() < ctx.getNowMillis())
                                                 isInWindow = true;
                                         }
                                     }
@@ -592,7 +596,7 @@ public class VMSAvailabilityWindowModule {
         if(countryContractRestrictions == null)
             return null;
 
-        long now = System.currentTimeMillis();
+        long now = ctx.getNowMillis();
 
         Set<com.netflix.vms.transformer.hollowoutput.Long> nextExcludedDownloadables = Collections.emptySet();
         long nextStartDate = Long.MAX_VALUE;

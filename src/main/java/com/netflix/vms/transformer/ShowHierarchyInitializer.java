@@ -35,13 +35,15 @@ public class ShowHierarchyInitializer {
     private final HollowPrimaryKeyIndex videoRightsIndex;
     private final HollowHashIndex rolloutVideoTypeIndex;
     private final Set<Integer> supplementalIds;
+    private final TransformerContext ctx;
 
-    public ShowHierarchyInitializer(VMSHollowVideoInputAPI videoAPI, VMSTransformerIndexer indexer) {
+    public ShowHierarchyInitializer(VMSHollowVideoInputAPI videoAPI, VMSTransformerIndexer indexer, TransformerContext ctx) {
         this.videoAPI = videoAPI;
         this.supplementalIndex = indexer.getPrimaryKeyIndex(IndexSpec.SUPPLEMENTAL);
         this.videoTypeCountryIndex = indexer.getHashIndex(IndexSpec.VIDEO_TYPE_COUNTRY);
         this.videoRightsIndex = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_RIGHTS);
         this.rolloutVideoTypeIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
+        this.ctx = ctx;
 
         this.supplementalIds = findAllSupplementalVideoIds(videoAPI);
     }
@@ -184,7 +186,7 @@ public class ShowHierarchyInitializer {
             for(RolloutPhaseHollow phase : rollout._getPhases()) {
                 for(Map.Entry<ISOCountryHollow, RolloutPhaseWindowHollow> entry : phase._getWindows().entrySet()) {
                     if(entry.getKey()._isValueEqual(country)) {
-                        return entry.getValue()._getEndDate()._getValue() >= System.currentTimeMillis();
+                        return entry.getValue()._getEndDate()._getValue() >= ctx.getNowMillis();
                     }
                 }
             }

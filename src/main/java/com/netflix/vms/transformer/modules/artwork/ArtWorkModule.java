@@ -14,6 +14,7 @@ import java.util.Set;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.ConversionUtils;
+import com.netflix.vms.transformer.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.ArtWorkImageTypeHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeHollow;
@@ -24,7 +25,6 @@ import com.netflix.vms.transformer.hollowinput.ArtworkRecipeHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
 import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
 import com.netflix.vms.transformer.hollowinput.MultiValuePassthroughMapHollow;
-import com.netflix.vms.transformer.hollowinput.PersonArtworkHollow;
 import com.netflix.vms.transformer.hollowinput.SingleValuePassthroughMapHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
@@ -49,8 +49,8 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     private final HollowPrimaryKeyIndex imageTypeIdx;
     private final HollowPrimaryKeyIndex recipeIdx;
     
-    public ArtWorkModule(VMSHollowVideoInputAPI api, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
-	    super(api, mapper);
+    public ArtWorkModule(VMSHollowVideoInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+	    super(api, ctx, mapper);
 	    this.imageTypeIdx = indexer.getPrimaryKeyIndex(IndexSpec.ARTWORK_IMAGE_FORMAT);
 	    this.recipeIdx = indexer.getPrimaryKeyIndex(ARTWORK_RECIPE);
 	}
