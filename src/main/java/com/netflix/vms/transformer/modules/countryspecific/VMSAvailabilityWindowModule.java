@@ -1,7 +1,5 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
-import com.netflix.vms.transformer.hollowinput.CdnDeploymentSetHollow;
-
 import com.netflix.vms.transformer.hollowoutput.BaseDownloadable;
 import com.netflix.vms.transformer.hollowoutput.TrickPlayDescriptor;
 import com.netflix.vms.transformer.hollowoutput.Video;
@@ -126,8 +124,8 @@ public class VMSAvailabilityWindowModule {
     public void populateWindowData(Integer videoId, String country, CompleteVideoCountrySpecificData data, VideoRightsHollow videoRights, CountrySpecificRollupValues rollup) {
         boolean isGoLive = isGoLive(videoRights);
 
-        if(videoId == 70286188 && "MQ".equals(country))
-            System.out.println("asdf");
+        /*if(videoId == 80017765 && "MS".equals(country))
+            System.out.println("asdf");*/
 
         VideoRightsRightsHollow rights = videoRights._getRights();
         if((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
@@ -142,6 +140,9 @@ public class VMSAvailabilityWindowModule {
                 if(endDate > maxEndDate)
                     maxEndDate = endDate;
 
+                if(rollup.doSeason()) {
+                    rollup.newSeasonWindow(startDate, endDate, rollup.getSeasonSequenceNumber());
+                }
             }
 
             VMSAvailabilityWindow outputWindow = new VMSAvailabilityWindow();
@@ -162,7 +163,8 @@ public class VMSAvailabilityWindowModule {
             videoMediaAvailabilityWindow.windowInfosByPackageId.put(ZERO, videoMediaContractInfo);
 
             videoMediaContractInfo.videoContractInfo.assetBcp47Codes = rollup.getAssetBcp47Codes();
-            videoMediaContractInfo.videoContractInfo.prePromotionDays = rollup.getPrePromoDays();
+            if(rollup.getPrePromoDays() != 0)
+                videoMediaContractInfo.videoContractInfo.prePromotionDays = rollup.getPrePromoDays();
             videoMediaContractInfo.videoContractInfo.postPromotionDays = 0;
             videoMediaContractInfo.videoContractInfo.cupTokens = rollup.getCupTokens() != null ? rollup.getCupTokens() : EMPTY_CUP_TOKENS;
             videoMediaContractInfo.videoPackageInfo.formats = rollup.getVideoFormatDescriptors();
@@ -171,6 +173,7 @@ public class VMSAvailabilityWindowModule {
 
             data.mediaAvailabilityWindows = Collections.singletonList(videoMediaAvailabilityWindow);
             data.imagesAvailabilityWindows = Collections.singletonList(videoImagesAvailabilityWindow);
+            
         } else {
             List<VMSAvailabilityWindow> availabilityWindows = new ArrayList<VMSAvailabilityWindow>();
 
@@ -235,38 +238,40 @@ public class VMSAvailabilityWindowModule {
                 }
 
                 outputWindow.bundledAssetsGroupId = bundledAssetsGroupId;
+                
+                availabilityWindows.add(outputWindow);
+            }
 
-                if(currentOrFirstFutureWindow != null) {
-                    maxPackageId = 0;
-                    Set<Strings> assetBcp47CodesFromMaxPackageId = null;
-                    Set<VideoFormatDescriptor> videoFormatDescriptorsFromMaxPackageId = null;
-                    int prePromoDays = 0;
-                    LinkedHashSetOfStrings cupTokens = null;
-                    Map<Strings, List<VideoImage>> stillImagesByTypeMap = Collections.emptyMap();
 
-                    for(Map.Entry<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo> entry : currentOrFirstFutureWindow.windowInfosByPackageId.entrySet()) {
-                        if(entry.getKey().val > maxPackageId) {
-                            maxPackageId = entry.getKey().val;
-                            assetBcp47CodesFromMaxPackageId = entry.getValue().videoContractInfo.assetBcp47Codes;
-                            videoFormatDescriptorsFromMaxPackageId = entry.getValue().videoPackageInfo.formats;
-                            prePromoDays = entry.getValue().videoContractInfo.prePromotionDays;
-                            cupTokens = entry.getValue().videoContractInfo.cupTokens;
-                            if(isGoLive && isInWindow)
-                                stillImagesByTypeMap = entry.getValue().videoPackageInfo.stillImagesMap;
-                        }
+            if(currentOrFirstFutureWindow != null) {
+                maxPackageId = 0;
+                Set<Strings> assetBcp47CodesFromMaxPackageId = null;
+                Set<VideoFormatDescriptor> videoFormatDescriptorsFromMaxPackageId = null;
+                int prePromoDays = 0;
+                LinkedHashSetOfStrings cupTokens = null;
+                Map<Strings, List<VideoImage>> stillImagesByTypeMap = Collections.emptyMap();
+
+                for(Map.Entry<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo> entry : currentOrFirstFutureWindow.windowInfosByPackageId.entrySet()) {
+                    if(entry.getKey().val > maxPackageId) {
+                        maxPackageId = entry.getKey().val;
+                        assetBcp47CodesFromMaxPackageId = entry.getValue().videoContractInfo.assetBcp47Codes;
+                        videoFormatDescriptorsFromMaxPackageId = entry.getValue().videoPackageInfo.formats;
+                        prePromoDays = entry.getValue().videoContractInfo.prePromotionDays;
+                        cupTokens = entry.getValue().videoContractInfo.cupTokens;
+                        if(isGoLive && isInWindow)
+                            stillImagesByTypeMap = entry.getValue().videoPackageInfo.stillImagesMap;
                     }
-
-                    rollup.newAssetBcp47Codes(assetBcp47CodesFromMaxPackageId);
-                    rollup.newVideoFormatDescriptors(videoFormatDescriptorsFromMaxPackageId);
-                    rollup.newPrePromoDays(prePromoDays);
-                    rollup.newCupTokens(cupTokens);
-                    rollup.newEpisodeStillImagesByTypeMap(stillImagesByTypeMap);
                 }
 
-
-                availabilityWindows.add(outputWindow);
-                rollup.newEpisodeData(isGoLive, bundledAssetsGroupId);
+                rollup.newAssetBcp47Codes(assetBcp47CodesFromMaxPackageId);
+                rollup.newVideoFormatDescriptors(videoFormatDescriptorsFromMaxPackageId);
+                rollup.newPrePromoDays(prePromoDays);
+                rollup.newCupTokens(cupTokens);
+                rollup.newEpisodeStillImagesByTypeMap(stillImagesByTypeMap);
             }
+
+            rollup.newEpisodeData(isGoLive, bundledAssetsGroupId);
+
 
             Collections.sort(availabilityWindows, new Comparator<VMSAvailabilityWindow>() {
                 public int compare(VMSAvailabilityWindow o1, VMSAvailabilityWindow o2) {
@@ -306,7 +311,7 @@ public class VMSAvailabilityWindowModule {
         info.videoContractInfo = new VideoContractInfo();
         info.videoContractInfo.contractId = (int) contract._getContractId();
         info.videoContractInfo.primaryPackageId = (int) contract._getPackageId();
-        if(contract._getPrePromotionDays() != 0)
+        if(contract._getPrePromotionDays() != Long.MIN_VALUE)
             info.videoContractInfo.prePromotionDays = (int) contract._getPrePromotionDays();
         info.videoContractInfo.isDayAfterBroadcast = contract._getDayAfterBroadcast();
         info.videoContractInfo.hasRollingEpisodes = contract._getDayAfterBroadcast();
@@ -334,13 +339,14 @@ public class VMSAvailabilityWindowModule {
             StreamProfilesHollow profile = api.getStreamProfilesHollow(streamProfileOrdinal);
             String streamProfileType = profile._getProfileType()._getValue();
 
-            /// add the videoFormatDescriptor
-            VideoFormatDescriptor descriptor = streamData.downloadDescriptor.videoFormatDescriptor;
-            if(descriptor.id == 1 || descriptor.id == 3 || descriptor.id == 4)  // Only interested in HD or better
-                info.videoPackageInfo.formats.add(descriptor);
 
             if("VIDEO".equals(streamProfileType) || "MUXED".equals(streamProfileType)) {
-                if(streamData.streamDataDescriptor.runTimeInSeconds > longestRuntimeInSeconds)
+                /// add the videoFormatDescriptor
+                VideoFormatDescriptor descriptor = streamData.downloadDescriptor.videoFormatDescriptor;
+                if(descriptor.id == 1 || descriptor.id == 3 || descriptor.id == 4)  // Only interested in HD or better
+                    info.videoPackageInfo.formats.add(descriptor);
+
+                if(streamData.streamDataDescriptor.runTimeInSeconds > longestRuntimeInSeconds && "VIDEO".equals(streamProfileType))
                     longestRuntimeInSeconds = streamData.streamDataDescriptor.runTimeInSeconds;
 
                 PixelAspect pixelAspect = streamData.streamDataDescriptor.pixelAspect;
@@ -421,18 +427,26 @@ public class VMSAvailabilityWindowModule {
                 videoMoment.videoMomentTypeName = new Strings(packageMoment._getMomentType()._getValue());
 
                 StringHollow packageMomentTags = packageMoment._getTags();
+                List<String> momentTags = new ArrayList<String>();
                 if(packageMomentTags != null) {
                     String tags = packageMomentTags._getValue();
                     if(!"".equals(tags)) {
                         videoMoment.momentTags = new ArrayList<Strings>();
                         for(String tag : tags.split(",")) {
-                            videoMoment.momentTags.add(new Strings(tag));
+                            momentTags.add(tag);
                         }
                     }
                 }
 
-                if(videoMoment.momentTags == null)
+                if(momentTags.isEmpty()) {
                     videoMoment.momentTags = Collections.emptyList();
+                } else {
+                    videoMoment.momentTags = new ArrayList<Strings>();
+                    Collections.sort(momentTags);
+                    for(String tag : momentTags) {
+                        videoMoment.momentTags.add(new Strings(tag));
+                    }
+                }                
 
                 for(DownloadableIdHollow id : downloadableIdList) {
                     Long downloadableId = id._getValueBoxed();

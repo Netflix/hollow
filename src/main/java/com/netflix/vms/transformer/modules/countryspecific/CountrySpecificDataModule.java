@@ -12,6 +12,7 @@ import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData
 import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.NFLocale;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
+import com.netflix.vms.transformer.hollowoutput.SortedMapOfDateWindowToListOfInteger;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 
@@ -60,6 +61,7 @@ public class CountrySpecificDataModule {
                 }
 
                 rollup.setDoSeason(true);
+                rollup.setSeasonSequenceNumber(hierarchy.getSeasonSequenceNumbers()[i]);
                 convert(hierarchy.getSeasonIds()[i], countryCode, countryMap, rollup);
                 rollup.setDoSeason(false);
                 rollup.resetSeason();
@@ -89,8 +91,10 @@ public class CountrySpecificDataModule {
         populateRightsData(videoId, countryCode, data, rollup);
         certificationListsModule.populateCertificationLists(videoId, countryCode, data);
 
-        countryMap.put(videoId, data);
+        if(rollup.doShow())
+            data.dateWindowWiseSeasonSequenceNumberMap = new SortedMapOfDateWindowToListOfInteger(rollup.getDateWindowWiseSeasonSequenceNumbers()); // VideoCollectionsShowDataHolder.computeEpisodeSeasonSequenceNumberMap(showVideoEpisodeList)
 
+        countryMap.put(videoId, data);
     }
 
     private void populateRightsData(Integer videoId, String countryCode, CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup) {
