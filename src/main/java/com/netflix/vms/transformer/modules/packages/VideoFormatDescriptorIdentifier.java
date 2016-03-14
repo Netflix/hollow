@@ -57,8 +57,14 @@ public class VideoFormatDescriptorIdentifier {
         if(ultraHDEncodingProfileIds.contains(Integer.valueOf(encodingProfileId)))
             return videoFormatDescriptorMap.get("Ultra_HD");
 
+        if(height == Integer.MIN_VALUE)
+            return getUnknownVideoFormatDescriptor();
+
         if(targetHeight != Integer.MIN_VALUE && targetWidth != Integer.MIN_VALUE) {
             if(aspectRatioVideoFormatIdentifiers.contains(new TargetResolution(targetHeight, targetWidth))) {
+                if(height > width)
+                    return getUnknownVideoFormatDescriptor();
+                
                 float div = ((float)width / (float)height);
                 final int index = (int)(div * 100) - 100;
 
@@ -68,9 +74,6 @@ public class VideoFormatDescriptorIdentifier {
             }
         }
 
-        if(height == Integer.MIN_VALUE)
-            return videoFormatDescriptorMap.get("unknown");
-
         if(height <= 719)
             return videoFormatDescriptorMap.get("SD");
 
@@ -78,6 +81,10 @@ public class VideoFormatDescriptorIdentifier {
             return videoFormatDescriptorMap.get("Super_HD");
 
         return videoFormatDescriptorMap.get("HD");
+    }
+    
+    public VideoFormatDescriptor getUnknownVideoFormatDescriptor() {
+        return videoFormatDescriptorMap.get("unknown");
     }
 
     private Map<String, VideoFormatDescriptor> getVideoFormatDescriptorMap() {
