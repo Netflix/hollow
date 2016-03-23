@@ -44,11 +44,11 @@ import org.junit.Test;
 public class FilterToSmallDataSubset {
 
     private static final int TARGET_NUMBER_OF_TOPNODES = 1000;
-    private static final String ORIGINAL_OUTPUT_BLOB_LOCATION = "/space/local-blob-store/latest_candidate-snapshot-20160218221244741";
-    private static final String ORIGINAL_INPUT_BLOB_LOCATION = "/space/local-blob-store/vmsinput-snapshot-20160218221244741";
+    private static final String ORIGINAL_OUTPUT_BLOB_LOCATION = "/space/transformer-data/pinned-blobs/dev_noevent-snapshot-20160307205744289";
+    private static final String ORIGINAL_INPUT_BLOB_LOCATION = "/space/transformer-data/pinned-blobs/vms.input-snapshot-20160307205744289";
 
-    private static final String FILTERED_OUTPUT_BLOB_LOCATION = "/space/local-blob-store/control-output";
-    private static final String FILTERED_INPUT_BLOB_LOCATION = "/space/local-blob-store/filtered-input";
+    private static final String FILTERED_OUTPUT_BLOB_LOCATION = "/space/transformer-data/pinned-subsets/control-output";
+    private static final String FILTERED_INPUT_BLOB_LOCATION = "/space/transformer-data/pinned-subsets/filtered-input";
 
     private HollowReadStateEngine stateEngine;
     private HollowPrimaryKeyIndex globalVideoIdx;
@@ -226,6 +226,11 @@ public class FilterToSmallDataSubset {
         findIncludedOrdinals("VideoArtWork", includedVideoIds, new VideoIdDeriver() {
             public Integer deriveId(int ordinal) {
                 return Integer.valueOf((int)inputAPI.getVideoArtWorkHollow(ordinal)._getMovieId());
+            }
+        });
+        findIncludedOrdinals("VideoArtwork", includedVideoIds, new VideoIdDeriver() {
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int)inputAPI.getVideoArtworkHollow(ordinal)._getMovieId());
             }
         });
         findIncludedOrdinals("VideoAward", includedVideoIds, new VideoIdDeriver() {

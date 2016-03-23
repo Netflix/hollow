@@ -6,8 +6,6 @@ nebula {
 }
 
 dependencies {
-    compile 'commons-lang:commons-lang:latest.release'
-    compile 'netflix:basicTypes:latest.release'
     compile 'com.netflix.hollow:netflix-hollow:latest.release'
     compile 'com.google.guava:guava:14.0.1'
 
