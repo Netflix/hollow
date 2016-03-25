@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.util;
 
+import com.netflix.vms.transformer.hollowoutput.ArtWorkImageTypeEntry;
+
 import com.netflix.hollow.util.HollowObjectHashCodeFinder;
 import com.netflix.vms.transformer.hollowoutput.DrmKeyString;
 import com.netflix.vms.transformer.hollowoutput.Episode;
@@ -20,6 +22,7 @@ import java.util.Set;
 public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder {
 
     private static enum RecordType {
+        ArtWorkImageTypeEntry,
         DrmKeyString,
         Episode,
         ISOCountry,
@@ -83,6 +86,8 @@ public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder 
             return ((VideoFormatDescriptor)objectToHash).id;
         case VideoSetType:
             return new String(((VideoSetType)objectToHash).value).hashCode();
+        case ArtWorkImageTypeEntry:
+            return new String(((ArtWorkImageTypeEntry)objectToHash).nameStr).hashCode();
         default:
             throw new IllegalArgumentException();
         }
