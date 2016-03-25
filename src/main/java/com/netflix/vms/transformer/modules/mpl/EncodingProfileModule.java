@@ -20,8 +20,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
-
 public class EncodingProfileModule extends AbstractTransformModule {
 
     private ThreadLocal<Map<String, ProfileTypeDescriptor>> profileTypeMapRef = new ThreadLocal<>();
@@ -86,17 +84,17 @@ public class EncodingProfileModule extends AbstractTransformModule {
         ProfileTypeDescriptor result = profileTypeMap.get(profileTypeName);
         if (result != null) return result;
 
-        if (StringUtils.equals("AUDIO", profileTypeName)) {
+        if ("AUDIO".equals(profileTypeName)) {
             result = newProfileTypeDescriptor(1, "Audio", "Audio");
-        } else if (StringUtils.equals("VIDEO", profileTypeName)) {
+        } else if ("VIDEO".equals(profileTypeName)) {
             result = newProfileTypeDescriptor(2, "Video", "Video");
-        } else if (StringUtils.equals("TEXT", profileTypeName)) {
+        } else if ("TEXT".equals(profileTypeName)) {
             result = newProfileTypeDescriptor(3, "Text", "Timed Text");
-        } else if (StringUtils.equals("MUXED", profileTypeName)) {
+        } else if ("MUXED".equals(profileTypeName)) {
             result = newProfileTypeDescriptor(4, "Muxed", "Muxed");
-        } else if (StringUtils.equals("TRICKPLAY", profileTypeName)) {
+        } else if ("TRICKPLAY".equals(profileTypeName)) {
             result = newProfileTypeDescriptor(5, "Trick Play", "Trick Play");
-        } else if (StringUtils.equals("MERCHSTILL", profileTypeName)) {
+        } else if ("MERCHSTILL".equals(profileTypeName)) {
             result = newProfileTypeDescriptor(6, "MerchStills", "MerchStills");
         } else {
             result = newProfileTypeDescriptor(-1, "unknown", "unknown");

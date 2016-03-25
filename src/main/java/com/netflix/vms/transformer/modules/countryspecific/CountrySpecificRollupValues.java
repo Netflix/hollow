@@ -140,7 +140,11 @@ public class CountrySpecificRollupValues extends RollupValues {
         if(seasonFirstEpisodeVideoImagesMap.isEmpty())
             seasonFirstEpisodeVideoImagesMap = map;
 
-        for(Map.Entry<Strings, List<VideoImage>> entry : map.entrySet()) {
+        newEpisodeStillImagesByTypeMapForShowLevelExtraction(map);
+    }
+
+	public void newEpisodeStillImagesByTypeMapForShowLevelExtraction(Map<Strings, List<VideoImage>> map) {
+		for(Map.Entry<Strings, List<VideoImage>> entry : map.entrySet()) {
             for(VideoImage img : entry.getValue()) {
                 for(Strings momentTag : img.videoMoment.momentTags) {
                     if(new String(momentTag.value).equals("show_level")) {
@@ -150,9 +154,12 @@ public class CountrySpecificRollupValues extends RollupValues {
                 }
             }
         }
-    }
+	}
 
     private void newTagBasedShowLevelVideoImage(Strings type, VideoImage img) {
+    	if(img.videoMoment.msOffset == 2548500)
+    		System.out.println("asdf");
+    	
         List<VideoImage> list = showLevelTaggedVideoImagesRollup.get(type);
         if(list == null) {
             list = new ArrayList<VideoImage>();
