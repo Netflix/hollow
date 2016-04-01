@@ -46,9 +46,6 @@ public class EncodeSummaryDescriptorModule {
             if((stream.additionalData.mostlyConstantData.deploymentLabel & DEPLOYMENT_LABELS_TO_EXCLUDE_FROM_SUMMARY) != 0)
                 continue;
 
-            if(stream.downloadableId == 1630622299)
-                System.out.println("asdf");
-
             int streamProfileOrdinal = streamProfileIdx.getMatchingOrdinal((long)stream.downloadDescriptor.encodingProfileId);
 
             if(streamProfileOrdinal == -1)

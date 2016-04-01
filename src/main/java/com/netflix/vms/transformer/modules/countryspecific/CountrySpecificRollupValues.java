@@ -40,7 +40,7 @@ public class CountrySpecificRollupValues extends RollupValues {
     private Map<Strings, List<VideoImage>> seasonFirstEpisodeVideoImagesMap = Collections.emptyMap();
     private Map<Strings, List<VideoImage>> showLevelTaggedVideoImagesRollup = new HashMap<Strings, List<VideoImage>>();
     private Map<Strings, List<VideoImage>> seasonLevelTaggedVideoImagesRollup = new HashMap<Strings, List<VideoImage>>();
-    
+
     private int seasonSequenceNumber = 0;
     private Map<DateWindow, IntList> seasonSequenceNumberMap = new HashMap<>();
 
@@ -54,7 +54,7 @@ public class CountrySpecificRollupValues extends RollupValues {
     public int getSeasonSequenceNumber() {
         return seasonSequenceNumber;
     }
-    
+
     public void reset() {
         resetSeason();
         resetShow();
@@ -157,15 +157,12 @@ public class CountrySpecificRollupValues extends RollupValues {
 	}
 
     private void newTagBasedShowLevelVideoImage(Strings type, VideoImage img) {
-    	if(img.videoMoment.msOffset == 2548500)
-    		System.out.println("asdf");
-    	
         List<VideoImage> list = showLevelTaggedVideoImagesRollup.get(type);
         if(list == null) {
             list = new ArrayList<VideoImage>();
             showLevelTaggedVideoImagesRollup.put(type, list);
         }
-        
+
         list.add(img);
 
         list = seasonLevelTaggedVideoImagesRollup.get(type);
@@ -175,18 +172,18 @@ public class CountrySpecificRollupValues extends RollupValues {
         }
         list.add(img);
     }
-    
+
     public void newSeasonWindow(long startDate, long endDate, int sequenceNumber) {
         DateWindow dateWindow = new DateWindow();
         dateWindow.startDateTimestamp = startDate;
         dateWindow.endDateTimestamp = endDate;
-        
+
         IntList seasonSeqNums = seasonSequenceNumberMap.get(dateWindow);
         if(seasonSeqNums == null) {
             seasonSeqNums = new IntList();
             seasonSequenceNumberMap.put(dateWindow, seasonSeqNums);
         }
-        
+
         seasonSeqNums.add(sequenceNumber);
     }
 
@@ -238,22 +235,22 @@ public class CountrySpecificRollupValues extends RollupValues {
         return showLevelTaggedVideoImagesRollup;
 
     }
-    
+
     public Map<DateWindow, List<com.netflix.vms.transformer.hollowoutput.Integer>> getDateWindowWiseSeasonSequenceNumbers() {
         if(seasonSequenceNumberMap.isEmpty())
             return Collections.emptyMap();
-        
+
         /// date windows may be overlapping, need to merge them.
         Set<Long> windowDates = new HashSet<Long>();
-        
+
         for(Map.Entry<DateWindow, ?> entry : seasonSequenceNumberMap.entrySet()) {
             windowDates.add(entry.getKey().startDateTimestamp);
             windowDates.add(entry.getKey().endDateTimestamp);
         }
-        
+
         List<Long> sortedWindowDates = new ArrayList<Long>(windowDates);
         Collections.sort(sortedWindowDates);
-        
+
         Map<DateWindow, List<com.netflix.vms.transformer.hollowoutput.Integer>> mergedWindowSeqNumMap = new HashMap<>();
 
         BitSet mergedSeqNums = new BitSet();
@@ -261,7 +258,7 @@ public class CountrySpecificRollupValues extends RollupValues {
             Long currentStartDate = sortedWindowDates.get(i);
             Long currentEndDate = sortedWindowDates.get(i+1);
             mergedSeqNums.clear();
-            
+
             for(Map.Entry<DateWindow, IntList> entry : seasonSequenceNumberMap.entrySet()) {
                 if(entry.getKey().startDateTimestamp <= currentStartDate && entry.getKey().endDateTimestamp >= currentEndDate) {
                     for(int j=0;j<entry.getValue().size();j++) {
@@ -269,21 +266,21 @@ public class CountrySpecificRollupValues extends RollupValues {
                     }
                 }
             }
-            
+
             DateWindow key = new DateWindow();
             key.startDateTimestamp = currentStartDate.longValue();
             key.endDateTimestamp = currentEndDate.longValue();
-            
+
             List<com.netflix.vms.transformer.hollowoutput.Integer> seqNums = new ArrayList<>();
             int currentSeqNum = mergedSeqNums.nextSetBit(0);
             while(currentSeqNum != -1) {
                 seqNums.add(new com.netflix.vms.transformer.hollowoutput.Integer(currentSeqNum));
                 currentSeqNum = mergedSeqNums.nextSetBit(currentSeqNum + 1);
             }
-            
+
             mergedWindowSeqNumMap.put(key, seqNums);
         }
-        
+
         return mergedWindowSeqNumMap;
     }
 
