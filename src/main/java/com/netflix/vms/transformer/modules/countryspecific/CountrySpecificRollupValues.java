@@ -69,6 +69,7 @@ public class CountrySpecificRollupValues extends RollupValues {
         seasonFirstEpisodeVideoImagesMap = Collections.emptyMap();
         seasonLevelTaggedVideoImagesRollup = new HashMap<Strings, List<VideoImage>>();
         seasonBundledAssetFromFirstAvailableEpisode = Integer.MIN_VALUE;
+        seasonBundledAssetFromFirstUnavailableEpisode = Integer.MIN_VALUE;
     }
 
     public void resetShow() {
@@ -81,6 +82,7 @@ public class CountrySpecificRollupValues extends RollupValues {
         showLevelTaggedVideoImagesRollup = new HashMap<Strings, List<VideoImage>>();
         seasonSequenceNumberMap = new HashMap<>();
         showBundledAssetFromFirstAvailableEpisode = Integer.MIN_VALUE;
+        showBundledAssetFromFirstUnavailableEpisode = Integer.MIN_VALUE;
     }
 
     public void episodeFound() {
