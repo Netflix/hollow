@@ -289,7 +289,7 @@ public class VMSAvailabilityWindowModule {
 		        	isInWindow = true;
 
 		        ////TODO: What was the logic for this before?
-		        if(rollup.doSeason() && startDate < (ctx.getNowMillis() + (10 * 365 * 24 * 60 * 60 * 1000))) {
+		        if(rollup.doSeason() && startDate < (ctx.getNowMillis() + (7 * 24 * 60 * 60 * 1000))) {
 		            rollup.newSeasonWindow(startDate, endDate, rollup.getSeasonSequenceNumber());
 		        }
 		    }
