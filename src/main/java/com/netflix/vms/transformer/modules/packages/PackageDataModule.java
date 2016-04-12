@@ -1,5 +1,8 @@
 package com.netflix.vms.transformer.modules.packages;
 
+import java.util.ArrayList;
+
+import java.util.List;
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
@@ -72,7 +75,9 @@ public class PackageDataModule {
         this.encodeSummaryModule = new EncodeSummaryDescriptorModule(api, indexer);
     }
 
-    public void transform(Map<String, ShowHierarchy> showHierarchiesByCountry) {
+    public Map<Integer, List<PackageData>> transform(Map<String, ShowHierarchy> showHierarchiesByCountry) {
+        Map<Integer, List<PackageData>> transformedPackages = new HashMap<Integer, List<PackageData>>();
+
         Set<Integer> videoIds = gatherVideoIds(showHierarchiesByCountry);
 
         for(Integer videoId : videoIds) {
@@ -81,6 +86,8 @@ public class PackageDataModule {
             if(packagesForVideo != null) {
                 HollowOrdinalIterator iter = packagesForVideo.iterator();
 
+                List<PackageData> transformedVideoPackages = new ArrayList<PackageData>();
+
                 int packageOrdinal = iter.next();
                 while(packageOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
                     drmKeysByGroupId.clear();
@@ -88,12 +95,18 @@ public class PackageDataModule {
 
                     PackagesHollow packages = api.getPackagesHollow(packageOrdinal);
                     populateDrmKeysByGroupId(packages, videoId);
-                    convertPackage(packages);
+                    PackageData transformedPackage = convertPackage(packages);
+
+                    transformedVideoPackages.add(transformedPackage);
+
                     packageOrdinal = iter.next();
                 }
 
+                transformedPackages.put(videoId, transformedVideoPackages);
             }
         }
+
+        return transformedPackages;
     }
 
     private void populateDrmKeysByGroupId(PackagesHollow packageInput, Integer videoId) {
@@ -136,7 +149,7 @@ public class PackageDataModule {
         }
     }
 
-    private void convertPackage(PackagesHollow packages) {
+    private PackageData convertPackage(PackagesHollow packages) {
         PackageData pkg = new PackageData();
 
         pkg.id = (int)packages._getPackageId();
@@ -182,6 +195,8 @@ public class PackageDataModule {
 
         mapper.addObject(pkg);
         mapper.addObject(drmInfoData);
+
+        return pkg;
     }
 
     private void addFileEncodingDataForStream(PackageStreamHollow inputStream) {

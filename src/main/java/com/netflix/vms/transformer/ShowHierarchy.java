@@ -46,11 +46,9 @@ public class ShowHierarchy {
             int episodeSequenceNumbers[][] = new int[seasons.size()][];
 
             int seasonCounter = 0;
-            int seasonSeqNum = 0;
 
             for(int i=0;i<seasons.size();i++) {
                 SeasonHollow season = seasons.get(i);
-                seasonSeqNum++;
 
                 if(!initializer.isChildNodeIncluded(season._getMovieId(), countryCode))
                     continue;
@@ -58,7 +56,7 @@ public class ShowHierarchy {
                 initializer.addSupplementalVideos(season._getMovieId(), countryCode, supplementalIds);
 
                 seasonIds[seasonCounter] = (int)season._getMovieId();
-                seasonSequenceNumbers[seasonCounter] = seasonSeqNum;
+                seasonSequenceNumbers[seasonCounter] = (int)season._getSequenceNumber();
                 hashCode ^= seasonIds[i];
                 hashCode = HashCodes.hashInt(hashCode);
 
@@ -73,11 +71,9 @@ public class ShowHierarchy {
                 episodeSequenceNumbers[seasonCounter] = new int[episodes.size()];
 
                 int episodeCounter = 0;
-                int episodeSeqNum = 0;
 
                 for(int j=0;j<episodes.size();j++) {
                     EpisodeHollow episode = episodes.get(j);
-                    episodeSeqNum++;
 
                     if(!initializer.isChildNodeIncluded(episode._getMovieId(), countryCode))
                         continue;
@@ -85,7 +81,7 @@ public class ShowHierarchy {
                     initializer.addSupplementalVideos(episode._getMovieId(), countryCode, supplementalIds);
                     
                     episodeIds[seasonCounter][episodeCounter] = (int)episode._getMovieId();
-                    episodeSequenceNumbers[seasonCounter][episodeCounter] = episodeSeqNum;
+                    episodeSequenceNumbers[seasonCounter][episodeCounter] = (int)episode._getSequenceNumber();
                     hashCode ^= episodeIds[seasonCounter][episodeCounter];
                     hashCode = HashCodes.hashInt(hashCode);
                     episodeCounter++;

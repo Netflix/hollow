@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.modules.passthrough.artwork;
 
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.vms.transformer.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.DefaultExtensionRecipeHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowoutput.DefaultExtensionRecipe;
@@ -8,9 +9,8 @@ import com.netflix.vms.transformer.modules.AbstractTransformModule;
 
 public class DefaultExtensionRecipeModule extends AbstractTransformModule {
 
-    public DefaultExtensionRecipeModule(VMSHollowVideoInputAPI api,
-            HollowObjectMapper mapper) {
-        super(api, mapper);
+    public DefaultExtensionRecipeModule(VMSHollowVideoInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
+        super(api, ctx, mapper);
     }
 
     @Override

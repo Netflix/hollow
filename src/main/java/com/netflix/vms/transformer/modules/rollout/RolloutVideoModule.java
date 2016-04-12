@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.modules.rollout;
 
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.vms.transformer.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.IndividualTrailerHollow;
@@ -50,6 +51,7 @@ import com.netflix.vms.transformer.hollowoutput.VPerson;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -61,8 +63,8 @@ import java.util.Map.Entry;
 
 public class RolloutVideoModule extends AbstractTransformModule {
 
-    public RolloutVideoModule(VMSHollowVideoInputAPI api, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
-        super(api, mapper);
+    public RolloutVideoModule(VMSHollowVideoInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+        super(api, ctx, mapper);
     }
 
     @Override

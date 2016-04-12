@@ -2,6 +2,7 @@ package com.netflix.vms.transformer.modules.passthrough.artwork;
 
 
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.vms.transformer.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.ArtWorkImageTypeHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageTypeEntry;
@@ -11,9 +12,8 @@ public class ArtworkTypeModule extends AbstractTransformModule {
     private final String UNAVAILABLE_STRING = "unavailable";
     private final boolean TRUE = true;
 
-    public ArtworkTypeModule(VMSHollowVideoInputAPI api,
-            HollowObjectMapper mapper) {
-        super(api, mapper);
+    public ArtworkTypeModule(VMSHollowVideoInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
+        super(api, ctx, mapper);
     }
 
     @Override

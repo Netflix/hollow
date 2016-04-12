@@ -1,7 +1,5 @@
 package com.netflix.vms.transformer.modules.packages;
 
-import com.netflix.vms.transformer.hollowoutput.DrmInfo;
-import com.netflix.vms.transformer.hollowoutput.DrmInfoData;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.hollowinput.AudioStreamInfoHollow;
@@ -17,8 +15,6 @@ import com.netflix.vms.transformer.hollowinput.StreamDeploymentLabelHollow;
 import com.netflix.vms.transformer.hollowinput.StreamDimensionsHollow;
 import com.netflix.vms.transformer.hollowinput.StreamFileIdentificationHollow;
 import com.netflix.vms.transformer.hollowinput.StreamNonImageInfoHollow;
-import com.netflix.vms.transformer.hollowinput.StreamProfileGroupsHollow;
-import com.netflix.vms.transformer.hollowinput.StreamProfileIdHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.TextStreamInfoHollow;
@@ -28,6 +24,8 @@ import com.netflix.vms.transformer.hollowoutput.AssetTypeDescriptor;
 import com.netflix.vms.transformer.hollowoutput.DownloadDescriptor;
 import com.netflix.vms.transformer.hollowoutput.DownloadLocation;
 import com.netflix.vms.transformer.hollowoutput.DownloadLocationSet;
+import com.netflix.vms.transformer.hollowoutput.DrmInfo;
+import com.netflix.vms.transformer.hollowoutput.DrmInfoData;
 import com.netflix.vms.transformer.hollowoutput.DrmKey;
 import com.netflix.vms.transformer.hollowoutput.FrameRate;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
@@ -43,7 +41,6 @@ import com.netflix.vms.transformer.hollowoutput.StreamMostlyConstantData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.TargetDimensions;
 import com.netflix.vms.transformer.hollowoutput.TimedTextTypeDescriptor;
-import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoResolution;
 import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
 import com.netflix.vms.transformer.index.IndexSpec;
@@ -62,15 +59,13 @@ public class StreamDataModule {
     private final DownloadLocationSet EMPTY_DOWNLOAD_LOCATIONS = new DownloadLocationSet();
 
     private final Map<String, AssetTypeDescriptor> assetTypeDescriptorMap;
-    private final Map<String, VideoFormatDescriptor> videoFormatDescriptorMap;
     private final Map<String, TimedTextTypeDescriptor> timedTextTypeDescriptorMap;
     private final Map<String, Integer> deploymentLabelBitsetOffsetMap;
-    private final Set<Integer> ultraHDEncodingProfileIds;
-    private final Set<SuperHDIdentifier> validSuperHDIdentifiers;
-    private final Set<TargetResolution> aspectRatioVideoFormatIdentifiers;
     private final Map<String, List<Strings>> tagsLists;
     private final Map<Integer, Object> drmKeysByGroupId;
     private final Map<Integer, DrmInfo> drmInfoByGroupId;
+
+    private final VideoFormatDescriptorIdentifier videoFormatIdentifier;
 
 
     private final HollowPrimaryKeyIndex streamProfileIdx;
@@ -82,10 +77,6 @@ public class StreamDataModule {
     public StreamDataModule(VMSHollowVideoInputAPI api, VMSTransformerIndexer indexer, HollowObjectMapper objectMapper, Map<Integer, Object> drmKeysByGroupId, Map<Integer, DrmInfo> drmInfoByGroupId) {
         this.api = api;
         this.assetTypeDescriptorMap = getAssetTypeDescriptorMap();
-        this.videoFormatDescriptorMap = getVideoFormatDescriptorMap();
-        this.ultraHDEncodingProfileIds = getUltraHDEncodingProfileIds(indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE_GROUP));
-        this.validSuperHDIdentifiers = getValidSuperHDIdentifiers();
-        this.aspectRatioVideoFormatIdentifiers = getAspectRatioVideoFormatIdentifiers();
         this.timedTextTypeDescriptorMap = getTimedTextTypeDescriptorMap();
         this.deploymentLabelBitsetOffsetMap = getDeploymentLabelBitsetOffsetMap();
         this.tagsLists = new HashMap<String, List<Strings>>();
@@ -93,6 +84,8 @@ public class StreamDataModule {
         this.drmInfoByGroupId = drmInfoByGroupId;
 
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
+
+        this.videoFormatIdentifier = new VideoFormatDescriptorIdentifier(api, indexer);
 
         /// only necessary for rogue DrmKeys.
         this.objectMapper = objectMapper;
@@ -108,8 +101,9 @@ public class StreamDataModule {
         if(streamProfile == null)
             return null;
 
-        if(streamProfile._getProfileType()._isValueEqual("MERCHSTILL"))
+        if(streamProfile._getProfileType()._isValueEqual("MERCHSTILL")) {
             return null;
+        }
 
         ImageStreamInfoHollow inputStreamImageInfo = inputStream._getImageInfo();
         StreamFileIdentificationHollow inputStreamIdentity = inputStream._getFileIdentification();
@@ -233,7 +227,7 @@ public class StreamDataModule {
             int targetWidth = inputStreamDimensions._getTargetWidthInPixels();
             int bitrate = inputVideoStreamInfo._getVideoBitrateKBPS();
 
-            outputStream.downloadDescriptor.videoFormatDescriptor = selectVideoFormatDescriptor(encodingProfileId, height, width, targetHeight, targetWidth, new SuperHDIdentifier(encodingProfileId, bitrate));
+            outputStream.downloadDescriptor.videoFormatDescriptor = videoFormatIdentifier.selectVideoFormatDescriptor(encodingProfileId, bitrate, height, width, targetHeight, targetWidth);
             outputStream.streamDataDescriptor.bitrate = bitrate;
 
             if(targetHeight != Integer.MIN_VALUE && targetWidth != Integer.MIN_VALUE) {
@@ -317,122 +311,6 @@ public class StreamDataModule {
         return cachedList;
     }
 
-    private VideoFormatDescriptor selectVideoFormatDescriptor(int encodingProfileId, int height, int width, int targetHeight, int targetWidth, SuperHDIdentifier superHDIdentifier) {
-        if(ultraHDEncodingProfileIds.contains(Integer.valueOf(encodingProfileId)))
-            return videoFormatDescriptorMap.get("Ultra_HD");
-
-        if(targetHeight != Integer.MIN_VALUE && targetWidth != Integer.MIN_VALUE) {
-            if(aspectRatioVideoFormatIdentifiers.contains(new TargetResolution(targetHeight, targetWidth))) {
-                float div = ((float)width / (float)height);
-                final int index = (int)(div * 100) - 100;
-
-                if (index <= 55) return videoFormatDescriptorMap.get("SD");
-
-                return videoFormatDescriptorMap.get("HD");
-            }
-        }
-
-        if(height == Integer.MIN_VALUE)
-            return videoFormatDescriptorMap.get("unknown");
-
-        if(height <= 719)
-            return videoFormatDescriptorMap.get("SD");
-
-        if(validSuperHDIdentifiers.contains(superHDIdentifier))
-            return videoFormatDescriptorMap.get("Super_HD");
-
-        return videoFormatDescriptorMap.get("HD");
-    }
-
-    private Map<String, TimedTextTypeDescriptor> getTimedTextTypeDescriptorMap() {
-        Map<String, TimedTextTypeDescriptor> map = new HashMap<String, TimedTextTypeDescriptor>();
-
-        map.put("CC", new TimedTextTypeDescriptor("ClosedCaptions"));
-        map.put("SUBS", new TimedTextTypeDescriptor("Subtitles"));
-        map.put("FN", new TimedTextTypeDescriptor("Forced"));
-        map.put("UNKNOWN", new TimedTextTypeDescriptor("Unknown"));
-
-        return map;
-    }
-
-    private Map<String, VideoFormatDescriptor> getVideoFormatDescriptorMap() {
-        Map<String, VideoFormatDescriptor> map = new HashMap<String, VideoFormatDescriptor>();
-
-        map.put("unknown", videoFormatDescriptor(-1, "unknown", "unknown"));
-        map.put("SD", videoFormatDescriptor(2, "SD", "Standard Definition"));
-        map.put("HD", videoFormatDescriptor(1, "HD", "HiDefinition"));
-        map.put("Super_HD", videoFormatDescriptor(3, "Super_HD", "Super HiDefinition"));
-        map.put("Ultra_HD", videoFormatDescriptor(4, "Ultra_HD", "Ultra HiDefinition"));
-
-        return map;
-    }
-
-    private VideoFormatDescriptor videoFormatDescriptor(int id, String name, String description) {
-        VideoFormatDescriptor descriptor = new VideoFormatDescriptor();
-        descriptor.id = id;
-        descriptor.name = new Strings(name);
-        descriptor.description = new Strings(description);
-        return descriptor;
-    }
-
-    private Set<Integer> getUltraHDEncodingProfileIds(HollowPrimaryKeyIndex primaryKeyIndex) {
-        Set<Integer> ultraHDEncodingProfiles = new HashSet<Integer>();
-
-        int ordinal = primaryKeyIndex.getMatchingOrdinal("CE4DASHVideo-4K");
-        if(ordinal != -1) {
-            StreamProfileGroupsHollow group = api.getStreamProfileGroupsHollow(ordinal);
-            List<StreamProfileIdHollow>idList = group._getStreamProfileIds();
-            for(StreamProfileIdHollow id : idList) {
-                ultraHDEncodingProfiles.add(Integer.valueOf((int)id._getValue()));
-            }
-        }
-
-        return ultraHDEncodingProfiles;
-    }
-
-    private Set<SuperHDIdentifier> getValidSuperHDIdentifiers() {
-        Set<SuperHDIdentifier> set = new HashSet<SuperHDIdentifier>();
-
-        set.add(new SuperHDIdentifier(214, 4300));
-        set.add(new SuperHDIdentifier(214, 4302));
-        set.add(new SuperHDIdentifier(67, 4300));
-        set.add(new SuperHDIdentifier(214, 5800));
-        set.add(new SuperHDIdentifier(214, 5802));
-        set.add(new SuperHDIdentifier(67, 5800));
-
-        return set;
-    }
-
-    ///TODO: This seems wrong.  What is the point of checking for these specific target resolutions?
-    private Set<TargetResolution> getAspectRatioVideoFormatIdentifiers() {
-        Set<TargetResolution> set = new HashSet<TargetResolution>();
-
-        set.add(new TargetResolution(0, 0));
-        set.add(new TargetResolution(1080, 0));
-        set.add(new TargetResolution(720, 0));
-        set.add(new TargetResolution(612, 0));
-        set.add(new TargetResolution(480, 0));
-        set.add(new TargetResolution(0, 1536));
-        set.add(new TargetResolution(0, 912));
-        set.add(new TargetResolution(0, 567));
-        set.add(new TargetResolution(0, 350));
-        set.add(new TargetResolution(0, 342));
-        set.add(new TargetResolution(0, 300));
-        set.add(new TargetResolution(0, 260));
-        set.add(new TargetResolution(0, 240));
-        set.add(new TargetResolution(0, 233));
-        set.add(new TargetResolution(0, 180));
-        set.add(new TargetResolution(0, 171));
-        set.add(new TargetResolution(0, 228));
-        set.add(new TargetResolution(0, 114));
-        set.add(new TargetResolution(0, 159));
-        set.add(new TargetResolution(0, 185));
-        set.add(new TargetResolution(0, 370));
-        set.add(new TargetResolution(0, 450));
-        set.add(new TargetResolution(0, 900));
-
-        return set;
-    }
 
     private Map<String, AssetTypeDescriptor> getAssetTypeDescriptorMap() {
         Map<String, AssetTypeDescriptor> map = new HashMap<String, AssetTypeDescriptor>();
@@ -461,6 +339,17 @@ public class StreamDataModule {
         map.put("DeployASAP", Integer.valueOf(2));
         map.put("DeployASAP-ignoreRules", Integer.valueOf(3));
         map.put("DoNotPlay", Integer.valueOf(4));
+
+        return map;
+    }
+
+    private Map<String, TimedTextTypeDescriptor> getTimedTextTypeDescriptorMap() {
+        Map<String, TimedTextTypeDescriptor> map = new HashMap<String, TimedTextTypeDescriptor>();
+
+        map.put("CC", new TimedTextTypeDescriptor("ClosedCaptions"));
+        map.put("SUBS", new TimedTextTypeDescriptor("Subtitles"));
+        map.put("FN", new TimedTextTypeDescriptor("Forced"));
+        map.put("UNKNOWN", new TimedTextTypeDescriptor("Unknown"));
 
         return map;
     }
