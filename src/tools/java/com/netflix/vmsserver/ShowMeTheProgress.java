@@ -43,7 +43,7 @@ public class ShowMeTheProgress {
         filter.addFieldRecursive("CompleteVideoFacetData", "videoMiscData", outputSchemas);
         filter.addFieldRecursive("CompleteVideo", "countrySpecificData", outputSchemas);
 
-        //filter.addTypeRecursive("PackageData", outputSchemas);
+        filter.addTypeRecursive("PackageData", outputSchemas);
 
         filter.addTypeRecursive("DrmSystem", outputSchemas);
         filter.addTypeRecursive("OriginServer", outputSchemas);
@@ -51,16 +51,16 @@ public class ShowMeTheProgress {
         filter.addTypeRecursive("EncodingProfile", outputSchemas);
         filter.addTypeRecursive("ArtWorkImageFormatEntry", outputSchemas);
         filter.addTypeRecursive("DeploymentIntent", outputSchemas);
-        //filter.addTypeRecursive("TopNVideoData", outputSchemas);
+        filter.addTypeRecursive("TopNVideoData", outputSchemas);
         filter.addTypeRecursive("RolloutCharacter", outputSchemas);
         filter.addTypeRecursive("RolloutVideo", outputSchemas);
         filter.addTypeRecursive("EncodingProfileGroup", outputSchemas);
-        //filter.addTypeRecursive("GlobalPerson", outputSchemas);
+        filter.addTypeRecursive("GlobalPerson", outputSchemas);
         filter.addTypeRecursive("VideoEpisode_CountryList", outputSchemas);
-        //filter.addTypeRecursive("PersonImages", outputSchemas);
+        filter.addTypeRecursive("PersonImages", outputSchemas);
         filter.addTypeRecursive("CharacterImages", outputSchemas);
-        //filter.addTypeRecursive("DrmInfoData", outputSchemas);
-        //filter.addTypeRecursive("FileEncodingData", outputSchemas);
+        filter.addTypeRecursive("DrmInfoData", outputSchemas);
+        filter.addTypeRecursive("FileEncodingData", outputSchemas);
         return filter;
     }
 

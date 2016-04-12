@@ -1,11 +1,5 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.vms.transformer.hollowoutput.PackageData;
-
-import com.netflix.vms.transformer.hollowinput.VideoArtworkHollow;
-import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
-import com.netflix.vms.transformer.modules.countryspecific.CountrySpecificDataModule;
-import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
@@ -13,15 +7,18 @@ import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoDisplaySetHollow;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
+import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
 import com.netflix.vms.transformer.hollowoutput.DeploymentIntent;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
+import com.netflix.vms.transformer.hollowoutput.PackageData;
 import com.netflix.vms.transformer.hollowoutput.RolloutVideo;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
 import com.netflix.vms.transformer.hollowoutput.VideoMediaData;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.hollowoutput.VideoMiscData;
+import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.misc.TopNVideoDataModule;
 import com.netflix.vms.transformer.misc.VideoEpisodeCountryDecoratorModule;
@@ -30,6 +27,7 @@ import com.netflix.vms.transformer.modules.artwork.CharacterImagesModule;
 import com.netflix.vms.transformer.modules.artwork.PersonImagesModule;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHierarchy;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
+import com.netflix.vms.transformer.modules.countryspecific.CountrySpecificDataModule;
 import com.netflix.vms.transformer.modules.deploymentintent.CacheDeploymentIntentModule;
 import com.netflix.vms.transformer.modules.media.VideoMediaDataModule;
 import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
@@ -141,9 +139,9 @@ public class SimpleTransformer {
                 new RolloutCharacterModule(api, ctx, objectMapper),
                 new RolloutVideoModule(api, ctx, objectMapper, indexer),
                 new EncodingProfileGroupModule(api, ctx, objectMapper),
-                //new GlobalPersonModule(api, ctx, objectMapper, indexer),
-                //new TopNVideoDataModule(api, ctx, objectMapper),
-                //new PersonImagesModule(api, ctx, objectMapper, indexer),
+                new GlobalPersonModule(api, ctx, objectMapper, indexer),
+                new TopNVideoDataModule(api, ctx, objectMapper),
+                new PersonImagesModule(api, ctx, objectMapper, indexer),
                 new CharacterImagesModule(api, ctx, objectMapper, indexer)
                 );
 
