@@ -223,11 +223,6 @@ public class FilterToSmallDataSubset {
                 return Integer.valueOf((int)inputAPI.getTrailerHollow(ordinal)._getMovieId());
             }
         });
-        findIncludedOrdinals("VideoArtWork", includedVideoIds, new VideoIdDeriver() {
-            public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int)inputAPI.getVideoArtWorkHollow(ordinal)._getMovieId());
-            }
-        });
         findIncludedOrdinals("VideoArtwork", includedVideoIds, new VideoIdDeriver() {
             public Integer deriveId(int ordinal) {
                 return Integer.valueOf((int)inputAPI.getVideoArtworkHollow(ordinal)._getMovieId());

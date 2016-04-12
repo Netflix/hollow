@@ -4,7 +4,7 @@ import com.netflix.hollow.HollowSchema;
 import com.netflix.hollow.codegen.HollowAPIGenerator;
 import com.netflix.hollow.codegen.HollowPOJOGenerator;
 import com.netflix.hollow.util.HollowSchemaParser;
-import com.netflix.hollow.util.HollowTypeWriteStateCreator;
+import com.netflix.hollow.util.HollowWriteStateCreator;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.hollow.zenoadapter.HollowSerializationFramework;
 import com.netflix.videometadata.hollow.VMSObjectHashCodeFinder;
@@ -25,7 +25,7 @@ public class GenerateAPIs {
         String schemas = IOUtils.toString(new FileReader(CONVERTER_PROJECT_BASE_DIR + "/src/main/resources/schemas.txt"));
         Collection<HollowSchema> configuredSchemas = HollowSchemaParser.parseCollectionOfSchemas(schemas);
 
-        HollowWriteStateEngine stateEngine = HollowTypeWriteStateCreator.createWithSchemas(configuredSchemas);
+        HollowWriteStateEngine stateEngine = HollowWriteStateCreator.createWithSchemas(configuredSchemas);
 
         HollowAPIGenerator videosGenerator = new HollowAPIGenerator("VMSHollowVideoInputAPI", "com.netflix.vms.transformer.hollowinput", stateEngine);
         videosGenerator.generateFiles(TRANSFORMER_PROJECT_BASE_DIR + "/src/main/java/com/netflix/vms/transformer/hollowinput");
