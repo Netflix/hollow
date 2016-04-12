@@ -1,0 +1,24 @@
+apply plugin: 'nebula-ospackage-tomcat'
+apply plugin: 'war'
+
+dependencies {
+	compile 'javax.servlet:javax.servlet-api:3.1.0'
+	compile project(':transformer')
+
+	compile 'netflix:platform:latest.release'
+	compile 'netflix:base-server:latest.release'
+	
+	compile 'netflix:awsutils:latest.release'
+}
+
+ospackage {
+    from('public_html/WEB-INF/classes/system/setenv.sh') {
+        into('/apps/tomcat/bin')
+    }
+    from('public_html/WEB-INF/classes/system/server.xml') {
+        into('/apps/tomcat/conf')
+    }
+}
+
+war.dependsOn compileTestJava
+
