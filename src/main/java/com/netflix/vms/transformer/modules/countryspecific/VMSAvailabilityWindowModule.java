@@ -65,199 +65,203 @@ public class VMSAvailabilityWindowModule {
     public void populateWindowData(Integer videoId, String country, CompleteVideoCountrySpecificData data, VideoRightsHollow videoRights, CountrySpecificRollupValues rollup) {
         boolean isGoLive = isGoLive(videoRights);
 
-        int includedPackageDataCount = 0;
-
-        //if(videoId == 80007778 && country.equals("FI"))
-        //    System.out.println("watch");
-
         VideoRightsRightsHollow rights = videoRights._getRights();
         if((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
+            if(videoId == 80080144 && "VU".equals(country))
+                System.out.println("asdf");
+
             populateRolledUpWindowData(data, rollup, rights, isGoLive);
         } else {
-            List<VMSAvailabilityWindow> availabilityWindows = new ArrayList<VMSAvailabilityWindow>();
+            populateEpisodeOrStandaloneWindowData(videoId, country, data, rollup, isGoLive, rights);
+        }
 
-            long minWindowStartDate = Long.MAX_VALUE;
-            VMSAvailabilityWindow currentOrFirstFutureWindow = null;
-            boolean isInWindow = false;
+    }
 
-            int maxPackageId = 0;
-            int bundledAssetsGroupId = 0; /// the contract ID for the highest package ID across all windows;
+    private void populateEpisodeOrStandaloneWindowData(Integer videoId, String country, CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup, boolean isGoLive, VideoRightsRightsHollow rights) {
+        List<VMSAvailabilityWindow> availabilityWindows = new ArrayList<VMSAvailabilityWindow>();
 
-            List<VideoRightsWindowHollow> sortedWindows = new ArrayList<VideoRightsWindowHollow>(rights._getWindows());
-            Collections.sort(sortedWindows, new Comparator<VideoRightsWindowHollow>() {
-                public int compare(VideoRightsWindowHollow o1, VideoRightsWindowHollow o2) {
-                    return Long.compare(o1._getStartDate()._getValue(), o2._getStartDate()._getValue());
-                }
-            });
+        long minWindowStartDate = Long.MAX_VALUE;
+        VMSAvailabilityWindow currentOrFirstFutureWindow = null;
+        boolean isInWindow = false;
 
-            for(VideoRightsWindowHollow window : sortedWindows) {
-                int thisWindowMaxPackageId = 0;
-                int thisWindowBundledAssetsGroupId = 0;
+        int includedPackageDataCount = 0;
 
-                VMSAvailabilityWindow outputWindow = new VMSAvailabilityWindow();
-                outputWindow.startDate = new Date(window._getStartDate()._getValue());
-                outputWindow.endDate = new Date(window._getEndDate()._getValue());
-                outputWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
+        int maxPackageId = 0;
+        int bundledAssetsGroupId = 0; /// the contract ID for the highest package ID across all windows;
 
-                for(VideoRightsContractIdHollow contractIdHollow : window._getContractIds()) {
-                    long contractId = contractIdHollow._getValue();
+        List<VideoRightsWindowHollow> sortedWindows = new ArrayList<VideoRightsWindowHollow>(rights._getWindows());
+        Collections.sort(sortedWindows, new Comparator<VideoRightsWindowHollow>() {
+            public int compare(VideoRightsWindowHollow o1, VideoRightsWindowHollow o2) {
+                return Long.compare(o1._getStartDate()._getValue(), o2._getStartDate()._getValue());
+            }
+        });
 
-                    VideoRightsContractHollow contract = getContract(rights, contractIdHollow._getValue());
+        for(VideoRightsWindowHollow window : sortedWindows) {
+            int thisWindowMaxPackageId = 0;
+            int thisWindowBundledAssetsGroupId = 0;
 
-                    if(contract != null) {
-                        List<VideoRightsContractPackageHollow> packageIdList = contract._getPackages();
+            VMSAvailabilityWindow outputWindow = new VMSAvailabilityWindow();
+            outputWindow.startDate = new Date(window._getStartDate()._getValue());
+            outputWindow.endDate = new Date(window._getEndDate()._getValue());
+            outputWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
 
-                        for(VideoRightsContractPackageHollow pkg : packageIdList) {
-                            com.netflix.vms.transformer.hollowoutput.Integer packageId = new com.netflix.vms.transformer.hollowoutput.Integer((int)pkg._getPackageId());
+            for(VideoRightsContractIdHollow contractIdHollow : window._getContractIds()) {
+                long contractId = contractIdHollow._getValue();
 
-                            WindowPackageContractInfo windowPackageContractInfo = outputWindow.windowInfosByPackageId.get(packageId);
-                            if(windowPackageContractInfo != null) {
-                                // MERGE MULTIPLE CONTRACTS
+                VideoRightsContractHollow contract = getContract(rights, contractIdHollow._getValue());
 
-                                if(!shouldFilterOutWindowInfo(isGoLive, contract, includedPackageDataCount, outputWindow.startDate.val, outputWindow.endDate.val)) {
-                                    ///merge cup tokens
-                                    List<Strings> cupTokens = new ArrayList<>();
-                                    Strings contractCupToken = new Strings(contract._getCupToken()._getValue());
-                                    if(windowPackageContractInfo.videoContractInfo.contractId > contractId) {
-                                        cupTokens.addAll(windowPackageContractInfo.videoContractInfo.cupTokens.ordinals);
-                                        if(!cupTokens.contains(contractCupToken))
-                                            cupTokens.add(contractCupToken);
-                                    } else {
+                if(contract != null) {
+                    List<VideoRightsContractPackageHollow> packageIdList = contract._getPackages();
+
+                    for(VideoRightsContractPackageHollow pkg : packageIdList) {
+                        com.netflix.vms.transformer.hollowoutput.Integer packageId = new com.netflix.vms.transformer.hollowoutput.Integer((int)pkg._getPackageId());
+
+                        WindowPackageContractInfo windowPackageContractInfo = outputWindow.windowInfosByPackageId.get(packageId);
+                        if(windowPackageContractInfo != null) {
+                            // MERGE MULTIPLE CONTRACTS
+
+                            if(!shouldFilterOutWindowInfo(isGoLive, contract, includedPackageDataCount, outputWindow.startDate.val, outputWindow.endDate.val)) {
+                                ///merge cup tokens
+                                List<Strings> cupTokens = new ArrayList<>();
+                                Strings contractCupToken = new Strings(contract._getCupToken()._getValue());
+                                if(windowPackageContractInfo.videoContractInfo.contractId > contractId) {
+                                    cupTokens.addAll(windowPackageContractInfo.videoContractInfo.cupTokens.ordinals);
+                                    if(!cupTokens.contains(contractCupToken))
                                         cupTokens.add(contractCupToken);
-                                        for(Strings cupToken : windowPackageContractInfo.videoContractInfo.cupTokens.ordinals) {
-                                            if(!cupToken.equals(contractCupToken))
-                                                cupTokens.add(cupToken);
-                                        }
+                                } else {
+                                    cupTokens.add(contractCupToken);
+                                    for(Strings cupToken : windowPackageContractInfo.videoContractInfo.cupTokens.ordinals) {
+                                        if(!cupToken.equals(contractCupToken))
+                                            cupTokens.add(cupToken);
                                     }
+                                }
 
-                                    ///merge bcp47 codes
-                                    Set<Strings> bcp47Codes = new HashSet<Strings>(windowPackageContractInfo.videoContractInfo.assetBcp47Codes);
-                                    for(VideoRightsContractAssetHollow asset : contract._getAssets()) {
-                                        bcp47Codes.add(new Strings(asset._getBcp47Code()._getValue()));
-                                    }
+                                ///merge bcp47 codes
+                                Set<Strings> bcp47Codes = new HashSet<Strings>(windowPackageContractInfo.videoContractInfo.assetBcp47Codes);
+                                for(VideoRightsContractAssetHollow asset : contract._getAssets()) {
+                                    bcp47Codes.add(new Strings(asset._getBcp47Code()._getValue()));
+                                }
 
 
-                                    windowPackageContractInfo = windowPackageContractInfo.clone();
-                                    windowPackageContractInfo.videoContractInfo = windowPackageContractInfo.videoContractInfo.clone();
-                                    windowPackageContractInfo.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(cupTokens);
-                                    windowPackageContractInfo.videoContractInfo.assetBcp47Codes = bcp47Codes;
-                                    windowPackageContractInfo.videoContractInfo.contractId = Math.max(windowPackageContractInfo.videoContractInfo.contractId, (int)contractId);
-                                    windowPackageContractInfo.videoContractInfo.primaryPackageId = (int) Math.max(windowPackageContractInfo.videoContractInfo.primaryPackageId, contract._getPackageId());
+                                windowPackageContractInfo = windowPackageContractInfo.clone();
+                                windowPackageContractInfo.videoContractInfo = windowPackageContractInfo.videoContractInfo.clone();
+                                windowPackageContractInfo.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(cupTokens);
+                                windowPackageContractInfo.videoContractInfo.assetBcp47Codes = bcp47Codes;
+                                windowPackageContractInfo.videoContractInfo.contractId = Math.max(windowPackageContractInfo.videoContractInfo.contractId, (int)contractId);
+                                windowPackageContractInfo.videoContractInfo.primaryPackageId = (int) Math.max(windowPackageContractInfo.videoContractInfo.primaryPackageId, contract._getPackageId());
 
-                                    outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
+                                outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
 
-                                    if(packageId.val == maxPackageId)
-                                        bundledAssetsGroupId = Math.max((int)contractId, bundledAssetsGroupId);
-                                    if(packageId.val == thisWindowMaxPackageId)
-                                        thisWindowBundledAssetsGroupId = Math.max((int)contractId, thisWindowBundledAssetsGroupId);
+                                if(packageId.val == maxPackageId)
+                                    bundledAssetsGroupId = Math.max((int)contractId, bundledAssetsGroupId);
+                                if(packageId.val == thisWindowMaxPackageId)
+                                    thisWindowBundledAssetsGroupId = Math.max((int)contractId, thisWindowBundledAssetsGroupId);
+                            }
+                        } else {
+                            if(shouldFilterOutWindowInfo(isGoLive, contract, includedPackageDataCount, outputWindow.startDate.val, outputWindow.endDate.val)) {
+                                outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractId));
+
+                                if(maxPackageId == 0) {
+                                    bundledAssetsGroupId = (int)contractId;
+                                    thisWindowBundledAssetsGroupId = (int) contractId;
                                 }
                             } else {
-                                if(shouldFilterOutWindowInfo(isGoLive, contract, includedPackageDataCount, outputWindow.startDate.val, outputWindow.endDate.val)) {
-                                    outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractId));
+                            	includedPackageDataCount++;
+                                PackageData packageData = getPackageData(videoId, pkg._getPackageId());
+                                if(packageData != null) {
+                                    /// package data is available
+                                    windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(packageData, contract, country);
+                                    outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
+
+                                    if(packageData.id >= maxPackageId) {
+                                        maxPackageId = packageData.id;
+                                        bundledAssetsGroupId = (int)contractId;
+                                    }
+
+                                    if(packageData.id >= thisWindowMaxPackageId) {
+                                        thisWindowMaxPackageId = packageData.id;
+                                        thisWindowBundledAssetsGroupId = (int)contractId;
+                                    }
+
+                                } else {
+                                    /// packagedata not available -- use the contract only
+                                    windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(contract, country);
+                                    outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfo);
 
                                     if(maxPackageId == 0) {
                                         bundledAssetsGroupId = (int)contractId;
                                         thisWindowBundledAssetsGroupId = (int) contractId;
                                     }
-                                } else {
-                                	includedPackageDataCount++;
-                                    PackageData packageData = getPackageData(videoId, pkg._getPackageId());
-                                    if(packageData != null) {
-                                        /// package data is available
-                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(packageData, contract, country);
-                                        outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
-
-                                        if(packageData.id >= maxPackageId) {
-                                            maxPackageId = packageData.id;
-                                            bundledAssetsGroupId = (int)contractId;
-                                        }
-
-                                        if(packageData.id >= thisWindowMaxPackageId) {
-                                            thisWindowMaxPackageId = packageData.id;
-                                            thisWindowBundledAssetsGroupId = (int)contractId;
-                                        }
-
-                                    } else {
-                                        /// packagedata not available -- use the contract only
-                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(contract, country);
-                                        outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfo);
-
-                                        if(maxPackageId == 0) {
-                                            bundledAssetsGroupId = (int)contractId;
-                                            thisWindowBundledAssetsGroupId = (int) contractId;
-                                        }
-                                    }
+                                }
 
 
-                                    if(window._getEndDate()._getValue() > ctx.getNowMillis() && window._getStartDate()._getValue() < minWindowStartDate) {
-                                        minWindowStartDate = window._getStartDate()._getValue();
-                                        currentOrFirstFutureWindow = outputWindow;
+                                if(window._getEndDate()._getValue() > ctx.getNowMillis() && window._getStartDate()._getValue() < minWindowStartDate) {
+                                    minWindowStartDate = window._getStartDate()._getValue();
+                                    currentOrFirstFutureWindow = outputWindow;
 
-                                        if(isGoLive && window._getStartDate()._getValue() < ctx.getNowMillis())
-                                            isInWindow = true;
-                                    }
+                                    if(isGoLive && window._getStartDate()._getValue() < ctx.getNowMillis())
+                                        isInWindow = true;
                                 }
                             }
-
                         }
-                    } else {
-                        outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractIdHollow._getValue()));
 
-                        if(maxPackageId == 0) {
-                            bundledAssetsGroupId = (int)contractId;
-                            thisWindowBundledAssetsGroupId = (int) contractId;
-                        }
+                    }
+                } else {
+                    outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractIdHollow._getValue()));
+
+                    if(maxPackageId == 0) {
+                        bundledAssetsGroupId = (int)contractId;
+                        thisWindowBundledAssetsGroupId = (int) contractId;
                     }
                 }
-
-                outputWindow.bundledAssetsGroupId = thisWindowBundledAssetsGroupId;
-
-                availabilityWindows.add(outputWindow);
             }
 
+            outputWindow.bundledAssetsGroupId = thisWindowBundledAssetsGroupId;
 
-            if(currentOrFirstFutureWindow != null) {
-                maxPackageId = Integer.MIN_VALUE;
-                Set<Strings> assetBcp47CodesFromMaxPackageId = null;
-                Set<VideoFormatDescriptor> videoFormatDescriptorsFromMaxPackageId = null;
-                int prePromoDays = 0;
-                LinkedHashSetOfStrings cupTokens = null;
-                Map<Strings, List<VideoImage>> stillImagesByTypeMap = null;
-                Map<Strings, List<VideoImage>> stillImagesByTypeMapForShowLevelExtraction = null;
-
-                for(Map.Entry<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo> entry : currentOrFirstFutureWindow.windowInfosByPackageId.entrySet()) {
-                    if(entry.getKey().val > maxPackageId) {
-                        maxPackageId = entry.getKey().val;
-                        assetBcp47CodesFromMaxPackageId = entry.getValue().videoContractInfo.assetBcp47Codes;
-                        videoFormatDescriptorsFromMaxPackageId = entry.getValue().videoPackageInfo.formats;
-                        prePromoDays = entry.getValue().videoContractInfo.prePromotionDays;
-                        cupTokens = entry.getValue().videoContractInfo.cupTokens;
-                        if(isGoLive) {
-                        	if(isInWindow)
-                        		stillImagesByTypeMap = entry.getValue().videoPackageInfo.stillImagesMap;
-                        	else
-                        		stillImagesByTypeMapForShowLevelExtraction = entry.getValue().videoPackageInfo.stillImagesMap;
-                        }
-                    }
-                }
-
-                rollup.newAssetBcp47Codes(assetBcp47CodesFromMaxPackageId);
-                rollup.newVideoFormatDescriptors(videoFormatDescriptorsFromMaxPackageId);
-                rollup.newPrePromoDays(prePromoDays);
-                if(isGoLive && isInWindow)
-                    rollup.newCupTokens(cupTokens);
-                if(stillImagesByTypeMap != null)
-                	rollup.newEpisodeStillImagesByTypeMap(stillImagesByTypeMap);
-                else if (stillImagesByTypeMapForShowLevelExtraction != null)
-                	rollup.newEpisodeStillImagesByTypeMapForShowLevelExtraction(stillImagesByTypeMapForShowLevelExtraction);
-            }
-
-            rollup.newEpisodeData(isGoLive, bundledAssetsGroupId);
-
-            data.mediaAvailabilityWindows = availabilityWindows;
-            data.imagesAvailabilityWindows = availabilityWindows;
+            availabilityWindows.add(outputWindow);
         }
 
+
+        if(currentOrFirstFutureWindow != null) {
+            maxPackageId = Integer.MIN_VALUE;
+            Set<Strings> assetBcp47CodesFromMaxPackageId = null;
+            Set<VideoFormatDescriptor> videoFormatDescriptorsFromMaxPackageId = null;
+            int prePromoDays = 0;
+            LinkedHashSetOfStrings cupTokens = null;
+            Map<Strings, List<VideoImage>> stillImagesByTypeMap = null;
+            Map<Strings, List<VideoImage>> stillImagesByTypeMapForShowLevelExtraction = null;
+
+            for(Map.Entry<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo> entry : currentOrFirstFutureWindow.windowInfosByPackageId.entrySet()) {
+                if(entry.getKey().val > maxPackageId) {
+                    maxPackageId = entry.getKey().val;
+                    assetBcp47CodesFromMaxPackageId = entry.getValue().videoContractInfo.assetBcp47Codes;
+                    videoFormatDescriptorsFromMaxPackageId = entry.getValue().videoPackageInfo.formats;
+                    prePromoDays = entry.getValue().videoContractInfo.prePromotionDays;
+                    cupTokens = entry.getValue().videoContractInfo.cupTokens;
+                    if(isGoLive) {
+                    	if(isInWindow)
+                    		stillImagesByTypeMap = entry.getValue().videoPackageInfo.stillImagesMap;
+                    	else
+                    		stillImagesByTypeMapForShowLevelExtraction = entry.getValue().videoPackageInfo.stillImagesMap;
+                    }
+                }
+            }
+
+            rollup.newAssetBcp47Codes(assetBcp47CodesFromMaxPackageId);
+            rollup.newVideoFormatDescriptors(videoFormatDescriptorsFromMaxPackageId);
+            rollup.newPrePromoDays(prePromoDays);
+            if(isGoLive && isInWindow)
+                rollup.newCupTokens(cupTokens);
+            if(stillImagesByTypeMap != null)
+            	rollup.newEpisodeStillImagesByTypeMap(stillImagesByTypeMap);
+            else if (stillImagesByTypeMapForShowLevelExtraction != null)
+            	rollup.newEpisodeStillImagesByTypeMapForShowLevelExtraction(stillImagesByTypeMapForShowLevelExtraction);
+        }
+
+        rollup.newEpisodeData(isGoLive, bundledAssetsGroupId);
+
+        data.mediaAvailabilityWindows = availabilityWindows;
+        data.imagesAvailabilityWindows = availabilityWindows;
     }
 
 
@@ -284,7 +288,8 @@ public class VMSAvailabilityWindowModule {
 		        if(startDate < ctx.getNowMillis() && endDate > ctx.getNowMillis())
 		        	isInWindow = true;
 
-		        if(rollup.doSeason() && startDate < (ctx.getNowMillis() + (7 * 24 * 60 * 60 * 1000))) {
+		        ////TODO: What was the logic for this before?
+		        if(rollup.doSeason() && startDate < (ctx.getNowMillis() + (10 * 365 * 24 * 60 * 60 * 1000))) {
 		            rollup.newSeasonWindow(startDate, endDate, rollup.getSeasonSequenceNumber());
 		        }
 		    }
@@ -388,6 +393,7 @@ public class VMSAvailabilityWindowModule {
 
     public void reset() {
         this.transformedPackageData = null;
+        this.windowPackageContractInfoModule.reset();
     }
 
 }

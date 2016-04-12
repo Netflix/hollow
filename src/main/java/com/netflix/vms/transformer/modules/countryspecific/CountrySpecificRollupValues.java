@@ -280,7 +280,8 @@ public class CountrySpecificRollupValues extends RollupValues {
                 currentSeqNum = mergedSeqNums.nextSetBit(currentSeqNum + 1);
             }
 
-            mergedWindowSeqNumMap.put(key, seqNums);
+            if(!seqNums.isEmpty())
+                mergedWindowSeqNumMap.put(key, seqNums);
         }
 
         return mergedWindowSeqNumMap;
