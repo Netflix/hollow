@@ -1,7 +1,8 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
-import com.netflix.vms.transformer.modules.packages.VideoFormatDescriptorIdentifier;
+import com.netflix.vms.transformer.hollowinput.PackageMomentListHollow;
 
+import com.netflix.vms.transformer.modules.packages.VideoFormatDescriptorIdentifier;
 import com.netflix.vms.transformer.hollowoutput.TrickPlayType;
 import com.netflix.vms.transformer.hollowinput.CdnDeploymentHollow;
 import java.util.Set;
@@ -72,24 +73,28 @@ public class PackageMomentDataModule {
     private PackageMomentData buildDownloadableIdsToVideoMomentsMap(PackageData packageData, PackagesHollow inputPackage) {
         PackageMomentData data = new PackageMomentData();
 
-        for(PackageMomentHollow packageMoment : inputPackage._getMoments()) {
-            String momentType = packageMoment._getMomentType()._getValue();
+        PackageMomentListHollow moments = inputPackage._getMoments();
 
-            if("SnackMoment".equals(momentType) && packageMoment._getClipSpecRuntimeMillis() != Long.MIN_VALUE) {
-                VideoMoment videoMoment = videoMomentModule.createVideoMoment(packageData.id, packageMoment, momentType);
-                data.phoneSnackMoments.add(videoMoment);
-            } else {
-                List<DownloadableIdHollow> downloadableIdList = packageMoment._getDownloadableIds();
+        if(moments != null) {
+            for(PackageMomentHollow packageMoment : inputPackage._getMoments()) {
+                String momentType = packageMoment._getMomentType()._getValue();
 
-                if(downloadableIdList != null) {
+                if("SnackMoment".equals(momentType) && packageMoment._getClipSpecRuntimeMillis() != Long.MIN_VALUE) {
                     VideoMoment videoMoment = videoMomentModule.createVideoMoment(packageData.id, packageMoment, momentType);
+                    data.phoneSnackMoments.add(videoMoment);
+                } else {
+                    List<DownloadableIdHollow> downloadableIdList = packageMoment._getDownloadableIds();
 
-                    for(DownloadableIdHollow id : downloadableIdList) {
-                        Long downloadableId = id._getValueBoxed();
-                        if(!data.downloadableIdsToVideoMoments.containsKey(downloadableId)) {
-                            data.downloadableIdsToVideoMoments.put(downloadableId, videoMoment);
+                    if(downloadableIdList != null) {
+                        VideoMoment videoMoment = videoMomentModule.createVideoMoment(packageData.id, packageMoment, momentType);
+
+                        for(DownloadableIdHollow id : downloadableIdList) {
+                            Long downloadableId = id._getValueBoxed();
+                            if(!data.downloadableIdsToVideoMoments.containsKey(downloadableId)) {
+                                data.downloadableIdsToVideoMoments.put(downloadableId, videoMoment);
+                            }
+                            //list.add(videoMoment);
                         }
-                        //list.add(videoMoment);
                     }
                 }
             }
