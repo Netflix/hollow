@@ -2,7 +2,7 @@ apply plugin: 'nebula-ospackage-tomcat'
 apply plugin: 'war'
 
 dependencies {
-	compile project(':transformer')
+	compile project(':vms-transformer-businesslogic')
 	compile 'netflix:vms-hollow-generated-notemplate:latest.release'
 
 	compile 'netflix:platform:latest.release'
