@@ -1,7 +1,5 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import java.util.Map;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
@@ -15,14 +13,11 @@ import com.netflix.hermes.data.NoContentDataEntry;
 import com.netflix.hermes.platformserviceclient.Property;
 import com.netflix.hermes.publisher.FastPropertyPublisher;
 import com.netflix.hermes.publisher.PurgePolicy;
-import com.netflix.util.RetryableAction;
-import com.netflix.videometadata.audit.ErrorCodeLogger;
-import com.netflix.videometadata.audit.VMSErrorCode.ErrorCode;
-import com.netflix.videometadata.audit.VMSLogManager;
+import com.netflix.vms.transformer.publish.workflow.job.impl.HermesAnnounceUtil.HermesAnnounceEvent;
+import java.util.Map;
 
 @Singleton
 public class HermesBlobAnnouncer{
-    private static final ErrorCodeLogger LOGGER = VMSLogManager.getErrorCodeLogger(HermesBlobAnnouncer.class);
     private final FastPropertyPublisher publisher;
     private final String topicPrefix;
 
@@ -32,8 +27,7 @@ public class HermesBlobAnnouncer{
         this.topicPrefix = topicPrefix;
     }
 
-    private boolean publishTopic(final RegionEnum region, final String topic, final String version,
-            FastBlobImagePublishEvent event) throws JsonProcessingException {
+    private boolean publishTopic(RegionEnum region, String topic, String version, HermesAnnounceEvent event) throws JsonProcessingException {
         String eventString = new ObjectMapper().writeValueAsString(event);
         final DirectDataPointer pointer = new DirectDataPointer.Builder()
                                             .topic(topic)
@@ -48,37 +42,32 @@ public class HermesBlobAnnouncer{
         final DataEntry entry = NoContentDataEntry.newInstance(null, pointer);
         final PurgePolicy purgePolicy = new PurgePolicy.Builder().maxNumOfVersions(1024).build();
 
-        final RetryableAction publishAction = new RetryableAction("topic-publish-thread", 5, 5000) {
-            @Override
-            public boolean run() throws Exception {
-                try {
-                    publisher.publish(pointer, entry, purgePolicy, prop);
-                    LOGGER.logfWithExplicitCycleVersion(ErrorCode.GeneralInfo, version, "Published topic:%s, region:%s, version:%s", topic, region, version);
-                    return true;
-                } catch(final Exception e) {
-                    throw e;
-                }
-            }
-        };
+        int retryCount = 0;
 
-        try {
-            return publishAction.executeWithRetry();
-        } catch (Exception e) {
-            LOGGER.logf(ErrorCode.GeneralError, version, "Failed to publish topic:%s, version:%s", e, topic, version);
-            return false;
+        while(retryCount < 3) {
+            try {
+                publisher.publish(pointer, entry, purgePolicy, prop);
+                return true;
+            } catch(Throwable th) {
+                th.printStackTrace();
+            }
+
+            retryCount++;
         }
+
+        return false;
     }
 
     /*
      * Publishes topic for a given region.
      */
-    public synchronized boolean publish(RegionEnum region, Map<String, String> attributes) throws Exception{
+    public synchronized boolean publish(String vip, RegionEnum region, Map<String, String> attributes) throws Exception{
         String version = attributes.get("dataVersion");
-        FastBlobImagePublishEvent event = new FastBlobImagePublishEvent.Builder()
+        HermesAnnounceEvent event = new HermesAnnounceEvent.Builder()
                                                     .withAttributes(attributes)
                                                     .build();
 
-        return publishTopic(region, getTopic(), version, event);
+        return publishTopic(region, getTopic(vip), version, event);
     }
 
     /*
@@ -86,14 +75,14 @@ public class HermesBlobAnnouncer{
      */
     public synchronized boolean publish(RegionEnum region, String topic, Map<String, String> attributes) throws Exception{
         String version = attributes.get("dataVersion");
-        FastBlobImagePublishEvent event = new FastBlobImagePublishEvent.Builder()
+        HermesAnnounceEvent event = new HermesAnnounceEvent.Builder()
                                                     .withAttributes(attributes)
                                                     .build();
 
         return publishTopic(region, topic, version, event);
     }
 
-    public String getTopic() {
-        return HermesTopicProvider.getTopic(topicPrefix);
+    public String getTopic(String vip) {
+        return HermesTopicProvider.getTopic(topicPrefix, vip);
     }
 }

@@ -1,8 +1,10 @@
 package com.netflix.vms.transformer;
 
+import org.apache.commons.io.IOUtils;
+
+import com.netflix.hollow.write.HollowBlobWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
 import java.io.File;
 import com.netflix.hollow.client.HollowClient;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
@@ -20,6 +22,8 @@ public class TransformCycle {
     private final HollowClient inputClient;
     private final VMSTransformerWriteStateEngine outputStateEngine;
     private final TransformerContext ctx;
+
+    private long cycleNumber = 0;
 
     public TransformCycle(String vip) {
         this.vip = vip;
@@ -54,10 +58,29 @@ public class TransformCycle {
     }
 
 
-    private void writeTheBlobFiles() throws IOException {
-        HollowBlobKeybaseBuilder keybaseBuilder = new HollowBlobKeybaseBuilder(vip);
+    private void writeTheBlobFiles() {
+        try {
+            HollowBlobWriter writer = new HollowBlobWriter(outputStateEngine);
+            //HollowBlobKeybaseBuilder keybaseBuilder = new HollowBlobKeybaseBuilder(vip);
 
-        OutputStream snapshotOutputStream = new LZ4VMSOutputStream(new FileOutputStream(new File(System.getProperty("java.io.tmpdir"), "vms.snapshot")));
+            OutputStream snapshotOutputStream = new LZ4VMSOutputStream(new FileOutputStream(new File(System.getProperty("java.io.tmpdir"), "vms." + vip + "-snapshot-" + cycleNumber)));
+            try {
+                writer.writeSnapshot(snapshotOutputStream);
+            } finally {
+                IOUtils.closeQuietly(snapshotOutputStream);
+            }
+
+            if(cycleNumber > 0) {
+                OutputStream deltaOutputStream = new LZ4VMSOutputStream(new FileOutputStream(new File(System.getProperty("java.io.tmpdir"), "vms." + vip + "-delta-" + (cycleNumber-1) + "-" + cycleNumber)));
+                try {
+                    writer.writeDelta(deltaOutputStream);
+                } finally {
+                    IOUtils.closeQuietly(deltaOutputStream);
+                }
+            }
+        } catch(IOException e) {
+            /// MUST restore from previous state, (or reset to last prepare for next cycle if possible).
+        }
     }
 
 

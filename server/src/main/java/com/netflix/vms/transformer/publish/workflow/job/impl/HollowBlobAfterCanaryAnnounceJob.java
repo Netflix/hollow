@@ -8,7 +8,7 @@ import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.AfterCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.BeforeCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryAnnounceJob;
-import com.netflix.vms.transformer.publish.workflow.job.DataTester;
+import com.netflix.vms.transformer.publish.workflow.playbackmonkey.PlaybackMonkeyTester;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,13 +19,13 @@ public class HollowBlobAfterCanaryAnnounceJob extends AfterCanaryAnnounceJob {
 	private static final long MAX_TIME_NEEDED_FOR_CLIENT_TO_LOAD_A_VERSION = 300000; // 5 minute
 
 	private final PublishWorkflowContext ctx;
-	private final DataTester dataTester;
+	private final PlaybackMonkeyTester dataTester;
 	private Map<VideoCountryKey, Boolean> testResultVideoCountryKeys;
 	private final ValidationVideoRanker videoRanker;
 
 	public HollowBlobAfterCanaryAnnounceJob(PublishWorkflowContext ctx, long newVersion,
 			RegionEnum region, BeforeCanaryAnnounceJob beforeCanaryAnnounceJob,
-			CanaryAnnounceJob canaryAnnounceJob, DataTester dataTester,
+			CanaryAnnounceJob canaryAnnounceJob, PlaybackMonkeyTester dataTester,
 			ValidationVideoRanker videoRanker) {
 		super(ctx.getVip(), newVersion, region, beforeCanaryAnnounceJob, canaryAnnounceJob);
 		this.ctx = ctx;
@@ -44,7 +44,7 @@ public class HollowBlobAfterCanaryAnnounceJob extends AfterCanaryAnnounceJob {
 						List<VideoCountryKey> mostValuableChangedVideos = videoRanker.getMostValuableChangedVideos(ctx);
 						ctx.getLogger().info("PlaybackMonkeyInfo", getJobName() + ": got " + mostValuableChangedVideos.size() + " most valuable videos to test.");
 
-						testResultVideoCountryKeys = dataTester.testVideoCountryKeysWithRetry(mostValuableChangedVideos, ctx.getConfig().getPlaybackMonkeyMaxRetriesPerTest());
+						testResultVideoCountryKeys = dataTester.testVideoCountryKeysWithRetry(ctx.getLogger(), mostValuableChangedVideos, ctx.getConfig().getPlaybackMonkeyMaxRetriesPerTest());
 
 						long timeTaken = System.currentTimeMillis()-now;
 						PlaybackMonkeyUtil.logResultsToAtlas(PlaybackMonkeyUtil.FAILURE_PERCENT, PlaybackMonkeyUtil.getFailedPercent(testResultVideoCountryKeys), vip, "after");

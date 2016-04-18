@@ -25,7 +25,7 @@ public class BlobMetaDataUtil {
 
         //map.put("VIP", MetaDataCommonPropertyManager.getVipAddressProperty());
         map.put("ProducedByServer", getServerId());
-        map.put("ProducedByJarVersion", getVersion());
+        map.put("ProducedByJarVersion", getJarVersion());
 
         return map;
     }
@@ -45,7 +45,7 @@ public class BlobMetaDataUtil {
     }
 
 
-    private static String getServerId() {
+    public static String getServerId() {
         String hostname = "unknown";
         if (ApplicationInfoManager.getInstance() != null && ApplicationInfoManager.getInstance().getInfo() != null) {
             hostname = ApplicationInfoManager.getInstance().getInfo().getHostName();
@@ -59,7 +59,8 @@ public class BlobMetaDataUtil {
         final String proposedVersion = ConfigAdmin.getLibraryVersion("transformer-server", BlobMetaDataUtil.class);
         version = StringUtils.isBlank(proposedVersion) ? "Unknown" : proposedVersion;
     }
-    public static String getVersion() {
+
+    public static String getJarVersion() {
         if (null != version) {
             return version;
         }

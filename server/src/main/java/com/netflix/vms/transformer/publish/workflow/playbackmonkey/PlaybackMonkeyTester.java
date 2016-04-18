@@ -1,8 +1,8 @@
 package com.netflix.vms.transformer.publish.workflow.playbackmonkey;
 
-import com.netflix.vms.transformer.publish.workflow.job.DataTester;
-
 import com.netflix.hollow.util.SimultaneousExecutor;
+
+import com.netflix.hermes.exception.EntityNotFoundException;
 import com.netflix.niws.client.IClientResponse;
 import com.netflix.niws.client.NFMultivaluedMap;
 import com.netflix.niws.client.NIWSClientException;
@@ -15,14 +15,9 @@ import com.netflix.playback.monkey.model.PlaybackMonkeyTestResults;
 import com.netflix.playback.monkey.model.PlaybackMonkeyTestResults.Status;
 import com.netflix.playback.monkey.model.VideoTestDetails;
 import com.netflix.servo.monitor.DynamicCounter;
-import com.netflix.videometadata.audit.ErrorCodeLogger;
 import com.netflix.videometadata.audit.VMSErrorCode.ErrorCode;
-import com.netflix.videometadata.audit.VMSLogManager;
-import com.netflix.videometadata.hollow.publish.HollowBlobDataProvider;
-import com.netflix.videometadata.hollow.publish.HollowBlobDataProvider.VideoCountryKey;
-import com.netflix.videometadata.mutationevents.EntityNotFoundException;
-import com.netflix.videometadata.mutationevents.EntityUnchangedException;
-import com.netflix.videometadata.mutationevents.SystemUnderMaintanenceException;
+import com.netflix.vms.transformer.TransformerLogger;
+import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -32,13 +27,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import org.codehaus.jackson.JsonProcessingException;
 
-public class PlaybackMonkeyTester implements DataTester {
+public class PlaybackMonkeyTester {
 
     public static final String INITATE_TEST_URL = "/REST/playback/monkey/viewable/";
     public static final String TEST_RESULT_URL = "/REST/playback/monkey/test/";
     public static final String INSTANCE_LIST_URL = "/REST/playback/monkey/system/instances/";
 
-    private static final ErrorCodeLogger LOGGER = VMSLogManager.getErrorCodeLogger(PlaybackMonkeyTester.class);
     private static final String PBM_REST_CLIENT_NAME = "vms-pbm-client";
 
     private final RestClient pbmRestClient;
@@ -47,8 +41,7 @@ public class PlaybackMonkeyTester implements DataTester {
     	this.pbmRestClient = createClient();
     }
 
-    @Override
-	public Map<VideoCountryKey, Boolean> testVideoCountryKeysWithRetry(final List<VideoCountryKey> keys, int numOfTries) throws Exception {
+	public Map<VideoCountryKey, Boolean> testVideoCountryKeysWithRetry(TransformerLogger logger, List<VideoCountryKey> keys, int numOfTries) throws Exception {
     	Map<VideoCountryKey, Boolean> playBackMonkeyResult = new HashMap<>(keys.size());
     	for(VideoCountryKey key: keys){
     		playBackMonkeyResult.put(key, false);
@@ -57,9 +50,9 @@ public class PlaybackMonkeyTester implements DataTester {
     	int currentTry = 0;
     	List<VideoCountryKey> videosToTest = keys;
     	while (currentTry++ <= numOfTries){
-    		Map<VideoCountryKey, Boolean> result = testVideoCountryKeys(videosToTest);
+    		Map<VideoCountryKey, Boolean> result = testVideoCountryKeys(logger, videosToTest);
 
-    		List<VideoCountryKey> failedVideos = new ArrayList<HollowBlobDataProvider.VideoCountryKey>(result.size());
+    		List<VideoCountryKey> failedVideos = new ArrayList<VideoCountryKey>(result.size());
 			for(Entry<VideoCountryKey, Boolean> entry: result.entrySet()){
 	    		if(entry.getValue()){
 	    			playBackMonkeyResult.put(entry.getKey(), entry.getValue());
@@ -67,7 +60,7 @@ public class PlaybackMonkeyTester implements DataTester {
 	    			failedVideos.add(entry.getKey());
 	    		}
 	    	}
-			LOGGER.logf(ErrorCode.PlayBackMonkeyInfo, "PBM run number: %d. Video sent: %d. Failed videos: %d.", currentTry, videosToTest.size(), failedVideos.size());
+			logger.info("PlaybackMonkeyInfo", "PBM run number: "+currentTry+". Video sent: "+videosToTest.size()+". Failed videos: "+failedVideos.size()+".");
 			if(failedVideos.size() == 0)
 				break;
 			videosToTest = failedVideos;
@@ -75,11 +68,11 @@ public class PlaybackMonkeyTester implements DataTester {
 
     	return playBackMonkeyResult;
     }
+
     /* (non-Javadoc)
 	 * @see com.netflix.videometadata.hollow.publish.workflow.playbackmonkey.DataTester#testVideoCountryKeys(java.util.List)
 	 */
-    @Override
-	public Map<VideoCountryKey, Boolean> testVideoCountryKeys(final List<VideoCountryKey> keys) throws Exception {
+	public Map<VideoCountryKey, Boolean> testVideoCountryKeys(TransformerLogger logger, List<VideoCountryKey> keys) throws Exception {
         final String[] testIds = new String[keys.size()];
         final int retries[] = new int[keys.size()];
         final boolean testCompleted[] = new boolean[keys.size()];
@@ -88,7 +81,7 @@ public class PlaybackMonkeyTester implements DataTester {
         SimultaneousExecutor executor = new SimultaneousExecutor();
         final int numThreads = executor.getCorePoolSize();
 
-        LOGGER.logf(ErrorCode.PlayBackMonkeyInfo,"keys.size(): %d ; testIds.length: %d ", keys.size(), testIds.length);
+        logger.info("PlaybackMonkeyInfo", "keys.size(): "+keys.size()+" ; testIds.length: "+testIds.length);
         for(int i=0;i<numThreads;i++) {
             final int threadNumber = i;
             executor.execute(new Runnable() {
@@ -100,7 +93,7 @@ public class PlaybackMonkeyTester implements DataTester {
                             testIds[i] = initiateTest(key);
                             //System.out.println("Initiated test for : "+key);
                         } catch(Exception e) {
-                            LOGGER.log(ErrorCode.PlayBackMonkeyError, e);
+                            logger.error("PlaybackMonkeyError", "Playback monkey test failed", e);
                         }
                     }
                 }
@@ -110,7 +103,7 @@ public class PlaybackMonkeyTester implements DataTester {
 
         executor.awaitSuccessfulCompletion();
 
-        LOGGER.logf(ErrorCode.PlayBackMonkeyInfo,"Initiated %d number of video country tests.", keys.size());
+        logger.info("PlaybackMonkeyInfo", "Initiated "+keys.size()+" number of video country tests.");
 
         executor = new SimultaneousExecutor();
 
@@ -143,7 +136,7 @@ public class PlaybackMonkeyTester implements DataTester {
                                         testSuccess[i] = true;
                                     }
                                 } catch(Exception e) {
-                                    LOGGER.log(ErrorCode.PlayBackMonkeyError, e);
+                                    logger.error("PlaybackMonkeyError", "Could not finish playback monkey test", e);
                                 }
                             }
                         }
@@ -160,13 +153,13 @@ public class PlaybackMonkeyTester implements DataTester {
             testResults.put(keys.get(i), testSuccess[i] ? Boolean.TRUE : Boolean.FALSE);
 
         //System.out.println("Completed PlaybackMonkeyTester with testResults size "+testResults.size());
-        LOGGER.logf(ErrorCode.PlayBackMonkeyInfo, "Completed PlaybackMonkeyTester with testResults size %d.",testResults.size());
+        logger.info("PlaybackMonkeyInfo", "Completed PlaybackMonkeyTester with testResults size " + testResults.size());
         return testResults;
     }
 
     public String getInstanceInPlayBackMonkeyStack() throws Exception{
 		String json = getResponseJson(pbmRestClient, new URI( INSTANCE_LIST_URL), null);
-		 LOGGER.logf(ErrorCode.PlayBackMonkeyInfo, "getInstanceInPlayBackMonkeyStack response: %s.",json);
+		//LOGGER.logf(ErrorCode.PlayBackMonkeyInfo, "getInstanceInPlayBackMonkeyStack response: %s.",json);
 		return json.substring(json.indexOf('[') + 1, json.lastIndexOf(']')).trim().replaceAll("\"", "");
     }
 
@@ -191,7 +184,7 @@ public class PlaybackMonkeyTester implements DataTester {
 	    	try {
 	    		pbmRestClient = RestClientFactory.registerRestClientUsingProperties(PBM_REST_CLIENT_NAME);
 	        } catch (NIWSClientException e) {
-	            LOGGER.logf(ErrorCode.PlayBackMonkeyError, "", e);
+	            throw new RuntimeException(e);
 	        }
     	}
     	return pbmRestClient;
@@ -211,10 +204,10 @@ public class PlaybackMonkeyTester implements DataTester {
 			if (statusCode == 200) {
 				return response.getEntity(String.class);
 			} else if (statusCode == 204) {
-				throw new EntityUnchangedException(
+				throw new IOException(
 						"204 returned. Entity is unchanged");
 			} else if (statusCode == 503) {
-				throw new SystemUnderMaintanenceException(
+				throw new IOException(
 						"503 returned. system under maintanence");
 			} else {
 				throw new RuntimeException("HTTP request error. Status:"

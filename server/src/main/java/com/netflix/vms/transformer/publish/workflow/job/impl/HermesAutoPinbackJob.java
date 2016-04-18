@@ -3,16 +3,7 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 import com.netflix.vms.transformer.publish.workflow.job.AnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.AutoPinbackJob;
 
-import netflix.admin.videometadata.VMSAutoPinBackEmergencyNotification;
-import netflix.admin.videometadata.VMSAutoPinBackEmergencyNotification.ErrorNotificationStatus;
-import java.util.Date;
-import com.netflix.videometadata.audit.VMSErrorCode.ErrorCode;
-import com.netflix.videometadata.audit.VMSLogManager;
-import com.netflix.videometadata.audit.ErrorCodeLogger;
-
 public class HermesAutoPinbackJob extends AutoPinbackJob {
-
-    private static final ErrorCodeLogger ERRCODELOGGER = VMSLogManager.getErrorCodeLogger(HermesAutoPinbackJob.class);
 
     public HermesAutoPinbackJob(AnnounceJob announcement, long waitMillis, long cycleVersion) {
         super(announcement, waitMillis, cycleVersion);
@@ -20,7 +11,7 @@ public class HermesAutoPinbackJob extends AutoPinbackJob {
 
     @Override
     protected boolean executeJob() {
-        /// if we've previously triggered auto pinback, don't run this check
+        /*/// if we've previously triggered auto pinback, don't run this check
         if(VMSAutoPinBackEmergencyNotification.isPinbackTriggered()) {
             ERRCODELOGGER.logfWithExplicitCycleVersion(ErrorCode.AutoPinbackTriggered, String.valueOf(getCycleVersion()), "Auto Pinback was previously triggered.  Not testing for auto pinback");
             return false;
@@ -53,7 +44,7 @@ public class HermesAutoPinbackJob extends AutoPinbackJob {
                     return false;
                 }
             }
-        }
+        }*/
 
         return false;
     }

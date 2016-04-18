@@ -13,7 +13,6 @@ import com.netflix.vms.transformer.publish.workflow.job.CanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryRollbackJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryValidationJob;
 import com.netflix.vms.transformer.publish.workflow.job.CircuitBreakerJob;
-import com.netflix.vms.transformer.publish.workflow.job.DataTester;
 import com.netflix.vms.transformer.publish.workflow.job.DelayJob;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobDeleteFileJob;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
@@ -31,7 +30,7 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
     ///TODO: VIP changes for red/black?
     private final PublishWorkflowContext ctx;
 	private final HollowBlobDataProvider hollowBlobDataProvider;
-	private final DataTester playbackMonkeyTester;
+	private final PlaybackMonkeyTester playbackMonkeyTester;
 	private final ValidationVideoRanker videoRanker;
 
     public DefaultHollowPublishJobCreator(String vip, PublishWorkflowConfig config, TransformerLogger logger) {
