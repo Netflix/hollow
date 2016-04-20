@@ -1,4 +1,4 @@
-package com.netflix.vmsserver;
+package com.netflix.vms.transformer;
 
 import com.netflix.hollow.HollowSchema;
 import com.netflix.hollow.filter.HollowFilterConfig;
@@ -7,7 +7,6 @@ import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.memory.WastefulRecycler;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
-import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -23,9 +22,11 @@ public class ShowMeTheProgress {
     public void start() throws Exception {
         VMSHollowVideoInputAPI api = new VMSHollowVideoInputAPI(loadStateEngine("/filtered-input.hollow"));
 
-        SimpleTransformer transformer = new SimpleTransformer(api);
+        VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
 
-        HollowWriteStateEngine outputStateEngine = transformer.transform();
+        SimpleTransformer transformer = new SimpleTransformer(api, outputStateEngine);
+
+        transformer.transform();
         HollowReadStateEngine actualOutputReadStateEngine = roundTripOutputStateEngine(outputStateEngine);
         HollowReadStateEngine expectedOutputStateEngine = loadStateEngine("/expected-output.hollow", getDiffFilter(actualOutputReadStateEngine.getSchemas()));
 

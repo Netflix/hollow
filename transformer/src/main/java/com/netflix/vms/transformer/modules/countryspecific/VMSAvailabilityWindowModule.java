@@ -67,9 +67,9 @@ public class VMSAvailabilityWindowModule {
 
         VideoRightsRightsHollow rights = videoRights._getRights();
         if((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
-            if(videoId == 80080144 && "VU".equals(country))
+/*            if(videoId == 80080144 && "VU".equals(country))
                 System.out.println("asdf");
-
+*/
             populateRolledUpWindowData(data, rollup, rights, isGoLive);
         } else {
             populateEpisodeOrStandaloneWindowData(videoId, country, data, rollup, isGoLive, rights);

@@ -1,7 +1,8 @@
 package com.netflix.vms.transformer.modules.packages;
 
-import com.netflix.vms.transformer.hollowoutput.TimedTextTypeDescriptor;
+import com.netflix.vms.transformer.hollowinput.StringHollow;
 
+import com.netflix.vms.transformer.hollowoutput.TimedTextTypeDescriptor;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
@@ -143,7 +144,10 @@ public class EncodeSummaryDescriptorModule {
     private String getNativeLanguage(long videoId) {
         int ordinal = videoGeneralIdx.getMatchingOrdinal(videoId);
         VideoGeneralHollow general = api.getVideoGeneralHollow(ordinal);
-        return general._getOriginalLanguageBcpCode()._getValue();
+        StringHollow originalLangCode = general._getOriginalLanguageBcpCode();
+        if(originalLangCode != null)
+            return originalLangCode._getValue();
+        return null;
     }
 
     private boolean isSubtitleBurnedIn(String profileType, Strings language) {

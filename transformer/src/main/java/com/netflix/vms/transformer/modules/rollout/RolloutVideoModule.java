@@ -343,7 +343,9 @@ public class RolloutVideoModule extends AbstractTransformModule {
         }
 
         sv.attributes.put(new Strings("type"), new Strings("trailer"));
-        sv.attributes.put(new Strings("identifier"), new Strings(indivTrailerHollow._getIdentifier()._getValue()));
+        StringHollow identifier = indivTrailerHollow._getIdentifier();
+        if(identifier != null)
+            sv.attributes.put(new Strings("identifier"), new Strings(indivTrailerHollow._getIdentifier()._getValue()));
 
         sv.multiValueAttributes = new HashMap<Strings, List<Strings>>();
         MultiValuePassthroughMapHollow multiValPassthrough = indivTrailerHollow._getPassthrough()._getMultiValues();

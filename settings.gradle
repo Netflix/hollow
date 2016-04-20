@@ -1,4 +1,5 @@
 rootProject.name = 'videometadata-transformer'
 include 'server', 'transformer'
-project(':transformer').name = 'transformer'
-project(':server').name = 'transformer-server'
+project(':transformer').name = 'vms-transformer-businesslogic'
+project(':server').name = 'vms-transformer-server'
+

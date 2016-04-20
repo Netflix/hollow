@@ -1,4 +1,4 @@
-package com.netflix.vmsserver;
+package com.netflix.vms.transformer;
 
 import com.netflix.hollow.diff.HollowDiff;
 import com.netflix.hollow.diff.HollowTypeDiff;
