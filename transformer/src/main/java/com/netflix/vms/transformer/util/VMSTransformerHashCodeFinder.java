@@ -1,8 +1,15 @@
 package com.netflix.vms.transformer.util;
 
-import com.netflix.vms.transformer.hollowoutput.ArtWorkImageTypeEntry;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
+
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
 
 import com.netflix.hollow.util.HollowObjectHashCodeFinder;
+import com.netflix.vms.transformer.hollowoutput.ArtWorkImageTypeEntry;
 import com.netflix.vms.transformer.hollowoutput.DrmKeyString;
 import com.netflix.vms.transformer.hollowoutput.Episode;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
@@ -14,14 +21,10 @@ import com.netflix.vms.transformer.hollowoutput.VPerson;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder {
 
-    private static enum RecordType {
+    static enum RecordType {
         ArtWorkImageTypeEntry,
         DrmKeyString,
         Episode,
@@ -36,27 +39,22 @@ public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder 
         Video,
         VideoFormatDescriptor,
         VideoSetType;
+
+        private static final Map<String, RecordType> lookup =
+                Arrays.stream(values()).collect(toMap(RecordType::name, identity()));
+
+        static RecordType lookup(String name) {
+            return lookup.get(name);
+        }
     }
 
-
-    private final Map<String, RecordType> definedHashCodeTypes;
-    private final Set<String> typesWithDefinedHashCodes;
-
-    public VMSTransformerHashCodeFinder() {
-        Map<String, RecordType> recordTypes = new HashMap<String, RecordType>();
-
-        for(RecordType recordType : RecordType.values())
-            recordTypes.put(recordType.toString(), recordType);
-
-        this.definedHashCodeTypes = new HashMap<String, RecordType>();
-        this.typesWithDefinedHashCodes = Collections.unmodifiableSet(definedHashCodeTypes.keySet());
-    }
+    public VMSTransformerHashCodeFinder() {}
 
     @Override
     public int hashCode(String typeName, int ordinal, Object objectToHash) {
-        RecordType recordType = definedHashCodeTypes.get(typeName);
+        RecordType recordType = RecordType.lookup(typeName);
 
-        if(recordType == null)
+        if (recordType == null)
             return ordinal;
 
         switch(recordType) {
@@ -100,7 +98,7 @@ public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder 
 
     @Override
     public Set<String> getTypesWithDefinedHashCodes() {
-        return typesWithDefinedHashCodes;
+        return Arrays.stream(RecordType.values()).map(t -> t.name()).collect(toSet());
     }
 
     @Deprecated
