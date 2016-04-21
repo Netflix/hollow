@@ -2,7 +2,6 @@ package com.netflix.vms.transformer.util;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -40,19 +39,15 @@ public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder 
         VideoFormatDescriptor,
         VideoSetType;
 
-        private static final Map<String, RecordType> lookup =
+        static final Map<String, RecordType> nameToRecordType =
                 Arrays.stream(values()).collect(toMap(RecordType::name, identity()));
-
-        static RecordType lookup(String name) {
-            return lookup.get(name);
-        }
     }
 
     public VMSTransformerHashCodeFinder() {}
 
     @Override
     public int hashCode(String typeName, int ordinal, Object objectToHash) {
-        RecordType recordType = RecordType.lookup(typeName);
+        RecordType recordType = RecordType.nameToRecordType.get(typeName);
 
         if (recordType == null)
             return ordinal;
@@ -98,7 +93,7 @@ public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder 
 
     @Override
     public Set<String> getTypesWithDefinedHashCodes() {
-        return Arrays.stream(RecordType.values()).map(t -> t.name()).collect(toSet());
+        return RecordType.nameToRecordType.keySet();
     }
 
     @Deprecated
@@ -106,5 +101,4 @@ public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder 
     public int hashCode(int ordinal, Object objectToHash) {
         throw new UnsupportedOperationException();
     }
-
 }
