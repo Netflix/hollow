@@ -1,6 +1,6 @@
 allprojects {
     apply plugin: 'nebula'
-    apply plugin: 'nebula-ide'
+    apply plugin: 'netflix.ide'
 
     nebula {
       moduleEmail = 'vms-dev@netflix.com'
@@ -13,4 +13,3 @@ allprojects {
         }
     }
 }
-
