@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +31,7 @@ public class VMSTransformerHashCodeFinderTest {
     @Test
     public void unknownRecordTypeHashesToOrdinal() {
         int ordinal = 13;
-        assertThat(subject.hashCode(null, ordinal, new Object()))
+        assertThat(subject.hashCode(null, ordinal, anyObject()))
             .isEqualTo(ordinal);
     }
 
@@ -162,7 +163,24 @@ public class VMSTransformerHashCodeFinderTest {
                 RecordType.Integer.name());
     }
 
+    @Test
+    public void hashingOnlyTheObjectUnsupported() {
+        assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(
+                () -> subject.hashCode(anyObject()));
+    }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    public void hashingWithoutTypeNameUnsupported() {
+        assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(
+                () -> subject.hashCode(anyOrdinal(), anyObject()));
+    }
+
     private final int anyOrdinal() {
         return -1;
+    }
+
+    private final Object anyObject() {
+        return new Object();
     }
 }
