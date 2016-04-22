@@ -9,7 +9,7 @@ public class StreamDeploymentLabelSetTypeAPI extends HollowSetTypeAPI {
 
     private final HollowSetLookupDelegate delegateLookupImpl;
 
-    StreamDeploymentLabelSetTypeAPI(VMSHollowVideoInputAPI api, HollowSetTypeDataAccess dataAccess) {
+    StreamDeploymentLabelSetTypeAPI(VMSHollowInputAPI api, HollowSetTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowSetLookupDelegate(this);
     }
@@ -18,8 +18,8 @@ public class StreamDeploymentLabelSetTypeAPI extends HollowSetTypeAPI {
         return getAPI().getStreamDeploymentLabelTypeAPI();
     }
 
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI)api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI)api;
     }
 
     public HollowSetLookupDelegate getDelegateLookupImpl() {

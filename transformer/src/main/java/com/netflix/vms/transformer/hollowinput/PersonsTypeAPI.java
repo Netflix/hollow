@@ -7,7 +7,7 @@ public class PersonsTypeAPI extends HollowObjectTypeAPI {
 
     private final PersonsDelegateLookupImpl delegateLookupImpl;
 
-    PersonsTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    PersonsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "personId",
             "name",
@@ -62,8 +62,8 @@ public class PersonsTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

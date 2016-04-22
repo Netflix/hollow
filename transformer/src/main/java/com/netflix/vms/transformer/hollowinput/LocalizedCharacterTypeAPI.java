@@ -7,7 +7,7 @@ public class LocalizedCharacterTypeAPI extends HollowObjectTypeAPI {
 
     private final LocalizedCharacterDelegateLookupImpl delegateLookupImpl;
 
-    LocalizedCharacterTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    LocalizedCharacterTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "characterId",
             "translatedTexts",
@@ -84,8 +84,8 @@ public class LocalizedCharacterTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

@@ -7,7 +7,7 @@ public class FestivalsTypeAPI extends HollowObjectTypeAPI {
 
     private final FestivalsDelegateLookupImpl delegateLookupImpl;
 
-    FestivalsTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    FestivalsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "festivalId",
             "copyright",
@@ -95,8 +95,8 @@ public class FestivalsTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

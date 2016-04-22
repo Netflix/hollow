@@ -30,7 +30,7 @@ public class StoriesSynopsesHookHollow extends HollowObject {
         return  api().getMapOfTranslatedTextHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

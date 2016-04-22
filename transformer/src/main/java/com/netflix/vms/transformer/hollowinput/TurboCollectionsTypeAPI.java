@@ -7,7 +7,7 @@ public class TurboCollectionsTypeAPI extends HollowObjectTypeAPI {
 
     private final TurboCollectionsDelegateLookupImpl delegateLookupImpl;
 
-    TurboCollectionsTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    TurboCollectionsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "id",
             "prefix",
@@ -260,8 +260,8 @@ public class TurboCollectionsTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

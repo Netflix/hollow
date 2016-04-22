@@ -7,11 +7,10 @@ public class VideoTypeTypeAPI extends HollowObjectTypeAPI {
 
     private final VideoTypeDelegateLookupImpl delegateLookupImpl;
 
-    VideoTypeTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    VideoTypeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "videoId",
-            "isTV",
-            "type"
+            "countryInfos"
         });
         this.delegateLookupImpl = new VideoTypeDelegateLookupImpl(this);
     }
@@ -37,27 +36,13 @@ public class VideoTypeTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public boolean getIsTV(int ordinal) {
+    public int getCountryInfosOrdinal(int ordinal) {
         if(fieldIndex[1] == -1)
-            return missingDataHandler().handleBoolean("VideoType", ordinal, "isTV") == Boolean.TRUE;
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[1]) == Boolean.TRUE;
+            return missingDataHandler().handleReferencedOrdinal("VideoType", ordinal, "countryInfos");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[1]);
     }
 
-    public Boolean getIsTVBoxed(int ordinal) {
-        if(fieldIndex[1] == -1)
-            return missingDataHandler().handleBoolean("VideoType", ordinal, "isTV");
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[1]);
-    }
-
-
-
-    public int getTypeOrdinal(int ordinal) {
-        if(fieldIndex[2] == -1)
-            return missingDataHandler().handleReferencedOrdinal("VideoType", ordinal, "type");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[2]);
-    }
-
-    public VideoTypeDescriptorListTypeAPI getTypeTypeAPI() {
+    public VideoTypeDescriptorListTypeAPI getCountryInfosTypeAPI() {
         return getAPI().getVideoTypeDescriptorListTypeAPI();
     }
 
@@ -66,8 +51,8 @@ public class VideoTypeTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

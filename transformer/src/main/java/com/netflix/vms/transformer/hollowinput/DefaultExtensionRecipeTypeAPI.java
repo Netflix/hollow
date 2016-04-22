@@ -7,7 +7,7 @@ public class DefaultExtensionRecipeTypeAPI extends HollowObjectTypeAPI {
 
     private final DefaultExtensionRecipeDelegateLookupImpl delegateLookupImpl;
 
-    DefaultExtensionRecipeTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    DefaultExtensionRecipeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "recipeName",
             "extension"
@@ -40,8 +40,8 @@ public class DefaultExtensionRecipeTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

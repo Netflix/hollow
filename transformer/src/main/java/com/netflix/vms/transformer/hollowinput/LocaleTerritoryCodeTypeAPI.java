@@ -7,7 +7,7 @@ public class LocaleTerritoryCodeTypeAPI extends HollowObjectTypeAPI {
 
     private final LocaleTerritoryCodeDelegateLookupImpl delegateLookupImpl;
 
-    LocaleTerritoryCodeTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    LocaleTerritoryCodeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });
@@ -29,8 +29,8 @@ public class LocaleTerritoryCodeTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

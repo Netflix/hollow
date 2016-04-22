@@ -32,7 +32,7 @@ public class CacheDeploymentIntentHollow extends HollowObject {
         return delegate().getBitrateKBPSBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

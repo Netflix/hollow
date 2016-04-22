@@ -28,6 +28,10 @@ public class VideoMetaData implements Cloneable {
     public Set<Strings> episodeTypes = null;
     public List<Hook> hooks = null;
     public Strings overrideTitle = null;
+    public Date broadcastReleaseDate = null;
+    public int broadcastReleaseYear = java.lang.Integer.MIN_VALUE;
+    public Strings broadcastDistributorName = null;
+    public Integer metadataReleaseDays = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
@@ -88,6 +92,16 @@ public class VideoMetaData implements Cloneable {
         if(o.overrideTitle == null) {
             if(overrideTitle != null) return false;
         } else if(!o.overrideTitle.equals(overrideTitle)) return false;
+        if(o.broadcastReleaseDate == null) {
+            if(broadcastReleaseDate != null) return false;
+        } else if(!o.broadcastReleaseDate.equals(broadcastReleaseDate)) return false;
+        if(o.broadcastReleaseYear != broadcastReleaseYear) return false;
+        if(o.broadcastDistributorName == null) {
+            if(broadcastDistributorName != null) return false;
+        } else if(!o.broadcastDistributorName.equals(broadcastDistributorName)) return false;
+        if(o.metadataReleaseDays == null) {
+            if(metadataReleaseDays != null) return false;
+        } else if(!o.metadataReleaseDays.equals(metadataReleaseDays)) return false;
         return true;
     }
 
@@ -116,6 +130,10 @@ public class VideoMetaData implements Cloneable {
         hashCode = hashCode * 31 + (episodeTypes == null ? 1237 : episodeTypes.hashCode());
         hashCode = hashCode * 31 + (hooks == null ? 1237 : hooks.hashCode());
         hashCode = hashCode * 31 + (overrideTitle == null ? 1237 : overrideTitle.hashCode());
+        hashCode = hashCode * 31 + (broadcastReleaseDate == null ? 1237 : broadcastReleaseDate.hashCode());
+        hashCode = hashCode * 31 + broadcastReleaseYear;
+        hashCode = hashCode * 31 + (broadcastDistributorName == null ? 1237 : broadcastDistributorName.hashCode());
+        hashCode = hashCode * 31 + (metadataReleaseDays == null ? 1237 : metadataReleaseDays.hashCode());
         return hashCode;
     }
 
@@ -144,6 +162,10 @@ public class VideoMetaData implements Cloneable {
         builder.append(",episodeTypes=").append(episodeTypes);
         builder.append(",hooks=").append(hooks);
         builder.append(",overrideTitle=").append(overrideTitle);
+        builder.append(",broadcastReleaseDate=").append(broadcastReleaseDate);
+        builder.append(",broadcastReleaseYear=").append(broadcastReleaseYear);
+        builder.append(",broadcastDistributorName=").append(broadcastDistributorName);
+        builder.append(",metadataReleaseDays=").append(metadataReleaseDays);
         builder.append("}");
         return builder.toString();
     }

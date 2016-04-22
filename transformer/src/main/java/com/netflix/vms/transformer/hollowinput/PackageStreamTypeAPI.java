@@ -7,7 +7,7 @@ public class PackageStreamTypeAPI extends HollowObjectTypeAPI {
 
     private final PackageStreamDelegateLookupImpl delegateLookupImpl;
 
-    PackageStreamTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    PackageStreamTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "downloadableId",
             "streamProfileId",
@@ -139,8 +139,8 @@ public class PackageStreamTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

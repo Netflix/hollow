@@ -8,22 +8,30 @@ import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 
 public class RolloutPhaseWindowDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, RolloutPhaseWindowDelegate {
 
-    private final int endDateOrdinal;
-    private final int startDateOrdinal;
+    private final Long endDate;
+    private final Long startDate;
    private RolloutPhaseWindowTypeAPI typeAPI;
 
     public RolloutPhaseWindowDelegateCachedImpl(RolloutPhaseWindowTypeAPI typeAPI, int ordinal) {
-        this.endDateOrdinal = typeAPI.getEndDateOrdinal(ordinal);
-        this.startDateOrdinal = typeAPI.getStartDateOrdinal(ordinal);
+        this.endDate = typeAPI.getEndDateBoxed(ordinal);
+        this.startDate = typeAPI.getStartDateBoxed(ordinal);
         this.typeAPI = typeAPI;
     }
 
-    public int getEndDateOrdinal(int ordinal) {
-        return endDateOrdinal;
+    public long getEndDate(int ordinal) {
+        return endDate.longValue();
     }
 
-    public int getStartDateOrdinal(int ordinal) {
-        return startDateOrdinal;
+    public Long getEndDateBoxed(int ordinal) {
+        return endDate;
+    }
+
+    public long getStartDate(int ordinal) {
+        return startDate.longValue();
+    }
+
+    public Long getStartDateBoxed(int ordinal) {
+        return startDate;
     }
 
     @Override

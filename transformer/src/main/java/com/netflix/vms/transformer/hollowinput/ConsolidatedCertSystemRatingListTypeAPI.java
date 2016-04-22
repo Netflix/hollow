@@ -9,7 +9,7 @@ public class ConsolidatedCertSystemRatingListTypeAPI extends HollowListTypeAPI {
 
     private final HollowListLookupDelegate delegateLookupImpl;
 
-    ConsolidatedCertSystemRatingListTypeAPI(VMSHollowVideoInputAPI api, HollowListTypeDataAccess dataAccess) {
+    ConsolidatedCertSystemRatingListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowListLookupDelegate(this);
     }
@@ -22,8 +22,8 @@ public class ConsolidatedCertSystemRatingListTypeAPI extends HollowListTypeAPI {
         return delegateLookupImpl;
     }
 
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI)api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI)api;
     }
 
 }

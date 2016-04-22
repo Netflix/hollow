@@ -14,6 +14,7 @@ public class RolloutPhaseDelegateCachedImpl extends HollowObjectAbstractDelegate
     private final Boolean showCoreMetadata;
     private final int windowsOrdinal;
     private final int phaseTypeOrdinal;
+    private final Boolean onHold;
    private RolloutPhaseTypeAPI typeAPI;
 
     public RolloutPhaseDelegateCachedImpl(RolloutPhaseTypeAPI typeAPI, int ordinal) {
@@ -23,6 +24,7 @@ public class RolloutPhaseDelegateCachedImpl extends HollowObjectAbstractDelegate
         this.showCoreMetadata = typeAPI.getShowCoreMetadataBoxed(ordinal);
         this.windowsOrdinal = typeAPI.getWindowsOrdinal(ordinal);
         this.phaseTypeOrdinal = typeAPI.getPhaseTypeOrdinal(ordinal);
+        this.onHold = typeAPI.getOnHoldBoxed(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -56,6 +58,14 @@ public class RolloutPhaseDelegateCachedImpl extends HollowObjectAbstractDelegate
 
     public int getPhaseTypeOrdinal(int ordinal) {
         return phaseTypeOrdinal;
+    }
+
+    public boolean getOnHold(int ordinal) {
+        return onHold.booleanValue();
+    }
+
+    public Boolean getOnHoldBoxed(int ordinal) {
+        return onHold;
     }
 
     @Override

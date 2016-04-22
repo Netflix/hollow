@@ -17,22 +17,14 @@ public class VideoTypeHollow extends HollowObject {
         return delegate().getVideoIdBoxed(ordinal);
     }
 
-    public boolean _getIsTV() {
-        return delegate().getIsTV(ordinal);
-    }
-
-    public Boolean _getIsTVBoxed() {
-        return delegate().getIsTVBoxed(ordinal);
-    }
-
-    public VideoTypeDescriptorListHollow _getType() {
-        int refOrdinal = delegate().getTypeOrdinal(ordinal);
+    public VideoTypeDescriptorListHollow _getCountryInfos() {
+        int refOrdinal = delegate().getCountryInfosOrdinal(ordinal);
         if(refOrdinal == -1)
             return null;
         return  api().getVideoTypeDescriptorListHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

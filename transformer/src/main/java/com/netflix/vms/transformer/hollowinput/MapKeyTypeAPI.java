@@ -7,7 +7,7 @@ public class MapKeyTypeAPI extends HollowObjectTypeAPI {
 
     private final MapKeyDelegateLookupImpl delegateLookupImpl;
 
-    MapKeyTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    MapKeyTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });
@@ -32,8 +32,8 @@ public class MapKeyTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

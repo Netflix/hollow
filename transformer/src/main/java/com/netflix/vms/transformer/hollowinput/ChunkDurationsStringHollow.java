@@ -17,7 +17,7 @@ public class ChunkDurationsStringHollow extends HollowObject {
         return delegate().isValueEqual(ordinal, testValue);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

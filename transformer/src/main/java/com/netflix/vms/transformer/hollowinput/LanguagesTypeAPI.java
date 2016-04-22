@@ -7,7 +7,7 @@ public class LanguagesTypeAPI extends HollowObjectTypeAPI {
 
     private final LanguagesDelegateLookupImpl delegateLookupImpl;
 
-    LanguagesTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    LanguagesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "languageId",
             "name"
@@ -51,8 +51,8 @@ public class LanguagesTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

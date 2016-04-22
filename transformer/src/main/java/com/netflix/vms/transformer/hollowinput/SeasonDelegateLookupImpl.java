@@ -20,16 +20,16 @@ public class SeasonDelegateLookupImpl extends HollowObjectAbstractDelegate imple
         return typeAPI.getSequenceNumberBoxed(ordinal);
     }
 
-    public int getChildrenOrdinal(int ordinal) {
-        return typeAPI.getChildrenOrdinal(ordinal);
-    }
-
     public long getMovieId(int ordinal) {
         return typeAPI.getMovieId(ordinal);
     }
 
     public Long getMovieIdBoxed(int ordinal) {
         return typeAPI.getMovieIdBoxed(ordinal);
+    }
+
+    public int getEpisodesOrdinal(int ordinal) {
+        return typeAPI.getEpisodesOrdinal(ordinal);
     }
 
     public SeasonTypeAPI getTypeAPI() {

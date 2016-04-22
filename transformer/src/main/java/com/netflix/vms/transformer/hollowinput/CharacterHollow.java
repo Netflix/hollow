@@ -39,7 +39,7 @@ public class CharacterHollow extends HollowObject {
         return delegate().getLastUpdatedBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

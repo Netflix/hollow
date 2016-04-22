@@ -20,6 +20,14 @@ public class VideoGeneralDelegateLookupImpl extends HollowObjectAbstractDelegate
         return typeAPI.getVideoIdBoxed(ordinal);
     }
 
+    public boolean getTv(int ordinal) {
+        return typeAPI.getTv(ordinal);
+    }
+
+    public Boolean getTvBoxed(int ordinal) {
+        return typeAPI.getTvBoxed(ordinal);
+    }
+
     public int getAliasesOrdinal(int ordinal) {
         return typeAPI.getAliasesOrdinal(ordinal);
     }
@@ -40,6 +48,14 @@ public class VideoGeneralDelegateLookupImpl extends HollowObjectAbstractDelegate
         return typeAPI.getSupplementalSubTypeOrdinal(ordinal);
     }
 
+    public long getFirstReleaseYear(int ordinal) {
+        return typeAPI.getFirstReleaseYear(ordinal);
+    }
+
+    public Long getFirstReleaseYearBoxed(int ordinal) {
+        return typeAPI.getFirstReleaseYearBoxed(ordinal);
+    }
+
     public boolean getTestTitle(int ordinal) {
         return typeAPI.getTestTitle(ordinal);
     }
@@ -52,8 +68,12 @@ public class VideoGeneralDelegateLookupImpl extends HollowObjectAbstractDelegate
         return typeAPI.getOriginalLanguageBcpCodeOrdinal(ordinal);
     }
 
-    public int getTitleTypesOrdinal(int ordinal) {
-        return typeAPI.getTitleTypesOrdinal(ordinal);
+    public long getMetadataReleaseDays(int ordinal) {
+        return typeAPI.getMetadataReleaseDays(ordinal);
+    }
+
+    public Long getMetadataReleaseDaysBoxed(int ordinal) {
+        return typeAPI.getMetadataReleaseDaysBoxed(ordinal);
     }
 
     public int getOriginCountryCodeOrdinal(int ordinal) {
@@ -64,8 +84,12 @@ public class VideoGeneralDelegateLookupImpl extends HollowObjectAbstractDelegate
         return typeAPI.getOriginalTitleOrdinal(ordinal);
     }
 
-    public int getCountryOfOriginNameLocaleOrdinal(int ordinal) {
-        return typeAPI.getCountryOfOriginNameLocaleOrdinal(ordinal);
+    public int getTestTitleTypesOrdinal(int ordinal) {
+        return typeAPI.getTestTitleTypesOrdinal(ordinal);
+    }
+
+    public int getOriginalTitleBcpCodeOrdinal(int ordinal) {
+        return typeAPI.getOriginalTitleBcpCodeOrdinal(ordinal);
     }
 
     public int getInternalTitleOrdinal(int ordinal) {

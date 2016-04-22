@@ -23,7 +23,7 @@ public class StreamProfileGroupsHollow extends HollowObject {
         return  api().getStreamProfileIdListHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

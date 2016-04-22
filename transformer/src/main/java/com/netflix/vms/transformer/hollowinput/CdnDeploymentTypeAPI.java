@@ -7,7 +7,7 @@ public class CdnDeploymentTypeAPI extends HollowObjectTypeAPI {
 
     private final CdnDeploymentDelegateLookupImpl delegateLookupImpl;
 
-    CdnDeploymentTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    CdnDeploymentTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "originServerId",
             "directory",
@@ -62,8 +62,8 @@ public class CdnDeploymentTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

@@ -7,19 +7,22 @@ public class VideoGeneralTypeAPI extends HollowObjectTypeAPI {
 
     private final VideoGeneralDelegateLookupImpl delegateLookupImpl;
 
-    VideoGeneralTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    VideoGeneralTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "videoId",
+            "tv",
             "aliases",
             "videoType",
             "runtime",
             "supplementalSubType",
+            "firstReleaseYear",
             "testTitle",
             "originalLanguageBcpCode",
-            "titleTypes",
+            "metadataReleaseDays",
             "originCountryCode",
             "originalTitle",
-            "countryOfOriginNameLocale",
+            "testTitleTypes",
+            "originalTitleBcpCode",
             "internalTitle",
             "episodeTypes"
         });
@@ -47,10 +50,24 @@ public class VideoGeneralTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public int getAliasesOrdinal(int ordinal) {
+    public boolean getTv(int ordinal) {
         if(fieldIndex[1] == -1)
+            return missingDataHandler().handleBoolean("VideoGeneral", ordinal, "tv") == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[1]) == Boolean.TRUE;
+    }
+
+    public Boolean getTvBoxed(int ordinal) {
+        if(fieldIndex[1] == -1)
+            return missingDataHandler().handleBoolean("VideoGeneral", ordinal, "tv");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[1]);
+    }
+
+
+
+    public int getAliasesOrdinal(int ordinal) {
+        if(fieldIndex[2] == -1)
             return missingDataHandler().handleReferencedOrdinal("VideoGeneral", ordinal, "aliases");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[1]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[2]);
     }
 
     public VideoGeneralAliasListTypeAPI getAliasesTypeAPI() {
@@ -58,9 +75,9 @@ public class VideoGeneralTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getVideoTypeOrdinal(int ordinal) {
-        if(fieldIndex[2] == -1)
+        if(fieldIndex[3] == -1)
             return missingDataHandler().handleReferencedOrdinal("VideoGeneral", ordinal, "videoType");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[2]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[3]);
     }
 
     public StringTypeAPI getVideoTypeTypeAPI() {
@@ -68,18 +85,18 @@ public class VideoGeneralTypeAPI extends HollowObjectTypeAPI {
     }
 
     public long getRuntime(int ordinal) {
-        if(fieldIndex[3] == -1)
+        if(fieldIndex[4] == -1)
             return missingDataHandler().handleLong("VideoGeneral", ordinal, "runtime");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[3]);
+        return getTypeDataAccess().readLong(ordinal, fieldIndex[4]);
     }
 
     public Long getRuntimeBoxed(int ordinal) {
         long l;
-        if(fieldIndex[3] == -1) {
+        if(fieldIndex[4] == -1) {
             l = missingDataHandler().handleLong("VideoGeneral", ordinal, "runtime");
         } else {
-            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[3]);
-            l = getTypeDataAccess().readLong(ordinal, fieldIndex[3]);
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[4]);
+            l = getTypeDataAccess().readLong(ordinal, fieldIndex[4]);
         }
         if(l == Long.MIN_VALUE)
             return null;
@@ -89,53 +106,85 @@ public class VideoGeneralTypeAPI extends HollowObjectTypeAPI {
 
 
     public int getSupplementalSubTypeOrdinal(int ordinal) {
-        if(fieldIndex[4] == -1)
+        if(fieldIndex[5] == -1)
             return missingDataHandler().handleReferencedOrdinal("VideoGeneral", ordinal, "supplementalSubType");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[4]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[5]);
     }
 
     public StringTypeAPI getSupplementalSubTypeTypeAPI() {
         return getAPI().getStringTypeAPI();
     }
 
+    public long getFirstReleaseYear(int ordinal) {
+        if(fieldIndex[6] == -1)
+            return missingDataHandler().handleLong("VideoGeneral", ordinal, "firstReleaseYear");
+        return getTypeDataAccess().readLong(ordinal, fieldIndex[6]);
+    }
+
+    public Long getFirstReleaseYearBoxed(int ordinal) {
+        long l;
+        if(fieldIndex[6] == -1) {
+            l = missingDataHandler().handleLong("VideoGeneral", ordinal, "firstReleaseYear");
+        } else {
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[6]);
+            l = getTypeDataAccess().readLong(ordinal, fieldIndex[6]);
+        }
+        if(l == Long.MIN_VALUE)
+            return null;
+        return Long.valueOf(l);
+    }
+
+
+
     public boolean getTestTitle(int ordinal) {
-        if(fieldIndex[5] == -1)
+        if(fieldIndex[7] == -1)
             return missingDataHandler().handleBoolean("VideoGeneral", ordinal, "testTitle") == Boolean.TRUE;
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[5]) == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[7]) == Boolean.TRUE;
     }
 
     public Boolean getTestTitleBoxed(int ordinal) {
-        if(fieldIndex[5] == -1)
+        if(fieldIndex[7] == -1)
             return missingDataHandler().handleBoolean("VideoGeneral", ordinal, "testTitle");
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[5]);
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[7]);
     }
 
 
 
     public int getOriginalLanguageBcpCodeOrdinal(int ordinal) {
-        if(fieldIndex[6] == -1)
+        if(fieldIndex[8] == -1)
             return missingDataHandler().handleReferencedOrdinal("VideoGeneral", ordinal, "originalLanguageBcpCode");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[6]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[8]);
     }
 
     public StringTypeAPI getOriginalLanguageBcpCodeTypeAPI() {
         return getAPI().getStringTypeAPI();
     }
 
-    public int getTitleTypesOrdinal(int ordinal) {
-        if(fieldIndex[7] == -1)
-            return missingDataHandler().handleReferencedOrdinal("VideoGeneral", ordinal, "titleTypes");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[7]);
+    public long getMetadataReleaseDays(int ordinal) {
+        if(fieldIndex[9] == -1)
+            return missingDataHandler().handleLong("VideoGeneral", ordinal, "metadataReleaseDays");
+        return getTypeDataAccess().readLong(ordinal, fieldIndex[9]);
     }
 
-    public VideoGeneralTitleTypeListTypeAPI getTitleTypesTypeAPI() {
-        return getAPI().getVideoGeneralTitleTypeListTypeAPI();
+    public Long getMetadataReleaseDaysBoxed(int ordinal) {
+        long l;
+        if(fieldIndex[9] == -1) {
+            l = missingDataHandler().handleLong("VideoGeneral", ordinal, "metadataReleaseDays");
+        } else {
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[9]);
+            l = getTypeDataAccess().readLong(ordinal, fieldIndex[9]);
+        }
+        if(l == Long.MIN_VALUE)
+            return null;
+        return Long.valueOf(l);
     }
+
+
 
     public int getOriginCountryCodeOrdinal(int ordinal) {
-        if(fieldIndex[8] == -1)
+        if(fieldIndex[10] == -1)
             return missingDataHandler().handleReferencedOrdinal("VideoGeneral", ordinal, "originCountryCode");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[8]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[10]);
     }
 
     public StringTypeAPI getOriginCountryCodeTypeAPI() {
@@ -143,29 +192,39 @@ public class VideoGeneralTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getOriginalTitleOrdinal(int ordinal) {
-        if(fieldIndex[9] == -1)
+        if(fieldIndex[11] == -1)
             return missingDataHandler().handleReferencedOrdinal("VideoGeneral", ordinal, "originalTitle");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[9]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[11]);
     }
 
     public StringTypeAPI getOriginalTitleTypeAPI() {
         return getAPI().getStringTypeAPI();
     }
 
-    public int getCountryOfOriginNameLocaleOrdinal(int ordinal) {
-        if(fieldIndex[10] == -1)
-            return missingDataHandler().handleReferencedOrdinal("VideoGeneral", ordinal, "countryOfOriginNameLocale");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[10]);
+    public int getTestTitleTypesOrdinal(int ordinal) {
+        if(fieldIndex[12] == -1)
+            return missingDataHandler().handleReferencedOrdinal("VideoGeneral", ordinal, "testTitleTypes");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[12]);
     }
 
-    public StringTypeAPI getCountryOfOriginNameLocaleTypeAPI() {
+    public VideoGeneralTitleTypeListTypeAPI getTestTitleTypesTypeAPI() {
+        return getAPI().getVideoGeneralTitleTypeListTypeAPI();
+    }
+
+    public int getOriginalTitleBcpCodeOrdinal(int ordinal) {
+        if(fieldIndex[13] == -1)
+            return missingDataHandler().handleReferencedOrdinal("VideoGeneral", ordinal, "originalTitleBcpCode");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[13]);
+    }
+
+    public StringTypeAPI getOriginalTitleBcpCodeTypeAPI() {
         return getAPI().getStringTypeAPI();
     }
 
     public int getInternalTitleOrdinal(int ordinal) {
-        if(fieldIndex[11] == -1)
+        if(fieldIndex[14] == -1)
             return missingDataHandler().handleReferencedOrdinal("VideoGeneral", ordinal, "internalTitle");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[11]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[14]);
     }
 
     public StringTypeAPI getInternalTitleTypeAPI() {
@@ -173,9 +232,9 @@ public class VideoGeneralTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getEpisodeTypesOrdinal(int ordinal) {
-        if(fieldIndex[12] == -1)
+        if(fieldIndex[15] == -1)
             return missingDataHandler().handleReferencedOrdinal("VideoGeneral", ordinal, "episodeTypes");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[12]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[15]);
     }
 
     public VideoGeneralEpisodeTypeListTypeAPI getEpisodeTypesTypeAPI() {
@@ -187,8 +246,8 @@ public class VideoGeneralTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

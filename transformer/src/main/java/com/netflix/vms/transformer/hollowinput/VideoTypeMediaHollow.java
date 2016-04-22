@@ -16,7 +16,7 @@ public class VideoTypeMediaHollow extends HollowObject {
         return  api().getStringHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

@@ -32,7 +32,7 @@ public class VideoRatingRatingHollow extends HollowObject {
         return delegate().getCertificationSystemIdBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

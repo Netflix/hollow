@@ -17,7 +17,7 @@ public class CharacterQuoteHollow extends HollowObject {
         return delegate().getSequenceNumberBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

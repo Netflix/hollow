@@ -7,7 +7,7 @@ public class ProtectionTypesTypeAPI extends HollowObjectTypeAPI {
 
     private final ProtectionTypesDelegateLookupImpl delegateLookupImpl;
 
-    ProtectionTypesTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    ProtectionTypesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "name",
             "id"
@@ -51,8 +51,8 @@ public class ProtectionTypesTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

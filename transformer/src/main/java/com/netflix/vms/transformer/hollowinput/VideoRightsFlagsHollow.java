@@ -71,7 +71,7 @@ public class VideoRightsFlagsHollow extends HollowObject {
         return  api().getMapOfFirstDisplayDatesHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

@@ -9,21 +9,23 @@ public class RolloutPhaseWindowHollow extends HollowObject {
         super(delegate, ordinal);
     }
 
-    public DateHollow _getEndDate() {
-        int refOrdinal = delegate().getEndDateOrdinal(ordinal);
-        if(refOrdinal == -1)
-            return null;
-        return  api().getDateHollow(refOrdinal);
+    public long _getEndDate() {
+        return delegate().getEndDate(ordinal);
     }
 
-    public DateHollow _getStartDate() {
-        int refOrdinal = delegate().getStartDateOrdinal(ordinal);
-        if(refOrdinal == -1)
-            return null;
-        return  api().getDateHollow(refOrdinal);
+    public Long _getEndDateBoxed() {
+        return delegate().getEndDateBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public long _getStartDate() {
+        return delegate().getStartDate(ordinal);
+    }
+
+    public Long _getStartDateBoxed() {
+        return delegate().getStartDateBoxed(ordinal);
+    }
+
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

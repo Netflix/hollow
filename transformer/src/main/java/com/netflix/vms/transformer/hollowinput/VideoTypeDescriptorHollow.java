@@ -9,20 +9,11 @@ public class VideoTypeDescriptorHollow extends HollowObject {
         super(delegate, ordinal);
     }
 
-    public boolean _getIsOriginal() {
-        return delegate().getIsOriginal(ordinal);
-    }
-
-    public Boolean _getIsOriginalBoxed() {
-        return delegate().getIsOriginalBoxed(ordinal);
-    }
-
-    public long _getShowMemberTypeId() {
-        return delegate().getShowMemberTypeId(ordinal);
-    }
-
-    public Long _getShowMemberTypeIdBoxed() {
-        return delegate().getShowMemberTypeIdBoxed(ordinal);
+    public StringHollow _getCountryCode() {
+        int refOrdinal = delegate().getCountryCodeOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getStringHollow(refOrdinal);
     }
 
     public StringHollow _getCopyright() {
@@ -32,19 +23,19 @@ public class VideoTypeDescriptorHollow extends HollowObject {
         return  api().getStringHollow(refOrdinal);
     }
 
-    public StringHollow _getCountryCode() {
-        int refOrdinal = delegate().getCountryCodeOrdinal(ordinal);
+    public StringHollow _getTierType() {
+        int refOrdinal = delegate().getTierTypeOrdinal(ordinal);
         if(refOrdinal == -1)
             return null;
         return  api().getStringHollow(refOrdinal);
     }
 
-    public boolean _getIsContentApproved() {
-        return delegate().getIsContentApproved(ordinal);
+    public boolean _getOriginal() {
+        return delegate().getOriginal(ordinal);
     }
 
-    public Boolean _getIsContentApprovedBoxed() {
-        return delegate().getIsContentApprovedBoxed(ordinal);
+    public Boolean _getOriginalBoxed() {
+        return delegate().getOriginalBoxed(ordinal);
     }
 
     public VideoTypeMediaListHollow _getMedia() {
@@ -54,23 +45,15 @@ public class VideoTypeDescriptorHollow extends HollowObject {
         return  api().getVideoTypeMediaListHollow(refOrdinal);
     }
 
-    public boolean _getIsCanon() {
-        return delegate().getIsCanon(ordinal);
+    public boolean _getExtended() {
+        return delegate().getExtended(ordinal);
     }
 
-    public Boolean _getIsCanonBoxed() {
-        return delegate().getIsCanonBoxed(ordinal);
+    public Boolean _getExtendedBoxed() {
+        return delegate().getExtendedBoxed(ordinal);
     }
 
-    public boolean _getIsExtended() {
-        return delegate().getIsExtended(ordinal);
-    }
-
-    public Boolean _getIsExtendedBoxed() {
-        return delegate().getIsExtendedBoxed(ordinal);
-    }
-
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

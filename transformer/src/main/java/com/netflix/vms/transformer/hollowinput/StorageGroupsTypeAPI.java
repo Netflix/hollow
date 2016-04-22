@@ -7,7 +7,7 @@ public class StorageGroupsTypeAPI extends HollowObjectTypeAPI {
 
     private final StorageGroupsDelegateLookupImpl delegateLookupImpl;
 
-    StorageGroupsTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    StorageGroupsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "id",
             "cdnId",
@@ -62,8 +62,8 @@ public class StorageGroupsTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

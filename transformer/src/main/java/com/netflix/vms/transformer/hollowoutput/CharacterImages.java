@@ -1,11 +1,12 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.List;
+import java.util.Map;
 
 public class CharacterImages implements Cloneable {
 
     public int id = java.lang.Integer.MIN_VALUE;
-    public List<ArtWorkDescriptor> artWorkDescriptorList = null;
+    public Map<Strings, List<Artwork>> artworks = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
@@ -14,23 +15,23 @@ public class CharacterImages implements Cloneable {
 
         CharacterImages o = (CharacterImages) other;
         if(o.id != id) return false;
-        if(o.artWorkDescriptorList == null) {
-            if(artWorkDescriptorList != null) return false;
-        } else if(!o.artWorkDescriptorList.equals(artWorkDescriptorList)) return false;
+        if(o.artworks == null) {
+            if(artworks != null) return false;
+        } else if(!o.artworks.equals(artworks)) return false;
         return true;
     }
 
     public int hashCode() {
         int hashCode = 1;
         hashCode = hashCode * 31 + id;
-        hashCode = hashCode * 31 + (artWorkDescriptorList == null ? 1237 : artWorkDescriptorList.hashCode());
+        hashCode = hashCode * 31 + (artworks == null ? 1237 : artworks.hashCode());
         return hashCode;
     }
 
     public String toString() {
         StringBuilder builder = new StringBuilder("CharacterImages{");
         builder.append("id=").append(id);
-        builder.append(",artWorkDescriptorList=").append(artWorkDescriptorList);
+        builder.append(",artworks=").append(artworks);
         builder.append("}");
         return builder.toString();
     }

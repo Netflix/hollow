@@ -17,6 +17,14 @@ public class VideoGeneralHollow extends HollowObject {
         return delegate().getVideoIdBoxed(ordinal);
     }
 
+    public boolean _getTv() {
+        return delegate().getTv(ordinal);
+    }
+
+    public Boolean _getTvBoxed() {
+        return delegate().getTvBoxed(ordinal);
+    }
+
     public VideoGeneralAliasListHollow _getAliases() {
         int refOrdinal = delegate().getAliasesOrdinal(ordinal);
         if(refOrdinal == -1)
@@ -46,6 +54,14 @@ public class VideoGeneralHollow extends HollowObject {
         return  api().getStringHollow(refOrdinal);
     }
 
+    public long _getFirstReleaseYear() {
+        return delegate().getFirstReleaseYear(ordinal);
+    }
+
+    public Long _getFirstReleaseYearBoxed() {
+        return delegate().getFirstReleaseYearBoxed(ordinal);
+    }
+
     public boolean _getTestTitle() {
         return delegate().getTestTitle(ordinal);
     }
@@ -61,11 +77,12 @@ public class VideoGeneralHollow extends HollowObject {
         return  api().getStringHollow(refOrdinal);
     }
 
-    public VideoGeneralTitleTypeListHollow _getTitleTypes() {
-        int refOrdinal = delegate().getTitleTypesOrdinal(ordinal);
-        if(refOrdinal == -1)
-            return null;
-        return  api().getVideoGeneralTitleTypeListHollow(refOrdinal);
+    public long _getMetadataReleaseDays() {
+        return delegate().getMetadataReleaseDays(ordinal);
+    }
+
+    public Long _getMetadataReleaseDaysBoxed() {
+        return delegate().getMetadataReleaseDaysBoxed(ordinal);
     }
 
     public StringHollow _getOriginCountryCode() {
@@ -82,8 +99,15 @@ public class VideoGeneralHollow extends HollowObject {
         return  api().getStringHollow(refOrdinal);
     }
 
-    public StringHollow _getCountryOfOriginNameLocale() {
-        int refOrdinal = delegate().getCountryOfOriginNameLocaleOrdinal(ordinal);
+    public VideoGeneralTitleTypeListHollow _getTestTitleTypes() {
+        int refOrdinal = delegate().getTestTitleTypesOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getVideoGeneralTitleTypeListHollow(refOrdinal);
+    }
+
+    public StringHollow _getOriginalTitleBcpCode() {
+        int refOrdinal = delegate().getOriginalTitleBcpCodeOrdinal(ordinal);
         if(refOrdinal == -1)
             return null;
         return  api().getStringHollow(refOrdinal);
@@ -103,7 +127,7 @@ public class VideoGeneralHollow extends HollowObject {
         return  api().getVideoGeneralEpisodeTypeListHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

@@ -49,7 +49,7 @@ public class VideoAwardMappingHollow extends HollowObject {
         return delegate().getWinnerBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

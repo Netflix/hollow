@@ -7,7 +7,7 @@ public class VideoRightsTypeAPI extends HollowObjectTypeAPI {
 
     private final VideoRightsDelegateLookupImpl delegateLookupImpl;
 
-    VideoRightsTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    VideoRightsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "movieId",
             "countryCode",
@@ -73,8 +73,8 @@ public class VideoRightsTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

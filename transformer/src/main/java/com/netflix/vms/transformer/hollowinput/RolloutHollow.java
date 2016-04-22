@@ -9,33 +9,12 @@ public class RolloutHollow extends HollowObject {
         super(delegate, ordinal);
     }
 
-    public StringHollow _getRolloutName() {
-        int refOrdinal = delegate().getRolloutNameOrdinal(ordinal);
-        if(refOrdinal == -1)
-            return null;
-        return  api().getStringHollow(refOrdinal);
-    }
-
-    public RolloutMapOfLaunchDatesHollow _getLaunchDates() {
-        int refOrdinal = delegate().getLaunchDatesOrdinal(ordinal);
-        if(refOrdinal == -1)
-            return null;
-        return  api().getRolloutMapOfLaunchDatesHollow(refOrdinal);
-    }
-
     public long _getRolloutId() {
         return delegate().getRolloutId(ordinal);
     }
 
     public Long _getRolloutIdBoxed() {
         return delegate().getRolloutIdBoxed(ordinal);
-    }
-
-    public StringHollow _getRolloutType() {
-        int refOrdinal = delegate().getRolloutTypeOrdinal(ordinal);
-        if(refOrdinal == -1)
-            return null;
-        return  api().getStringHollow(refOrdinal);
     }
 
     public long _getMovieId() {
@@ -46,6 +25,20 @@ public class RolloutHollow extends HollowObject {
         return delegate().getMovieIdBoxed(ordinal);
     }
 
+    public StringHollow _getRolloutName() {
+        int refOrdinal = delegate().getRolloutNameOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getStringHollow(refOrdinal);
+    }
+
+    public StringHollow _getRolloutType() {
+        int refOrdinal = delegate().getRolloutTypeOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getStringHollow(refOrdinal);
+    }
+
     public RolloutPhaseListHollow _getPhases() {
         int refOrdinal = delegate().getPhasesOrdinal(ordinal);
         if(refOrdinal == -1)
@@ -53,7 +46,7 @@ public class RolloutHollow extends HollowObject {
         return  api().getRolloutPhaseListHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

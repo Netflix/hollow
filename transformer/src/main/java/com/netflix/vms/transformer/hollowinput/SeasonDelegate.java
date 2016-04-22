@@ -8,11 +8,11 @@ public interface SeasonDelegate extends HollowObjectDelegate {
 
     public Long getSequenceNumberBoxed(int ordinal);
 
-    public int getChildrenOrdinal(int ordinal);
-
     public long getMovieId(int ordinal);
 
     public Long getMovieIdBoxed(int ordinal);
+
+    public int getEpisodesOrdinal(int ordinal);
 
     public SeasonTypeAPI getTypeAPI();
 

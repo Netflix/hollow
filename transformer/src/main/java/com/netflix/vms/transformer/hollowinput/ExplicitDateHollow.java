@@ -33,7 +33,7 @@ public class ExplicitDateHollow extends HollowObject {
         return delegate().getDayOfMonthBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

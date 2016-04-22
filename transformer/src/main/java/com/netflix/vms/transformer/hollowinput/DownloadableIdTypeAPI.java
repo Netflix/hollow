@@ -7,7 +7,7 @@ public class DownloadableIdTypeAPI extends HollowObjectTypeAPI {
 
     private final DownloadableIdDelegateLookupImpl delegateLookupImpl;
 
-    DownloadableIdTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    DownloadableIdTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });
@@ -40,8 +40,8 @@ public class DownloadableIdTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

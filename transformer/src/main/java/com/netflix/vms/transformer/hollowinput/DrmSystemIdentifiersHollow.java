@@ -39,7 +39,7 @@ public class DrmSystemIdentifiersHollow extends HollowObject {
         return delegate().getHeaderDataAvailableBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

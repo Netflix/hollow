@@ -24,7 +24,7 @@ public class VideoRatingHollow extends HollowObject {
         return  api().getVideoRatingArrayOfRatingHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

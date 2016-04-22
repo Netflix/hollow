@@ -7,7 +7,7 @@ public class ArtworkDerivativeTypeAPI extends HollowObjectTypeAPI {
 
     private final ArtworkDerivativeDelegateLookupImpl delegateLookupImpl;
 
-    ArtworkDerivativeTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    ArtworkDerivativeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "recipeName",
             "fileName",
@@ -172,8 +172,8 @@ public class ArtworkDerivativeTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

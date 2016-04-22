@@ -7,7 +7,7 @@ public class StreamProfileGroupsTypeAPI extends HollowObjectTypeAPI {
 
     private final StreamProfileGroupsDelegateLookupImpl delegateLookupImpl;
 
-    StreamProfileGroupsTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    StreamProfileGroupsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "groupName",
             "streamProfileIds"
@@ -40,8 +40,8 @@ public class StreamProfileGroupsTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

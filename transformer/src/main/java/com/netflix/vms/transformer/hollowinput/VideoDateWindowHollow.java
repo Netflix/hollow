@@ -48,7 +48,7 @@ public class VideoDateWindowHollow extends HollowObject {
         return delegate().getTheatricalReleaseYearBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

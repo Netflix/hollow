@@ -7,7 +7,7 @@ public class ConsolidatedVideoCountryRatingTypeAPI extends HollowObjectTypeAPI {
 
     private final ConsolidatedVideoCountryRatingDelegateLookupImpl delegateLookupImpl;
 
-    ConsolidatedVideoCountryRatingTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    ConsolidatedVideoCountryRatingTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "advisories",
             "reasons",
@@ -84,8 +84,8 @@ public class ConsolidatedVideoCountryRatingTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

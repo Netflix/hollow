@@ -38,7 +38,7 @@ public class AltGenresHollow extends HollowObject {
         return  api().getAltGenresAlternateNamesListHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

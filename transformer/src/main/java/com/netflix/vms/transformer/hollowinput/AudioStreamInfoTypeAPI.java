@@ -7,7 +7,7 @@ public class AudioStreamInfoTypeAPI extends HollowObjectTypeAPI {
 
     private final AudioStreamInfoDelegateLookupImpl delegateLookupImpl;
 
-    AudioStreamInfoTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    AudioStreamInfoTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "audioLanguageCode",
             "audioBitrateKBPS"
@@ -51,8 +51,8 @@ public class AudioStreamInfoTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

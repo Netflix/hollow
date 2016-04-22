@@ -7,7 +7,7 @@ public class StreamAssetTypeTypeAPI extends HollowObjectTypeAPI {
 
     private final StreamAssetTypeDelegateLookupImpl delegateLookupImpl;
 
-    StreamAssetTypeTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    StreamAssetTypeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "assetTypeId",
             "assetType"
@@ -51,8 +51,8 @@ public class StreamAssetTypeTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

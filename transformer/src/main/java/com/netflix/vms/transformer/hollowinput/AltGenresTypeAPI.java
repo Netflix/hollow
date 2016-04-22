@@ -7,7 +7,7 @@ public class AltGenresTypeAPI extends HollowObjectTypeAPI {
 
     private final AltGenresDelegateLookupImpl delegateLookupImpl;
 
-    AltGenresTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    AltGenresTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "altGenreId",
             "displayName",
@@ -73,8 +73,8 @@ public class AltGenresTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

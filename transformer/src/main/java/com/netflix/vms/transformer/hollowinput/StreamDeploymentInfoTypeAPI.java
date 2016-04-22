@@ -7,7 +7,7 @@ public class StreamDeploymentInfoTypeAPI extends HollowObjectTypeAPI {
 
     private final StreamDeploymentInfoDelegateLookupImpl delegateLookupImpl;
 
-    StreamDeploymentInfoTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    StreamDeploymentInfoTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "cacheDeployedCountries",
             "cdnDeployments"
@@ -40,8 +40,8 @@ public class StreamDeploymentInfoTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

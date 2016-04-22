@@ -7,7 +7,7 @@ public class VideoArtworkTypeAPI extends HollowObjectTypeAPI {
 
     private final VideoArtworkDelegateLookupImpl delegateLookupImpl;
 
-    VideoArtworkTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    VideoArtworkTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "movieId",
             "sourceFileId",
@@ -139,8 +139,8 @@ public class VideoArtworkTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

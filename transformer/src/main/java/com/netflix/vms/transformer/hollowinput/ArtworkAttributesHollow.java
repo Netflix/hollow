@@ -16,7 +16,7 @@ public class ArtworkAttributesHollow extends HollowObject {
         return  api().getPassthroughDataHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

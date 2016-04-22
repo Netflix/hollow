@@ -7,51 +7,30 @@ public class RolloutTypeAPI extends HollowObjectTypeAPI {
 
     private final RolloutDelegateLookupImpl delegateLookupImpl;
 
-    RolloutTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    RolloutTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
-            "rolloutName",
-            "launchDates",
             "rolloutId",
-            "rolloutType",
             "movieId",
+            "rolloutName",
+            "rolloutType",
             "phases"
         });
         this.delegateLookupImpl = new RolloutDelegateLookupImpl(this);
     }
 
-    public int getRolloutNameOrdinal(int ordinal) {
-        if(fieldIndex[0] == -1)
-            return missingDataHandler().handleReferencedOrdinal("Rollout", ordinal, "rolloutName");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[0]);
-    }
-
-    public StringTypeAPI getRolloutNameTypeAPI() {
-        return getAPI().getStringTypeAPI();
-    }
-
-    public int getLaunchDatesOrdinal(int ordinal) {
-        if(fieldIndex[1] == -1)
-            return missingDataHandler().handleReferencedOrdinal("Rollout", ordinal, "launchDates");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[1]);
-    }
-
-    public RolloutMapOfLaunchDatesTypeAPI getLaunchDatesTypeAPI() {
-        return getAPI().getRolloutMapOfLaunchDatesTypeAPI();
-    }
-
     public long getRolloutId(int ordinal) {
-        if(fieldIndex[2] == -1)
+        if(fieldIndex[0] == -1)
             return missingDataHandler().handleLong("Rollout", ordinal, "rolloutId");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[2]);
+        return getTypeDataAccess().readLong(ordinal, fieldIndex[0]);
     }
 
     public Long getRolloutIdBoxed(int ordinal) {
         long l;
-        if(fieldIndex[2] == -1) {
+        if(fieldIndex[0] == -1) {
             l = missingDataHandler().handleLong("Rollout", ordinal, "rolloutId");
         } else {
-            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[2]);
-            l = getTypeDataAccess().readLong(ordinal, fieldIndex[2]);
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[0]);
+            l = getTypeDataAccess().readLong(ordinal, fieldIndex[0]);
         }
         if(l == Long.MIN_VALUE)
             return null;
@@ -59,6 +38,37 @@ public class RolloutTypeAPI extends HollowObjectTypeAPI {
     }
 
 
+
+    public long getMovieId(int ordinal) {
+        if(fieldIndex[1] == -1)
+            return missingDataHandler().handleLong("Rollout", ordinal, "movieId");
+        return getTypeDataAccess().readLong(ordinal, fieldIndex[1]);
+    }
+
+    public Long getMovieIdBoxed(int ordinal) {
+        long l;
+        if(fieldIndex[1] == -1) {
+            l = missingDataHandler().handleLong("Rollout", ordinal, "movieId");
+        } else {
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[1]);
+            l = getTypeDataAccess().readLong(ordinal, fieldIndex[1]);
+        }
+        if(l == Long.MIN_VALUE)
+            return null;
+        return Long.valueOf(l);
+    }
+
+
+
+    public int getRolloutNameOrdinal(int ordinal) {
+        if(fieldIndex[2] == -1)
+            return missingDataHandler().handleReferencedOrdinal("Rollout", ordinal, "rolloutName");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[2]);
+    }
+
+    public StringTypeAPI getRolloutNameTypeAPI() {
+        return getAPI().getStringTypeAPI();
+    }
 
     public int getRolloutTypeOrdinal(int ordinal) {
         if(fieldIndex[3] == -1)
@@ -70,31 +80,10 @@ public class RolloutTypeAPI extends HollowObjectTypeAPI {
         return getAPI().getStringTypeAPI();
     }
 
-    public long getMovieId(int ordinal) {
-        if(fieldIndex[4] == -1)
-            return missingDataHandler().handleLong("Rollout", ordinal, "movieId");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[4]);
-    }
-
-    public Long getMovieIdBoxed(int ordinal) {
-        long l;
-        if(fieldIndex[4] == -1) {
-            l = missingDataHandler().handleLong("Rollout", ordinal, "movieId");
-        } else {
-            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[4]);
-            l = getTypeDataAccess().readLong(ordinal, fieldIndex[4]);
-        }
-        if(l == Long.MIN_VALUE)
-            return null;
-        return Long.valueOf(l);
-    }
-
-
-
     public int getPhasesOrdinal(int ordinal) {
-        if(fieldIndex[5] == -1)
+        if(fieldIndex[4] == -1)
             return missingDataHandler().handleReferencedOrdinal("Rollout", ordinal, "phases");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[5]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[4]);
     }
 
     public RolloutPhaseListTypeAPI getPhasesTypeAPI() {
@@ -106,8 +95,8 @@ public class RolloutTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

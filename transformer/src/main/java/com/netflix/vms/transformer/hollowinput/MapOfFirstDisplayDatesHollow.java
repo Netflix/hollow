@@ -33,7 +33,7 @@ public class MapOfFirstDisplayDatesHollow extends HollowMap<MapKeyHollow, DateHo
         return GenericHollowRecordHelper.equalObject(getSchema().getValueType(), valueOrdinal, testObject);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

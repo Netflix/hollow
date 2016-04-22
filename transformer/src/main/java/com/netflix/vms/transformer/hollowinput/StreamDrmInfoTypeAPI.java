@@ -7,7 +7,7 @@ public class StreamDrmInfoTypeAPI extends HollowObjectTypeAPI {
 
     private final StreamDrmInfoDelegateLookupImpl delegateLookupImpl;
 
-    StreamDrmInfoTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    StreamDrmInfoTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "keyId",
             "key",
@@ -73,8 +73,8 @@ public class StreamDrmInfoTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

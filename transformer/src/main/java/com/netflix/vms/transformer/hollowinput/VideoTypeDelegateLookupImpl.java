@@ -20,16 +20,8 @@ public class VideoTypeDelegateLookupImpl extends HollowObjectAbstractDelegate im
         return typeAPI.getVideoIdBoxed(ordinal);
     }
 
-    public boolean getIsTV(int ordinal) {
-        return typeAPI.getIsTV(ordinal);
-    }
-
-    public Boolean getIsTVBoxed(int ordinal) {
-        return typeAPI.getIsTVBoxed(ordinal);
-    }
-
-    public int getTypeOrdinal(int ordinal) {
-        return typeAPI.getTypeOrdinal(ordinal);
+    public int getCountryInfosOrdinal(int ordinal) {
+        return typeAPI.getCountryInfosOrdinal(ordinal);
     }
 
     public VideoTypeTypeAPI getTypeAPI() {

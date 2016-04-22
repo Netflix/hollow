@@ -7,7 +7,7 @@ public class VideoDateWindowTypeAPI extends HollowObjectTypeAPI {
 
     private final VideoDateWindowDelegateLookupImpl delegateLookupImpl;
 
-    VideoDateWindowTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    VideoDateWindowTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "countryCode",
             "isTheatricalRelease",
@@ -110,8 +110,8 @@ public class VideoDateWindowTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

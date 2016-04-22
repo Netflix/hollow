@@ -74,7 +74,7 @@ public class PackageStreamHollow extends HollowObject {
         return  api().getStreamDeploymentHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

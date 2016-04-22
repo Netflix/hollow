@@ -7,7 +7,7 @@ public class ArtworkRecipeTypeAPI extends HollowObjectTypeAPI {
 
     private final ArtworkRecipeDelegateLookupImpl delegateLookupImpl;
 
-    ArtworkRecipeTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    ArtworkRecipeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "recipeName",
             "cdnFolder",
@@ -51,8 +51,8 @@ public class ArtworkRecipeTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

@@ -33,7 +33,7 @@ public class RolloutPhaseWindowMapHollow extends HollowMap<ISOCountryHollow, Rol
         return GenericHollowRecordHelper.equalObject(getSchema().getValueType(), valueOrdinal, testObject);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

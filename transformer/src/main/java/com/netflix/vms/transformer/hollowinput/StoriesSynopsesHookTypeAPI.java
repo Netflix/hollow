@@ -7,7 +7,7 @@ public class StoriesSynopsesHookTypeAPI extends HollowObjectTypeAPI {
 
     private final StoriesSynopsesHookDelegateLookupImpl delegateLookupImpl;
 
-    StoriesSynopsesHookTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    StoriesSynopsesHookTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "type",
             "rank",
@@ -51,8 +51,8 @@ public class StoriesSynopsesHookTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

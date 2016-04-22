@@ -9,14 +9,12 @@ import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 public class VideoTypeDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, VideoTypeDelegate {
 
     private final Long videoId;
-    private final Boolean isTV;
-    private final int typeOrdinal;
+    private final int countryInfosOrdinal;
    private VideoTypeTypeAPI typeAPI;
 
     public VideoTypeDelegateCachedImpl(VideoTypeTypeAPI typeAPI, int ordinal) {
         this.videoId = typeAPI.getVideoIdBoxed(ordinal);
-        this.isTV = typeAPI.getIsTVBoxed(ordinal);
-        this.typeOrdinal = typeAPI.getTypeOrdinal(ordinal);
+        this.countryInfosOrdinal = typeAPI.getCountryInfosOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -28,16 +26,8 @@ public class VideoTypeDelegateCachedImpl extends HollowObjectAbstractDelegate im
         return videoId;
     }
 
-    public boolean getIsTV(int ordinal) {
-        return isTV.booleanValue();
-    }
-
-    public Boolean getIsTVBoxed(int ordinal) {
-        return isTV;
-    }
-
-    public int getTypeOrdinal(int ordinal) {
-        return typeOrdinal;
+    public int getCountryInfosOrdinal(int ordinal) {
+        return countryInfosOrdinal;
     }
 
     @Override

@@ -7,7 +7,7 @@ public class TopNAttributeTypeAPI extends HollowObjectTypeAPI {
 
     private final TopNAttributeDelegateLookupImpl delegateLookupImpl;
 
-    TopNAttributeTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    TopNAttributeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "country",
             "viewShare",
@@ -51,8 +51,8 @@ public class TopNAttributeTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

@@ -7,7 +7,7 @@ public class CacheDeploymentIntentTypeAPI extends HollowObjectTypeAPI {
 
     private final CacheDeploymentIntentDelegateLookupImpl delegateLookupImpl;
 
-    CacheDeploymentIntentTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    CacheDeploymentIntentTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "streamProfileId",
             "isoCountryCode",
@@ -73,8 +73,8 @@ public class CacheDeploymentIntentTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

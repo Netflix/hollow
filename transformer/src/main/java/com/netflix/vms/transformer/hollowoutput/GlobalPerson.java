@@ -7,6 +7,10 @@ public class GlobalPerson implements Cloneable {
     public int id = java.lang.Integer.MIN_VALUE;
     public List<Integer> aliasesIds = null;
     public List<PersonRole> personRoles = null;
+    public BirthDate birthDate = null;
+    public List<Strings> spouses = null;
+    public List<Strings> partners = null;
+    public List<Video> topVideos = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
@@ -21,6 +25,18 @@ public class GlobalPerson implements Cloneable {
         if(o.personRoles == null) {
             if(personRoles != null) return false;
         } else if(!o.personRoles.equals(personRoles)) return false;
+        if(o.birthDate == null) {
+            if(birthDate != null) return false;
+        } else if(!o.birthDate.equals(birthDate)) return false;
+        if(o.spouses == null) {
+            if(spouses != null) return false;
+        } else if(!o.spouses.equals(spouses)) return false;
+        if(o.partners == null) {
+            if(partners != null) return false;
+        } else if(!o.partners.equals(partners)) return false;
+        if(o.topVideos == null) {
+            if(topVideos != null) return false;
+        } else if(!o.topVideos.equals(topVideos)) return false;
         return true;
     }
 
@@ -29,6 +45,10 @@ public class GlobalPerson implements Cloneable {
         hashCode = hashCode * 31 + id;
         hashCode = hashCode * 31 + (aliasesIds == null ? 1237 : aliasesIds.hashCode());
         hashCode = hashCode * 31 + (personRoles == null ? 1237 : personRoles.hashCode());
+        hashCode = hashCode * 31 + (birthDate == null ? 1237 : birthDate.hashCode());
+        hashCode = hashCode * 31 + (spouses == null ? 1237 : spouses.hashCode());
+        hashCode = hashCode * 31 + (partners == null ? 1237 : partners.hashCode());
+        hashCode = hashCode * 31 + (topVideos == null ? 1237 : topVideos.hashCode());
         return hashCode;
     }
 
@@ -37,6 +57,10 @@ public class GlobalPerson implements Cloneable {
         builder.append("id=").append(id);
         builder.append(",aliasesIds=").append(aliasesIds);
         builder.append(",personRoles=").append(personRoles);
+        builder.append(",birthDate=").append(birthDate);
+        builder.append(",spouses=").append(spouses);
+        builder.append(",partners=").append(partners);
+        builder.append(",topVideos=").append(topVideos);
         builder.append("}");
         return builder.toString();
     }

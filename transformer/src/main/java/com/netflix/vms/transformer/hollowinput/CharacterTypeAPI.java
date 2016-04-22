@@ -7,7 +7,7 @@ public class CharacterTypeAPI extends HollowObjectTypeAPI {
 
     private final CharacterDelegateLookupImpl delegateLookupImpl;
 
-    CharacterTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    CharacterTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "characterId",
             "elements",
@@ -84,8 +84,8 @@ public class CharacterTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

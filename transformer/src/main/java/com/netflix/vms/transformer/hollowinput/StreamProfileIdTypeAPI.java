@@ -7,7 +7,7 @@ public class StreamProfileIdTypeAPI extends HollowObjectTypeAPI {
 
     private final StreamProfileIdDelegateLookupImpl delegateLookupImpl;
 
-    StreamProfileIdTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    StreamProfileIdTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });
@@ -40,8 +40,8 @@ public class StreamProfileIdTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

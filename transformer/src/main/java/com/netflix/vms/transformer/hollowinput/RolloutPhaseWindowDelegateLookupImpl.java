@@ -12,12 +12,20 @@ public class RolloutPhaseWindowDelegateLookupImpl extends HollowObjectAbstractDe
         this.typeAPI = typeAPI;
     }
 
-    public int getEndDateOrdinal(int ordinal) {
-        return typeAPI.getEndDateOrdinal(ordinal);
+    public long getEndDate(int ordinal) {
+        return typeAPI.getEndDate(ordinal);
     }
 
-    public int getStartDateOrdinal(int ordinal) {
-        return typeAPI.getStartDateOrdinal(ordinal);
+    public Long getEndDateBoxed(int ordinal) {
+        return typeAPI.getEndDateBoxed(ordinal);
+    }
+
+    public long getStartDate(int ordinal) {
+        return typeAPI.getStartDate(ordinal);
+    }
+
+    public Long getStartDateBoxed(int ordinal) {
+        return typeAPI.getStartDateBoxed(ordinal);
     }
 
     public RolloutPhaseWindowTypeAPI getTypeAPI() {
