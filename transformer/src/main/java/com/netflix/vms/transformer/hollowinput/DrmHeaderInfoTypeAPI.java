@@ -7,7 +7,7 @@ public class DrmHeaderInfoTypeAPI extends HollowObjectTypeAPI {
 
     private final DrmHeaderInfoDelegateLookupImpl delegateLookupImpl;
 
-    DrmHeaderInfoTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    DrmHeaderInfoTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "keyId",
             "drmSystemId",
@@ -62,8 +62,8 @@ public class DrmHeaderInfoTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

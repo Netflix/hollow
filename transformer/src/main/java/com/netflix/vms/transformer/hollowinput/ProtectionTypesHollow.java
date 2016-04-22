@@ -24,7 +24,7 @@ public class ProtectionTypesHollow extends HollowObject {
         return delegate().getIdBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

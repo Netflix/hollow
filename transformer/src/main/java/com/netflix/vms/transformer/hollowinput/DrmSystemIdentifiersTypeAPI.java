@@ -7,7 +7,7 @@ public class DrmSystemIdentifiersTypeAPI extends HollowObjectTypeAPI {
 
     private final DrmSystemIdentifiersDelegateLookupImpl delegateLookupImpl;
 
-    DrmSystemIdentifiersTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    DrmSystemIdentifiersTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "id",
             "guid",
@@ -77,8 +77,8 @@ public class DrmSystemIdentifiersTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

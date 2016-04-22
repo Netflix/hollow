@@ -7,7 +7,7 @@ public class RolloutPhaseWindowTypeAPI extends HollowObjectTypeAPI {
 
     private final RolloutPhaseWindowDelegateLookupImpl delegateLookupImpl;
 
-    RolloutPhaseWindowTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    RolloutPhaseWindowTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "endDate",
             "startDate"
@@ -15,33 +15,55 @@ public class RolloutPhaseWindowTypeAPI extends HollowObjectTypeAPI {
         this.delegateLookupImpl = new RolloutPhaseWindowDelegateLookupImpl(this);
     }
 
-    public int getEndDateOrdinal(int ordinal) {
+    public long getEndDate(int ordinal) {
         if(fieldIndex[0] == -1)
-            return missingDataHandler().handleReferencedOrdinal("RolloutPhaseWindow", ordinal, "endDate");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[0]);
+            return missingDataHandler().handleLong("RolloutPhaseWindow", ordinal, "endDate");
+        return getTypeDataAccess().readLong(ordinal, fieldIndex[0]);
     }
 
-    public DateTypeAPI getEndDateTypeAPI() {
-        return getAPI().getDateTypeAPI();
+    public Long getEndDateBoxed(int ordinal) {
+        long l;
+        if(fieldIndex[0] == -1) {
+            l = missingDataHandler().handleLong("RolloutPhaseWindow", ordinal, "endDate");
+        } else {
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[0]);
+            l = getTypeDataAccess().readLong(ordinal, fieldIndex[0]);
+        }
+        if(l == Long.MIN_VALUE)
+            return null;
+        return Long.valueOf(l);
     }
 
-    public int getStartDateOrdinal(int ordinal) {
+
+
+    public long getStartDate(int ordinal) {
         if(fieldIndex[1] == -1)
-            return missingDataHandler().handleReferencedOrdinal("RolloutPhaseWindow", ordinal, "startDate");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[1]);
+            return missingDataHandler().handleLong("RolloutPhaseWindow", ordinal, "startDate");
+        return getTypeDataAccess().readLong(ordinal, fieldIndex[1]);
     }
 
-    public DateTypeAPI getStartDateTypeAPI() {
-        return getAPI().getDateTypeAPI();
+    public Long getStartDateBoxed(int ordinal) {
+        long l;
+        if(fieldIndex[1] == -1) {
+            l = missingDataHandler().handleLong("RolloutPhaseWindow", ordinal, "startDate");
+        } else {
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[1]);
+            l = getTypeDataAccess().readLong(ordinal, fieldIndex[1]);
+        }
+        if(l == Long.MIN_VALUE)
+            return null;
+        return Long.valueOf(l);
     }
+
+
 
     public RolloutPhaseWindowDelegateLookupImpl getDelegateLookupImpl() {
         return delegateLookupImpl;
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

@@ -61,7 +61,7 @@ public class PackageDrmInfoHollow extends HollowObject {
         return delegate().getKeyDecryptedBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

@@ -9,7 +9,7 @@ public class VideoRightsContractAssetsSetTypeAPI extends HollowSetTypeAPI {
 
     private final HollowSetLookupDelegate delegateLookupImpl;
 
-    VideoRightsContractAssetsSetTypeAPI(VMSHollowVideoInputAPI api, HollowSetTypeDataAccess dataAccess) {
+    VideoRightsContractAssetsSetTypeAPI(VMSHollowInputAPI api, HollowSetTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowSetLookupDelegate(this);
     }
@@ -18,8 +18,8 @@ public class VideoRightsContractAssetsSetTypeAPI extends HollowSetTypeAPI {
         return getAPI().getVideoRightsContractAssetTypeAPI();
     }
 
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI)api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI)api;
     }
 
     public HollowSetLookupDelegate getDelegateLookupImpl() {

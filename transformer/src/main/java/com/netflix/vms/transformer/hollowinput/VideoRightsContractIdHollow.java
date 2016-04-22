@@ -17,7 +17,7 @@ public class VideoRightsContractIdHollow extends HollowObject {
         return delegate().getValueBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

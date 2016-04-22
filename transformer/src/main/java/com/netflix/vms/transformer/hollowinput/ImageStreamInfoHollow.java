@@ -32,7 +32,7 @@ public class ImageStreamInfoHollow extends HollowObject {
         return delegate().getOffsetMillisBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

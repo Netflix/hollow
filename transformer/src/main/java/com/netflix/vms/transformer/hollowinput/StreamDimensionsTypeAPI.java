@@ -7,7 +7,7 @@ public class StreamDimensionsTypeAPI extends HollowObjectTypeAPI {
 
     private final StreamDimensionsDelegateLookupImpl delegateLookupImpl;
 
-    StreamDimensionsTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    StreamDimensionsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "widthInPixels",
             "heightInPixels",
@@ -150,8 +150,8 @@ public class StreamDimensionsTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

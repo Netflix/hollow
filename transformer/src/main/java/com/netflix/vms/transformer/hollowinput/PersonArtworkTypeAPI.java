@@ -7,7 +7,7 @@ public class PersonArtworkTypeAPI extends HollowObjectTypeAPI {
 
     private final PersonArtworkDelegateLookupImpl delegateLookupImpl;
 
-    PersonArtworkTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    PersonArtworkTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "derivatives",
             "locales",
@@ -139,8 +139,8 @@ public class PersonArtworkTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

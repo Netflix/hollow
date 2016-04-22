@@ -7,7 +7,7 @@ public class TerritoryCountriesTypeAPI extends HollowObjectTypeAPI {
 
     private final TerritoryCountriesDelegateLookupImpl delegateLookupImpl;
 
-    TerritoryCountriesTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    TerritoryCountriesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "territoryCode",
             "countryCodes"
@@ -40,8 +40,8 @@ public class TerritoryCountriesTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

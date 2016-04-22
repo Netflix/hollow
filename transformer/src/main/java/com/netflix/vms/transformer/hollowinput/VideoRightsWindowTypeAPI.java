@@ -7,7 +7,7 @@ public class VideoRightsWindowTypeAPI extends HollowObjectTypeAPI {
 
     private final VideoRightsWindowDelegateLookupImpl delegateLookupImpl;
 
-    VideoRightsWindowTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    VideoRightsWindowTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "contractWindowStartDate",
             "onHold",
@@ -99,8 +99,8 @@ public class VideoRightsWindowTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

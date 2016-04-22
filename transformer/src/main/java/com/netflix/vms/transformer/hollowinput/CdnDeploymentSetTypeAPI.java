@@ -9,7 +9,7 @@ public class CdnDeploymentSetTypeAPI extends HollowSetTypeAPI {
 
     private final HollowSetLookupDelegate delegateLookupImpl;
 
-    CdnDeploymentSetTypeAPI(VMSHollowVideoInputAPI api, HollowSetTypeDataAccess dataAccess) {
+    CdnDeploymentSetTypeAPI(VMSHollowInputAPI api, HollowSetTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowSetLookupDelegate(this);
     }
@@ -18,8 +18,8 @@ public class CdnDeploymentSetTypeAPI extends HollowSetTypeAPI {
         return getAPI().getCdnDeploymentTypeAPI();
     }
 
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI)api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI)api;
     }
 
     public HollowSetLookupDelegate getDelegateLookupImpl() {

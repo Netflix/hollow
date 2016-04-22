@@ -7,7 +7,7 @@ public class VideoRightsContractAssetTypeAPI extends HollowObjectTypeAPI {
 
     private final VideoRightsContractAssetDelegateLookupImpl delegateLookupImpl;
 
-    VideoRightsContractAssetTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    VideoRightsContractAssetTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "bcp47Code",
             "assetType"
@@ -40,8 +40,8 @@ public class VideoRightsContractAssetTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

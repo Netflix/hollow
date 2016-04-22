@@ -7,7 +7,7 @@ public class VideoGeneralEpisodeTypeTypeAPI extends HollowObjectTypeAPI {
 
     private final VideoGeneralEpisodeTypeDelegateLookupImpl delegateLookupImpl;
 
-    VideoGeneralEpisodeTypeTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    VideoGeneralEpisodeTypeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });
@@ -29,8 +29,8 @@ public class VideoGeneralEpisodeTypeTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

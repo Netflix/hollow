@@ -16,24 +16,8 @@ public class RolloutPhaseElementsDelegateLookupImpl extends HollowObjectAbstract
         return typeAPI.getLocalized_metadataOrdinal(ordinal);
     }
 
-    public int getCharactersOrdinal(int ordinal) {
-        return typeAPI.getCharactersOrdinal(ordinal);
-    }
-
-    public int getCastOrdinal(int ordinal) {
-        return typeAPI.getCastOrdinal(ordinal);
-    }
-
-    public int getArtwork_newOrdinal(int ordinal) {
-        return typeAPI.getArtwork_newOrdinal(ordinal);
-    }
-
     public int getArtworkOrdinal(int ordinal) {
         return typeAPI.getArtworkOrdinal(ordinal);
-    }
-
-    public int getTrailersOrdinal(int ordinal) {
-        return typeAPI.getTrailersOrdinal(ordinal);
     }
 
     public RolloutPhaseElementsTypeAPI getTypeAPI() {

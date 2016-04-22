@@ -23,7 +23,7 @@ public class StreamDeploymentInfoHollow extends HollowObject {
         return  api().getCdnDeploymentSetHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

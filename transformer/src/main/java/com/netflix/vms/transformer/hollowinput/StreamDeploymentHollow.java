@@ -31,7 +31,7 @@ public class StreamDeploymentHollow extends HollowObject {
         return delegate().getDeploymentPriorityBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

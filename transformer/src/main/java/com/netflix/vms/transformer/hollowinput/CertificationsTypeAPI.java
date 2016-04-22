@@ -7,7 +7,7 @@ public class CertificationsTypeAPI extends HollowObjectTypeAPI {
 
     private final CertificationsDelegateLookupImpl delegateLookupImpl;
 
-    CertificationsTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    CertificationsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "certificationTypeId",
             "name",
@@ -62,8 +62,8 @@ public class CertificationsTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

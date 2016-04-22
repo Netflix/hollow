@@ -9,14 +9,6 @@ public class EpisodeHollow extends HollowObject {
         super(delegate, ordinal);
     }
 
-    public long _getParentSequenceNumber() {
-        return delegate().getParentSequenceNumber(ordinal);
-    }
-
-    public Long _getParentSequenceNumberBoxed() {
-        return delegate().getParentSequenceNumberBoxed(ordinal);
-    }
-
     public long _getSequenceNumber() {
         return delegate().getSequenceNumber(ordinal);
     }
@@ -33,15 +25,7 @@ public class EpisodeHollow extends HollowObject {
         return delegate().getMovieIdBoxed(ordinal);
     }
 
-    public long _getAltId() {
-        return delegate().getAltId(ordinal);
-    }
-
-    public Long _getAltIdBoxed() {
-        return delegate().getAltIdBoxed(ordinal);
-    }
-
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

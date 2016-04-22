@@ -7,7 +7,7 @@ public class StreamDeploymentLabelTypeAPI extends HollowObjectTypeAPI {
 
     private final StreamDeploymentLabelDelegateLookupImpl delegateLookupImpl;
 
-    StreamDeploymentLabelTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    StreamDeploymentLabelTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });
@@ -29,8 +29,8 @@ public class StreamDeploymentLabelTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

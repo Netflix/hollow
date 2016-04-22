@@ -12,14 +12,6 @@ public class RolloutDelegateLookupImpl extends HollowObjectAbstractDelegate impl
         this.typeAPI = typeAPI;
     }
 
-    public int getRolloutNameOrdinal(int ordinal) {
-        return typeAPI.getRolloutNameOrdinal(ordinal);
-    }
-
-    public int getLaunchDatesOrdinal(int ordinal) {
-        return typeAPI.getLaunchDatesOrdinal(ordinal);
-    }
-
     public long getRolloutId(int ordinal) {
         return typeAPI.getRolloutId(ordinal);
     }
@@ -28,16 +20,20 @@ public class RolloutDelegateLookupImpl extends HollowObjectAbstractDelegate impl
         return typeAPI.getRolloutIdBoxed(ordinal);
     }
 
-    public int getRolloutTypeOrdinal(int ordinal) {
-        return typeAPI.getRolloutTypeOrdinal(ordinal);
-    }
-
     public long getMovieId(int ordinal) {
         return typeAPI.getMovieId(ordinal);
     }
 
     public Long getMovieIdBoxed(int ordinal) {
         return typeAPI.getMovieIdBoxed(ordinal);
+    }
+
+    public int getRolloutNameOrdinal(int ordinal) {
+        return typeAPI.getRolloutNameOrdinal(ordinal);
+    }
+
+    public int getRolloutTypeOrdinal(int ordinal) {
+        return typeAPI.getRolloutTypeOrdinal(ordinal);
     }
 
     public int getPhasesOrdinal(int ordinal) {

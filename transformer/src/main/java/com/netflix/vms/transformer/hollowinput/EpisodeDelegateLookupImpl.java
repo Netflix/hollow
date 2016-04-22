@@ -12,14 +12,6 @@ public class EpisodeDelegateLookupImpl extends HollowObjectAbstractDelegate impl
         this.typeAPI = typeAPI;
     }
 
-    public long getParentSequenceNumber(int ordinal) {
-        return typeAPI.getParentSequenceNumber(ordinal);
-    }
-
-    public Long getParentSequenceNumberBoxed(int ordinal) {
-        return typeAPI.getParentSequenceNumberBoxed(ordinal);
-    }
-
     public long getSequenceNumber(int ordinal) {
         return typeAPI.getSequenceNumber(ordinal);
     }
@@ -34,14 +26,6 @@ public class EpisodeDelegateLookupImpl extends HollowObjectAbstractDelegate impl
 
     public Long getMovieIdBoxed(int ordinal) {
         return typeAPI.getMovieIdBoxed(ordinal);
-    }
-
-    public long getAltId(int ordinal) {
-        return typeAPI.getAltId(ordinal);
-    }
-
-    public Long getAltIdBoxed(int ordinal) {
-        return typeAPI.getAltIdBoxed(ordinal);
     }
 
     public EpisodeTypeAPI getTypeAPI() {

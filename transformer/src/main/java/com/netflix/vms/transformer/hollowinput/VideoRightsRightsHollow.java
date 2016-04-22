@@ -23,7 +23,7 @@ public class VideoRightsRightsHollow extends HollowObject {
         return  api().getVideoRightsContractSetHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

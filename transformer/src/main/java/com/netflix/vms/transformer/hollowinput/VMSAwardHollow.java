@@ -48,7 +48,7 @@ public class VMSAwardHollow extends HollowObject {
         return delegate().getIsMovieAwardBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

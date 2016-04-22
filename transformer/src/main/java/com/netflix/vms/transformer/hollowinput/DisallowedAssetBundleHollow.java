@@ -31,7 +31,7 @@ public class DisallowedAssetBundleHollow extends HollowObject {
         return  api().getDisallowedSubtitleLangCodesListHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

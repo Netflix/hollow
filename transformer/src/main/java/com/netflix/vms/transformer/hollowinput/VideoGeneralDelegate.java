@@ -8,6 +8,10 @@ public interface VideoGeneralDelegate extends HollowObjectDelegate {
 
     public Long getVideoIdBoxed(int ordinal);
 
+    public boolean getTv(int ordinal);
+
+    public Boolean getTvBoxed(int ordinal);
+
     public int getAliasesOrdinal(int ordinal);
 
     public int getVideoTypeOrdinal(int ordinal);
@@ -18,19 +22,27 @@ public interface VideoGeneralDelegate extends HollowObjectDelegate {
 
     public int getSupplementalSubTypeOrdinal(int ordinal);
 
+    public long getFirstReleaseYear(int ordinal);
+
+    public Long getFirstReleaseYearBoxed(int ordinal);
+
     public boolean getTestTitle(int ordinal);
 
     public Boolean getTestTitleBoxed(int ordinal);
 
     public int getOriginalLanguageBcpCodeOrdinal(int ordinal);
 
-    public int getTitleTypesOrdinal(int ordinal);
+    public long getMetadataReleaseDays(int ordinal);
+
+    public Long getMetadataReleaseDaysBoxed(int ordinal);
 
     public int getOriginCountryCodeOrdinal(int ordinal);
 
     public int getOriginalTitleOrdinal(int ordinal);
 
-    public int getCountryOfOriginNameLocaleOrdinal(int ordinal);
+    public int getTestTitleTypesOrdinal(int ordinal);
+
+    public int getOriginalTitleBcpCodeOrdinal(int ordinal);
 
     public int getInternalTitleOrdinal(int ordinal);
 

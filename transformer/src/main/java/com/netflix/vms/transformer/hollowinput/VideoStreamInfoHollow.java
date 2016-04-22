@@ -57,7 +57,7 @@ public class VideoStreamInfoHollow extends HollowObject {
         return delegate().getFpsBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

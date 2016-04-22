@@ -45,7 +45,7 @@ public class PersonBioHollow extends HollowObject {
         return  api().getListOfVideoIdsHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

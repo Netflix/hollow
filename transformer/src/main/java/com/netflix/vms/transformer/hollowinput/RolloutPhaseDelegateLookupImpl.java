@@ -44,6 +44,14 @@ public class RolloutPhaseDelegateLookupImpl extends HollowObjectAbstractDelegate
         return typeAPI.getPhaseTypeOrdinal(ordinal);
     }
 
+    public boolean getOnHold(int ordinal) {
+        return typeAPI.getOnHold(ordinal);
+    }
+
+    public Boolean getOnHoldBoxed(int ordinal) {
+        return typeAPI.getOnHoldBoxed(ordinal);
+    }
+
     public RolloutPhaseTypeAPI getTypeAPI() {
         return typeAPI;
     }

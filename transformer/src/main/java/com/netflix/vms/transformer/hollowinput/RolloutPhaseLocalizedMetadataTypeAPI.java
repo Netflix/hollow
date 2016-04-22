@@ -7,7 +7,7 @@ public class RolloutPhaseLocalizedMetadataTypeAPI extends HollowObjectTypeAPI {
 
     private final RolloutPhaseLocalizedMetadataDelegateLookupImpl delegateLookupImpl;
 
-    RolloutPhaseLocalizedMetadataTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    RolloutPhaseLocalizedMetadataTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "SUPPLEMENTAL_MESSAGE",
             "TAGLINE"
@@ -40,8 +40,8 @@ public class RolloutPhaseLocalizedMetadataTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

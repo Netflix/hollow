@@ -24,7 +24,7 @@ public class VideoDateHollow extends HollowObject {
         return  api().getVideoDateWindowListHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

@@ -22,7 +22,7 @@ public class VideoPersonAliasListHollow extends HollowList<VideoPersonAliasHollo
         return GenericHollowRecordHelper.equalObject(getSchema().getElementType(), elementOrdinal, testObject);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

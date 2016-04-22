@@ -7,7 +7,7 @@ public class CategoriesTypeAPI extends HollowObjectTypeAPI {
 
     private final CategoriesDelegateLookupImpl delegateLookupImpl;
 
-    CategoriesTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    CategoriesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "categoryId",
             "displayName",
@@ -62,8 +62,8 @@ public class CategoriesTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

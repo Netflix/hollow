@@ -7,7 +7,7 @@ public class CertificationSystemTypeAPI extends HollowObjectTypeAPI {
 
     private final CertificationSystemDelegateLookupImpl delegateLookupImpl;
 
-    CertificationSystemTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    CertificationSystemTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "certificationSystemId",
             "countryCode",
@@ -73,8 +73,8 @@ public class CertificationSystemTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

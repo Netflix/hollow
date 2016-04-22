@@ -57,7 +57,7 @@ public class StreamDimensionsHollow extends HollowObject {
         return delegate().getTargetHeightInPixelsBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

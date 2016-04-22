@@ -30,7 +30,7 @@ public class ArtworkLocaleHollow extends HollowObject {
         return  api().getDateHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

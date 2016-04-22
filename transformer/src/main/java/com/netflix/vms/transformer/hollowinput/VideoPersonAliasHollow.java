@@ -17,7 +17,7 @@ public class VideoPersonAliasHollow extends HollowObject {
         return delegate().getAliasIdBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

@@ -24,7 +24,7 @@ public class TopNHollow extends HollowObject {
         return  api().getTopNAttributesListHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

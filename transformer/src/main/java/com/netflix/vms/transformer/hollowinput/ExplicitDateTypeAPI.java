@@ -7,7 +7,7 @@ public class ExplicitDateTypeAPI extends HollowObjectTypeAPI {
 
     private final ExplicitDateDelegateLookupImpl delegateLookupImpl;
 
-    ExplicitDateTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    ExplicitDateTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "monthOfYear",
             "year",
@@ -84,8 +84,8 @@ public class ExplicitDateTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

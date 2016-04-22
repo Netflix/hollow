@@ -23,7 +23,7 @@ public class AssetMetaDatasHollow extends HollowObject {
         return  api().getTranslatedTextHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

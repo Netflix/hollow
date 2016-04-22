@@ -9,7 +9,7 @@ public class PackageStreamSetTypeAPI extends HollowSetTypeAPI {
 
     private final HollowSetLookupDelegate delegateLookupImpl;
 
-    PackageStreamSetTypeAPI(VMSHollowVideoInputAPI api, HollowSetTypeDataAccess dataAccess) {
+    PackageStreamSetTypeAPI(VMSHollowInputAPI api, HollowSetTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowSetLookupDelegate(this);
     }
@@ -18,8 +18,8 @@ public class PackageStreamSetTypeAPI extends HollowSetTypeAPI {
         return getAPI().getPackageStreamTypeAPI();
     }
 
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI)api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI)api;
     }
 
     public HollowSetLookupDelegate getDelegateLookupImpl() {

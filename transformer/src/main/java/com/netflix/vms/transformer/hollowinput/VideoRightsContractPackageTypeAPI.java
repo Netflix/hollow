@@ -7,7 +7,7 @@ public class VideoRightsContractPackageTypeAPI extends HollowObjectTypeAPI {
 
     private final VideoRightsContractPackageDelegateLookupImpl delegateLookupImpl;
 
-    VideoRightsContractPackageTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    VideoRightsContractPackageTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "packageId",
             "primary"
@@ -55,8 +55,8 @@ public class VideoRightsContractPackageTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

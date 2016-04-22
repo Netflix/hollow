@@ -7,7 +7,7 @@ public class ArtWorkImageFormatTypeAPI extends HollowObjectTypeAPI {
 
     private final ArtWorkImageFormatDelegateLookupImpl delegateLookupImpl;
 
-    ArtWorkImageFormatTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    ArtWorkImageFormatTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "format",
             "width",
@@ -73,8 +73,8 @@ public class ArtWorkImageFormatTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

@@ -65,7 +65,7 @@ public class StreamFileIdentificationHollow extends HollowObject {
         return delegate().getCreatedTimeSecondsBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

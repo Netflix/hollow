@@ -8,30 +8,20 @@ import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 
 public class RolloutDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, RolloutDelegate {
 
-    private final int rolloutNameOrdinal;
-    private final int launchDatesOrdinal;
     private final Long rolloutId;
-    private final int rolloutTypeOrdinal;
     private final Long movieId;
+    private final int rolloutNameOrdinal;
+    private final int rolloutTypeOrdinal;
     private final int phasesOrdinal;
    private RolloutTypeAPI typeAPI;
 
     public RolloutDelegateCachedImpl(RolloutTypeAPI typeAPI, int ordinal) {
-        this.rolloutNameOrdinal = typeAPI.getRolloutNameOrdinal(ordinal);
-        this.launchDatesOrdinal = typeAPI.getLaunchDatesOrdinal(ordinal);
         this.rolloutId = typeAPI.getRolloutIdBoxed(ordinal);
-        this.rolloutTypeOrdinal = typeAPI.getRolloutTypeOrdinal(ordinal);
         this.movieId = typeAPI.getMovieIdBoxed(ordinal);
+        this.rolloutNameOrdinal = typeAPI.getRolloutNameOrdinal(ordinal);
+        this.rolloutTypeOrdinal = typeAPI.getRolloutTypeOrdinal(ordinal);
         this.phasesOrdinal = typeAPI.getPhasesOrdinal(ordinal);
         this.typeAPI = typeAPI;
-    }
-
-    public int getRolloutNameOrdinal(int ordinal) {
-        return rolloutNameOrdinal;
-    }
-
-    public int getLaunchDatesOrdinal(int ordinal) {
-        return launchDatesOrdinal;
     }
 
     public long getRolloutId(int ordinal) {
@@ -42,16 +32,20 @@ public class RolloutDelegateCachedImpl extends HollowObjectAbstractDelegate impl
         return rolloutId;
     }
 
-    public int getRolloutTypeOrdinal(int ordinal) {
-        return rolloutTypeOrdinal;
-    }
-
     public long getMovieId(int ordinal) {
         return movieId.longValue();
     }
 
     public Long getMovieIdBoxed(int ordinal) {
         return movieId;
+    }
+
+    public int getRolloutNameOrdinal(int ordinal) {
+        return rolloutNameOrdinal;
+    }
+
+    public int getRolloutTypeOrdinal(int ordinal) {
+        return rolloutTypeOrdinal;
     }
 
     public int getPhasesOrdinal(int ordinal) {

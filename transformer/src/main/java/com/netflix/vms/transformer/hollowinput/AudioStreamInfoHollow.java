@@ -24,7 +24,7 @@ public class AudioStreamInfoHollow extends HollowObject {
         return delegate().getAudioBitrateKBPSBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

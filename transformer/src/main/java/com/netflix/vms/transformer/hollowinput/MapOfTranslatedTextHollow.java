@@ -33,7 +33,7 @@ public class MapOfTranslatedTextHollow extends HollowMap<MapKeyHollow, Translate
         return GenericHollowRecordHelper.equalObject(getSchema().getValueType(), valueOrdinal, testObject);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

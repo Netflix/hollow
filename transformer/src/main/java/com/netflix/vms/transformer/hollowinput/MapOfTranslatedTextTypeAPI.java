@@ -9,7 +9,7 @@ public class MapOfTranslatedTextTypeAPI extends HollowMapTypeAPI {
 
     private final HollowMapLookupDelegate delegateLookupImpl;
 
-    MapOfTranslatedTextTypeAPI(VMSHollowVideoInputAPI api, HollowMapTypeDataAccess dataAccess) {
+    MapOfTranslatedTextTypeAPI(VMSHollowInputAPI api, HollowMapTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowMapLookupDelegate(this);
     }
@@ -26,8 +26,8 @@ public class MapOfTranslatedTextTypeAPI extends HollowMapTypeAPI {
         return delegateLookupImpl;
     }
 
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI)api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI)api;
     }
 
 }

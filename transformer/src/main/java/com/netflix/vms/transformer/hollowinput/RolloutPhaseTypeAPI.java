@@ -7,14 +7,15 @@ public class RolloutPhaseTypeAPI extends HollowObjectTypeAPI {
 
     private final RolloutPhaseDelegateLookupImpl delegateLookupImpl;
 
-    RolloutPhaseTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    RolloutPhaseTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "seasonMovieId",
             "elements",
             "name",
             "showCoreMetadata",
             "windows",
-            "phaseType"
+            "phaseType",
+            "onHold"
         });
         this.delegateLookupImpl = new RolloutPhaseDelegateLookupImpl(this);
     }
@@ -94,13 +95,27 @@ public class RolloutPhaseTypeAPI extends HollowObjectTypeAPI {
         return getAPI().getStringTypeAPI();
     }
 
+    public boolean getOnHold(int ordinal) {
+        if(fieldIndex[6] == -1)
+            return missingDataHandler().handleBoolean("RolloutPhase", ordinal, "onHold") == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[6]) == Boolean.TRUE;
+    }
+
+    public Boolean getOnHoldBoxed(int ordinal) {
+        if(fieldIndex[6] == -1)
+            return missingDataHandler().handleBoolean("RolloutPhase", ordinal, "onHold");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[6]);
+    }
+
+
+
     public RolloutPhaseDelegateLookupImpl getDelegateLookupImpl() {
         return delegateLookupImpl;
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

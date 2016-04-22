@@ -16,42 +16,14 @@ public class RolloutPhaseElementsHollow extends HollowObject {
         return  api().getRolloutPhaseLocalizedMetadataHollow(refOrdinal);
     }
 
-    public RolloutPhaseCharacterListHollow _getCharacters() {
-        int refOrdinal = delegate().getCharactersOrdinal(ordinal);
-        if(refOrdinal == -1)
-            return null;
-        return  api().getRolloutPhaseCharacterListHollow(refOrdinal);
-    }
-
-    public RolloutPhaseCastListHollow _getCast() {
-        int refOrdinal = delegate().getCastOrdinal(ordinal);
-        if(refOrdinal == -1)
-            return null;
-        return  api().getRolloutPhaseCastListHollow(refOrdinal);
-    }
-
-    public RolloutPhaseNewArtworkHollow _getArtwork_new() {
-        int refOrdinal = delegate().getArtwork_newOrdinal(ordinal);
-        if(refOrdinal == -1)
-            return null;
-        return  api().getRolloutPhaseNewArtworkHollow(refOrdinal);
-    }
-
-    public RolloutPhaseOldArtworkListHollow _getArtwork() {
+    public RolloutPhaseArtworkHollow _getArtwork() {
         int refOrdinal = delegate().getArtworkOrdinal(ordinal);
         if(refOrdinal == -1)
             return null;
-        return  api().getRolloutPhaseOldArtworkListHollow(refOrdinal);
+        return  api().getRolloutPhaseArtworkHollow(refOrdinal);
     }
 
-    public RolloutPhaseTrailerListHollow _getTrailers() {
-        int refOrdinal = delegate().getTrailersOrdinal(ordinal);
-        if(refOrdinal == -1)
-            return null;
-        return  api().getRolloutPhaseTrailerListHollow(refOrdinal);
-    }
-
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

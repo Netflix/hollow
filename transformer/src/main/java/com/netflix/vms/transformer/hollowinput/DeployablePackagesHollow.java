@@ -32,7 +32,7 @@ public class DeployablePackagesHollow extends HollowObject {
         return  api().getISOCountrySetHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

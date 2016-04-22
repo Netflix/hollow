@@ -7,7 +7,7 @@ public class CategoryGroupsTypeAPI extends HollowObjectTypeAPI {
 
     private final CategoryGroupsDelegateLookupImpl delegateLookupImpl;
 
-    CategoryGroupsTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    CategoryGroupsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "categoryGroupId",
             "categoryGroupName"
@@ -51,8 +51,8 @@ public class CategoryGroupsTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

@@ -7,7 +7,7 @@ public class EpisodesTypeAPI extends HollowObjectTypeAPI {
 
     private final EpisodesDelegateLookupImpl delegateLookupImpl;
 
-    EpisodesTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    EpisodesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "episodeName",
             "movieId",
@@ -73,8 +73,8 @@ public class EpisodesTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

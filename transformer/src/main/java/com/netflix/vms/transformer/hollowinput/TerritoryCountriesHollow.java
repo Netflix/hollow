@@ -23,7 +23,7 @@ public class TerritoryCountriesHollow extends HollowObject {
         return  api().getISOCountryListHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

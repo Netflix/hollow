@@ -7,7 +7,7 @@ public class ConsolidatedCertSystemRatingTypeAPI extends HollowObjectTypeAPI {
 
     private final ConsolidatedCertSystemRatingDelegateLookupImpl delegateLookupImpl;
 
-    ConsolidatedCertSystemRatingTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    ConsolidatedCertSystemRatingTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "ratingId",
             "maturityLevel",
@@ -95,8 +95,8 @@ public class ConsolidatedCertSystemRatingTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

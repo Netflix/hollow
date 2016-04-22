@@ -8,7 +8,7 @@ public class VideoStreamInfoTypeAPI extends HollowObjectTypeAPI {
 
     private final VideoStreamInfoDelegateLookupImpl delegateLookupImpl;
 
-    VideoStreamInfoTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    VideoStreamInfoTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "videoBitrateKBPS",
             "dashHeaderSize",
@@ -148,8 +148,8 @@ public class VideoStreamInfoTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

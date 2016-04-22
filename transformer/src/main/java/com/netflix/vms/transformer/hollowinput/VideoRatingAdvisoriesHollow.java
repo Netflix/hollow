@@ -32,7 +32,7 @@ public class VideoRatingAdvisoriesHollow extends HollowObject {
         return  api().getVideoRatingAdvisoryIdListHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

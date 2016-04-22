@@ -7,7 +7,7 @@ public class VideoRatingTypeAPI extends HollowObjectTypeAPI {
 
     private final VideoRatingDelegateLookupImpl delegateLookupImpl;
 
-    VideoRatingTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    VideoRatingTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "videoId",
             "rating"
@@ -51,8 +51,8 @@ public class VideoRatingTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

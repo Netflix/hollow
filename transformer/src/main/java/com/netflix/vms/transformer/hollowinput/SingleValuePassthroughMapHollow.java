@@ -33,7 +33,7 @@ public class SingleValuePassthroughMapHollow extends HollowMap<MapKeyHollow, Str
         return GenericHollowRecordHelper.equalObject(getSchema().getValueType(), valueOrdinal, testObject);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

@@ -7,7 +7,7 @@ public class LocalizedMetadataTypeAPI extends HollowObjectTypeAPI {
 
     private final LocalizedMetadataDelegateLookupImpl delegateLookupImpl;
 
-    LocalizedMetadataTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    LocalizedMetadataTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "movieId",
             "attributeName",
@@ -73,8 +73,8 @@ public class LocalizedMetadataTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

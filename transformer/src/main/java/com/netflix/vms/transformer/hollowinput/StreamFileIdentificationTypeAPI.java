@@ -7,7 +7,7 @@ public class StreamFileIdentificationTypeAPI extends HollowObjectTypeAPI {
 
     private final StreamFileIdentificationDelegateLookupImpl delegateLookupImpl;
 
-    StreamFileIdentificationTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    StreamFileIdentificationTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "filename",
             "fileSizeInBytes",
@@ -164,8 +164,8 @@ public class StreamFileIdentificationTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

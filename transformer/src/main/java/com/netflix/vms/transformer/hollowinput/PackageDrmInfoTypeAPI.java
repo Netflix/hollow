@@ -7,7 +7,7 @@ public class PackageDrmInfoTypeAPI extends HollowObjectTypeAPI {
 
     private final PackageDrmInfoDelegateLookupImpl delegateLookupImpl;
 
-    PackageDrmInfoTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    PackageDrmInfoTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "contentPackagerPublicKey",
             "keySeed",
@@ -121,8 +121,8 @@ public class PackageDrmInfoTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

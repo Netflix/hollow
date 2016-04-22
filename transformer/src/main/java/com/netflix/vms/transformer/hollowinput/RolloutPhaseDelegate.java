@@ -20,6 +20,10 @@ public interface RolloutPhaseDelegate extends HollowObjectDelegate {
 
     public int getPhaseTypeOrdinal(int ordinal);
 
+    public boolean getOnHold(int ordinal);
+
+    public Boolean getOnHoldBoxed(int ordinal);
+
     public RolloutPhaseTypeAPI getTypeAPI();
 
 }

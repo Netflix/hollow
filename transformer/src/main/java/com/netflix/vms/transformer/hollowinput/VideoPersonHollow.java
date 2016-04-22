@@ -31,7 +31,7 @@ public class VideoPersonHollow extends HollowObject {
         return  api().getVideoPersonAliasListHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

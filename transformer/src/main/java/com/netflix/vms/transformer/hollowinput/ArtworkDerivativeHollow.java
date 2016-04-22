@@ -89,7 +89,7 @@ public class ArtworkDerivativeHollow extends HollowObject {
         return delegate().getHeightBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

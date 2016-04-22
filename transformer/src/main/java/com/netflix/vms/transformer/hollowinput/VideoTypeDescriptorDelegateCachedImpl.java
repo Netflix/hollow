@@ -8,78 +8,54 @@ import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 
 public class VideoTypeDescriptorDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, VideoTypeDescriptorDelegate {
 
-    private final Boolean isOriginal;
-    private final Long showMemberTypeId;
-    private final int copyrightOrdinal;
     private final int countryCodeOrdinal;
-    private final Boolean isContentApproved;
+    private final int copyrightOrdinal;
+    private final int tierTypeOrdinal;
+    private final Boolean original;
     private final int mediaOrdinal;
-    private final Boolean isCanon;
-    private final Boolean isExtended;
+    private final Boolean extended;
    private VideoTypeDescriptorTypeAPI typeAPI;
 
     public VideoTypeDescriptorDelegateCachedImpl(VideoTypeDescriptorTypeAPI typeAPI, int ordinal) {
-        this.isOriginal = typeAPI.getIsOriginalBoxed(ordinal);
-        this.showMemberTypeId = typeAPI.getShowMemberTypeIdBoxed(ordinal);
-        this.copyrightOrdinal = typeAPI.getCopyrightOrdinal(ordinal);
         this.countryCodeOrdinal = typeAPI.getCountryCodeOrdinal(ordinal);
-        this.isContentApproved = typeAPI.getIsContentApprovedBoxed(ordinal);
+        this.copyrightOrdinal = typeAPI.getCopyrightOrdinal(ordinal);
+        this.tierTypeOrdinal = typeAPI.getTierTypeOrdinal(ordinal);
+        this.original = typeAPI.getOriginalBoxed(ordinal);
         this.mediaOrdinal = typeAPI.getMediaOrdinal(ordinal);
-        this.isCanon = typeAPI.getIsCanonBoxed(ordinal);
-        this.isExtended = typeAPI.getIsExtendedBoxed(ordinal);
+        this.extended = typeAPI.getExtendedBoxed(ordinal);
         this.typeAPI = typeAPI;
-    }
-
-    public boolean getIsOriginal(int ordinal) {
-        return isOriginal.booleanValue();
-    }
-
-    public Boolean getIsOriginalBoxed(int ordinal) {
-        return isOriginal;
-    }
-
-    public long getShowMemberTypeId(int ordinal) {
-        return showMemberTypeId.longValue();
-    }
-
-    public Long getShowMemberTypeIdBoxed(int ordinal) {
-        return showMemberTypeId;
-    }
-
-    public int getCopyrightOrdinal(int ordinal) {
-        return copyrightOrdinal;
     }
 
     public int getCountryCodeOrdinal(int ordinal) {
         return countryCodeOrdinal;
     }
 
-    public boolean getIsContentApproved(int ordinal) {
-        return isContentApproved.booleanValue();
+    public int getCopyrightOrdinal(int ordinal) {
+        return copyrightOrdinal;
     }
 
-    public Boolean getIsContentApprovedBoxed(int ordinal) {
-        return isContentApproved;
+    public int getTierTypeOrdinal(int ordinal) {
+        return tierTypeOrdinal;
+    }
+
+    public boolean getOriginal(int ordinal) {
+        return original.booleanValue();
+    }
+
+    public Boolean getOriginalBoxed(int ordinal) {
+        return original;
     }
 
     public int getMediaOrdinal(int ordinal) {
         return mediaOrdinal;
     }
 
-    public boolean getIsCanon(int ordinal) {
-        return isCanon.booleanValue();
+    public boolean getExtended(int ordinal) {
+        return extended.booleanValue();
     }
 
-    public Boolean getIsCanonBoxed(int ordinal) {
-        return isCanon;
-    }
-
-    public boolean getIsExtended(int ordinal) {
-        return isExtended.booleanValue();
-    }
-
-    public Boolean getIsExtendedBoxed(int ordinal) {
-        return isExtended;
+    public Boolean getExtendedBoxed(int ordinal) {
+        return extended;
     }
 
     @Override

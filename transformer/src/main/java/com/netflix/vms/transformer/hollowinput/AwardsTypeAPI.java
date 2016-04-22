@@ -7,7 +7,7 @@ public class AwardsTypeAPI extends HollowObjectTypeAPI {
 
     private final AwardsDelegateLookupImpl delegateLookupImpl;
 
-    AwardsTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    AwardsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "awardId",
             "awardName",
@@ -73,8 +73,8 @@ public class AwardsTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

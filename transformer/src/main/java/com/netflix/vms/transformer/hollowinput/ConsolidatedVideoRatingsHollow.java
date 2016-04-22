@@ -24,7 +24,7 @@ public class ConsolidatedVideoRatingsHollow extends HollowObject {
         return delegate().getVideoIdBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

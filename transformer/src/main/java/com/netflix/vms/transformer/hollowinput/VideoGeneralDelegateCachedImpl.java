@@ -9,32 +9,38 @@ import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 public class VideoGeneralDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, VideoGeneralDelegate {
 
     private final Long videoId;
+    private final Boolean tv;
     private final int aliasesOrdinal;
     private final int videoTypeOrdinal;
     private final Long runtime;
     private final int supplementalSubTypeOrdinal;
+    private final Long firstReleaseYear;
     private final Boolean testTitle;
     private final int originalLanguageBcpCodeOrdinal;
-    private final int titleTypesOrdinal;
+    private final Long metadataReleaseDays;
     private final int originCountryCodeOrdinal;
     private final int originalTitleOrdinal;
-    private final int countryOfOriginNameLocaleOrdinal;
+    private final int testTitleTypesOrdinal;
+    private final int originalTitleBcpCodeOrdinal;
     private final int internalTitleOrdinal;
     private final int episodeTypesOrdinal;
    private VideoGeneralTypeAPI typeAPI;
 
     public VideoGeneralDelegateCachedImpl(VideoGeneralTypeAPI typeAPI, int ordinal) {
         this.videoId = typeAPI.getVideoIdBoxed(ordinal);
+        this.tv = typeAPI.getTvBoxed(ordinal);
         this.aliasesOrdinal = typeAPI.getAliasesOrdinal(ordinal);
         this.videoTypeOrdinal = typeAPI.getVideoTypeOrdinal(ordinal);
         this.runtime = typeAPI.getRuntimeBoxed(ordinal);
         this.supplementalSubTypeOrdinal = typeAPI.getSupplementalSubTypeOrdinal(ordinal);
+        this.firstReleaseYear = typeAPI.getFirstReleaseYearBoxed(ordinal);
         this.testTitle = typeAPI.getTestTitleBoxed(ordinal);
         this.originalLanguageBcpCodeOrdinal = typeAPI.getOriginalLanguageBcpCodeOrdinal(ordinal);
-        this.titleTypesOrdinal = typeAPI.getTitleTypesOrdinal(ordinal);
+        this.metadataReleaseDays = typeAPI.getMetadataReleaseDaysBoxed(ordinal);
         this.originCountryCodeOrdinal = typeAPI.getOriginCountryCodeOrdinal(ordinal);
         this.originalTitleOrdinal = typeAPI.getOriginalTitleOrdinal(ordinal);
-        this.countryOfOriginNameLocaleOrdinal = typeAPI.getCountryOfOriginNameLocaleOrdinal(ordinal);
+        this.testTitleTypesOrdinal = typeAPI.getTestTitleTypesOrdinal(ordinal);
+        this.originalTitleBcpCodeOrdinal = typeAPI.getOriginalTitleBcpCodeOrdinal(ordinal);
         this.internalTitleOrdinal = typeAPI.getInternalTitleOrdinal(ordinal);
         this.episodeTypesOrdinal = typeAPI.getEpisodeTypesOrdinal(ordinal);
         this.typeAPI = typeAPI;
@@ -46,6 +52,14 @@ public class VideoGeneralDelegateCachedImpl extends HollowObjectAbstractDelegate
 
     public Long getVideoIdBoxed(int ordinal) {
         return videoId;
+    }
+
+    public boolean getTv(int ordinal) {
+        return tv.booleanValue();
+    }
+
+    public Boolean getTvBoxed(int ordinal) {
+        return tv;
     }
 
     public int getAliasesOrdinal(int ordinal) {
@@ -68,6 +82,14 @@ public class VideoGeneralDelegateCachedImpl extends HollowObjectAbstractDelegate
         return supplementalSubTypeOrdinal;
     }
 
+    public long getFirstReleaseYear(int ordinal) {
+        return firstReleaseYear.longValue();
+    }
+
+    public Long getFirstReleaseYearBoxed(int ordinal) {
+        return firstReleaseYear;
+    }
+
     public boolean getTestTitle(int ordinal) {
         return testTitle.booleanValue();
     }
@@ -80,8 +102,12 @@ public class VideoGeneralDelegateCachedImpl extends HollowObjectAbstractDelegate
         return originalLanguageBcpCodeOrdinal;
     }
 
-    public int getTitleTypesOrdinal(int ordinal) {
-        return titleTypesOrdinal;
+    public long getMetadataReleaseDays(int ordinal) {
+        return metadataReleaseDays.longValue();
+    }
+
+    public Long getMetadataReleaseDaysBoxed(int ordinal) {
+        return metadataReleaseDays;
     }
 
     public int getOriginCountryCodeOrdinal(int ordinal) {
@@ -92,8 +118,12 @@ public class VideoGeneralDelegateCachedImpl extends HollowObjectAbstractDelegate
         return originalTitleOrdinal;
     }
 
-    public int getCountryOfOriginNameLocaleOrdinal(int ordinal) {
-        return countryOfOriginNameLocaleOrdinal;
+    public int getTestTitleTypesOrdinal(int ordinal) {
+        return testTitleTypesOrdinal;
+    }
+
+    public int getOriginalTitleBcpCodeOrdinal(int ordinal) {
+        return originalTitleBcpCodeOrdinal;
     }
 
     public int getInternalTitleOrdinal(int ordinal) {

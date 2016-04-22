@@ -30,7 +30,7 @@ public class ArtworkRecipeHollow extends HollowObject {
         return  api().getStringHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

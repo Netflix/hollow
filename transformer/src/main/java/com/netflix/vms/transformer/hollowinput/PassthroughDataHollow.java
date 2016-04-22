@@ -23,7 +23,7 @@ public class PassthroughDataHollow extends HollowObject {
         return  api().getMultiValuePassthroughMapHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

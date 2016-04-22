@@ -281,7 +281,7 @@ public class CSMReviewHollow extends HollowObject {
         return delegate().getRuntimeInMinsBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

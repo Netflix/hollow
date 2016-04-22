@@ -7,7 +7,7 @@ public class PackageMomentTypeAPI extends HollowObjectTypeAPI {
 
     private final PackageMomentDelegateLookupImpl delegateLookupImpl;
 
-    PackageMomentTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    PackageMomentTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "clipSpecRuntimeMillis",
             "offsetMillis",
@@ -139,8 +139,8 @@ public class PackageMomentTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

@@ -32,7 +32,7 @@ public class EpisodesHollow extends HollowObject {
         return delegate().getEpisodeIdBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

@@ -7,7 +7,7 @@ public class AssetMetaDatasTypeAPI extends HollowObjectTypeAPI {
 
     private final AssetMetaDatasDelegateLookupImpl delegateLookupImpl;
 
-    AssetMetaDatasTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    AssetMetaDatasTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "assetId",
             "trackLabels"
@@ -40,8 +40,8 @@ public class AssetMetaDatasTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

@@ -7,7 +7,7 @@ public class CSMReviewTypeAPI extends HollowObjectTypeAPI {
 
     private final CSMReviewDelegateLookupImpl delegateLookupImpl;
 
-    CSMReviewTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    CSMReviewTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "videoId",
             "studio",
@@ -568,8 +568,8 @@ public class CSMReviewTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

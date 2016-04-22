@@ -59,7 +59,7 @@ public class StreamNonImageInfoHollow extends HollowObject {
         return  api().getAudioStreamInfoHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

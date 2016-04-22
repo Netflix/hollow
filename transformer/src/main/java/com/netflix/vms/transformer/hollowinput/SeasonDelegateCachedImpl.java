@@ -9,14 +9,14 @@ import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 public class SeasonDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, SeasonDelegate {
 
     private final Long sequenceNumber;
-    private final int childrenOrdinal;
     private final Long movieId;
+    private final int episodesOrdinal;
    private SeasonTypeAPI typeAPI;
 
     public SeasonDelegateCachedImpl(SeasonTypeAPI typeAPI, int ordinal) {
         this.sequenceNumber = typeAPI.getSequenceNumberBoxed(ordinal);
-        this.childrenOrdinal = typeAPI.getChildrenOrdinal(ordinal);
         this.movieId = typeAPI.getMovieIdBoxed(ordinal);
+        this.episodesOrdinal = typeAPI.getEpisodesOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -28,16 +28,16 @@ public class SeasonDelegateCachedImpl extends HollowObjectAbstractDelegate imple
         return sequenceNumber;
     }
 
-    public int getChildrenOrdinal(int ordinal) {
-        return childrenOrdinal;
-    }
-
     public long getMovieId(int ordinal) {
         return movieId.longValue();
     }
 
     public Long getMovieIdBoxed(int ordinal) {
         return movieId;
+    }
+
+    public int getEpisodesOrdinal(int ordinal) {
+        return episodesOrdinal;
     }
 
     @Override

@@ -7,7 +7,7 @@ public class DisallowedAssetBundleTypeAPI extends HollowObjectTypeAPI {
 
     private final DisallowedAssetBundleDelegateLookupImpl delegateLookupImpl;
 
-    DisallowedAssetBundleTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    DisallowedAssetBundleTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "forceSubtitle",
             "audioLanguageCode",
@@ -55,8 +55,8 @@ public class DisallowedAssetBundleTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

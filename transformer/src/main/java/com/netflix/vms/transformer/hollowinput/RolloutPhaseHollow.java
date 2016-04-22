@@ -53,7 +53,15 @@ public class RolloutPhaseHollow extends HollowObject {
         return  api().getStringHollow(refOrdinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public boolean _getOnHold() {
+        return delegate().getOnHold(ordinal);
+    }
+
+    public Boolean _getOnHoldBoxed() {
+        return delegate().getOnHoldBoxed(ordinal);
+    }
+
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

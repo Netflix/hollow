@@ -7,11 +7,11 @@ public class SeasonTypeAPI extends HollowObjectTypeAPI {
 
     private final SeasonDelegateLookupImpl delegateLookupImpl;
 
-    SeasonTypeAPI(VMSHollowVideoInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    SeasonTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "sequenceNumber",
-            "children",
-            "movieId"
+            "movieId",
+            "episodes"
         });
         this.delegateLookupImpl = new SeasonDelegateLookupImpl(this);
     }
@@ -37,29 +37,19 @@ public class SeasonTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public int getChildrenOrdinal(int ordinal) {
-        if(fieldIndex[1] == -1)
-            return missingDataHandler().handleReferencedOrdinal("Season", ordinal, "children");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[1]);
-    }
-
-    public EpisodeListTypeAPI getChildrenTypeAPI() {
-        return getAPI().getEpisodeListTypeAPI();
-    }
-
     public long getMovieId(int ordinal) {
-        if(fieldIndex[2] == -1)
+        if(fieldIndex[1] == -1)
             return missingDataHandler().handleLong("Season", ordinal, "movieId");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[2]);
+        return getTypeDataAccess().readLong(ordinal, fieldIndex[1]);
     }
 
     public Long getMovieIdBoxed(int ordinal) {
         long l;
-        if(fieldIndex[2] == -1) {
+        if(fieldIndex[1] == -1) {
             l = missingDataHandler().handleLong("Season", ordinal, "movieId");
         } else {
-            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[2]);
-            l = getTypeDataAccess().readLong(ordinal, fieldIndex[2]);
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[1]);
+            l = getTypeDataAccess().readLong(ordinal, fieldIndex[1]);
         }
         if(l == Long.MIN_VALUE)
             return null;
@@ -68,13 +58,23 @@ public class SeasonTypeAPI extends HollowObjectTypeAPI {
 
 
 
+    public int getEpisodesOrdinal(int ordinal) {
+        if(fieldIndex[2] == -1)
+            return missingDataHandler().handleReferencedOrdinal("Season", ordinal, "episodes");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[2]);
+    }
+
+    public EpisodeListTypeAPI getEpisodesTypeAPI() {
+        return getAPI().getEpisodeListTypeAPI();
+    }
+
     public SeasonDelegateLookupImpl getDelegateLookupImpl() {
         return delegateLookupImpl;
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) api;
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
     }
 
 }

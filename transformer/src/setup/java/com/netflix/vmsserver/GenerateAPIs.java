@@ -17,17 +17,17 @@ import org.junit.Test;
 
 public class GenerateAPIs {
 
-    private static final String TRANSFORMER_PROJECT_BASE_DIR = "/common/git/videometadata-transformer";
+    private static final String TRANSFORMER_PROJECT_BASE_DIR = "/common/git/videometadata-transformer/transformer";
     private static final String CONVERTER_PROJECT_BASE_DIR = "/common/git/videometadata-converter";
 
     @Test
-    public void generateEverythingElse() throws IOException {
+    public void generateInputAPI() throws IOException {
         String schemas = IOUtils.toString(new FileReader(CONVERTER_PROJECT_BASE_DIR + "/src/main/resources/schemas.txt"));
         Collection<HollowSchema> configuredSchemas = HollowSchemaParser.parseCollectionOfSchemas(schemas);
 
         HollowWriteStateEngine stateEngine = HollowWriteStateCreator.createWithSchemas(configuredSchemas);
 
-        HollowAPIGenerator videosGenerator = new HollowAPIGenerator("VMSHollowVideoInputAPI", "com.netflix.vms.transformer.hollowinput", stateEngine);
+        HollowAPIGenerator videosGenerator = new HollowAPIGenerator("VMSHollowInputAPI", "com.netflix.vms.transformer.hollowinput", stateEngine);
         videosGenerator.generateFiles(TRANSFORMER_PROJECT_BASE_DIR + "/src/main/java/com/netflix/vms/transformer/hollowinput");
     }
 

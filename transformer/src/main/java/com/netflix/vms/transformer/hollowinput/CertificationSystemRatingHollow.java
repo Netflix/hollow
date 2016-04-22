@@ -32,7 +32,7 @@ public class CertificationSystemRatingHollow extends HollowObject {
         return delegate().getMaturityLevelBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

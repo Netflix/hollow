@@ -4,9 +4,13 @@ import com.netflix.hollow.objects.delegate.HollowObjectDelegate;
 
 public interface RolloutPhaseWindowDelegate extends HollowObjectDelegate {
 
-    public int getEndDateOrdinal(int ordinal);
+    public long getEndDate(int ordinal);
 
-    public int getStartDateOrdinal(int ordinal);
+    public Long getEndDateBoxed(int ordinal);
+
+    public long getStartDate(int ordinal);
+
+    public Long getStartDateBoxed(int ordinal);
 
     public RolloutPhaseWindowTypeAPI getTypeAPI();
 

@@ -20,6 +20,9 @@ public class Phase implements Cloneable {
     public List<SupplementalVideo> supplementalVideos = null;
     public Set<Long> artWorkImageIds = null;
     public Set<Strings> sourceFileIds = null;
+    public char[] phaseType = null;
+    public boolean isOnHold = false;
+    public Video seasonVideo = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
@@ -60,6 +63,11 @@ public class Phase implements Cloneable {
         if(o.sourceFileIds == null) {
             if(sourceFileIds != null) return false;
         } else if(!o.sourceFileIds.equals(sourceFileIds)) return false;
+        if(!Arrays.equals(o.phaseType, phaseType)) return false;
+        if(o.isOnHold != isOnHold) return false;
+        if(o.seasonVideo == null) {
+            if(seasonVideo != null) return false;
+        } else if(!o.seasonVideo.equals(seasonVideo)) return false;
         return true;
     }
 
@@ -78,6 +86,9 @@ public class Phase implements Cloneable {
         hashCode = hashCode * 31 + (supplementalVideos == null ? 1237 : supplementalVideos.hashCode());
         hashCode = hashCode * 31 + (artWorkImageIds == null ? 1237 : artWorkImageIds.hashCode());
         hashCode = hashCode * 31 + (sourceFileIds == null ? 1237 : sourceFileIds.hashCode());
+        hashCode = hashCode * 31 + Arrays.hashCode(phaseType);
+        hashCode = hashCode * 31 + (isOnHold? 1231 : 1237);
+        hashCode = hashCode * 31 + (seasonVideo == null ? 1237 : seasonVideo.hashCode());
         return hashCode;
     }
 
@@ -96,6 +107,9 @@ public class Phase implements Cloneable {
         builder.append(",supplementalVideos=").append(supplementalVideos);
         builder.append(",artWorkImageIds=").append(artWorkImageIds);
         builder.append(",sourceFileIds=").append(sourceFileIds);
+        builder.append(",phaseType=").append(phaseType);
+        builder.append(",isOnHold=").append(isOnHold);
+        builder.append(",seasonVideo=").append(seasonVideo);
         builder.append("}");
         return builder.toString();
     }

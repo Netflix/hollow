@@ -99,7 +99,7 @@ public class StreamProfilesHollow extends HollowObject {
         return delegate().getIsAdaptiveSwitchingBoxed(ordinal);
     }
 
-    public VMSHollowVideoInputAPI api() {
+    public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
 

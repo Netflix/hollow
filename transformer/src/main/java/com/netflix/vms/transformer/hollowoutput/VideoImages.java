@@ -1,11 +1,13 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class VideoImages implements Cloneable {
 
-    public List<ArtWorkDescriptor> artWorkDescriptors = null;
-    public ArtWorkIndex artWorkIndex = null;
+    public Map<Strings, List<Artwork>> artworks = null;
+    public Map<ArtWorkImageTypeEntry, Set<ArtWorkImageFormatEntry>> artworkFormatsByType = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
@@ -13,26 +15,26 @@ public class VideoImages implements Cloneable {
             return false;
 
         VideoImages o = (VideoImages) other;
-        if(o.artWorkDescriptors == null) {
-            if(artWorkDescriptors != null) return false;
-        } else if(!o.artWorkDescriptors.equals(artWorkDescriptors)) return false;
-        if(o.artWorkIndex == null) {
-            if(artWorkIndex != null) return false;
-        } else if(!o.artWorkIndex.equals(artWorkIndex)) return false;
+        if(o.artworks == null) {
+            if(artworks != null) return false;
+        } else if(!o.artworks.equals(artworks)) return false;
+        if(o.artworkFormatsByType == null) {
+            if(artworkFormatsByType != null) return false;
+        } else if(!o.artworkFormatsByType.equals(artworkFormatsByType)) return false;
         return true;
     }
 
     public int hashCode() {
         int hashCode = 1;
-        hashCode = hashCode * 31 + (artWorkDescriptors == null ? 1237 : artWorkDescriptors.hashCode());
-        hashCode = hashCode * 31 + (artWorkIndex == null ? 1237 : artWorkIndex.hashCode());
+        hashCode = hashCode * 31 + (artworks == null ? 1237 : artworks.hashCode());
+        hashCode = hashCode * 31 + (artworkFormatsByType == null ? 1237 : artworkFormatsByType.hashCode());
         return hashCode;
     }
 
     public String toString() {
         StringBuilder builder = new StringBuilder("VideoImages{");
-        builder.append("artWorkDescriptors=").append(artWorkDescriptors);
-        builder.append(",artWorkIndex=").append(artWorkIndex);
+        builder.append("artworks=").append(artworks);
+        builder.append(",artworkFormatsByType=").append(artworkFormatsByType);
         builder.append("}");
         return builder.toString();
     }
