@@ -78,20 +78,20 @@ public class ValidationVideoRanker {
 	}
 
     private void addFailedIDs(List<VideoCountryKey> mostValueableVideosToTest,
-			Set<VideoCountryKey> pastFailedIDsToCheck2, Set<String> importantCountriesToTest) {
-    	for(VideoCountryKey failedOne: pastFailedIDsToCheck2){
-    		if(importantCountriesToTest.contains(failedOne.getCountry())) //do not failed id if the country has been excluded from PBM tests
-    			mostValueableVideosToTest.add(failedOne);
-    	}
-	}
+            Set<VideoCountryKey> pastFailedIDsToCheck2, Set<String> importantCountriesToTest) {
+        for (VideoCountryKey failedOne: pastFailedIDsToCheck2) {
+            if (importantCountriesToTest.contains(failedOne.getCountry())) //do not failed id if the country has been excluded from PBM tests
+                mostValueableVideosToTest.add(failedOne);
+        }
+    }
 
-	private Object getFailedIDsStr(Set<VideoCountryKey> failedIDs) {
-    	StringBuilder idStr = new StringBuilder();
-		for(VideoCountryKey v: failedIDs){
-			idStr.append(v.toShortString()).append(",");
-		}
-		return idStr;
-	}
+    private Object getFailedIDsStr(Set<VideoCountryKey> failedIDs) {
+        StringBuilder idStr = new StringBuilder();
+        for (VideoCountryKey v: failedIDs) {
+          idStr.append(v.toShortString()).append(",");
+        }
+        return idStr;
+    }
 
 	private List<Integer> getSortedTopNVideos(Map<Integer, Float> videoViewHrs1Day, Set<Integer> videosWithPckgDataChange, Set<Integer> videosWithCompVideoChange) {
         if(nullOrEmpty(videoViewHrs1Day)) return Collections.emptyList();
@@ -136,24 +136,22 @@ public class ValidationVideoRanker {
 
         @Override
         public int compare(Integer o1, Integer o2) {
-        	/**
-        	 * Among the topN videos, prioritize package changes first, then complete video changes.
-        	 * If package and complete video changes are equal, then compare by view share.
-        	 */
-        	ComparisonChain chain = ComparisonChain.start()
-        			.compareTrueFirst(videosWithPckgDataChange.contains(o1), videosWithPckgDataChange.contains(o2))
-        			.compareTrueFirst(videosWithCompVideoChange.contains(o1), videosWithCompVideoChange.contains(o2))
-        			.compare(videoViewHoursMap.get(o2), videoViewHoursMap.get(o1));
+            /**
+             * Among the topN videos, prioritize package changes first, then complete video changes.
+             * If package and complete video changes are equal, then compare by view share.
+             */
+            ComparisonChain chain = ComparisonChain.start()
+                .compareTrueFirst(videosWithPckgDataChange.contains(o1), videosWithPckgDataChange.contains(o2))
+                .compareTrueFirst(videosWithCompVideoChange.contains(o1), videosWithCompVideoChange.contains(o2))
+                .compare(videoViewHoursMap.get(o2), videoViewHoursMap.get(o1));
             return chain.result();
         }
-
     }
 
-	/**
-	 * This comparator assumes that all videos being compared are from topN list
-	 * @author lkanchanapalli
-	 *
-	 */
+    /**
+     * This comparator assumes that all videos being compared are from topN list
+     * @author lkanchanapalli
+     */
     public class TopNViewShareAndModifiedInCycleComparator implements Comparator<Integer> {
         private final Set<Integer> videosModInThisCycle;
         private final Map<Integer, Float> videoViewHoursMap;

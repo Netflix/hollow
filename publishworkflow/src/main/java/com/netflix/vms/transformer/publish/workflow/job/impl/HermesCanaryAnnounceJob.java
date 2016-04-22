@@ -9,21 +9,16 @@ import java.util.List;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 
 public class HermesCanaryAnnounceJob extends CanaryAnnounceJob {
-
-    
-
     public HermesCanaryAnnounceJob(String vip, long newVersion,
-			RegionEnum region, BeforeCanaryAnnounceJob beforeCanaryAnnounceHook,
-			final CanaryValidationJob previousCycleValidationJob,
-			final List<PublicationJob> newPublishJobs) {
-    	super(vip, newVersion, region, beforeCanaryAnnounceHook, previousCycleValidationJob,
-				newPublishJobs);
-	}
+            RegionEnum region, BeforeCanaryAnnounceJob beforeCanaryAnnounceHook,
+            final CanaryValidationJob previousCycleValidationJob,
+            final List<PublicationJob> newPublishJobs) {
+        super(vip, newVersion, region, beforeCanaryAnnounceHook, previousCycleValidationJob,
+                newPublishJobs);
+    }
 
-	@Override
+	  @Override
     protected boolean executeJob() {
         return HermesAnnounceUtil.announce(vip, region, true, getCycleVersion());
     }
-
 }
- 

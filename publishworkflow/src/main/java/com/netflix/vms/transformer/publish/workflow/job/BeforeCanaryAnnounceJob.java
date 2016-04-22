@@ -47,11 +47,11 @@ public abstract class BeforeCanaryAnnounceJob extends PublicationJob {
                 if(jobExistsAndCompletedSuccessfully(snapshotPublishJob))
                     return true;
                 if(jobExistsAndCompletedSuccessfully(deltaPublishJob))
-                	if(jobExistsAndCompletedSuccessfully(previousCanaryValidationJob))
-                		return true;
-                	else if(previousCanaryValidationJob != null && previousCanaryValidationJob.hasJobFailed()
-                			&& jobExistsAndCompletedSuccessfully(previousCanaryRollbackJob))
-                		return true;
+                    if(jobExistsAndCompletedSuccessfully(previousCanaryValidationJob))
+                        return true;
+                    else if(previousCanaryValidationJob != null && previousCanaryValidationJob.hasJobFailed()
+                            && jobExistsAndCompletedSuccessfully(previousCanaryRollbackJob))
+                        return true;
             }
         }
         return false;

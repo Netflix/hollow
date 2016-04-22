@@ -101,7 +101,7 @@ public class HollowPublishWorkflowStager {
 	private Map<RegionEnum, List<PublicationJob>> addPublishJobsAllRegions(long previousVersion, long newVersion, CircuitBreakerJob circuitBreakerJob){
 		Map<RegionEnum, List<PublicationJob>> publishJobsByRegion = new HashMap<>(RegionEnum.values().length);
 	    for(RegionEnum region : PublishRegionProvider.ALL_REGIONS) {
-	    	List<PublicationJob> allPublishJobs = new ArrayList<>();
+          List<PublicationJob> allPublishJobs = new ArrayList<>();
 	        List<PublicationJob> publishJobs = addPublishJobs(region, previousVersion, newVersion);
 	        allPublishJobs.addAll(publishJobs);
 	        publishJobsByRegion.put(region, allPublishJobs);
@@ -114,11 +114,11 @@ public class HollowPublishWorkflowStager {
 	    Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs = new HashMap<RegionEnum, AfterCanaryAnnounceJob>(3);
 
 	    for(RegionEnum region : PublishRegionProvider.ALL_REGIONS) {
-	    	BeforeCanaryAnnounceJob beforeCanaryAnnounceJob = jobCreator.createBeforeCanaryAnnounceJob(vip, newVersion, region, circuitBreakerJob,
-	    														priorCycleCanaryValidationJob, publishJobsByRegion.get(region), priorCycleCanaryRollbackJob);
-	    	scheduler.submitJob(beforeCanaryAnnounceJob);
+          BeforeCanaryAnnounceJob beforeCanaryAnnounceJob = jobCreator.createBeforeCanaryAnnounceJob(vip, newVersion, region, circuitBreakerJob,
+                  priorCycleCanaryValidationJob, publishJobsByRegion.get(region), priorCycleCanaryRollbackJob);
+          scheduler.submitJob(beforeCanaryAnnounceJob);
 
-	    	CanaryAnnounceJob canaryAnnounceJob = jobCreator.createCanaryAnnounceJob(vip, newVersion, region, beforeCanaryAnnounceJob, priorCycleCanaryValidationJob, publishJobsByRegion.get(region));
+          CanaryAnnounceJob canaryAnnounceJob = jobCreator.createCanaryAnnounceJob(vip, newVersion, region, beforeCanaryAnnounceJob, priorCycleCanaryValidationJob, publishJobsByRegion.get(region));
 	        scheduler.submitJob(canaryAnnounceJob);
 
 	        AfterCanaryAnnounceJob afterCanaryAnnounceJob = jobCreator.createAfterCanaryAnnounceJob(vip, newVersion, region, beforeCanaryAnnounceJob, canaryAnnounceJob);
@@ -132,9 +132,9 @@ public class HollowPublishWorkflowStager {
 	    PoisonStateMarkerJob canaryPoisonStateMarkerJob = jobCreator.createPoisonStateMarkerJob(validationJob, newVersion);
 	    CanaryRollbackJob canaryRollbackJob = jobCreator.createCanaryRollbackJob(vip, newVersion, previousVersion, validationJob);
 
-        scheduler.submitJob(validationJob);
-        scheduler.submitJob(canaryPoisonStateMarkerJob);
-        scheduler.submitJob(canaryRollbackJob);
+      scheduler.submitJob(validationJob);
+      scheduler.submitJob(canaryPoisonStateMarkerJob);
+      scheduler.submitJob(canaryRollbackJob);
 
 	    this.priorCycleCanaryRollbackJob = canaryRollbackJob;// this is used in next cycle for dependency wiring.
 	    return validationJob;
@@ -157,11 +157,10 @@ public class HollowPublishWorkflowStager {
 	private void addDeleteJob(long previousVersion, long nextVersion, List<PublicationJob> publishJobsForCycle) {
 		scheduler.submitJob(
 		        jobCreator.createDeleteFileJob(publishJobsForCycle,
-                                				nextVersion,
-                                				fileNamer.getDeltaFileName(previousVersion, nextVersion),
-                                				fileNamer.getReverseDeltaFileName(nextVersion, previousVersion),
-                                				fileNamer.getSnapshotFileName(nextVersion)));
-
+                                           nextVersion,
+                                           fileNamer.getDeltaFileName(previousVersion, nextVersion),
+                                           fileNamer.getReverseDeltaFileName(nextVersion, previousVersion),
+                                           fileNamer.getSnapshotFileName(nextVersion)));
     }
 
 	private List<PublicationJob> addPublishJobs(RegionEnum region, long previousVersion, long newVersion) {

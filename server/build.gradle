@@ -3,13 +3,12 @@ apply plugin: 'war'
 
 dependencies {
     compile project(':vms-transformer-businesslogic')
+    compile project(':vms-transformer-publish-workflow')
     compile 'netflix:vms-hollow-generated-notemplate:latest.release'
 
     compile 'netflix:platform:latest.release'
     compile 'netflix:base-server:latest.release'
     compile 'netflix:awsutils:latest.release'
-    compile 'netflix:hermes:latest.release'
-    compile 'netflix:playback-monkey-model:latest.candidate'
 
     compile 'commons-lang:commons-lang:2.6'
 }

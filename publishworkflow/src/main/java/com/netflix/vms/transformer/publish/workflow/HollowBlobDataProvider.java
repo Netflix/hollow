@@ -38,9 +38,9 @@ public class HollowBlobDataProvider {
     }
 
     public void readSnapshot(File snapshotFile) throws IOException {
-    	hollowReadStateEngine = new HollowReadStateEngine(true);
-    	hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
-    	hollowBlobReader.readSnapshot(new LZ4VMSInputStream(new FileInputStream(snapshotFile)));
+        hollowReadStateEngine = new HollowReadStateEngine(true);
+        hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
+        hollowBlobReader.readSnapshot(new LZ4VMSInputStream(new FileInputStream(snapshotFile)));
     }
 
     public void readDelta(File deltaFile) throws IOException {
@@ -131,7 +131,7 @@ public class HollowBlobDataProvider {
 
             Set<Integer> set = modifiedIds.get(countryId);
             if(set == null)
-            	set = new HashSet<>();
+                set = new HashSet<>();
             set.add(videoId);
             modifiedIds.put(countryId, set);
 
@@ -179,7 +179,7 @@ public class HollowBlobDataProvider {
     }
 
     public long getLoadedVersion(){
-    	return Long.parseLong(hollowReadStateEngine.getHeaderTag("dataVersion"));
+        return Long.parseLong(hollowReadStateEngine.getHeaderTag("dataVersion"));
     }
 
 	public static class VideoCountryKey {
@@ -213,12 +213,12 @@ public class HollowBlobDataProvider {
 	    }
 	    @Override
 	    public String toString() {
-	    	return "VideoCountryKey [country=" + country + ", videoId="
-	    			+ videoId + "]";
+          return "VideoCountryKey [country=" + country + ", videoId="
+              + videoId + "]";
 	    }
 
 	    public String toShortString() {
-	    	return "["+country + ", "+ videoId + "]";
+          return "["+country + ", "+ videoId + "]";
 	    }
 	}
 

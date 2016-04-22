@@ -1,0 +1,15 @@
+apply plugin: 'java'
+
+dependencies {
+    compile project(':vms-transformer-common-interfaces')
+
+    compile 'com.netflix.hollow:netflix-hollow:latest.release'
+    compile 'netflix:vms-hollow-generated-notemplate:latest.release'
+    compile 'netflix:platform:latest.release'
+    compile 'netflix:awsutils:latest.release'
+    compile 'netflix:hermes:latest.release'
+    compile 'netflix:playback-monkey-model:latest.candidate'
+
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.assertj:assertj-core:3.3+'
+}
