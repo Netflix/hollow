@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.modules.countryspecific;
 
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.TransformerContext;
-import com.netflix.vms.transformer.hollowinput.PackagesHollow;
+import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractAssetHollow;
@@ -21,6 +21,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoResolution;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,7 +32,7 @@ import java.util.TreeSet;
 
 public class WindowPackageContractInfoModule {
 
-	private final VMSHollowInputAPI api;
+    private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
     private final HollowPrimaryKeyIndex packageIdx;
     private final HollowPrimaryKeyIndex streamProfileIdx;
@@ -42,13 +43,13 @@ public class WindowPackageContractInfoModule {
     private final VideoPackageInfo FILTERED_VIDEO_PACKAGE_INFO;
 
     public WindowPackageContractInfoModule(VMSHollowInputAPI api, TransformerContext ctx, VMSTransformerIndexer indexer) {
-    	this.api = api;
-    	this.ctx = ctx;
+        this.api = api;
+        this.ctx = ctx;
 
-    	this.packageMomentDataModule = new PackageMomentDataModule(api, indexer);
+        this.packageMomentDataModule = new PackageMomentDataModule(api, indexer);
 
-    	this.packageIdx = indexer.getPrimaryKeyIndex(IndexSpec.PACKAGES);
-    	this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
+        this.packageIdx = indexer.getPrimaryKeyIndex(IndexSpec.PACKAGES);
+        this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
 
         this.soundTypesMap = getSoundTypesMap();
 
@@ -56,7 +57,7 @@ public class WindowPackageContractInfoModule {
     }
 
     public WindowPackageContractInfo buildWindowPackageContractInfo(PackageData packageData, VideoRightsContractHollow contract, String country) {
-        PackagesHollow inputPackage = api.getPackagesHollow(packageIdx.getMatchingOrdinal((long)packageData.id));
+        PackageHollow inputPackage = api.getPackageHollow(packageIdx.getMatchingOrdinal((long) packageData.id));
 
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();

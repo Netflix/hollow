@@ -17,6 +17,7 @@ import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
 import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.VideoMediaData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -113,7 +114,7 @@ public class VideoMediaDataModule {
             VideoTypeDescriptorHollow typeDescriptor = null;
             if (videoTypeMatches != null) {
                 typeDescriptor = api.getVideoTypeDescriptorHollow(videoTypeMatches.iterator().next());
-                vmd.isOriginal = typeDescriptor._getIsOriginal();
+                vmd.isOriginal = typeDescriptor._getOriginal();
             }
         }
         return (rightsOrdinal != -1);
@@ -144,14 +145,14 @@ public class VideoMediaDataModule {
 
     private void setReferencesForRollupDown(VideoMediaData vmd, HierarchyLeveL level) {
         switch (level) {
-        case SHOW:
-            showData = vmd;
-            break;
-        case SEASON:
-            seasonData = vmd;
-            break;
-        default:
-            break;
+            case SHOW:
+                showData = vmd;
+                break;
+            case SEASON:
+                seasonData = vmd;
+                break;
+            default:
+                break;
         }
     }
 

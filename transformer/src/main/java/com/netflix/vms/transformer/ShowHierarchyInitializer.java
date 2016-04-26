@@ -5,16 +5,13 @@ import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.util.IntList;
-import com.netflix.vms.transformer.hollowinput.CountryVideoDisplaySetHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
-import com.netflix.vms.transformer.hollowinput.IndividualTrailerHollow;
+import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseHollow;
-import com.netflix.vms.transformer.hollowinput.RolloutPhaseTrailerHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowHollow;
-import com.netflix.vms.transformer.hollowinput.TrailerHollow;
+import com.netflix.vms.transformer.hollowinput.SupplementalsHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
-import com.netflix.vms.transformer.hollowinput.VideoDisplaySetHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
@@ -51,18 +48,15 @@ public class ShowHierarchyInitializer {
     private Set<Integer> findAllSupplementalVideoIds(VMSHollowInputAPI videoAPI) {
         Set<Integer> ids = new HashSet<Integer>();
 
-        for(IndividualTrailerHollow supplemental : videoAPI.getAllIndividualTrailerHollow())
+        for (IndividualSupplementalHollow supplemental : videoAPI.getAllIndividualSupplementalHollow())
             ids.add((int)supplemental._getMovieId());
-
-        for(RolloutPhaseTrailerHollow rolloutTrailer : videoAPI.getAllRolloutPhaseTrailerHollow())
-            ids.add((int)rolloutTrailer._getTrailerMovieId());
 
         return ids;
     }
 
     public Map<String, ShowHierarchy> getShowHierarchiesByCountry(VideoDisplaySetHollow displaySet) {
         long topNodeId = displaySet._getTopNodeId();
-        
+
         if(supplementalIds.contains((int)topNodeId))
             return null;
 
@@ -124,7 +118,7 @@ public class ShowHierarchyInitializer {
         int ordinal = queryResult.iterator().next();
 
         VideoTypeDescriptorHollow countryType = videoAPI.getVideoTypeDescriptorHollow(ordinal);
-        if(countryType._getIsCanon() || countryType._getIsExtended())
+        if (countryType._getExtended())
             return true;
 
         for(VideoTypeMediaHollow media : countryType._getMedia()) {
@@ -142,9 +136,8 @@ public class ShowHierarchyInitializer {
             return false;
 
         int ordinal = queryResult.iterator().next();
-
         VideoTypeDescriptorHollow countryType = videoAPI.getVideoTypeDescriptorHollow(ordinal);
-        return countryType._getIsContentApproved();
+        return countryType != null;
     }
 
     boolean isGoLiveOrHasFirstDisplayDate(long videoId, String countryCode) {
@@ -182,15 +175,15 @@ public class ShowHierarchyInitializer {
         int rolloutOrdinal = iter.next();
         while(rolloutOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
             RolloutHollow rollout = videoAPI.getRolloutHollow(rolloutOrdinal);
-    
+
             for(RolloutPhaseHollow phase : rollout._getPhases()) {
                 for(Map.Entry<ISOCountryHollow, RolloutPhaseWindowHollow> entry : phase._getWindows().entrySet()) {
                     if(entry.getKey()._isValueEqual(country)) {
-                        return entry.getValue()._getEndDate()._getValue() >= ctx.getNowMillis();
+                        return entry.getValue()._getEndDate() >= ctx.getNowMillis();
                     }
                 }
             }
-            
+
             rolloutOrdinal = iter.next();
         }
 
@@ -203,8 +196,8 @@ public class ShowHierarchyInitializer {
         if(supplementalsOrdinal == -1)
             return;
 
-        TrailerHollow supplementals = videoAPI.getTrailerHollow(supplementalsOrdinal);
-        for(IndividualTrailerHollow supplemental : supplementals._getTrailers()) {
+        SupplementalsHollow supplementals = videoAPI.getSupplementalsHollow(supplementalsOrdinal);
+        for (IndividualSupplementalHollow supplemental : supplementals._getSupplementals()) {
             int supplementalId = (int)supplemental._getMovieId();
             if(isChildNodeIncluded(supplementalId, countryCode))
                 toList.add(supplementalId);

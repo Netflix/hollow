@@ -2,35 +2,23 @@ package com.netflix.vms.transformer.modules.rollout;
 
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.TransformerContext;
-import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
-import com.netflix.vms.transformer.hollowinput.IndividualTrailerHollow;
+import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
 import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
 import com.netflix.vms.transformer.hollowinput.MultiValuePassthroughMapHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutHollow;
-import com.netflix.vms.transformer.hollowinput.RolloutMapOfLaunchDatesHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkSourceFileIdHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkSourceFileIdListHollow;
-import com.netflix.vms.transformer.hollowinput.RolloutPhaseCastHollow;
-import com.netflix.vms.transformer.hollowinput.RolloutPhaseCastListHollow;
-import com.netflix.vms.transformer.hollowinput.RolloutPhaseCharacterHollow;
-import com.netflix.vms.transformer.hollowinput.RolloutPhaseCharacterListHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseElementsHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseHollow;
-import com.netflix.vms.transformer.hollowinput.RolloutPhaseImageIdHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseListHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseLocalizedMetadataHollow;
-import com.netflix.vms.transformer.hollowinput.RolloutPhaseOldArtworkListHollow;
-import com.netflix.vms.transformer.hollowinput.RolloutPhaseTrailerHollow;
-import com.netflix.vms.transformer.hollowinput.RolloutPhaseTrailerListHollow;
-import com.netflix.vms.transformer.hollowinput.RolloutPhaseTrailerSupplementalInfoHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowMapHollow;
-import com.netflix.vms.transformer.hollowinput.RolloutPhasesElementsTrailerSupplementalInfoMapHollow;
 import com.netflix.vms.transformer.hollowinput.SingleValuePassthroughMapHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
-import com.netflix.vms.transformer.hollowinput.TrailerHollow;
+import com.netflix.vms.transformer.hollowinput.SupplementalsHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.AvailabilityWindow;
 import com.netflix.vms.transformer.hollowoutput.Date;
@@ -44,10 +32,8 @@ import com.netflix.vms.transformer.hollowoutput.RolloutSummary;
 import com.netflix.vms.transformer.hollowoutput.RolloutTrailer;
 import com.netflix.vms.transformer.hollowoutput.RolloutVideo;
 import com.netflix.vms.transformer.hollowoutput.Strings;
-import com.netflix.vms.transformer.hollowoutput.SupplementalInfoType;
 import com.netflix.vms.transformer.hollowoutput.SupplementalVideo;
 import com.netflix.vms.transformer.hollowoutput.TrailerInfo;
-import com.netflix.vms.transformer.hollowoutput.VPerson;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
@@ -70,7 +56,7 @@ public class RolloutVideoModule extends AbstractTransformModule {
     @Override
     public void transform() {
         Map<Integer, List<RolloutHollow>> videoIdToRolloutMap = getVideoIdToRolloutMap();
-        Map<Integer, IndividualTrailerHollow> trailerIdToTrailerMap = getTrailerIdToTrailerMap();
+        Map<Integer, IndividualSupplementalHollow> trailerIdToTrailerMap = getTrailerIdToTrailerMap();
 
         for (Integer videoId : videoIdToRolloutMap.keySet()) {
             RolloutVideo output = new RolloutVideo();
@@ -104,14 +90,6 @@ public class RolloutVideoModule extends AbstractTransformModule {
                     phase.video = info.video;
 
                     copy(phaseHollow, phase);
-
-                    // trailers
-                    RolloutPhaseTrailerListHollow inputTrailerList = phaseHollow._getElements()._getTrailers();
-                    for (RolloutPhaseTrailerHollow phaseTrailer : inputTrailerList) {
-                        RolloutTrailer outputTrailer = new RolloutTrailer();
-                        copy(phaseTrailer, outputTrailer);
-                        phase.trailers.add(outputTrailer);
-                    }
 
                     RolloutPhaseWindowMapHollow phaseWindows = phaseHollow._getWindows();
                     for(Entry<ISOCountryHollow, RolloutPhaseWindowHollow> entry : phaseWindows.entrySet()) {
@@ -152,7 +130,7 @@ public class RolloutVideoModule extends AbstractTransformModule {
 
 
                     for (RolloutTrailer rolloutTrailer : phase.trailers) {
-                        IndividualTrailerHollow indivTrailerHollow = trailerIdToTrailerMap.get(rolloutTrailer.video.value);
+                        IndividualSupplementalHollow indivTrailerHollow = trailerIdToTrailerMap.get(rolloutTrailer.video.value);
                         if (indivTrailerHollow == null)
                             continue;
 
@@ -163,28 +141,6 @@ public class RolloutVideoModule extends AbstractTransformModule {
                         phase.supplementalVideos.add(sv);
                     }
                     Collections.sort(phase.supplementalVideos, new SupplementalVideoComparator());
-
-
-                    RolloutPhaseCharacterListHollow charList = phaseHollow._getElements()._getCharacters();
-                    for (RolloutPhaseCharacterHollow phaseChar : charList) {
-                        RolloutRole role = new RolloutRole();
-                        copy(phaseChar, role);
-                        phase.roles.add(role);
-                    }
-
-                    // #cleanup: launch-dates are pulled down, and duplicated for every phase level
-                    RolloutMapOfLaunchDatesHollow launchMap = rollout._getLaunchDates();
-                    for (Map.Entry<ISOCountryHollow, DateHollow> entry : launchMap.entrySet()) {
-                        phase.projectedLaunchDates.put(new ISOCountry(entry.getKey()._getValue()), new Date(entry.getValue()._getValue()));
-                    }
-
-
-                    RolloutPhaseCastListHollow castList = phaseHollow._getElements()._getCast();
-                    for (RolloutPhaseCastHollow castIn : castList) {
-                        RolloutCast rc = new RolloutCast();
-                        copy(castIn, rc);
-                        phase.casts.add(rc);
-                    }
 
                     summary.allPhases.add(phase);
                 }
@@ -209,11 +165,11 @@ public class RolloutVideoModule extends AbstractTransformModule {
         return videoIdToRolloutMap;
     }
 
-    private Map<Integer, IndividualTrailerHollow> getTrailerIdToTrailerMap() {
-        Map<Integer, IndividualTrailerHollow> trailerIdToTrailerMap = new HashMap<>();
+    private Map<Integer, IndividualSupplementalHollow> getTrailerIdToTrailerMap() {
+        Map<Integer, IndividualSupplementalHollow> trailerIdToTrailerMap = new HashMap<>();
 
-        for (TrailerHollow trailerHollow : api.getAllTrailerHollow()) {
-            for (IndividualTrailerHollow trailer : trailerHollow._getTrailers()) {
+        for (SupplementalsHollow suppHollow : api.getAllSupplementalsHollow()) {
+            for (IndividualSupplementalHollow trailer : suppHollow._getSupplementals()) {
                 trailerIdToTrailerMap.put((int) trailer._getMovieId(), trailer);
             }
         }
@@ -252,73 +208,17 @@ public class RolloutVideoModule extends AbstractTransformModule {
         phase.name = phaseHollow._getName()._getValue().toCharArray();
         phase.isCoreMetaDataShown = phaseHollow._getShowCoreMetadata();
 
-        // add artwork ids
-        RolloutPhaseOldArtworkListHollow artworkIdList = phaseHollow._getElements()._getArtwork();
-        for (RolloutPhaseImageIdHollow idHollow : artworkIdList) {
-            phase.artWorkImageIds.add(new com.netflix.vms.transformer.hollowoutput.Long(idHollow._getImageId()));
-        }
-
         // add artwork source fields
-        RolloutPhaseArtworkSourceFileIdListHollow artworkSourceFieldList = phaseHollow._getElements()._getArtwork_new()._getSourceFileIds();
+        RolloutPhaseArtworkSourceFileIdListHollow artworkSourceFieldList = phaseHollow._getElements()._getArtwork()._getSourceFileIds();
         for (RolloutPhaseArtworkSourceFileIdHollow sourceFieldHollow : artworkSourceFieldList) {
             phase.sourceFileIds.add(new Strings(sourceFieldHollow._getValue()._getValue()));
         }
     }
 
     // src -> dest
-    private void copy(RolloutPhaseTrailerSupplementalInfoHollow infoIn, TrailerInfo infoOut) {
-        infoOut.imageBackgroundTone = infoIn._getImageBackgroundTone()._getValue().toCharArray();
-        infoOut.imageTag = infoIn._getImageTag()._getValue().toCharArray();
-        infoOut.priority = (int) infoIn._getPriority();
-        infoOut.seasonNumber = (int) infoIn._getSeasonNumber();
-        infoOut.subtitleLocale = infoIn._getSubtitleLocale()._getValue().toCharArray();
-        infoOut.video = infoIn._getVideo()._getValue().toCharArray();
-        infoOut.videoLength = (int) infoIn._getVideoLength();
-        infoOut.videoValue = infoIn._getVideoValue()._getValue().toCharArray();
-
-        // #for-parity
-        if (infoOut.subtitleLocale.length == 0)
-            infoOut.subtitleLocale = null;
-        if (infoOut.videoLength == 0)
-            infoOut.videoLength = Integer.MIN_VALUE;
-    }
-
-    // src -> dest
-    private void copy(RolloutPhaseTrailerHollow phaseTrailer, RolloutTrailer outputTrailer) {
-        outputTrailer.sequenceNumber = (int) phaseTrailer._getSequenceNumber();
-        outputTrailer.video = new Video((int) phaseTrailer._getTrailerMovieId());
-        outputTrailer.supplementalInfos = new HashMap<SupplementalInfoType, TrailerInfo>();
-        RolloutPhasesElementsTrailerSupplementalInfoMapHollow inputInfoMap = phaseTrailer._getSupplementalInfo();
-
-        for (Entry<MapKeyHollow, RolloutPhaseTrailerSupplementalInfoHollow> entry : inputInfoMap.entrySet()) {
-            SupplementalInfoType typeOut = new SupplementalInfoType(entry.getKey()._getValue());
-            RolloutPhaseTrailerSupplementalInfoHollow infoIn = entry.getValue();
-
-            TrailerInfo infoOut = new TrailerInfo();
-            infoOut.type = typeOut;
-            copy(infoIn, infoOut);
-            outputTrailer.supplementalInfos.put(typeOut, infoOut);
-        }
-    }
-
-    // src -> dest
-    private void copy(RolloutPhaseCharacterHollow phaseChar, RolloutRole role) {
-        role.characterId = (int) phaseChar._getCharacterId();
-        role.id = (int) phaseChar._getRoleId();
-        role.sequenceNumber = (int) phaseChar._getSequenceNumber();
-        role.person = new VPerson((int) phaseChar._getPersonId());
-    }
-
-    // src -> dest
-    private void copy(RolloutPhaseCastHollow castIn, RolloutCast rc) {
-        rc.person = new VPerson((int) castIn._getPersonId());
-        rc.sequenceNumber = (int) castIn._getSequenceNumber();
-    }
-
-    // src -> dest
     private void copy(RolloutPhaseWindowHollow inputPhaseWindow, AvailabilityWindow w) {
-        w.startDate = new Date(inputPhaseWindow._getStartDate()._getValue());
-        w.endDate = new Date(inputPhaseWindow._getEndDate()._getValue());
+        w.startDate = new Date(inputPhaseWindow._getStartDate());
+        w.endDate = new Date(inputPhaseWindow._getEndDate());
     }
 
     // src -> dest
@@ -334,7 +234,7 @@ public class RolloutVideoModule extends AbstractTransformModule {
     }
 
     // src -> dest
-    private void copy(IndividualTrailerHollow indivTrailerHollow, SupplementalVideo sv) {
+    private void copy(IndividualSupplementalHollow indivTrailerHollow, SupplementalVideo sv) {
         sv.id = new Video((int) indivTrailerHollow._getMovieId());
         sv.attributes = new HashMap<Strings, Strings>();
         SingleValuePassthroughMapHollow singleValPassthrough = indivTrailerHollow._getPassthrough()._getSingleValues();

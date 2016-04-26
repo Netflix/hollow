@@ -1,40 +1,31 @@
 package com.netflix.vmsserver;
 
-import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
-
-import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
-import com.netflix.hollow.index.HollowHashIndexResult;
-import com.netflix.hollow.index.HollowHashIndex;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
-import java.io.BufferedInputStream;
 import com.netflix.hollow.combine.HollowCombiner;
 import com.netflix.hollow.combine.HollowCombinerIncludeOrdinalsCopyDirector;
+import com.netflix.hollow.index.HollowHashIndex;
+import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.index.traversal.HollowIndexerValueTraverser;
 import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
+import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.write.HollowBlobWriter;
-import com.netflix.videometadata.lz4.LZ4VMSInputStream;
-import com.netflix.vms.generated.notemplate.GlobalVideoHollow;
-import com.netflix.vms.generated.notemplate.L10NResourcesHollow;
-import com.netflix.vms.generated.notemplate.SupplementalVideoHollow;
-import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
-import com.netflix.vms.generated.notemplate.VideoCollectionsDataHollow;
-import com.netflix.vms.generated.notemplate.VideoEpisodeHollow;
-import com.netflix.vms.generated.notemplate.VideoHollow;
-import com.netflix.vms.generated.notemplate.VideoNodeTypeHollow;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+
 import org.junit.Test;
 
 /// NOTE:  This has a dependency on videometadata-common (for LZ4VMSInputStream)
@@ -79,30 +70,35 @@ public class FilterToSmallDataSubset {
         Set<Integer> includedVideoIds = findRandomVideoIds(stateEngine);
 
         BitSet completeVideosToInclude = findIncludedOrdinals("CompleteVideo", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
                 return outputAPI.getCompleteVideoHollow(ordinal)._getId()._getValueBoxed();
             }
         });
 
         BitSet packagesToInclude = findIncludedOrdinals("PackageData", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
                 return outputAPI.getPackageDataHollow(ordinal)._getVideo()._getValueBoxed();
             }
         });
 
         BitSet rolloutVideosToInclude = findIncludedOrdinals("RolloutVideo", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
                 return outputAPI.getRolloutVideoHollow(ordinal)._getVideo()._getValueBoxed();
             }
         });
 
         findIncludedOrdinals("GlobalVideo", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
                 return outputAPI.getGlobalVideoHollow(ordinal)._getCompleteVideo()._getId()._getValueBoxed();
             }
         });
 
         findIncludedOrdinals("VideoEpisode_CountryList", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
                 return outputAPI.getVideoEpisode_CountryListHollow(ordinal)._getItem()._getDeliverableVideo()._getValueBoxed();
             }
@@ -143,12 +139,12 @@ public class FilterToSmallDataSubset {
                         "RolloutVideo", "summaryMap.value.allPhases.element.roles.element.characterId");*/
 
         joinIncludedOrdinals(packagesToInclude,
-                        "FileEncodingData", "downloadableId",
-                        "PackageData", "streams.element.downloadableId");
+                "FileEncodingData", "downloadableId",
+                "PackageData", "streams.element.downloadableId");
 
         joinIncludedOrdinals(packagesToInclude,
-                        "DrmInfoData", "packageId",
-                        "PackageData", "id");
+                "DrmInfoData", "packageId",
+                "PackageData", "id");
 
 
         writeFilteredBlob(FILTERED_OUTPUT_BLOB_LOCATION);
@@ -164,91 +160,109 @@ public class FilterToSmallDataSubset {
         final VMSHollowInputAPI inputAPI = new VMSHollowInputAPI(stateEngine);
 
         findIncludedOrdinals("VideoDisplaySet", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
                 return Integer.valueOf((int)inputAPI.getVideoDisplaySetHollow(ordinal)._getTopNodeId());
             }
         });
         findIncludedOrdinals("Packages", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int)inputAPI.getPackagesHollow(ordinal)._getMovieId());
+                return Integer.valueOf((int) inputAPI.getPackageHollow(ordinal)._getMovieId());
             }
         });
         findIncludedOrdinals("VideoRights", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
                 return Integer.valueOf((int)inputAPI.getVideoRightsHollow(ordinal)._getMovieId());
             }
         });
         findIncludedOrdinals("CSMReview", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
                 return Integer.valueOf((int)inputAPI.getCSMReviewHollow(ordinal)._getVideoId());
             }
         });
         findIncludedOrdinals("DeployablePackages", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
                 return Integer.valueOf((int)inputAPI.getDeployablePackagesHollow(ordinal)._getMovieId());
             }
         });
         findIncludedOrdinals("Episodes", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
                 return Integer.valueOf((int)inputAPI.getEpisodesHollow(ordinal)._getEpisodeId());
             }
         });
         findIncludedOrdinals("LocalizedMetadata", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
                 return Integer.valueOf((int)inputAPI.getLocalizedMetadataHollow(ordinal)._getMovieId());
             }
         });
         findIncludedOrdinals("MovieRatings", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
                 return Integer.valueOf((int)inputAPI.getMovieRatingsHollow(ordinal)._getMovieId());
             }
         });
         findIncludedOrdinals("Movies", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
                 return Integer.valueOf((int)inputAPI.getMoviesHollow(ordinal)._getMovieId());
             }
         });
         findIncludedOrdinals("Rollout", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
                 return Integer.valueOf((int)inputAPI.getRolloutHollow(ordinal)._getMovieId());
             }
         });
         findIncludedOrdinals("Stories_Synopses", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
                 return Integer.valueOf((int)inputAPI.getStories_SynopsesHollow(ordinal)._getMovieId());
             }
         });
         findIncludedOrdinals("Trailer", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
                 return Integer.valueOf((int)inputAPI.getTrailerHollow(ordinal)._getMovieId());
             }
         });
         findIncludedOrdinals("VideoArtwork", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
                 return Integer.valueOf((int)inputAPI.getVideoArtworkHollow(ordinal)._getMovieId());
             }
         });
         findIncludedOrdinals("VideoAward", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
                 return Integer.valueOf((int)inputAPI.getVideoAwardHollow(ordinal)._getVideoId());
             }
         });
         findIncludedOrdinals("VideoDate", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
                 return Integer.valueOf((int)inputAPI.getVideoDateHollow(ordinal)._getVideoId());
             }
         });
         findIncludedOrdinals("VideoGeneral", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
                 return Integer.valueOf((int)inputAPI.getVideoGeneralHollow(ordinal)._getVideoId());
             }
         });
         findIncludedOrdinals("VideoRating", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
                 return Integer.valueOf((int)inputAPI.getVideoRatingHollow(ordinal)._getVideoId());
             }
         });
         findIncludedOrdinals("VideoType", includedVideoIds, new VideoIdDeriver() {
+            @Override
             public Integer deriveId(int ordinal) {
                 return Integer.valueOf((int)inputAPI.getVideoTypeHollow(ordinal)._getVideoId());
             }

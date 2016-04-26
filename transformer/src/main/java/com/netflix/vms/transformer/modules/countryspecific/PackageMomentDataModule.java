@@ -1,38 +1,38 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
-import com.netflix.vms.transformer.hollowinput.PackageMomentListHollow;
-
-import com.netflix.vms.transformer.modules.packages.VideoFormatDescriptorIdentifier;
-import com.netflix.vms.transformer.hollowoutput.TrickPlayType;
-import com.netflix.vms.transformer.hollowinput.CdnDeploymentHollow;
-import java.util.Set;
-import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
-import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
-import com.netflix.vms.transformer.index.IndexSpec;
-import com.netflix.vms.transformer.hollowoutput.VideoImage;
+import com.netflix.vms.transformer.hollowinput.CdnDeploymentHollow;
+import com.netflix.vms.transformer.hollowinput.DownloadableIdHollow;
+import com.netflix.vms.transformer.hollowinput.PackageHollow;
+import com.netflix.vms.transformer.hollowinput.PackageMomentHollow;
+import com.netflix.vms.transformer.hollowinput.PackageMomentListHollow;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
 import com.netflix.vms.transformer.hollowinput.StreamDimensionsHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.BaseDownloadable;
 import com.netflix.vms.transformer.hollowoutput.ImageDownloadable;
 import com.netflix.vms.transformer.hollowoutput.ImageDownloadableDescriptor;
+import com.netflix.vms.transformer.hollowoutput.PackageData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.TargetDimensions;
 import com.netflix.vms.transformer.hollowoutput.TrickPlayDescriptor;
 import com.netflix.vms.transformer.hollowoutput.TrickPlayDownloadable;
 import com.netflix.vms.transformer.hollowoutput.TrickPlayItem;
+import com.netflix.vms.transformer.hollowoutput.TrickPlayType;
 import com.netflix.vms.transformer.hollowoutput.Video;
-import com.netflix.vms.transformer.hollowoutput.VideoResolution;
-import java.util.ArrayList;
-import com.netflix.vms.transformer.hollowinput.DownloadableIdHollow;
-import com.netflix.vms.transformer.hollowinput.PackageMomentHollow;
+import com.netflix.vms.transformer.hollowoutput.VideoImage;
 import com.netflix.vms.transformer.hollowoutput.VideoMoment;
-import java.util.List;
+import com.netflix.vms.transformer.hollowoutput.VideoResolution;
+import com.netflix.vms.transformer.index.IndexSpec;
+import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.modules.packages.VideoFormatDescriptorIdentifier;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import com.netflix.vms.transformer.hollowinput.PackagesHollow;
-import com.netflix.vms.transformer.hollowoutput.PackageData;
+import java.util.Set;
 
 public class PackageMomentDataModule {
 
@@ -56,7 +56,7 @@ public class PackageMomentDataModule {
         this.trickPlayTypeMap = getTrickPlayTypeMap();
     }
 
-    public PackageMomentData getWindowPackageMomentData(PackageData packageData, PackagesHollow inputPackage) {
+    public PackageMomentData getWindowPackageMomentData(PackageData packageData, PackageHollow inputPackage) {
         PackageMomentData packageMomentData = packageMomentDataByPackageId.get(Integer.valueOf(packageData.id));
         if(packageMomentData != null)
             return packageMomentData;
@@ -70,7 +70,7 @@ public class PackageMomentDataModule {
         return packageMomentData;
     }
 
-    private PackageMomentData buildDownloadableIdsToVideoMomentsMap(PackageData packageData, PackagesHollow inputPackage) {
+    private PackageMomentData buildDownloadableIdsToVideoMomentsMap(PackageData packageData, PackageHollow inputPackage) {
         PackageMomentData data = new PackageMomentData();
 
         PackageMomentListHollow moments = inputPackage._getMoments();
@@ -102,7 +102,7 @@ public class PackageMomentDataModule {
         return data;
     }
 
-    private void buildIndexedPackageImageResult(PackagesHollow inputPackage, PackageMomentData packageMomentData) {
+    private void buildIndexedPackageImageResult(PackageHollow inputPackage, PackageMomentData packageMomentData) {
 
         for(PackageStreamHollow stream : inputPackage._getDownloadables()) {
             long streamProfileId = stream._getStreamProfileId();
@@ -139,12 +139,12 @@ public class PackageMomentDataModule {
                 if(moment != null) {
                     //VideoMoment moment = videoMomentList.get(0);
                     //for(VideoMoment moment : videoMomentList) {
-                        List<ImageDownloadable> list = packageMomentData.videoMomentToDownloadableListMap.get(moment);
-                        if(list == null) {
-                            list = new ArrayList<ImageDownloadable>();
-                            packageMomentData.videoMomentToDownloadableListMap.put(moment, list);
-                        }
-                        list.add(downloadable);
+                    List<ImageDownloadable> list = packageMomentData.videoMomentToDownloadableListMap.get(moment);
+                    if(list == null) {
+                        list = new ArrayList<ImageDownloadable>();
+                        packageMomentData.videoMomentToDownloadableListMap.put(moment, list);
+                    }
+                    list.add(downloadable);
                     //}
                 }
             } else if("TRICKPLAY".equals(streamProfileType)) {

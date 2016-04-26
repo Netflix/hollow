@@ -17,8 +17,8 @@ import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.vms.transformer.ShowHierarchy;
 import com.netflix.vms.transformer.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
+import com.netflix.vms.transformer.hollowinput.StoriesSynopsesHollow;
 import com.netflix.vms.transformer.hollowinput.StoriesSynopsesHookHollow;
-import com.netflix.vms.transformer.hollowinput.Stories_SynopsesHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoDateWindowHollow;
@@ -168,7 +168,7 @@ public class VideoMetaDataModule {
         countrySpecificClone.year = countrySpecificKey.year;
         countrySpecificClone.latestYear = countrySpecificKey.latestYear;
         countrySpecificClone.videoSetTypes = countrySpecificKey.videoSetTypes;
-        countrySpecificClone.showMemberTypeId = (int) countrySpecificKey.showMemberTypeId;
+        countrySpecificClone.showMemberTypeId = countrySpecificKey.showMemberTypeId;
         countrySpecificClone.copyright = countrySpecificKey.copyright;
         countrySpecificClone.hasNewContent = countrySpecificKey.hasNewContent;
 
@@ -251,9 +251,9 @@ public class VideoMetaDataModule {
         populateCastLists(videoId, vmd);
         populateHooks(videoId, vmd);
 
-        int typeOrdinal = videoTypeIdx.getMatchingOrdinal((long)videoId);
-        if(typeOrdinal != -1)
-            vmd.isTV = api.getVideoTypeTypeAPI().getIsTV(typeOrdinal);
+        int genOrdinal = videoGeneralIdx.getMatchingOrdinal((long) videoId);
+        if (genOrdinal != -1)
+            vmd.isTV = api.getVideoGeneralTypeAPI().getTv(genOrdinal);
 
         countryAgnosticMap.put(videoId, vmd);
 
@@ -285,8 +285,7 @@ public class VideoMetaDataModule {
         }
 
         if(typeDescriptor != null) {
-            isExtended = typeDescriptor._getIsExtended();
-            isCanon = typeDescriptor._getIsCanon();
+            isExtended = typeDescriptor._getExtended();
         }
 
         Set<VideoSetType> setOfVideoSetType = new HashSet<VideoSetType>();
@@ -298,9 +297,6 @@ public class VideoMetaDataModule {
         } else if(isExtended) {
             setOfVideoSetType.add(EXTENDED);
         }
-
-        if(isCanon)
-            setOfVideoSetType.add(CANON);
 
         if(setOfVideoSetType.isEmpty())
             setOfVideoSetType.add(PAST);
@@ -324,7 +320,7 @@ public class VideoMetaDataModule {
             StringHollow origCountry = general._getOriginCountryCode();
             if(origCountry != null)
                 vmd.countryOfOrigin = new ISOCountry(origCountry._getValue());
-            vmd.countryOfOriginNameLocale = new NFLocale(general._getCountryOfOriginNameLocale()._getValue().replace('-', '_'));
+            vmd.countryOfOriginNameLocale = new NFLocale(general._getOriginalTitleBcpCode()._getValue().replace('-', '_'));
             StringHollow origLang = general._getOriginalLanguageBcpCode();
             if(origLang != null)
                 vmd.originalLanguageBcp47code = new Strings(origLang._getValue());
@@ -339,7 +335,7 @@ public class VideoMetaDataModule {
                 vmd.aliases = aliasList;
             }
 
-            List<VideoGeneralTitleTypeHollow>inputTitleTypes = general._getTitleTypes();
+            List<VideoGeneralTitleTypeHollow> inputTitleTypes = general._getTestTitleTypes();
 
             if(inputTitleTypes != null) {
                 Set<Strings> titleTypes = new HashSet<Strings>();
@@ -421,7 +417,7 @@ public class VideoMetaDataModule {
         int storiesSynopsesOrdinal = storiesSynopsesIdx.getMatchingOrdinal((long)videoId);
 
         if(storiesSynopsesOrdinal != -1) {
-            Stories_SynopsesHollow synopses = api.getStories_SynopsesHollow(storiesSynopsesOrdinal);
+            StoriesSynopsesHollow synopses = api.getStoriesSynopsesHollow(storiesSynopsesOrdinal);
 
             List<Hook> hooks = new ArrayList<Hook>();
 
