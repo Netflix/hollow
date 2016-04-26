@@ -9,14 +9,14 @@ import com.netflix.hollow.util.memory.WastefulRecycler;
 import java.io.IOException;
 import java.io.InputStream;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import org.junit.Test;
 
 public class ShowMeAllTheProgress {
 
     @Test
     public void start() throws Exception {
-        VMSHollowVideoInputAPI api = new VMSHollowVideoInputAPI(loadStateEngine());
+        VMSHollowInputAPI api = new VMSHollowInputAPI(loadStateEngine());
 
         VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
 

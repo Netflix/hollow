@@ -4,7 +4,7 @@ import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.PackagesHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractAssetHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractHollow;
 import com.netflix.vms.transformer.hollowoutput.ContractRestriction;
@@ -31,7 +31,7 @@ import java.util.TreeSet;
 
 public class WindowPackageContractInfoModule {
 
-	private final VMSHollowVideoInputAPI api;
+	private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
     private final HollowPrimaryKeyIndex packageIdx;
     private final HollowPrimaryKeyIndex streamProfileIdx;
@@ -41,7 +41,7 @@ public class WindowPackageContractInfoModule {
     private final Map<Integer, Strings> soundTypesMap;
     private final VideoPackageInfo FILTERED_VIDEO_PACKAGE_INFO;
 
-    public WindowPackageContractInfoModule(VMSHollowVideoInputAPI api, TransformerContext ctx, VMSTransformerIndexer indexer) {
+    public WindowPackageContractInfoModule(VMSHollowInputAPI api, TransformerContext ctx, VMSTransformerIndexer indexer) {
     	this.api = api;
     	this.ctx = ctx;
 

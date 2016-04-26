@@ -8,7 +8,7 @@ import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
 import com.netflix.vms.transformer.hollowinput.PassthroughDataHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.TrailerHollow;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.SupplementalVideo;
 import com.netflix.vms.transformer.hollowoutput.Video;
@@ -26,10 +26,10 @@ public class VideoCollectionsModule {
     private final Strings TRAILER = new Strings("trailer");
     private final Strings IDENTIFIER = new Strings("identifier");
 
-    private final VMSHollowVideoInputAPI videoAPI;
+    private final VMSHollowInputAPI videoAPI;
     private final HollowPrimaryKeyIndex supplementalIndex;
 
-    public VideoCollectionsModule(VMSHollowVideoInputAPI videoAPI, VMSTransformerIndexer indexer) {
+    public VideoCollectionsModule(VMSHollowInputAPI videoAPI, VMSTransformerIndexer indexer) {
         this.videoAPI = videoAPI;
         this.supplementalIndex = indexer.getPrimaryKeyIndex(IndexSpec.SUPPLEMENTAL);
     }

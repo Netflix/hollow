@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.modules.person;
 
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.TransformerContext;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoPersonAliasHollow;
 import com.netflix.vms.transformer.hollowinput.VideoPersonAliasListHollow;
 import com.netflix.vms.transformer.hollowinput.VideoPersonCastHollow;
@@ -24,7 +24,7 @@ import java.util.List;
 
 public class GlobalPersonModule extends AbstractTransformModule {
 
-    public GlobalPersonModule(VMSHollowVideoInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+    public GlobalPersonModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
         super(api, ctx, mapper);
     }
 

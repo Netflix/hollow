@@ -10,7 +10,7 @@ import com.netflix.vms.transformer.hollowinput.CSMReviewHollow;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSAwardHollow;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoAwardHollow;
 import com.netflix.vms.transformer.hollowinput.VideoAwardListHollow;
 import com.netflix.vms.transformer.hollowinput.VideoAwardMappingHollow;
@@ -31,13 +31,13 @@ import java.util.List;
 import java.util.Map;
 
 public class VideoMiscDataModule {
-    private final VMSHollowVideoInputAPI api;
+    private final VMSHollowInputAPI api;
     Map<Integer, VideoMiscData> videoMiscMap = new HashMap<>();
     private final HollowPrimaryKeyIndex videoAwardIdx;
     private final HollowPrimaryKeyIndex csmReviewIdx;
     private final HollowPrimaryKeyIndex awardIdx;
 
-    public VideoMiscDataModule(VMSHollowVideoInputAPI api, VMSTransformerIndexer indexer) {
+    public VideoMiscDataModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer) {
         this.api = api;
         this.videoAwardIdx = indexer.getPrimaryKeyIndex(VIDEO_AWARD);
         this.awardIdx = indexer.getPrimaryKeyIndex(VMS_AWARD);

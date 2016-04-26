@@ -14,7 +14,7 @@ import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeListHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleListHollow;
 import com.netflix.vms.transformer.hollowinput.PersonArtworkHollow;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkDescriptor;
 import com.netflix.vms.transformer.hollowoutput.Integer;
 import com.netflix.vms.transformer.hollowoutput.PersonImages;
@@ -22,7 +22,7 @@ import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 
 public class PersonImagesModule extends ArtWorkModule{
 
-    public PersonImagesModule(VMSHollowVideoInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+    public PersonImagesModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
 	    super(api, ctx, mapper, indexer);
 	}
 

@@ -7,7 +7,7 @@ import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowHashIndex;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import java.io.BufferedInputStream;
 import com.netflix.hollow.combine.HollowCombiner;
 import com.netflix.hollow.combine.HollowCombinerIncludeOrdinalsCopyDirector;
@@ -161,7 +161,7 @@ public class FilterToSmallDataSubset {
         HollowBlobReader reader = new HollowBlobReader(stateEngine);
         reader.readSnapshot(new BufferedInputStream(new FileInputStream(ORIGINAL_INPUT_BLOB_LOCATION)));
 
-        final VMSHollowVideoInputAPI inputAPI = new VMSHollowVideoInputAPI(stateEngine);
+        final VMSHollowInputAPI inputAPI = new VMSHollowInputAPI(stateEngine);
 
         findIncludedOrdinals("VideoDisplaySet", includedVideoIds, new VideoIdDeriver() {
             public Integer deriveId(int ordinal) {

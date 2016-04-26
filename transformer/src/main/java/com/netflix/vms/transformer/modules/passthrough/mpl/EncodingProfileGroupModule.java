@@ -5,7 +5,7 @@ import com.netflix.vms.transformer.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.StreamProfileGroupsHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfileIdHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfileIdListHollow;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.EncodingProfileGroup;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
 
@@ -14,7 +14,7 @@ import java.util.HashSet;
 
 public class EncodingProfileGroupModule extends AbstractTransformModule {
 
-    public EncodingProfileGroupModule(VMSHollowVideoInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
+    public EncodingProfileGroupModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
         super(api, ctx, mapper);
     }
 

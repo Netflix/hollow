@@ -5,7 +5,7 @@ import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.client.HollowClientMemoryConfig;
 import com.netflix.hollow.util.DefaultHashCodeFinder;
 import java.util.Collections;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.hollow.read.customapi.HollowAPI;
 import com.netflix.hollow.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.client.HollowAPIFactory;
@@ -25,20 +25,20 @@ public class VMSInputDataClient extends HollowClient {
     }
 
     @Override
-    public VMSHollowVideoInputAPI getAPI() {
-        return (VMSHollowVideoInputAPI) super.getAPI();
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) super.getAPI();
     }
 
     private static class VMSInputDataAPIFactory implements HollowAPIFactory {
 
         @Override
         public HollowAPI createAPI(HollowDataAccess dataAccess) {
-            return new VMSHollowVideoInputAPI(dataAccess);
+            return new VMSHollowInputAPI(dataAccess);
         }
 
         @Override
         public HollowAPI createAPI(HollowDataAccess dataAccess, HollowAPI previousCycleAPI) {
-            return new VMSHollowVideoInputAPI(dataAccess, Collections.emptySet(), Collections.emptyMap(), (VMSHollowVideoInputAPI)previousCycleAPI);
+            return new VMSHollowInputAPI(dataAccess, Collections.emptySet(), Collections.emptyMap(), (VMSHollowInputAPI)previousCycleAPI);
         }
 
     }

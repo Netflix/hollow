@@ -6,8 +6,8 @@ import com.netflix.vms.transformer.hollowinput.AudioStreamInfoHollow;
 import com.netflix.vms.transformer.hollowinput.CdnDeploymentHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.ImageStreamInfoHollow;
+import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
-import com.netflix.vms.transformer.hollowinput.PackagesHollow;
 import com.netflix.vms.transformer.hollowinput.StreamAssetTypeHollow;
 import com.netflix.vms.transformer.hollowinput.StreamDeploymentHollow;
 import com.netflix.vms.transformer.hollowinput.StreamDeploymentInfoHollow;
@@ -18,7 +18,7 @@ import com.netflix.vms.transformer.hollowinput.StreamNonImageInfoHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.TextStreamInfoHollow;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoStreamInfoHollow;
 import com.netflix.vms.transformer.hollowoutput.AssetTypeDescriptor;
 import com.netflix.vms.transformer.hollowoutput.DownloadDescriptor;
@@ -45,6 +45,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoResolution;
 import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -70,11 +71,11 @@ public class StreamDataModule {
 
     private final HollowPrimaryKeyIndex streamProfileIdx;
 
-    private final VMSHollowVideoInputAPI api;
+    private final VMSHollowInputAPI api;
 
     private final HollowObjectMapper objectMapper;
 
-    public StreamDataModule(VMSHollowVideoInputAPI api, VMSTransformerIndexer indexer, HollowObjectMapper objectMapper, Map<Integer, Object> drmKeysByGroupId, Map<Integer, DrmInfo> drmInfoByGroupId) {
+    public StreamDataModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer, HollowObjectMapper objectMapper, Map<Integer, Object> drmKeysByGroupId, Map<Integer, DrmInfo> drmInfoByGroupId) {
         this.api = api;
         this.assetTypeDescriptorMap = getAssetTypeDescriptorMap();
         this.timedTextTypeDescriptorMap = getTimedTextTypeDescriptorMap();
@@ -94,7 +95,7 @@ public class StreamDataModule {
         EMPTY_DOWNLOAD_LOCATIONS.locations = Collections.emptyList();
     }
 
-    StreamData convertStreamData(PackagesHollow packages, PackageStreamHollow inputStream, DrmInfoData drmInfoData) {
+    StreamData convertStreamData(PackageHollow packages, PackageStreamHollow inputStream, DrmInfoData drmInfoData) {
         int encodingProfileId = (int) inputStream._getStreamProfileId();
         int streamProfileOrdinal = streamProfileIdx.getMatchingOrdinal(Long.valueOf(encodingProfileId));
         StreamProfilesHollow streamProfile = api.getStreamProfilesHollow(streamProfileOrdinal);

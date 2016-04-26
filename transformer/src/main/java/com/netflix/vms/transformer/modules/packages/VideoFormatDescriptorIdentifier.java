@@ -6,7 +6,7 @@ import com.netflix.vms.transformer.hollowinput.StreamDimensionsHollow;
 import com.netflix.vms.transformer.hollowinput.StreamNonImageInfoHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfileGroupsHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfileIdHollow;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoStreamInfoHollow;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
@@ -26,7 +26,7 @@ public class VideoFormatDescriptorIdentifier {
     private final Set<TargetResolution> aspectRatioVideoFormatIdentifiers;
 
 
-    public VideoFormatDescriptorIdentifier(VMSHollowVideoInputAPI api, VMSTransformerIndexer indexer) {
+    public VideoFormatDescriptorIdentifier(VMSHollowInputAPI api, VMSTransformerIndexer indexer) {
         this.videoFormatDescriptorMap = getVideoFormatDescriptorMap();
         this.ultraHDEncodingProfileIds = getUltraHDEncodingProfileIds(api, indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE_GROUP));
         this.validSuperHDIdentifiers = getValidSuperHDIdentifiers();
@@ -107,7 +107,7 @@ public class VideoFormatDescriptorIdentifier {
         return descriptor;
     }
 
-    private Set<Integer> getUltraHDEncodingProfileIds(VMSHollowVideoInputAPI api, HollowPrimaryKeyIndex primaryKeyIndex) {
+    private Set<Integer> getUltraHDEncodingProfileIds(VMSHollowInputAPI api, HollowPrimaryKeyIndex primaryKeyIndex) {
         Set<Integer> ultraHDEncodingProfiles = new HashSet<Integer>();
 
         int ordinal = primaryKeyIndex.getMatchingOrdinal("CE4DASHVideo-4K");

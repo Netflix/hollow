@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.modules.deploymentintent;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.CacheDeploymentIntentHollow;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.DeploymentIntent;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
@@ -12,7 +12,7 @@ import java.util.Collection;
 
 public class CacheDeploymentIntentModule extends AbstractTransformModule {
 
-    public CacheDeploymentIntentModule(VMSHollowVideoInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
+    public CacheDeploymentIntentModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
         super(api, ctx, mapper);
     }
 

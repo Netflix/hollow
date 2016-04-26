@@ -31,7 +31,7 @@ import com.netflix.vms.transformer.hollowinput.RolloutPhasesElementsTrailerSuppl
 import com.netflix.vms.transformer.hollowinput.SingleValuePassthroughMapHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.TrailerHollow;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.AvailabilityWindow;
 import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
@@ -63,7 +63,7 @@ import java.util.Map.Entry;
 
 public class RolloutVideoModule extends AbstractTransformModule {
 
-    public RolloutVideoModule(VMSHollowVideoInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+    public RolloutVideoModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
         super(api, ctx, mapper);
     }
 

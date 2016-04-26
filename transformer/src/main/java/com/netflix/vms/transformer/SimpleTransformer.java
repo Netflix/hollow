@@ -4,8 +4,7 @@ import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
-import com.netflix.vms.transformer.hollowinput.VideoDisplaySetHollow;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
@@ -44,6 +43,7 @@ import com.netflix.vms.transformer.modules.passthrough.beehive.RolloutCharacterM
 import com.netflix.vms.transformer.modules.passthrough.mpl.EncodingProfileGroupModule;
 import com.netflix.vms.transformer.modules.person.GlobalPersonModule;
 import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -58,17 +58,17 @@ public class SimpleTransformer {
     private final ThreadLocal<VideoMiscDataModule> miscdataModuleRef = new ThreadLocal<VideoMiscDataModule>();
     private final ThreadLocal<CountrySpecificDataModule> countrySpecificModuleRef = new ThreadLocal<CountrySpecificDataModule>();
 
-    private final VMSHollowVideoInputAPI api;
+    private final VMSHollowInputAPI api;
     private final HollowWriteStateEngine writeStateEngine;
     private final TransformerContext ctx;
     private VMSTransformerIndexer indexer;
 
-    SimpleTransformer(VMSHollowVideoInputAPI inputAPI, VMSTransformerWriteStateEngine outputStateEngine) {
+    SimpleTransformer(VMSHollowInputAPI inputAPI, VMSTransformerWriteStateEngine outputStateEngine) {
         this(inputAPI, outputStateEngine, new TransformerContext());
         ctx.setNowMillis(1457384787807L);
     }
 
-    public SimpleTransformer(VMSHollowVideoInputAPI inputAPI, VMSTransformerWriteStateEngine outputStateEngine, TransformerContext ctx) {
+    public SimpleTransformer(VMSHollowInputAPI inputAPI, VMSTransformerWriteStateEngine outputStateEngine, TransformerContext ctx) {
         this.api = inputAPI;
         this.writeStateEngine = outputStateEngine;
         this.ctx = ctx;

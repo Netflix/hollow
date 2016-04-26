@@ -8,7 +8,7 @@ import com.netflix.vms.transformer.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.TopNAttributeHollow;
 import com.netflix.vms.transformer.hollowinput.TopNAttributesListHollow;
 import com.netflix.vms.transformer.hollowinput.TopNHollow;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.Float;
 import com.netflix.vms.transformer.hollowoutput.Integer;
 import com.netflix.vms.transformer.hollowoutput.TopNVideoData;
@@ -16,7 +16,7 @@ import com.netflix.vms.transformer.modules.AbstractTransformModule;
 
 public class TopNVideoDataModule extends AbstractTransformModule{
 
-    public TopNVideoDataModule(VMSHollowVideoInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
+    public TopNVideoDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
 	    super(api, ctx, mapper);
 	}
 	

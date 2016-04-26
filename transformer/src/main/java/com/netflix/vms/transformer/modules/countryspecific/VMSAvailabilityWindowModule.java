@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.netflix.vms.transformer.TransformerContext;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractAssetHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractIdHollow;
@@ -45,7 +45,7 @@ public class VMSAvailabilityWindowModule {
 
     private final WindowPackageContractInfoModule windowPackageContractInfoModule;
 
-    public VMSAvailabilityWindowModule(VMSHollowVideoInputAPI api, TransformerContext ctx, VMSTransformerIndexer indexer) {
+    public VMSAvailabilityWindowModule(VMSHollowInputAPI api, TransformerContext ctx, VMSTransformerIndexer indexer) {
         this.ctx = ctx;
 
         this.windowPackageContractInfoModule = new WindowPackageContractInfoModule(api, ctx, indexer);

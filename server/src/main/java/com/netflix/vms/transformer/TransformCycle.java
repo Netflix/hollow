@@ -7,7 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.File;
 import com.netflix.hollow.client.HollowClient;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.VMSInputDataTransitionCreator;
 import com.netflix.vms.transformer.logger.TransformerServerLogger;
 import com.netflix.vms.transformer.servlet.platform.PlatformLibraries;
@@ -46,7 +46,7 @@ public class TransformCycle {
 
     private boolean transformTheData() {
         try {
-            SimpleTransformer transformer = new SimpleTransformer((VMSHollowVideoInputAPI)inputClient.getAPI(), outputStateEngine);
+            SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI)inputClient.getAPI(), outputStateEngine);
             transformer.transform();
         } catch(Throwable th) {
             ctx.getLogger().error("TransformCycleFailed", "Transformer failed cycle -- rolling back", th);

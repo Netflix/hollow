@@ -8,7 +8,7 @@ import com.netflix.vms.transformer.hollowinput.ConsolidatedVideoRatingHollow;
 import com.netflix.vms.transformer.hollowinput.ConsolidatedVideoRatingsHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoRatingAdvisoriesHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRatingAdvisoryIdHollow;
 import com.netflix.vms.transformer.hollowoutput.Certification;
@@ -30,14 +30,14 @@ import java.util.Map;
 
 public class CertificationListsModule {
 
-    private final VMSHollowVideoInputAPI api;
+    private final VMSHollowInputAPI api;
     private final HollowPrimaryKeyIndex videoRatingsIdx;
     private final HollowPrimaryKeyIndex certSystemIdx;
     private final HollowPrimaryKeyIndex certSystemRatingIdx;
 
     private final Map<Integer, Map<String, List<Certification>>> perCountryCertificationLists;
 
-    public CertificationListsModule(VMSHollowVideoInputAPI api, VMSTransformerIndexer indexer) {
+    public CertificationListsModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer) {
         this.api = api;
         this.videoRatingsIdx = indexer.getPrimaryKeyIndex(IndexSpec.CONSOLIDATED_VIDEO_RATINGS);
         this.certSystemIdx = indexer.getPrimaryKeyIndex(IndexSpec.CONSOLIDATED_CERT_SYSTEMS);

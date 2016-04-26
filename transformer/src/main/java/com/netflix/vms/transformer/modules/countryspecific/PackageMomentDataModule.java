@@ -8,7 +8,7 @@ import com.netflix.vms.transformer.hollowinput.CdnDeploymentHollow;
 import java.util.Set;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.hollowoutput.VideoImage;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
@@ -36,7 +36,7 @@ import com.netflix.vms.transformer.hollowoutput.PackageData;
 
 public class PackageMomentDataModule {
 
-    private final VMSHollowVideoInputAPI api;
+    private final VMSHollowInputAPI api;
     private final HollowPrimaryKeyIndex streamProfileIdx;
 
     private final VideoMomentModule videoMomentModule;
@@ -45,7 +45,7 @@ public class PackageMomentDataModule {
 
     private final Map<Integer, TrickPlayType> trickPlayTypeMap;
 
-    public PackageMomentDataModule(VMSHollowVideoInputAPI api, VMSTransformerIndexer indexer) {
+    public PackageMomentDataModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer) {
         this.api = api;
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
 

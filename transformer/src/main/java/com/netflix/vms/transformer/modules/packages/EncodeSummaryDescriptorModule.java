@@ -5,7 +5,7 @@ import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowoutput.TimedTextTypeDescriptor;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowoutput.EncodeSummaryDescriptor;
 import com.netflix.vms.transformer.hollowoutput.EncodeSummaryDescriptorData;
@@ -27,11 +27,11 @@ public class EncodeSummaryDescriptorModule {
 
     private final TimedTextTypeDescriptor SUBTITLES = new TimedTextTypeDescriptor("Subtitles");
 
-    private final VMSHollowVideoInputAPI api;
+    private final VMSHollowInputAPI api;
     private final HollowPrimaryKeyIndex streamProfileIdx;
     private final HollowPrimaryKeyIndex videoGeneralIdx;
 
-    public EncodeSummaryDescriptorModule(VMSHollowVideoInputAPI api, VMSTransformerIndexer indexer) {
+    public EncodeSummaryDescriptorModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer) {
         this.api = api;
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);

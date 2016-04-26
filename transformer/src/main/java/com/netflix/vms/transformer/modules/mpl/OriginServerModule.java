@@ -3,11 +3,11 @@ package com.netflix.vms.transformer.modules.mpl;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.TransformerContext;
-import com.netflix.vms.transformer.hollowinput.CdnsHollow;
+import com.netflix.vms.transformer.hollowinput.CdnHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryListHollow;
-import com.netflix.vms.transformer.hollowinput.OriginServersHollow;
+import com.netflix.vms.transformer.hollowinput.OriginServerHollow;
 import com.netflix.vms.transformer.hollowinput.StorageGroupsHollow;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.CdnData;
 import com.netflix.vms.transformer.hollowoutput.OriginServer;
 import com.netflix.vms.transformer.hollowoutput.StorageGroup;
@@ -22,7 +22,7 @@ public class OriginServerModule extends AbstractTransformModule {
     private final HollowPrimaryKeyIndex storageGroupsIndex;
     private final HollowPrimaryKeyIndex cdnsIndex;
 
-    public OriginServerModule(VMSHollowVideoInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+    public OriginServerModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
         super(api, ctx, mapper);
         this.storageGroupsIndex = indexer.getPrimaryKeyIndex(IndexSpec.STORAGE_GROUPS);
         this.cdnsIndex = indexer.getPrimaryKeyIndex(IndexSpec.CDNS);
@@ -30,7 +30,7 @@ public class OriginServerModule extends AbstractTransformModule {
 
     @Override
     public void transform() {
-        for (OriginServersHollow input : api.getAllOriginServersHollow()) {
+        for (OriginServerHollow input : api.getAllOriginServerHollow()) {
             OriginServer output = new OriginServer();
             output.nameStr = input._getName()._getValue().toCharArray();
 
@@ -41,14 +41,14 @@ public class OriginServerModule extends AbstractTransformModule {
 
             long cdnId = storageGroupInput._getCdnId();
             int cdnOrdinal = cdnsIndex.getMatchingOrdinal(cdnId);
-            CdnsHollow cdnInput = api.getCdnsHollow(cdnOrdinal);
+            CdnHollow cdnInput = api.getCdnHollow(cdnOrdinal);
             output.cdnData = createCdnData(cdnInput);
 
             mapper.addObject(output);
         }
     }
 
-    private CdnData createCdnData(CdnsHollow input) {
+    private CdnData createCdnData(CdnHollow input) {
         CdnData output = new CdnData();
         output.id = (int) input._getId();
         output.name = new Strings(input._getName()._getValue());

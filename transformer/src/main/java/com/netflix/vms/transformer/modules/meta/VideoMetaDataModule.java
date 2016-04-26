@@ -20,7 +20,7 @@ import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.StoriesSynopsesHookHollow;
 import com.netflix.vms.transformer.hollowinput.Stories_SynopsesHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoDateWindowHollow;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralAliasHollow;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
@@ -62,7 +62,7 @@ public class VideoMetaDataModule {
     private final VideoSetType CANON = new VideoSetType("Canon");
     private final VideoSetType EXTENDED = new VideoSetType("Extended");
 
-    private final VMSHollowVideoInputAPI api;
+    private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
 
     private final HollowPrimaryKeyIndex videoGeneralIdx;
@@ -79,7 +79,7 @@ public class VideoMetaDataModule {
 
     private final Map<String, HookType> hookTypeMap = new HashMap<String, HookType>();
 
-    public VideoMetaDataModule(VMSHollowVideoInputAPI api, TransformerContext ctx, VMSTransformerIndexer indexer) {
+    public VideoMetaDataModule(VMSHollowInputAPI api, TransformerContext ctx, VMSTransformerIndexer indexer) {
         this.api = api;
         this.ctx = ctx;
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(VIDEO_GENERAL);

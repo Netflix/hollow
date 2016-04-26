@@ -7,7 +7,7 @@ import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.memory.WastefulRecycler;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -20,7 +20,7 @@ public class ShowMeTheProgress {
 
     @Test
     public void start() throws Exception {
-        VMSHollowVideoInputAPI api = new VMSHollowVideoInputAPI(loadStateEngine("/filtered-input.hollow"));
+        VMSHollowInputAPI api = new VMSHollowInputAPI(loadStateEngine("/filtered-input.hollow"));
 
         VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
 

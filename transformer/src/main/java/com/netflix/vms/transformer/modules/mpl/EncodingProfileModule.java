@@ -6,7 +6,7 @@ import com.netflix.vms.transformer.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.ProtectionTypesHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.AudioChannelsDescriptor;
 import com.netflix.vms.transformer.hollowoutput.EncodingProfile;
 import com.netflix.vms.transformer.hollowoutput.ProfileTypeDescriptor;
@@ -30,7 +30,7 @@ public class EncodingProfileModule extends AbstractTransformModule {
     private final HollowPrimaryKeyIndex protectionTypeIndex;
 
 
-    public EncodingProfileModule(VMSHollowVideoInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+    public EncodingProfileModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
         super(api, ctx, mapper);
 
         this.protectionTypeIndex = indexer.getPrimaryKeyIndex(IndexSpec.PROTECTION_TYPES);

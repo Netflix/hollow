@@ -1,8 +1,5 @@
 package com.netflix.vms.transformer.modules.packages;
 
-import java.util.ArrayList;
-
-import java.util.List;
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
@@ -16,11 +13,11 @@ import com.netflix.vms.transformer.hollowinput.DrmHeaderInfoHollow;
 import com.netflix.vms.transformer.hollowinput.DrmHeaderInfoListHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.PackageDrmInfoHollow;
+import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
-import com.netflix.vms.transformer.hollowinput.PackagesHollow;
 import com.netflix.vms.transformer.hollowinput.StreamNonImageInfoHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoStreamInfoHollow;
 import com.netflix.vms.transformer.hollowoutput.ChunkDurationsString;
 import com.netflix.vms.transformer.hollowoutput.CodecPrivateDataString;
@@ -38,17 +35,21 @@ import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.contracts.ContractRestrictionModule;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.xml.bind.DatatypeConverter;
 
 public class PackageDataModule {
 
     static final int WMDRMKEY_GROUP = 1;
 
-    private final VMSHollowVideoInputAPI api;
+    private final VMSHollowInputAPI api;
     private final HollowObjectMapper mapper;
 
     private final HollowHashIndex packagesByVideoIdx;
@@ -61,7 +62,7 @@ public class PackageDataModule {
     private final ContractRestrictionModule contractRestrictionModule;
     private final EncodeSummaryDescriptorModule encodeSummaryModule;
 
-    public PackageDataModule(VMSHollowVideoInputAPI api, HollowObjectMapper objectMapper, VMSTransformerIndexer indexer) {
+    public PackageDataModule(VMSHollowInputAPI api, HollowObjectMapper objectMapper, VMSTransformerIndexer indexer) {
         this.api = api;
         this.mapper = objectMapper;
         this.packagesByVideoIdx = indexer.getHashIndex(IndexSpec.PACKAGES_BY_VIDEO);
@@ -93,7 +94,7 @@ public class PackageDataModule {
                     drmKeysByGroupId.clear();
                     drmInfoByGroupId.clear();
 
-                    PackagesHollow packages = api.getPackagesHollow(packageOrdinal);
+                    PackageHollow packages = api.getPackageHollow(packageOrdinal);
                     populateDrmKeysByGroupId(packages, videoId);
                     PackageData transformedPackage = convertPackage(packages);
 
@@ -109,7 +110,7 @@ public class PackageDataModule {
         return transformedPackages;
     }
 
-    private void populateDrmKeysByGroupId(PackagesHollow packageInput, Integer videoId) {
+    private void populateDrmKeysByGroupId(PackageHollow packageInput, Integer videoId) {
         for(PackageDrmInfoHollow inputDrmInfo : packageInput._getDrmInfo()) {
             int drmKeyGroup = (int)inputDrmInfo._getDrmKeyGroup();
             if(drmKeyGroup == WMDRMKEY_GROUP) {
@@ -149,7 +150,7 @@ public class PackageDataModule {
         }
     }
 
-    private PackageData convertPackage(PackagesHollow packages) {
+    private PackageData convertPackage(PackageHollow packages) {
         PackageData pkg = new PackageData();
 
         pkg.id = (int)packages._getPackageId();

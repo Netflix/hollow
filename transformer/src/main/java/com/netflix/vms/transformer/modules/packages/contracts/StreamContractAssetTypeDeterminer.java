@@ -6,7 +6,7 @@ import com.netflix.vms.transformer.hollowinput.StreamAssetTypeHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.TextStreamInfoHollow;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 
@@ -22,12 +22,12 @@ public class StreamContractAssetTypeDeterminer {
     public static final String SECONDARY_AUDIO = "Secondary Audio Source";
     /// public static final String NOLANG = "nolanguage";   /// just return null instead
 
-    private final VMSHollowVideoInputAPI api;
+    private final VMSHollowInputAPI api;
     private final HollowPrimaryKeyIndex streamProfileIdx;
 
     private final Map<Long, String> cachedAssetTypes;
 
-    public StreamContractAssetTypeDeterminer(VMSHollowVideoInputAPI api, VMSTransformerIndexer indexer) {
+    public StreamContractAssetTypeDeterminer(VMSHollowInputAPI api, VMSTransformerIndexer indexer) {
         this.api = api;
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
         this.cachedAssetTypes = new HashMap<Long, String>();

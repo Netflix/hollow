@@ -9,7 +9,7 @@ import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.ShowHierarchy;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoDateWindowHollow;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsHollow;
@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class VideoMediaDataModule {
 
-    private final VMSHollowVideoInputAPI api;
+    private final VMSHollowInputAPI api;
     private final HollowPrimaryKeyIndex videoRightsIdx;
     private final HollowHashIndex videoTypeCountryIdx;
     private final HollowPrimaryKeyIndex videoGeneralIdx;
@@ -35,7 +35,7 @@ public class VideoMediaDataModule {
         SHOW, SEASON, EPISODE, SUPPLEMENTAL
     }
 
-    public VideoMediaDataModule(VMSHollowVideoInputAPI api, VMSTransformerIndexer indexer) {
+    public VideoMediaDataModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer) {
         this.api = api;
         this.videoRightsIdx = indexer.getPrimaryKeyIndex(VIDEO_RIGHTS);
         this.videoTypeCountryIdx = indexer.getHashIndex(VIDEO_TYPE_COUNTRY);

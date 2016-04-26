@@ -13,7 +13,7 @@ import com.netflix.vms.transformer.hollowinput.RolloutPhaseHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseTrailerHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowHollow;
 import com.netflix.vms.transformer.hollowinput.TrailerHollow;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoDisplaySetHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsWindowHollow;
@@ -29,7 +29,7 @@ import java.util.Set;
 
 public class ShowHierarchyInitializer {
 
-    private final VMSHollowVideoInputAPI videoAPI;
+    private final VMSHollowInputAPI videoAPI;
     private final HollowPrimaryKeyIndex supplementalIndex;
     private final HollowHashIndex videoTypeCountryIndex;
     private final HollowPrimaryKeyIndex videoRightsIndex;
@@ -37,7 +37,7 @@ public class ShowHierarchyInitializer {
     private final Set<Integer> supplementalIds;
     private final TransformerContext ctx;
 
-    public ShowHierarchyInitializer(VMSHollowVideoInputAPI videoAPI, VMSTransformerIndexer indexer, TransformerContext ctx) {
+    public ShowHierarchyInitializer(VMSHollowInputAPI videoAPI, VMSTransformerIndexer indexer, TransformerContext ctx) {
         this.videoAPI = videoAPI;
         this.supplementalIndex = indexer.getPrimaryKeyIndex(IndexSpec.SUPPLEMENTAL);
         this.videoTypeCountryIndex = indexer.getHashIndex(IndexSpec.VIDEO_TYPE_COUNTRY);
@@ -48,7 +48,7 @@ public class ShowHierarchyInitializer {
         this.supplementalIds = findAllSupplementalVideoIds(videoAPI);
     }
 
-    private Set<Integer> findAllSupplementalVideoIds(VMSHollowVideoInputAPI videoAPI) {
+    private Set<Integer> findAllSupplementalVideoIds(VMSHollowInputAPI videoAPI) {
         Set<Integer> ids = new HashSet<Integer>();
 
         for(IndividualTrailerHollow supplemental : videoAPI.getAllIndividualTrailerHollow())

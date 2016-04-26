@@ -1,22 +1,18 @@
 package com.netflix.vms.transformer.modules.packages.contracts;
 
-import java.util.LinkedHashSet;
-import java.util.TreeMap;
-import java.util.Collections;
-import com.netflix.vms.transformer.hollowinput.DisallowedSubtitleLangCodesListHollow;
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.vms.transformer.hollowinput.AudioStreamInfoHollow;
-import com.netflix.vms.transformer.hollowinput.Bcp47CodeHollow;
 import com.netflix.vms.transformer.hollowinput.DisallowedAssetBundleHollow;
 import com.netflix.vms.transformer.hollowinput.DisallowedSubtitleLangCodeHollow;
+import com.netflix.vms.transformer.hollowinput.DisallowedSubtitleLangCodesListHollow;
+import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
-import com.netflix.vms.transformer.hollowinput.PackagesHollow;
 import com.netflix.vms.transformer.hollowinput.StreamNonImageInfoHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractAssetHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractIdHollow;
@@ -33,12 +29,16 @@ import com.netflix.vms.transformer.hollowoutput.LanguageRestrictions;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 /// Documentation of this logic available at: https://docs.google.com/document/d/15eGhbVPcEK_ARZA8OrtXpPAzrTalVqmZnKuzK_hrZAA/edit
 public class ContractRestrictionModule {
@@ -46,7 +46,7 @@ public class ContractRestrictionModule {
     private final HollowHashIndex videoRightsIdx;
     private final HollowPrimaryKeyIndex bcp47CodeIdx;
 
-    private final VMSHollowVideoInputAPI api;
+    private final VMSHollowInputAPI api;
 
     private final Map<String, CupKey> cupKeysMap;
     private final Map<String, Strings> bcp47Codes;
@@ -54,7 +54,7 @@ public class ContractRestrictionModule {
 
     private final StreamContractAssetTypeDeterminer assetTypeDeterminer;
 
-    public ContractRestrictionModule(VMSHollowVideoInputAPI api , VMSTransformerIndexer indexer) {
+    public ContractRestrictionModule(VMSHollowInputAPI api , VMSTransformerIndexer indexer) {
         this.api = api;
         this.videoRightsIdx = indexer.getHashIndex(IndexSpec.ALL_VIDEO_RIGHTS);
         this.bcp47CodeIdx = indexer.getPrimaryKeyIndex(IndexSpec.BCP47_CODE);
@@ -64,7 +64,7 @@ public class ContractRestrictionModule {
         this.assetTypeDeterminer = new StreamContractAssetTypeDeterminer(api, indexer);
     }
 
-    public Map<ISOCountry, Set<ContractRestriction>> getContractRestrictions(PackagesHollow packages) {
+    public Map<ISOCountry, Set<ContractRestriction>> getContractRestrictions(PackageHollow packages) {
         assetTypeDeterminer.clearCache();
 
         Map<ISOCountry, Set<ContractRestriction>> restrictions = new HashMap<ISOCountry, Set<ContractRestriction>>();
@@ -140,7 +140,7 @@ public class ContractRestrictionModule {
         return restrictions;
     }
 
-    private List<VideoRightsContractHollow> filterToApplicableContracts(PackagesHollow packages, Set<VideoRightsContractHollow> contracts, Set<Integer> contractIds) {
+    private List<VideoRightsContractHollow> filterToApplicableContracts(PackageHollow packages, Set<VideoRightsContractHollow> contracts, Set<Integer> contractIds) {
         List<VideoRightsContractHollow> applicableContracts = new ArrayList<VideoRightsContractHollow>(contracts.size());
         for(VideoRightsContractHollow contract : contracts) {
             if(contractIds.contains((int) contract._getContractId()) && contractIsApplicableForPackage(contract, packages._getPackageId())) {

@@ -6,7 +6,7 @@ import com.netflix.vms.transformer.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
 import com.netflix.vms.transformer.hollowinput.MapOfFirstDisplayDatesHollow;
-import com.netflix.vms.transformer.hollowinput.VMSHollowVideoInputAPI;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoRightsFlagsHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsHollow;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
@@ -24,7 +24,7 @@ import java.util.Map;
 public class CountrySpecificDataModule {
 
 
-    private final VMSHollowVideoInputAPI api;
+    private final VMSHollowInputAPI api;
     private final HollowPrimaryKeyIndex videoRightsIdx;
 
     private final CertificationListsModule certificationListsModule;
@@ -32,7 +32,7 @@ public class CountrySpecificDataModule {
 
 
 
-    public CountrySpecificDataModule(VMSHollowVideoInputAPI api, TransformerContext ctx, VMSTransformerIndexer indexer) {
+    public CountrySpecificDataModule(VMSHollowInputAPI api, TransformerContext ctx, VMSTransformerIndexer indexer) {
         this.api = api;
         this.videoRightsIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_RIGHTS);
 
