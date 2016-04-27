@@ -1,5 +1,5 @@
 rootProject.name = 'videometadata-transformer'
-include 'server', 'transformer'
+include 'commoninterfaces', 'server', 'transformer'
 project(':transformer').name = 'vms-transformer-businesslogic'
 project(':server').name = 'vms-transformer-server'
-
+project(':commoninterfaces').name = 'vms-transformer-common-interfaces'
