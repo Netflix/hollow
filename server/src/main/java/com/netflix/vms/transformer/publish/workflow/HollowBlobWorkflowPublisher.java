@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.publish.workflow;
 
-import com.netflix.vms.transformer.TransformerLogger;
+import com.netflix.vms.transformer.common.TransformerLogger;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.util.LZ4VMSOutputStream;
