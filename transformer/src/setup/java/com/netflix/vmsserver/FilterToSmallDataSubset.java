@@ -11,8 +11,17 @@ import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.write.HollowBlobWriter;
+import com.netflix.videometadata.lz4.LZ4VMSInputStream;
+import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
+import com.netflix.vms.generated.notemplate.GlobalVideoHollow;
+import com.netflix.vms.generated.notemplate.L10NResourcesHollow;
+import com.netflix.vms.generated.notemplate.SupplementalVideoHollow;
+import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
+import com.netflix.vms.generated.notemplate.VideoCollectionsDataHollow;
+import com.netflix.vms.generated.notemplate.VideoEpisodeHollow;
+import com.netflix.vms.generated.notemplate.VideoHollow;
+import com.netflix.vms.generated.notemplate.VideoNodeTypeHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
@@ -25,7 +34,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-
 import org.junit.Test;
 
 /// NOTE:  This has a dependency on videometadata-common (for LZ4VMSInputStream)
@@ -35,8 +43,8 @@ import org.junit.Test;
 public class FilterToSmallDataSubset {
 
     private static final int TARGET_NUMBER_OF_TOPNODES = 1000;
-    private static final String ORIGINAL_OUTPUT_BLOB_LOCATION = "/space/transformer-data/pinned-blobs/dev_noevent-snapshot-20160307205744289";
-    private static final String ORIGINAL_INPUT_BLOB_LOCATION = "/space/transformer-data/pinned-blobs/vms.input-snapshot-20160307205744289";
+    private static final String ORIGINAL_OUTPUT_BLOB_LOCATION = "/space/transformer-data/pinned-blobs/berlin-snapshot";
+    private static final String ORIGINAL_INPUT_BLOB_LOCATION = "/space/transformer-data/pinned-blobs/vmsinput-snapshot";
 
     private static final String FILTERED_OUTPUT_BLOB_LOCATION = "/space/transformer-data/pinned-subsets/control-output";
     private static final String FILTERED_INPUT_BLOB_LOCATION = "/space/transformer-data/pinned-subsets/filtered-input";
@@ -159,13 +167,13 @@ public class FilterToSmallDataSubset {
 
         final VMSHollowInputAPI inputAPI = new VMSHollowInputAPI(stateEngine);
 
-        findIncludedOrdinals("VideoDisplaySet", includedVideoIds, new VideoIdDeriver() {
+        findIncludedOrdinals("ShowSeasonEpisode", includedVideoIds, new VideoIdDeriver() {
             @Override
             public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int)inputAPI.getVideoDisplaySetHollow(ordinal)._getTopNodeId());
+                return Integer.valueOf((int)inputAPI.getShowSeasonEpisodeHollow(ordinal)._getMovieId());
             }
         });
-        findIncludedOrdinals("Packages", includedVideoIds, new VideoIdDeriver() {
+        findIncludedOrdinals("Package", includedVideoIds, new VideoIdDeriver() {
             @Override
             public Integer deriveId(int ordinal) {
                 return Integer.valueOf((int) inputAPI.getPackageHollow(ordinal)._getMovieId());
@@ -219,16 +227,16 @@ public class FilterToSmallDataSubset {
                 return Integer.valueOf((int)inputAPI.getRolloutHollow(ordinal)._getMovieId());
             }
         });
-        findIncludedOrdinals("Stories_Synopses", includedVideoIds, new VideoIdDeriver() {
+        findIncludedOrdinals("StoriesSynopses", includedVideoIds, new VideoIdDeriver() {
             @Override
             public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int)inputAPI.getStories_SynopsesHollow(ordinal)._getMovieId());
+                return Integer.valueOf((int)inputAPI.getStoriesSynopsesHollow(ordinal)._getMovieId());
             }
         });
-        findIncludedOrdinals("Trailer", includedVideoIds, new VideoIdDeriver() {
+        findIncludedOrdinals("Supplementals", includedVideoIds, new VideoIdDeriver() {
             @Override
             public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int)inputAPI.getTrailerHollow(ordinal)._getMovieId());
+                return Integer.valueOf((int)inputAPI.getSupplementalsHollow(ordinal)._getMovieId());
             }
         });
         findIncludedOrdinals("VideoArtwork", includedVideoIds, new VideoIdDeriver() {
@@ -275,11 +283,10 @@ public class FilterToSmallDataSubset {
         includeAll("ArtworkRecipe");
         includeAll("AssetMetaDatas");
         includeAll("Awards");
-        includeAll("Bcp47Code");
         includeAll("CacheDeploymentIntent");
         includeAll("Categories");
         includeAll("CategoryGroups");
-        includeAll("Cdns");
+        includeAll("Cdn");
         includeAll("Certifications");
         includeAll("CertificationSystem");
         includeAll("Character");
@@ -292,7 +299,7 @@ public class FilterToSmallDataSubset {
         includeAll("Festivals");
         includeAll("Languages");
         includeAll("LocalizedCharacter");
-        includeAll("OriginServers");
+        includeAll("OriginServer");
         includeAll("PersonAliases");
         includeAll("PersonArtwork");
         includeAll("Persons");
@@ -304,6 +311,7 @@ public class FilterToSmallDataSubset {
         includeAll("StreamProfiles");
         includeAll("TerritoryCountries");
         includeAll("VideoPerson");
+        includeAll("PersonBio");
         includeAll("VMSAward");
 
         writeFilteredBlob(FILTERED_INPUT_BLOB_LOCATION);
