@@ -2,7 +2,6 @@ package com.netflix.vms.transformer.modules.packages.contracts;
 
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
-import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.vms.transformer.hollowinput.AudioStreamInfoHollow;
 import com.netflix.vms.transformer.hollowinput.DisallowedAssetBundleHollow;
@@ -44,23 +43,21 @@ import java.util.TreeMap;
 public class ContractRestrictionModule {
 
     private final HollowHashIndex videoRightsIdx;
-    private final HollowPrimaryKeyIndex bcp47CodeIdx;
+    //private final HollowPrimaryKeyIndex bcp47CodeIdx;
 
     private final VMSHollowInputAPI api;
 
     private final Map<String, CupKey> cupKeysMap;
     private final Map<String, Strings> bcp47Codes;
-    private final Map<String, com.netflix.vms.transformer.hollowoutput.Integer> bcp47Ids;
 
     private final StreamContractAssetTypeDeterminer assetTypeDeterminer;
 
     public ContractRestrictionModule(VMSHollowInputAPI api , VMSTransformerIndexer indexer) {
         this.api = api;
         this.videoRightsIdx = indexer.getHashIndex(IndexSpec.ALL_VIDEO_RIGHTS);
-        this.bcp47CodeIdx = indexer.getPrimaryKeyIndex(IndexSpec.BCP47_CODE);
+        //this.bcp47CodeIdx = indexer.getPrimaryKeyIndex(IndexSpec.BCP47_CODE);
         this.cupKeysMap = new HashMap<String, CupKey>();
         this.bcp47Codes = new HashMap<String, Strings>();
-        this.bcp47Ids = new HashMap<String, com.netflix.vms.transformer.hollowoutput.Integer>();
         this.assetTypeDeterminer = new StreamContractAssetTypeDeterminer(api, indexer);
     }
 
@@ -169,20 +166,18 @@ public class ContractRestrictionModule {
             String audioLangStr = disallowedAssetBundle._getAudioLanguageCode()._getValue();
             Strings audioLanguage = getBcp47Code(audioLangStr);
             langRestriction.audioLanguage = audioLanguage;
-            langRestriction.audioLanguageId = getBcp47CodeId(audioLangStr).val;
+            langRestriction.audioLanguageId = 0;
             langRestriction.requiresForcedSubtitles = disallowedAssetBundle._getForceSubtitle();
 
-            Set<com.netflix.vms.transformer.hollowoutput.Integer> disallowedTimedTextIds = new HashSet<com.netflix.vms.transformer.hollowoutput.Integer>();
             Set<Strings> disallowedTimedTextCodes = new HashSet<Strings>();
             List<DisallowedSubtitleLangCodeHollow> disallowedSubtitles = disallowedAssetBundle._getDisallowedSubtitleLangCodes();
 
             for(DisallowedSubtitleLangCodeHollow sub : disallowedSubtitles) {
                 String subLang = sub._getValue()._getValue();
                 disallowedTimedTextCodes.add(getBcp47Code(subLang));
-                disallowedTimedTextIds.add(getBcp47CodeId(subLang));
             }
 
-            langRestriction.disallowedTimedText = disallowedTimedTextIds;
+            langRestriction.disallowedTimedText = Collections.emptySet();
             langRestriction.disallowedTimedTextBcp47codes = disallowedTimedTextCodes;
 
             restriction.languageBcp47RestrictionsMap.put(audioLanguage, langRestriction);
@@ -316,18 +311,16 @@ public class ContractRestrictionModule {
             if(requiresForcedSubtitles || !disallowedTextLangauges.isEmpty()) {
                 LanguageRestrictions langRestriction = new LanguageRestrictions();
                 langRestriction.audioLanguage = getBcp47Code(audioLang);
-                langRestriction.audioLanguageId = getBcp47CodeId(audioLang).val;
+                langRestriction.audioLanguageId = 0;
                 langRestriction.requiresForcedSubtitles = requiresForcedSubtitles;
 
-                Set<com.netflix.vms.transformer.hollowoutput.Integer> disallowedTimedTextIds = new HashSet<com.netflix.vms.transformer.hollowoutput.Integer>();
                 Set<Strings> disallowedTimedTextCodes = new HashSet<Strings>();
 
                 for(String textLang : disallowedTextLangauges) {
                     disallowedTimedTextCodes.add(getBcp47Code(textLang));
-                    disallowedTimedTextIds.add(getBcp47CodeId(textLang));
                 }
 
-                langRestriction.disallowedTimedText = disallowedTimedTextIds;
+                langRestriction.disallowedTimedText = Collections.emptySet();
                 langRestriction.disallowedTimedTextBcp47codes = disallowedTimedTextCodes;
 
                 restriction.languageBcp47RestrictionsMap.put(langRestriction.audioLanguage, langRestriction);
@@ -405,20 +398,5 @@ public class ContractRestrictionModule {
         }
         return bcp47Code;
     }
-
-    private com.netflix.vms.transformer.hollowoutput.Integer getBcp47CodeId(String code) {
-        com.netflix.vms.transformer.hollowoutput.Integer id = bcp47Ids.get(code);
-        if(id == null) {
-            int bcp47Ordinal = bcp47CodeIdx.getMatchingOrdinal(code);
-            Bcp47CodeHollow bcp47CodeHollow = api.getBcp47CodeHollow(bcp47Ordinal);
-
-            id = new com.netflix.vms.transformer.hollowoutput.Integer((int)bcp47CodeHollow._getLanguageId());
-            bcp47Ids.put(code, id);
-        }
-
-        return id;
-    }
-
-
 
 }
