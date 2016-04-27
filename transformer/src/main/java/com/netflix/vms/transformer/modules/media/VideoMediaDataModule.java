@@ -82,10 +82,13 @@ public class VideoMediaDataModule {
 
         if (populateRights(videoId, countryCode, vmd)) {
             result.put(videoId, vmd);
+            // NOTE: Previous version below. Apparently logic was not changed, but removing roll-down produces no diffs.
+            // keeping this note just in case.
+
             // #cleanup: why is vms.isGoLive not in the condition?
-            if (level == HierarchyLeveL.EPISODE) {
-                vmd.isGoLive = showData.isGoLive && seasonData.isGoLive;
-            }
+            // if (level == HierarchyLeveL.EPISODE) {
+            //    vmd.isGoLive = showData.isGoLive && seasonData.isGoLive;
+            // }
         }
 
         populateGeneral(videoId, vmd);
