@@ -2,15 +2,8 @@ package com.netflix.vms.transformer.modules.artwork;
 
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_RECIPE;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.ComparisonChain;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.ConversionUtils;
@@ -28,14 +21,16 @@ import com.netflix.vms.transformer.hollowinput.MultiValuePassthroughMapHollow;
 import com.netflix.vms.transformer.hollowinput.SingleValuePassthroughMapHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
-import com.netflix.vms.transformer.hollowoutput.ArtWorkDescriptor;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageFormatEntry;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageRecipe;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageTypeEntry;
+import com.netflix.vms.transformer.hollowoutput.Artwork;
 import com.netflix.vms.transformer.hollowoutput.ArtworkBasicPassthrough;
+import com.netflix.vms.transformer.hollowoutput.ArtworkCdn;
+import com.netflix.vms.transformer.hollowoutput.ArtworkDerivative;
+import com.netflix.vms.transformer.hollowoutput.ArtworkDerivatives;
 import com.netflix.vms.transformer.hollowoutput.ArtworkSourcePassthrough;
 import com.netflix.vms.transformer.hollowoutput.ArtworkSourceString;
-import com.netflix.vms.transformer.hollowoutput.AssetLocation;
 import com.netflix.vms.transformer.hollowoutput.Integer;
 import com.netflix.vms.transformer.hollowoutput.NFLocale;
 import com.netflix.vms.transformer.hollowoutput.PassthroughString;
@@ -45,51 +40,131 @@ import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 public abstract class ArtWorkModule extends AbstractTransformModule{
+    protected final String entityType;
     private final HollowPrimaryKeyIndex imageTypeIdx;
     private final HollowPrimaryKeyIndex recipeIdx;
-    
-    public ArtWorkModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
-	    super(api, ctx, mapper);
-	    this.imageTypeIdx = indexer.getPrimaryKeyIndex(IndexSpec.ARTWORK_IMAGE_FORMAT);
-	    this.recipeIdx = indexer.getPrimaryKeyIndex(ARTWORK_RECIPE);
-	}
-	
-    protected void transformArtWorkDescriptors(Set<ArtworkLocaleHollow> localeSet,
-            Set<ArtWorkDescriptor> descriptorSet, Map<Long, DescriptorGroup> descGroupMap, int ordinalPriority,
-            int seqNum, ArtworkAttributesHollow attributes, ArtworkDerivativeListHollow derivatives) {
+    private final ArtWorkComparator artworkComparator;
+
+    public ArtWorkModule(String entityType, VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+        super(api, ctx, mapper);
+        this.entityType = entityType;
+        this.imageTypeIdx = indexer.getPrimaryKeyIndex(IndexSpec.ARTWORK_IMAGE_FORMAT);
+        this.recipeIdx = indexer.getPrimaryKeyIndex(ARTWORK_RECIPE);
+        this.artworkComparator = new ArtWorkComparator(ctx);
+    }
+
+    protected void transformArtworks(int entityId, String sourceFileId, int ordinalPriority, int seqNum, ArtworkAttributesHollow attributes, ArtworkDerivativeListHollow derivatives, Set<ArtworkLocaleHollow> localeSet, Set<Artwork> artworkSet) {
+
+        // Process list of derivatives
+        List<ArtworkDerivative> derivativeList = new ArrayList<ArtworkDerivative>();
+        List<ArtworkCdn> cdnList = new ArrayList<ArtworkCdn>();
+        for (ArtworkDerivativeHollow derivativeHollow : sortInputDerivatives(derivatives)) {
+            ArtWorkImageFormatEntry formatEntry = getImageFormatEntry(derivativeHollow);
+            ArtWorkImageTypeEntry typeEntry = getImageTypeEntry(derivativeHollow);
+            ArtWorkImageRecipe recipeEntry = getImageRecipe(derivativeHollow);
+            if (typeEntry == null) {
+                ctx.getLogger().error("UnknownArtworkImageType", String.format("Unknown Image Type for entity=%s, id=%s, type=%s; data will be dropped.", entityType, entityId, derivativeHollow._getImageType()._getValue()));
+                continue;
+            }
+
+            ArtworkDerivative derivative = new ArtworkDerivative();
+            derivative.format = formatEntry;
+            derivative.type = typeEntry;
+            derivative.recipe = recipeEntry;
+            derivative.recipeDesc = new Strings(derivativeHollow._getRecipeDescriptor()._getValue());
+            derivativeList.add(derivative);
+
+            ArtworkCdn cdn = new ArtworkCdn();
+            cdn.cdnId = java.lang.Integer.parseInt(derivativeHollow._getCdnId()._getValue()); // @TODO: Is it Integer or String
+            cdn.cdnDirectory = new Strings(derivativeHollow._getCdnDirectory()._getValue());
+            cdnList.add(cdn);
+        }
+
         for (final ArtworkLocaleHollow localeHollow : localeSet) {
             final NFLocale locale = new NFLocale(localeHollow._getBcp47Code()._getValue());
-            for (ArtworkDerivativeHollow derivative : derivatives) {
-                Long imageId = derivative._getImageId();
-                ArtWorkImageFormatEntry formatEntry = getImageFormatEntry(derivative);
-                ArtWorkImageTypeEntry typeEntry = getImageTypeEntry(derivative);
-                Set<ArtWorkImageRecipe> recipes = descGroupMap.get(imageId).recipes;
-                Map<Strings, AssetLocation> assetLocations = descGroupMap.get(imageId).assetLocations;
-                ArtWorkDescriptor desc = new ArtWorkDescriptor();
-                desc.locale = locale;
-                desc.format = formatEntry;
-                desc.imageType = typeEntry;
-                desc.imageId = imageId;
-                desc.isUsDescriptor = true;
-                desc.seqNum = seqNum;
-                desc.recipes = recipes;
-                desc.ordinalPriority = ordinalPriority;
-                desc.effectiveDate = localeHollow._getEffectiveDate()._getValue();
-                desc.assetLocationMap = assetLocations;
-                fillPassThroughData(desc, attributes);
-                descriptorSet.add(desc);
-            }
+
+            Artwork artwork = new Artwork();
+            artwork.sourceFileId = new Strings(sourceFileId);
+            artwork.seqNum = seqNum;
+            artwork.ordinalPriority = ordinalPriority;
+            artwork.locale = locale;
+            artwork.effectiveDate = localeHollow._getEffectiveDate()._getValue();
+            artwork.derivatives = artworkDerivatives(derivativeList);
+            artwork.cdns = cdnList;
+            fillPassThroughData(artwork, attributes);
+
+            artworkSet.add(artwork);
         }
     }
-    
-    private void fillPassThroughData(ArtWorkDescriptor desc, ArtworkAttributesHollow attributes) {
+
+    private ArtworkDerivatives artworkDerivatives(List<ArtworkDerivative> derivatives) {
+        ArtworkDerivatives result = new ArtworkDerivatives();
+
+        result.list = derivatives;
+        result.formatToDerivativeIndex = new HashMap<>();
+
+        for (int i = 0; i < derivatives.size(); i++) {
+            ArtworkDerivative derivative = derivatives.get(i);
+
+            List<Integer> list = result.formatToDerivativeIndex.get(derivative.format);
+            if (list == null) {
+                list = new ArrayList<Integer>();
+                result.formatToDerivativeIndex.put(derivative.format, list);
+            }
+
+            list.add(new Integer(i));
+        }
+
+        return result;
+    }
+
+    public Map<Strings, List<Artwork>> createArtworkByTypeMap(Collection<Artwork> allArtwork) {
+        Map<Strings, List<Artwork>> artworks = new HashMap<>();
+
+        Set<Strings> imageTypes = new HashSet<>();
+        for (Artwork artwork : allArtwork) {
+            imageTypes.clear();
+            for (ArtworkDerivative derivative : artwork.derivatives.list) {
+                imageTypes.add(new Strings(derivative.type.nameStr.toString()));
+            }
+
+            for (Strings imageType : imageTypes) {
+                List<Artwork> list = artworks.get(imageType);
+                if (list == null) {
+                    list = new ArrayList<Artwork>();
+                    artworks.put(imageType, list);
+                }
+                list.add(artwork);
+            }
+        }
+
+        for (Map.Entry<Strings, List<Artwork>> entry : artworks.entrySet()) {
+            Collections.sort(entry.getValue(), artworkComparator);
+        }
+
+        return artworks;
+    }
+
+    private void fillPassThroughData(Artwork desc, ArtworkAttributesHollow attributes) {
         SingleValuePassthroughMapHollow singleValuePassThrough = attributes._getPassthrough()._getSingleValues();
         HashMap<String, String> keyValues = new HashMap<>();
         for(Entry<MapKeyHollow, StringHollow> entry : singleValuePassThrough.entrySet()) {
             keyValues.put(entry.getKey()._getValue(), entry.getValue()._getValue());
         }
-        
+
         HashMap<String, List<__passthrough_string>> keyListValues = new HashMap<>();
         MultiValuePassthroughMapHollow multiValuePassthrough = attributes._getPassthrough()._getMultiValues();
         for(Entry<MapKeyHollow, ListOfStringHollow> entry : multiValuePassthrough.entrySet()) {
@@ -103,7 +178,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             }
             keyListValues.put(key, values);
         }
-        
+
         ArtworkBasicPassthrough passThrough = new ArtworkBasicPassthrough();
         PassthroughString passThroughString = getPassThroughString("approval_source", keyValues);
         boolean setBasicPassThrough = false;
@@ -137,7 +212,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             passThrough.group_id = passThroughString;
             setBasicPassThrough = true;
         }
-        
+
         if(passThroughString != null) {
             passThrough.awardCampaigns = keyListValues.get("awardCampaigns");
             setBasicPassThrough = true;
@@ -146,11 +221,11 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             passThrough.themes = keyListValues.get("themes");
             setBasicPassThrough = true;
         }
-        
+
         ArtworkSourcePassthrough sourcePassThrough = new ArtworkSourcePassthrough();
         sourcePassThrough.original_source_file_id = getArtworkSourceString("source_file_id", keyValues);
         sourcePassThrough.source_file_id = getArtworkSourceString("source_file_id", keyValues);
-        
+
         if(setBasicPassThrough) {
             desc.basic_passthrough = passThrough;
         }
@@ -165,9 +240,9 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             passthroughString.value = value.toCharArray();
             return passthroughString;
         }
-        return null;            
+        return null;
     }
-    
+
     private ArtworkSourceString getArtworkSourceString(String key, HashMap<String, String> keyValues) {
         ArtworkSourceString passthroughString = new ArtworkSourceString();
         String value = keyValues.get(key);
@@ -178,37 +253,6 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         return null;
     }
 
-    protected static class DescriptorGroup {
-        Set<ArtWorkImageRecipe> recipes = new HashSet<>();
-        Map<Strings, AssetLocation> assetLocations = new HashMap<>();
-    }
-
-    protected final Map<Long, DescriptorGroup> groupData(final ArtworkDerivativeListHollow derivatives) {
-        Map<Long, DescriptorGroup> descGroupMap = new HashMap<>();
-        for (ArtworkDerivativeHollow derivative : derivatives) {
-            Long imageId = derivative._getImageId();
-            DescriptorGroup group = descGroupMap.get(imageId);
-            if (group == null) {
-                group = new DescriptorGroup();
-                descGroupMap.put(imageId, group);
-            }
-            ArtWorkImageRecipe recipe = getImageRecipe(derivative);
-            group.recipes.add(recipe);
-            if(isAssetLocationEnabled()) {
-                AssetLocation assetLocation = new AssetLocation();
-                assetLocation.cdnDirectory = ConversionUtils.getStrings(derivative._getCdnDirectory());
-                assetLocation.cdnId = ConversionUtils.getInt(derivative._getCdnId());
-                assetLocation.recipeDescriptor = ConversionUtils.getStrings(derivative._getRecipeDescriptor());
-                group.assetLocations.put(new Strings(recipe.recipeNameStr), assetLocation);
-            }
-        }
-        return descGroupMap;
-    }
-    
-    protected boolean isAssetLocationEnabled() {
-        return false;
-    }
-    
     protected final ArtWorkImageTypeEntry getImageTypeEntry(ArtworkDerivativeHollow derivative) {
         StringHollow imageTypeHollow = derivative._getImageType();
         int ordinal = imageTypeIdx.getMatchingOrdinal(imageTypeHollow._getValue());
@@ -225,7 +269,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             entry.unavailableFileNameStr = "unavailable".toCharArray();
             entry.nameStr = imageTypeHollow._getValue().toCharArray();
         }
-        
+
         return entry;
     }
 
@@ -256,7 +300,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         }
         return entry;
     }
-    
+
     protected Set<ArtworkLocaleHollow> getLocalTerritories(ArtworkLocaleListHollow locales) {
         Set<ArtworkLocaleHollow> artworkLocales = new HashSet<>();
         Iterator<ArtworkLocaleHollow> iterator = locales.iterator();
@@ -268,14 +312,34 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         }
         return artworkLocales;
     }
-    
-    protected Set<ArtWorkDescriptor> getDescriptorSet(Integer personId, Map<Integer, Set<ArtWorkDescriptor>> descMap) {
-        Set<ArtWorkDescriptor> descriptorSet = descMap.get(personId);
-        if (descriptorSet == null) {
-            descriptorSet = new HashSet<>();
-            descMap.put(personId, descriptorSet);
+
+    protected Set<Artwork> getArtworkSet(Integer personId, Map<Integer, Set<Artwork>> descMap) {
+        Set<Artwork> artworkSet = descMap.get(personId);
+        if (artworkSet == null) {
+            artworkSet = new HashSet<>();
+            descMap.put(personId, artworkSet);
         }
-        return descriptorSet;
-    }    
-    
+        return artworkSet;
+    }
+
+    protected List<ArtworkDerivativeHollow> sortInputDerivatives(ArtworkDerivativeListHollow derivatives) {
+        List<ArtworkDerivativeHollow> sortedDerivativeHollowList = new ArrayList<>();
+        for (ArtworkDerivativeHollow derivativeHollow : derivatives) {
+            sortedDerivativeHollowList.add(derivativeHollow);
+        }
+        Collections.sort(sortedDerivativeHollowList, new Comparator<ArtworkDerivativeHollow>() {
+            @Override
+            public int compare(ArtworkDerivativeHollow o1, ArtworkDerivativeHollow o2) {
+                return ComparisonChain.start()
+                        .compare(o1._getImageType()._getValue(), o2._getImageType()._getValue())
+                        .compare(o1._getWidth(), o2._getWidth())
+                        .compare(o1._getHeight(), o2._getHeight())
+                        .compare(o1._getRecipeName()._getValue(), o2._getRecipeName()._getValue())
+                        .compare(o1._getRecipeDescriptor()._getValue(), o2._getRecipeDescriptor()._getValue())
+                        .result();
+            }
+        });
+        return sortedDerivativeHollowList;
+    }
+
 }
