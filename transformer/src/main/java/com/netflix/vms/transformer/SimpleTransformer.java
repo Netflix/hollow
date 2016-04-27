@@ -139,12 +139,6 @@ public class SimpleTransformer {
             });
         }
 
-        objectMapper.addObject(new DeploymentIntent());
-        RolloutVideo rolloutVideoForSpec = new RolloutVideo();
-        rolloutVideoForSpec.video = new Video(-1);
-        objectMapper.addObject(rolloutVideoForSpec);
-        // @formatter:off
-
         // Register Transform Modules
         List<TransformModule> moduleList = Arrays.<TransformModule>asList(
                 new DrmSystemModule(api, ctx, objectMapper),
@@ -187,8 +181,24 @@ public class SimpleTransformer {
         holder.country = new ISOCountry("-1");
         objectMapper.addObject(holder);
 
-        objectMapper.addObject(new DrmSystem());
-        objectMapper.addObject(new LanguageRights());
+        DrmSystem drmSystem = new DrmSystem();
+        drmSystem.id = -1;
+        objectMapper.addObject(drmSystem);
+
+        LanguageRights languageRights = new LanguageRights();
+        languageRights.contractId = -1;
+        languageRights.videoId = new Video(-1);
+        objectMapper.addObject(languageRights);
+
+        DeploymentIntent deploymentIntent = new DeploymentIntent();
+        deploymentIntent.profileId = -1;
+        deploymentIntent.bitrate = -1;
+        deploymentIntent.country = new ISOCountry("-1");
+        objectMapper.addObject(deploymentIntent);
+
+        RolloutVideo rolloutVideoForSpec = new RolloutVideo();
+        rolloutVideoForSpec.video = new Video(-1);
+        objectMapper.addObject(rolloutVideoForSpec);
 
         L10NResources l10n = new L10NResources();
         l10n.resourceIdStr = new char[] { 'c' };
