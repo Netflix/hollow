@@ -302,7 +302,7 @@ public class VideoMetaDataModule {
             setOfVideoSetType.add(PAST);
 
         vmd.videoSetTypes = setOfVideoSetType;
-        long showMemberTypeId = typeDescriptor._getShowMemberTypeId();
+        long showMemberTypeId = 0; //@TODO: typeDescriptor._getShowMemberTypeId();
         if(showMemberTypeId != Long.MIN_VALUE)
             vmd.showMemberTypeId = (int)showMemberTypeId;
 
