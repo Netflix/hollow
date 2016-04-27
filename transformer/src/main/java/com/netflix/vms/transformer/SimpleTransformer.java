@@ -5,6 +5,7 @@ import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
@@ -43,7 +44,6 @@ import com.netflix.vms.transformer.modules.passthrough.beehive.RolloutCharacterM
 import com.netflix.vms.transformer.modules.passthrough.mpl.EncodingProfileGroupModule;
 import com.netflix.vms.transformer.modules.person.GlobalPersonModule;
 import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -89,7 +89,7 @@ public class SimpleTransformer {
 
         startTime = System.currentTimeMillis();
 
-        for(final VideoDisplaySetHollow displaySet : api.getAllVideoDisplaySetHollow()) {
+        for(VideoGeneralHollow videoGeneral : api.getAllVideoGeneralHollow()) {
 
             executor.execute(new Runnable() {
                 @Override
@@ -104,7 +104,7 @@ public class SimpleTransformer {
                         CountrySpecificDataModule countrySpecificModule = getCountrySpecificDataModule();
                         VideoEpisodeCountryDecoratorModule countryDecoratorModule = new VideoEpisodeCountryDecoratorModule(api, objectMapper);
 
-                        Map<String, ShowHierarchy> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(displaySet);
+                        Map<String, ShowHierarchy> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(videoGeneral);
 
                         if (showHierarchiesByCountry != null) {
 

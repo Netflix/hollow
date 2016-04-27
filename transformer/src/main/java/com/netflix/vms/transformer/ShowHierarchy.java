@@ -1,11 +1,11 @@
 package com.netflix.vms.transformer;
 
+import com.netflix.vms.transformer.hollowinput.ShowSeasonEpisodeHollow;
+
 import com.netflix.hollow.util.HashCodes;
 import com.netflix.hollow.util.IntList;
-import com.netflix.vms.transformer.hollowinput.CountryVideoDisplaySetHollow;
 import com.netflix.vms.transformer.hollowinput.EpisodeHollow;
 import com.netflix.vms.transformer.hollowinput.SeasonHollow;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,7 +23,7 @@ public class ShowHierarchy {
     private final int supplementalIds[];
     private final int hashCode;
 
-    public ShowHierarchy(int topNodeId, boolean isStandalone, CountryVideoDisplaySetHollow set, String countryCode, ShowHierarchyInitializer initializer) {
+    public ShowHierarchy(int topNodeId, boolean isStandalone, ShowSeasonEpisodeHollow set, String countryCode, ShowHierarchyInitializer initializer) {
         this.topNodeId = topNodeId;
         this.isStandalone = isStandalone;
         int hashCode = HashCodes.hashInt(topNodeId);
@@ -31,7 +31,11 @@ public class ShowHierarchy {
         IntList supplementalIds = new IntList();
         initializer.addSupplementalVideos(topNodeId, countryCode, supplementalIds);
 
-        List<SeasonHollow> seasons = set._getChildren();
+        List<SeasonHollow> seasons = null;
+
+        if(set != null)
+            seasons = set._getSeasons();
+
         if(seasons != null) {
             seasons = new ArrayList<SeasonHollow>(seasons);
             Collections.sort(seasons, new Comparator<SeasonHollow>() {
@@ -60,7 +64,7 @@ public class ShowHierarchy {
                 hashCode ^= seasonIds[i];
                 hashCode = HashCodes.hashInt(hashCode);
 
-                List<EpisodeHollow> episodes = new ArrayList<EpisodeHollow>(season._getChildren());
+                List<EpisodeHollow> episodes = new ArrayList<EpisodeHollow>(season._getEpisodes());
                 Collections.sort(episodes, new Comparator<EpisodeHollow>() {
                     public int compare(EpisodeHollow o1, EpisodeHollow o2) {
                         return (int)o1._getSequenceNumber() - (int)o2._getSequenceNumber();
@@ -79,7 +83,7 @@ public class ShowHierarchy {
                         continue;
 
                     initializer.addSupplementalVideos(episode._getMovieId(), countryCode, supplementalIds);
-                    
+
                     episodeIds[seasonCounter][episodeCounter] = (int)episode._getMovieId();
                     episodeSequenceNumbers[seasonCounter][episodeCounter] = (int)episode._getSequenceNumber();
                     hashCode ^= episodeIds[seasonCounter][episodeCounter];
@@ -166,7 +170,7 @@ public class ShowHierarchy {
             if(seasonSequenceNumbers[i] != other.seasonSequenceNumbers[i])
                 return false;
         }
-        
+
         for(int i=0;i<episodeIds.length;i++) {
             if(!Arrays.equals(episodeIds[i], other.episodeIds[i]))
                 return false;
