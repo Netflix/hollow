@@ -207,6 +207,9 @@ public class RolloutVideoModule extends AbstractTransformModule {
     private void copy(RolloutPhaseHollow phaseHollow, Phase phase) {
         phase.name = phaseHollow._getName()._getValue().toCharArray();
         phase.isCoreMetaDataShown = phaseHollow._getShowCoreMetadata();
+        phase.isOnHold = phaseHollow._getOnHold();
+        phase.seasonVideo = (int)(phaseHollow._getSeasonMovieId()) == 0 ? null : new Video((int)phaseHollow._getSeasonMovieId());
+        phase.phaseType = phaseHollow._getPhaseType() == null ? null :  phaseHollow._getPhaseType()._getValue().toCharArray();
 
         // add artwork source fields
         RolloutPhaseArtworkSourceFileIdListHollow artworkSourceFieldList = phaseHollow._getElements()._getArtwork()._getSourceFileIds();
