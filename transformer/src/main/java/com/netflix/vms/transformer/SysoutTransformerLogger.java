@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer;
 
+import com.netflix.vms.transformer.common.TransformerLogger;
+
 public class SysoutTransformerLogger implements TransformerLogger {
 
     @Override

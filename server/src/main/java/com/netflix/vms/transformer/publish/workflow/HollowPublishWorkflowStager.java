@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow;
 
 import netflix.admin.videometadata.VMSPublishWorkflowHistoryAdmin;
-import com.netflix.vms.transformer.TransformerLogger;
+import com.netflix.vms.transformer.common.TransformerLogger;
 import com.netflix.vms.transformer.SysoutTransformerLogger;
 import com.netflix.cassandra.NFAstyanaxManager;
 import com.netflix.config.NetflixConfiguration.RegionEnum;

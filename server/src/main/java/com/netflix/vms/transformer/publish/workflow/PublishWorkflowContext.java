@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.publish.workflow;
 import com.netflix.vms.transformer.publish.CassandraBasedPoisonedStateMarker;
 
 import com.netflix.vms.transformer.util.VMSCassandraHelper;
-import com.netflix.vms.transformer.TransformerLogger;
+import com.netflix.vms.transformer.common.TransformerLogger;
 
 public class PublishWorkflowContext {
 

@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.vms.transformer.TransformerLogger;
+import com.netflix.vms.transformer.common.TransformerLogger;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowConfig;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
