@@ -1,8 +1,8 @@
 package com.netflix.vms.transformer.logger;
 
 import com.netflix.logging.LogManager;
+import com.netflix.vms.transformer.common.TransformerLogger;
 import com.netflix.logging.ILog;
-import com.netflix.vms.transformer.TransformerLogger;
 
 public class TransformerServerLogger implements TransformerLogger {
 

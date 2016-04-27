@@ -1,0 +1,6 @@
+apply plugin: 'java'
+
+dependencies {
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.assertj:assertj-core:3.3+'
+}

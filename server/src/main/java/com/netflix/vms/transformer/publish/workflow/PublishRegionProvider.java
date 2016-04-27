@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.publish.workflow;
 
-import com.netflix.vms.transformer.TransformerLogger;
+import com.netflix.vms.transformer.common.TransformerLogger;
 import java.util.List;
 import java.util.Arrays;
 import com.netflix.config.FastProperty;

@@ -1,4 +1,4 @@
-package com.netflix.vms.transformer;
+package com.netflix.vms.transformer.common;
 
 public interface TransformerLogger {
 
