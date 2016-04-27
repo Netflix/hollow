@@ -15,12 +15,11 @@ public class DefaultExtensionRecipeModule extends AbstractTransformModule {
 
     @Override
     public void transform() {
-        mapper.addObject(new DefaultExtensionRecipe());
-
         for(DefaultExtensionRecipeHollow inExtRec : api.getAllDefaultExtensionRecipeHollow()) {
             DefaultExtensionRecipe outExtRec = new DefaultExtensionRecipe();
             outExtRec.extensionStr = inExtRec._getExtension()._getValue().toCharArray();
             outExtRec.recipeNameStr = inExtRec._getRecipeName()._getValue().toCharArray();
+            mapper.addObject(outExtRec);
         }
     }
 }
