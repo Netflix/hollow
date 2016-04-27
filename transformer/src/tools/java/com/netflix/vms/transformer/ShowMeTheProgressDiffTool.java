@@ -4,6 +4,7 @@ import com.netflix.hollow.diff.HollowDiff;
 import com.netflix.hollow.diff.HollowTypeDiff;
 import com.netflix.hollow.diff.ui.jetty.HollowDiffUIServer;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
+
 import java.util.Random;
 
 public class ShowMeTheProgressDiffTool {
@@ -15,27 +16,33 @@ public class ShowMeTheProgressDiffTool {
     public static void startTheDiff(HollowReadStateEngine expected, HollowReadStateEngine actual) throws Exception {
         HollowDiff diff = new HollowDiff(expected, actual);
         addTypeDiff(diff, "CompleteVideo", "id.value", "country.id");
+        addTypeDiff(diff, "FallbackUSArtwork", "id.value");
+        addTypeDiff(diff, "VideoEpisode_CountryList", "country.id", "item.deliverableVideo.value");
         addTypeDiff(diff, "PackageData", "id");
-        addTypeDiff(diff, "DrmSystem", "id");
-        addTypeDiff(diff, "OriginServer", "name");
+        addTypeDiff(diff, "NamedCollectionHolder", "country.id");
         addTypeDiff(diff, "EncodingProfile", "id");
-
-        addTypeDiff(diff, "ArtWorkImageFormatEntry", "nameStr");
+        addTypeDiff(diff, "OriginServer", "nameStr");
+        addTypeDiff(diff, "LanguageRights", "contractId", "videoId.value");
         addTypeDiff(diff, "DeploymentIntent", "profileId", "bitrate", "country.id");
-        addTypeDiff(diff, "TopNVideoData", "countryId");
-        addTypeDiff(diff, "RolloutCharacter", "id");
-        addTypeDiff(diff, "RolloutVideo", "video.value");
+        addTypeDiff(diff, "LanguageDescriptor", "languageId");
+        addTypeDiff(diff, "GlobalPerson", "id");
+        addTypeDiff(diff, "GlobalVideo", "completeVideo.id.value");
+        addTypeDiff(diff, "PersonImages", "id");
+        addTypeDiff(diff, "ArtWorkImageFormatEntry", "nameStr");
+        addTypeDiff(diff, "ArtWorkImageTypeEntry", "nameStr");
+        addTypeDiff(diff, "ArtWorkImageRecipe", "recipeNameStr");
+        addTypeDiff(diff, "DefaultExtensionRecipe", "extensionStr");
         addTypeDiff(diff, "DrmKey", "keyId");
         addTypeDiff(diff, "WmDrmKey", "downloadableId");
         addTypeDiff(diff, "DrmInfoData", "packageId");
-        addTypeDiff(diff, "EncodingProfileGroup", "groupNameStr"); // TODO: zero-diff
-        addTypeDiff(diff, "GlobalPerson", "id");
-        addTypeDiff(diff, "PersonImages", "id");
+        addTypeDiff(diff, "DrmSystem", "id");
+        addTypeDiff(diff, "L10NResources", "resourceIdStr");
+        addTypeDiff(diff, "EncodingProfileGroup", "groupNameStr");
         addTypeDiff(diff, "CharacterImages", "id");
         addTypeDiff(diff, "FileEncodingData", "downloadableId");
-
-        addTypeDiff(diff, "VideoEpisode_CountryList", "country.id", "item.deliverableVideo.value");
-
+        addTypeDiff(diff, "RolloutVideo", "video.value");
+        addTypeDiff(diff, "RolloutCharacter", "id");
+        addTypeDiff(diff, "TopNVideoData", "countryId");
         diff.calculateDiffs();
 
         int port = randomPort();

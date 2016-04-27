@@ -10,7 +10,12 @@ import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
 import com.netflix.vms.transformer.hollowoutput.DeploymentIntent;
+import com.netflix.vms.transformer.hollowoutput.DrmSystem;
+import com.netflix.vms.transformer.hollowoutput.GlobalVideo;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
+import com.netflix.vms.transformer.hollowoutput.L10NResources;
+import com.netflix.vms.transformer.hollowoutput.LanguageRights;
+import com.netflix.vms.transformer.hollowoutput.NamedCollectionHolder;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
 import com.netflix.vms.transformer.hollowoutput.RolloutVideo;
 import com.netflix.vms.transformer.hollowoutput.Video;
@@ -44,6 +49,7 @@ import com.netflix.vms.transformer.modules.passthrough.beehive.RolloutCharacterM
 import com.netflix.vms.transformer.modules.passthrough.mpl.EncodingProfileGroupModule;
 import com.netflix.vms.transformer.modules.person.GlobalPersonModule;
 import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -170,6 +176,24 @@ public class SimpleTransformer {
 
 
         executor.awaitSuccessfulCompletion();
+
+        // Hack
+        GlobalVideo gVideo = new GlobalVideo();
+        gVideo.completeVideo = new CompleteVideo();
+        gVideo.completeVideo.id = new Video(-1);
+        objectMapper.addObject(gVideo);
+
+        NamedCollectionHolder holder = new NamedCollectionHolder();
+        holder.country = new ISOCountry("-1");
+        objectMapper.addObject(holder);
+
+        objectMapper.addObject(new DrmSystem());
+        objectMapper.addObject(new LanguageRights());
+
+        L10NResources l10n = new L10NResources();
+        l10n.resourceIdStr = new char[] { 'c' };
+        objectMapper.addObject(l10n);
+        // End of Hack
 
         endTime = System.currentTimeMillis();
         System.out.println("Processed all videos in " + (endTime - startTime) + "ms");

@@ -8,12 +8,14 @@ import com.netflix.hollow.util.memory.WastefulRecycler;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+
 import org.junit.Test;
 
 public class ShowMeTheProgress {
@@ -45,12 +47,19 @@ public class ShowMeTheProgress {
         filter.addFieldRecursive("CompleteVideo", "countrySpecificData", outputSchemas);
 
         filter.addTypeRecursive("PackageData", outputSchemas);
+        filter.addTypeRecursive("GlobalVideo", outputSchemas);
+        filter.addTypeRecursive("NamedCollectionHolder", outputSchemas);
+        filter.addTypeRecursive("LanguageRights", outputSchemas);
+        filter.addTypeRecursive("L10NResources", outputSchemas);
 
-        // filter.addTypeRecursive("DrmSystem", outputSchemas);
+        filter.addTypeRecursive("DrmSystem", outputSchemas);
         filter.addTypeRecursive("OriginServer", outputSchemas);
         filter.addTypeRecursive("ArtWorkImageFormatEntry", outputSchemas);
         filter.addTypeRecursive("EncodingProfile", outputSchemas);
         filter.addTypeRecursive("ArtWorkImageFormatEntry", outputSchemas);
+        filter.addTypeRecursive("ArtWorkImageTypeEntry", outputSchemas);
+        filter.addTypeRecursive("ArtWorkImageRecipe", outputSchemas);
+        filter.addTypeRecursive("DefaultExtensionRecipe", outputSchemas);
         filter.addTypeRecursive("DeploymentIntent", outputSchemas);
         filter.addTypeRecursive("TopNVideoData", outputSchemas);
         filter.addTypeRecursive("RolloutCharacter", outputSchemas);
