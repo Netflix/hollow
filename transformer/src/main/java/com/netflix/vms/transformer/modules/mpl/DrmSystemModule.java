@@ -20,7 +20,11 @@ public class DrmSystemModule extends AbstractTransformModule {
         super(api, ctx, mapper);
     }
 
+    @Override
     public void transform() {
+        // @TODO: api.getAllDrmSystemIdentifiersHollow() is empty / need to regenerate with slice input/output
+        mapper.addObject(new DrmSystem());
+
         for(DrmSystemIdentifiersHollow drmSystemIdentifier : api.getAllDrmSystemIdentifiersHollow()) {
             DrmSystem system = new DrmSystem();
             system.id = (int)drmSystemIdentifier._getId();
@@ -28,11 +32,9 @@ public class DrmSystemModule extends AbstractTransformModule {
             system.name = new DrmKeyString(drmSystemIdentifier._getName()._getValue());
 
             system.attributes = new HashMap<DrmKeyString, DrmKeyString>();
-
             system.attributes.put(HEADER_DATA_AVAILABLE, drmSystemIdentifier._getHeaderDataAvailable() ? TRUE : FALSE);
 
             mapper.addObject(system);
         }
     }
-
 }

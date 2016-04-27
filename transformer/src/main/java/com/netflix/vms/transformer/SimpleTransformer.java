@@ -10,7 +10,6 @@ import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
 import com.netflix.vms.transformer.hollowoutput.DeploymentIntent;
-import com.netflix.vms.transformer.hollowoutput.DrmSystem;
 import com.netflix.vms.transformer.hollowoutput.GlobalVideo;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.L10NResources;
@@ -180,10 +179,6 @@ public class SimpleTransformer {
         NamedCollectionHolder holder = new NamedCollectionHolder();
         holder.country = new ISOCountry("-1");
         objectMapper.addObject(holder);
-
-        DrmSystem drmSystem = new DrmSystem();
-        drmSystem.id = -1;
-        objectMapper.addObject(drmSystem);
 
         LanguageRights languageRights = new LanguageRights();
         languageRights.contractId = -1;
