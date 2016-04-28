@@ -16,7 +16,6 @@ import com.netflix.vms.transformer.hollowoutput.L10NResources;
 import com.netflix.vms.transformer.hollowoutput.LanguageRights;
 import com.netflix.vms.transformer.hollowoutput.NamedCollectionHolder;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
-import com.netflix.vms.transformer.hollowoutput.RolloutVideo;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
 import com.netflix.vms.transformer.hollowoutput.VideoMediaData;
@@ -190,10 +189,6 @@ public class SimpleTransformer {
         deploymentIntent.bitrate = -1;
         deploymentIntent.country = new ISOCountry("-1");
         objectMapper.addObject(deploymentIntent);
-
-        RolloutVideo rolloutVideoForSpec = new RolloutVideo();
-        rolloutVideoForSpec.video = new Video(-1);
-        objectMapper.addObject(rolloutVideoForSpec);
 
         L10NResources l10n = new L10NResources();
         l10n.resourceIdStr = new char[] { 'c' };

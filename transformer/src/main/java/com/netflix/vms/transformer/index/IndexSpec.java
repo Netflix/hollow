@@ -25,6 +25,7 @@ public enum IndexSpec {
     CONSOLIDATED_CERT_SYSTEMS(PRIMARY_KEY, "ConsolidatedCertificationSystems", "certificationSystemId"),
     CERT_SYSTEM_RATING(PRIMARY_KEY, "ConsolidatedCertSystemRating", "ratingId"),
     PACKAGES(PRIMARY_KEY, "Package", "packageId"),
+    PERSON_BIO(PRIMARY_KEY, "PersonBio", "personId"),
 
     SHOW_SEASON_EPISODE(HASH, "ShowSeasonEpisode", "", "movieId"),
     VIDEO_DATE(HASH, "VideoDate", "window.element", "videoId", "window.element.countryCode.value"),

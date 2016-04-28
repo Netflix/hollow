@@ -16,65 +16,65 @@ public class ExplicitDateTypeAPI extends HollowObjectTypeAPI {
         this.delegateLookupImpl = new ExplicitDateDelegateLookupImpl(this);
     }
 
-    public long getMonthOfYear(int ordinal) {
+    public int getMonthOfYear(int ordinal) {
         if(fieldIndex[0] == -1)
-            return missingDataHandler().handleLong("ExplicitDate", ordinal, "monthOfYear");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[0]);
+            return missingDataHandler().handleInt("ExplicitDate", ordinal, "monthOfYear");
+        return getTypeDataAccess().readInt(ordinal, fieldIndex[0]);
     }
 
-    public Long getMonthOfYearBoxed(int ordinal) {
-        long l;
+    public Integer getMonthOfYearBoxed(int ordinal) {
+        int i;
         if(fieldIndex[0] == -1) {
-            l = missingDataHandler().handleLong("ExplicitDate", ordinal, "monthOfYear");
+            i = missingDataHandler().handleInt("ExplicitDate", ordinal, "monthOfYear");
         } else {
             boxedFieldAccessSampler.recordFieldAccess(fieldIndex[0]);
-            l = getTypeDataAccess().readLong(ordinal, fieldIndex[0]);
+            i = getTypeDataAccess().readInt(ordinal, fieldIndex[0]);
         }
-        if(l == Long.MIN_VALUE)
+        if(i == Integer.MIN_VALUE)
             return null;
-        return Long.valueOf(l);
+        return Integer.valueOf(i);
     }
 
 
 
-    public long getYear(int ordinal) {
+    public int getYear(int ordinal) {
         if(fieldIndex[1] == -1)
-            return missingDataHandler().handleLong("ExplicitDate", ordinal, "year");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[1]);
+            return missingDataHandler().handleInt("ExplicitDate", ordinal, "year");
+        return getTypeDataAccess().readInt(ordinal, fieldIndex[1]);
     }
 
-    public Long getYearBoxed(int ordinal) {
-        long l;
+    public Integer getYearBoxed(int ordinal) {
+        int i;
         if(fieldIndex[1] == -1) {
-            l = missingDataHandler().handleLong("ExplicitDate", ordinal, "year");
+            i = missingDataHandler().handleInt("ExplicitDate", ordinal, "year");
         } else {
             boxedFieldAccessSampler.recordFieldAccess(fieldIndex[1]);
-            l = getTypeDataAccess().readLong(ordinal, fieldIndex[1]);
+            i = getTypeDataAccess().readInt(ordinal, fieldIndex[1]);
         }
-        if(l == Long.MIN_VALUE)
+        if(i == Integer.MIN_VALUE)
             return null;
-        return Long.valueOf(l);
+        return Integer.valueOf(i);
     }
 
 
 
-    public long getDayOfMonth(int ordinal) {
+    public int getDayOfMonth(int ordinal) {
         if(fieldIndex[2] == -1)
-            return missingDataHandler().handleLong("ExplicitDate", ordinal, "dayOfMonth");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[2]);
+            return missingDataHandler().handleInt("ExplicitDate", ordinal, "dayOfMonth");
+        return getTypeDataAccess().readInt(ordinal, fieldIndex[2]);
     }
 
-    public Long getDayOfMonthBoxed(int ordinal) {
-        long l;
+    public Integer getDayOfMonthBoxed(int ordinal) {
+        int i;
         if(fieldIndex[2] == -1) {
-            l = missingDataHandler().handleLong("ExplicitDate", ordinal, "dayOfMonth");
+            i = missingDataHandler().handleInt("ExplicitDate", ordinal, "dayOfMonth");
         } else {
             boxedFieldAccessSampler.recordFieldAccess(fieldIndex[2]);
-            l = getTypeDataAccess().readLong(ordinal, fieldIndex[2]);
+            i = getTypeDataAccess().readInt(ordinal, fieldIndex[2]);
         }
-        if(l == Long.MIN_VALUE)
+        if(i == Integer.MIN_VALUE)
             return null;
-        return Long.valueOf(l);
+        return Integer.valueOf(i);
     }
 
 
