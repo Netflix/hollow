@@ -8,9 +8,9 @@ import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 
 public class ExplicitDateDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, ExplicitDateDelegate {
 
-    private final Long monthOfYear;
-    private final Long year;
-    private final Long dayOfMonth;
+    private final Integer monthOfYear;
+    private final Integer year;
+    private final Integer dayOfMonth;
    private ExplicitDateTypeAPI typeAPI;
 
     public ExplicitDateDelegateCachedImpl(ExplicitDateTypeAPI typeAPI, int ordinal) {
@@ -20,27 +20,27 @@ public class ExplicitDateDelegateCachedImpl extends HollowObjectAbstractDelegate
         this.typeAPI = typeAPI;
     }
 
-    public long getMonthOfYear(int ordinal) {
-        return monthOfYear.longValue();
+    public int getMonthOfYear(int ordinal) {
+        return monthOfYear.intValue();
     }
 
-    public Long getMonthOfYearBoxed(int ordinal) {
+    public Integer getMonthOfYearBoxed(int ordinal) {
         return monthOfYear;
     }
 
-    public long getYear(int ordinal) {
-        return year.longValue();
+    public int getYear(int ordinal) {
+        return year.intValue();
     }
 
-    public Long getYearBoxed(int ordinal) {
+    public Integer getYearBoxed(int ordinal) {
         return year;
     }
 
-    public long getDayOfMonth(int ordinal) {
-        return dayOfMonth.longValue();
+    public int getDayOfMonth(int ordinal) {
+        return dayOfMonth.intValue();
     }
 
-    public Long getDayOfMonthBoxed(int ordinal) {
+    public Integer getDayOfMonthBoxed(int ordinal) {
         return dayOfMonth;
     }
 

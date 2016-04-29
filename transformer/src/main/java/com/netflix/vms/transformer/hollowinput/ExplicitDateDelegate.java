@@ -4,17 +4,17 @@ import com.netflix.hollow.objects.delegate.HollowObjectDelegate;
 
 public interface ExplicitDateDelegate extends HollowObjectDelegate {
 
-    public long getMonthOfYear(int ordinal);
+    public int getMonthOfYear(int ordinal);
 
-    public Long getMonthOfYearBoxed(int ordinal);
+    public Integer getMonthOfYearBoxed(int ordinal);
 
-    public long getYear(int ordinal);
+    public int getYear(int ordinal);
 
-    public Long getYearBoxed(int ordinal);
+    public Integer getYearBoxed(int ordinal);
 
-    public long getDayOfMonth(int ordinal);
+    public int getDayOfMonth(int ordinal);
 
-    public Long getDayOfMonthBoxed(int ordinal);
+    public Integer getDayOfMonthBoxed(int ordinal);
 
     public ExplicitDateTypeAPI getTypeAPI();
 

@@ -9,27 +9,27 @@ public class ExplicitDateHollow extends HollowObject {
         super(delegate, ordinal);
     }
 
-    public long _getMonthOfYear() {
+    public int _getMonthOfYear() {
         return delegate().getMonthOfYear(ordinal);
     }
 
-    public Long _getMonthOfYearBoxed() {
+    public Integer _getMonthOfYearBoxed() {
         return delegate().getMonthOfYearBoxed(ordinal);
     }
 
-    public long _getYear() {
+    public int _getYear() {
         return delegate().getYear(ordinal);
     }
 
-    public Long _getYearBoxed() {
+    public Integer _getYearBoxed() {
         return delegate().getYearBoxed(ordinal);
     }
 
-    public long _getDayOfMonth() {
+    public int _getDayOfMonth() {
         return delegate().getDayOfMonth(ordinal);
     }
 
-    public Long _getDayOfMonthBoxed() {
+    public Integer _getDayOfMonthBoxed() {
         return delegate().getDayOfMonthBoxed(ordinal);
     }
 

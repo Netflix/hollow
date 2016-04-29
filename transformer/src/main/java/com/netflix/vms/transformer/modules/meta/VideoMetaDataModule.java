@@ -17,6 +17,7 @@ import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.vms.transformer.ShowHierarchy;
 import com.netflix.vms.transformer.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
+import com.netflix.vms.transformer.hollowinput.ReleaseDateHollow;
 import com.netflix.vms.transformer.hollowinput.StoriesSynopsesHollow;
 import com.netflix.vms.transformer.hollowinput.StoriesSynopsesHookHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
@@ -31,7 +32,6 @@ import com.netflix.vms.transformer.hollowinput.VideoRightsFlagsHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
-import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.Hook;
 import com.netflix.vms.transformer.hollowoutput.HookType;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
@@ -42,7 +42,7 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-
+import com.netflix.vms.transformer.util.VideoDateUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -171,7 +171,6 @@ public class VideoMetaDataModule {
         countrySpecificClone.showMemberTypeId = countrySpecificKey.showMemberTypeId;
         countrySpecificClone.copyright = countrySpecificKey.copyright;
         countrySpecificClone.hasNewContent = countrySpecificKey.hasNewContent;
-
 
         /// return the country specific clone
         countrySpecificMap.put(countrySpecificKey, countrySpecificClone);
@@ -357,14 +356,11 @@ public class VideoMetaDataModule {
         if(dateResult != null) {
             int ordinal = dateResult.iterator().next();
             VideoDateWindowHollow dateWindow = api.getVideoDateWindowHollow(ordinal);
-
-            vmd.isTheatricalRelease = dateWindow._getIsTheatricalRelease();
-            int theatricalReleaseYear = dateWindow._getTheatricalReleaseYear();
-            vmd.year = theatricalReleaseYear == Integer.MIN_VALUE ? 0 : theatricalReleaseYear;
+            ReleaseDateHollow theatricalReleaseDate = VideoDateUtil.getReleaseDateType("Theatrical", dateWindow);
+            vmd.isTheatricalRelease = theatricalReleaseDate != null;
+            vmd.year = theatricalReleaseDate == null ? 0 : theatricalReleaseDate._getYear();
             vmd.latestYear = vmd.year;
-            if(dateWindow._getTheatricalReleaseDate() != Long.MIN_VALUE)
-                vmd.theatricalReleaseDate = new Date(dateWindow._getTheatricalReleaseDate());
-
+            vmd.theatricalReleaseDate = VideoDateUtil.convertToHollowOutputDate(theatricalReleaseDate);
         } else {
             vmd.year = 0;
             vmd.latestYear = 0;

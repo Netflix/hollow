@@ -12,27 +12,27 @@ public class ExplicitDateDelegateLookupImpl extends HollowObjectAbstractDelegate
         this.typeAPI = typeAPI;
     }
 
-    public long getMonthOfYear(int ordinal) {
+    public int getMonthOfYear(int ordinal) {
         return typeAPI.getMonthOfYear(ordinal);
     }
 
-    public Long getMonthOfYearBoxed(int ordinal) {
+    public Integer getMonthOfYearBoxed(int ordinal) {
         return typeAPI.getMonthOfYearBoxed(ordinal);
     }
 
-    public long getYear(int ordinal) {
+    public int getYear(int ordinal) {
         return typeAPI.getYear(ordinal);
     }
 
-    public Long getYearBoxed(int ordinal) {
+    public Integer getYearBoxed(int ordinal) {
         return typeAPI.getYearBoxed(ordinal);
     }
 
-    public long getDayOfMonth(int ordinal) {
+    public int getDayOfMonth(int ordinal) {
         return typeAPI.getDayOfMonth(ordinal);
     }
 
-    public Long getDayOfMonthBoxed(int ordinal) {
+    public Integer getDayOfMonthBoxed(int ordinal) {
         return typeAPI.getDayOfMonthBoxed(ordinal);
     }
 

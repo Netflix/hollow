@@ -9,15 +9,15 @@ import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.ShowHierarchy;
+import com.netflix.vms.transformer.hollowinput.ReleaseDateHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoDateWindowHollow;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
-import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.VideoMediaData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-
+import com.netflix.vms.transformer.util.VideoDateUtil;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -138,10 +138,8 @@ public class VideoMediaDataModule {
         if (dateResult != null) {
             int ordinal = dateResult.iterator().next();
             VideoDateWindowHollow dateWindow = api.getVideoDateWindowHollow(ordinal);
-            long dt = dateWindow._getStreetDate();
-            if (dt != Long.MIN_VALUE) {
-                vmd.dvdReleaseDate = new Date(dateWindow._getStreetDate());
-            }
+            ReleaseDateHollow date_ = VideoDateUtil.getReleaseDateType("DVDStreet", dateWindow);
+            vmd.dvdReleaseDate = VideoDateUtil.convertToHollowOutputDate(date_);
         }
         return (vmd.dvdReleaseDate != null);
     }
