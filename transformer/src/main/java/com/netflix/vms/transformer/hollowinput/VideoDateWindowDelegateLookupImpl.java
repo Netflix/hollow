@@ -16,36 +16,8 @@ public class VideoDateWindowDelegateLookupImpl extends HollowObjectAbstractDeleg
         return typeAPI.getCountryCodeOrdinal(ordinal);
     }
 
-    public boolean getIsTheatricalRelease(int ordinal) {
-        return typeAPI.getIsTheatricalRelease(ordinal);
-    }
-
-    public Boolean getIsTheatricalReleaseBoxed(int ordinal) {
-        return typeAPI.getIsTheatricalReleaseBoxed(ordinal);
-    }
-
-    public long getStreetDate(int ordinal) {
-        return typeAPI.getStreetDate(ordinal);
-    }
-
-    public Long getStreetDateBoxed(int ordinal) {
-        return typeAPI.getStreetDateBoxed(ordinal);
-    }
-
-    public long getTheatricalReleaseDate(int ordinal) {
-        return typeAPI.getTheatricalReleaseDate(ordinal);
-    }
-
-    public Long getTheatricalReleaseDateBoxed(int ordinal) {
-        return typeAPI.getTheatricalReleaseDateBoxed(ordinal);
-    }
-
-    public int getTheatricalReleaseYear(int ordinal) {
-        return typeAPI.getTheatricalReleaseYear(ordinal);
-    }
-
-    public Integer getTheatricalReleaseYearBoxed(int ordinal) {
-        return typeAPI.getTheatricalReleaseYearBoxed(ordinal);
+    public int getReleaseDatesOrdinal(int ordinal) {
+        return typeAPI.getReleaseDatesOrdinal(ordinal);
     }
 
     public VideoDateWindowTypeAPI getTypeAPI() {

@@ -10,10 +10,7 @@ public class VideoDateWindowTypeAPI extends HollowObjectTypeAPI {
     VideoDateWindowTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "countryCode",
-            "isTheatricalRelease",
-            "streetDate",
-            "theatricalReleaseDate",
-            "theatricalReleaseYear"
+            "releaseDates"
         });
         this.delegateLookupImpl = new VideoDateWindowDelegateLookupImpl(this);
     }
@@ -28,82 +25,15 @@ public class VideoDateWindowTypeAPI extends HollowObjectTypeAPI {
         return getAPI().getStringTypeAPI();
     }
 
-    public boolean getIsTheatricalRelease(int ordinal) {
+    public int getReleaseDatesOrdinal(int ordinal) {
         if(fieldIndex[1] == -1)
-            return missingDataHandler().handleBoolean("VideoDateWindow", ordinal, "isTheatricalRelease") == Boolean.TRUE;
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[1]) == Boolean.TRUE;
+            return missingDataHandler().handleReferencedOrdinal("VideoDateWindow", ordinal, "releaseDates");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[1]);
     }
 
-    public Boolean getIsTheatricalReleaseBoxed(int ordinal) {
-        if(fieldIndex[1] == -1)
-            return missingDataHandler().handleBoolean("VideoDateWindow", ordinal, "isTheatricalRelease");
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[1]);
+    public ListOfReleaseDatesTypeAPI getReleaseDatesTypeAPI() {
+        return getAPI().getListOfReleaseDatesTypeAPI();
     }
-
-
-
-    public long getStreetDate(int ordinal) {
-        if(fieldIndex[2] == -1)
-            return missingDataHandler().handleLong("VideoDateWindow", ordinal, "streetDate");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[2]);
-    }
-
-    public Long getStreetDateBoxed(int ordinal) {
-        long l;
-        if(fieldIndex[2] == -1) {
-            l = missingDataHandler().handleLong("VideoDateWindow", ordinal, "streetDate");
-        } else {
-            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[2]);
-            l = getTypeDataAccess().readLong(ordinal, fieldIndex[2]);
-        }
-        if(l == Long.MIN_VALUE)
-            return null;
-        return Long.valueOf(l);
-    }
-
-
-
-    public long getTheatricalReleaseDate(int ordinal) {
-        if(fieldIndex[3] == -1)
-            return missingDataHandler().handleLong("VideoDateWindow", ordinal, "theatricalReleaseDate");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[3]);
-    }
-
-    public Long getTheatricalReleaseDateBoxed(int ordinal) {
-        long l;
-        if(fieldIndex[3] == -1) {
-            l = missingDataHandler().handleLong("VideoDateWindow", ordinal, "theatricalReleaseDate");
-        } else {
-            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[3]);
-            l = getTypeDataAccess().readLong(ordinal, fieldIndex[3]);
-        }
-        if(l == Long.MIN_VALUE)
-            return null;
-        return Long.valueOf(l);
-    }
-
-
-
-    public int getTheatricalReleaseYear(int ordinal) {
-        if(fieldIndex[4] == -1)
-            return missingDataHandler().handleInt("VideoDateWindow", ordinal, "theatricalReleaseYear");
-        return getTypeDataAccess().readInt(ordinal, fieldIndex[4]);
-    }
-
-    public Integer getTheatricalReleaseYearBoxed(int ordinal) {
-        int i;
-        if(fieldIndex[4] == -1) {
-            i = missingDataHandler().handleInt("VideoDateWindow", ordinal, "theatricalReleaseYear");
-        } else {
-            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[4]);
-            i = getTypeDataAccess().readInt(ordinal, fieldIndex[4]);
-        }
-        if(i == Integer.MIN_VALUE)
-            return null;
-        return Integer.valueOf(i);
-    }
-
-
 
     public VideoDateWindowDelegateLookupImpl getDelegateLookupImpl() {
         return delegateLookupImpl;
