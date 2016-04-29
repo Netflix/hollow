@@ -138,7 +138,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         for (Artwork artwork : allArtwork) {
             imageTypes.clear();
             for (ArtworkDerivative derivative : artwork.derivatives.list) {
-                imageTypes.add(new Strings(derivative.type.nameStr.toString()));
+                imageTypes.add(new Strings(derivative.type.nameStr));
             }
 
             for (Strings imageType : imageTypes) {
