@@ -1,37 +1,34 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import com.netflix.aws.db.ItemAttribute;
-import com.netflix.aws.file.FileStore;
-import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
-import com.netflix.vms.transformer.servlet.platform.PlatformLibraries;
-import com.netflix.vms.transformer.util.HollowBlobKeybaseBuilder;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.netflix.aws.db.ItemAttribute;
+import com.netflix.aws.file.FileStore;
+import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.videometadata.s3.HollowBlobKeybaseBuilder;
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
+
 import netflix.admin.videometadata.uploadstat.VMSFileUploadStatus;
 import netflix.admin.videometadata.uploadstat.VMSFileUploadStatus.UploadStatus;
 import netflix.admin.videometadata.uploadstat.VMSFileUploadStatus.VMSFileRegionUploadStatus;
 import netflix.admin.videometadata.uploadstat.VMSServerCycleUploadStatus;
 import netflix.admin.videometadata.uploadstat.VMSServerUploadStatus;
 
-@SuppressWarnings("deprecation")
 public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
 
     private static final int  RETRY_ATTEMPTS = 10;
     private static final long TIMEOUT_MILLIS = 60 * 60 * 1000; /// 1 hour
 
-    private final PublishWorkflowContext ctx;
-
     public FileStoreHollowBlobPublishJob(PublishWorkflowContext ctx, long previousVersion, long version, PublishType jobType, RegionEnum region, File fileToUpload) {
-        super(ctx.getVip(), previousVersion, version, jobType, region, fileToUpload);
-        this.ctx = ctx;
+        super(ctx, ctx.getVip(), previousVersion, version, jobType, region, fileToUpload);
     }
 
     @Override
     protected boolean executeJob() {
-        FileStore fileStore = PlatformLibraries.FILE_STORE;
+        FileStore fileStore = ctx.getFileStore();
         String keybase = getKeybase();
         String fileStoreVersion = jobType == PublishType.DELTA ? String.valueOf(previousVersion) : String.valueOf(getCycleVersion());
 
@@ -76,6 +73,7 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private List<ItemAttribute> getItemAttributes() {
         List<ItemAttribute> att = new ArrayList<ItemAttribute>(4);
 

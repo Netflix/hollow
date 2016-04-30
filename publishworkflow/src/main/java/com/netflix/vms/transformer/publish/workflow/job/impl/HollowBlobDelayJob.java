@@ -1,17 +1,17 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
+import com.netflix.config.FastProperty;
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.DelayJob;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
-
-import com.netflix.config.FastProperty;
 
 public class HollowBlobDelayJob extends DelayJob {
 
     private static final FastProperty.BooleanProperty BIG_GREEN_BUTTON = new FastProperty.BooleanProperty("com.netflix.vms.server.biggreenbutton", false);
     private static final long BIG_GREEN_BUTTON_POLL_MILLIS = 10000L;
 
-    public HollowBlobDelayJob(PublicationJob dependency, long delayMillis, long cycleVersion) {
-        super(dependency, delayMillis, cycleVersion);
+    public HollowBlobDelayJob(PublishWorkflowContext ctx, PublicationJob jobToDelay, long delayMillis, long cycleVersion) {
+        super(ctx, jobToDelay, delayMillis, cycleVersion);
     }
 
     @Override
@@ -31,5 +31,4 @@ public class HollowBlobDelayJob extends DelayJob {
 
         return true;
     }
-
 }

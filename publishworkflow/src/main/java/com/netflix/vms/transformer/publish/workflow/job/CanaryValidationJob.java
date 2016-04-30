@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.publish.workflow.job;
 
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
 
 import java.util.Map;
@@ -8,14 +9,11 @@ import com.netflix.config.NetflixConfiguration.RegionEnum;
 public abstract class CanaryValidationJob extends PublicationJob {
 
     protected final String vip;
-    @SuppressWarnings("unused")
-	private final Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs;
     private final Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs;
 
-    public CanaryValidationJob(String vip, long cycleVersion, Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs, Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs) {
-        super("canary-validation", cycleVersion);
+    public CanaryValidationJob(PublishWorkflowContext ctx, String vip, long cycleVersion, Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs, Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs) {
+        super(ctx, "canary-validation", cycleVersion);
         this.vip = vip;
-        this.beforeCanaryAnnounceJobs = beforeCanaryAnnounceJobs;
         this.afterCanaryAnnounceJobs = afterCanaryAnnounceJobs;
     }
 

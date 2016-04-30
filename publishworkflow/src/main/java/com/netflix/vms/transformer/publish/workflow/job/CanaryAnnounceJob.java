@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.publish.workflow.job;
 
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob.PublishType;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
 
@@ -14,10 +15,10 @@ public abstract class CanaryAnnounceJob extends PublicationJob {
     private final CanaryValidationJob previousCycleValidationJob;
     private HollowBlobPublishJob snapshotJob;
 
-    public CanaryAnnounceJob(final String vip, final long newVersion, final RegionEnum region, final BeforeCanaryAnnounceJob beforeCanaryAnnounceJob,
-                             final CanaryValidationJob previousCycleValidationJob,
-                             final List<PublicationJaob> newPublishJobs) {
-        super("canary-announce-"+region, newVersion);
+    public CanaryAnnounceJob(final PublishWorkflowContext ctx, final String vip, final long newVersion, final RegionEnum region, final BeforeCanaryAnnounceJob beforeCanaryAnnounceJob,
+			final CanaryValidationJob previousCycleValidationJob,
+			final List<PublicationJob> newPublishJobs) {
+        super(ctx, "canary-announce-"+region, newVersion);
         this.vip = vip;
         this.region = region;
         this.beforeCanaryAnnounceJob = beforeCanaryAnnounceJob;

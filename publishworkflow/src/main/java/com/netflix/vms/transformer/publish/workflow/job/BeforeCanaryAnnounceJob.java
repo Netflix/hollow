@@ -2,6 +2,7 @@ package com.netflix.vms.transformer.publish.workflow.job;
 
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob.PublishType;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
 import java.util.List;
@@ -18,9 +19,9 @@ public abstract class BeforeCanaryAnnounceJob extends PublicationJob {
     private final CanaryRollbackJob previousCanaryRollbackJob;
 
 
-	public BeforeCanaryAnnounceJob(String vip, long newVersion, RegionEnum region, CircuitBreakerJob circuitBreakerJob,
+	public BeforeCanaryAnnounceJob(PublishWorkflowContext ctx, String vip, long newVersion, RegionEnum region, CircuitBreakerJob circuitBreakerJob,
 			CanaryValidationJob previousCycleValidationJob, List<PublicationJob> newPublishJobs, CanaryRollbackJob previousCanaryRollBackJob) {
-		super("Before-canary-annouce-"+region, newVersion);
+		super(ctx, "Before-canary-annouce-"+region, newVersion);
         this.vip = vip;
         this.region = region;
         this.previousCanaryValidationJob = previousCycleValidationJob;

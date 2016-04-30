@@ -1,50 +1,27 @@
 package com.netflix.vms.transformer.publish.workflow;
 
-import com.netflix.vms.transformer.publish.CassandraBasedPoisonedStateMarker;
-
-import com.netflix.vms.transformer.util.VMSCassandraHelper;
+import com.netflix.aws.file.FileStore;
+import com.netflix.vms.transformer.common.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.TransformerLogger;
+import com.netflix.vms.transformer.common.VipAnnouncer;
+import com.netflix.vms.transformer.publish.PoisonedStateMarker;
 
-public class PublishWorkflowContext {
+public interface PublishWorkflowContext {
 
-    private final String vip;
-    private final TransformerLogger logger;
-    private final PublishWorkflowConfig config;
-    private final CassandraBasedPoisonedStateMarker poisonStateMarker;
-    private final VMSCassandraHelper validationStatsCassandraHelper;
-    private final VMSCassandraHelper canaryResultsCassandraHelper;
+    String getVip();
 
-    public PublishWorkflowContext(String vip, TransformerLogger logger, PublishWorkflowConfig config, VMSCassandraHelper validationStatsCassandraHelper, VMSCassandraHelper canaryResultsCassandraHelper) {
-        this.vip = vip;
-        this.logger = logger;
-        this.config = config;
-        this.validationStatsCassandraHelper = validationStatsCassandraHelper;
-        this.canaryResultsCassandraHelper = canaryResultsCassandraHelper;
-        this.poisonStateMarker = new CassandraBasedPoisonedStateMarker(vip);
-    }
+    TransformerLogger getLogger();
 
-    public String getVip() {
-        return vip;
-    }
+    PublishWorkflowConfig getConfig();
 
-    public TransformerLogger getLogger() {
-        return logger;
-    }
+    TransformerCassandraHelper getValidationStatsCassandraHelper();
 
-    public PublishWorkflowConfig getConfig() {
-        return config;
-    }
+    TransformerCassandraHelper getCanaryResultsCassandraHelper();
 
-    public VMSCassandraHelper getValidationStatsCassandraHelper() {
-        return validationStatsCassandraHelper;
-    }
+    PoisonedStateMarker getPoisonStateMarker();
 
-    public VMSCassandraHelper getCanaryResultsCassandraHelper() {
-        return canaryResultsCassandraHelper;
-    }
+    FileStore getFileStore();
 
-    public CassandraBasedPoisonedStateMarker getPoisonStateMarker() {
-        return poisonStateMarker;
-    }
+    VipAnnouncer getVipAnnouncer();
 
 }

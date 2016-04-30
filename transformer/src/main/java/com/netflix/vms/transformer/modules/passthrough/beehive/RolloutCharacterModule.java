@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.modules.passthrough.beehive;
 
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
-import com.netflix.vms.transformer.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.CharacterElementsHollow;
 import com.netflix.vms.transformer.hollowinput.CharacterHollow;
 import com.netflix.vms.transformer.hollowinput.CharacterQuoteHollow;

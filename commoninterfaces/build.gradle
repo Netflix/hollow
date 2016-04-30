@@ -1,8 +1,13 @@
 apply plugin: 'java'
 
 dependencies {
+    // TODO: common interfaces shouldn't depend on these; it forces transitive dependencies
+    //       on the union of dependencies required for two or more coordinating subprojects.
+    //       Provide narrower adapter interfaces that are fulfilled by concrete classes
+    //       defined in a subproject with the appropriate dependency.
     compile 'netflix:platform:latest.release'
     compile 'netflix:awsutils:latest.release'
+    compile 'netflix:hermes:latest.release'
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.assertj:assertj-core:3.3+'

@@ -1,19 +1,15 @@
 package com.netflix.vms.transformer.servlet.platform;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.inject.servlet.ServletModule;
-import com.netflix.aws.file.FileStore;
-import com.netflix.cassandra.NFAstyanaxManager;
 import com.netflix.governator.annotations.AutoBindSingleton;
-import com.netflix.hermes.publisher.FastPropertyPublisher;
-import com.netflix.hermes.subscriber.SubscriptionManager;
 import com.netflix.karyon.spi.HealthCheckHandler;
 import com.netflix.server.base.NFFilter;
 import com.netflix.server.base.lifecycle.BaseServerLifecycleListener;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
-import java.util.HashMap;
-import java.util.Map;
-import javax.servlet.ServletContextEvent;
 
 
 @AutoBindSingleton
@@ -21,14 +17,6 @@ public class StartServerLifecycle extends BaseServerLifecycleListener {
 
     public StartServerLifecycle() {
         super("vmstransformer", "vmstransformer", "1.0");
-    }
-
-    @Override
-    protected void initialize(ServletContextEvent event) throws Exception {
-        PlatformLibraries.FILE_STORE = getInjector().getInstance(FileStore.class);
-        PlatformLibraries.ASTYANAX = getInjector().getInstance(NFAstyanaxManager.class);
-        PlatformLibraries.HERMES_SUBSCRIBER = getInjector().getInstance(SubscriptionManager.class);
-        PlatformLibraries.HERMES_PUBLISHER = getInjector().getInstance(FastPropertyPublisher.class);
     }
 
     @Override
@@ -58,11 +46,8 @@ public class StartServerLifecycle extends BaseServerLifecycleListener {
         };
     }
 
-
     @Override
     protected Class<? extends HealthCheckHandler> getHealthCheckHandler() {
         return HealthCheckHandlerImpl.class;
     }
-
 }
-

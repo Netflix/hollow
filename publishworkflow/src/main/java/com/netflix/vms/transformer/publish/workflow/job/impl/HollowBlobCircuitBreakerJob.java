@@ -1,20 +1,5 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import org.apache.commons.lang.StringUtils;
-
-import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-import com.netflix.vms.transformer.publish.workflow.circuitbreaker.CertificationSystemCircuitBreaker;
-import com.netflix.vms.transformer.publish.workflow.circuitbreaker.DuplicateDetectionCircuitBreaker;
-import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuitBreaker;
-import com.netflix.vms.transformer.publish.workflow.circuitbreaker.SnapshotSizeCircuitBreaker;
-import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TypeCardinalityCircuitBreaker;
-import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuitBreaker.CircuitBreakerResult;
-import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuitBreaker.CircuitBreakerResults;
-import com.netflix.vms.transformer.publish.workflow.job.CircuitBreakerJob;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.util.SimultaneousExecutor;
-import com.netflix.servo.monitor.DynamicCounter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,17 +7,30 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
-public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
+import org.apache.commons.lang.StringUtils;
 
-    private PublishWorkflowContext ctx;
+import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.util.SimultaneousExecutor;
+import com.netflix.servo.monitor.DynamicCounter;
+import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import com.netflix.vms.transformer.publish.workflow.circuitbreaker.CertificationSystemCircuitBreaker;
+import com.netflix.vms.transformer.publish.workflow.circuitbreaker.DuplicateDetectionCircuitBreaker;
+import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuitBreaker;
+import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuitBreaker.CircuitBreakerResult;
+import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuitBreaker.CircuitBreakerResults;
+import com.netflix.vms.transformer.publish.workflow.circuitbreaker.SnapshotSizeCircuitBreaker;
+import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TypeCardinalityCircuitBreaker;
+import com.netflix.vms.transformer.publish.workflow.job.CircuitBreakerJob;
+
+public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
     private final HollowBlobDataProvider hollowBlobDataProvider;
     private final HollowCircuitBreaker circuitBreakerRules[];
 
     private final boolean circuitBreakersDisabled;
 
     public HollowBlobCircuitBreakerJob(PublishWorkflowContext ctx, long cycleVersion, File snapshotFile, File deltaFile, File reverseDeltaFile, HollowBlobDataProvider hollowBlobDataProvider) {
-        super(ctx.getVip(), cycleVersion, snapshotFile, deltaFile, reverseDeltaFile);
-        this.ctx = ctx;
+        super(ctx, ctx.getVip(), cycleVersion, snapshotFile, deltaFile, reverseDeltaFile);
         this.hollowBlobDataProvider = hollowBlobDataProvider;
 
         //// add your circuit breakers here.
@@ -147,10 +145,7 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
         }
     }
 
-
     private void incrementAlertCounter() {
         DynamicCounter.increment("vms.hollow.validation.failed");
     }
-
-
 }

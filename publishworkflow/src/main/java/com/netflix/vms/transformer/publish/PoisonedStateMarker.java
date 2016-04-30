@@ -1,8 +1,15 @@
 package com.netflix.vms.transformer.publish;
 
+import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
+
 public interface PoisonedStateMarker {
 
-    public boolean isStatePoisoned(long version);
+    boolean isStatePoisoned(long version);
+
+    /** mark the <code>version</code> as poisoned or clear the poison marker. Optional method. */
+    default void markStatePoisoned(long version, boolean isPoisoned) throws ConnectionException {
+        throw new UnsupportedOperationException();
+    }
 
     public static PoisonedStateMarker DEFAULT_MARKER = new PoisonedStateMarker() {
         @Override

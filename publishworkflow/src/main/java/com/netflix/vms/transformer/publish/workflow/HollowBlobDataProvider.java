@@ -22,19 +22,21 @@ import com.netflix.vms.generated.notemplate.ISOCountryHollow;
 import com.netflix.vms.generated.notemplate.PackageDataHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
 import com.netflix.vms.generated.notemplate.VideoHollow;
-import com.netflix.vms.transformer.common.Files;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TopNVideoViewHoursData;
 
 public class HollowBlobDataProvider {
     private static final ILog LOGGER = LogManager.getLogger(HollowBlobDataProvider.class);
 
-    private final Files files;
+    /* dependencies */
+    private final TransformerContext ctx;
 
+    /* fields */
     private HollowReadStateEngine hollowReadStateEngine;
     private HollowBlobReader hollowBlobReader;
 
-    public HollowBlobDataProvider(Files files) {
-        this.files = files;
+    public HollowBlobDataProvider(TransformerContext ctx) {
+        this.ctx = ctx;
         this.hollowReadStateEngine = new HollowReadStateEngine(true);
         this.hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
     }
@@ -42,11 +44,11 @@ public class HollowBlobDataProvider {
     public void readSnapshot(File snapshotFile) throws IOException {
         hollowReadStateEngine = new HollowReadStateEngine(true);
         hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
-        hollowBlobReader.readSnapshot(files.newBlobInputStream(snapshotFile));
+        hollowBlobReader.readSnapshot(ctx.files().newBlobInputStream(snapshotFile));
     }
 
     public void readDelta(File deltaFile) throws IOException {
-        hollowBlobReader.applyDelta(files.newBlobInputStream(deltaFile));
+        hollowBlobReader.applyDelta(ctx.files().newBlobInputStream(deltaFile));
     }
 
     public HollowReadStateEngine getStateEngine() {
@@ -79,7 +81,7 @@ public class HollowBlobDataProvider {
     private void validateChecksums(File snapshotFile, File reverseDeltaFile, HollowChecksum initialChecksumBeforeDelta) throws IOException {
         HollowReadStateEngine anotherStateEngine = new HollowReadStateEngine();
         HollowBlobReader anotherReader = new HollowBlobReader(anotherStateEngine);
-        anotherReader.readSnapshot(files.newBlobInputStream(snapshotFile));
+        anotherReader.readSnapshot(ctx.files().newBlobInputStream(snapshotFile));
 
         HollowChecksum deltaChecksum = HollowChecksum.forStateEngine(hollowReadStateEngine);
         HollowChecksum snapshotChecksum = HollowChecksum.forStateEngine(anotherStateEngine);
@@ -91,7 +93,7 @@ public class HollowBlobDataProvider {
             throw new RuntimeException("DELTA CHECKSUM VALIDATION FAILURE!");
 
         if(reverseDeltaFile.exists()) {
-            anotherReader.applyDelta(files.newBlobInputStream(reverseDeltaFile));
+            anotherReader.applyDelta(ctx.files().newBlobInputStream(reverseDeltaFile));
             HollowChecksum reverseDeltaChecksum = HollowChecksum.forStateEngine(anotherStateEngine);
 
             LOGGER.info("INITIAL STATE CHECKSUM: " + initialChecksumBeforeDelta.toString());

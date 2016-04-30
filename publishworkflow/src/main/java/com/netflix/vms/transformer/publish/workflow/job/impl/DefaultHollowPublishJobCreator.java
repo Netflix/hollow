@@ -1,10 +1,19 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
+import java.io.File;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import com.netflix.config.FastProperty;
+import com.netflix.config.FastProperty.BooleanProperty;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.vms.transformer.common.TransformerLogger;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowConfig;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import com.netflix.vms.transformer.publish.workflow.TransformerPublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.AfterCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.AnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.AutoPinbackJob;
@@ -20,26 +29,31 @@ import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob.Pub
 import com.netflix.vms.transformer.publish.workflow.job.PoisonStateMarkerJob;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.PlaybackMonkeyTester;
-import com.netflix.vms.transformer.util.VMSCassandraHelper;
-import java.io.File;
-import java.util.List;
-import java.util.Map;
 
 public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
+    private static final BooleanProperty BIG_RED_BUTTON = new FastProperty.BooleanProperty("com.netflix.vms.server.bigredbutton", false);
 
+    /* dependencies */
+    private HollowBlobDataProvider hollowBlobDataProvider;
+    private final PlaybackMonkeyTester playbackMonkeyTester;
+    private final ValidationVideoRanker videoRanker;
+
+    /* fields */
     ///TODO: VIP changes for red/black?
     private final PublishWorkflowContext ctx;
-	private final HollowBlobDataProvider hollowBlobDataProvider;
-	private final PlaybackMonkeyTester playbackMonkeyTester;
-	private final ValidationVideoRanker videoRanker;
 
-    public DefaultHollowPublishJobCreator(String vip, PublishWorkflowConfig config, TransformerLogger logger) {
-        VMSCassandraHelper validationStatsCassandraHelper = new VMSCassandraHelper("cass_dpt", "hollow_publish_workflow", "hollow_validation_stats");
-        VMSCassandraHelper canaryResultsCassandraHelper = new VMSCassandraHelper("cass_dpt", "canary_validation", "canary_results");
-		this.hollowBlobDataProvider = new HollowBlobDataProvider();
-		this.playbackMonkeyTester = new PlaybackMonkeyTester();
-		this.videoRanker = new ValidationVideoRanker(hollowBlobDataProvider);
-		this.ctx = new PublishWorkflowContext(vip, logger, config, validationStatsCassandraHelper, canaryResultsCassandraHelper);
+    public DefaultHollowPublishJobCreator(TransformerContext transformerContext,
+            HollowBlobDataProvider hollowBlobDataProvider, PlaybackMonkeyTester playbackMonkeyTester,
+            ValidationVideoRanker videoRanker, String vip, PublishWorkflowConfig config) {
+        this.hollowBlobDataProvider = hollowBlobDataProvider;
+        this.playbackMonkeyTester = playbackMonkeyTester;
+        this.videoRanker = videoRanker;
+        this.ctx = new TransformerPublishWorkflowContext(transformerContext, config,
+                new HermesVipAnnouncer(
+                        new HermesBlobAnnouncer(transformerContext.platformLibraries().getHermesPublisher(),
+                                HermesTopicProvider.HOLLOWBLOB_TOPIC_PREFIX),
+                        transformerContext.platformLibraries().getHermesSubscriber(), BIG_RED_BUTTON),
+                vip);
     }
 
     @Override
@@ -54,12 +68,12 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
 
     @Override
     public HollowBlobDeleteFileJob createDeleteFileJob(List<PublicationJob> copyJobs, long version, String... filesToDelete) {
-        return new HollowBlobDeleteFileJob(copyJobs, version, filesToDelete);
+        return new HollowBlobDeleteFileJob(ctx, copyJobs, version, filesToDelete);
     }
 
     @Override
     public DelayJob createDelayJob(PublicationJob dependency, long delayMillis, long cycleVersion) {
-        return new HollowBlobDelayJob(dependency, delayMillis, cycleVersion);
+        return new HollowBlobDelayJob(ctx, dependency, delayMillis, cycleVersion);
     }
 
     @Override
@@ -69,12 +83,12 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
 
     @Override
     public PoisonStateMarkerJob createPoisonStateMarkerJob(PublicationJob validationJob, long newVersion) {
-        return new CassandraPoisonStateMarkerJob(validationJob, ctx, newVersion);
+        return new CassandraPoisonStateMarkerJob(ctx, validationJob, newVersion);
     }
 
     @Override
     public CanaryRollbackJob createCanaryRollbackJob(String vip, long cycleVersion, long priorVersion,CanaryValidationJob validationJob) {
-        return new HermesCanaryRollbackJob(vip, cycleVersion, priorVersion, validationJob);
+        return new HermesCanaryRollbackJob(ctx, vip, cycleVersion, priorVersion, validationJob);
     }
 
     @Override
@@ -100,7 +114,7 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
 			BeforeCanaryAnnounceJob beforeCanaryAnnounceHook,
 			CanaryValidationJob previousCycleValidationJob,
 			List<PublicationJob> newPublishJobs) {
-		return new HermesCanaryAnnounceJob(vip, newVersion, region, beforeCanaryAnnounceHook, previousCycleValidationJob,
+		return new HermesCanaryAnnounceJob(ctx, vip, newVersion, region, beforeCanaryAnnounceHook, previousCycleValidationJob,
 				newPublishJobs);
 	}
 
@@ -115,7 +129,6 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
 
     @Override
     public AutoPinbackJob createAutoPinbackJob(AnnounceJob announcement, long waitMillis, long cycleVersion) {
-        return new HermesAutoPinbackJob(announcement, waitMillis, cycleVersion);
+        return new HermesAutoPinbackJob(ctx, announcement, waitMillis, cycleVersion);
     }
-
 }

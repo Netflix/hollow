@@ -2,13 +2,13 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.publish.workflow.PublishRegionProvider;
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryRollbackJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryValidationJob;
 
 public class HermesCanaryRollbackJob extends CanaryRollbackJob {
-
-    public HermesCanaryRollbackJob(String vip, long cycleVersion, long priorVersion, CanaryValidationJob validationJob) {
-        super(vip, cycleVersion, priorVersion, HermesAnnounceUtil.getPreviouslyAnnouncedCanaryVersion(vip), validationJob);
+    public HermesCanaryRollbackJob(PublishWorkflowContext ctx, String vip, long cycleVersion, long priorVersion, CanaryValidationJob validationJob) {
+        super(ctx, vip, cycleVersion, priorVersion, ctx.getVipAnnouncer().getPreviouslyAnnouncedCanaryVersion(vip), validationJob);
     }
 
     @Override
@@ -18,7 +18,7 @@ public class HermesCanaryRollbackJob extends CanaryRollbackJob {
             destVersion = priorVersion;
         boolean allSucceeded = true;
         for(RegionEnum region : PublishRegionProvider.ALL_REGIONS) {
-            if(!HermesAnnounceUtil.announce(vip, region, true, destVersion, Long.MIN_VALUE)) {
+            if (!ctx.getVipAnnouncer().announce(vip, region, true, destVersion, Long.MIN_VALUE)) {
                 allSucceeded = false;
             }
         }

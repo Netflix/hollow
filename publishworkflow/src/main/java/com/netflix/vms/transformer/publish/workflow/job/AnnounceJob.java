@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.publish.workflow.job;
 
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
 
 import com.netflix.config.NetflixConfiguration.RegionEnum;
@@ -15,8 +16,8 @@ public abstract class AnnounceJob extends PublicationJob {
     private final CanaryValidationJob canaryValidationJob;
     private final DelayJob delayJob;
 
-    public AnnounceJob(String vip, long priorVersion, long newVersion, RegionEnum region, CanaryValidationJob canaryValidationJob, DelayJob delayJob, AnnounceJob previousAnnounceJob) {
-        super("announce-"+region, newVersion);
+    public AnnounceJob(PublishWorkflowContext ctx, String vip, long priorVersion, long newVersion, RegionEnum region, CanaryValidationJob canaryValidationJob, DelayJob delayJob, AnnounceJob previousAnnounceJob) {
+        super(ctx, "announce-"+region, newVersion);
         this.vip = vip;
         this.canaryValidationJob = canaryValidationJob;
         this.previousAnnounceJob = previousAnnounceJob;

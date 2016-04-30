@@ -22,15 +22,13 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
     private static final FastProperty.StringProperty REQUIRED_CANARIES = new FastProperty.StringProperty("com.netflix.vms.server.canary.apps", NO_CANARIES_VALUE);
     private static final long CANARY_TIMEOUT_MS = 300000; /// 5 minutes
 
-    private final PublishWorkflowContext ctx;
     private final Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs;
     private final Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs;
 	private final ValidationVideoRanker videoRanker;
 
     public CassandraCanaryValidationJob(PublishWorkflowContext ctx, long cycleVersion, Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs,
             Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs, ValidationVideoRanker videoRanker) {
-        super(ctx.getVip(), cycleVersion, beforeCanaryAnnounceJobs, afterCanaryAnnounceJobs);
-        this.ctx = ctx;
+        super(ctx, ctx.getVip(), cycleVersion, beforeCanaryAnnounceJobs, afterCanaryAnnounceJobs);
 		this.videoRanker = videoRanker;
         this.beforeCanaryAnnounceJobs = beforeCanaryAnnounceJobs;
         this.afterCanaryAnnounceJobs = afterCanaryAnnounceJobs;

@@ -1,12 +1,13 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.AnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.AutoPinbackJob;
 
 public class HermesAutoPinbackJob extends AutoPinbackJob {
 
-    public HermesAutoPinbackJob(AnnounceJob announcement, long waitMillis, long cycleVersion) {
-        super(announcement, waitMillis, cycleVersion);
+    public HermesAutoPinbackJob(PublishWorkflowContext ctx, AnnounceJob announcement, long waitMillis, long cycleVersion) {
+        super(ctx, announcement, waitMillis, cycleVersion);
     }
 
     @Override

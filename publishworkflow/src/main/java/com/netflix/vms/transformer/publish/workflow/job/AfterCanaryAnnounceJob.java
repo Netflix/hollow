@@ -2,6 +2,7 @@ package com.netflix.vms.transformer.publish.workflow.job;
 
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
 import java.util.Map;
 
@@ -11,12 +12,13 @@ public abstract class AfterCanaryAnnounceJob extends PublicationJob {
 	protected final String vip;
 	protected final RegionEnum region;
 
-	public AfterCanaryAnnounceJob(final String vip,
+	public AfterCanaryAnnounceJob(PublishWorkflowContext ctx,
+	        final String vip,
 			final long newVersion,
 			final RegionEnum region,
 			final BeforeCanaryAnnounceJob beforeCanaryAnnounceJob,
 			final CanaryAnnounceJob canaryAnnounceJob) {
-		super("AfterCanaryAnnounce-"+region, newVersion);
+		super(ctx, "AfterCanaryAnnounce-"+region, newVersion);
 		this.region = region;
 		this.vip = vip;
 		this.beforeCanaryAnnounceJob = beforeCanaryAnnounceJob;

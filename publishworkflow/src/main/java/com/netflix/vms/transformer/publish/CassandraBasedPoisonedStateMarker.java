@@ -3,24 +3,20 @@ package com.netflix.vms.transformer.publish;
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.astyanax.connectionpool.exceptions.NotFoundException;
 import com.netflix.config.FastProperty;
-import com.netflix.logging.ILog;
-import com.netflix.logging.LogManager;
+import com.netflix.vms.transformer.common.TransformerContext;
 
 public class CassandraBasedPoisonedStateMarker implements PoisonedStateMarker {
 
-    private static final ILog LOGGER = LogManager.getLogger(CassandraBasedPoisonedStateMarker.class);
-
     private static final FastProperty.BooleanProperty CHECK_FOR_POISON_STATES = new FastProperty.BooleanProperty("com.netflix.videometadata.checkforpoisonstates", true);
 
-    private static final String CASSANDRA_CLUSTER_NAME = "cass_dpt";
-    private static final String CASSANDRA_KEYSPACE_NAME = "vms_poison_states";
-    private static final String CASSANDRA_COLUMN_FAMILY_NAME = "poison_states";
+    /* dependencies */
+    private final TransformerContext ctx;
 
+    /* fields */
     private final String vip;
-    private final VMSCassandraHelper cassandraHelper;
 
-    public CassandraBasedPoisonedStateMarker(String vip) {
-        this.cassandraHelper = new VMSCassandraHelper(CASSANDRA_CLUSTER_NAME, CASSANDRA_KEYSPACE_NAME, CASSANDRA_COLUMN_FAMILY_NAME);
+    public CassandraBasedPoisonedStateMarker(TransformerContext ctx, String vip) {
+        this.ctx = ctx;
         this.vip = vip;
     }
 
@@ -28,8 +24,9 @@ public class CassandraBasedPoisonedStateMarker implements PoisonedStateMarker {
         return vip;
     }
 
+    @Override
     public void markStatePoisoned(long version, boolean isPoisoned) throws ConnectionException {
-        cassandraHelper.addVipKeyValuePair(vip, String.valueOf(version), String.valueOf(isPoisoned));
+        ctx.getPoisonStatesHelper().addVipKeyValuePair(vip, String.valueOf(version), String.valueOf(isPoisoned));
     }
 
     @Override
@@ -38,18 +35,20 @@ public class CassandraBasedPoisonedStateMarker implements PoisonedStateMarker {
             return false;
 
         try {
-            String poisonStatus = cassandraHelper.getVipKeyValuePair(vip, String.valueOf(version));
+            String poisonStatus = ctx.getPoisonStatesHelper().getVipKeyValuePair(vip, String.valueOf(version));
             if("true".equals(poisonStatus)) {
-                LOGGER.info("VMS Poisoned state discovered -- " + version);
+                // FIXME: what's the proper type to log?
+                ctx.getLogger().info("poison_state_discovered", "VMS Poisoned state discovered -- " + version);
                 return true;
             }
         } catch(NotFoundException nfe) {
             return false;
         } catch(Throwable th) {
-            LOGGER.error(th);
+            // FIXME: what type and message should we pass? Alternatively, why don't we let this bubble up to be logged
+            // in a central exception handler?
+            ctx.getLogger().error("", "", th);
         }
 
         return true;
     }
-
 }

@@ -18,7 +18,6 @@ public class HollowBlobAfterCanaryAnnounceJob extends AfterCanaryAnnounceJob {
 
 	private static final long MAX_TIME_NEEDED_FOR_CLIENT_TO_LOAD_A_VERSION = 300000; // 5 minute
 
-	private final PublishWorkflowContext ctx;
 	private final PlaybackMonkeyTester dataTester;
 	private Map<VideoCountryKey, Boolean> testResultVideoCountryKeys;
 	private final ValidationVideoRanker videoRanker;
@@ -27,8 +26,7 @@ public class HollowBlobAfterCanaryAnnounceJob extends AfterCanaryAnnounceJob {
 			RegionEnum region, BeforeCanaryAnnounceJob beforeCanaryAnnounceJob,
 			CanaryAnnounceJob canaryAnnounceJob, PlaybackMonkeyTester dataTester,
 			ValidationVideoRanker videoRanker) {
-		super(ctx.getVip(), newVersion, region, beforeCanaryAnnounceJob, canaryAnnounceJob);
-		this.ctx = ctx;
+		super(ctx, ctx.getVip(), newVersion, region, beforeCanaryAnnounceJob, canaryAnnounceJob);
 		this.dataTester = dataTester;
 		this.testResultVideoCountryKeys = Collections.emptyMap();
 		this.videoRanker = videoRanker;

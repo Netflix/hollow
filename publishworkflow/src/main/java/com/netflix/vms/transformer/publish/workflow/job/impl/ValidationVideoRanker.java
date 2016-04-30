@@ -1,10 +1,5 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import com.google.common.collect.ComparisonChain;
-import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
-import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TopNVideoViewHoursData;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,14 +8,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.ComparisonChain;
+import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
+import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TopNVideoViewHoursData;
+
 public class ValidationVideoRanker {
-	private final HollowBlobDataProvider hollowBlobDataProvider;
-	private final Set<VideoCountryKey> pastFailedIDsToCheck = new HashSet<>();
+    private final HollowBlobDataProvider hollowBlobDataProvider;
+    private final Set<VideoCountryKey> pastFailedIDsToCheck = new HashSet<>();
 
-
-	public ValidationVideoRanker( final HollowBlobDataProvider hollowBlobDataProvider) {
-		this.hollowBlobDataProvider = hollowBlobDataProvider;
-	}
+    public ValidationVideoRanker(final HollowBlobDataProvider hollowBlobDataProvider) {
+        this.hollowBlobDataProvider = hollowBlobDataProvider;
+    }
 
 	public List<VideoCountryKey> getMostValuableChangedVideos(PublishWorkflowContext ctx) {
 		long start = System.currentTimeMillis();

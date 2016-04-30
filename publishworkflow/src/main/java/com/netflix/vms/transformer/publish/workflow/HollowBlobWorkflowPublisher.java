@@ -6,27 +6,24 @@ import java.io.OutputStream;
 
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
-import com.netflix.vms.transformer.common.Files;
-import com.netflix.vms.transformer.common.TransformerLogger;
+import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerFiles;
 
 public class HollowBlobWorkflowPublisher {
 
-    private Files files;
+    /* dependencies */
+    private final TransformerFiles files;
 
+    /* fields */
     private HollowWriteStateEngine stateEngine;
     private long previouslyProducedVersion;
     private final HollowPublishWorkflowStager publishWorkflowStager;
     private final HollowBlobFileNamer fileNamer;
 
-    public HollowBlobWorkflowPublisher(String vip, PublishWorkflowConfig circuitBreakerConfig, TransformerLogger logger) {
+    public HollowBlobWorkflowPublisher(String vip, PublishWorkflowConfig circuitBreakerConfig, TransformerContext ctx) {
+        this.files = ctx.files();
         this.fileNamer = new HollowBlobFileNamer(vip);
-        this.publishWorkflowStager = new HollowPublishWorkflowStager(vip, circuitBreakerConfig, logger);
-    }
-
-    // TODO: for testing; goes away when switching to constructor injection
-    HollowBlobWorkflowPublisher(Files files, String vip, PublishWorkflowConfig circuitBreakerConfig, TransformerLogger logger) {
-        this(vip, circuitBreakerConfig, logger);
-        this.files = files;
+        this.publishWorkflowStager = new HollowPublishWorkflowStager(ctx, circuitBreakerConfig, vip);
     }
 
     public void initialize(HollowWriteStateEngine stateEngine) {

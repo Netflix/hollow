@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.publish.workflow.job;
 
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
 
 public abstract class AutoPinbackJob extends PublicationJob {
@@ -7,8 +8,8 @@ public abstract class AutoPinbackJob extends PublicationJob {
     protected final AnnounceJob announcementJob;
     protected final long waitMillis;
 
-    public AutoPinbackJob(AnnounceJob announcement, long waitMillis, long cycleVersion) {
-        super("auto-pinback", cycleVersion);
+    public AutoPinbackJob(PublishWorkflowContext ctx, AnnounceJob announcement, long waitMillis, long cycleVersion) {
+        super(ctx, "auto-pinback", cycleVersion);
 
         this.waitMillis = waitMillis;
         this.announcementJob = announcement;

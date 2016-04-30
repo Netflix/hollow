@@ -6,36 +6,46 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.netflix.cassandra.NFAstyanaxManager;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.vms.transformer.common.TransformerLogger;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.publish.workflow.job.*;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob.PublishType;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJobScheduler;
 import com.netflix.vms.transformer.publish.workflow.job.impl.DefaultHollowPublishJobCreator;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HollowPublishJobCreator;
+import com.netflix.vms.transformer.publish.workflow.job.impl.ValidationVideoRanker;
+import com.netflix.vms.transformer.publish.workflow.playbackmonkey.PlaybackMonkeyTester;
 
 public class HollowPublishWorkflowStager {
 
+    /* dependencies */
+    private final TransformerContext ctx;
 	private final PublicationJobScheduler scheduler;
 	private final HollowBlobFileNamer fileNamer;
+    private PublishRegionProvider regionProvider;
+    private final HollowPublishJobCreator jobCreator;
+
+	/* fields */
 	private final String vip;
-	private PublishRegionProvider regionProvider;
-	private final HollowPublishJobCreator jobCreator;
 	private final Map<RegionEnum, AnnounceJob> priorAnnouncedJobs;
 	private CanaryValidationJob priorCycleCanaryValidationJob;
 	private CanaryRollbackJob priorCycleCanaryRollbackJob;
 
-	public HollowPublishWorkflowStager(String vip, PublishWorkflowConfig config, TransformerLogger logger) {
-	    this(vip, new DefaultHollowPublishJobCreator(vip, config, logger), PlatformLibraries.ASTYANAX, logger);
+	public HollowPublishWorkflowStager(TransformerContext ctx, PublishWorkflowConfig config, String vip) {
+	    this(ctx, config, new HollowBlobDataProvider(ctx), vip);
 	}
 
-	public HollowPublishWorkflowStager(String vip, HollowPublishJobCreator jobCreator, NFAstyanaxManager astyanaxManager, TransformerLogger logger){
+	private HollowPublishWorkflowStager(TransformerContext ctx, PublishWorkflowConfig config, HollowBlobDataProvider hollowBlobDataProvider, String vip) {
+	    this(ctx, new DefaultHollowPublishJobCreator(ctx, hollowBlobDataProvider, new PlaybackMonkeyTester(), new ValidationVideoRanker(hollowBlobDataProvider), vip, config), vip);
+	}
+
+	public HollowPublishWorkflowStager(TransformerContext ctx, HollowPublishJobCreator jobCreator, String vip) {
+	    this.ctx = ctx;
 		this.scheduler = new PublicationJobScheduler();
 		this.fileNamer = new HollowBlobFileNamer(vip);
 		this.vip = vip;
-		this.regionProvider =  new PublishRegionProvider(new SysoutTransformerLogger());
+		this.regionProvider =  new PublishRegionProvider(ctx.getLogger());
 		this.priorAnnouncedJobs = new HashMap<RegionEnum, AnnounceJob>();
 		this.jobCreator = jobCreator;
 
@@ -180,6 +190,7 @@ public class HollowPublishWorkflowStager {
         return scheduler;
     }
 
+    // TODO: use constructor injection
 	void injectPublishRegionProvider(PublishRegionProvider regionProvider) {
 		this.regionProvider = regionProvider;
 	}

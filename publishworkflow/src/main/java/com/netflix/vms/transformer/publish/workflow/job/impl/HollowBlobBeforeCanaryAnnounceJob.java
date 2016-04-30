@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 public class HollowBlobBeforeCanaryAnnounceJob extends BeforeCanaryAnnounceJob {
-
-    private final PublishWorkflowContext ctx;
     private final PlaybackMonkeyTester dataTester;
 	private Map<VideoCountryKey, Boolean> testResultVideoCountryKeys;
 	private final ValidationVideoRanker videoRanker;
@@ -23,8 +21,7 @@ public class HollowBlobBeforeCanaryAnnounceJob extends BeforeCanaryAnnounceJob {
 	public HollowBlobBeforeCanaryAnnounceJob(PublishWorkflowContext ctx, long newVersion, RegionEnum region, CircuitBreakerJob circuitBreakerJob,
 			CanaryValidationJob previousCycleValidationJob, List<PublicationJob> newPublishJobs, CanaryRollbackJob previousCanaryRollBackJob, PlaybackMonkeyTester dataTester,
 			ValidationVideoRanker videoRanker) {
-		super(ctx.getVip(), newVersion, region, circuitBreakerJob, previousCycleValidationJob, newPublishJobs, previousCanaryRollBackJob);
-		this.ctx = ctx;
+		super(ctx, ctx.getVip(), newVersion, region, circuitBreakerJob, previousCycleValidationJob, newPublishJobs, previousCanaryRollBackJob);
 		this.dataTester = dataTester;
 		this.videoRanker = videoRanker;
 		this.testResultVideoCountryKeys = Collections.emptyMap();

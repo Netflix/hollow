@@ -1,5 +1,8 @@
 package com.netflix.vms.transformer.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.netflix.astyanax.Keyspace;
 import com.netflix.astyanax.MutationBatch;
 import com.netflix.astyanax.connectionpool.OperationResult;
@@ -14,20 +17,13 @@ import com.netflix.astyanax.retry.RetryPolicy;
 import com.netflix.astyanax.serializers.StringSerializer;
 import com.netflix.cassandra.NFAstyanaxManager;
 import com.netflix.vms.transformer.common.TransformerCassandraHelper;
-import com.netflix.vms.transformer.servlet.platform.PlatformLibraries;
-import java.util.HashMap;
-import java.util.Map;
 
-public class VMSCassandraHelper implements TransformerCassandraHelper {
+public class TransformerServerCassandraHelper implements TransformerCassandraHelper {
 
     private final Keyspace keyspace;
     private final ColumnFamily<String, String> columnFamily;
 
-    public VMSCassandraHelper(String clusterName, String keyspaceName, String columnFamilyName) {
-        this(PlatformLibraries.ASTYANAX, clusterName, keyspaceName, columnFamilyName);
-    }
-
-    public VMSCassandraHelper(NFAstyanaxManager astyanaxManager, String clusterName, String keyspaceName, String columnFamilyName) {
+    public TransformerServerCassandraHelper(NFAstyanaxManager astyanaxManager, String clusterName, String keyspaceName, String columnFamilyName) {
         this.keyspace = getKeyspace(astyanaxManager, clusterName, keyspaceName);
         this.columnFamily = new ColumnFamily<String, String>(columnFamilyName, StringSerializer.get(), StringSerializer.get());
     }

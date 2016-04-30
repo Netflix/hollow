@@ -13,7 +13,6 @@ import com.netflix.hermes.data.NoContentDataEntry;
 import com.netflix.hermes.platformserviceclient.Property;
 import com.netflix.hermes.publisher.FastPropertyPublisher;
 import com.netflix.hermes.publisher.PurgePolicy;
-import com.netflix.vms.transformer.publish.workflow.job.impl.HermesAnnounceUtil.HermesAnnounceEvent;
 import java.util.Map;
 
 @Singleton
@@ -27,7 +26,7 @@ public class HermesBlobAnnouncer{
         this.topicPrefix = topicPrefix;
     }
 
-    private boolean publishTopic(RegionEnum region, String topic, String version, HermesAnnounceEvent event) throws JsonProcessingException {
+    private boolean publishTopic(RegionEnum region, String topic, String version, HermesVipAnnouncer.HermesAnnounceEvent event) throws JsonProcessingException {
         String eventString = new ObjectMapper().writeValueAsString(event);
         final DirectDataPointer pointer = new DirectDataPointer.Builder()
                                             .topic(topic)
@@ -63,7 +62,7 @@ public class HermesBlobAnnouncer{
      */
     public synchronized boolean publish(String vip, RegionEnum region, Map<String, String> attributes) throws Exception{
         String version = attributes.get("dataVersion");
-        HermesAnnounceEvent event = new HermesAnnounceEvent.Builder()
+        HermesVipAnnouncer.HermesAnnounceEvent event = new HermesVipAnnouncer.HermesAnnounceEvent.Builder()
                                                     .withAttributes(attributes)
                                                     .build();
 
@@ -75,7 +74,7 @@ public class HermesBlobAnnouncer{
      */
     public synchronized boolean publish(RegionEnum region, String topic, Map<String, String> attributes) throws Exception{
         String version = attributes.get("dataVersion");
-        HermesAnnounceEvent event = new HermesAnnounceEvent.Builder()
+        HermesVipAnnouncer.HermesAnnounceEvent event = new HermesVipAnnouncer.HermesAnnounceEvent.Builder()
                                                     .withAttributes(attributes)
                                                     .build();
 

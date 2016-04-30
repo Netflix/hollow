@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.publish.workflow.job;
 
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
 
 import java.io.File;
@@ -13,8 +14,8 @@ public abstract class HollowBlobPublishJob extends PublicationJob {
     protected final File fileToUpload;
     protected final PublishType jobType;
 
-    public HollowBlobPublishJob(String vip, long previousVersion, long version, PublishType jobType, RegionEnum region, File fileToUpload) {
-        super("publish-"+ region + "-" + jobType.toString(), version);
+    public HollowBlobPublishJob(PublishWorkflowContext ctx, String vip, long previousVersion, long version, PublishType jobType, RegionEnum region, File fileToUpload) {
+        super(ctx, "publish-"+ region + "-" + jobType.toString(), version);
         this.vip = vip;
         this.previousVersion = previousVersion;
         this.jobType = jobType;

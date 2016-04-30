@@ -10,8 +10,8 @@ public class CassandraPoisonStateMarkerJob extends PoisonStateMarkerJob {
     private final PublishWorkflowContext ctx;
     private final long cycleVersion;
 
-    public CassandraPoisonStateMarkerJob(PublicationJob validationJob, PublishWorkflowContext ctx, long cycleVersion) {
-        super(validationJob, cycleVersion);
+    public CassandraPoisonStateMarkerJob(PublishWorkflowContext ctx, PublicationJob validationJob, long cycleVersion) {
+        super(ctx, validationJob, cycleVersion);
         this.cycleVersion = cycleVersion;
         this.ctx = ctx;
     }

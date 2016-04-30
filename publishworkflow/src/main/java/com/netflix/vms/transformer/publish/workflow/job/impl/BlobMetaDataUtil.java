@@ -10,6 +10,7 @@ import java.util.TimeZone;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 
+@SuppressWarnings("deprecation")
 public class BlobMetaDataUtil {
     private final static TimeZone tz = TimeZone.getTimeZone("America/Los_Angeles");
     private final static FastDateFormat formatter = FastDateFormat.getInstance("dd-MMM-yyyy HH:mm:ss z", tz);
@@ -43,7 +44,6 @@ public class BlobMetaDataUtil {
             addAttribute(attributes, entry.getKey(), entry.getValue());
         }
     }
-
 
     public static String getServerId() {
         String hostname = "unknown";

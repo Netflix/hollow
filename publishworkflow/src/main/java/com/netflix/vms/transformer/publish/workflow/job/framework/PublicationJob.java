@@ -3,6 +3,8 @@ package com.netflix.vms.transformer.publish.workflow.job.framework;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+
 /**
  * A job goes through three phases
  *
@@ -15,6 +17,10 @@ public abstract class PublicationJob implements Runnable {
 
     public static final long NOT_YET = Long.MIN_VALUE;
 
+    /* dependencies */
+    protected final PublishWorkflowContext ctx;
+
+    /* fields */
     private PublicationJobQueue queue;
 
     private long startTimestamp = NOT_YET;
@@ -29,10 +35,12 @@ public abstract class PublicationJob implements Runnable {
     private boolean failedWithException;
     private boolean failedBasedOnDependencies;
 
+
     /**
      * Create a PublicationJob.
      */
-    public PublicationJob(String jobName, long cycleVersion) {
+    public PublicationJob(PublishWorkflowContext ctx, String jobName, long cycleVersion) {
+        this.ctx = ctx;
         this.cycleVersion = cycleVersion;
         this.jobName = jobName;
     }

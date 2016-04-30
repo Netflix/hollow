@@ -1,14 +1,14 @@
 package com.netflix.vms.transformer.publish.workflow.job;
 
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
 
 public abstract class DelayJob extends PublicationJob {
-
     protected final long delayMillis;
     private final PublicationJob dependency;
 
-    public DelayJob(PublicationJob dependency, long delayMillis, long cycleVersion) {
-        super(getJobName(dependency, delayMillis), cycleVersion);
+    public DelayJob(PublishWorkflowContext ctx, PublicationJob dependency, long delayMillis, long cycleVersion) {
+        super(ctx, getJobName(dependency, delayMillis), cycleVersion);
         this.dependency = dependency;
         this.delayMillis = delayMillis;
     }
@@ -28,5 +28,4 @@ public abstract class DelayJob extends PublicationJob {
             return "delay-" + delayMillis;
         return "delay-after-" + dependency.getJobName() + "-" + delayMillis;
     }
-
 }

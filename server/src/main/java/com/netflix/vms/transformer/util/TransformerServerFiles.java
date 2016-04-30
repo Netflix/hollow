@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.netflix.vms.transformer.common.Files;
+import com.netflix.vms.transformer.common.TransformerFiles;
 
-public class VMSTransformerFiles implements Files {
+public class TransformerServerFiles implements TransformerFiles {
     @Override
     public InputStream newBlobInputStream(File file) throws IOException {
         return new LZ4VMSInputStream(new FileInputStream(file));

@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.modules.mpl;
 
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
-import com.netflix.vms.transformer.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.CdnHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryListHollow;
 import com.netflix.vms.transformer.hollowinput.OriginServerHollow;
