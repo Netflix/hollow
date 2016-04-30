@@ -70,7 +70,7 @@ public class SimpleTransformer {
 
     SimpleTransformer(VMSHollowInputAPI inputAPI, VMSTransformerWriteStateEngine outputStateEngine) {
         this(inputAPI, outputStateEngine, new TransformerContext());
-        ctx.setNowMillis(1457384787807L);
+        ctx.setNowMillis(1461970901632L);
     }
 
     public SimpleTransformer(VMSHollowInputAPI inputAPI, VMSTransformerWriteStateEngine outputStateEngine, TransformerContext ctx) {
