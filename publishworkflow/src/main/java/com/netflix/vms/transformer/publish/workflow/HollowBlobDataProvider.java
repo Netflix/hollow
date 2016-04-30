@@ -1,6 +1,14 @@
 package com.netflix.vms.transformer.publish.workflow;
 
-import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TopNVideoViewHoursData;
+import java.io.File;
+import java.io.IOException;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
@@ -14,25 +22,19 @@ import com.netflix.vms.generated.notemplate.ISOCountryHollow;
 import com.netflix.vms.generated.notemplate.PackageDataHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
 import com.netflix.vms.generated.notemplate.VideoHollow;
-import com.netflix.vms.transformer.util.LZ4VMSInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import com.netflix.vms.transformer.common.Files;
+import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TopNVideoViewHoursData;
 
 public class HollowBlobDataProvider {
     private static final ILog LOGGER = LogManager.getLogger(HollowBlobDataProvider.class);
 
+    private final Files files;
+
     private HollowReadStateEngine hollowReadStateEngine;
     private HollowBlobReader hollowBlobReader;
 
-    public HollowBlobDataProvider() {
+    public HollowBlobDataProvider(Files files) {
+        this.files = files;
         this.hollowReadStateEngine = new HollowReadStateEngine(true);
         this.hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
     }
@@ -40,11 +42,11 @@ public class HollowBlobDataProvider {
     public void readSnapshot(File snapshotFile) throws IOException {
         hollowReadStateEngine = new HollowReadStateEngine(true);
         hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
-        hollowBlobReader.readSnapshot(new LZ4VMSInputStream(new FileInputStream(snapshotFile)));
+        hollowBlobReader.readSnapshot(files.newBlobInputStream(snapshotFile));
     }
 
     public void readDelta(File deltaFile) throws IOException {
-        hollowBlobReader.applyDelta(new LZ4VMSInputStream(new FileInputStream(deltaFile)));
+        hollowBlobReader.applyDelta(files.newBlobInputStream(deltaFile));
     }
 
     public HollowReadStateEngine getStateEngine() {
@@ -77,7 +79,7 @@ public class HollowBlobDataProvider {
     private void validateChecksums(File snapshotFile, File reverseDeltaFile, HollowChecksum initialChecksumBeforeDelta) throws IOException {
         HollowReadStateEngine anotherStateEngine = new HollowReadStateEngine();
         HollowBlobReader anotherReader = new HollowBlobReader(anotherStateEngine);
-        anotherReader.readSnapshot(new LZ4VMSInputStream(new FileInputStream(snapshotFile)));
+        anotherReader.readSnapshot(files.newBlobInputStream(snapshotFile));
 
         HollowChecksum deltaChecksum = HollowChecksum.forStateEngine(hollowReadStateEngine);
         HollowChecksum snapshotChecksum = HollowChecksum.forStateEngine(anotherStateEngine);
@@ -89,7 +91,7 @@ public class HollowBlobDataProvider {
             throw new RuntimeException("DELTA CHECKSUM VALIDATION FAILURE!");
 
         if(reverseDeltaFile.exists()) {
-            anotherReader.applyDelta(new LZ4VMSInputStream(new FileInputStream(reverseDeltaFile)));
+            anotherReader.applyDelta(files.newBlobInputStream(reverseDeltaFile));
             HollowChecksum reverseDeltaChecksum = HollowChecksum.forStateEngine(anotherStateEngine);
 
             LOGGER.info("INITIAL STATE CHECKSUM: " + initialChecksumBeforeDelta.toString());
