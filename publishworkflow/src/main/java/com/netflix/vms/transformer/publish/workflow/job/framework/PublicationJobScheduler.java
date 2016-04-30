@@ -1,16 +1,18 @@
 package com.netflix.vms.transformer.publish.workflow.job.framework;
 
-import com.netflix.hollow.util.SimultaneousExecutor;
-
 import java.util.concurrent.ThreadPoolExecutor;
+
+import com.netflix.hollow.util.SimultaneousExecutor;
+import com.netflix.vms.transformer.common.PublicationHistory;
+import com.netflix.vms.transformer.common.PublicationJob;
 
 public class PublicationJobScheduler {
 
-    private final PublicationJobQueue publicationJobQueue;
+    private final PublishWorkflowPublicationJobQueue publicationJobQueue;
     private final ThreadPoolExecutor threadPool;
 
     public PublicationJobScheduler() {
-        publicationJobQueue = new PublicationJobQueue();
+        publicationJobQueue = new PublishWorkflowPublicationJobQueue();
         threadPool = new SimultaneousExecutor();
 
         startListening();
@@ -44,5 +46,4 @@ public class PublicationJobScheduler {
     public PublicationHistory getHistory() {
         return publicationJobQueue.getHistory();
     }
-
 }

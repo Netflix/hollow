@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.vms.transformer.common.PublicationHistory;
+import com.netflix.vms.transformer.common.PublicationJob;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.publish.workflow.job.*;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob.PublishType;
-import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJobScheduler;
 import com.netflix.vms.transformer.publish.workflow.job.impl.DefaultHollowPublishJobCreator;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HollowPublishJobCreator;
@@ -31,6 +33,7 @@ public class HollowPublishWorkflowStager {
 	private final Map<RegionEnum, AnnounceJob> priorAnnouncedJobs;
 	private CanaryValidationJob priorCycleCanaryValidationJob;
 	private CanaryRollbackJob priorCycleCanaryRollbackJob;
+    private Consumer<PublicationHistory> publicationHistoryConsumer;
 
 	public HollowPublishWorkflowStager(TransformerContext ctx, PublishWorkflowConfig config, String vip) {
 	    this(ctx, config, new HollowBlobDataProvider(ctx), vip);
@@ -196,6 +199,6 @@ public class HollowPublishWorkflowStager {
 	}
 
     private void exposePublicationHistory() {
-        VMSPublishWorkflowHistoryAdmin.history = scheduler.getHistory();
+        ctx.getPublicationHistoryConsumer().accept(scheduler.getHistory());
     }
 }

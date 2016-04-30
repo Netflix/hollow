@@ -1,14 +1,16 @@
 package com.netflix.vms.transformer.publish.workflow.job;
 
-import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob.PublishType;
-import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
 import java.util.List;
 import java.util.Map;
 
-public abstract class BeforeCanaryAnnounceJob extends PublicationJob {
+import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.vms.transformer.common.PublicationJob;
+import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob.PublishType;
+import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
+
+public abstract class BeforeCanaryAnnounceJob extends PublishWorkflowPublicationJob {
 
     protected final String vip;
     protected final RegionEnum region;
@@ -42,7 +44,7 @@ public abstract class BeforeCanaryAnnounceJob extends PublicationJob {
     }
 
     @Override
-    protected boolean isEligible() {
+    public boolean isEligible() {
         if(previousCanaryValidationJobFinished()) {
             if(jobExistsAndCompletedSuccessfully(circuitBreakerJob)) {
                 if(jobExistsAndCompletedSuccessfully(snapshotPublishJob))

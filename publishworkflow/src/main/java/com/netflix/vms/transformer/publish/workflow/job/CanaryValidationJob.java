@@ -1,12 +1,12 @@
 package com.netflix.vms.transformer.publish.workflow.job;
 
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
+import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
 
 import java.util.Map;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 
-public abstract class CanaryValidationJob extends PublicationJob {
+public abstract class CanaryValidationJob extends PublishWorkflowPublicationJob {
 
     protected final String vip;
     private final Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs;
@@ -18,7 +18,7 @@ public abstract class CanaryValidationJob extends PublicationJob {
     }
 
     @Override
-    protected boolean isEligible() {
+    public boolean isEligible() {
         for(final AfterCanaryAnnounceJob dependency : afterCanaryAnnounceJobs.values()) {
             if(!dependency.isComplete())
                 return false;

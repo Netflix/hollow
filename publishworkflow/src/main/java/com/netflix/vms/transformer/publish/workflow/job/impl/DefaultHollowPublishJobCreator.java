@@ -4,11 +4,10 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import com.netflix.config.FastProperty;
 import com.netflix.config.FastProperty.BooleanProperty;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.vms.transformer.common.PublicationJob;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowConfig;
@@ -27,7 +26,6 @@ import com.netflix.vms.transformer.publish.workflow.job.HollowBlobDeleteFileJob;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob.PublishType;
 import com.netflix.vms.transformer.publish.workflow.job.PoisonStateMarkerJob;
-import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.PlaybackMonkeyTester;
 
 public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {

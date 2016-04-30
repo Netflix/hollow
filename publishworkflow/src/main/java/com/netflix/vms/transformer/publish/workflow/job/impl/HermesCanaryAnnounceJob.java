@@ -1,13 +1,13 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
+import java.util.List;
+
+import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.vms.transformer.common.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.BeforeCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryValidationJob;
-import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
-
-import java.util.List;
-import com.netflix.config.NetflixConfiguration.RegionEnum;
 
 public class HermesCanaryAnnounceJob extends CanaryAnnounceJob {
     public HermesCanaryAnnounceJob(PublishWorkflowContext ctx, String vip, long newVersion,

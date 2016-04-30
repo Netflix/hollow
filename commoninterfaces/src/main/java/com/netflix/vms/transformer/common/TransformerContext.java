@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.common;
 
+import java.util.function.Consumer;
+
 public interface TransformerContext {
 
     void setNowMillis(long now);
@@ -17,4 +19,6 @@ public interface TransformerContext {
     TransformerFiles files();
 
     TransformerPlatformLibraries platformLibraries();
+
+    Consumer<PublicationHistory> getPublicationHistoryConsumer();
 }

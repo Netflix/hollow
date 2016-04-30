@@ -1,9 +1,9 @@
 package com.netflix.vms.transformer.publish.workflow.job;
 
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
+import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
 
-public abstract class AutoPinbackJob extends PublicationJob {
+public abstract class AutoPinbackJob extends PublishWorkflowPublicationJob {
 
     protected final AnnounceJob announcementJob;
     protected final long waitMillis;
@@ -16,7 +16,7 @@ public abstract class AutoPinbackJob extends PublicationJob {
     }
 
     @Override
-    protected boolean isEligible() {
+    public boolean isEligible() {
         return announcementJob.isComplete();
     }
 

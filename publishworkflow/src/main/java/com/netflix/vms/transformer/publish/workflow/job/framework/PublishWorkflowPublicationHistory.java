@@ -1,18 +1,21 @@
 package com.netflix.vms.transformer.publish.workflow.job.framework;
 
-import static com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob.NOT_YET;
+import static com.netflix.vms.transformer.common.PublicationJob.NOT_YET;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Vector;
 
-public class PublicationHistory {
+import com.netflix.vms.transformer.common.PublicationHistory;
+import com.netflix.vms.transformer.common.PublicationJob;
 
-    private final Vector<PublicationJob> jobs;
+public class PublishWorkflowPublicationHistory implements PublicationHistory {
 
-    public PublicationHistory() {
-        this.jobs = new Vector<>();
+    private final List<PublicationJob> jobs;
+
+    public PublishWorkflowPublicationHistory() {
+        this.jobs = Collections.synchronizedList(new ArrayList<>());
     }
 
     public void addJob(PublicationJob job) {
@@ -75,5 +78,4 @@ public class PublicationHistory {
             return -1;
         return 0;
     }
-
 }

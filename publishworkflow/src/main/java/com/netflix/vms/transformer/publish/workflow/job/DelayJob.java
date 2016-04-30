@@ -1,9 +1,10 @@
 package com.netflix.vms.transformer.publish.workflow.job;
 
+import com.netflix.vms.transformer.common.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
+import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
 
-public abstract class DelayJob extends PublicationJob {
+public abstract class DelayJob extends PublishWorkflowPublicationJob {
     protected final long delayMillis;
     private final PublicationJob dependency;
 
@@ -14,7 +15,7 @@ public abstract class DelayJob extends PublicationJob {
     }
 
     @Override
-    protected boolean isEligible() {
+    public boolean isEligible() {
         return jobDoesNotExistOrCompletedSuccessfully(dependency);
     }
 

@@ -1,11 +1,11 @@
 package com.netflix.vms.transformer.publish.workflow.job;
 
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
+import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
 
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 
-public abstract class AnnounceJob extends PublicationJob {
+public abstract class AnnounceJob extends PublishWorkflowPublicationJob {
     public final static String ANNOUNCE_DELTA_JOB_NAME_PREFIX = "announce_delta_";
     public final static String ANNOUNCE_SNAPSHOT_JOB_NAME_PREFIX = "announce_snapshot_";
 
@@ -37,7 +37,7 @@ public abstract class AnnounceJob extends PublicationJob {
     }
 
     @Override
-    protected boolean isEligible() {
+    public boolean isEligible() {
         if(previousAnnounceJobFinished()) {
             return jobDoesNotExistOrCompletedSuccessfully(delayJob) && jobExistsAndCompletedSuccessfully(canaryValidationJob);
         }

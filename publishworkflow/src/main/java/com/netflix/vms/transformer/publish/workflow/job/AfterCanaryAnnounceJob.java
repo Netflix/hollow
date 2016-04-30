@@ -3,10 +3,10 @@ package com.netflix.vms.transformer.publish.workflow.job;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
+import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
 import java.util.Map;
 
-public abstract class AfterCanaryAnnounceJob extends PublicationJob {
+public abstract class AfterCanaryAnnounceJob extends PublishWorkflowPublicationJob {
 	private final CanaryAnnounceJob canaryAnnounceJob;
 	protected final BeforeCanaryAnnounceJob beforeCanaryAnnounceJob;
 	protected final String vip;
@@ -26,7 +26,7 @@ public abstract class AfterCanaryAnnounceJob extends PublicationJob {
 	}
 
 	@Override
-	protected boolean isEligible() {
+	public boolean isEligible() {
 		if(jobExistsAndCompletedSuccessfully(canaryAnnounceJob))
 			return true;
 		return false;

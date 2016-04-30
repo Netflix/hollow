@@ -1,9 +1,10 @@
 package com.netflix.vms.transformer.publish.workflow.job;
 
+import com.netflix.vms.transformer.common.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
+import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
 
-public abstract class PoisonStateMarkerJob extends PublicationJob {
+public abstract class PoisonStateMarkerJob extends PublishWorkflowPublicationJob {
 
     private final PublicationJob dependency;
 
@@ -13,7 +14,7 @@ public abstract class PoisonStateMarkerJob extends PublicationJob {
     }
 
     @Override
-    protected boolean isEligible() {
+    public boolean isEligible() {
         if(dependency.hasJobFailed())
             return true;
         return dependency.hasJobFailed();

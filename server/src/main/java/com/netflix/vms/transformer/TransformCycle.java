@@ -9,6 +9,7 @@ import org.apache.commons.io.IOUtils;
 
 import com.netflix.hollow.client.HollowClient;
 import com.netflix.hollow.write.HollowBlobWriter;
+import com.netflix.vms.transformer.common.PublicationHistoryConsumer;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerPlatformLibraries;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
@@ -25,7 +26,7 @@ public class TransformCycle {
     private final TransformerContext ctx;
     private long cycleNumber = 0;
 
-    public TransformCycle(TransformerPlatformLibraries platformLibraries, String vip) {
+    public TransformCycle(TransformerPlatformLibraries platformLibraries, PublicationHistoryConsumer historyConsumer, String vip) {
         this.vip = vip;
         this.inputClient = new HollowClient(new VMSInputDataTransitionCreator(platformLibraries.getFileStore()));
         this.outputStateEngine = new VMSTransformerWriteStateEngine();
@@ -34,7 +35,8 @@ public class TransformCycle {
                 new TransformerServerCassandraHelper(platformLibraries.getAstyanax(), "cass_dpt", "hollow_publish_workflow", "hollow_validation_stats"),
                 new TransformerServerCassandraHelper(platformLibraries.getAstyanax(), "cass_dpt", "canary_validation", "canary_results"),
                 new TransformerServerFiles(),
-                platformLibraries);
+                platformLibraries,
+                historyConsumer);
     }
 
     public void cycle() {

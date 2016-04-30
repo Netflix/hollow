@@ -1,8 +1,8 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
+import com.netflix.vms.transformer.common.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.PoisonStateMarkerJob;
-import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
 
 
 public class CassandraPoisonStateMarkerJob extends PoisonStateMarkerJob {

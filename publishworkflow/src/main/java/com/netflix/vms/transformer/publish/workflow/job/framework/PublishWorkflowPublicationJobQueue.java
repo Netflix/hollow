@@ -4,17 +4,21 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class PublicationJobQueue {
+import com.netflix.vms.transformer.common.PublicationJobQueue;
+import com.netflix.vms.transformer.common.PublicationHistory;
+import com.netflix.vms.transformer.common.PublicationJob;
+
+public class PublishWorkflowPublicationJobQueue implements PublicationJobQueue {
 
     private final List<PublicationJob> waitingJobs;
     private final PublicationHistory history;
 
-    public PublicationJobQueue() {
+    public PublishWorkflowPublicationJobQueue() {
         this.waitingJobs = new ArrayList<PublicationJob>();
-        this.history = new PublicationHistory();
+        this.history = new PublishWorkflowPublicationHistory();
     }
 
-    synchronized void jobDone() {
+    public synchronized void jobDone() {
         this.notifyAll();
     }
 

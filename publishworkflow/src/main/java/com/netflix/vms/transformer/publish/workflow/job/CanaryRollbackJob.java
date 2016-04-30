@@ -1,9 +1,9 @@
 package com.netflix.vms.transformer.publish.workflow.job;
 
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
+import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
 
-public abstract class CanaryRollbackJob extends PublicationJob {
+public abstract class CanaryRollbackJob extends PublishWorkflowPublicationJob {
 
     protected final String vip;
     protected final long priorVersion;
@@ -19,7 +19,7 @@ public abstract class CanaryRollbackJob extends PublicationJob {
     }
 
     @Override
-    protected boolean isEligible() {
+    public boolean isEligible() {
         return validationJob.hasJobFailed();
     }
 

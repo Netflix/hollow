@@ -1,17 +1,18 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.vms.transformer.common.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.BeforeCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryRollbackJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryValidationJob;
 import com.netflix.vms.transformer.publish.workflow.job.CircuitBreakerJob;
-import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.PlaybackMonkeyTester;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 public class HollowBlobBeforeCanaryAnnounceJob extends BeforeCanaryAnnounceJob {
     private final PlaybackMonkeyTester dataTester;

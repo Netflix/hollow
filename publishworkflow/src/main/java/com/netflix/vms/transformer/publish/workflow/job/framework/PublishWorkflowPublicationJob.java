@@ -3,6 +3,8 @@ package com.netflix.vms.transformer.publish.workflow.job.framework;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.netflix.vms.transformer.common.PublicationJob;
+import com.netflix.vms.transformer.common.PublicationJobQueue;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 
 /**
@@ -13,9 +15,7 @@ import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
  * 3) Completed -- The job is complete.
  *
  */
-public abstract class PublicationJob implements Runnable {
-
-    public static final long NOT_YET = Long.MIN_VALUE;
+public abstract class PublishWorkflowPublicationJob implements PublicationJob {
 
     /* dependencies */
     protected final PublishWorkflowContext ctx;
@@ -39,13 +39,13 @@ public abstract class PublicationJob implements Runnable {
     /**
      * Create a PublicationJob.
      */
-    public PublicationJob(PublishWorkflowContext ctx, String jobName, long cycleVersion) {
+    public PublishWorkflowPublicationJob(PublishWorkflowContext ctx, String jobName, long cycleVersion) {
         this.ctx = ctx;
         this.cycleVersion = cycleVersion;
         this.jobName = jobName;
     }
 
-    void setJobQueue(PublicationJobQueue jobQueue) {
+    public void setJobQueue(PublicationJobQueue jobQueue) {
         this.queue = jobQueue;
     }
 
@@ -84,30 +84,37 @@ public abstract class PublicationJob implements Runnable {
         queue.jobDone();
     }
 
+    @Override
     public final boolean isComplete() {
         return completedTimestamp != Long.MIN_VALUE;
     }
 
+    @Override
     public final long getCompletedTimestamp() {
         return completedTimestamp;
     }
 
+    @Override
     public final long getFailedTimestamp() {
         return failedTimestamp;
     }
 
+    @Override
     public String getJobName() {
         return jobName;
     }
 
+    @Override
     public final long getActualStartTimestamp() {
         return startTimestamp;
     }
 
+    @Override
     public long getCycleVersion() {
         return cycleVersion;
     }
 
+    @Override
     public final boolean hasJobFailed() {
         if(failedExplicitly || failedWithException || failedBasedOnDependencies)
             return true;
@@ -119,7 +126,6 @@ public abstract class PublicationJob implements Runnable {
         return false;
     }
 
-    protected abstract boolean isEligible();
     protected abstract boolean isFailedBasedOnDependencies();
 
     protected boolean jobExistsAndFailed(PublicationJob job) {
@@ -138,13 +144,14 @@ public abstract class PublicationJob implements Runnable {
         return job == null || job.isComplete();
     }
 
+    @Override
     public long getFinishedTimestamp() {
         if(completedTimestamp == NOT_YET)
             return failedTimestamp;
         return completedTimestamp;
     }
 
-
+    @Override
     public String toString() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd HH:mm:ss.SSS");
         StringBuilder builder = new StringBuilder();
@@ -161,6 +168,7 @@ public abstract class PublicationJob implements Runnable {
         return builder.toString();
     }
 
+    @Override
     public String getDisplayableStatus() {
         if(completedTimestamp != NOT_YET)
             return "SUCCESS";

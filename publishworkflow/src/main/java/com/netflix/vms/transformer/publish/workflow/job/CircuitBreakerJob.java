@@ -1,11 +1,11 @@
 package com.netflix.vms.transformer.publish.workflow.job;
 
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob;
+import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
 
 import java.io.File;
 
-public abstract class CircuitBreakerJob extends PublicationJob {
+public abstract class CircuitBreakerJob extends PublishWorkflowPublicationJob {
     protected final long cycleVersion;
     protected final File snapshotFile;
     protected final File deltaFile;
@@ -20,7 +20,7 @@ public abstract class CircuitBreakerJob extends PublicationJob {
     }
 
     @Override
-    protected boolean isEligible() {
+    public boolean isEligible() {
         return true;
     }
 
