@@ -13,11 +13,12 @@ import com.netflix.astyanax.retry.RetryNTimes;
 import com.netflix.astyanax.retry.RetryPolicy;
 import com.netflix.astyanax.serializers.StringSerializer;
 import com.netflix.cassandra.NFAstyanaxManager;
+import com.netflix.vms.transformer.common.TransformerCassandraHelper;
 import com.netflix.vms.transformer.servlet.platform.PlatformLibraries;
 import java.util.HashMap;
 import java.util.Map;
 
-public class VMSCassandraHelper {
+public class VMSCassandraHelper implements TransformerCassandraHelper {
 
     private final Keyspace keyspace;
     private final ColumnFamily<String, String> columnFamily;
@@ -32,32 +33,39 @@ public class VMSCassandraHelper {
     }
 
 
+    @Override
     public void addVipKeyValuePair(String vip, String key, String value) throws ConnectionException {
         addKeyValuePair(vipSpecificKey(vip, key), value);
     }
 
+    @Override
     public void addKeyValuePair(String key, String value) throws ConnectionException {
         addKeyColumnValue(key, "val", value);
     }
 
+    @Override
     public void addKeyColumnValue(String key, String columnName, String value) throws ConnectionException {
         MutationBatch batch = createMutationBatch();
         batch.withRow(getColumnFamily(), key).putColumn(columnName, value);
         batch.execute();
     }
 
+    @Override
     public String getVipKeyValuePair(String vip, String key) throws ConnectionException {
         return getKeyValuePair(vipSpecificKey(vip, key));
     }
 
+    @Override
     public String getKeyValuePair(String key) throws ConnectionException {
         return getKeyColumnValue(key, "val");
     }
 
+    @Override
     public String getKeyColumnValue(String key, String columnName) throws ConnectionException {
         return createQuery().getKey(key).getColumn(columnName).execute().getResult().getStringValue();
     }
 
+    @Override
     public Map<String, String> getColumns(String key) throws ConnectionException {
         OperationResult<ColumnList<String>> opResult = createQuery().getKey(key).execute();
 
@@ -73,16 +81,19 @@ public class VMSCassandraHelper {
         return resultMap;
     }
 
+    @Override
     public MutationBatch createMutationBatch() {
         return this.keyspace.prepareMutationBatch().withConsistencyLevel(ConsistencyLevel.CL_LOCAL_QUORUM)
                 .withRetryPolicy(getRetryPolicy());
     }
 
+    @Override
     public ColumnFamilyQuery<String, String> createQuery() {
         return this.keyspace.prepareQuery(columnFamily).setConsistencyLevel(ConsistencyLevel.CL_LOCAL_QUORUM)
                 .withRetryPolicy(getRetryPolicy());
     }
 
+    @Override
     public ColumnFamily<String, String> getColumnFamily() {
         return columnFamily;
     }
@@ -91,6 +102,7 @@ public class VMSCassandraHelper {
         return new RetryNTimes(3);
     }
 
+    @Override
     public String vipSpecificKey(String vip, String key) {
         return key + "_" + vip;
     }

@@ -5,7 +5,6 @@ import com.netflix.astyanax.connectionpool.exceptions.NotFoundException;
 import com.netflix.config.FastProperty;
 import com.netflix.logging.ILog;
 import com.netflix.logging.LogManager;
-import com.netflix.vms.transformer.util.VMSCassandraHelper;
 
 public class CassandraBasedPoisonedStateMarker implements PoisonedStateMarker {
 
