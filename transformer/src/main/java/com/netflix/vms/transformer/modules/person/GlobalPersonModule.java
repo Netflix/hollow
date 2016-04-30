@@ -1,19 +1,29 @@
 package com.netflix.vms.transformer.modules.person;
 
+import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.TransformerContext;
+import com.netflix.vms.transformer.hollowinput.ExplicitDateHollow;
+import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
+import com.netflix.vms.transformer.hollowinput.ListOfVideoIdsHollow;
+import com.netflix.vms.transformer.hollowinput.PersonBioHollow;
+import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+import com.netflix.vms.transformer.hollowinput.VideoIdHollow;
 import com.netflix.vms.transformer.hollowinput.VideoPersonAliasHollow;
 import com.netflix.vms.transformer.hollowinput.VideoPersonAliasListHollow;
 import com.netflix.vms.transformer.hollowinput.VideoPersonCastHollow;
 import com.netflix.vms.transformer.hollowinput.VideoPersonCastListHollow;
 import com.netflix.vms.transformer.hollowinput.VideoPersonHollow;
+import com.netflix.vms.transformer.hollowoutput.BirthDate;
 import com.netflix.vms.transformer.hollowoutput.GlobalPerson;
 import com.netflix.vms.transformer.hollowoutput.Integer;
 import com.netflix.vms.transformer.hollowoutput.PersonRole;
+import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VPerson;
 import com.netflix.vms.transformer.hollowoutput.VRole;
 import com.netflix.vms.transformer.hollowoutput.Video;
+import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
 
@@ -24,8 +34,12 @@ import java.util.List;
 
 public class GlobalPersonModule extends AbstractTransformModule {
 
+    private final HollowPrimaryKeyIndex personBioIndex;
+
     public GlobalPersonModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
         super(api, ctx, mapper);
+
+        this.personBioIndex = indexer.getPrimaryKeyIndex(IndexSpec.PERSON_BIO);
     }
 
     @Override
@@ -38,8 +52,48 @@ public class GlobalPersonModule extends AbstractTransformModule {
             output.aliasesIds = getAliasIds(input._getAlias());
             output.personRoles = getPersonRoles(person, input._getCast());
 
+            int personBioOrdinal = personBioIndex.getMatchingOrdinal(input._getPersonId());
+            if (personBioOrdinal != -1) {
+                PersonBioHollow personBioInput = api.getPersonBioHollow(personBioOrdinal);
+                output.spouses = stringsList(personBioInput._getSpouses());
+                output.partners = stringsList(personBioInput._getPartners());
+                output.birthDate = birthDate(personBioInput._getBirthDate());
+                output.topVideos = videoList(personBioInput._getMovieIds());
+            }
+
             mapper.addObject(output);
         }
+    }
+
+    private List<Video> videoList(ListOfVideoIdsHollow videos) {
+        List<Video> result = new ArrayList<>();
+        for (VideoIdHollow id : videos) {
+            result.add(new Video((int) id._getValue()));
+        }
+        return result;
+    }
+
+    private BirthDate birthDate(ExplicitDateHollow date) {
+        if (date == null) return null;
+
+        BirthDate bDate = new BirthDate();
+        bDate.day = nullableInteger(date._getDayOfMonthBoxed());
+        bDate.month = nullableInteger(date._getMonthOfYearBoxed());
+        bDate.year = nullableInteger(date._getYearBoxed());
+        return bDate;
+    }
+
+    private Integer nullableInteger(java.lang.Integer value) {
+        if (value == null) return null;
+        return new Integer(value);
+    }
+
+    private List<Strings> stringsList(ListOfStringHollow listHollow) {
+        List<Strings> result = new ArrayList<>();
+        for (StringHollow value : listHollow) {
+            result.add(new Strings(value._getValue()));
+        }
+        return result;
     }
 
     private List<PersonRole> getPersonRoles(VPerson person, VideoPersonCastListHollow castList) {
