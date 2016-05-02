@@ -9,7 +9,6 @@ import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
-import com.netflix.vms.transformer.hollowoutput.DeploymentIntent;
 import com.netflix.vms.transformer.hollowoutput.GlobalVideo;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.L10NResources;
@@ -183,12 +182,6 @@ public class SimpleTransformer {
         languageRights.contractId = -1;
         languageRights.videoId = new Video(-1);
         objectMapper.addObject(languageRights);
-
-        DeploymentIntent deploymentIntent = new DeploymentIntent();
-        deploymentIntent.profileId = -1;
-        deploymentIntent.bitrate = -1;
-        deploymentIntent.country = new ISOCountry("-1");
-        objectMapper.addObject(deploymentIntent);
 
         L10NResources l10n = new L10NResources();
         l10n.resourceIdStr = new char[] { 'c' };

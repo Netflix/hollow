@@ -22,9 +22,6 @@ public class DrmSystemModule extends AbstractTransformModule {
 
     @Override
     public void transform() {
-        // @TODO: api.getAllDrmSystemIdentifiersHollow() is empty / need to regenerate with slice input/output
-        mapper.addObject(new DrmSystem());
-
         for(DrmSystemIdentifiersHollow drmSystemIdentifier : api.getAllDrmSystemIdentifiersHollow()) {
             DrmSystem system = new DrmSystem();
             system.id = (int)drmSystemIdentifier._getId();
