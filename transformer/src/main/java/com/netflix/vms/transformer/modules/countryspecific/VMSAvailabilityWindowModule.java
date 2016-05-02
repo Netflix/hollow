@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.netflix.vms.transformer.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractAssetHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractHollow;
@@ -65,11 +65,11 @@ public class VMSAvailabilityWindowModule {
     public void populateWindowData(Integer videoId, String country, CompleteVideoCountrySpecificData data, VideoRightsHollow videoRights, CountrySpecificRollupValues rollup) {
         boolean isGoLive = isGoLive(videoRights);
 
+        if(videoId == 80004675 && "MQ".equals(country))
+            System.out.println("asdf");
+
         VideoRightsRightsHollow rights = videoRights._getRights();
         if((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
-/*            if(videoId == 80080144 && "VU".equals(country))
-                System.out.println("asdf");
-*/
             populateRolledUpWindowData(data, rollup, rights, isGoLive);
         } else {
             populateEpisodeOrStandaloneWindowData(videoId, country, data, rollup, isGoLive, rights);
@@ -97,6 +97,7 @@ public class VMSAvailabilityWindowModule {
         });
 
         for(VideoRightsWindowHollow window : sortedWindows) {
+            boolean includedWindowPackageData = false;
             int thisWindowMaxPackageId = 0;
             int thisWindowBundledAssetsGroupId = 0;
 
@@ -166,7 +167,7 @@ public class VMSAvailabilityWindowModule {
                                     thisWindowBundledAssetsGroupId = (int) contractId;
                                 }
                             } else {
-                            	includedPackageDataCount++;
+                                includedWindowPackageData = true;
                                 PackageData packageData = getPackageData(videoId, pkg._getPackageId());
                                 if(packageData != null) {
                                     /// package data is available
@@ -214,11 +215,16 @@ public class VMSAvailabilityWindowModule {
                         thisWindowBundledAssetsGroupId = (int) contractId;
                     }
                 }
+
+
             }
 
             outputWindow.bundledAssetsGroupId = thisWindowBundledAssetsGroupId;
 
             availabilityWindows.add(outputWindow);
+
+            if(includedWindowPackageData)
+                includedPackageDataCount++;
         }
 
 
