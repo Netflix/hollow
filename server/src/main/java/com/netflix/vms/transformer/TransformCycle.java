@@ -9,9 +9,9 @@ import org.apache.commons.io.IOUtils;
 
 import com.netflix.hollow.client.HollowClient;
 import com.netflix.hollow.write.HollowBlobWriter;
-import com.netflix.vms.transformer.common.PublicationHistoryConsumer;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerPlatformLibraries;
+import com.netflix.vms.transformer.common.publish.workflow.PublicationHistoryConsumer;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.VMSInputDataTransitionCreator;
 import com.netflix.vms.transformer.io.LZ4VMSOutputStream;

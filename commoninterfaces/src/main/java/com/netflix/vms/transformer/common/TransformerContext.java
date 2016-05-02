@@ -2,6 +2,9 @@ package com.netflix.vms.transformer.common;
 
 import java.util.function.Consumer;
 
+import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
+import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
+
 public interface TransformerContext {
 
     void setNowMillis(long now);

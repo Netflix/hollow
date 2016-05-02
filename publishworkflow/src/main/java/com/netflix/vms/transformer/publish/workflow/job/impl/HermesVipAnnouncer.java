@@ -12,7 +12,7 @@ import com.netflix.hermes.data.DirectDataPointer;
 import com.netflix.hermes.exception.DataConsumeException;
 import com.netflix.hermes.subscriber.Subscription;
 import com.netflix.hermes.subscriber.SubscriptionManager;
-import com.netflix.vms.transformer.common.VipAnnouncer;
+import com.netflix.vms.transformer.common.publish.workflow.VipAnnouncer;
 
 public class HermesVipAnnouncer implements VipAnnouncer {
 

@@ -3,8 +3,8 @@ package com.netflix.vms.transformer.publish.workflow.job.framework;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.netflix.vms.transformer.common.PublicationJob;
-import com.netflix.vms.transformer.common.PublicationJobQueue;
+import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
+import com.netflix.vms.transformer.common.publish.workflow.PublicationJobQueue;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 
 /**

@@ -1,4 +1,4 @@
-package com.netflix.vms.transformer.common;
+package com.netflix.vms.transformer.common.publish.workflow;
 
 public interface PublicationJob extends Runnable {
     public static final long NOT_YET = Long.MIN_VALUE;

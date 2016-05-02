@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.vms.transformer.common.PublicationHistory;
-import com.netflix.vms.transformer.common.PublicationJob;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
+import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.job.*;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob.PublishType;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJobScheduler;

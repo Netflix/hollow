@@ -1,10 +1,10 @@
 package com.netflix.vms.transformer.publish.workflow;
 
 import com.netflix.aws.file.FileStore;
-import com.netflix.vms.transformer.common.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerLogger;
-import com.netflix.vms.transformer.common.VipAnnouncer;
+import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
+import com.netflix.vms.transformer.common.publish.workflow.VipAnnouncer;
 import com.netflix.vms.transformer.publish.CassandraBasedPoisonedStateMarker;
 import com.netflix.vms.transformer.publish.PoisonedStateMarker;
 

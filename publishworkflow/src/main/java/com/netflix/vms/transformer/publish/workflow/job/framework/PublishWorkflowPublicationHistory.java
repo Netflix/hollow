@@ -1,14 +1,13 @@
 package com.netflix.vms.transformer.publish.workflow.job.framework;
 
-import static com.netflix.vms.transformer.common.PublicationJob.NOT_YET;
-
+import static com.netflix.vms.transformer.common.publish.workflow.PublicationJob.NOT_YET;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import com.netflix.vms.transformer.common.PublicationHistory;
-import com.netflix.vms.transformer.common.PublicationJob;
+import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
+import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 
 public class PublishWorkflowPublicationHistory implements PublicationHistory {
 

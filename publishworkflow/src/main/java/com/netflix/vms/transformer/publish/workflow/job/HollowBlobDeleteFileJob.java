@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.publish.workflow.job;
 import java.io.File;
 import java.util.List;
 
-import com.netflix.vms.transformer.common.PublicationJob;
+import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
 

@@ -1,4 +1,4 @@
-package com.netflix.vms.transformer.common;
+package com.netflix.vms.transformer.common.publish.workflow;
 
 import java.util.function.Consumer;
 

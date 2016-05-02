@@ -16,7 +16,7 @@ import com.netflix.astyanax.retry.RetryNTimes;
 import com.netflix.astyanax.retry.RetryPolicy;
 import com.netflix.astyanax.serializers.StringSerializer;
 import com.netflix.cassandra.NFAstyanaxManager;
-import com.netflix.vms.transformer.common.TransformerCassandraHelper;
+import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
 
 public class TransformerServerCassandraHelper implements TransformerCassandraHelper {
 

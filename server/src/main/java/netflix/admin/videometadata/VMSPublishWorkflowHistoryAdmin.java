@@ -19,8 +19,8 @@ import org.apache.commons.lang.StringUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.netflix.vms.transformer.common.PublicationHistory;
-import com.netflix.vms.transformer.common.PublicationJob;
+import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
+import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 
 @Path("/vms/workflowhistory")
 @Singleton

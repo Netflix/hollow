@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import com.netflix.vms.transformer.common.PublicationJob;
+import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.PoisonStateMarkerJob;
 
