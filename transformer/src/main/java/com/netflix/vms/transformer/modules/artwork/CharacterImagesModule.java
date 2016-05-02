@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.modules.artwork;
 
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
-import com.netflix.vms.transformer.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeListHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;

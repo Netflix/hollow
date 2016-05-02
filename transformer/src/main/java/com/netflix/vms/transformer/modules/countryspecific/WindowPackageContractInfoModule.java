@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
-import com.netflix.vms.transformer.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;

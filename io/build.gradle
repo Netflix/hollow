@@ -1,0 +1,8 @@
+apply plugin: 'java'
+
+dependencies {
+    compile project(':vms-transformer-common-interfaces')
+
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.assertj:assertj-core:3.3+'
+}
