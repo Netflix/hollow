@@ -1,4 +1,4 @@
-package com.netflix.vms.transformer.util;
+package com.netflix.vms.transformer.io;
 
 import java.io.IOException;
 import java.io.InputStream;

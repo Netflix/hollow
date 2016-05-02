@@ -2,6 +2,8 @@ apply plugin: 'netflix.ospackage-tomcat'
 apply plugin: 'war'
 
 dependencies {
+    compile project(':vms-transformer-common-interfaces')
+    compile project(':vms-transformer-io')
     compile project(':vms-transformer-businesslogic')
     compile project(':vms-transformer-publish-workflow')
     compile 'netflix:vms-hollow-generated-notemplate:latest.release'

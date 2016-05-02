@@ -14,10 +14,10 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerPlatformLibraries;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.VMSInputDataTransitionCreator;
+import com.netflix.vms.transformer.io.LZ4VMSOutputStream;
+import com.netflix.vms.transformer.io.LZ4VMSTransformerFiles;
 import com.netflix.vms.transformer.logger.TransformerServerLogger;
-import com.netflix.vms.transformer.util.LZ4VMSOutputStream;
 import com.netflix.vms.transformer.util.TransformerServerCassandraHelper;
-import com.netflix.vms.transformer.util.TransformerServerFiles;
 
 public class TransformCycle {
     private final String vip;
@@ -34,7 +34,7 @@ public class TransformCycle {
                 new TransformerServerCassandraHelper(platformLibraries.getAstyanax(), "cass_dpt", "vms_poison_states", "poison_states"),
                 new TransformerServerCassandraHelper(platformLibraries.getAstyanax(), "cass_dpt", "hollow_publish_workflow", "hollow_validation_stats"),
                 new TransformerServerCassandraHelper(platformLibraries.getAstyanax(), "cass_dpt", "canary_validation", "canary_results"),
-                new TransformerServerFiles(),
+                new LZ4VMSTransformerFiles(),
                 platformLibraries,
                 historyConsumer);
     }

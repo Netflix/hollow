@@ -1,11 +1,13 @@
 rootProject.name = 'videometadata-transformer'
 
 include 'commoninterfaces'
+include 'io'
 include 'publishworkflow'
 include 'server'
 include 'transformer'
 
 project(':commoninterfaces').name = 'vms-transformer-common-interfaces'
+project(':io').name = 'vms-transformer-io'
 project(':publishworkflow').name = 'vms-transformer-publish-workflow'
 project(':server').name = 'vms-transformer-server'
 project(':transformer').name = 'vms-transformer-businesslogic'

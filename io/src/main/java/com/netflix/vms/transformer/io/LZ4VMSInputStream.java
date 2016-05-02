@@ -1,10 +1,10 @@
-package com.netflix.vms.transformer.util;
-
-import net.jpountz.lz4.LZ4FastDecompressor;
+package com.netflix.vms.transformer.io;
 
 import java.io.IOException;
 import java.io.InputStream;
+
 import net.jpountz.lz4.LZ4Factory;
+import net.jpountz.lz4.LZ4FastDecompressor;
 
 // NOTE: Frozen code - do not change.  There is a cloned version in videometadata-snaphost library.  On next vip: need to use standard lz4 lib
 public class LZ4VMSInputStream extends InputStream {
