@@ -12,8 +12,9 @@ public class Artwork implements Cloneable {
     public ArtworkDerivatives derivatives = null;
     public List<ArtworkCdn> cdns = null;
     public List<DeprecatedImageId> deprecatedImageIds = null;
-    public ArtworkBasicPassthrough basic_passthrough = null;
+    public PassthroughVideo source_movie_id = null;
     public ArtworkSourcePassthrough source = null;
+    public ArtworkBasicPassthrough basic_passthrough = null;
     public int file_seq = java.lang.Integer.MIN_VALUE;
 
     public boolean equals(Object other) {
@@ -40,12 +41,15 @@ public class Artwork implements Cloneable {
         if(o.deprecatedImageIds == null) {
             if(deprecatedImageIds != null) return false;
         } else if(!o.deprecatedImageIds.equals(deprecatedImageIds)) return false;
-        if(o.basic_passthrough == null) {
-            if(basic_passthrough != null) return false;
-        } else if(!o.basic_passthrough.equals(basic_passthrough)) return false;
+        if(o.source_movie_id == null) {
+            if(source_movie_id != null) return false;
+        } else if(!o.source_movie_id.equals(source_movie_id)) return false;
         if(o.source == null) {
             if(source != null) return false;
         } else if(!o.source.equals(source)) return false;
+        if(o.basic_passthrough == null) {
+            if(basic_passthrough != null) return false;
+        } else if(!o.basic_passthrough.equals(basic_passthrough)) return false;
         if(o.file_seq != file_seq) return false;
         return true;
     }
@@ -60,8 +64,9 @@ public class Artwork implements Cloneable {
         hashCode = hashCode * 31 + (derivatives == null ? 1237 : derivatives.hashCode());
         hashCode = hashCode * 31 + (cdns == null ? 1237 : cdns.hashCode());
         hashCode = hashCode * 31 + (deprecatedImageIds == null ? 1237 : deprecatedImageIds.hashCode());
-        hashCode = hashCode * 31 + (basic_passthrough == null ? 1237 : basic_passthrough.hashCode());
+        hashCode = hashCode * 31 + (source_movie_id == null ? 1237 : source_movie_id.hashCode());
         hashCode = hashCode * 31 + (source == null ? 1237 : source.hashCode());
+        hashCode = hashCode * 31 + (basic_passthrough == null ? 1237 : basic_passthrough.hashCode());
         hashCode = hashCode * 31 + file_seq;
         return hashCode;
     }
@@ -76,8 +81,9 @@ public class Artwork implements Cloneable {
         builder.append(",derivatives=").append(derivatives);
         builder.append(",cdns=").append(cdns);
         builder.append(",deprecatedImageIds=").append(deprecatedImageIds);
-        builder.append(",basic_passthrough=").append(basic_passthrough);
+        builder.append(",source_movie_id=").append(source_movie_id);
         builder.append(",source=").append(source);
+        builder.append(",basic_passthrough=").append(basic_passthrough);
         builder.append(",file_seq=").append(file_seq);
         builder.append("}");
         return builder.toString();

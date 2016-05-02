@@ -6,6 +6,7 @@ import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ComparisonChain;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.write.objectmapper.NullablePrimitiveBoolean;
 import com.netflix.vms.transformer.ConversionUtils;
 import com.netflix.vms.transformer.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.ArtWorkImageTypeHollow;
@@ -34,6 +35,7 @@ import com.netflix.vms.transformer.hollowoutput.ArtworkSourceString;
 import com.netflix.vms.transformer.hollowoutput.Integer;
 import com.netflix.vms.transformer.hollowoutput.NFLocale;
 import com.netflix.vms.transformer.hollowoutput.PassthroughString;
+import com.netflix.vms.transformer.hollowoutput.PassthroughVideo;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.__passthrough_string;
 import com.netflix.vms.transformer.index.IndexSpec;
@@ -180,7 +182,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         }
 
         ArtworkBasicPassthrough passThrough = new ArtworkBasicPassthrough();
-        PassthroughString passThroughString = getPassThroughString("approval_source", keyValues);
+        PassthroughString passThroughString = getPassThroughString("APPROVAL_SOURCE", keyValues);
         boolean setBasicPassThrough = false;
         if(passThroughString != null) {
             passThrough.approval_source = passThroughString;
@@ -188,21 +190,22 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         }
         String approvalState = keyValues.get("APPROVAL_STATE");
         if(approvalState != null) {
-            passThrough.approval_state = java.lang.Boolean.valueOf(approvalState);
+            // NOTE: Need to manually make approval_state to NullablePrimitiveBoolean (public NullablePrimitiveBoolean approval_state = null)
+            passThrough.approval_state = java.lang.Boolean.valueOf(approvalState) ? NullablePrimitiveBoolean.TRUE : NullablePrimitiveBoolean.FALSE;
             setBasicPassThrough = true;
         }
-        passThroughString = getPassThroughString("design_attribute", keyValues);
+        passThroughString = getPassThroughString("designAttribute", keyValues);
         if(passThroughString != null) {
             passThrough.design_attribute = passThroughString;
             setBasicPassThrough = true;
         }
-        passThroughString = getPassThroughString("focal_point", keyValues);
+        passThroughString = getPassThroughString("FOCAL_POINT", keyValues);
         if(passThroughString != null) {
             passThrough.focal_point = passThroughString;
             setBasicPassThrough = true;
         }            // Sort descriptor necessary for client artwork resolver
 
-        passThroughString = getPassThroughString("tone", keyValues);
+        passThroughString = getPassThroughString("TONE", keyValues);
         if(passThroughString != null) {
             passThrough.tone = passThroughString;
             setBasicPassThrough = true;
@@ -213,24 +216,42 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             setBasicPassThrough = true;
         }
 
-        if(passThroughString != null) {
-            passThrough.awardCampaigns = keyListValues.get("awardCampaigns");
+        if (keyListValues.containsKey("AWARD_CAMPAIGNS")) {
+            passThrough.awardCampaigns = keyListValues.get("AWARD_CAMPAIGNS");
             setBasicPassThrough = true;
         }
-        if(passThroughString != null) {
+        if (keyListValues.containsKey("themes")) {
             passThrough.themes = keyListValues.get("themes");
+            setBasicPassThrough = true;
+        }
+        if (keyListValues.containsKey("IDENTIFIERS")) {
+            passThrough.identifiers = keyListValues.get("IDENTIFIERS");
+            setBasicPassThrough = true;
+        }
+        if (keyListValues.containsKey("PERSON_IDS")) {
+            passThrough.personIdStrs = keyListValues.get("PERSON_IDS");
             setBasicPassThrough = true;
         }
 
         ArtworkSourcePassthrough sourcePassThrough = new ArtworkSourcePassthrough();
-        sourcePassThrough.original_source_file_id = getArtworkSourceString("source_file_id", keyValues);
         sourcePassThrough.source_file_id = getArtworkSourceString("source_file_id", keyValues);
+        sourcePassThrough.original_source_file_id = getArtworkSourceString("original_source_file_id", keyValues);
+        if (sourcePassThrough.original_source_file_id == null) sourcePassThrough.original_source_file_id = sourcePassThrough.source_file_id;
 
         if(setBasicPassThrough) {
             desc.basic_passthrough = passThrough;
         }
         desc.source = sourcePassThrough;
         desc.file_seq = java.lang.Integer.valueOf(keyValues.get("file_seq"));
+        desc.source_movie_id = getPassThroughVideo("SOURCE_MOVIE_ID", keyValues);
+    }
+
+    private PassthroughVideo getPassThroughVideo(String key, HashMap<String, String> keyValues) {
+        PassthroughString passThroughString = getPassThroughString(key, keyValues);
+        if (passThroughString == null) return null;
+
+        String videoStr = new String(passThroughString.value);
+        return new PassthroughVideo(java.lang.Integer.parseInt(videoStr));
     }
 
     private PassthroughString getPassThroughString(String key, HashMap<String, String> keyValues) {
