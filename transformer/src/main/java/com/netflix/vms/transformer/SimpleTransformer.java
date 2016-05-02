@@ -1,5 +1,11 @@
 package com.netflix.vms.transformer;
 
+import java.lang.Integer;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
@@ -7,21 +13,7 @@ import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
-import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
-import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
-import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
-import com.netflix.vms.transformer.hollowoutput.GlobalVideo;
-import com.netflix.vms.transformer.hollowoutput.ISOCountry;
-import com.netflix.vms.transformer.hollowoutput.L10NResources;
-import com.netflix.vms.transformer.hollowoutput.LanguageRights;
-import com.netflix.vms.transformer.hollowoutput.NamedCollectionHolder;
-import com.netflix.vms.transformer.hollowoutput.PackageData;
-import com.netflix.vms.transformer.hollowoutput.Video;
-import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
-import com.netflix.vms.transformer.hollowoutput.VideoMediaData;
-import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
-import com.netflix.vms.transformer.hollowoutput.VideoMiscData;
-import com.netflix.vms.transformer.hollowoutput.VideoSetType;
+import com.netflix.vms.transformer.hollowoutput.*;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.misc.TopNVideoDataModule;
 import com.netflix.vms.transformer.misc.VideoEpisodeCountryDecoratorModule;
@@ -48,11 +40,6 @@ import com.netflix.vms.transformer.modules.passthrough.mpl.EncodingProfileGroupM
 import com.netflix.vms.transformer.modules.person.GlobalPersonModule;
 import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class SimpleTransformer {
 
     private final ThreadLocal<VideoCollectionsModule> collectionsModuleRef = new ThreadLocal<VideoCollectionsModule>();
@@ -68,7 +55,7 @@ public class SimpleTransformer {
     private VMSTransformerIndexer indexer;
 
     SimpleTransformer(VMSHollowInputAPI inputAPI, VMSTransformerWriteStateEngine outputStateEngine) {
-        this(inputAPI, outputStateEngine, new TransformerContext());
+        this(inputAPI, outputStateEngine, new SimpleTransformerContext());
         ctx.setNowMillis(1461970901632L);
     }
 
