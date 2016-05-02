@@ -12,6 +12,8 @@ public interface PackageStreamDelegate extends HollowObjectDelegate {
 
     public Long getStreamProfileIdBoxed(int ordinal);
 
+    public int getModificationsOrdinal(int ordinal);
+
     public int getFileIdentificationOrdinal(int ordinal);
 
     public int getDimensionsOrdinal(int ordinal);

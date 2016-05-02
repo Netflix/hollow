@@ -10,6 +10,7 @@ public class PackageStreamDelegateCachedImpl extends HollowObjectAbstractDelegat
 
     private final Long downloadableId;
     private final Long streamProfileId;
+    private final int modificationsOrdinal;
     private final int fileIdentificationOrdinal;
     private final int dimensionsOrdinal;
     private final int tagsOrdinal;
@@ -22,6 +23,7 @@ public class PackageStreamDelegateCachedImpl extends HollowObjectAbstractDelegat
     public PackageStreamDelegateCachedImpl(PackageStreamTypeAPI typeAPI, int ordinal) {
         this.downloadableId = typeAPI.getDownloadableIdBoxed(ordinal);
         this.streamProfileId = typeAPI.getStreamProfileIdBoxed(ordinal);
+        this.modificationsOrdinal = typeAPI.getModificationsOrdinal(ordinal);
         this.fileIdentificationOrdinal = typeAPI.getFileIdentificationOrdinal(ordinal);
         this.dimensionsOrdinal = typeAPI.getDimensionsOrdinal(ordinal);
         this.tagsOrdinal = typeAPI.getTagsOrdinal(ordinal);
@@ -46,6 +48,10 @@ public class PackageStreamDelegateCachedImpl extends HollowObjectAbstractDelegat
 
     public Long getStreamProfileIdBoxed(int ordinal) {
         return streamProfileId;
+    }
+
+    public int getModificationsOrdinal(int ordinal) {
+        return modificationsOrdinal;
     }
 
     public int getFileIdentificationOrdinal(int ordinal) {
