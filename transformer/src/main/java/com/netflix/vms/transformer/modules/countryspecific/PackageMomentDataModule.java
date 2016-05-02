@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import com.netflix.vms.transformer.hollowinput.StringHollow;
+import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.hollowinput.CdnDeploymentHollow;
 import com.netflix.vms.transformer.hollowinput.DownloadableIdHollow;
@@ -27,7 +29,6 @@ import com.netflix.vms.transformer.hollowoutput.VideoResolution;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.VideoFormatDescriptorIdentifier;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -137,15 +138,18 @@ public class PackageMomentDataModule {
 
                 VideoMoment moment = packageMomentData.downloadableIdsToVideoMoments.get(stream._getDownloadableId());
                 if(moment != null) {
-                    //VideoMoment moment = videoMomentList.get(0);
-                    //for(VideoMoment moment : videoMomentList) {
+                    ListOfStringHollow modifications = stream._getModifications();
+                    if(modifications != null && !modifications.isEmpty()) {
+                        moment = moment.clone();
+                        moment.videoMomentTypeName = buildModifiedInterestingMomentTag(modifications);
+                    }
+
                     List<ImageDownloadable> list = packageMomentData.videoMomentToDownloadableListMap.get(moment);
                     if(list == null) {
                         list = new ArrayList<ImageDownloadable>();
                         packageMomentData.videoMomentToDownloadableListMap.put(moment, list);
                     }
                     list.add(downloadable);
-                    //}
                 }
             } else if("TRICKPLAY".equals(streamProfileType)) {
                 TrickPlayItem trickplay = new TrickPlayItem();
@@ -170,6 +174,26 @@ public class PackageMomentDataModule {
                 packageMomentData.trickPlayItemMap.put(trickPlayTypeMap.get((int) streamProfileId), trickplay);
             }
         }
+    }
+
+    private final Map<Integer, Strings> modifiedInterestingMomentTagByModificationsOrdinal = new HashMap<>();
+
+    private Strings buildModifiedInterestingMomentTag(ListOfStringHollow modifications) {
+        Integer modificationsOrdinal = Integer.valueOf(modifications.getOrdinal());
+        Strings tag = modifiedInterestingMomentTagByModificationsOrdinal.get(modificationsOrdinal);
+        if(tag != null)
+            return tag;
+
+        StringBuilder builder = new StringBuilder("INTERESTINGMOMENT");
+
+        for(StringHollow modification : modifications) {
+            builder.append('_');
+            builder.append(modification._getValue().toUpperCase());
+        }
+
+        tag = new Strings(builder.toString());
+        modifiedInterestingMomentTagByModificationsOrdinal.put(modificationsOrdinal, tag);
+        return tag;
     }
 
     private void convertCdnDeploymentsAndAddToList(PackageStreamHollow stream, List<Strings> originServerNames) {
