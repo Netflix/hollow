@@ -1,15 +1,14 @@
 package com.netflix.vms.transformer.modules.person;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
-import com.netflix.vms.transformer.hollowinput.VideoIdHollow;
-import com.netflix.vms.transformer.hollowinput.VideoPersonAliasHollow;
-import com.netflix.vms.transformer.hollowinput.VideoPersonAliasListHollow;
-import com.netflix.vms.transformer.hollowinput.VideoPersonCastHollow;
-import com.netflix.vms.transformer.hollowinput.VideoPersonCastListHollow;
-import com.netflix.vms.transformer.hollowinput.VideoPersonHollow;
+import com.netflix.vms.transformer.hollowinput.*;
 import com.netflix.vms.transformer.hollowoutput.BirthDate;
 import com.netflix.vms.transformer.hollowoutput.GlobalPerson;
 import com.netflix.vms.transformer.hollowoutput.Integer;
@@ -21,11 +20,6 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 
 public class GlobalPersonModule extends AbstractTransformModule {
 
