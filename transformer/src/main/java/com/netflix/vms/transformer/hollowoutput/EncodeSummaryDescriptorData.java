@@ -10,7 +10,6 @@ public class EncodeSummaryDescriptorData implements Cloneable {
     public boolean isNative = false;
     public int encodingProfileId = java.lang.Integer.MIN_VALUE;
     public boolean isSubtitleBurnedIn = false;
-    public boolean isImageBasedSubtitles = false;
     public AssetMetaData assetMetaData = null;
 
     public boolean equals(Object other) {
@@ -34,7 +33,6 @@ public class EncodeSummaryDescriptorData implements Cloneable {
         if(o.isNative != isNative) return false;
         if(o.encodingProfileId != encodingProfileId) return false;
         if(o.isSubtitleBurnedIn != isSubtitleBurnedIn) return false;
-        if(o.isImageBasedSubtitles != isImageBasedSubtitles) return false;
         if(o.assetMetaData == null) {
             if(assetMetaData != null) return false;
         } else if(!o.assetMetaData.equals(assetMetaData)) return false;
@@ -50,7 +48,6 @@ public class EncodeSummaryDescriptorData implements Cloneable {
         hashCode = hashCode * 31 + (isNative? 1231 : 1237);
         hashCode = hashCode * 31 + encodingProfileId;
         hashCode = hashCode * 31 + (isSubtitleBurnedIn? 1231 : 1237);
-        hashCode = hashCode * 31 + (isImageBasedSubtitles? 1231 : 1237);
         hashCode = hashCode * 31 + (assetMetaData == null ? 1237 : assetMetaData.hashCode());
         return hashCode;
     }
@@ -64,7 +61,6 @@ public class EncodeSummaryDescriptorData implements Cloneable {
         builder.append(",isNative=").append(isNative);
         builder.append(",encodingProfileId=").append(encodingProfileId);
         builder.append(",isSubtitleBurnedIn=").append(isSubtitleBurnedIn);
-        builder.append(",isImageBasedSubtitles=").append(isImageBasedSubtitles);
         builder.append(",assetMetaData=").append(assetMetaData);
         builder.append("}");
         return builder.toString();
