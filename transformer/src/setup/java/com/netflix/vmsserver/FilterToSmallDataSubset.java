@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import net.jpountz.lz4.LZ4BlockInputStream;
 import org.junit.Test;
 
 /// NOTE:  This has a dependency on videometadata-common (for LZ4VMSInputStream)
@@ -41,13 +42,15 @@ import org.junit.Test;
 
 @SuppressWarnings("deprecation")
 public class FilterToSmallDataSubset {
+    
+    private static final String WORKING_DIR = "/space/transformer-data";
 
     private static final int TARGET_NUMBER_OF_TOPNODES = 1000;
-    private static final String ORIGINAL_OUTPUT_BLOB_LOCATION = "/space/transformer-data/pinned-blobs/berlin-snapshot";
-    private static final String ORIGINAL_INPUT_BLOB_LOCATION = "/space/transformer-data/pinned-blobs/vmsinput-snapshot";
+    private static final String ORIGINAL_OUTPUT_BLOB_LOCATION = WORKING_DIR + "/pinned-blobs/berlin-snapshot";
+    private static final String ORIGINAL_INPUT_BLOB_LOCATION = WORKING_DIR + "/pinned-blobs/input-snapshot";
 
-    private static final String FILTERED_OUTPUT_BLOB_LOCATION = "/space/transformer-data/pinned-subsets/control-output";
-    private static final String FILTERED_INPUT_BLOB_LOCATION = "/space/transformer-data/pinned-subsets/filtered-input";
+    private static final String FILTERED_OUTPUT_BLOB_LOCATION = WORKING_DIR + "/pinned-subsets/control-output";
+    private static final String FILTERED_INPUT_BLOB_LOCATION = WORKING_DIR + "/pinned-subsets/filtered-input";
 
     private HollowReadStateEngine stateEngine;
     private HollowPrimaryKeyIndex globalVideoIdx;
@@ -163,7 +166,7 @@ public class FilterToSmallDataSubset {
         ordinalsToInclude.clear();
         stateEngine = new HollowReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(stateEngine);
-        reader.readSnapshot(new BufferedInputStream(new FileInputStream(ORIGINAL_INPUT_BLOB_LOCATION)));
+        reader.readSnapshot(new LZ4BlockInputStream(new FileInputStream(ORIGINAL_INPUT_BLOB_LOCATION)));
 
         final VMSHollowInputAPI inputAPI = new VMSHollowInputAPI(stateEngine);
 
