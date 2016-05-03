@@ -55,13 +55,8 @@ public class SimpleTransformer {
     private VMSTransformerIndexer indexer;
 
     SimpleTransformer(VMSHollowInputAPI inputAPI, VMSTransformerWriteStateEngine outputStateEngine) {
-<<<<<<< HEAD
-        this(inputAPI, outputStateEngine, new TransformerContext());
-        ctx.setNowMillis(1462034581112L);
-=======
         this(inputAPI, outputStateEngine, new SimpleTransformerContext());
-        ctx.setNowMillis(1461970901632L);
->>>>>>> 30c282f4cb7ab7afb202b465cfd43c8281051bde
+        ctx.setNowMillis(1462034581112L);
     }
 
     public SimpleTransformer(VMSHollowInputAPI inputAPI, VMSTransformerWriteStateEngine outputStateEngine, TransformerContext ctx) {
