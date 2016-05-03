@@ -21,7 +21,6 @@ import com.netflix.vms.transformer.hollowoutput.VideoResolution;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -109,7 +108,7 @@ public class WindowPackageContractInfoModule {
                     int parWidth = Math.max(pixelAspect.width, 1);
 
                     float screenFormat = ((float) (videoResolution.width * parWidth)) / (videoResolution.height * parHeight);
-                    screenFormats.add(String.format("%.2f:1", screenFormat));
+                    screenFormats.add(getScreenFormat(screenFormat));
                 }
 
             } else if("AUDIO".equals(streamProfileType)) {
@@ -117,7 +116,6 @@ public class WindowPackageContractInfoModule {
                     soundTypesAudioChannels.add(Integer.valueOf((int)profile._getAudioChannelCount()));
             }
         }
-
 
         PackageMomentData packageMomentData = packageMomentDataModule.getWindowPackageMomentData(packageData, inputPackage);
 
@@ -140,6 +138,17 @@ public class WindowPackageContractInfoModule {
         info.videoPackageInfo.runtimeInSeconds = (int) longestRuntimeInSeconds;
 
         return info;
+    }
+
+    private Map<Float, String> screenFormatCache = new HashMap<Float, String>();
+
+    private String getScreenFormat(Float screenFormat) {
+        String formatStr = screenFormatCache.get(screenFormat);
+        if(formatStr == null) {
+            formatStr = String.format("%.2f:1", screenFormat);
+            screenFormatCache.put(screenFormat, formatStr);
+        }
+        return formatStr;
     }
 
     public WindowPackageContractInfo buildWindowPackageContractInfoWithoutPackage(VideoRightsContractHollow contract, String country) {

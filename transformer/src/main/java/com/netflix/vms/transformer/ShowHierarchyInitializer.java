@@ -159,8 +159,8 @@ public class ShowHierarchyInitializer {
         int ordinal = queryResult.iterator().next();
 
         VideoTypeDescriptorHollow countryType = api.getVideoTypeDescriptorHollow(ordinal);
-        /*if (countryType._getExtended())
-            return true;*/
+        if ("US".equals(countryCode) && countryType._getExtended())
+            return true;
 
         for(VideoTypeMediaHollow media : countryType._getMedia()) {
             if(media._getValue()._isValueEqual("Plastic"))
