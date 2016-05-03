@@ -1,7 +1,8 @@
 package com.netflix.vms.transformer;
 
-import java.io.FileInputStream;
+import net.jpountz.lz4.LZ4BlockInputStream;
 
+import java.io.FileInputStream;
 import java.io.BufferedInputStream;
 import com.netflix.hollow.filter.HollowFilterConfig;
 import com.netflix.hollow.read.engine.HollowBlobReader;
@@ -31,7 +32,7 @@ public class ShowMeAllTheProgress {
 
 
     private HollowReadStateEngine loadStateEngine() throws IOException {
-        InputStream is = new BufferedInputStream(new FileInputStream("/space/transformer-data/pinned-blobs/vms.input-snapshot-20160307205744289"));
+        InputStream is = new LZ4BlockInputStream(new FileInputStream("/space/transformer-data/pinned-blobs/input-snapshot"));
 
         HollowReadStateEngine stateEngine = new HollowReadStateEngine(WastefulRecycler.DEFAULT_INSTANCE);
 
