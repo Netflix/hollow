@@ -106,18 +106,7 @@ public class RolloutVideoModule extends AbstractTransformModule {
                         }
                         RolloutPhaseWindow phaseWindow = new RolloutPhaseWindow();
                         phaseWindow.phaseWindow = w;
-                        phaseWindow.phaseOrdinal = inputPhaseWindow.getOrdinal();
                         phaseWindowList.add(phaseWindow);
-                    }
-
-                    // Sort phaseWindows
-                    for (ISOCountry country : summary.phaseWindowMap.keySet()) {
-                        List<RolloutPhaseWindow> phaseWindowList = summary.phaseWindowMap.get(country);
-                        Collections.sort(phaseWindowList, new RolloutPhaseWindowComparator());
-                        int index = 0;
-                        for (RolloutPhaseWindow window : phaseWindowList) {
-                            window.phaseOrdinal = ++index;
-                        }
                     }
 
                     RolloutPhaseElementsHollow phaseElements = phaseHollow._getElements();
