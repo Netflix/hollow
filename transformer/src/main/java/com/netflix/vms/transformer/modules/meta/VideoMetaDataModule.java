@@ -7,7 +7,6 @@ import static com.netflix.vms.transformer.index.IndexSpec.STORIES_SYNOPSES;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_DATE;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_RIGHTS;
-import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 
 import com.netflix.hollow.index.HollowHashIndex;
@@ -59,14 +58,12 @@ public class VideoMetaDataModule {
     private final VideoSetType PAST = new VideoSetType("Past");
     private final VideoSetType PRESENT = new VideoSetType("Present");
     private final VideoSetType FUTURE = new VideoSetType("Future");
-    private final VideoSetType CANON = new VideoSetType("Canon");
     private final VideoSetType EXTENDED = new VideoSetType("Extended");
 
     private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
 
     private final HollowPrimaryKeyIndex videoGeneralIdx;
-    private final HollowPrimaryKeyIndex videoTypeIdx;
     private final HollowHashIndex videoTypeCountryIdx;
     private final HollowHashIndex videoDateIdx;
     private final HollowHashIndex videoPersonIdx;
@@ -83,7 +80,6 @@ public class VideoMetaDataModule {
         this.api = api;
         this.ctx = ctx;
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(VIDEO_GENERAL);
-        this.videoTypeIdx = indexer.getPrimaryKeyIndex(VIDEO_TYPE);
         this.videoPersonIdx = indexer.getHashIndex(PERSONS_BY_VIDEO_ID);
         this.videoPersonRoleIdx = indexer.getHashIndex(PERSON_ROLES_BY_VIDEO_ID);
         this.videoDateIdx = indexer.getHashIndex(VIDEO_DATE);
@@ -268,7 +264,6 @@ public class VideoMetaDataModule {
         boolean isInWindow = false;
         boolean isInFuture = false;
         boolean isExtended = false;
-        boolean isCanon = false;
 
         if(rights != null) {
             Set<VideoRightsWindowHollow> windows = rights._getRights()._getWindows();
@@ -284,7 +279,7 @@ public class VideoMetaDataModule {
         }
 
         if(typeDescriptor != null) {
-            isExtended = typeDescriptor._getExtended();
+            isExtended = "US".equals(countryCode) && typeDescriptor._getExtended();
         }
 
         Set<VideoSetType> setOfVideoSetType = new HashSet<VideoSetType>();

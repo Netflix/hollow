@@ -68,6 +68,9 @@ public class VideoMiscDataModule {
     }
 
     private void addVideoMiscData(int videoId, String countryCode) {
+        if(videoId == 60021797 && "DO".equals(countryCode))
+            System.out.println("asdf");
+
         VideoMiscData miscData = videoMiscMap.get(videoId);
         if(miscData == null) {
             miscData = createMiscData(videoId, countryCode);
