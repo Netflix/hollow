@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.modules.artwork;
 
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
-import com.netflix.vms.transformer.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowoutput.Artwork;
 
 import java.util.Comparator;

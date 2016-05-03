@@ -11,7 +11,6 @@ import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.write.HollowBlobWriter;
-import com.netflix.videometadata.lz4.LZ4VMSInputStream;
 import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
 import com.netflix.vms.generated.notemplate.GlobalVideoHollow;
 import com.netflix.vms.generated.notemplate.L10NResourcesHollow;
@@ -22,7 +21,8 @@ import com.netflix.vms.generated.notemplate.VideoEpisodeHollow;
 import com.netflix.vms.generated.notemplate.VideoHollow;
 import com.netflix.vms.generated.notemplate.VideoNodeTypeHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
-import java.io.BufferedInputStream;
+import com.netflix.vms.transformer.io.LZ4VMSInputStream;
+
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -34,15 +34,17 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import net.jpountz.lz4.LZ4BlockInputStream;
+
 import org.junit.Test;
+
+import net.jpountz.lz4.LZ4BlockInputStream;
 
 /// NOTE:  This has a dependency on videometadata-common (for LZ4VMSInputStream)
 /// NOTE:  This has a dependency on vms-hollow-generated-notemplate (for output blob API)
 
 @SuppressWarnings("deprecation")
 public class FilterToSmallDataSubset {
-    
+
     private static final String WORKING_DIR = "/space/transformer-data";
 
     private static final int TARGET_NUMBER_OF_TOPNODES = 1000;
@@ -351,7 +353,7 @@ public class FilterToSmallDataSubset {
             int randomOrdinal = rand.nextInt(maxGlobalVideoOrdinal + 1);
 
             if(ordinalIsPopulated("GlobalVideo", randomOrdinal)) {
-                GlobalVideoHollow vid = (GlobalVideoHollow)outputAPI.getGlobalVideoHollow(randomOrdinal);
+                GlobalVideoHollow vid = outputAPI.getGlobalVideoHollow(randomOrdinal);
 
                 addIdsBasedOnGlobalVideo(topNodeVideoIds, allVideoIds, vid);
             }

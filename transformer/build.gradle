@@ -2,10 +2,10 @@ apply plugin: 'java'
 
 dependencies {
     compile project(':vms-transformer-common-interfaces')
+    compile project(':vms-transformer-io')
     compile 'com.netflix.hollow:netflix-hollow:latest.release'
     compile 'com.google.guava:guava:14.0.1'
 
     testCompile 'junit:junit:4.11'
-    testCompile 'com.netflix.hollow:netflix-hollow-diff-ui:latest.release'
     testCompile 'org.assertj:assertj-core:3.3+'
 }

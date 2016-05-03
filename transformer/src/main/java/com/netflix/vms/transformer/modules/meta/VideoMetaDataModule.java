@@ -14,7 +14,7 @@ import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.vms.transformer.ShowHierarchy;
-import com.netflix.vms.transformer.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.ReleaseDateHollow;
 import com.netflix.vms.transformer.hollowinput.StoriesSynopsesHollow;
@@ -37,12 +37,15 @@ import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.NFLocale;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VPerson;
+import com.netflix.vms.transformer.hollowoutput.VRole;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.util.VideoDateUtil;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -243,7 +246,7 @@ public class VideoMetaDataModule {
         vmd = new VideoMetaData();
 
         populateGeneral(videoId, vmd);
-        populateCastLists(videoId, vmd);
+        populateRoleLists(videoId, vmd);
         populateHooks(videoId, vmd);
 
         int genOrdinal = videoGeneralIdx.getMatchingOrdinal((long) videoId);
@@ -362,11 +365,8 @@ public class VideoMetaDataModule {
         }
     }
 
-    private void populateCastLists(Integer videoId, VideoMetaData vmd) {
-        List<VPerson> actorList = new ArrayList<VPerson>();
-        List<VPerson> directorList = new ArrayList<VPerson>();
-        List<VPerson> creatorList = new ArrayList<VPerson>();
-
+    private void populateRoleLists(Integer videoId, VideoMetaData vmd) {
+        Map<VRole, List<VPerson>> roles = new HashMap<>();
         HollowHashIndexResult personMatches = videoPersonIdx.findMatches((long)videoId);
         if(personMatches != null) {
             HollowOrdinalIterator iter = personMatches.iterator();
@@ -384,13 +384,14 @@ public class VideoMetaDataModule {
                 while(roleOrdinal != NO_MORE_ORDINALS) {
                     VideoPersonCastHollow role = api.getVideoPersonCastHollow(roleOrdinal);
 
-                    if(role._getRoleTypeId() == ACTOR_ROLE_ID) {
-                        actorList.add(new VPerson((int)personId));
-                    } else if(role._getRoleTypeId() == DIRECTOR_ROLE_ID) {
-                        directorList.add(new VPerson((int)personId));
-                    } else if(role._getRoleTypeId() == CREATOR_ROLE_ID) {
-                        creatorList.add(new VPerson((int)personId));
+                    VRole vRole = new VRole((int) role._getRoleTypeId());
+                    List<VPerson> list = roles.get(vRole);
+                    if (list == null) {
+                        list = new ArrayList<>();
+                        roles.put(vRole, list);
                     }
+                    VPerson vPerson = new VPerson((int) personId);
+                    list.add(vPerson);
 
                     roleOrdinal = roleIter.next();
                 }
@@ -399,9 +400,18 @@ public class VideoMetaDataModule {
             }
         }
 
-        vmd.actorList = actorList;
-        vmd.directorList = directorList;
-        vmd.creatorList = creatorList;
+        vmd.roles = roles;
+        vmd.actorList = getRoles(ACTOR_ROLE_ID, roles);
+        vmd.directorList = getRoles(DIRECTOR_ROLE_ID, roles);
+        vmd.creatorList = getRoles(CREATOR_ROLE_ID, roles);
+    }
+
+    private List<VPerson> getRoles(int roleId, Map<VRole, List<VPerson>> roles) {
+        VRole vRole = new VRole(roleId);
+        List<VPerson> list = roles.get(vRole);
+        if (list != null) return list;
+
+        return Collections.emptyList();
     }
 
     private void populateHooks(Integer videoId, VideoMetaData vmd) {

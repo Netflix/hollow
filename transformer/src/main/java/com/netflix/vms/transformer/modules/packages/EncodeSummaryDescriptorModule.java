@@ -1,10 +1,8 @@
 package com.netflix.vms.transformer.modules.packages;
 
-import com.netflix.vms.transformer.hollowinput.StringHollow;
-
-import com.netflix.vms.transformer.hollowoutput.TimedTextTypeDescriptor;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
+import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowoutput.EncodeSummaryDescriptor;
@@ -12,8 +10,10 @@ import com.netflix.vms.transformer.hollowoutput.EncodeSummaryDescriptorData;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
 import com.netflix.vms.transformer.hollowoutput.StreamData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
+import com.netflix.vms.transformer.hollowoutput.TimedTextTypeDescriptor;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -71,7 +71,6 @@ public class EncodeSummaryDescriptorModule {
 
             data.isNative = language != null && language.equals(getNativeLanguage(packageData.video.value));
             data.isSubtitleBurnedIn = isSubtitleBurnedIn(profileType, data.textLanguage);
-            data.isImageBasedSubtitles = stream.additionalData.mostlyConstantData.imageSubtitleIndexByteRange != null;
 
             if(isAudio(profileType)) {
                 EncodeSummaryDescriptorData audioData = data;
@@ -210,6 +209,7 @@ public class EncodeSummaryDescriptorModule {
             return summaryType;
         }
 
+        @Override
         public boolean equals(Object obj) {
             if(obj instanceof EncodeSummaryDescriptorDataKey) {
                 EncodeSummaryDescriptorDataKey other = ((EncodeSummaryDescriptorDataKey) obj);
@@ -265,6 +265,7 @@ public class EncodeSummaryDescriptorModule {
             return false;
         }
 
+        @Override
         public int hashCode() {
             return hashCode;
         }

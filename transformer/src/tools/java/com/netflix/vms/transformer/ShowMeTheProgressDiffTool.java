@@ -52,8 +52,11 @@ public class ShowMeTheProgressDiffTool {
 
         server.start();
 
-        if(BROWSER_COMMAND != null)
-            Runtime.getRuntime().exec(BROWSER_COMMAND + " http://localhost:" + port + "/diff");
+        if (BROWSER_COMMAND != null) {
+            String command = BROWSER_COMMAND + " http://localhost:" + port + "/diff";
+            System.out.println("Executing command: " + command);
+            Runtime.getRuntime().exec(command);
+        }
 
         server.join();
     }

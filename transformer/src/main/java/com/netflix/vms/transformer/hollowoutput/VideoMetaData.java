@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class VideoMetaData implements Cloneable {
@@ -17,6 +18,7 @@ public class VideoMetaData implements Cloneable {
     public List<VPerson> actorList = null;
     public List<VPerson> directorList = null;
     public List<VPerson> creatorList = null;
+    public Map<VRole, List<VPerson>> roles = null;
     public int showMemberTypeId = java.lang.Integer.MIN_VALUE;
     public Strings showMemberSequenceLabel = null;
     public Strings copyright = null;
@@ -61,6 +63,9 @@ public class VideoMetaData implements Cloneable {
         if(o.creatorList == null) {
             if(creatorList != null) return false;
         } else if(!o.creatorList.equals(creatorList)) return false;
+        if(o.roles == null) {
+            if(roles != null) return false;
+        } else if(!o.roles.equals(roles)) return false;
         if(o.showMemberTypeId != showMemberTypeId) return false;
         if(o.showMemberSequenceLabel == null) {
             if(showMemberSequenceLabel != null) return false;
@@ -119,6 +124,7 @@ public class VideoMetaData implements Cloneable {
         hashCode = hashCode * 31 + (actorList == null ? 1237 : actorList.hashCode());
         hashCode = hashCode * 31 + (directorList == null ? 1237 : directorList.hashCode());
         hashCode = hashCode * 31 + (creatorList == null ? 1237 : creatorList.hashCode());
+        hashCode = hashCode * 31 + (roles == null ? 1237 : roles.hashCode());
         hashCode = hashCode * 31 + showMemberTypeId;
         hashCode = hashCode * 31 + (showMemberSequenceLabel == null ? 1237 : showMemberSequenceLabel.hashCode());
         hashCode = hashCode * 31 + (copyright == null ? 1237 : copyright.hashCode());
@@ -151,6 +157,7 @@ public class VideoMetaData implements Cloneable {
         builder.append(",actorList=").append(actorList);
         builder.append(",directorList=").append(directorList);
         builder.append(",creatorList=").append(creatorList);
+        builder.append(",roles=").append(roles);
         builder.append(",showMemberTypeId=").append(showMemberTypeId);
         builder.append(",showMemberSequenceLabel=").append(showMemberSequenceLabel);
         builder.append(",copyright=").append(copyright);
