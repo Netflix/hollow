@@ -2,8 +2,8 @@ package com.netflix.vms.transformer.modules.meta;
 
 
 
-import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.Date;
+import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import java.util.Set;
 
@@ -12,6 +12,8 @@ public class VideoMetaDataCountrySpecificDataKey {
     boolean isSearchOnly;
     boolean isTheatricalRelease;
     Date theatricalReleaseDate;
+    Date broadcastReleaseDate;
+    int broadcastYear;
     int year;
     int latestYear;
     Set<VideoSetType> videoSetTypes;
@@ -19,11 +21,12 @@ public class VideoMetaDataCountrySpecificDataKey {
     Strings copyright;
     boolean hasNewContent;
 
-
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + ((broadcastReleaseDate == null) ? 0 : broadcastReleaseDate.hashCode());
+        result = prime * result + broadcastYear;
         result = prime * result + ((copyright == null) ? 0 : copyright.hashCode());
         result = prime * result + (hasNewContent ? 1231 : 1237);
         result = prime * result + (isSearchOnly ? 1231 : 1237);
@@ -36,7 +39,6 @@ public class VideoMetaDataCountrySpecificDataKey {
         return result;
     }
 
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -46,6 +48,13 @@ public class VideoMetaDataCountrySpecificDataKey {
         if (getClass() != obj.getClass())
             return false;
         VideoMetaDataCountrySpecificDataKey other = (VideoMetaDataCountrySpecificDataKey) obj;
+        if (broadcastReleaseDate == null) {
+            if (other.broadcastReleaseDate != null)
+                return false;
+        } else if (!broadcastReleaseDate.equals(other.broadcastReleaseDate))
+            return false;
+        if (broadcastYear != other.broadcastYear)
+            return false;
         if (copyright == null) {
             if (other.copyright != null)
                 return false;
@@ -75,6 +84,5 @@ public class VideoMetaDataCountrySpecificDataKey {
             return false;
         return true;
     }
-
 
 }

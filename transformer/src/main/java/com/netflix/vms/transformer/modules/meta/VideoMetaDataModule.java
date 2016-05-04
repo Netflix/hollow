@@ -160,11 +160,12 @@ public class VideoMetaDataModule {
         /// clone the country agnostic data
         countrySpecificClone = countryAgnosticVMD.clone();
 
-
         /// set the country specific data
         countrySpecificClone.isSearchOnly = countrySpecificKey.isSearchOnly;
         countrySpecificClone.isTheatricalRelease = countrySpecificKey.isTheatricalRelease;
         countrySpecificClone.theatricalReleaseDate = countrySpecificKey.theatricalReleaseDate;
+        countrySpecificClone.broadcastReleaseDate = countrySpecificKey.broadcastReleaseDate;
+        countrySpecificClone.broadcastReleaseYear = countrySpecificKey.broadcastYear;
         countrySpecificClone.year = countrySpecificKey.year;
         countrySpecificClone.latestYear = countrySpecificKey.latestYear;
         countrySpecificClone.videoSetTypes = countrySpecificKey.videoSetTypes;
@@ -245,7 +246,6 @@ public class VideoMetaDataModule {
             return vmd;
 
         vmd = new VideoMetaData();
-
         populateGeneral(videoId, vmd);
         populateCastLists(videoId, vmd);
         populateHooks(videoId, vmd);
@@ -357,10 +357,14 @@ public class VideoMetaDataModule {
             int ordinal = dateResult.iterator().next();
             VideoDateWindowHollow dateWindow = api.getVideoDateWindowHollow(ordinal);
             ReleaseDateHollow theatricalReleaseDate = VideoDateUtil.getReleaseDateType("Theatrical", dateWindow);
+            ReleaseDateHollow broadcastReleaseDate = VideoDateUtil.getReleaseDateType("Broadcast", dateWindow);
+
             vmd.isTheatricalRelease = theatricalReleaseDate != null;
             vmd.year = theatricalReleaseDate == null ? 0 : theatricalReleaseDate._getYear();
             vmd.latestYear = vmd.year;
             vmd.theatricalReleaseDate = VideoDateUtil.convertToHollowOutputDate(theatricalReleaseDate);
+            vmd.broadcastYear = broadcastReleaseDate == null ? 0 : broadcastReleaseDate._getYear();
+            vmd.broadcastReleaseDate = VideoDateUtil.convertToHollowOutputDate(broadcastReleaseDate);
         } else {
             vmd.year = 0;
             vmd.latestYear = 0;
