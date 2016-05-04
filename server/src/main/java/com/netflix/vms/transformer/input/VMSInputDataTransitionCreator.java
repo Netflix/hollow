@@ -2,6 +2,7 @@ package com.netflix.vms.transformer.input;
 
 import com.netflix.aws.file.FileAccessItem;
 import com.netflix.aws.file.FileStore;
+import com.netflix.config.FastProperty;
 import com.netflix.hollow.client.HollowTransitionCreator;
 import com.netflix.hollow.client.HollowUpdateTransition;
 import com.netflix.logging.ILog;
@@ -12,9 +13,7 @@ import java.util.List;
 
 public class VMSInputDataTransitionCreator implements HollowTransitionCreator {
 
-    private static final String SNAPSHOT_KEYBASE = "vms.hollowinput.blob.snapshot";
-    private static final String DELTA_KEYBASE = "vms.hollowinput.blob.delta";
-
+    private static final FastProperty.StringProperty CONVERTER_VIP_PROPERTY = new FastProperty.StringProperty("vms.converter.vip", "input");
 
     private static final ILog LOGGER = LogManager.getLogger(VMSInputDataTransitionCreator.class);
 
@@ -26,14 +25,15 @@ public class VMSInputDataTransitionCreator implements HollowTransitionCreator {
 
     @Override
     public HollowUpdateTransition createSnapshotTransition(long desiredVersion) {
-        final TransitionResult result = new TransitionResult();
+        TransitionResult result = new TransitionResult();
+        String snapshotKeybase = getSnapshotKeybase();
 
         int retryCount = 0;
         while(retryCount < 3) {
             retryCount++;
 
             try {
-                FileAccessItem latestItem = fileStore.getPublishedFileAccessItem(SNAPSHOT_KEYBASE);
+                FileAccessItem latestItem = fileStore.getPublishedFileAccessItem(snapshotKeybase);
                 if(latestItem != null) {
                     long version = FileStoreUtil.getToVersion(latestItem);
 
@@ -53,7 +53,7 @@ public class VMSInputDataTransitionCreator implements HollowTransitionCreator {
         while(retryCount < 3) {
             retryCount++;
             try {
-                List<FileAccessItem> allFileAccessItems = fileStore.getAllFileAccessItems(SNAPSHOT_KEYBASE);
+                List<FileAccessItem> allFileAccessItems = fileStore.getAllFileAccessItems(snapshotKeybase);
 
                 Collections.sort(allFileAccessItems, new Comparator<FileAccessItem>() {
                     public int compare(FileAccessItem o1, FileAccessItem o2) {
@@ -91,7 +91,7 @@ public class VMSInputDataTransitionCreator implements HollowTransitionCreator {
         while(retryCount < 3) {
             retryCount++;
             try {
-                FileAccessItem fileAccessItem = fileStore.getPublishedFileAccessItem(DELTA_KEYBASE, String.valueOf(currentVersion));
+                FileAccessItem fileAccessItem = fileStore.getPublishedFileAccessItem(getDeltaKeybase(), String.valueOf(currentVersion));
                 if(fileAccessItem == null)
                     return null;
 
@@ -117,4 +117,13 @@ public class VMSInputDataTransitionCreator implements HollowTransitionCreator {
     private class TransitionResult {
         HollowUpdateTransition transition = null;
     }
+
+    private String getSnapshotKeybase() {
+        return "vms.hollowinput.blob." + CONVERTER_VIP_PROPERTY.get() + ".snapshot";
+    }
+
+    private String getDeltaKeybase() {
+        return "vms.hollowinput.blob." + CONVERTER_VIP_PROPERTY.get() + ".delta";
+    }
+
 }

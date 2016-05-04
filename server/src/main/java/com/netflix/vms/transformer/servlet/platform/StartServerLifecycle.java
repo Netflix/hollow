@@ -1,15 +1,21 @@
 package com.netflix.vms.transformer.servlet.platform;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.google.inject.servlet.ServletModule;
+import com.netflix.aws.file.FileStore;
+import com.netflix.cassandra.NFAstyanaxManager;
 import com.netflix.governator.annotations.AutoBindSingleton;
+import com.netflix.hermes.publisher.FastPropertyPublisher;
+import com.netflix.hermes.subscriber.SubscriptionManager;
 import com.netflix.karyon.spi.HealthCheckHandler;
 import com.netflix.server.base.NFFilter;
 import com.netflix.server.base.lifecycle.BaseServerLifecycleListener;
+import com.netflix.vms.transformer.TransformCycle;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
+import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.ServletContextEvent;
+import netflix.admin.videometadata.VMSPublishWorkflowHistoryAdmin;
 
 
 @AutoBindSingleton
@@ -18,6 +24,35 @@ public class StartServerLifecycle extends BaseServerLifecycleListener {
     public StartServerLifecycle() {
         super("vmstransformer", "vmstransformer", "1.0");
     }
+
+    @Override
+    protected void initialize(ServletContextEvent event) throws Exception {
+        FileStore.useMultipartUploadWhenApplicable(true);
+
+        TransformerServerPlatformLibraries libs = new TransformerServerPlatformLibraries(
+                                                            getInjector().getInstance(FileStore.class),
+                                                            getInjector().getInstance(NFAstyanaxManager.class),
+                                                            getInjector().getInstance(SubscriptionManager.class),
+                                                            getInjector().getInstance(FastPropertyPublisher.class));
+
+        TransformCycle cycle = new TransformCycle(
+                                            libs,
+                                            (history) -> { VMSPublishWorkflowHistoryAdmin.history = history; },
+                                            System.getProperty("vms.transformer.vip"));
+
+        Thread t = new Thread(new Runnable() {
+            public void run() {
+                while(true) {
+                    cycle.cycle();
+                }
+            }
+        });
+
+        t.setDaemon(true);
+        t.setName("vms-transformer-cycler");
+        t.start();
+    }
+
 
     @Override
     protected ServletModule getServletModule() {

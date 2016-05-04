@@ -25,8 +25,7 @@ GCLOG=/apps/tomcat/logs/gc.log
 let GB=`free -m | grep '^Mem:' | awk '{print $2}'`/1000
   if [ $GB -ge 240 ] ; then HEAP_GB=235 YOUNG_GB=10
 elif [ $GB -ge 120 ] ; then HEAP_GB=115 YOUNG_GB=5
-elif [ $GB -ge 60 ] ; then HEAP_GB=58 YOUNG_GB=6
-elif [ $GB -ge 38 ] ; then HEAP_GB=54 YOUNG_GB=6
+elif [ $GB -ge 60 ] ; then HEAP_GB=56 YOUNG_GB=4
 elif [ $GB -ge 35 ] ; then HEAP_GB=30 YOUNG_GB=6
 elif [ $GB -ge 28 ] ; then HEAP_GB=26 YOUNG_GB=6
 else
@@ -36,19 +35,14 @@ fi
 
 echo GB=$GB HEAP_GB=$HEAP_GB YOUNG_GB=$YOUNG_GB
 
-## NETFLIX_AUTO_SCALE_GROUP=videometadata-slewfoot-27-USA-A
+## NETFLIX_AUTO_SCALE_GROUP=vmstransformer-boson-berlin
 if [ ! -z "$NETFLIX_AUTO_SCALE_GROUP" ]; then
     save_ifs=$IFS
     IFS=- asg_parts=($NETFLIX_AUTO_SCALE_GROUP)
     export NETFLIX_VMS_APP=${asg_parts[0]}
-    export NETFLIX_VMS_STACK=${asg_parts[1]}
-    export NETFLIX_VMS_VERSION=${asg_parts[2]}
-    export NETFLIX_VMS_COUNTRY=${asg_parts[3]}
-    export NETFLIX_VMS_REDBLACK=${asg_parts[4]}
+    export NETFLIX_VMS_TRANSFORMERVIP=${asg_parts[1]}
+    export NETFLIX_VMS_CONVERTERVIP=${asg_parts[2]}
     IFS=$save_ifs
-    VMS_ASG_OVERRIDES=" \
-        -Dcom.netflix.videometadata.vipaddress=$NETFLIX_VMS_STACK \
-    "
     # what if NETFLIX_VMS_APP != NETFLIX_APP
     # or NETFLIX_VMS_STACK != NETFLIX_STACK
     # -Dcom.netflix.videometadata.country=$NETFLIX_VMS_COUNTRY
@@ -68,6 +62,8 @@ if [ "$1" == "start" ]; then
     export JAVA_OPTS=" \
         ${YOURKIT_PROFILER_SERVER_DEBUG_OPTS} \
         -Dnetflix.environment=$NETFLIX_ENVIRONMENT \
+	-Dvms.converter.vip=$NETFLIX_VMS_CONVERTERVIP \
+	-Dvms.transformer.vip=$NETFLIX_VMS_TRANSFORMERVIP \
         -Dcom.netflix.cloud.namespace=sharedSystem \
         -Dcom.sun.management.jmxremote.authenticate=false \
         -Dcom.sun.management.jmxremote.ssl=false \

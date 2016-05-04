@@ -1,12 +1,5 @@
 package com.netflix.vms.transformer;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-
-import org.apache.commons.io.IOUtils;
-
 import com.netflix.hollow.client.HollowClient;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -17,14 +10,26 @@ import com.netflix.vms.transformer.input.VMSInputDataTransitionCreator;
 import com.netflix.vms.transformer.io.LZ4VMSOutputStream;
 import com.netflix.vms.transformer.io.LZ4VMSTransformerFiles;
 import com.netflix.vms.transformer.logger.TransformerServerLogger;
+import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
+import com.netflix.vms.transformer.publish.workflow.HollowPublishWorkflowStager;
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowConfig;
 import com.netflix.vms.transformer.util.TransformerServerCassandraHelper;
+import com.netflix.vms.transformer.util.VersionMinter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.function.Supplier;
 
 public class TransformCycle {
     private final String vip;
     private final HollowClient inputClient;
     private final VMSTransformerWriteStateEngine outputStateEngine;
     private final TransformerContext ctx;
-    private long cycleNumber = 0;
+    private final Supplier<Long> versionMinter;
+
+    private long previousCycleNumber = Long.MIN_VALUE;
+    private long currentCycleNumber = Long.MIN_VALUE;
 
     public TransformCycle(TransformerPlatformLibraries platformLibraries, PublicationHistoryConsumer historyConsumer, String vip) {
         this.vip = vip;
@@ -37,13 +42,17 @@ public class TransformCycle {
                 new LZ4VMSTransformerFiles(),
                 platformLibraries,
                 historyConsumer);
+        this.versionMinter = new VersionMinter();
     }
 
     public void cycle() {
+        currentCycleNumber = versionMinter.get();
+
         updateTheInput();
         if(transformTheData()) {
             writeTheBlobFiles();
             submitToPublishWorkflow();
+            previousCycleNumber = currentCycleNumber;
         }
     }
 
@@ -53,7 +62,7 @@ public class TransformCycle {
 
     private boolean transformTheData() {
         try {
-            ctx.setNowMillis(1457384787807L);
+            ctx.setNowMillis(System.currentTimeMillis());
             SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI)inputClient.getAPI(), outputStateEngine, ctx);
             transformer.transform();
         } catch(Throwable th) {
@@ -67,23 +76,22 @@ public class TransformCycle {
 
 
     private void writeTheBlobFiles() {
+        HollowBlobFileNamer fileNamer = new HollowBlobFileNamer(vip);
+
         try {
             HollowBlobWriter writer = new HollowBlobWriter(outputStateEngine);
-            //HollowBlobKeybaseBuilder keybaseBuilder = new HollowBlobKeybaseBuilder(vip);
 
-            OutputStream snapshotOutputStream = new LZ4VMSOutputStream(new FileOutputStream(new File(System.getProperty("java.io.tmpdir"), "vms." + vip + "-snapshot-" + cycleNumber)));
-            try {
+            try (OutputStream snapshotOutputStream = new LZ4VMSOutputStream(new FileOutputStream(new File(System.getProperty("java.io.tmpdir"), fileNamer.getSnapshotFileName(currentCycleNumber))))) {
                 writer.writeSnapshot(snapshotOutputStream);
-            } finally {
-                IOUtils.closeQuietly(snapshotOutputStream);
             }
 
-            if(cycleNumber > 0) {
-                OutputStream deltaOutputStream = new LZ4VMSOutputStream(new FileOutputStream(new File(System.getProperty("java.io.tmpdir"), "vms." + vip + "-delta-" + (cycleNumber-1) + "-" + cycleNumber)));
-                try {
+            if(previousCycleNumber != Long.MIN_VALUE) {
+                try (OutputStream deltaOutputStream = new LZ4VMSOutputStream(new FileOutputStream(new File(System.getProperty("java.io.tmpdir"), fileNamer.getDeltaFileName(previousCycleNumber, currentCycleNumber))))) {
                     writer.writeDelta(deltaOutputStream);
-                } finally {
-                    IOUtils.closeQuietly(deltaOutputStream);
+                }
+
+                try (OutputStream reverseDeltaOutputStream = new LZ4VMSOutputStream(new FileOutputStream(new File(System.getProperty("java.io.tmpdir"), fileNamer.getReverseDeltaFileName(currentCycleNumber, previousCycleNumber))))){
+                    writer.writeDelta(reverseDeltaOutputStream);
                 }
             }
         } catch(IOException e) {
@@ -93,7 +101,8 @@ public class TransformCycle {
 
 
     public void submitToPublishWorkflow() {
-
+        HollowPublishWorkflowStager stager = new HollowPublishWorkflowStager(ctx, new PublishWorkflowConfig(), vip);
+        stager.triggerPublish(previousCycleNumber, currentCycleNumber);
     }
 
 }

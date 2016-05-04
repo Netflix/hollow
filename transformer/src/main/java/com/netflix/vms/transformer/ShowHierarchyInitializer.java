@@ -5,7 +5,6 @@ import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.util.IntList;
-import com.netflix.videometadata.VideoNodeType;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
@@ -25,7 +24,6 @@ import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,7 +36,6 @@ public class ShowHierarchyInitializer {
     private final HollowHashIndex videoTypeCountryIndex;
     private final HollowPrimaryKeyIndex videoRightsIndex;
     private final HollowHashIndex rolloutVideoTypeIndex;
-    private final Set<Integer> supplementalIds;
     private final TransformerContext ctx;
 
     public ShowHierarchyInitializer(VMSHollowInputAPI api, VMSTransformerIndexer indexer, TransformerContext ctx) {
@@ -50,17 +47,6 @@ public class ShowHierarchyInitializer {
         this.videoRightsIndex = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_RIGHTS);
         this.rolloutVideoTypeIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
         this.ctx = ctx;
-
-        this.supplementalIds = findAllSupplementalVideoIds(api);
-    }
-
-    private Set<Integer> findAllSupplementalVideoIds(VMSHollowInputAPI api) {
-        Set<Integer> ids = new HashSet<Integer>();
-
-        for (IndividualSupplementalHollow supplemental : api.getAllIndividualSupplementalHollow())
-            ids.add((int)supplemental._getMovieId());
-
-        return ids;
     }
 
     public Map<String, ShowHierarchy> getShowHierarchiesByCountry(VideoGeneralHollow videoGeneral) {

@@ -25,3 +25,10 @@ ospackage {
 }
 
 war.dependsOn compileTestJava
+
+war {
+  from 'public_html'
+  into('WEB-INF/classes') {
+    from 'src'
+  }
+}

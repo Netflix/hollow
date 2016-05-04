@@ -26,7 +26,7 @@ public class PublishWorkflowConfig {
     }
 
     public boolean isPlaybackMonkeyEnabled() {
-        return true;
+        return false;
     }
 
     public Set<String> getSupportedCountrySet() {
@@ -50,7 +50,6 @@ public class PublishWorkflowConfig {
     }
 
     public float getPlaybackMonkeyNoiseTolerance() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
