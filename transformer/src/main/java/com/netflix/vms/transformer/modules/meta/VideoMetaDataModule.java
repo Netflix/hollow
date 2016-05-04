@@ -43,7 +43,6 @@ import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.util.VideoDateUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -354,8 +353,8 @@ public class VideoMetaDataModule {
         if(dateResult != null) {
             int ordinal = dateResult.iterator().next();
             VideoDateWindowHollow dateWindow = api.getVideoDateWindowHollow(ordinal);
-            ReleaseDateHollow theatricalReleaseDate = VideoDateUtil.getReleaseDateType("Theatrical", dateWindow);
-            ReleaseDateHollow broadcastReleaseDate = VideoDateUtil.getReleaseDateType("Broadcast", dateWindow);
+            ReleaseDateHollow theatricalReleaseDate = VideoDateUtil.getReleaseDateType(VideoDateUtil.ReleaseDateType.Theatrical, dateWindow);
+            ReleaseDateHollow broadcastReleaseDate = VideoDateUtil.getReleaseDateType(VideoDateUtil.ReleaseDateType.Broadcast, dateWindow);
 
             vmd.isTheatricalRelease = theatricalReleaseDate != null;
             vmd.year = theatricalReleaseDate == null ? 0 : theatricalReleaseDate._getYear();

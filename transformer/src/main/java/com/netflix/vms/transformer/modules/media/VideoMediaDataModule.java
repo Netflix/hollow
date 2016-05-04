@@ -138,7 +138,7 @@ public class VideoMediaDataModule {
         if (dateResult != null) {
             int ordinal = dateResult.iterator().next();
             VideoDateWindowHollow dateWindow = api.getVideoDateWindowHollow(ordinal);
-            ReleaseDateHollow date_ = VideoDateUtil.getReleaseDateType("DVDStreet", dateWindow);
+            ReleaseDateHollow date_ = VideoDateUtil.getReleaseDateType(VideoDateUtil.ReleaseDateType.DVDStreet, dateWindow);
             vmd.dvdReleaseDate = VideoDateUtil.convertToHollowOutputDate(date_);
         }
         return (vmd.dvdReleaseDate != null);

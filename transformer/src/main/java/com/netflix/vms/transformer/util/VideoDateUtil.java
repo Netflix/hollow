@@ -9,7 +9,14 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 public class VideoDateUtil {
-    
+    public static enum ReleaseDateType {
+        DVDStreet, Theatrical, Broadcast
+    }
+
+    public static ReleaseDateHollow getReleaseDateType(ReleaseDateType type, VideoDateWindowHollow videoDate_) {
+        return getReleaseDateType(type.name(), videoDate_);
+    }
+
     public static ReleaseDateHollow getReleaseDateType(String type, VideoDateWindowHollow videoDate_) {
         ListOfReleaseDatesHollow releaseDateList = videoDate_._getReleaseDates();
         if (releaseDateList == null) {
