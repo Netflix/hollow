@@ -1,5 +1,3 @@
-apply plugin: 'java'
-
 dependencies {
     // TODO: common interfaces shouldn't depend on these; it forces transitive dependencies
     //       on the union of dependencies required for two or more coordinating subprojects.

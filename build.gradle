@@ -1,15 +1,21 @@
 allprojects {
-    apply plugin: 'nebula'
-    apply plugin: 'netflix.ide'
+    apply plugin: 'netflix.nebula'
+}
 
-    nebula {
-      moduleEmail = 'vms-dev@netflix.com'
-      moduleOwner = 'VMS'
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'nebula.javadoc-jar'
+    apply plugin: 'nebula.dependency-lock'
+
+    group = "com.netflix.vms.transformer"
+
+    dependencyLock {
+        includeTransitives = true
     }
 
-    if(JavaVersion.current().isJava8Compatible()) {
-        project.tasks.withType(Javadoc) {
-            options.addStringOption('Xdoclint:none','-quiet')
-        }
+    configurations.all {
+        exclude group: 'com.oracle'
+        exclude group: 'org.apache.ant', module: 'ant'
+        exclude group: 'org.apache.cxf', module: 'cxf'
     }
 }
