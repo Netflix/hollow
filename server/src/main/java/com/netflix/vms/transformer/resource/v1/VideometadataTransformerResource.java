@@ -1,22 +1,10 @@
 package com.netflix.vms.transformer.resource.v1;
 
-import com.netflix.vms.transformer.config.VideometadataTransformerConfig;
-import com.netflix.vms.transformer.model.Greeting;
-import com.netflix.vms.transformer.model.VideometadataTransformerDao;
 import com.netflix.spectator.api.Counter;
-import com.netflix.spectator.api.Registry;
+import javax.inject.Singleton;
+import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 
 /**
  * This is our "Controller" portion of our Model-View-Controller pattern.
@@ -48,13 +36,13 @@ import javax.ws.rs.core.MediaType;
 public final class VideometadataTransformerResource {
     private static final Logger logger = LoggerFactory.getLogger(VideometadataTransformerResource.class);
 
-    private final Counter numTimesGreetingIsSetCounter;
+    //private final Counter numTimesGreetingIsSetCounter;
 
     /** Where we keep our greetings for each user. */
-    private final VideometadataTransformerDao videometadataTransformerDao;
+    //private final VideometadataTransformerDao videometadataTransformerDao;
 
     /** Where we keep our configurations that we can dynamically access via the property getters. */
-    private final VideometadataTransformerConfig config;
+    /*private final VideometadataTransformerConfig config;
 
     @Inject
     public VideometadataTransformerResource(
@@ -93,5 +81,5 @@ public final class VideometadataTransformerResource {
         videometadataTransformerDao.storeGreeting(greeting);
         numTimesGreetingIsSetCounter.increment();
         return "\"OK\"";
-    }
+    }*/
 }
