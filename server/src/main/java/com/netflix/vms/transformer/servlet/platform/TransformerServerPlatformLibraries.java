@@ -1,7 +1,8 @@
 package com.netflix.vms.transformer.servlet.platform;
 
-import com.netflix.hermes.publisher.FastPropertyPublisher;
+import com.google.inject.Inject;
 
+import com.netflix.hermes.publisher.FastPropertyPublisher;
 import com.netflix.hermes.subscriber.SubscriptionManager;
 import com.netflix.vms.transformer.common.TransformerPlatformLibraries;
 import com.netflix.aws.file.FileStore;
@@ -13,6 +14,7 @@ public class TransformerServerPlatformLibraries implements TransformerPlatformLi
     private final SubscriptionManager hermesSubscriber;
     private final FastPropertyPublisher hermesPublisher;
 
+    @Inject
     public TransformerServerPlatformLibraries(FileStore fileStore,
      NFAstyanaxManager astyanax,
      SubscriptionManager hermesSubscriber,

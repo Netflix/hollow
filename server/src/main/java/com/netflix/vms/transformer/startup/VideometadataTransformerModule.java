@@ -4,16 +4,12 @@ import com.google.inject.AbstractModule;
 // Common module dependencies
 import com.google.inject.Provides;
 import com.netflix.archaius.ConfigProxyFactory;
-import javax.inject.Singleton;
-
 // Server dependencies
 import com.netflix.runtime.health.guice.HealthModule;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
-
 import com.netflix.vms.transformer.config.VideometadataTransformerConfig;
 import com.netflix.vms.transformer.health.CustomHealthIndicator;
-import com.netflix.vms.transformer.model.VideometadataTransformerInMemoryDao;
-import com.netflix.vms.transformer.model.VideometadataTransformerDao;
+import javax.inject.Singleton;
 
 
 /**
@@ -35,7 +31,7 @@ public final class VideometadataTransformerModule extends AbstractModule {
         });
         install(new JerseyModule());
 
-        bind(VideometadataTransformerDao.class).to(VideometadataTransformerInMemoryDao.class);
+        bind(TransformerCycleKickoff.class).asEagerSingleton();
     }
 
     @Provides
