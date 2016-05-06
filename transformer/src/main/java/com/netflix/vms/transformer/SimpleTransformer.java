@@ -19,6 +19,7 @@ import com.netflix.vms.transformer.hollowoutput.PackageData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
+import com.netflix.vms.transformer.hollowoutput.VideoImages;
 import com.netflix.vms.transformer.hollowoutput.VideoMediaData;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.hollowoutput.VideoMiscData;
@@ -34,6 +35,7 @@ import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
 import com.netflix.vms.transformer.modules.countryspecific.CountrySpecificDataModule;
 import com.netflix.vms.transformer.modules.deploymentintent.CacheDeploymentIntentModule;
 import com.netflix.vms.transformer.modules.media.VideoMediaDataModule;
+import com.netflix.vms.transformer.modules.meta.VideoImagesDataModule;
 import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
 import com.netflix.vms.transformer.modules.meta.VideoMiscDataModule;
 import com.netflix.vms.transformer.modules.mpl.DrmSystemModule;
@@ -64,6 +66,7 @@ public class SimpleTransformer {
     private final ThreadLocal<PackageDataModule> packageDataModuleRef = new ThreadLocal<PackageDataModule>();
     private final ThreadLocal<VideoMediaDataModule> mediadataModuleRef = new ThreadLocal<VideoMediaDataModule>();
     private final ThreadLocal<VideoMiscDataModule> miscdataModuleRef = new ThreadLocal<VideoMiscDataModule>();
+    private final ThreadLocal<VideoImagesDataModule> imagesdataModuleRef = new ThreadLocal<VideoImagesDataModule>();
     private final ThreadLocal<CountrySpecificDataModule> countrySpecificModuleRef = new ThreadLocal<CountrySpecificDataModule>();
 
     private final VMSHollowInputAPI api;
@@ -73,7 +76,7 @@ public class SimpleTransformer {
 
     SimpleTransformer(VMSHollowInputAPI inputAPI, VMSTransformerWriteStateEngine outputStateEngine) {
         this(inputAPI, outputStateEngine, new SimpleTransformerContext());
-        //ctx.setNowMillis(1462034581112L);
+        ctx.setNowMillis(1462034581112L);
     }
 
     public SimpleTransformer(VMSHollowInputAPI inputAPI, VMSTransformerWriteStateEngine outputStateEngine, TransformerContext ctx) {
@@ -103,11 +106,12 @@ public class SimpleTransformer {
                 @Override
                 public void run() {
                     try {
+                        PackageDataModule packageDataModule = getPackageDataModule(objectMapper);
                         VideoCollectionsModule collectionsModule = getVideoCollectionsModule();
                         VideoMetaDataModule metadataModule = getVideoMetaDataModule();
-                        PackageDataModule packageDataModule = getPackageDataModule(objectMapper);
                         VideoMediaDataModule mediaDataModule = getVideoMediaDataModule();
-                        VideoMiscDataModule miscdataModule = getVideoMiscDataModule();
+                        VideoMiscDataModule miscDataModule = getVideoMiscDataModule();
+                        VideoImagesDataModule imagesDataModule = getVideoImagesDataModule(objectMapper);
                         CountrySpecificDataModule countrySpecificModule = getCountrySpecificDataModule();
                         VideoEpisodeCountryDecoratorModule countryDecoratorModule = new VideoEpisodeCountryDecoratorModule(api, objectMapper);
 
@@ -117,11 +121,12 @@ public class SimpleTransformer {
                             Map<String, VideoCollectionsDataHierarchy> vcdByCountry = collectionsModule.buildVideoCollectionsDataByCountry(showHierarchiesByCountry);
                             Map<String, Map<Integer, VideoMetaData>> vmdByCountry = metadataModule.buildVideoMetaDataByCountry(showHierarchiesByCountry);
                             Map<String, Map<Integer, VideoMediaData>> mediaDataByCountry = mediaDataModule.buildVideoMediaDataByCountry(showHierarchiesByCountry);
-                            Map<Integer, VideoMiscData> miscData = miscdataModule.buildVideoMiscDataByCountry(showHierarchiesByCountry);
+                            Map<String, Map<Integer, VideoImages>> imagesDataByCountry = imagesDataModule.buildVideoImagesByCountry(showHierarchiesByCountry);
+                            Map<Integer, VideoMiscData> miscData = miscDataModule.buildVideoMiscDataByCountry(showHierarchiesByCountry);
                             Map<String, Map<Integer, CompleteVideoCountrySpecificData>> countrySpecificByCountry = countrySpecificModule.buildCountrySpecificDataByCountry(showHierarchiesByCountry, transformedPackageData);
 
                             if(vcdByCountry != null) {
-                                writeJustTheCurrentData(vcdByCountry, vmdByCountry, miscData, mediaDataByCountry, countrySpecificByCountry, objectMapper);
+                                writeJustTheCurrentData(vcdByCountry, vmdByCountry, miscData, mediaDataByCountry, imagesDataByCountry, countrySpecificByCountry, objectMapper);
 
                                 for(String country : vcdByCountry.keySet()) {
                                     countryDecoratorModule.decorateVideoEpisodes(country, vcdByCountry.get(country));
@@ -234,6 +239,15 @@ public class SimpleTransformer {
         return module;
     }
 
+    private VideoImagesDataModule getVideoImagesDataModule(HollowObjectMapper objectMapper) {
+        VideoImagesDataModule module = imagesdataModuleRef.get();
+        if (module == null) {
+            module = new VideoImagesDataModule(api, ctx, objectMapper, indexer);
+            imagesdataModuleRef.set(module);
+        }
+        return module;
+    }
+
     private CountrySpecificDataModule getCountrySpecificDataModule() {
         CountrySpecificDataModule module = countrySpecificModuleRef.get();
         if(module == null) {
@@ -247,6 +261,7 @@ public class SimpleTransformer {
             Map<String, Map<Integer, VideoMetaData>> vmdByCountry,
             Map<Integer, VideoMiscData> miscData,
             Map<String, Map<Integer, VideoMediaData>> mediaDataByCountry,
+            Map<String, Map<Integer, VideoImages>> imagesDataByCountry,
             Map<String, Map<Integer, CompleteVideoCountrySpecificData>> countrySpecificByCountry,
             HollowObjectMapper objectMapper) {
 
@@ -260,7 +275,7 @@ public class SimpleTransformer {
             VideoCollectionsData videoCollectionsData = hierarchy.getTopNode();
 
             // Process TopNode
-            CompleteVideo topNode = addCompleteVideo(vmdByCountry, miscData, mediaDataByCountry, countrySpecificByCountry,
+            CompleteVideo topNode = addCompleteVideo(vmdByCountry, miscData, mediaDataByCountry, imagesDataByCountry, countrySpecificByCountry,
                     objectMapper, country, countryId, videoCollectionsData, hierarchy.getTopNode().topNode, globalVideoMap);
 
             // Process Show children
@@ -268,12 +283,12 @@ public class SimpleTransformer {
                 int sequenceNumber = 0;
                 // Process Seasons
                 for(Map.Entry<Integer, VideoCollectionsData> showEntry : hierarchy.getOrderedSeasons().entrySet()) {
-                    addCompleteVideo(vmdByCountry, miscData, mediaDataByCountry, countrySpecificByCountry,
+                    addCompleteVideo(vmdByCountry, miscData, mediaDataByCountry, imagesDataByCountry, countrySpecificByCountry,
                             objectMapper, country, countryId, showEntry.getValue(), new Video(showEntry.getKey().intValue()), globalVideoMap);
 
                     // Process Episodes
                     for(Map.Entry<Integer, VideoCollectionsData> episodeEntry : hierarchy.getOrderedSeasonEpisodes(++sequenceNumber).entrySet()) {
-                        addCompleteVideo(vmdByCountry, miscData, mediaDataByCountry, countrySpecificByCountry,
+                        addCompleteVideo(vmdByCountry, miscData, mediaDataByCountry, imagesDataByCountry, countrySpecificByCountry,
                                 objectMapper, country, countryId, episodeEntry.getValue(), new Video(episodeEntry.getKey().intValue()), globalVideoMap);
                     }
                 }
@@ -281,7 +296,7 @@ public class SimpleTransformer {
 
             // Process Supplemental
             for(Map.Entry<Integer, VideoCollectionsData> supplementalEntry : hierarchy.getSupplementalVideosCollectionsData().entrySet()) {
-                addCompleteVideo(vmdByCountry, miscData, mediaDataByCountry, countrySpecificByCountry,
+                addCompleteVideo(vmdByCountry, miscData, mediaDataByCountry, imagesDataByCountry, countrySpecificByCountry,
                         objectMapper, country, countryId, supplementalEntry.getValue(), new Video(supplementalEntry.getKey().intValue()), globalVideoMap);
             }
         }
@@ -330,6 +345,7 @@ public class SimpleTransformer {
             Map<String, Map<Integer, VideoMetaData>> vmdByCountry,
             Map<Integer, VideoMiscData> miscData,
             Map<String, Map<Integer, VideoMediaData>> mediaDataByCountry,
+            Map<String, Map<Integer, VideoImages>> imagesDataByCountry,
             Map<String, Map<Integer, CompleteVideoCountrySpecificData>> countrySpecificByCountry,
             HollowObjectMapper objectMapper, ISOCountry country, String countryId,
             VideoCollectionsData videoCollectionsData, Video video,
@@ -341,6 +357,8 @@ public class SimpleTransformer {
         completeVideo.facetData.videoCollectionsData = videoCollectionsData;
         completeVideo.facetData.videoMetaData = vmdByCountry.get(countryId).get(completeVideo.id.value);
         completeVideo.facetData.videoMediaData = mediaDataByCountry.get(countryId).get(completeVideo.id.value);
+        completeVideo.facetData.videoImages = getVideoImages(countryId, completeVideo.id.value, imagesDataByCountry);
+
         if(!isExtended(completeVideo))  /// "Extended" videos have VideoMiscData excluded.
             completeVideo.facetData.videoMiscData = miscData.get(completeVideo.id.value);
         completeVideo.countrySpecificData = countrySpecificByCountry.get(countryId).get(completeVideo.id.value);
@@ -349,6 +367,12 @@ public class SimpleTransformer {
         // keep track of created completeVideo for GlobalVideo creation
         addToGlobalVideoMap(completeVideo, country, globalVideoMap);
         return completeVideo;
+    }
+
+    private VideoImages getVideoImages(String countryId, Integer videoId, Map<String, Map<Integer, VideoImages>> imagesDataByCountry) {
+        Map<Integer, VideoImages> countryDataMap = imagesDataByCountry.get(countryId);
+        if (countryDataMap == null) return null;
+        return countryDataMap.get(videoId);
     }
 
     private synchronized void addToGlobalVideoMap(CompleteVideo completeVideo, ISOCountry country, Map<Video, Map<ISOCountry, CompleteVideo>> globalVideoMap) {

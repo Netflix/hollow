@@ -1,8 +1,9 @@
 package com.netflix.vms.transformer.modules.artwork;
 
+import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_IMAGE_FORMAT;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_RECIPE;
+import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_TERRITORY_COUNTRIES;
 
-import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ComparisonChain;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
@@ -38,7 +39,6 @@ import com.netflix.vms.transformer.hollowoutput.PassthroughString;
 import com.netflix.vms.transformer.hollowoutput.PassthroughVideo;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.__passthrough_string;
-import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
 
@@ -56,15 +56,17 @@ import java.util.Set;
 
 public abstract class ArtWorkModule extends AbstractTransformModule{
     protected final String entityType;
-    private final HollowPrimaryKeyIndex imageTypeIdx;
-    private final HollowPrimaryKeyIndex recipeIdx;
+    protected final HollowPrimaryKeyIndex imageTypeIdx;
+    protected final HollowPrimaryKeyIndex recipeIdx;
+    protected final HollowPrimaryKeyIndex territoryIdx;
     private final ArtWorkComparator artworkComparator;
 
     public ArtWorkModule(String entityType, VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
         super(api, ctx, mapper);
         this.entityType = entityType;
-        this.imageTypeIdx = indexer.getPrimaryKeyIndex(IndexSpec.ARTWORK_IMAGE_FORMAT);
+        this.imageTypeIdx = indexer.getPrimaryKeyIndex(ARTWORK_IMAGE_FORMAT);
         this.recipeIdx = indexer.getPrimaryKeyIndex(ARTWORK_RECIPE);
+        this.territoryIdx = indexer.getPrimaryKeyIndex(ARTWORK_TERRITORY_COUNTRIES);
         this.artworkComparator = new ArtWorkComparator(ctx);
     }
 
@@ -73,6 +75,15 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         // Process list of derivatives
         List<ArtworkDerivative> derivativeList = new ArrayList<ArtworkDerivative>();
         List<ArtworkCdn> cdnList = new ArrayList<ArtworkCdn>();
+        processDerivatives(entityId, derivatives, derivativeList, cdnList);
+
+        for (final ArtworkLocaleHollow localeHollow : localeSet) {
+            createArtworkForLocale(localeHollow, sourceFileId, ordinalPriority, seqNum, attributes, derivativeList, cdnList, artworkSet);
+        }
+    }
+
+    // Process Derivatives to create derivativeList and cdnList
+    protected void processDerivatives(int entityId, ArtworkDerivativeListHollow derivatives, List<ArtworkDerivative> derivativeList, List<ArtworkCdn> cdnList) {
         for (ArtworkDerivativeHollow derivativeHollow : sortInputDerivatives(derivatives)) {
             ArtWorkImageFormatEntry formatEntry = getImageFormatEntry(derivativeHollow);
             ArtWorkImageTypeEntry typeEntry = getImageTypeEntry(derivativeHollow);
@@ -94,22 +105,22 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             cdn.cdnDirectory = new Strings(derivativeHollow._getCdnDirectory()._getValue());
             cdnList.add(cdn);
         }
+    }
 
-        for (final ArtworkLocaleHollow localeHollow : localeSet) {
-            final NFLocale locale = new NFLocale(localeHollow._getBcp47Code()._getValue());
+    protected void createArtworkForLocale(ArtworkLocaleHollow localeHollow, String sourceFileId, int ordinalPriority, int seqNum, ArtworkAttributesHollow attributes, List<ArtworkDerivative> derivativeList, List<ArtworkCdn> cdnList, Set<Artwork> artworkSet) {
+        final NFLocale locale = new NFLocale(com.netflix.i18n.NFLocale.findInstance(localeHollow._getBcp47Code()._getValue()).getName());
 
-            Artwork artwork = new Artwork();
-            artwork.sourceFileId = new Strings(sourceFileId);
-            artwork.seqNum = seqNum;
-            artwork.ordinalPriority = ordinalPriority;
-            artwork.locale = locale;
-            artwork.effectiveDate = localeHollow._getEffectiveDate()._getValue();
-            artwork.derivatives = artworkDerivatives(derivativeList);
-            artwork.cdns = cdnList;
-            fillPassThroughData(artwork, attributes);
+        Artwork artwork = new Artwork();
+        artwork.sourceFileId = new Strings(sourceFileId);
+        artwork.seqNum = seqNum;
+        artwork.ordinalPriority = ordinalPriority;
+        artwork.locale = locale;
+        artwork.effectiveDate = localeHollow._getEffectiveDate()._getValue();
+        artwork.derivatives = artworkDerivatives(derivativeList);
+        artwork.cdns = cdnList;
+        fillPassThroughData(artwork, attributes);
 
-            artworkSet.add(artwork);
-        }
+        artworkSet.add(artwork);
     }
 
     private ArtworkDerivatives artworkDerivatives(List<ArtworkDerivative> derivatives) {
@@ -158,6 +169,23 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         }
 
         return artworks;
+    }
+
+    public Map<ArtWorkImageTypeEntry, Set<ArtWorkImageFormatEntry>> createFormatByTypeMap(Collection<Artwork> allArtwork) {
+        Map<ArtWorkImageTypeEntry, Set<ArtWorkImageFormatEntry>> map = new HashMap<>();
+
+        for (Artwork artwork : allArtwork) {
+            for (ArtworkDerivative derivative : artwork.derivatives.list) {
+                ArtWorkImageTypeEntry imageType = getImageTypeEntry(new String(derivative.type.nameStr));
+                Set<ArtWorkImageFormatEntry> list = map.get(imageType);
+                if (list == null) {
+                    list = new HashSet<ArtWorkImageFormatEntry>();
+                    map.put(imageType, list);
+                }
+                list.add(derivative.format);
+            }
+        }
+        return map;
     }
 
     private void fillPassThroughData(Artwork desc, ArtworkAttributesHollow attributes) {
@@ -276,19 +304,23 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
 
     protected final ArtWorkImageTypeEntry getImageTypeEntry(ArtworkDerivativeHollow derivative) {
         StringHollow imageTypeHollow = derivative._getImageType();
-        int ordinal = imageTypeIdx.getMatchingOrdinal(imageTypeHollow._getValue());
+        return getImageTypeEntry(imageTypeHollow._getValue());
+    }
+
+    protected final ArtWorkImageTypeEntry getImageTypeEntry(String typeName) {
+        int ordinal = imageTypeIdx.getMatchingOrdinal(typeName);
         ArtWorkImageTypeEntry entry = new ArtWorkImageTypeEntry();
         if(ordinal != -1) {
             ArtWorkImageTypeHollow artWorkImageTypeHollow = api.getArtWorkImageTypeHollow(ordinal);
             entry.recipeNameStr = artWorkImageTypeHollow._getRecipe()._getValue().toCharArray();
             entry.allowMultiples = true;
             entry.unavailableFileNameStr = "unavailable".toCharArray();
-            entry.nameStr = imageTypeHollow._getValue().toCharArray();
+            entry.nameStr = typeName.toCharArray();
         }else {
             entry.recipeNameStr = "jpg".toCharArray();
             entry.allowMultiples = true;
             entry.unavailableFileNameStr = "unavailable".toCharArray();
-            entry.nameStr = imageTypeHollow._getValue().toCharArray();
+            entry.nameStr = typeName.toCharArray();
         }
 
         return entry;
@@ -334,11 +366,11 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         return artworkLocales;
     }
 
-    protected Set<Artwork> getArtworkSet(Integer personId, Map<Integer, Set<Artwork>> descMap) {
-        Set<Artwork> artworkSet = descMap.get(personId);
+    protected Set<Artwork> getArtworkSet(int entityId, Map<java.lang.Integer, Set<Artwork>> artMap) {
+        Set<Artwork> artworkSet = artMap.get(entityId);
         if (artworkSet == null) {
             artworkSet = new HashSet<>();
-            descMap.put(personId, artworkSet);
+            artMap.put(entityId, artworkSet);
         }
         return artworkSet;
     }

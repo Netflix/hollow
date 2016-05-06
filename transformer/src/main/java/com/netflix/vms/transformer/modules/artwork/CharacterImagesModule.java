@@ -10,7 +10,6 @@ import com.netflix.vms.transformer.hollowinput.CharacterArtworkHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.Artwork;
 import com.netflix.vms.transformer.hollowoutput.CharacterImages;
-import com.netflix.vms.transformer.hollowoutput.Integer;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 
 import java.util.HashMap;
@@ -40,7 +39,7 @@ public class CharacterImagesModule extends ArtWorkModule{
             int seqNum = (int) artworkHollowInput._getSeqNum();
             ArtworkAttributesHollow attributes = artworkHollowInput._getAttributes();
             ArtworkDerivativeListHollow derivatives = artworkHollowInput._getDerivatives();
-            Set<Artwork> artworkSet = getArtworkSet(new Integer(entityId), descMap);
+            Set<Artwork> artworkSet = getArtworkSet(entityId, descMap);
 
             transformArtworks(entityId, sourceFileId, ordinalPriority, seqNum, attributes, derivatives, localeSet, artworkSet);
         }
@@ -48,7 +47,7 @@ public class CharacterImagesModule extends ArtWorkModule{
         for (Map.Entry<Integer, Set<Artwork>> entry : descMap.entrySet()) {
             Integer id = entry.getKey();
             CharacterImages images = new CharacterImages();
-            images.id = id.val;
+            images.id = id;
             images.artworks = createArtworkByTypeMap(entry.getValue());
             mapper.addObject(images);
         }

@@ -44,6 +44,7 @@ public class ShowMeTheProgress {
         filter.addFieldRecursive("CompleteVideoFacetData", "videoMetaData", outputSchemas);
         filter.addFieldRecursive("CompleteVideoFacetData", "videoMediaData", outputSchemas);
         filter.addFieldRecursive("CompleteVideoFacetData", "videoMiscData", outputSchemas);
+        filter.addFieldRecursive("CompleteVideoFacetData", "videoImages", outputSchemas);
         filter.addFieldRecursive("CompleteVideo", "countrySpecificData", outputSchemas);
 
         filter.addTypeRecursive("PackageData", outputSchemas);
