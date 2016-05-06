@@ -1,16 +1,18 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.vms.transformer.hollowinput.ShowSeasonEpisodeHollow;
-
 import com.netflix.hollow.util.HashCodes;
 import com.netflix.hollow.util.IntList;
 import com.netflix.vms.transformer.hollowinput.EpisodeHollow;
 import com.netflix.vms.transformer.hollowinput.SeasonHollow;
+import com.netflix.vms.transformer.hollowinput.ShowSeasonEpisodeHollow;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ShowHierarchy {
 
@@ -22,6 +24,7 @@ public class ShowHierarchy {
     private final int episodeSequenceNumbers[][];
     private final int supplementalIds[];
     private final int hashCode;
+    private final Set<Integer> allIds = new HashSet<>();
 
     public ShowHierarchy(int topNodeId, boolean isStandalone, ShowSeasonEpisodeHollow set, String countryCode, ShowHierarchyInitializer initializer) {
         this.topNodeId = topNodeId;
@@ -39,6 +42,7 @@ public class ShowHierarchy {
         if(seasons != null) {
             seasons = new ArrayList<SeasonHollow>(seasons);
             Collections.sort(seasons, new Comparator<SeasonHollow>() {
+                @Override
                 public int compare(SeasonHollow o1, SeasonHollow o2) {
                     return (int)o1._getSequenceNumber() - (int)o2._getSequenceNumber();
                 }
@@ -66,6 +70,7 @@ public class ShowHierarchy {
 
                 List<EpisodeHollow> episodes = new ArrayList<EpisodeHollow>(season._getEpisodes());
                 Collections.sort(episodes, new Comparator<EpisodeHollow>() {
+                    @Override
                     public int compare(EpisodeHollow o1, EpisodeHollow o2) {
                         return (int)o1._getSequenceNumber() - (int)o2._getSequenceNumber();
                     }
@@ -120,6 +125,25 @@ public class ShowHierarchy {
         }
 
         this.hashCode = hashCode;
+
+        // Track all ids
+        addIds(this.topNodeId);
+        addIds(this.seasonIds);
+        for (int[] episodeIdsPerSeason : this.episodeIds) {
+            addIds(episodeIdsPerSeason);
+        }
+        addIds(this.supplementalIds);
+
+    }
+
+    private void addIds(int... ids) {
+        for (int id : ids) {
+            allIds.add(id);
+        }
+    }
+
+    public Set<Integer> getAllIds() {
+        return allIds;
     }
 
     public boolean isStandalone() {
@@ -151,8 +175,8 @@ public class ShowHierarchy {
     }
 
     public boolean includesSupplementalId(int id) {
-        for(int i=0;i<supplementalIds.length;i++)
-            if(supplementalIds[i] == id)
+        for (int supplementalId : supplementalIds)
+            if(supplementalId == id)
                 return true;
         return false;
     }

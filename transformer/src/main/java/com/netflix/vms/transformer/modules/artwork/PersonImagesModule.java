@@ -9,7 +9,6 @@ import com.netflix.vms.transformer.hollowinput.ArtworkLocaleListHollow;
 import com.netflix.vms.transformer.hollowinput.PersonArtworkHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.Artwork;
-import com.netflix.vms.transformer.hollowoutput.Integer;
 import com.netflix.vms.transformer.hollowoutput.PersonImages;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 
@@ -25,7 +24,7 @@ public class PersonImagesModule extends ArtWorkModule{
 
     @Override
     public void transform() {
-        Map<Integer, Set<Artwork>> descMap = new HashMap<>();
+        Map<Integer, Set<Artwork>> artMap = new HashMap<>();
         for(PersonArtworkHollow artworkHollowInput : api.getAllPersonArtworkHollow()) {
             ArtworkLocaleListHollow locales = artworkHollowInput._getLocales();
             int entityId = (int) artworkHollowInput._getPersonId();
@@ -40,15 +39,15 @@ public class PersonImagesModule extends ArtWorkModule{
             int seqNum = (int) artworkHollowInput._getSeqNum();
             ArtworkAttributesHollow attributes = artworkHollowInput._getAttributes();
             ArtworkDerivativeListHollow derivatives = artworkHollowInput._getDerivatives();
-            Set<Artwork> artworkSet = getArtworkSet(new Integer(entityId), descMap);
+            Set<Artwork> artworkSet = getArtworkSet(entityId, artMap);
 
             transformArtworks(entityId, sourceFileId, ordinalPriority, seqNum, attributes, derivatives, localeSet, artworkSet);
         }
 
-        for (Map.Entry<Integer, Set<Artwork>> entry : descMap.entrySet()) {
+        for (Map.Entry<Integer, Set<Artwork>> entry : artMap.entrySet()) {
             Integer id = entry.getKey();
             PersonImages images = new PersonImages();
-            images.id = id.val;
+            images.id = id;
             images.artworks = createArtworkByTypeMap(entry.getValue());
             mapper.addObject(images);
         }
