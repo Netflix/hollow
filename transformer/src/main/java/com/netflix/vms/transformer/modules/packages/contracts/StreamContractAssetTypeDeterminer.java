@@ -41,36 +41,38 @@ public class StreamContractAssetTypeDeterminer {
 
 
         int streamProfileOrdinal = streamProfileIdx.getMatchingOrdinal(stream._getStreamProfileId());
-        StreamProfilesHollow streamProfile = api.getStreamProfilesHollow(streamProfileOrdinal);
+        if(streamProfileOrdinal != -1) {
+            StreamProfilesHollow streamProfile = api.getStreamProfilesHollow(streamProfileOrdinal);
 
-        String profileType = streamProfile._getProfileType()._getValue();
-        if("MERCHSTILL".equals(profileType))
-            return null;
+            String profileType = streamProfile._getProfileType()._getValue();
+            if("MERCHSTILL".equals(profileType))
+                return null;
 
-        if(streamProfile._getProfileType()._isValueEqual("MUXED")){
-            return cache(downloadableId, PRIMARYVIDEO_AUDIOMUXED);
-        }else if(streamProfile._getProfileType()._isValueEqual("VIDEO")) {
-            TextStreamInfoHollow textInfo = stream._getNonImageInfo()._getTextInfo();
-            if(textInfo != null && textInfo._getTextLanguageCode() != null) {
-                return cache(downloadableId, SUBTITLES);
-            }
-            return null;
-        } else if(streamProfile._getProfileType()._isValueEqual("AUDIO")) {
-            StreamAssetTypeHollow assetType = stream._getAssetType();
-            if(assetType != null) {
-                StringHollow assetTypeStringHollow = assetType._getAssetType();
-                if(assetTypeStringHollow != null && assetTypeStringHollow._isValueEqual("assistive"))
-                    return cache(downloadableId, DESCRIPTIVE_AUDIO);
-            }
-            return cache(downloadableId, PRIMARYVIDEO_AUDIOMUXED);
-        } else if(streamProfile._getProfileType()._isValueEqual("TEXT")) {
-            TextStreamInfoHollow textInfo = stream._getNonImageInfo()._getTextInfo();
-            if(textInfo != null) {
-                if(textInfo._getTimedTextType()._isValueEqual("SUBS")) {
+            if(streamProfile._getProfileType()._isValueEqual("MUXED")){
+                return cache(downloadableId, PRIMARYVIDEO_AUDIOMUXED);
+            }else if(streamProfile._getProfileType()._isValueEqual("VIDEO")) {
+                TextStreamInfoHollow textInfo = stream._getNonImageInfo()._getTextInfo();
+                if(textInfo != null && textInfo._getTextLanguageCode() != null) {
                     return cache(downloadableId, SUBTITLES);
-                } else if(textInfo._getTimedTextType()._isValueEqual("CC")) {
-                    //return cache(downloadableId, CLOSEDCAPTIONING);
-                    return cache(downloadableId, SUBTITLES); /// subtitles and closed captioning are treated the same.
+                }
+                return null;
+            } else if(streamProfile._getProfileType()._isValueEqual("AUDIO")) {
+                StreamAssetTypeHollow assetType = stream._getAssetType();
+                if(assetType != null) {
+                    StringHollow assetTypeStringHollow = assetType._getAssetType();
+                    if(assetTypeStringHollow != null && assetTypeStringHollow._isValueEqual("assistive"))
+                        return cache(downloadableId, DESCRIPTIVE_AUDIO);
+                }
+                return cache(downloadableId, PRIMARYVIDEO_AUDIOMUXED);
+            } else if(streamProfile._getProfileType()._isValueEqual("TEXT")) {
+                TextStreamInfoHollow textInfo = stream._getNonImageInfo()._getTextInfo();
+                if(textInfo != null) {
+                    if(textInfo._getTimedTextType()._isValueEqual("SUBS")) {
+                        return cache(downloadableId, SUBTITLES);
+                    } else if(textInfo._getTimedTextType()._isValueEqual("CC")) {
+                        //return cache(downloadableId, CLOSEDCAPTIONING);
+                        return cache(downloadableId, SUBTITLES); /// subtitles and closed captioning are treated the same.
+                    }
                 }
             }
         }

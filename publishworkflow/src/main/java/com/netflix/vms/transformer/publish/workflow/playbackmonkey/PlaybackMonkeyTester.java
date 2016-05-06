@@ -1,8 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow.playbackmonkey;
 
-import com.netflix.hollow.util.SimultaneousExecutor;
-
 import com.netflix.hermes.exception.EntityNotFoundException;
+import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.niws.client.IClientResponse;
 import com.netflix.niws.client.NFMultivaluedMap;
 import com.netflix.niws.client.NIWSClientException;
@@ -15,7 +14,6 @@ import com.netflix.playback.monkey.model.PlaybackMonkeyTestResults;
 import com.netflix.playback.monkey.model.PlaybackMonkeyTestResults.Status;
 import com.netflix.playback.monkey.model.VideoTestDetails;
 import com.netflix.servo.monitor.DynamicCounter;
-import com.netflix.videometadata.audit.VMSErrorCode.ErrorCode;
 import com.netflix.vms.transformer.common.TransformerLogger;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
 import java.io.IOException;
@@ -43,7 +41,7 @@ public class PlaybackMonkeyTester {
 
     public Map<VideoCountryKey, Boolean> testVideoCountryKeysWithRetry(TransformerLogger logger, List<VideoCountryKey> keys, int numOfTries) throws Exception {
         Map<VideoCountryKey, Boolean> playBackMonkeyResult = new HashMap<>(keys.size());
-        for (VideoCountryKey key: keys) {
+        for (VideoCountryKey key : keys) {
             playBackMonkeyResult.put(key, false);
         }
 
@@ -53,14 +51,14 @@ public class PlaybackMonkeyTester {
             Map<VideoCountryKey, Boolean> result = testVideoCountryKeys(logger, videosToTest);
 
             List<VideoCountryKey> failedVideos = new ArrayList<VideoCountryKey>(result.size());
-            for (Entry<VideoCountryKey, Boolean> entry: result.entrySet()) {
-              if (entry.getValue()) {
-                  playBackMonkeyResult.put(entry.getKey(), entry.getValue());
-              } else {
-                failedVideos.add(entry.getKey());
-              }
+            for (Entry<VideoCountryKey, Boolean> entry : result.entrySet()) {
+                if (entry.getValue()) {
+                    playBackMonkeyResult.put(entry.getKey(), entry.getValue());
+                } else {
+                    failedVideos.add(entry.getKey());
+                }
             }
-            logger.info("PlaybackMonkeyInfo", "PBM run number: "+currentTry+". Video sent: "+videosToTest.size()+". Failed videos: "+failedVideos.size()+".");
+            logger.info("PlaybackMonkeyInfo", "PBM run number: " + currentTry + ". Video sent: " + videosToTest.size() + ". Failed videos: " + failedVideos.size() + ".");
             if (failedVideos.size() == 0)
                 break;
             videosToTest = failedVideos;
@@ -68,8 +66,12 @@ public class PlaybackMonkeyTester {
         return playBackMonkeyResult;
     }
 
-    /* (non-Javadoc)
-     * @see com.netflix.videometadata.hollow.publish.workflow.playbackmonkey.DataTester#testVideoCountryKeys(java.util.List)
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * com.netflix.videometadata.hollow.publish.workflow.playbackmonkey.DataTester
+     * #testVideoCountryKeys(java.util.List)
      */
     public Map<VideoCountryKey, Boolean> testVideoCountryKeys(TransformerLogger logger, List<VideoCountryKey> keys) throws Exception {
         final String[] testIds = new String[keys.size()];
@@ -80,18 +82,19 @@ public class PlaybackMonkeyTester {
         SimultaneousExecutor executor = new SimultaneousExecutor();
         final int numThreads = executor.getCorePoolSize();
 
-        logger.info("PlaybackMonkeyInfo", "keys.size(): "+keys.size()+" ; testIds.length: "+testIds.length);
-        for(int i=0;i<numThreads;i++) {
+        logger.info("PlaybackMonkeyInfo", "keys.size(): " + keys.size() + " ; testIds.length: " + testIds.length);
+        for (int i = 0; i < numThreads; i++) {
             final int threadNumber = i;
             executor.execute(new Runnable() {
                 public void run() {
-                    //LOGGER.logf(ErrorCode.PlayBackMonkeyInfo,"threadNumber: %d keys.size(): %d ; testIds.length: %d ", threadNumber, keys.size(), testIds.length);
-                    for(int i=threadNumber;i<keys.size();i += numThreads) {
+                    // LOGGER.logf(ErrorCode.PlayBackMonkeyInfo,"threadNumber: %d keys.size(): %d ; testIds.length: %d ",
+                    // threadNumber, keys.size(), testIds.length);
+                    for (int i = threadNumber; i < keys.size(); i += numThreads) {
                         VideoCountryKey key = keys.get(i);
                         try {
                             testIds[i] = initiateTest(key);
-                            //System.out.println("Initiated test for : "+key);
-                        } catch(Exception e) {
+                            // System.out.println("Initiated test for : "+key);
+                        } catch (Exception e) {
                             logger.error("PlaybackMonkeyError", "Playback monkey test failed", e);
                         }
                     }
@@ -102,39 +105,45 @@ public class PlaybackMonkeyTester {
 
         executor.awaitSuccessfulCompletion();
 
-        logger.info("PlaybackMonkeyInfo", "Initiated "+keys.size()+" number of video country tests.");
+        logger.info("PlaybackMonkeyInfo", "Initiated " + keys.size() + " number of video country tests.");
 
         executor = new SimultaneousExecutor();
 
-        for(int i=0;i<numThreads;i++) {
+        for (int i = 0; i < numThreads; i++) {
             final int threadNumber = i;
             executor.execute(new Runnable() {
                 public void run() {
                     boolean allComplete = false;
-                    while(!allComplete) {
+                    while (!allComplete) {
                         allComplete = true;
-                        for(int i=threadNumber;i<keys.size();i += numThreads) {
-                            if(!testCompleted[i]) {
+                        for (int i = threadNumber; i < keys.size(); i += numThreads) {
+                            if (!testCompleted[i]) {
                                 try {
-                                    //LOGGER.logf(ErrorCode.PlayBackMonkeyInfo,"threadNumber: %d keys.size(): %d ; testIds.length: %d ", threadNumber, keys.size(), testIds.length);
+                                    // LOGGER.logf(ErrorCode.PlayBackMonkeyInfo,"threadNumber: %d keys.size(): %d ; testIds.length: %d ",
+                                    // threadNumber, keys.size(),
+                                    // testIds.length);
                                     PlaybackMonkeyTestResults results = getTestResults(testIds[i]);
-                                    if(results.getStatus() != Status.COMPLETE) {
+                                    if (results.getStatus() != Status.COMPLETE) {
                                         allComplete = false;
-                                        //System.out.println("PENDING " + testIds[i]);
-                                    } else if(!results.isSuccess()) {
-                                        if(++retries[i] > 3) {
+                                        // System.out.println("PENDING " +
+                                        // testIds[i]);
+                                    } else if (!results.isSuccess()) {
+                                        if (++retries[i] > 3) {
                                             testCompleted[i] = true;
-                                            //System.out.println("FAILED " + testIds[i]);
+                                            // System.out.println("FAILED " +
+                                            // testIds[i]);
                                         } else {
-                                            //System.out.println("RETRYING " + i + " (" + retries[i] + ")");
+                                            // System.out.println("RETRYING " +
+                                            // i + " (" + retries[i] + ")");
                                             allComplete = false;
                                         }
                                     } else {
-                                        //System.out.println("SUCCESS " + testIds[i]);
+                                        // System.out.println("SUCCESS " +
+                                        // testIds[i]);
                                         testCompleted[i] = true;
                                         testSuccess[i] = true;
                                     }
-                                } catch(Exception e) {
+                                } catch (Exception e) {
                                     logger.error("PlaybackMonkeyError", "Could not finish playback monkey test", e);
                                 }
                             }
@@ -148,23 +157,24 @@ public class PlaybackMonkeyTester {
 
         Map<VideoCountryKey, Boolean> testResults = new HashMap<VideoCountryKey, Boolean>();
 
-        for(int i=0;i<keys.size();i++)
+        for (int i = 0; i < keys.size(); i++)
             testResults.put(keys.get(i), testSuccess[i] ? Boolean.TRUE : Boolean.FALSE);
 
-        //System.out.println("Completed PlaybackMonkeyTester with testResults size "+testResults.size());
+        // System.out.println("Completed PlaybackMonkeyTester with testResults size "+testResults.size());
         logger.info("PlaybackMonkeyInfo", "Completed PlaybackMonkeyTester with testResults size " + testResults.size());
         return testResults;
     }
 
-    public String getInstanceInPlayBackMonkeyStack() throws Exception{
-		String json = getResponseJson(pbmRestClient, new URI( INSTANCE_LIST_URL), null);
-		//LOGGER.logf(ErrorCode.PlayBackMonkeyInfo, "getInstanceInPlayBackMonkeyStack response: %s.",json);
-		return json.substring(json.indexOf('[') + 1, json.lastIndexOf(']')).trim().replaceAll("\"", "");
+    public String getInstanceInPlayBackMonkeyStack() throws Exception {
+        String json = getResponseJson(pbmRestClient, new URI(INSTANCE_LIST_URL), null);
+        // LOGGER.logf(ErrorCode.PlayBackMonkeyInfo,
+        // "getInstanceInPlayBackMonkeyStack response: %s.",json);
+        return json.substring(json.indexOf('[') + 1, json.lastIndexOf(']')).trim().replaceAll("\"", "");
     }
 
     private String initiateTest(VideoCountryKey key) throws Exception {
-		String url =  INITATE_TEST_URL+ key.getVideoId() + "?countryList=" + key.getCountry();
-		String json = getResponseJson(pbmRestClient, new URI(url), null);
+        String url = INITATE_TEST_URL + key.getVideoId() + "?countryList=" + key.getCountry();
+        String json = getResponseJson(pbmRestClient, new URI(url), null);
         json = json.substring(json.indexOf('[') + 1, json.lastIndexOf(']'));
         VideoTestDetails test = (VideoTestDetails) ParseUtil.deserialize(json, VideoTestDetails.class);
         return test.getId();
@@ -180,38 +190,29 @@ public class PlaybackMonkeyTester {
     private RestClient createClient() {
         RestClient pbmRestClient = RestClientManager.getInstance().getClient(PBM_REST_CLIENT_NAME);
         if (pbmRestClient == null) {
-          try {
-              pbmRestClient = RestClientFactory.registerRestClientUsingProperties(PBM_REST_CLIENT_NAME);
-	        } catch (NIWSClientException e) {
-              throw new RuntimeException(e);
-	        }
+            try {
+                pbmRestClient = RestClientFactory.registerRestClientUsingProperties(PBM_REST_CLIENT_NAME);
+            } catch (NIWSClientException e) {
+                e.printStackTrace();
+            }
         }
         return pbmRestClient;
     }
 
-    public static String getResponseJson(final RestClient client,
-            final URI uri, final NFMultivaluedMap<String, String> params)
-            throws EntityNotFoundException, JsonProcessingException,
-                    IllegalArgumentException, IOException, NIWSClientException {
-      IClientResponse response = null;
+    public static String getResponseJson(final RestClient client, final URI uri, final NFMultivaluedMap<String, String> params) throws EntityNotFoundException, JsonProcessingException, IllegalArgumentException, IOException, NIWSClientException {
+        IClientResponse response = null;
         try {
             response = client.execute(Verb.GET, uri, null, params, null, null, null);
             final int statusCode = response.getStatus();
-            DynamicCounter.increment("vms.restclientutil.response",
-                    "statusCode", String.valueOf(statusCode), "clientname",
-                    client.getRestClientName());
+            DynamicCounter.increment("vms.restclientutil.response", "statusCode", String.valueOf(statusCode), "clientname", client.getRestClientName());
             if (statusCode == 200) {
                 return response.getEntity(String.class);
             } else if (statusCode == 204) {
-                throw new IOException(
-                        "204 returned. Entity is unchanged");
+                throw new IOException("204 returned. Entity is unchanged");
             } else if (statusCode == 503) {
-                throw new IOException(
-                        "503 returned. system under maintanence");
+                throw new IOException("503 returned. system under maintanence");
             } else {
-                throw new RuntimeException("HTTP request error. Status:"
-                        + response.getStatus() + " Entity:"
-                        + response.getEntity(String.class));
+                throw new RuntimeException("HTTP request error. Status:" + response.getStatus() + " Entity:" + response.getEntity(String.class));
             }
         } finally {
             if (response != null) {

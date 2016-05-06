@@ -95,6 +95,7 @@ public class TransformCycle {
                 }
             }
         } catch(IOException e) {
+            e.printStackTrace();
             /// MUST restore from previous state, (or reset to last prepare for next cycle if possible).
         }
     }
