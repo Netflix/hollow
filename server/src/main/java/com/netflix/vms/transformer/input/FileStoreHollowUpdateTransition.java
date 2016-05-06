@@ -59,7 +59,9 @@ public class FileStoreHollowUpdateTransition extends HollowUpdateTransition {
             }
         }
 
-        return new LZ4BlockInputStream(new DeleteOnCloseFileInputStream(localFile));
+        ///TODO: During testing, do not delete and force re-download of files
+        return new LZ4BlockInputStream(new FileInputStream(localFile));
+        //return new LZ4BlockInputStream(new DeleteOnCloseFileInputStream(localFile));
     }
 
 }
