@@ -82,56 +82,58 @@ public class ContractRestrictionModule {
 
         //// iterate over the VideoRights of every country
         HollowHashIndexResult videoRightsResult = videoRightsIdx.findMatches(packages._getMovieId());
-        HollowOrdinalIterator iter = videoRightsResult.iterator();
-        int videoRightsOrdinal = iter.next();
+        if(videoRightsResult != null) {
+            HollowOrdinalIterator iter = videoRightsResult.iterator();
+            int videoRightsOrdinal = iter.next();
 
-        while(videoRightsOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
-            VideoRightsHollow rights = api.getVideoRightsHollow(videoRightsOrdinal);
+            while(videoRightsOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+                VideoRightsHollow rights = api.getVideoRightsHollow(videoRightsOrdinal);
 
-            VideoRightsFlagsHollow rightsFlags = rights._getFlags();
-            if(rightsFlags == null || !rightsFlags._getGoLive()) {
+                VideoRightsFlagsHollow rightsFlags = rights._getFlags();
+                if(rightsFlags == null || !rightsFlags._getGoLive()) {
+                    videoRightsOrdinal = iter.next();
+                    continue;
+                }
+
+                Set<ContractRestriction> contractRestrictions = new HashSet<ContractRestriction>();
+
+                Set<VideoRightsWindowHollow> windows = rights._getRights()._getWindows();
+                Set<VideoRightsContractHollow> contracts = rights._getRights()._getContracts();
+                for(VideoRightsWindowHollow window : windows) {
+                    Set<Integer> contractIds = new HashSet<Integer>();
+
+                    for(VideoRightsContractIdHollow contractId : window._getContractIds()) {
+                        contractIds.add(Integer.valueOf((int)contractId._getValue()));
+                    }
+
+                    ContractRestriction restriction = new ContractRestriction();
+
+                    restriction.availabilityWindow = new AvailabilityWindow();
+                    restriction.availabilityWindow.startDate = new Date(window._getStartDate()._getValue());
+                    restriction.availabilityWindow.endDate = new Date(window._getEndDate()._getValue());
+
+                    restriction.cupKeys = new ArrayList<CupKey>();
+                    restriction.languageBcp47RestrictionsMap = new HashMap<Strings, LanguageRestrictions>();
+                    restriction.excludedDownloadables = new HashSet<com.netflix.vms.transformer.hollowoutput.Long>();
+
+                    assetTypeIdx.resetMarks();
+
+                    List<VideoRightsContractHollow> applicableContracts = filterToApplicableContracts(packages, contracts, contractIds);
+
+                    if(applicableContracts.size() > 0) {
+                        if(applicableContracts.size() == 1)
+                            buildRestrictionBasedOnSingleApplicableContract(assetTypeIdx, restriction, applicableContracts.get(0));
+                        else
+                            buildRestrictionBasedOnMultipleApplicableContracts(assetTypeIdx, restriction, applicableContracts);
+                        contractRestrictions.add(restriction);
+                    }
+                }
+
+                if(!contractRestrictions.isEmpty())
+                    restrictions.put(new ISOCountry(rights._getCountryCode()._getValue()), contractRestrictions);
+
                 videoRightsOrdinal = iter.next();
-                continue;
             }
-
-            Set<ContractRestriction> contractRestrictions = new HashSet<ContractRestriction>();
-
-            Set<VideoRightsWindowHollow> windows = rights._getRights()._getWindows();
-            Set<VideoRightsContractHollow> contracts = rights._getRights()._getContracts();
-            for(VideoRightsWindowHollow window : windows) {
-                Set<Integer> contractIds = new HashSet<Integer>();
-
-                for(VideoRightsContractIdHollow contractId : window._getContractIds()) {
-                    contractIds.add(Integer.valueOf((int)contractId._getValue()));
-                }
-
-                ContractRestriction restriction = new ContractRestriction();
-
-                restriction.availabilityWindow = new AvailabilityWindow();
-                restriction.availabilityWindow.startDate = new Date(window._getStartDate()._getValue());
-                restriction.availabilityWindow.endDate = new Date(window._getEndDate()._getValue());
-
-                restriction.cupKeys = new ArrayList<CupKey>();
-                restriction.languageBcp47RestrictionsMap = new HashMap<Strings, LanguageRestrictions>();
-                restriction.excludedDownloadables = new HashSet<com.netflix.vms.transformer.hollowoutput.Long>();
-
-                assetTypeIdx.resetMarks();
-
-                List<VideoRightsContractHollow> applicableContracts = filterToApplicableContracts(packages, contracts, contractIds);
-
-                if(applicableContracts.size() > 0) {
-                    if(applicableContracts.size() == 1)
-                        buildRestrictionBasedOnSingleApplicableContract(assetTypeIdx, restriction, applicableContracts.get(0));
-                    else
-                        buildRestrictionBasedOnMultipleApplicableContracts(assetTypeIdx, restriction, applicableContracts);
-                    contractRestrictions.add(restriction);
-                }
-            }
-
-            if(!contractRestrictions.isEmpty())
-                restrictions.put(new ISOCountry(rights._getCountryCode()._getValue()), contractRestrictions);
-
-            videoRightsOrdinal = iter.next();
         }
 
         return restrictions;
