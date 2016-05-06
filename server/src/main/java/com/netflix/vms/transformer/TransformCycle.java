@@ -15,7 +15,6 @@ import com.netflix.vms.transformer.publish.workflow.HollowPublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowConfig;
 import com.netflix.vms.transformer.util.TransformerServerCassandraHelper;
 import com.netflix.vms.transformer.util.VersionMinter;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -81,16 +80,16 @@ public class TransformCycle {
         try {
             HollowBlobWriter writer = new HollowBlobWriter(outputStateEngine);
 
-            try (OutputStream snapshotOutputStream = new LZ4VMSOutputStream(new FileOutputStream(new File(System.getProperty("java.io.tmpdir"), fileNamer.getSnapshotFileName(currentCycleNumber))))) {
+            try (OutputStream snapshotOutputStream = new LZ4VMSOutputStream(new FileOutputStream(fileNamer.getSnapshotFileName(currentCycleNumber)))) {
                 writer.writeSnapshot(snapshotOutputStream);
             }
 
             if(previousCycleNumber != Long.MIN_VALUE) {
-                try (OutputStream deltaOutputStream = new LZ4VMSOutputStream(new FileOutputStream(new File(System.getProperty("java.io.tmpdir"), fileNamer.getDeltaFileName(previousCycleNumber, currentCycleNumber))))) {
+                try (OutputStream deltaOutputStream = new LZ4VMSOutputStream(new FileOutputStream(fileNamer.getDeltaFileName(previousCycleNumber, currentCycleNumber)))) {
                     writer.writeDelta(deltaOutputStream);
                 }
 
-                try (OutputStream reverseDeltaOutputStream = new LZ4VMSOutputStream(new FileOutputStream(new File(System.getProperty("java.io.tmpdir"), fileNamer.getReverseDeltaFileName(currentCycleNumber, previousCycleNumber))))){
+                try (OutputStream reverseDeltaOutputStream = new LZ4VMSOutputStream(new FileOutputStream(fileNamer.getReverseDeltaFileName(currentCycleNumber, previousCycleNumber)))){
                     writer.writeDelta(reverseDeltaOutputStream);
                 }
             }
