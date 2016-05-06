@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.input;
 
+import net.jpountz.lz4.LZ4BlockInputStream;
+
 import com.netflix.aws.S3.S3Object;
 import com.netflix.aws.file.FileAccessItem;
 import com.netflix.aws.file.FileStore;
@@ -40,7 +42,7 @@ public class FileStoreHollowUpdateTransition extends HollowUpdateTransition {
         File localFile = new File(localFileLocation, filename);
 
         if(localFile.exists())
-            return new FileInputStream(localFile);
+            return new LZ4BlockInputStream(new FileInputStream(localFile));
 
         int retryCount = 0;
 
@@ -51,12 +53,13 @@ public class FileStoreHollowUpdateTransition extends HollowUpdateTransition {
                 S3Object s3Object = fileStore.getPublishedFile(fileStoreKeybase, fileStoreVersion);
                 LOGGER.infof("Copying object %s to %s", s3Object, localFile);
                 fileStore.copyFile(s3Object, localFile);
+                break;
             } catch(Exception e) {
-
+                LOGGER.error(e);
             }
         }
 
-        return new DeleteOnCloseFileInputStream(localFile);
+        return new LZ4BlockInputStream(new DeleteOnCloseFileInputStream(localFile));
     }
 
 }

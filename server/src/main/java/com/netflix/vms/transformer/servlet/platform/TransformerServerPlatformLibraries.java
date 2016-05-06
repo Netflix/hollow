@@ -15,10 +15,11 @@ public class TransformerServerPlatformLibraries implements TransformerPlatformLi
     private final FastPropertyPublisher hermesPublisher;
 
     @Inject
-    public TransformerServerPlatformLibraries(FileStore fileStore,
-     NFAstyanaxManager astyanax,
-     SubscriptionManager hermesSubscriber,
-     FastPropertyPublisher hermesPublisher) {
+    public TransformerServerPlatformLibraries(
+                 FileStore fileStore,
+                 NFAstyanaxManager astyanax,
+                 SubscriptionManager hermesSubscriber,
+                 FastPropertyPublisher hermesPublisher) {
         this.fileStore = fileStore;
         this.astyanax = astyanax;
         this.hermesSubscriber = hermesSubscriber;

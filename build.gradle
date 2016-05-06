@@ -14,6 +14,41 @@ subprojects {
     }
 
     configurations.all {
+        resolutionStrategy {
+            force 'com.google.inject.extensions:guice-servlet:latest.release'
+            force 'org.apache.commons:commons-lang3:latest.release'
+            
+            def platform_components = [
+                'adminresources',
+                'akmsclient',
+                'base-explorer',
+                'netflix-config',
+                'nflibrary',
+                'nflibrary-legacy-core',
+                'nflibrary-junit-util',
+                'server-context',
+                'platform',
+                'platform-aws',
+                'platform-chukwaClient',
+                'platform-core',
+                'platform-ipc',
+                'platform-logimpl',
+                'platform-management',
+                'platform-messaging',
+                'platform-pool',
+                'platform-sla',
+                'platform-utils'
+            ]
+            def platform_desiredVersion = 'latest.release'  // or define the version you want
+            eachDependency { DependencyResolveDetails details ->
+                if (details.requested.group == 'netflix' && platform_components.contains(details.requested.name)) {
+                    details.useTarget group: details.requested.group, name: details.requested.name, version: platform_desiredVersion
+                }
+            }
+        }
+        
+        
+    
         exclude group: 'com.oracle'
         exclude group: 'org.apache.ant', module: 'ant'
         exclude group: 'org.apache.cxf', module: 'cxf'

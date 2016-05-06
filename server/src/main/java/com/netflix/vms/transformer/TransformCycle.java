@@ -6,7 +6,7 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerPlatformLibraries;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistoryConsumer;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
-import com.netflix.vms.transformer.input.VMSInputDataTransitionCreator;
+import com.netflix.vms.transformer.input.VMSInputDataClient;
 import com.netflix.vms.transformer.io.LZ4VMSOutputStream;
 import com.netflix.vms.transformer.io.LZ4VMSTransformerFiles;
 import com.netflix.vms.transformer.logger.TransformerServerLogger;
@@ -33,7 +33,7 @@ public class TransformCycle {
 
     public TransformCycle(TransformerPlatformLibraries platformLibraries, PublicationHistoryConsumer historyConsumer, String vip) {
         this.vip = vip;
-        this.inputClient = new HollowClient(new VMSInputDataTransitionCreator(platformLibraries.getFileStore()));
+        this.inputClient = new VMSInputDataClient(platformLibraries.getFileStore());
         this.outputStateEngine = new VMSTransformerWriteStateEngine();
         this.ctx = new TransformerServerContext(new TransformerServerLogger(),
                 new TransformerServerCassandraHelper(platformLibraries.getAstyanax(), "cass_dpt", "vms_poison_states", "poison_states"),

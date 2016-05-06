@@ -8,7 +8,6 @@ import netflix.admin.videometadata.VMSPublishWorkflowHistoryAdmin;
 
 public class TransformerCycleKickoff {
 
-
     @Inject
     public TransformerCycleKickoff(TransformerServerPlatformLibraries platformLibs) {
         FileStore.useMultipartUploadWhenApplicable(true);
@@ -29,9 +28,6 @@ public class TransformerCycleKickoff {
         t.setDaemon(true);
         t.setName("vms-transformer-cycler");
         t.start();
-
     }
-
-
 
 }

@@ -25,6 +25,9 @@ public class FileStoreUtil {
     public static long getFromVersion(FileAccessItem fileItem) {
         String fromVersionStr = getAttribute(fileItem, "fromVersion");
 
+        if(fromVersionStr == null)
+            return Long.MIN_VALUE;
+
         return Long.parseLong(fromVersionStr);
     }
 
