@@ -47,6 +47,7 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
                     fileStore.publish(fileToUpload, keybase, fileStoreVersion, region, getItemAttributes());
                     fileStore.removeObsoleteVersions(keybase, region == RegionEnum.US_EAST_1 ? 4096 : 1024, region);
                     success=true;
+                    break;
                 } catch(Exception e) {
                     //status.setStatus(UploadStatus.RETRYING);
                     //status.incrementRetryCount();
