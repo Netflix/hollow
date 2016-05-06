@@ -8,6 +8,8 @@ import netflix.admin.videometadata.VMSPublishWorkflowHistoryAdmin;
 
 public class TransformerCycleKickoff {
 
+    private static final long MIN_CYCLE_TIME = 10 * 60 * 1000;
+
     @Inject
     public TransformerCycleKickoff(TransformerServerPlatformLibraries platformLibs) {
         FileStore.useMultipartUploadWhenApplicable(true);
@@ -18,10 +20,26 @@ public class TransformerCycleKickoff {
                                             System.getProperty("vms.transformer.vip"));
 
         Thread t = new Thread(new Runnable() {
+            private long previousCycleStartTime;
+
+            @Override
             public void run() {
                 while(true) {
+                    waitForMinCycleTimeToPass();
+                    previousCycleStartTime = System.currentTimeMillis();
                     cycle.cycle();
                 }
+            }
+
+            private void waitForMinCycleTimeToPass() {
+                long timeSinceLastCycle = System.currentTimeMillis() - previousCycleStartTime;
+                while(timeSinceLastCycle < MIN_CYCLE_TIME) {
+                    try {
+                        Thread.sleep(MIN_CYCLE_TIME - timeSinceLastCycle);
+                    } catch (InterruptedException ignore) { }
+                }
+
+                previousCycleStartTime = Long.MIN_VALUE;
             }
         });
 
