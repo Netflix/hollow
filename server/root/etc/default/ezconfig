@@ -1,0 +1,8 @@
+# nflx-ezconfig application configuration file. See http://go/ezconfig
+TOMCAT_VERSION = 8
+
+JAVA_GC          = PAROLD
+JAVA_EXPLICITNEW = enabled
+JAVA_NEWSIZE     = 5g
+
+JAVA_FLIGHTRECORDER = enabled

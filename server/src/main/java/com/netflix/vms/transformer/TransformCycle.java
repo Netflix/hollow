@@ -21,7 +21,7 @@ import java.io.OutputStream;
 import java.util.function.Supplier;
 
 public class TransformCycle {
-    private final String vip;
+    private final String transformerVip;
     private final HollowClient inputClient;
     private final VMSTransformerWriteStateEngine outputStateEngine;
     private final TransformerContext ctx;
@@ -30,9 +30,9 @@ public class TransformCycle {
     private long previousCycleNumber = Long.MIN_VALUE;
     private long currentCycleNumber = Long.MIN_VALUE;
 
-    public TransformCycle(TransformerPlatformLibraries platformLibraries, PublicationHistoryConsumer historyConsumer, String vip) {
-        this.vip = vip;
-        this.inputClient = new VMSInputDataClient(platformLibraries.getFileStore());
+    public TransformCycle(TransformerPlatformLibraries platformLibraries, PublicationHistoryConsumer historyConsumer, String converterVip, String transformerVip) {
+        this.transformerVip = transformerVip;
+        this.inputClient = new VMSInputDataClient(platformLibraries.getFileStore(), converterVip);
         this.outputStateEngine = new VMSTransformerWriteStateEngine();
         this.ctx = new TransformerServerContext(new TransformerServerLogger(),
                 new TransformerServerCassandraHelper(platformLibraries.getAstyanax(), "cass_dpt", "vms_poison_states", "poison_states"),
@@ -75,7 +75,7 @@ public class TransformCycle {
 
 
     private void writeTheBlobFiles() {
-        HollowBlobFileNamer fileNamer = new HollowBlobFileNamer(vip);
+        HollowBlobFileNamer fileNamer = new HollowBlobFileNamer(transformerVip);
 
         try {
             HollowBlobWriter writer = new HollowBlobWriter(outputStateEngine);
@@ -101,7 +101,7 @@ public class TransformCycle {
 
 
     public void submitToPublishWorkflow() {
-        HollowPublishWorkflowStager stager = new HollowPublishWorkflowStager(ctx, new PublishWorkflowConfig(), vip);
+        HollowPublishWorkflowStager stager = new HollowPublishWorkflowStager(ctx, new PublishWorkflowConfig(), transformerVip);
         stager.triggerPublish(previousCycleNumber, currentCycleNumber);
     }
 

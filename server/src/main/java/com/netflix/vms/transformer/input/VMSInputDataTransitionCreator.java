@@ -2,7 +2,6 @@ package com.netflix.vms.transformer.input;
 
 import com.netflix.aws.file.FileAccessItem;
 import com.netflix.aws.file.FileStore;
-import com.netflix.config.FastProperty;
 import com.netflix.hollow.client.HollowTransitionCreator;
 import com.netflix.hollow.client.HollowUpdateTransition;
 import com.netflix.logging.ILog;
@@ -13,14 +12,14 @@ import java.util.List;
 
 public class VMSInputDataTransitionCreator implements HollowTransitionCreator {
 
-    private static final FastProperty.StringProperty CONVERTER_VIP_PROPERTY = new FastProperty.StringProperty("vms.converter.vip", "input");
-
     private static final ILog LOGGER = LogManager.getLogger(VMSInputDataTransitionCreator.class);
 
     private final FileStore fileStore;
+    private final String converterVip;
 
-    public VMSInputDataTransitionCreator(FileStore fileStore) {
+    public VMSInputDataTransitionCreator(FileStore fileStore, String converterVip) {
         this.fileStore = fileStore;
+        this.converterVip = converterVip;
     }
 
     @Override
@@ -119,11 +118,11 @@ public class VMSInputDataTransitionCreator implements HollowTransitionCreator {
     }
 
     private String getSnapshotKeybase() {
-        return "vms.hollowinput.blob." + CONVERTER_VIP_PROPERTY.get() + ".snapshot";
+        return "vms.hollowinput.blob." + converterVip + ".snapshot";
     }
 
     private String getDeltaKeybase() {
-        return "vms.hollowinput.blob." + CONVERTER_VIP_PROPERTY.get() + ".delta";
+        return "vms.hollowinput.blob." + converterVip + ".delta";
     }
 
 }

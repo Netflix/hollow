@@ -48,6 +48,10 @@ dependencies {
     // Same for the servlet libs.
     provided "org.eclipse.jetty:jetty-servlet:9.2.15.v20160210"
     provided "javax.servlet:javax.servlet-api:3.0.1"
+    
+    compile "netflix:nf-eventbus-guice:latest.release"
+    compile "netflix:nf-eventbus:latest.release"
+    compile "netflix:nf-eventbus-core:latest.release"
 
     // Runtime lifecycle modules bring in all the essential Netflix platform dependencies.
     compile "com.netflix.runtime:runtime-lifecycle:latest.release"

@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.startup;
 
+import com.netflix.vms.transformer.config.VideometadataTransformerConfig;
+
 import com.google.inject.Inject;
 import com.netflix.aws.file.FileStore;
 import com.netflix.vms.transformer.TransformCycle;
@@ -11,13 +13,17 @@ public class TransformerCycleKickoff {
     private static final long MIN_CYCLE_TIME = 10 * 60 * 1000;
 
     @Inject
-    public TransformerCycleKickoff(TransformerServerPlatformLibraries platformLibs) {
+    public TransformerCycleKickoff(TransformerServerPlatformLibraries platformLibs, VideometadataTransformerConfig config) {
         FileStore.useMultipartUploadWhenApplicable(true);
+
+        System.out.println("TRANSFORMER VIP: " + config.getTransformerVip());
+        System.out.println("CONVERTER VIP: " + config.getConverterVip());
 
         TransformCycle cycle = new TransformCycle(
                                             platformLibs,
                                             (history) -> { VMSPublishWorkflowHistoryAdmin.history = history; },
-                                            System.getProperty("vms.transformer.vip"));
+                                            config.getConverterVip(),
+                                            config.getTransformerVip());
 
         Thread t = new Thread(new Runnable() {
             private long previousCycleStartTime;

@@ -15,8 +15,8 @@ import com.netflix.hollow.client.HollowClient;
 
 public class VMSInputDataClient extends HollowClient {
 
-    public VMSInputDataClient(FileStore fileStore) {
-        super(new VMSInputDataTransitionCreator(fileStore),
+    public VMSInputDataClient(FileStore fileStore, String converterVip) {
+        super(new VMSInputDataTransitionCreator(fileStore, converterVip),
               new HollowClientUpdateDirector.DefaultDirector(),
               HollowUpdateListener.DEFAULT_LISTENER,
               new VMSInputDataAPIFactory(),
