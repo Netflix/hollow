@@ -47,6 +47,8 @@ public class TransformCycle {
     public void cycle() {
         currentCycleNumber = versionMinter.get();
 
+        outputStateEngine.prepareForNextCycle();
+
         updateTheInput();
         if(transformTheData()) {
             writeTheBlobFiles();
