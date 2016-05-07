@@ -15,17 +15,17 @@ public class VMSInputDataTransitionCreator implements HollowTransitionCreator {
     private static final ILog LOGGER = LogManager.getLogger(VMSInputDataTransitionCreator.class);
 
     private final FileStore fileStore;
-    private final String converterVip;
+    private final VMSInputDataKeybaseBuilder keybaseBuilder;
 
     public VMSInputDataTransitionCreator(FileStore fileStore, String converterVip) {
         this.fileStore = fileStore;
-        this.converterVip = converterVip;
+        this.keybaseBuilder = new VMSInputDataKeybaseBuilder(converterVip);
     }
 
     @Override
     public HollowUpdateTransition createSnapshotTransition(long desiredVersion) {
         TransitionResult result = new TransitionResult();
-        String snapshotKeybase = getSnapshotKeybase();
+        String snapshotKeybase = keybaseBuilder.getSnapshotKeybase();
 
         int retryCount = 0;
         while(retryCount < 3) {
@@ -90,7 +90,7 @@ public class VMSInputDataTransitionCreator implements HollowTransitionCreator {
         while(retryCount < 3) {
             retryCount++;
             try {
-                FileAccessItem fileAccessItem = fileStore.getPublishedFileAccessItem(getDeltaKeybase(), String.valueOf(currentVersion));
+                FileAccessItem fileAccessItem = fileStore.getPublishedFileAccessItem(keybaseBuilder.getDeltaKeybase(), String.valueOf(currentVersion));
                 if(fileAccessItem == null)
                     return null;
 
@@ -115,14 +115,6 @@ public class VMSInputDataTransitionCreator implements HollowTransitionCreator {
 
     private class TransitionResult {
         HollowUpdateTransition transition = null;
-    }
-
-    private String getSnapshotKeybase() {
-        return "vms.hollowinput.blob." + converterVip + ".snapshot";
-    }
-
-    private String getDeltaKeybase() {
-        return "vms.hollowinput.blob." + converterVip + ".delta";
     }
 
 }
