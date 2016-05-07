@@ -134,8 +134,7 @@ public class SimpleTransformer {
                             }
                         }
                     } catch(Throwable th) {
-                        ///TODO: Handle this appropriately.
-                        th.printStackTrace();
+                        ctx.getLogger().error("TransformationFailed", "Transformation failed for hierarchy with top node " + videoGeneral._getVideoId(), th);
                     }
                 }
             });
