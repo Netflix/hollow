@@ -2,6 +2,7 @@
 TOMCAT_VERSION = 8
 
 JAVA_GC          = PAROLD
+JAVA_HEAPSIZE    = 50g
 JAVA_EXPLICITNEW = enabled
 JAVA_NEWSIZE     = 5g
 
