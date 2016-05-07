@@ -92,7 +92,7 @@ public class TransformCycle {
                 }
 
                 try (OutputStream reverseDeltaOutputStream = new LZ4VMSOutputStream(new FileOutputStream(fileNamer.getReverseDeltaFileName(currentCycleNumber, previousCycleNumber)))){
-                    writer.writeDelta(reverseDeltaOutputStream);
+                    writer.writeReverseDelta(reverseDeltaOutputStream);
                 }
             }
         } catch(IOException e) {
