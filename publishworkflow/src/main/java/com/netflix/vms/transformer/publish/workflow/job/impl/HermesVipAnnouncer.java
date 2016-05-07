@@ -96,7 +96,8 @@ public class HermesVipAnnouncer implements VipAnnouncer {
             subscription.waitInitUpdate(60000L);
             return true;
         } catch(TimeoutException te) {
-            throw new RuntimeException(te);
+            te.printStackTrace();
+            return false;
         }
     }
 

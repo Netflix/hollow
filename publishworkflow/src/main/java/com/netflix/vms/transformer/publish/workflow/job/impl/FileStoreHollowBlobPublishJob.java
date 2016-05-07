@@ -51,7 +51,7 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
                 } catch(Exception e) {
                     //status.setStatus(UploadStatus.RETRYING);
                     //status.incrementRetryCount();
-                    throw e;
+                    e.printStackTrace();
                 }
             }
 
