@@ -42,12 +42,14 @@ public class HollowBlobDataProvider {
     }
 
     public void readSnapshot(File snapshotFile) throws IOException {
+        ctx.getLogger().info("CircuitBreakerReadBlob", "Reading Snapshot blob " + snapshotFile.getName());
         hollowReadStateEngine = new HollowReadStateEngine(true);
         hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
         hollowBlobReader.readSnapshot(ctx.files().newBlobInputStream(snapshotFile));
     }
 
     public void readDelta(File deltaFile) throws IOException {
+        ctx.getLogger().info("CircuitBreakerReadBlob", "Reading Delta blob " + deltaFile.getName());
         hollowBlobReader.applyDelta(ctx.files().newBlobInputStream(deltaFile));
     }
 

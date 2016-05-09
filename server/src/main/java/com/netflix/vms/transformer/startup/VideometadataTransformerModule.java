@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.startup;
 
+import com.netflix.vms.transformer.common.config.TransformerConfig;
+
 import com.google.inject.AbstractModule;
 // Common module dependencies
 import com.google.inject.Provides;
@@ -7,7 +9,6 @@ import com.netflix.archaius.ConfigProxyFactory;
 // Server dependencies
 import com.netflix.runtime.health.guice.HealthModule;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
-import com.netflix.vms.transformer.config.VideometadataTransformerConfig;
 import com.netflix.vms.transformer.health.CustomHealthIndicator;
 import javax.inject.Singleton;
 
@@ -36,8 +37,8 @@ public final class VideometadataTransformerModule extends AbstractModule {
 
     @Provides
     @Singleton
-    VideometadataTransformerConfig getVideometadataTransformerConfig(ConfigProxyFactory factory) {
+    TransformerConfig getVideometadataTransformerConfig(ConfigProxyFactory factory) {
         // Here we turn the config interface into an implementation that can load dynamic properties.
-        return factory.newProxy(VideometadataTransformerConfig.class);
+        return factory.newProxy(TransformerConfig.class);
     }
 }
