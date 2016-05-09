@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.modules.artwork;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_IMAGE_FORMAT;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_RECIPE;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_TERRITORY_COUNTRIES;
-
 import com.google.common.collect.ComparisonChain;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
@@ -41,7 +40,6 @@ import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.__passthrough_string;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -61,6 +59,12 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     protected final HollowPrimaryKeyIndex territoryIdx;
     private final ArtWorkComparator artworkComparator;
 
+    private final Map<String, ArtWorkImageTypeEntry> imageTypeEntryCache;
+    private final Map<String, ArtWorkImageFormatEntry> imageFormatEntryCache;
+    private final Map<String, ArtWorkImageRecipe> imageRecipeCache;
+    private final Map<String, ArtworkDerivative> derivativeCache;
+    private final Map<ArtworkCdn, ArtworkCdn> cdnLocationCache;
+
     public ArtWorkModule(String entityType, VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
         super(api, ctx, mapper);
         this.entityType = entityType;
@@ -68,6 +72,11 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         this.recipeIdx = indexer.getPrimaryKeyIndex(ARTWORK_RECIPE);
         this.territoryIdx = indexer.getPrimaryKeyIndex(ARTWORK_TERRITORY_COUNTRIES);
         this.artworkComparator = new ArtWorkComparator(ctx);
+        this.imageFormatEntryCache = new HashMap<String, ArtWorkImageFormatEntry>();
+        this.imageTypeEntryCache = new HashMap<String, ArtWorkImageTypeEntry>();
+        this.imageRecipeCache = new HashMap<String, ArtWorkImageRecipe>();
+        this.derivativeCache = new HashMap<String, ArtworkDerivative>();
+        this.cdnLocationCache = new HashMap<ArtworkCdn, ArtworkCdn>();
     }
 
     protected void transformArtworks(int entityId, String sourceFileId, int ordinalPriority, int seqNum, ArtworkAttributesHollow attributes, ArtworkDerivativeListHollow derivatives, Set<ArtworkLocaleHollow> localeSet, Set<Artwork> artworkSet) {
@@ -93,22 +102,39 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
                 continue;
             }
 
-            ArtworkDerivative derivative = new ArtworkDerivative();
-            derivative.format = formatEntry;
-            derivative.type = typeEntry;
-            derivative.recipe = recipeEntry;
-            derivative.recipeDesc = new Strings(derivativeHollow._getRecipeDescriptor()._getValue());
+            String recipeDescriptor = derivativeHollow._getRecipeDescriptor()._getValue();
+
+            ArtworkDerivative derivative = derivativeCache.get(recipeDescriptor);
+            if(derivative == null) {
+                derivative = new ArtworkDerivative();
+                derivative.format = formatEntry;
+                derivative.type = typeEntry;
+                derivative.recipe = recipeEntry;
+                derivative.recipeDesc = new Strings(recipeDescriptor);
+
+                derivativeCache.put(recipeDescriptor, derivative);
+            }
+
             derivativeList.add(derivative);
 
             ArtworkCdn cdn = new ArtworkCdn();
             cdn.cdnId = java.lang.Integer.parseInt(derivativeHollow._getCdnId()._getValue()); // @TODO: Is it Integer or String
             cdn.cdnDirectory = new Strings(derivativeHollow._getCdnDirectory()._getValue());
+
+            ArtworkCdn canonicalCdn = cdnLocationCache.get(cdn);
+            if(canonicalCdn != null) {
+                cdn = canonicalCdn;
+            } else {
+                cdnLocationCache.put(cdn, cdn);
+            }
+
             cdnList.add(cdn);
         }
     }
 
     protected void createArtworkForLocale(ArtworkLocaleHollow localeHollow, String sourceFileId, int ordinalPriority, int seqNum, ArtworkAttributesHollow attributes, List<ArtworkDerivative> derivativeList, List<ArtworkCdn> cdnList, Set<Artwork> artworkSet) {
         //NOTE: com.netflix.i18n.NFLocale needed to convert pt-BR to pt_BR (Use NFlocale.getName() to be backwards compatible with NFLocaleSerializer) t
+        //TODO: How do we get rid of this?
         final NFLocale locale = new NFLocale(com.netflix.i18n.NFLocale.findInstance(localeHollow._getBcp47Code()._getValue()).getName());
 
         Artwork artwork = new Artwork();
@@ -309,19 +335,25 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     }
 
     protected final ArtWorkImageTypeEntry getImageTypeEntry(String typeName) {
-        int ordinal = imageTypeIdx.getMatchingOrdinal(typeName);
-        ArtWorkImageTypeEntry entry = new ArtWorkImageTypeEntry();
-        if(ordinal != -1) {
-            ArtWorkImageTypeHollow artWorkImageTypeHollow = api.getArtWorkImageTypeHollow(ordinal);
-            entry.recipeNameStr = artWorkImageTypeHollow._getRecipe()._getValue().toCharArray();
-            entry.allowMultiples = true;
-            entry.unavailableFileNameStr = "unavailable".toCharArray();
-            entry.nameStr = typeName.toCharArray();
-        }else {
-            entry.recipeNameStr = "jpg".toCharArray();
-            entry.allowMultiples = true;
-            entry.unavailableFileNameStr = "unavailable".toCharArray();
-            entry.nameStr = typeName.toCharArray();
+        ArtWorkImageTypeEntry entry = imageTypeEntryCache.get(typeName);
+
+        if(entry == null) {
+            int ordinal = imageTypeIdx.getMatchingOrdinal(typeName);
+            entry = new ArtWorkImageTypeEntry();
+            if(ordinal != -1) {
+                ArtWorkImageTypeHollow artWorkImageTypeHollow = api.getArtWorkImageTypeHollow(ordinal);
+                entry.recipeNameStr = artWorkImageTypeHollow._getRecipe()._getValue().toCharArray();
+                entry.allowMultiples = true;
+                entry.unavailableFileNameStr = "unavailable".toCharArray();
+                entry.nameStr = typeName.toCharArray();
+            }else {
+                entry.recipeNameStr = "jpg".toCharArray();
+                entry.allowMultiples = true;
+                entry.unavailableFileNameStr = "unavailable".toCharArray();
+                entry.nameStr = typeName.toCharArray();
+            }
+
+            imageTypeEntryCache.put(typeName, entry);
         }
 
         return entry;
@@ -331,27 +363,43 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         int width = (int)derivative._getWidth();
         int height = (int)derivative._getHeight();
         String formatName = width + "x" + height;
-        ArtWorkImageFormatEntry entry = new ArtWorkImageFormatEntry();
-        entry.nameStr = formatName.toCharArray();
-        entry.height = height;
-        entry.width = width;
+
+        ArtWorkImageFormatEntry entry = imageFormatEntryCache.get(formatName);
+
+        if(entry == null) {
+            entry = new ArtWorkImageFormatEntry();
+            entry.nameStr = formatName.toCharArray();
+            entry.height = height;
+            entry.width = width;
+
+            imageFormatEntryCache.put(formatName, entry);
+        }
+
         return entry;
     }
 
     protected final ArtWorkImageRecipe getImageRecipe(ArtworkDerivativeHollow derivative) {
-        StringHollow recipeNameHollow = derivative._getRecipeName();
-        int ordinal = recipeIdx.getMatchingOrdinal(recipeNameHollow._getValue());
-        ArtWorkImageRecipe entry = new ArtWorkImageRecipe();
-        if(ordinal != -1) {
-            ArtworkRecipeHollow artworkRecipeHollow = api.getArtworkRecipeHollow(ordinal);
-            entry.cdnFolderStr = ConversionUtils.getCharArray(artworkRecipeHollow._getCdnFolder());
-            entry.extensionStr = ConversionUtils.getCharArray(artworkRecipeHollow._getExtension());
-            entry.recipeNameStr = ConversionUtils.getCharArray(artworkRecipeHollow._getRecipeName());
-        }else {
-            entry.cdnFolderStr = ConversionUtils.getCharArray(derivative._getCdnDirectory());
-            entry.extensionStr = ConversionUtils.getCharArray(recipeNameHollow);
-            entry.recipeNameStr = ConversionUtils.getCharArray(recipeNameHollow);
+        String recipeName = derivative._getRecipeName()._getValue();
+
+        ArtWorkImageRecipe entry = imageRecipeCache.get(recipeName);
+
+        if(entry == null) {
+            int ordinal = recipeIdx.getMatchingOrdinal(recipeName);
+            entry = new ArtWorkImageRecipe();
+            if(ordinal != -1) {
+                ArtworkRecipeHollow artworkRecipeHollow = api.getArtworkRecipeHollow(ordinal);
+                entry.cdnFolderStr = ConversionUtils.getCharArray(artworkRecipeHollow._getCdnFolder());
+                entry.extensionStr = ConversionUtils.getCharArray(artworkRecipeHollow._getExtension());
+                entry.recipeNameStr = ConversionUtils.getCharArray(artworkRecipeHollow._getRecipeName());
+            }else {
+                entry.cdnFolderStr = ConversionUtils.getCharArray(derivative._getCdnDirectory());
+                entry.extensionStr = recipeName.toCharArray();
+                entry.recipeNameStr = recipeName.toCharArray();
+            }
+
+            imageRecipeCache.put(recipeName, entry);
         }
+
         return entry;
     }
 
