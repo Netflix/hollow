@@ -108,6 +108,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     }
 
     protected void createArtworkForLocale(ArtworkLocaleHollow localeHollow, String sourceFileId, int ordinalPriority, int seqNum, ArtworkAttributesHollow attributes, List<ArtworkDerivative> derivativeList, List<ArtworkCdn> cdnList, Set<Artwork> artworkSet) {
+        //NOTE: com.netflix.i18n.NFLocale needed to convert pt-BR to pt_BR (Use NFlocale.getName() to be backwards compatible with NFLocaleSerializer) t
         final NFLocale locale = new NFLocale(com.netflix.i18n.NFLocale.findInstance(localeHollow._getBcp47Code()._getValue()).getName());
 
         Artwork artwork = new Artwork();
