@@ -1,7 +1,8 @@
 package com.netflix.vms.transformer;
 
-import java.util.function.Consumer;
+import com.netflix.vms.transformer.logger.TransformerServerLogger;
 
+import java.util.function.Consumer;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerFiles;
 import com.netflix.vms.transformer.common.TransformerLogger;
@@ -17,7 +18,6 @@ import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraH
 public class TransformerServerContext implements TransformerContext {
 
     /* dependencies */
-    private final TransformerLogger logger;
     private final TransformerCassandraHelper poisonStatesHelper;
     private final TransformerCassandraHelper hollowValidationStats;
     private final TransformerCassandraHelper canaryResults;
@@ -26,9 +26,12 @@ public class TransformerServerContext implements TransformerContext {
     private final PublicationHistoryConsumer publicationHistoryConsumer;
 
     /* fields */
+    private TransformerServerLogger logger;
+    private long currentCycleId;
     private long now = System.currentTimeMillis();
 
-    public TransformerServerContext(TransformerLogger logger,
+    public TransformerServerContext(
+            TransformerServerLogger logger,
             TransformerCassandraHelper poisonStatesHelper,
             TransformerCassandraHelper hollowValidationStats,
             TransformerCassandraHelper canaryResults,
@@ -42,6 +45,17 @@ public class TransformerServerContext implements TransformerContext {
         this.files = files;
         this.platformLibraries = platformLibraries;
         this.publicationHistoryConsumer = publicationHistoryConsumer;
+    }
+
+    @Override
+    public void setCurrentCycleId(long currentCycleId) {
+        this.currentCycleId = currentCycleId;
+        this.logger = logger.withCurrentCycleId(currentCycleId);
+    }
+
+    @Override
+    public long getCurrentCycleId() {
+        return currentCycleId;
     }
 
     @Override

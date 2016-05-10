@@ -1,19 +1,20 @@
 package com.netflix.vms.transformer.startup;
 
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowConfig;
+import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.WaitForNextCycle;
 
-import com.netflix.vms.transformer.common.publish.workflow.PublicationHistoryConsumer;
-import com.netflix.vms.transformer.TransformerServerContext;
-import com.netflix.vms.transformer.io.LZ4VMSTransformerFiles;
-import com.netflix.vms.transformer.logger.TransformerServerLogger;
-import com.netflix.vms.transformer.util.TransformerServerCassandraHelper;
-import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.publish.workflow.HollowPublishWorkflowStager;
-import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.google.inject.Inject;
 import com.netflix.aws.file.FileStore;
 import com.netflix.vms.transformer.TransformCycle;
+import com.netflix.vms.transformer.TransformerServerContext;
+import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.config.TransformerConfig;
+import com.netflix.vms.transformer.elasticsearch.ElasticSearchClient;
+import com.netflix.vms.transformer.io.LZ4VMSTransformerFiles;
+import com.netflix.vms.transformer.logger.TransformerServerLogger;
+import com.netflix.vms.transformer.publish.workflow.HollowPublishWorkflowStager;
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowConfig;
 import com.netflix.vms.transformer.servlet.platform.TransformerServerPlatformLibraries;
+import com.netflix.vms.transformer.util.TransformerServerCassandraHelper;
 import netflix.admin.videometadata.VMSPublishWorkflowHistoryAdmin;
 
 public class TransformerCycleKickoff {
@@ -21,13 +22,13 @@ public class TransformerCycleKickoff {
     private static final long MIN_CYCLE_TIME = 10 * 60 * 1000;
 
     @Inject
-    public TransformerCycleKickoff(TransformerServerPlatformLibraries platformLibs, TransformerConfig config) {
+    public TransformerCycleKickoff(TransformerServerPlatformLibraries platformLibs, ElasticSearchClient esClient, TransformerConfig config) {
         FileStore.useMultipartUploadWhenApplicable(true);
 
         System.out.println("TRANSFORMER VIP: " + config.getTransformerVip());
         System.out.println("CONVERTER VIP: " + config.getConverterVip());
 
-        TransformerContext ctx = ctx(platformLibs, (history) -> { VMSPublishWorkflowHistoryAdmin.history = history; });
+        TransformerContext ctx = ctx(platformLibs, esClient, config);
         HollowPublishWorkflowStager publishStager = publishStager(ctx, config);
 
         TransformCycle cycle = new TransformCycle(
@@ -51,7 +52,7 @@ public class TransformerCycleKickoff {
                 long timeSinceLastCycle = System.currentTimeMillis() - previousCycleStartTime;
                 long msUntilNextCycle = MIN_CYCLE_TIME - timeSinceLastCycle;
 
-                ctx.getLogger().info("WaitForNextCycle", "Waiting " + msUntilNextCycle + "ms until beginning next cycle");
+                ctx.getLogger().info(WaitForNextCycle, "Waiting " + msUntilNextCycle + "ms until beginning next cycle");
 
                 while(msUntilNextCycle > 0) {
                     try {
@@ -71,14 +72,15 @@ public class TransformerCycleKickoff {
         t.start();
     }
 
-    private final TransformerContext ctx(TransformerServerPlatformLibraries platformLibs, PublicationHistoryConsumer historyConsumer) {
-        return new TransformerServerContext(new TransformerServerLogger(),
+    private final TransformerContext ctx(TransformerServerPlatformLibraries platformLibs, ElasticSearchClient esClient, TransformerConfig config) {
+        return new TransformerServerContext(
+                new TransformerServerLogger(config, esClient),
                 new TransformerServerCassandraHelper(platformLibs.getAstyanax(), "cass_dpt", "vms_poison_states", "poison_states"),
                 new TransformerServerCassandraHelper(platformLibs.getAstyanax(), "cass_dpt", "hollow_publish_workflow", "hollow_validation_stats"),
                 new TransformerServerCassandraHelper(platformLibs.getAstyanax(), "cass_dpt", "canary_validation", "canary_results"),
                 new LZ4VMSTransformerFiles(),
                 platformLibs,
-                historyConsumer);
+                (history) -> { VMSPublishWorkflowHistoryAdmin.history = history; });
     }
 
     private final HollowPublishWorkflowStager publishStager(TransformerContext ctx, TransformerConfig cfg) {

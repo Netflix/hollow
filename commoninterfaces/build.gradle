@@ -6,6 +6,7 @@ dependencies {
     compile 'netflix:platform:latest.release'
     compile 'netflix:awsutils:latest.release'
     compile 'netflix:hermes:latest.release'
+    compile 'com.netflix.hollow:netflix-hollow:latest.release'
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.assertj:assertj-core:3.3+'

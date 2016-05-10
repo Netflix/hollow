@@ -1,5 +1,13 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
+import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.PlaybackMonkey;
+import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.PlaybackMonkeyTestVideo;
+
+import com.google.common.collect.ComparisonChain;
+import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
+import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TopNVideoViewHoursData;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -7,12 +15,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.google.common.collect.ComparisonChain;
-import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
-import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TopNVideoViewHoursData;
 
 public class ValidationVideoRanker {
     private final HollowBlobDataProvider hollowBlobDataProvider;
@@ -59,20 +61,20 @@ public class ValidationVideoRanker {
 					Integer videoId = sortedTopNVideos.get(i);
 					mostValueableVideosToTest.add(new VideoCountryKey(countryId, videoId));
 
-					ctx.getLogger().info("PlayBackMonkeyTestVideoIDs", "ID: " + videoId + " country: " + countryId);
+					ctx.getLogger().info(PlaybackMonkeyTestVideo, "ID: " + videoId + " country: " + countryId);
 				}
 			}
 		}
 
 		// If videos from past cycles failed, add the failed IDs to current cycle.
 		if(pastFailedIDsToCheck != null && pastFailedIDsToCheck.size() > 0){
-		    ctx.getLogger().info("PlaybackMonkeyInfo", "Adding accumulated failed IDs to most valued video list: " + getFailedIDsStr(pastFailedIDsToCheck));
+		    ctx.getLogger().info(PlaybackMonkey, "Adding accumulated failed IDs to most valued video list: " + getFailedIDsStr(pastFailedIDsToCheck));
 			//mostValueableVideosToTest.addAll(pastFailedIDsToCheck);
 			addFailedIDs(mostValueableVideosToTest, pastFailedIDsToCheck, importantCountriesToTest);
 		}
 
 		long timeTaken = System.currentTimeMillis() - start;
-		ctx.getLogger().info("PlaybackMonkeyInfo", "Returning " + mostValueableVideosToTest.size() + " TopN Videos.  Took " + timeTaken + "ms.");
+		ctx.getLogger().info(PlaybackMonkey, "Returning " + mostValueableVideosToTest.size() + " TopN Videos.  Took " + timeTaken + "ms.");
 
 		return Collections.unmodifiableList(mostValueableVideosToTest);
 	}

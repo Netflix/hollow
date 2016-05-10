@@ -25,6 +25,17 @@ public class SimpleTransformerContext implements TransformerContext {
     }
 
     private long now;
+    private long currentCycleId;
+
+    @Override
+    public void setCurrentCycleId(long cycleId) {
+        this.currentCycleId = cycleId;
+    }
+
+    @Override
+    public long getCurrentCycleId() {
+        return currentCycleId;
+    }
 
     @Override
     public void setNowMillis(long now) {

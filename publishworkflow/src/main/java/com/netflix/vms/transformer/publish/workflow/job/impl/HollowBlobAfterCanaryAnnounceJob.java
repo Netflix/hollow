@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
+import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.PlaybackMonkey;
+
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.astyanax.connectionpool.exceptions.NotFoundException;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
@@ -40,27 +42,27 @@ public class HollowBlobAfterCanaryAnnounceJob extends AfterCanaryAnnounceJob {
 			try {
 				if(isPlaybackMonkeyInstancesReadyForTest()){
 						List<VideoCountryKey> mostValuableChangedVideos = videoRanker.getMostValuableChangedVideos(ctx);
-						ctx.getLogger().info("PlaybackMonkeyInfo", getJobName() + ": got " + mostValuableChangedVideos.size() + " most valuable videos to test.");
+						ctx.getLogger().info(PlaybackMonkey, getJobName() + ": got " + mostValuableChangedVideos.size() + " most valuable videos to test.");
 
 						testResultVideoCountryKeys = dataTester.testVideoCountryKeysWithRetry(ctx.getLogger(), mostValuableChangedVideos, ctx.getConfig().getPlaybackMonkeyMaxRetriesPerTest());
 
 						long timeTaken = System.currentTimeMillis()-now;
 						PlaybackMonkeyUtil.logResultsToAtlas(PlaybackMonkeyUtil.FAILURE_PERCENT, PlaybackMonkeyUtil.getFailedPercent(testResultVideoCountryKeys), vip, "after");
 						PlaybackMonkeyUtil.logResultsToAtlas(PlaybackMonkeyUtil.TIME_TAKEN, timeTaken, vip, "after");
-						ctx.getLogger().info("PlaybackMonkeyInfo", getJobName() + ": completed with " + testResultVideoCountryKeys.size() + " video country pairs");
-						ctx.getLogger().info("PlaybackMonkeyInfo", getJobName() + ": success of test: " + success);
-						ctx.getLogger().info("PlaybackMonkeyInfo", getJobName() + ": time taken " + timeTaken + "ms");
+						ctx.getLogger().info(PlaybackMonkey, getJobName() + ": completed with " + testResultVideoCountryKeys.size() + " video country pairs");
+						ctx.getLogger().info(PlaybackMonkey, getJobName() + ": success of test: " + success);
+						ctx.getLogger().info(PlaybackMonkey, getJobName() + ": time taken " + timeTaken + "ms");
 
 				} else {// For some reason instances did not get to desired version in timeout.
 					success = false;
 				}
 			} catch (Exception e) {
-			    ctx.getLogger().error("PlaybackMonkeyError", getJobName() + " failed with Exception", e);
+			    ctx.getLogger().error(PlaybackMonkey, getJobName() + " failed with Exception", e);
 				success = false;
 			}
 		}
 		boolean finalResultAferPBMOverride = PlaybackMonkeyUtil.getFinalResultAferPBMOverride(success, ctx.getConfig());
-		ctx.getLogger().info("PlaybackMonkeyInfo", getJobName() +": success: " + success + ". finalResultAfterPBMOverride: " + finalResultAferPBMOverride);
+		ctx.getLogger().info(PlaybackMonkey, getJobName() +": success: " + success + ". finalResultAfterPBMOverride: " + finalResultAferPBMOverride);
 		return finalResultAferPBMOverride;
 	}
 
@@ -68,7 +70,7 @@ public class HollowBlobAfterCanaryAnnounceJob extends AfterCanaryAnnounceJob {
         final long stopCheckingTime = System.currentTimeMillis() + MAX_TIME_NEEDED_FOR_CLIENT_TO_LOAD_A_VERSION;
         final String desiredVersion = String.valueOf(getCycleVersion());
         List<String> instancesNotInDesiredVersion = null;
-        ctx.getLogger().info("PlaybackMonkeyInfo", getJobName() + ": Waiting for pbm instances to get to version " + desiredVersion);
+        ctx.getLogger().info(PlaybackMonkey, getJobName() + ": Waiting for pbm instances to get to version " + desiredVersion);
         while(System.currentTimeMillis() < stopCheckingTime) {
 			try {
 				instancesNotInDesiredVersion = parseStringToListExcludeEmptyValues(dataTester.getInstanceInPlayBackMonkeyStack(), ",");
@@ -80,7 +82,7 @@ public class HollowBlobAfterCanaryAnnounceJob extends AfterCanaryAnnounceJob {
 					return true;
 			} catch (final NotFoundException ignore) {
             } catch (final ConnectionException e) {
-                ctx.getLogger().warn("HollowValidationDebug", "ConnectionException in " + getJobName() + " " + e.getMessage());
+                ctx.getLogger().warn(PlaybackMonkey, "ConnectionException in " + getJobName() + " " + e.getMessage());
             }
 			try {
                 Thread.sleep(2000);
@@ -89,7 +91,7 @@ public class HollowBlobAfterCanaryAnnounceJob extends AfterCanaryAnnounceJob {
         // Giving up after time-out
         final String instancesNotInDesiredVersionStr = (instancesNotInDesiredVersion == null)?"":instancesNotInDesiredVersion.toString();
         String msg = "PBM instances: "+instancesNotInDesiredVersionStr+" did not get to desired version "+desiredVersion+" with in time out (ms) "+MAX_TIME_NEEDED_FOR_CLIENT_TO_LOAD_A_VERSION;
-        ctx.getLogger().error("PlaybackMonkeyError", msg);
+        ctx.getLogger().error(PlaybackMonkey, msg);
         return false;
 	}
 

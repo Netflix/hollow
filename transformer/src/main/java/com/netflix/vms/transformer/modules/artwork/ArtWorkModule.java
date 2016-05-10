@@ -3,6 +3,9 @@ package com.netflix.vms.transformer.modules.artwork;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_IMAGE_FORMAT;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_RECIPE;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_TERRITORY_COUNTRIES;
+
+import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
+
 import com.google.common.collect.ComparisonChain;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
@@ -98,7 +101,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             ArtWorkImageTypeEntry typeEntry = getImageTypeEntry(derivativeHollow);
             ArtWorkImageRecipe recipeEntry = getImageRecipe(derivativeHollow);
             if (typeEntry == null) {
-                ctx.getLogger().error("UnknownArtworkImageType", String.format("Unknown Image Type for entity=%s, id=%s, type=%s; data will be dropped.", entityType, entityId, derivativeHollow._getImageType()._getValue()));
+                ctx.getLogger().error(LogTag.UnknownArtworkImageType, String.format("Unknown Image Type for entity=%s, id=%s, type=%s; data will be dropped.", entityType, entityId, derivativeHollow._getImageType()._getValue()));
                 continue;
             }
 

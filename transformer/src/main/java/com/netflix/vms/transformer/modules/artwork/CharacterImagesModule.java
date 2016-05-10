@@ -2,6 +2,7 @@ package com.netflix.vms.transformer.modules.artwork;
 
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeListHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
@@ -11,7 +12,6 @@ import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.Artwork;
 import com.netflix.vms.transformer.hollowoutput.CharacterImages;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -30,7 +30,7 @@ public class CharacterImagesModule extends ArtWorkModule{
             ArtworkLocaleListHollow locales = artworkHollowInput._getLocales();
             Set<ArtworkLocaleHollow> localeSet = getLocalTerritories(locales);
             if(localeSet.isEmpty()) {
-                ctx.getLogger().error("MissingLocaleForArtwork", String.format("Missing artwork locale for %s with id=%d; data will be dropped.", entityType, entityId));
+                ctx.getLogger().error(LogTag.MissingLocaleForArtwork, String.format("Missing artwork locale for %s with id=%d; data will be dropped.", entityType, entityId));
                 continue;
             }
 

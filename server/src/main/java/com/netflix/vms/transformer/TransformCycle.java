@@ -1,5 +1,8 @@
 package com.netflix.vms.transformer;
 
+import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleFailed;
+import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.WroteBlob;
+
 import com.netflix.hollow.client.HollowClient;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -11,15 +14,14 @@ import com.netflix.vms.transformer.util.VersionMinter;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.function.Supplier;
 
 public class TransformCycle {
     private final String transformerVip;
     private final HollowClient inputClient;
     private final VMSTransformerWriteStateEngine outputStateEngine;
     private final TransformerContext ctx;
-    private final Supplier<Long> versionMinter;
     private final HollowPublishWorkflowStager publishWorkflowStager;
+    private final VersionMinter versionMinter;
 
     private long previousCycleNumber = Long.MIN_VALUE;
     private long currentCycleNumber = Long.MIN_VALUE;
@@ -29,12 +31,13 @@ public class TransformCycle {
         this.inputClient = new VMSInputDataClient(ctx.platformLibraries().getFileStore(), converterVip);
         this.outputStateEngine = new VMSTransformerWriteStateEngine();
         this.ctx = ctx;
-        this.versionMinter = new VersionMinter();
         this.publishWorkflowStager = publishStager;
+        this.versionMinter = new VersionMinter();
     }
 
     public void cycle() {
         currentCycleNumber = versionMinter.get();
+        ctx.setCurrentCycleId(currentCycleNumber);
 
         outputStateEngine.prepareForNextCycle();
 
@@ -56,7 +59,7 @@ public class TransformCycle {
             SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI)inputClient.getAPI(), outputStateEngine, ctx);
             transformer.transform();
         } catch(Throwable th) {
-            ctx.getLogger().error("TransformCycleFailed", "Transformer failed cycle -- rolling back", th);
+            ctx.getLogger().error(TransformCycleFailed, "Transformer failed cycle -- rolling back", th);
             outputStateEngine.resetToLastPrepareForNextCycle();
             return false;
         }
@@ -74,20 +77,20 @@ public class TransformCycle {
             String snapshotFileName = fileNamer.getSnapshotFileName(currentCycleNumber);
             try (OutputStream snapshotOutputStream = ctx.files().newBlobOutputStream(new File(snapshotFileName))) {
                 writer.writeSnapshot(snapshotOutputStream);
-                ctx.getLogger().info("WroteBlob", "Wrote Snapshot to local file " + snapshotFileName);
+                ctx.getLogger().info(WroteBlob, "Wrote Snapshot to local file " + snapshotFileName);
             }
 
             if(previousCycleNumber != Long.MIN_VALUE) {
                 String deltaFileName = fileNamer.getDeltaFileName(previousCycleNumber, currentCycleNumber);
                 try (OutputStream deltaOutputStream = ctx.files().newBlobOutputStream(new File(deltaFileName))) {
                     writer.writeDelta(deltaOutputStream);
-                    ctx.getLogger().info("WroteBlob", "Wrote Delta to local file " + deltaFileName);
+                    ctx.getLogger().info(WroteBlob, "Wrote Delta to local file " + deltaFileName);
                 }
 
                 String reverseDeltaFileName = fileNamer.getReverseDeltaFileName(currentCycleNumber, previousCycleNumber);
                 try (OutputStream reverseDeltaOutputStream = ctx.files().newBlobOutputStream(new File(reverseDeltaFileName))){
                     writer.writeReverseDelta(reverseDeltaOutputStream);
-                    ctx.getLogger().info("WroteBlob", "Wrote Reverse Delta to local file " + reverseDeltaFileName);
+                    ctx.getLogger().info(WroteBlob, "Wrote Reverse Delta to local file " + reverseDeltaFileName);
                 }
             }
         } catch(IOException e) {

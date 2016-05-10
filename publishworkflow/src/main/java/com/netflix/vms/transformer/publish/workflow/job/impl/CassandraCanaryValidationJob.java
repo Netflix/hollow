@@ -1,9 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.DataCanary;
+import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.PlaybackMonkey;
 
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.astyanax.connectionpool.exceptions.NotFoundException;
@@ -15,6 +13,10 @@ import com.netflix.vms.transformer.publish.workflow.job.AfterCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.BeforeCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryValidationJob;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.VMSDataCanaryResult;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class CassandraCanaryValidationJob extends CanaryValidationJob {
 
@@ -78,11 +80,11 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
             if (!pbmSuccess) {
                 // Log which results failed
                 String msg = "PBM validation: for region "+region.name()+" failed. " + getFailureReason(befTestResults, failedIDs);
-                ctx.getLogger().error("PlaybackMonkeyError", msg);
+                ctx.getLogger().error(PlaybackMonkey, msg);
             } else
-              ctx.getLogger().info("PlaybackMonkeyInfo", "PBM validation " + region.name() + " region completed. Success validation: " + pbmSuccess);
+              ctx.getLogger().info(PlaybackMonkey, "PBM validation " + region.name() + " region completed. Success validation: " + pbmSuccess);
         } catch(Exception ex) {
-	        ctx.getLogger().error("PlaybackMonkeyError", "Error validating PBM results.", ex);
+	        ctx.getLogger().error(PlaybackMonkey, "Error validating PBM results.", ex);
           pbmSuccess = false;
         }
         return PlaybackMonkeyUtil.getFinalResultAferPBMOverride(pbmSuccess, ctx.getConfig());
@@ -135,7 +137,7 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
                     final VMSDataCanaryResult result = VMSDataCanaryResult.fromString(column.getValue());
 
                     if(!result.allWereSuccessful()) {
-                        ctx.getLogger().error("DataCanaryError", "Failed due to 1 data canary app. Not validating other data canaries. Will fail the cycle. Details: " + result.toString());
+                        ctx.getLogger().error(DataCanary, "Failed due to 1 data canary app. Not validating other data canaries. Will fail the cycle. Details: " + result.toString());
                         return false;
                     } else {
                         remainingCanaryAppList.remove(result.getAppId());
@@ -144,13 +146,13 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
                 }
 
                 if(remainingCanaryAppList.isEmpty()){
-                    ctx.getLogger().info("DataCanaryInfo", "All data canary validations successful");
+                    ctx.getLogger().info(DataCanary, "All data canary validations successful");
                     return true;
                 }
 
             } catch (final NotFoundException ignore) {
             } catch (final ConnectionException e) {
-                ctx.getLogger().warn("DataCanaryWarn", "Caught ConnectionException but continuing with validation. Will not result in poisoned blob: " + e.getMessage());
+                ctx.getLogger().warn(DataCanary, "Caught ConnectionException but continuing with validation. Will not result in poisoned blob: " + e.getMessage());
             }
 
             try {
@@ -159,7 +161,7 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
         }
 
         String failedDataCanaries = (remainingCanaryAppList == null)?"":remainingCanaryAppList.toString();
-        ctx.getLogger().error("DataCanaryError", "Data canary validation failed. Will fail the cycle. Following apps failed to return result in timeout of " + (CANARY_TIMEOUT_MS / 1000) + " seconds. " + failedDataCanaries);
+        ctx.getLogger().error(DataCanary, "Data canary validation failed. Will fail the cycle. Following apps failed to return result in timeout of " + (CANARY_TIMEOUT_MS / 1000) + " seconds. " + failedDataCanaries);
         return false;
 	}
 

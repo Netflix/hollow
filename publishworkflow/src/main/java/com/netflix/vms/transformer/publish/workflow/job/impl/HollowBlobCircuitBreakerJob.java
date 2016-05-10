@@ -1,13 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
-
-import org.apache.commons.lang.StringUtils;
+import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.CircuitBreaker;
+import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleFailed;
 
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
@@ -22,6 +16,14 @@ import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuit
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.SnapshotSizeCircuitBreaker;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TypeCardinalityCircuitBreaker;
 import com.netflix.vms.transformer.publish.workflow.job.CircuitBreakerJob;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import org.apache.commons.lang.StringUtils;
 
 public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
     private final HollowBlobDataProvider hollowBlobDataProvider;
@@ -61,7 +63,7 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
             hollowBlobDataProvider.updateData(snapshotFile, deltaFile, reverseDeltaFile);
 
             if (circuitBreakersDisabled) {
-                ctx.getLogger().warn("HollowValidationFailure", "Hollow/Master Circuit Breaker is disabled!");
+                ctx.getLogger().warn(CircuitBreaker, "Hollow/Master Circuit Breaker is disabled!");
                 return true;
             }
 
@@ -74,7 +76,7 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
             return allDataValid;
         } catch (Exception e) {
             logResult(false);
-            ctx.getLogger().error("HollowValidationFailure", e.getMessage(), e);
+            ctx.getLogger().error(CircuitBreaker, e.getMessage(), e);
             incrementAlertCounter();
             e.printStackTrace();
             return false;
@@ -112,9 +114,9 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
                 for(CircuitBreakerResult result : results) {
                     if(!StringUtils.isEmpty(result.getMessage())) {
                         if(result.isPassed())
-                            ctx.getLogger().info("CircuitBreakerInfo", result.getMessage());
+                            ctx.getLogger().info(CircuitBreaker, result.getMessage());
                         else
-                            ctx.getLogger().error("HollowValidationFailure", result.getMessage());
+                            ctx.getLogger().error(CircuitBreaker, result.getMessage());
                     }
 
                     isAllDataValid = isAllDataValid && result.isPassed();
@@ -137,11 +139,9 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
         String logMessage = "Hollow data validation completed for version " + cycleVersion + " vip: " + ctx.getVip();
 
         if (!isAllDataValid) {
-            /// this error code causes the dashboard to show the cycle as failed.
-            ctx.getLogger().error("RefreshAttemptOnVMSCachesFailed", "Hollow data validation failed");
-            ctx.getLogger().error("HollowValidationFailure", logMessage);
+            ctx.getLogger().error(Arrays.asList(TransformCycleFailed, CircuitBreaker), "Circuit Breakers Failed: " + logMessage);
         } else {
-            ctx.getLogger().info("HollowValidationSuccess", logMessage);
+            ctx.getLogger().info(CircuitBreaker, "Circuit Breakers Successful: " + logMessage);
         }
     }
 

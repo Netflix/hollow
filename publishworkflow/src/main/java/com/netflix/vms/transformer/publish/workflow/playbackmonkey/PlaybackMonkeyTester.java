@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow.playbackmonkey;
 
+import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.PlaybackMonkey;
+
 import com.netflix.hermes.exception.EntityNotFoundException;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.niws.client.IClientResponse;
@@ -58,7 +60,7 @@ public class PlaybackMonkeyTester {
                     failedVideos.add(entry.getKey());
                 }
             }
-            logger.info("PlaybackMonkeyInfo", "PBM run number: " + currentTry + ". Video sent: " + videosToTest.size() + ". Failed videos: " + failedVideos.size() + ".");
+            logger.info(PlaybackMonkey, "PBM run number: " + currentTry + ". Video sent: " + videosToTest.size() + ". Failed videos: " + failedVideos.size() + ".");
             if (failedVideos.size() == 0)
                 break;
             videosToTest = failedVideos;
@@ -82,7 +84,7 @@ public class PlaybackMonkeyTester {
         SimultaneousExecutor executor = new SimultaneousExecutor();
         final int numThreads = executor.getCorePoolSize();
 
-        logger.info("PlaybackMonkeyInfo", "keys.size(): " + keys.size() + " ; testIds.length: " + testIds.length);
+        logger.info(PlaybackMonkey, "keys.size(): " + keys.size() + " ; testIds.length: " + testIds.length);
         for (int i = 0; i < numThreads; i++) {
             final int threadNumber = i;
             executor.execute(new Runnable() {
@@ -95,7 +97,7 @@ public class PlaybackMonkeyTester {
                             testIds[i] = initiateTest(key);
                             // System.out.println("Initiated test for : "+key);
                         } catch (Exception e) {
-                            logger.error("PlaybackMonkeyError", "Playback monkey test failed", e);
+                            logger.error(PlaybackMonkey, "Playback monkey test failed", e);
                         }
                     }
                 }
@@ -105,7 +107,7 @@ public class PlaybackMonkeyTester {
 
         executor.awaitSuccessfulCompletion();
 
-        logger.info("PlaybackMonkeyInfo", "Initiated " + keys.size() + " number of video country tests.");
+        logger.info(PlaybackMonkey, "Initiated " + keys.size() + " number of video country tests.");
 
         executor = new SimultaneousExecutor();
 
@@ -144,7 +146,7 @@ public class PlaybackMonkeyTester {
                                         testSuccess[i] = true;
                                     }
                                 } catch (Exception e) {
-                                    logger.error("PlaybackMonkeyError", "Could not finish playback monkey test", e);
+                                    logger.error(PlaybackMonkey, "Could not finish playback monkey test", e);
                                 }
                             }
                         }
@@ -161,7 +163,7 @@ public class PlaybackMonkeyTester {
             testResults.put(keys.get(i), testSuccess[i] ? Boolean.TRUE : Boolean.FALSE);
 
         // System.out.println("Completed PlaybackMonkeyTester with testResults size "+testResults.size());
-        logger.info("PlaybackMonkeyInfo", "Completed PlaybackMonkeyTester with testResults size " + testResults.size());
+        logger.info(PlaybackMonkey, "Completed PlaybackMonkeyTester with testResults size " + testResults.size());
         return testResults;
     }
 

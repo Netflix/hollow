@@ -1,10 +1,11 @@
 package com.netflix.vms.transformer.publish.workflow.circuitbreaker;
 
 
+import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.CircuitBreaker;
+
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.type.ISOCountry;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,7 +21,7 @@ public abstract class HollowCountrySpecificCircuitBreaker extends HollowCircuitB
     @Override
     public CircuitBreakerResults run(HollowReadStateEngine stateEngine) {
         if(!ctx.getConfig().isCircuitBreakerEnabled(getRuleName())) {
-            ctx.getLogger().warn("CircuitBreakerDisabled", "Circuit breaker rule: " + getRuleName() + " is disabled!");
+            ctx.getLogger().warn(CircuitBreaker, "Circuit breaker rule: " + getRuleName() + " is disabled!");
             return PASSED;
         }
 

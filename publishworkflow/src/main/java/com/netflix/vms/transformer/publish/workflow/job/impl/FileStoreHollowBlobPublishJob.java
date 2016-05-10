@@ -1,16 +1,16 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
+import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.netflix.aws.db.ItemAttribute;
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.videometadata.s3.HollowBlobKeybaseBuilder;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
-
 import netflix.admin.videometadata.uploadstat.VMSFileUploadStatus;
 import netflix.admin.videometadata.uploadstat.VMSFileUploadStatus.UploadStatus;
 import netflix.admin.videometadata.uploadstat.VMSFileUploadStatus.VMSFileRegionUploadStatus;
@@ -20,7 +20,6 @@ import netflix.admin.videometadata.uploadstat.VMSServerUploadStatus;
 public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
 
     private static final int  RETRY_ATTEMPTS = 10;
-    private static final long TIMEOUT_MILLIS = 60 * 60 * 1000; /// 1 hour
 
     public FileStoreHollowBlobPublishJob(PublishWorkflowContext ctx, long previousVersion, long version, PublishType jobType, RegionEnum region, File fileToUpload) {
         super(ctx, ctx.getVip(), previousVersion, version, jobType, region, fileToUpload);
@@ -42,7 +41,7 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
 
         try {
             int retryCount = 0;
-            while(retryCount < 3) {
+            while(retryCount < RETRY_ATTEMPTS) {
                 try {
                     fileStore.publish(fileToUpload, keybase, fileStoreVersion, region, getItemAttributes());
                     fileStore.removeObsoleteVersions(keybase, region == RegionEnum.US_EAST_1 ? 4096 : 1024, region);
@@ -68,7 +67,7 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
         long duration = System.currentTimeMillis() - startTime;
         if(success) {
             status.setStatus(UploadStatus.SUCCESS);
-            ctx.getLogger().info("PublishedBlob", "Uploaded VMS Blob: keybase=" + keybase + "; region=" + status.getRegion() + " version=" +getCycleVersion() + " dataVersion=" + getCycleVersion() +" size=" + fileToUpload.length() + " duration=" +duration+ "ms");
+            ctx.getLogger().info(LogTag.PublishedBlob, "Uploaded VMS Blob: keybase=" + keybase + "; region=" + status.getRegion() + " version=" +getCycleVersion() + " dataVersion=" + getCycleVersion() +" size=" + fileToUpload.length() + " duration=" +duration+ "ms");
         } else {
             status.setStatus(UploadStatus.FAILED);
         }

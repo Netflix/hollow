@@ -1,29 +1,18 @@
 package com.netflix.vms.transformer;
 
 import com.netflix.vms.transformer.common.TransformerLogger;
+import java.util.Collection;
 
 public class SysoutTransformerLogger implements TransformerLogger {
 
     @Override
-    public void info(String messageType, String message) {
-        System.out.format("INFO: %s: %s\n", messageType, message);
-    }
+    public void log(Severity severity, Collection<LogTag> tags, String message, Throwable th) {
+        for(LogTag tag : tags) {
+            System.out.format("%s: %s: %s\n", severity.toString(), tag.toString(), th);
+        }
 
-    @Override
-    public void warn(String messageType, String message) {
-        System.out.format("WARN: %s: %s\n", messageType, message);
+        if(th != null)
+            th.printStackTrace();
     }
-
-    @Override
-    public void error(String messageType, String message) {
-        System.out.format("ERROR: %s: %s\n", messageType, message);
-    }
-
-    @Override
-    public void error(String messageType, String message, Throwable th) {
-        System.out.format("ERROR: %s: %s\n", messageType, message);
-        th.printStackTrace();
-    }
-
 
 }

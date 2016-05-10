@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer;
 
+import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.IndividualTransformFailed;
+
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
@@ -50,7 +52,6 @@ import com.netflix.vms.transformer.modules.passthrough.beehive.RolloutCharacterM
 import com.netflix.vms.transformer.modules.passthrough.mpl.EncodingProfileGroupModule;
 import com.netflix.vms.transformer.modules.person.GlobalPersonModule;
 import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -76,7 +77,7 @@ public class SimpleTransformer {
 
     SimpleTransformer(VMSHollowInputAPI inputAPI, VMSTransformerWriteStateEngine outputStateEngine) {
         this(inputAPI, outputStateEngine, new SimpleTransformerContext());
-        ctx.setNowMillis(1462034581112L);
+        //ctx.setNowMillis(1462034581112L);
     }
 
     public SimpleTransformer(VMSHollowInputAPI inputAPI, VMSTransformerWriteStateEngine outputStateEngine, TransformerContext ctx) {
@@ -134,7 +135,7 @@ public class SimpleTransformer {
                             }
                         }
                     } catch(Throwable th) {
-                        ctx.getLogger().error("TransformationFailed", "Transformation failed for hierarchy with top node " + videoGeneral._getVideoId(), th);
+                        ctx.getLogger().error(IndividualTransformFailed, "Transformation failed for hierarchy with top node " + videoGeneral._getVideoId(), th);
                     }
                 }
             });
@@ -374,7 +375,7 @@ public class SimpleTransformer {
         return countryDataMap.get(videoId);
     }
 
-    private synchronized void addToGlobalVideoMap(CompleteVideo completeVideo, ISOCountry country, Map<Video, Map<ISOCountry, CompleteVideo>> globalVideoMap) {
+    private void addToGlobalVideoMap(CompleteVideo completeVideo, ISOCountry country, Map<Video, Map<ISOCountry, CompleteVideo>> globalVideoMap) {
         Video video = completeVideo.id;
         Map<ISOCountry, CompleteVideo> countryMap = globalVideoMap.get(video);
         if (countryMap == null) {

@@ -22,8 +22,12 @@ public interface TransformerConfig {
     @DefaultValue("defaultTransformerVip")
     String getTransformerVip();
 
+    String getAwsInstanceId();
 
     /////////////// VMS IOPS (ElasticSearch) CONFIGURED VALUES ///////////////
+
+    @DefaultValue("true")
+    boolean isElasticSearchLoggingEnabled();
 
     @DefaultValue("es_vmsops")
     String getElasticSearchClusterName();
@@ -42,5 +46,22 @@ public interface TransformerConfig {
 
     @DefaultValue("50s")
     String getElasticSearchTimeoutInSeconds();
+
+    @DefaultValue("50s")
+    String getElasticSearchSamplerIntervalInSeconds();
+
+    @DefaultValue("25000")
+    int getElasticSearchMaxQueueSize();
+
+    @DefaultValue("6")
+    int getElasticSearchMaxTransportThreads();
+
+    @DefaultValue("30000")
+    int getElasticSearchQueueTimeoutMillis();
+
+    @DefaultValue("true")
+    boolean isElasticSearchNoWaitingEnabled();
+
+
 
 }

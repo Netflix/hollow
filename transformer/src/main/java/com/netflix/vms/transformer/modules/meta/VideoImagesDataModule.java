@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.meta;
 
+import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
+
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
@@ -23,7 +25,6 @@ import com.netflix.vms.transformer.hollowoutput.VideoImages;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.artwork.ArtWorkModule;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -94,7 +95,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
 
         Set<ArtworkLocaleHollow> localeSet = getLocalTerritories(locales);
         if (localeSet.isEmpty()) {
-            ctx.getLogger().error("MissingLocaleForArtwork", String.format("Missing artwork locale for %s with id=%d; data will be dropped.", entityType, entityId));
+            ctx.getLogger().error(LogTag.MissingLocaleForArtwork, String.format("Missing artwork locale for %s with id=%d; data will be dropped.", entityType, entityId));
             return;
         }
 
@@ -139,7 +140,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
                     countrySet.add(countryHollow._getValue());
                 }
             } else {
-                ctx.getLogger().error("InvalidImagesTerritoryCode", String.format("Invalid TerritoryCode=%s in entityType=%s", codeHollow._getValue(), entityType));
+                ctx.getLogger().error(LogTag.InvalidImagesTerritoryCode, String.format("Invalid TerritoryCode=%s in entityType=%s", codeHollow._getValue(), entityType));
                 continue;
             }
         }

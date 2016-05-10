@@ -7,6 +7,10 @@ import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraH
 
 public interface TransformerContext {
 
+    void setCurrentCycleId(long cycleId);
+
+    long getCurrentCycleId();
+
     void setNowMillis(long now);
 
     long getNowMillis();

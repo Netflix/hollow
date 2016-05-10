@@ -1,5 +1,8 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
+import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.AnnouncementFailure;
+import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.AnnouncementSuccess;
+
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.AnnounceJob;
@@ -27,8 +30,8 @@ public class HermesAnnounceJob extends AnnounceJob {
 
     private void logResult(boolean success) {
         if(success)
-            ctx.getLogger().info("HollowAnnounceSuccess", "Hollow data announce success: for version " + getCycleVersion() + " for vip "+vip+" region " + region);
+            ctx.getLogger().info(AnnouncementSuccess, "Hollow data announce success: for version " + getCycleVersion() + " for vip "+vip+" region " + region);
         else
-            ctx.getLogger().error("HollowAnnounceFailure", "Hollow data announce failure: for version " + getCycleVersion() + " for vip "+vip+" region "+region);
+            ctx.getLogger().error(AnnouncementFailure, "Hollow data announce failure: for version " + getCycleVersion() + " for vip "+vip+" region "+region);
     }
 }
