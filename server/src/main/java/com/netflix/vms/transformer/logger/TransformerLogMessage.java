@@ -9,7 +9,7 @@ class TransformerLogMessage {
     private final EventInfo eventInfo;
     private final String message;
 
-    public TransformerLogMessage(Severity logLevel, LogTag tag, String message, long currentCycle, long timestamp, String instanceId) {
+    public TransformerLogMessage(Severity logLevel, LogTag tag, String message, String currentCycle, long timestamp, String instanceId) {
         this.eventInfo = new EventInfo(logLevel, tag, currentCycle, timestamp, instanceId);
         this.message = message;
     }
@@ -26,11 +26,11 @@ class TransformerLogMessage {
 
         private final Severity logLevel;
         private final LogTag tag;
-        private final long currentCycle;
+        private final String currentCycle;
         private final long timestamp;
         private final String instanceId;
 
-        public EventInfo(Severity logLevel, LogTag tag, long currentCycle, long timestamp, String instanceId) {
+        public EventInfo(Severity logLevel, LogTag tag, String currentCycle, long timestamp, String instanceId) {
             this.logLevel = logLevel;
             this.tag = tag;
             this.currentCycle = currentCycle;
@@ -46,7 +46,7 @@ class TransformerLogMessage {
             return tag;
         }
 
-        public long getCurrentCycle() {
+        public String getCurrentCycle() {
             return currentCycle;
         }
 

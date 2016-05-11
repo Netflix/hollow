@@ -83,7 +83,7 @@ public class TransformerServerLogger implements TransformerLogger {
         if(th != null)
             message += "; Exception: " + ExceptionUtils.getStackTrace(th);
 
-        TransformerLogMessage msg = new TransformerLogMessage(severity, logTag, message, currentCycleId, System.currentTimeMillis(), config.getAwsInstanceId());
+        TransformerLogMessage msg = new TransformerLogMessage(severity, logTag, message, String.valueOf(currentCycleId), System.currentTimeMillis(), config.getAwsInstanceId());
 
         ObjectWriter writer = objectMapper.writer();
         return writer.writeValueAsString(msg);
