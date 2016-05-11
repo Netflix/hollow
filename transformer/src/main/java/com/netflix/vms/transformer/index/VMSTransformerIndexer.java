@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.index;
 
+import com.netflix.hollow.util.SimultaneousExecutor;
+
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
@@ -15,7 +17,9 @@ public class VMSTransformerIndexer {
 
     private final Map<IndexSpec, Object> indexMap;
 
-    public VMSTransformerIndexer(HollowReadStateEngine stateEngine, ExecutorService executor) {
+    public VMSTransformerIndexer(HollowReadStateEngine stateEngine) {
+        ExecutorService executor = new SimultaneousExecutor();
+
         try {
             Map<IndexSpec, Object> indexMap = new HashMap<IndexSpec, Object>();
 
@@ -25,6 +29,8 @@ public class VMSTransformerIndexer {
             this.indexMap = indexMap;
         } catch(Exception e) {
             throw new RuntimeException(e);
+        } finally {
+            executor.shutdown();
         }
     }
 

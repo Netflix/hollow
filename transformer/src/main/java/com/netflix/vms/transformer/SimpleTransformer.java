@@ -88,7 +88,7 @@ public class SimpleTransformer {
 
     public HollowWriteStateEngine transform() throws Exception {
         long startTime = System.currentTimeMillis();
-        indexer = new VMSTransformerIndexer((HollowReadStateEngine)api.getDataAccess(), new SimultaneousExecutor());
+        indexer = new VMSTransformerIndexer((HollowReadStateEngine)api.getDataAccess());
         long endTime = System.currentTimeMillis();
 
         System.out.println("INDEXED IN " + (endTime - startTime) + "ms");
