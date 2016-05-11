@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.elasticsearch;
 
+import com.netflix.hollow.util.SimultaneousExecutor;
+
 import com.google.common.collect.Sets;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
@@ -84,23 +86,27 @@ public class ElasticSearchClientBridge {
                     newServerSet.add(instance);
                 }
             }
-            //LOGGER.infof("UP Instances clusterName=%s, app=%s, num=%s :%s", clusterName, app.getName(), newServerSet.size(), getHostNames(newServerSet));
+            //LOGGER.infof("UP Instances clusterName={}, app={}, num={} :{}", clusterName, app.getName(), newServerSet.size(), getHostNames(newServerSet));
 
             for (final InstanceInfo removed : Sets.difference(esServerSet, newServerSet)) {
                 client.removeTransportAddress(new InetSocketTransportAddress(removed.getHostName(), port));
                 esServerSet.remove(removed);
-                LOGGER.info("Instance removed id=%s, host=%s", removed.getId(), removed.getHostName());
+                LOGGER.info("Instance removed id={}, host={}", removed.getId(), removed.getHostName());
             }
 
+            SimultaneousExecutor executor = new SimultaneousExecutor(50);
+
             for (final InstanceInfo added : Sets.difference(newServerSet, esServerSet)) {
-                if (healthy(added.getHostName(), clusterName, port)) {
-                    client.addTransportAddress(new InetSocketTransportAddress(added.getHostName(), port));
-                    esServerSet.add(added);
-                    LOGGER.info("Instance added id=%s, host=%s", added.getId(), added.getHostName());
-                }
+                executor.execute(() -> {
+                    if (healthy(added.getHostName(), clusterName, port)) {
+                        client.addTransportAddress(new InetSocketTransportAddress(added.getHostName(), port));
+                        esServerSet.add(added);
+                        LOGGER.info("Instance added id={}, host={}", added.getId(), added.getHostName());
+                    }
+                });
             }
         } catch (final Exception e) {
-            LOGGER.error("Exception while updateESRegistry: %s", e, e.getMessage());
+            LOGGER.error("Exception while updateESRegistry: {}", e, e.getMessage());
         }
     }
 
@@ -136,9 +142,9 @@ public class ElasticSearchClientBridge {
             if (healthStatus == ClusterHealthStatus.GREEN || healthStatus == ClusterHealthStatus.YELLOW) {
                 isHealthy = true;
             }
-            LOGGER.debug("Health Check: host=%s, clusterName=%s, port=%s, isHealthy=%s", host, clusterName, port, isHealthy);
+            LOGGER.debug("Health Check: host={}, clusterName={}, port={}, isHealthy={}", host, clusterName, port, isHealthy);
         } catch (final Exception e) {
-            LOGGER.error("Failed to check health status: host=%s, clusterName=%s, port=%s, adddres=%s, settings=%s", e,
+            LOGGER.error("Failed to check health status: host={}, clusterName={}, port={}, adddres={}, settings={}", e,
                     host, clusterName, port, address, settings.getAsMap());
         } finally {
             if (localClient != null) {
