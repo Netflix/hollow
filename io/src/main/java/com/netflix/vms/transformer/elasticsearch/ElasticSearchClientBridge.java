@@ -100,11 +100,15 @@ public class ElasticSearchClientBridge {
                 executor.execute(() -> {
                     if (healthy(added.getHostName(), clusterName, port)) {
                         client.addTransportAddress(new InetSocketTransportAddress(added.getHostName(), port));
-                        esServerSet.add(added);
+                        synchronized(esServerSet) {
+                            esServerSet.add(added);
+                        }
                         LOGGER.info("Instance added id={}, host={}", added.getId(), added.getHostName());
                     }
                 });
             }
+
+            executor.awaitUninterruptibly();
         } catch (final Exception e) {
             LOGGER.error("Exception while updateESRegistry: {}", e, e.getMessage());
         }
