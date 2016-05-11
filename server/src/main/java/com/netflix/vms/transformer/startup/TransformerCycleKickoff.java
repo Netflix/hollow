@@ -2,6 +2,8 @@ package com.netflix.vms.transformer.startup;
 
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.WaitForNextCycle;
 
+import com.netflix.vms.transformer.resource.v1.VMSPublishWorkflowHistoryAdmin;
+
 import com.google.inject.Inject;
 import com.netflix.aws.file.FileStore;
 import com.netflix.vms.transformer.TransformCycle;
@@ -15,7 +17,6 @@ import com.netflix.vms.transformer.publish.workflow.HollowPublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowConfig;
 import com.netflix.vms.transformer.servlet.platform.TransformerServerPlatformLibraries;
 import com.netflix.vms.transformer.util.TransformerServerCassandraHelper;
-import netflix.admin.videometadata.VMSPublishWorkflowHistoryAdmin;
 
 public class TransformerCycleKickoff {
 

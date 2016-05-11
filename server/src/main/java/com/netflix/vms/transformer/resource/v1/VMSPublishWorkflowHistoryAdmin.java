@@ -1,4 +1,4 @@
-package netflix.admin.videometadata;
+package com.netflix.vms.transformer.resource.v1;
 
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -22,8 +22,8 @@ import com.google.inject.Singleton;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 
-@Path("/vms/workflowhistory")
 @Singleton
+@Path("/vms/workflowhistory")
 public class VMSPublishWorkflowHistoryAdmin {
 
     public static PublicationHistory history;

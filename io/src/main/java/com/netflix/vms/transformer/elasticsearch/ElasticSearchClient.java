@@ -76,8 +76,8 @@ public class ElasticSearchClient {
         queueInfoScheduler.scheduleAtFixedRate(infoUpdater, 60, 60, TimeUnit.SECONDS);
     }
 
-    public ElasticSearchClientBridge getElasticSearchClient() {
-        return transportClients.get(0).getClient();
+    public ElasticSearchClientBridge getElasticSearchClientBridge() {
+        return transportClients.get(0).getClientBridge();
     }
 
     // overflow is dropped
@@ -133,25 +133,25 @@ public class ElasticSearchClient {
         private static final int MAX_WAIT_INITIALIZE_SECONDS = 60;
 
         private final LinkedBlockingQueue<ElasticSearchLogMessage> indexableItemQueue;
-        private final ElasticSearchClientBridge esClient;
+        private final ElasticSearchClientBridge esClientBridge;
         private volatile Boolean runState = new Boolean(true);
 
         RunnableTransportClient(TransformerConfig config, LinkedBlockingQueue<ElasticSearchLogMessage> jsonQueue) {
             this.indexableItemQueue = jsonQueue;
-            this.esClient = new ElasticSearchClientBridge(config, eureka);
+            this.esClientBridge = new ElasticSearchClientBridge(config, eureka);
         }
 
         public void quit() {
             runState = false;
         }
 
-        public ElasticSearchClientBridge getClient() {
-            return esClient;
+        public ElasticSearchClientBridge getClientBridge() {
+            return esClientBridge;
         }
 
         private void waitForInitialization() {
             int numTries = 0;
-            while (!esClient.isConnected()) {
+            while (!esClientBridge.isConnected()) {
                 if (++numTries > MAX_WAIT_INITIALIZE_SECONDS) {
                     break;
                 }
@@ -161,7 +161,7 @@ public class ElasticSearchClient {
                     LOGGER.warn(e.getMessage(), e);
                 }
             }
-            LOGGER.info("ES initialization -- " + esClient.isConnected() + ", numTries=" + numTries);
+            LOGGER.info("ES initialization -- " + esClientBridge.isConnected() + ", numTries=" + numTries);
         }
 
         @Override
@@ -177,7 +177,7 @@ public class ElasticSearchClient {
                     continue;
                 }
                 indexableItemQueue.drainTo(items, 200);
-                final Client esTransportClient = esClient.getClient();
+                final Client esTransportClient = esClientBridge.getClient();
                 try {
                     final BulkRequestBuilder bulkRequest = esTransportClient.prepareBulk().setReplicationType(ReplicationType.ASYNC);
 

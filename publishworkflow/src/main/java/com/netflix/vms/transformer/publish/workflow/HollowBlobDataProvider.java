@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow;
 
+import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.CircuitBreaker;
+import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import java.io.File;
 import java.io.IOException;
 import java.util.BitSet;
@@ -9,7 +11,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
 import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
@@ -42,14 +43,14 @@ public class HollowBlobDataProvider {
     }
 
     public void readSnapshot(File snapshotFile) throws IOException {
-        ctx.getLogger().info("CircuitBreakerReadBlob", "Reading Snapshot blob " + snapshotFile.getName());
+        ctx.getLogger().info(CircuitBreaker, "Reading Snapshot blob " + snapshotFile.getName());
         hollowReadStateEngine = new HollowReadStateEngine(true);
         hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
         hollowBlobReader.readSnapshot(ctx.files().newBlobInputStream(snapshotFile));
     }
 
     public void readDelta(File deltaFile) throws IOException {
-        ctx.getLogger().info("CircuitBreakerReadBlob", "Reading Delta blob " + deltaFile.getName());
+        ctx.getLogger().info(CircuitBreaker, "Reading Delta blob " + deltaFile.getName());
         hollowBlobReader.applyDelta(ctx.files().newBlobInputStream(deltaFile));
     }
 
