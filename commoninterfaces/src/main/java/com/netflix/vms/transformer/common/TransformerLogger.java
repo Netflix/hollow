@@ -8,6 +8,8 @@ public interface TransformerLogger {
 
     public static enum LogTag {
         WaitForNextCycle,
+        TransformCycleBegin,
+        TransformCycleSuccess,
         TransformCycleFailed,
         IndividualTransformFailed,
         WroteBlob,

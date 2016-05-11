@@ -1,6 +1,8 @@
 package com.netflix.vms.transformer;
 
+import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleBegin;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleFailed;
+import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleSuccess;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.WroteBlob;
 
 import com.netflix.hollow.client.HollowClient;
@@ -36,8 +38,7 @@ public class TransformCycle {
     }
 
     public void cycle() {
-        currentCycleNumber = versionMinter.get();
-        ctx.setCurrentCycleId(currentCycleNumber);
+        beginCycle();
 
         outputStateEngine.prepareForNextCycle();
 
@@ -45,8 +46,15 @@ public class TransformCycle {
         if(transformTheData()) {
             writeTheBlobFiles();
             submitToPublishWorkflow();
-            previousCycleNumber = currentCycleNumber;
+            endCycleSuccessfully();
         }
+    }
+
+    private void beginCycle() {
+        currentCycleNumber = versionMinter.mintANewVersion();
+        ctx.setCurrentCycleId(currentCycleNumber);
+
+        ctx.getLogger().info(TransformCycleBegin, "Beginning cycle " + currentCycleNumber);
     }
 
     private void updateTheInput() {
@@ -102,6 +110,11 @@ public class TransformCycle {
 
     public void submitToPublishWorkflow() {
         publishWorkflowStager.triggerPublish(previousCycleNumber, currentCycleNumber);
+    }
+
+    private void endCycleSuccessfully() {
+        ctx.getLogger().info(TransformCycleSuccess, "Cycle " + currentCycleNumber + " succeeded");
+        previousCycleNumber = currentCycleNumber;
     }
 
 }

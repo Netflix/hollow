@@ -59,6 +59,11 @@ public class TransformerServerContext implements TransformerContext {
     }
 
     @Override
+    public TransformerLogger getLogger() {
+        return logger;
+    }
+
+    @Override
     public void setNowMillis(long now) {
         this.now = now;
     }
@@ -66,11 +71,6 @@ public class TransformerServerContext implements TransformerContext {
     @Override
     public long getNowMillis() {
         return now;
-    }
-
-    @Override
-    public TransformerLogger getLogger() {
-        return logger;
     }
 
     @Override
