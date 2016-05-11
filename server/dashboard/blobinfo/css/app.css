@@ -1,0 +1,60 @@
+html, body {
+    height: 100%;
+    overflow-y: hidden;
+}
+
+#mainContainer {
+    height: 100%;
+    overflow-y: hidden;
+}
+
+nav.prod {
+    background-color: #B6272B;
+}
+
+nav .logo {
+    text-transform: none;
+}
+
+#loadingContainer {
+    margin-top: 5em;
+    display: none;
+}
+.isLoading #loadingContainer {
+    display: block;
+}
+
+#loadingContainer img {
+    border: 0;
+    width: 30px;
+    position: relative;
+    top: 6px;
+    left: 5px;
+}
+
+.isLoading .hideLoading {
+    display: none;
+}
+
+nf-templated-list .header .col {
+    cursor: pointer;
+}
+
+grouped.with-icon {
+    position: relative;
+}
+grouped.with-icon nf-icon {
+    position: absolute;
+    top: 0.4em;
+    left: 0.5em;
+}
+grouped.with-icon label {
+    padding-left: 1.6em;
+}
+
+grouped input[type=checkbox]:checked+label {
+    background-color: #478cc8;
+    color: #FFF;
+    border: 1px solid rgba(0,0,0,.2);
+    text-shadow: 0 1px 1px rgba(0,0,0,.2);
+}

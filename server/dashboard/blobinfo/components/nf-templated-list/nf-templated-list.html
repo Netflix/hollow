@@ -1,0 +1,196 @@
+<link rel="import" href="nf-templated-list-style.html" />
+
+<dom-module id="nf-templated-list">
+
+  <template>
+    <style include="nf-templated-list-style"></style>
+
+    <nf-data id="data"></nf-data>
+
+    <div id="table" class="striped">
+        <div id="thead">
+          <content select="div.header"></content>
+        </div>
+        <div id="tbody"></div>
+    </div>
+
+    <content id="itemTemplate" select="template.itemTemplate"></content>
+  </template>
+
+  <script>
+    (function () {
+
+      'use strict';
+
+      Polymer({
+        is: 'nf-templated-list',
+
+        behaviors: [ Polymer.Templatizer ],
+
+        properties: {
+          customPagination: {
+            type: Boolean,
+            value: false,
+            notify: true
+          }
+        },
+
+        getData: function () {
+          return this.nfData.data;
+        },
+
+        setData: function (data) {
+          this.nfData = this.$.data;
+
+          if (this.nfData.initialised) {
+            this.nfData.setData(data);
+            this.generateTableBody();
+          } else {
+            this.nfData.init(data, false);
+          }
+          this.fire('nfdataisready');
+
+          if (!this.runOnlyOnceGuard) {
+            this.runOnlyOnceGuard = true;
+            this.generateTableBody();
+            this.addEventHandlers();
+          }
+        },
+
+        sortDataByColumn: function (sortProperty) {
+          var desc = false,
+              dataType,
+              alpha,
+              alphaDesc,
+              num,
+              numDesc,
+              context,
+              sortFunction;
+
+          dataType = typeof(this.getData()[0][sortProperty]);
+
+          // Sorting functions:
+          context = { prop: sortProperty };
+
+          alpha = function (a, b) {
+            if (a[this.prop] > b[this.prop]) {
+              return 1;
+            }
+            if (a[this.prop] < b[this.prop]) {
+              return -1;
+            }
+            return 0;
+          };
+
+          alphaDesc = function (a, b) {
+            if (a[this.prop] < b[this.prop]) {
+              return 1;
+            }
+            if (a[this.prop] > b[this.prop]) {
+              return -1;
+            }
+            return 0;
+          };
+
+          num = function (a, b) {
+            return a[this.prop] - b[this.prop];
+          };
+
+          numDesc = function (a, b) {
+            return b[this.prop] - a[this.prop];
+          };
+
+          // ascertaining sort order
+          if (this.dataPropertySorted === sortProperty) {
+            desc = true;
+            this.dataPropertySorted = null;
+          } else {
+            this.dataPropertySorted = sortProperty;
+          }
+
+          // assigning appropriate sort function
+          if (desc && (dataType === 'number' || dataType === 'date')) {
+            sortFunction = numDesc;
+          } else if (!desc && (dataType === 'number' || dataType === 'date')) {
+            sortFunction = num;
+          } else if (desc && dataType === 'string') {
+            sortFunction = alphaDesc;
+          } else {
+            sortFunction = alpha;
+          }
+
+          // updating UI accordingly
+          // if (this.lastSortedHeader) {
+          //   Polymer.dom(this.lastSortedHeader).classList.remove('is-sorted-desc');
+          //   Polymer.dom(this.lastSortedHeader).classList.remove('is-sorted-asc');
+          // }
+          // if (desc) {
+          //   this.lastSortedHeader = Polymer.dom(this.$.thead).querySelector('th:nth-child(' + (index + 1) + ')');
+          //   Polymer.dom(this.lastSortedHeader).classList.add('is-sorted-desc');
+          // } else {
+          //   this.lastSortedHeader = Polymer.dom(this.$.thead).querySelector('th:nth-child(' + (index + 1) + ')');
+          //   Polymer.dom(this.lastSortedHeader).classList.add('is-sorted-asc');
+          // }
+
+          this.nfData.sort(sortFunction, context);
+        },
+
+        generateTableBody: function () {
+          var self = this,
+              docFrag = document.createDocumentFragment();
+
+          if (this.customPagination && !this.nfData.customPagination) {
+            return;
+          }
+
+          this.nfData.getPaginatedData().then(function (paginatedData) {
+            var itemTemplate = Polymer.dom(self).querySelector('.itemTemplate');
+            self.templatize(itemTemplate);
+
+            paginatedData.forEach(function (data) {
+              var itemNode = self.stamp(null);
+              itemNode.item = data;
+              Polymer.dom(docFrag).appendChild(itemNode.root);
+            });
+
+            var bodyNode = Polymer.dom(self.$.tbody);
+            bodyNode.innerHTML = '';
+            bodyNode.appendChild(docFrag);
+          });
+        },
+
+        addEventHandlers: function () {
+          var self = this;
+
+          this.$.table.addEventListener('click', function (e) {
+            var node = e.target,
+                clickEvent,
+                proxyNode;
+
+            if (node && node.getAttribute('data-sort-prop')) {
+              self.sortDataByColumn(node.getAttribute('data-sort-prop'));
+            }
+          }, false);
+
+          this.nfData.addEventListener('filtereddatachanged', function () {
+            self.generateTableBody();
+          }, false);
+        },
+
+        getNfData: function () {
+          var self = this;
+
+          return new Promise(function (resolve, reject) {
+            if (self.nfData) {
+              resolve(self.nfData);
+            } else {
+              self.addEventListener('nfdataisready', function () {
+                resolve(self.nfData);
+              }, false);
+            }
+          });
+        }
+      });
+    }());
+  </script>
+</dom-module>

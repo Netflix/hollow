@@ -1,0 +1,231 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>VMS Blobs</title>
+        <script src="//reboot.prod.netflix.net/dist/4/webcomponents.js"></script>
+        <link rel="import" href="//reboot.prod.netflix.net/dist/4/netflix.html" />
+        <link rel="import" href="components/nf-vms-pin-split-button/nf-vms-pin-split-button.html" />
+        <link rel="import" href="components/nf-templated-list/nf-templated-list.html" />
+        <link rel="import" href="components/nf-templated-list-search/nf-templated-list-search.html" />
+        <link rel="import" href="bower_components/iron-collapse/iron-collapse.html" />
+        <link rel="stylesheet" href="css/app.css" />
+    </head>
+    <body unresolved>
+        <template id="app" is="dom-bind">
+            <nav class$="{{ environment }}">
+              <ul>
+                <li class="logo">VMS Blobs</li>
+                <li><a href="hipchat://www.hipchat.com/room/VMS%20Team">Help</a></li>
+              </ul>
+            </nav>
+
+            <main id="mainContainer" class="isLoading">
+                <section id="loadingContainer" class="txt-center">
+                    <h1>Fetching blobs... <img src="//reboot.prod.netflix.net/dist/4/img/loading.gif"></h1>
+                </section>
+
+                <header style="margin-bottom: 1em;" class="hideLoading">
+                    <h1><span class="nf-light">VIP:</span> <span>{{ vipName }}</span></h1>
+
+                    <grouped class="nf-right with-icon" on-click="togglePoisonedBlobs">
+                        <nf-icon name="blocked" width="12" height="12"></nf-icon>
+                        <input type="checkbox" id="togglePoisonedCheckbox">
+                        <label for="togglePoisonedCheckbox">Include Poisoned</label>
+                    </grouped>
+
+                    <grouped class="nf-right with-icon" on-click="toggleTimezone">
+                        <nf-icon name="time" width="12" height="12"></nf-icon>
+                        <input type="checkbox" id="toggleUtcCheckbox">
+                        <label for="toggleUtcCheckbox">Show UTC time</label>
+                    </grouped>
+                </header>
+
+                <div style="margin-bottom: 1.5em;" class="hideLoading" hidden>
+                    <h3 class="nf-light">Pinned Blobs</h3>
+                    <nf-templated-list id="pinnedBlobTable" on-click="handleBlobIconClick">
+                        <div class="header row nf-grid" style="align-items: center;">
+                            <div class="col nf-4" data-sort-prop="publishDate">Published at</div>
+                            <div class="col nf-5"></div>
+                            <div class="col nf-2" data-sort-prop="version">Version</div>
+                            <div class="col nf-1"></div>
+                            <div class="col nf-1"></div>
+                            <div class="col nf-1"></div>
+                            <div class="col nf-1"></div>
+                            <div class="col nf-1"></div>
+                        </div>
+                        <template class="itemTemplate">
+                            <div class="row nf-grid" style="align-items: center; min-height: 58px; background-color: rgba(71,140,200,0.125);">
+                                <div class="col nf-4">[[ item.publishDateStr ]]</div>
+                                <div class="col nf-5">
+                                    <nf-vms-pin-split-button vip$="[[ vipName ]]"
+                                                             version$="[[ item.version ]]"
+                                                             regions$="[[ item.regions ]]">
+                                    </nf-vms-pin-split-button>
+                                </div>
+                                <div class="col nf-2" style="color: #777777;">[[ item.version ]]</div>
+                                <div class="col nf-1" style="text-align: center;">
+                                </div>
+                                <div class="col nf-1" style="text-align: center;">
+                                    <template is="dom-if" if="[[ item.hasBrokenChain ]]">
+                                        <nf-icon name="brokenChain" color="#B6272B"></nf-icon>
+                                    </template>
+                                </div>
+                                <div class="col nf-1" style="text-align: center;">
+                                    <template is="dom-if" if="[[ item.hasDelta ]]">
+                                        <nf-icon name="triangle" class="is-button"
+                                                 color="#777777" hover-color="#478CC8"
+                                                 data-version$="[[ item.version ]]"
+                                                 data-blob-type="DELTA"></nf-icon>
+                                    </template>
+                                </div>
+                                <div class="col nf-1" style="text-align: center;">
+                                    <template is="dom-if" if="[[ item.hasReverseDelta ]]">
+                                        <nf-icon name="invertedTriangle" class="is-button"
+                                                 color="#777777" hover-color="#478CC8"
+                                                 data-version$="[[ item.version ]]"
+                                                 data-blob-type="REVERSEDELTA"></nf-icon>
+                                    </template>
+                                </div>
+                                <div class="col nf-1" style="text-align: center;">
+                                    <template is="dom-if" if="[[ item.hasSnapshot ]]">
+                                        <nf-icon name="cube" class="is-button"
+                                                 color="#777777" hover-color="#478CC8"
+                                                 data-version$="[[ item.version ]]"
+                                                 data-blob-type="SNAPSHOT"></nf-icon>
+                                    </template>
+                                </div>
+                            </div>
+                            <div></div>
+                            <iron-collapse opened$="{{ item.showDetails }}">
+                                <div style="background-color: #C4C4C4; border-color: #D9D9D9; border-style: solid; border-width: 0px 1px;" class="clearfix">
+                                    <div class="nf-left" style="width: 3%; height: 0;">
+                                        <h4 style="transform: rotate(90deg); position: relative; top: 25px;">[[ item.selectedType.type ]]</h4>
+                                    </div>
+                                    <table style="background-color: #F8F8F8; width: 97%;" class="nf-right">
+                                        <tbody>
+                                            <template is="dom-repeat" items="[[item.selectedType.attributes]]">
+                                                <tr>
+                                                    <td style="width: 23%;">[[item.label]]</td>
+                                                    <td>[[item.value]]</td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </iron-collapse>
+                        </template>
+                    </nf-templated-list>
+                </div>
+
+                <div id="scrollableContainer" class="hideLoading">
+                    <div class="clearfix">
+                        <h3 class="nf-light nf-left">All Blobs</h3>
+                        <nf-templated-list-search placeholder="Filter blobs by version..." table="blobTable"
+                                                  class="nf-right"></nf-templated-list-search>
+                    </div>
+
+                    <div class="clearfix" style="height: calc(100% - 50px); overflow-y: auto;">
+                        <nf-templated-list id="blobTable" on-click="handleBlobIconClick" custom-pagination>
+                            <div class="header row nf-grid" style="align-items: center;">
+                                <div class="col nf-4" data-sort-prop="publishDate">Published at</div>
+                                <div class="col nf-4"></div>
+                                <div class="col nf-2" data-sort-prop="version">Version</div>
+                                <div class="col nf-1">Changes</div>
+                                <div class="col nf-1"></div>
+                                <div class="col nf-1"></div>
+                                <div class="col nf-1"></div>
+                                <div class="col nf-1"></div>
+                                <div class="col nf-1"></div>
+                            </div>
+                            <template class="itemTemplate">
+                                <div class="row nf-grid" style="align-items: center; min-height: 58px;">
+                                    <div class="col nf-4">[[ item.publishDateStr ]]</div>
+                                    <div class="col nf-4">
+                                        <template is="dom-if" if="[[ item.isPinnable ]]">
+                                            <template is="dom-if" if="[[ item.isPinned ]]">
+                                                <div style="margin-left: 5px; color: #8DAC71;">
+                                                    <nf-icon name="pin" color="#8DAC71"></nf-icon> Pinned
+                                                </div>
+                                            </template>
+                                            <template is="dom-if" if="[[ !item.isPinned ]]">
+                                                <nf-vms-pin-split-button vip$="[[ vipName ]]"
+                                                                         version$="[[ item.version ]]"
+                                                                         regions$="[[ item.regions ]]">
+                                                </nf-vms-pin-split-button>
+                                            </template>
+                                        </template>
+                                    </div>
+                                    <div class="col nf-2" style="color: #777777;">[[ item.version ]]</div>
+                                    <div class="col nf-1" style="color: #777777;">
+                                        <a href$="[[ item.changeUrl ]]" target="_blank">
+                                        [[ item.changes ]]
+                                        </a>
+                                    </div>
+                                    <div class="col nf-1" style="text-align: center;">
+                                        <template is="dom-if" if="[[ item.isPoisoned ]]">
+                                            <nf-icon name="blocked" color="#B6272B" width="14" height="14"></nf-icon>
+                                        </template>
+                                    </div>
+                                    <div class="col nf-1" style="text-align: center;">
+                                        <template is="dom-if" if="[[ item.hasBrokenChain ]]">
+                                            <nf-icon name="brokenChain" color="#B6272B"></nf-icon>
+                                        </template>
+                                    </div>
+                                    <div class="col nf-1" style="text-align: center;">
+                                        <template is="dom-if" if="[[ item.hasDelta ]]">
+                                            <nf-icon name="triangle" class="is-button"
+                                                     color="#777777" hover-color="#478CC8"
+                                                     data-version$="[[ item.version ]]"
+                                                     data-blob-type="DELTA"></nf-icon>
+                                        </template>
+                                    </div>
+                                    <div class="col nf-1" style="text-align: center;">
+                                        <template is="dom-if" if="[[ item.hasReverseDelta ]]">
+                                            <nf-icon name="invertedTriangle" class="is-button"
+                                                     color="#777777" hover-color="#478CC8"
+                                                     data-version$="[[ item.version ]]"
+                                                     data-blob-type="REVERSEDELTA"></nf-icon>
+                                        </template>
+                                    </div>
+                                    <div class="col nf-1" style="text-align: center;">
+                                        <template is="dom-if" if="[[ item.hasSnapshot ]]">
+                                            <nf-icon name="cube" class="is-button"
+                                                     color="#777777" hover-color="#478CC8"
+                                                     data-version$="[[ item.version ]]"
+                                                     data-blob-type="SNAPSHOT"></nf-icon>
+                                        </template>
+                                    </div>
+                                </div>
+                                <div></div>
+                                <iron-collapse opened$="{{ item.showDetails }}">
+                                    <div style="background-color: #C4C4C4; border-color: #D9D9D9; border-style: solid; border-width: 0px 1px;" class="clearfix">
+                                        <div class="nf-left" style="width: 3%; height: 0;">
+                                            <h4 style="transform: rotate(90deg); position: relative; top: 25px;">[[ item.selectedType.type ]]</h4>
+                                        </div>
+                                        <table style="background-color: #F8F8F8; width: 97%;" class="nf-right">
+                                            <tbody>
+                                                <template is="dom-repeat" items="[[item.selectedType.attributes]]">
+                                                    <tr>
+                                                        <td style="width: 23%;">[[item.label]]</td>
+                                                        <td>[[item.value]]</td>
+                                                    </tr>
+                                                </template>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </iron-collapse>
+                            </template>
+                        </nf-templated-list>
+
+                        <div style="margin-top: 1em;">
+                            <nf-table-paginate-infinite table="blobTable" size="25"></nf-table-paginate-infinite>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </template>
+
+        <script src="js/app.js"></script>
+    </body>
+</html>

@@ -1,0 +1,164 @@
+<link rel="import" href="nf-templated-list-search-style.html" />
+
+<dom-module id="nf-templated-list-search">
+
+  <template>
+    <style include="nf-templated-list-search-style"></style>
+
+    <input id="input" placeholder="{{placeholder}}">
+    <nf-icon id="searchIcon" name="search"></nf-icon>
+    <nf-icon id="clearIcon" name="close" class="is-button"></nf-icon>
+    <img id="progressIndicator" src="//reboot.prod.netflix.net/dist/4/img/loading.gif"
+         class$="{{_computeClass(isSearching)}}">
+  </template>
+
+  <script>
+    (function () {
+
+      'use strict';
+
+      Polymer({
+
+        is: 'nf-templated-list-search',
+
+        behaviors: [ NfRebootBehavior, NfFilterBehavior ],
+
+        properties: {
+          placeholder: {
+            type: String,
+            value: 'Search',
+            notify: true
+          },
+          table: {
+            notify: true
+          }
+        },
+
+        getTable: function () {
+          var self = this,
+              retryDelay = 300,
+              selector,
+              table;
+
+          if (this.table) {
+            if (typeof this.table === 'string') {
+              selector = this.table.indexOf('#') === 0 ? this.table : '#' + this.table;
+              table = Polymer.dom(document).querySelector(selector);
+            } else if (typeof this.table === 'object') {
+              table = this.table;
+            }
+          } else {
+            table = document.querySelector('table[is=nf-table]');
+          }
+
+          if (table && table.getNfData) {
+            table.getNfData().then(function (nfData) {
+              self.setup(nfData);
+
+              self.nfData.addEventListener('filteringStarted', function () {
+                self.isSearching = true;
+              }, false);
+
+              self.nfData.addEventListener('filteringFinished', function () {
+                self.isSearching = false;
+              }, false);
+            });
+          } else {
+            // relevant table has not yet been found,
+            // retry in a little bit (probably template has not run yet)
+            window.setTimeout(function () {
+              self.getTable();
+            }, retryDelay);
+          }
+        },
+
+        assignEventHandlers: function () {
+          var delay = 270,
+              self = this;
+
+          this.$.input.addEventListener('keyup', function (e) {
+            var keyCode = e.keyCode;
+            window.clearTimeout(self.timeoutId);
+            self.timeoutId = window.setTimeout(function () {
+              if (keyCode === 27) {
+                self.$.input.value = '';
+                self.setQuery('');
+              } else {
+                self.setQuery(self.$.input.value.trim().toLowerCase());
+              }
+            }, delay);
+          }, false);
+
+          this.$.clearIcon.addEventListener('click', function () {
+            self.$.input.value = '';
+            self.setQuery('');
+            self.$.input.focus();
+          }, false);
+        },
+
+        filter: function (data) {
+          var retVal,
+              self = this;
+
+          var filterFunction = function (row) {
+            var matchFound = false;;
+            for (let rowKey in row) {
+              if (doesItemMatchQuery(row[rowKey])) {
+                matchFound = true;
+                break;
+              }
+            }
+            return matchFound;
+          };
+
+          var doesItemMatchQuery = function (itemObj) {
+            var isMatch = false,
+                itemVal = '',
+                item = itemObj;
+
+            if (typeof item === 'number') {
+              itemVal = item.toString();
+            } else if (typeof item === 'string') {
+              itemVal = item.toLowerCase();
+            }
+            if (itemVal.indexOf(self.query) !== -1) {
+              isMatch = true;
+            }
+            return isMatch;
+          };
+
+          if (Array.isArray(data)) {
+            retVal = data.filter(filterFunction, this);
+          } else {
+            retVal = [];
+          }
+          return retVal;
+        },
+
+        getQuery: function () {
+          return this.query;
+        },
+
+        ready: function () {
+          this.timeoutId = 0;
+          this.getTable();
+          this.assignEventHandlers();
+        },
+
+        _computeClass: function (isSearching) {
+          return this.tokenList({ isSearching: isSearching });
+        },
+
+        tokenList: function (obj) {
+          var pieces = [];
+          for (var key in obj) {
+            if (obj[key]) {
+              pieces.push(key);
+            }
+          }
+          return pieces.join(' ');
+        }
+      });
+    }());
+  </script>
+</dom-module>
