@@ -12,7 +12,9 @@ public interface TransformerLogger {
         TransformCycleSuccess,
         TransformCycleFailed,
         IndividualTransformFailed,
+        InputDataVersionIds,
         WroteBlob,
+        WritingBlobsFailed,
 
         //// TRANSFORMATION ERRORS ////
 

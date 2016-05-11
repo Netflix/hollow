@@ -1,7 +1,8 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.vms.transformer.logger.TransformerServerLogger;
+import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 
+import com.netflix.vms.transformer.logger.TransformerServerLogger;
 import java.util.function.Consumer;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerFiles;
@@ -24,6 +25,7 @@ public class TransformerServerContext implements TransformerContext {
     private final TransformerFiles files;
     private final TransformerPlatformLibraries platformLibraries;
     private final PublicationHistoryConsumer publicationHistoryConsumer;
+    private final TransformerMetricRecorder metricRecorder;
 
     /* fields */
     private TransformerServerLogger logger;
@@ -32,6 +34,7 @@ public class TransformerServerContext implements TransformerContext {
 
     public TransformerServerContext(
             TransformerServerLogger logger,
+            TransformerMetricRecorder metricRecorder,
             TransformerCassandraHelper poisonStatesHelper,
             TransformerCassandraHelper hollowValidationStats,
             TransformerCassandraHelper canaryResults,
@@ -39,6 +42,7 @@ public class TransformerServerContext implements TransformerContext {
             TransformerPlatformLibraries platformLibraries,
             PublicationHistoryConsumer publicationHistoryConsumer) {
         this.logger = logger;
+        this.metricRecorder = metricRecorder;
         this.poisonStatesHelper = poisonStatesHelper;
         this.hollowValidationStats = hollowValidationStats;
         this.canaryResults = canaryResults;
@@ -61,6 +65,11 @@ public class TransformerServerContext implements TransformerContext {
     @Override
     public TransformerLogger getLogger() {
         return logger;
+    }
+
+    @Override
+    public TransformerMetricRecorder getMetricRecorder() {
+        return metricRecorder;
     }
 
     @Override

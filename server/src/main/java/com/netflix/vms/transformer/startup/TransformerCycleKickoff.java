@@ -1,13 +1,13 @@
 package com.netflix.vms.transformer.startup;
 
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.WaitForNextCycle;
-
-import com.netflix.vms.transformer.resource.v1.VMSPublishWorkflowHistoryAdmin;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WaitForNextCycleDuration;
 
 import com.google.inject.Inject;
 import com.netflix.aws.file.FileStore;
 import com.netflix.vms.transformer.TransformCycle;
 import com.netflix.vms.transformer.TransformerServerContext;
+import com.netflix.vms.transformer.atlas.AtlasTransformerMetricRecorder;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.elasticsearch.ElasticSearchClient;
@@ -15,6 +15,7 @@ import com.netflix.vms.transformer.io.LZ4VMSTransformerFiles;
 import com.netflix.vms.transformer.logger.TransformerServerLogger;
 import com.netflix.vms.transformer.publish.workflow.HollowPublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowConfig;
+import com.netflix.vms.transformer.resource.v1.VMSPublishWorkflowHistoryAdmin;
 import com.netflix.vms.transformer.servlet.platform.TransformerServerPlatformLibraries;
 import com.netflix.vms.transformer.util.TransformerServerCassandraHelper;
 
@@ -25,9 +26,6 @@ public class TransformerCycleKickoff {
     @Inject
     public TransformerCycleKickoff(TransformerServerPlatformLibraries platformLibs, ElasticSearchClient esClient, TransformerConfig config) {
         FileStore.useMultipartUploadWhenApplicable(true);
-
-        System.out.println("TRANSFORMER VIP: " + config.getTransformerVip());
-        System.out.println("CONVERTER VIP: " + config.getConverterVip());
 
         TransformerContext ctx = ctx(platformLibs, esClient, config);
         HollowPublishWorkflowStager publishStager = publishStager(ctx, config);
@@ -53,7 +51,10 @@ public class TransformerCycleKickoff {
                 long timeSinceLastCycle = System.currentTimeMillis() - previousCycleStartTime;
                 long msUntilNextCycle = MIN_CYCLE_TIME - timeSinceLastCycle;
 
-                ctx.getLogger().info(WaitForNextCycle, "Waiting " + msUntilNextCycle + "ms until beginning next cycle");
+                if(msUntilNextCycle > 0) {
+                    ctx.getLogger().info(WaitForNextCycle, "Waiting " + msUntilNextCycle + "ms until beginning next cycle");
+                    ctx.getMetricRecorder().recordMetric(WaitForNextCycleDuration, msUntilNextCycle);
+                }
 
                 while(msUntilNextCycle > 0) {
                     try {
@@ -76,6 +77,7 @@ public class TransformerCycleKickoff {
     private final TransformerContext ctx(TransformerServerPlatformLibraries platformLibs, ElasticSearchClient esClient, TransformerConfig config) {
         return new TransformerServerContext(
                 new TransformerServerLogger(config, esClient),
+                new AtlasTransformerMetricRecorder(),
                 new TransformerServerCassandraHelper(platformLibs.getAstyanax(), "cass_dpt", "vms_poison_states", "poison_states"),
                 new TransformerServerCassandraHelper(platformLibs.getAstyanax(), "cass_dpt", "hollow_publish_workflow", "hollow_validation_stats"),
                 new TransformerServerCassandraHelper(platformLibs.getAstyanax(), "cass_dpt", "canary_validation", "canary_results"),
