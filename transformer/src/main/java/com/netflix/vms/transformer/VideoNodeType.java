@@ -84,7 +84,7 @@ public enum VideoNodeType {
     }
 
     private static final Set<VideoNodeType> topNodeSet = Collections.unmodifiableSet(EnumSet.of(SHOW, MOVIE));
-    private static final Set<VideoNodeType> standaloneSet = Collections.unmodifiableSet(EnumSet.of(MOVIE, SUPPLEMENTAL));
+    private static final Set<VideoNodeType> standaloneSet = Collections.unmodifiableSet(EnumSet.of(MOVIE));
     private static final Map<String, VideoNodeType> map = new HashMap<String, VideoNodeType>();
     private static final Map<VideoNodeType, String> reverseMap = new HashMap<VideoNodeType, String>();
 
