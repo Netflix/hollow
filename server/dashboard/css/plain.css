@@ -1,0 +1,82 @@
+/**
+	ufd 0.6: http://code.google.com/p/ufd/
+	
+	This is the default skin, a plain but attractive dropdown.
+*/
+
+span.ufd.plain {
+    height: 18px;
+    background-color: #B5B8C8; /* http://blog.toolman.geek.nz/2009/12/annoying-ie6-bug-of-day.html */
+    border: 1px solid #B5B8C8;
+}
+
+span.ufd.plain-focus {
+    background-color: #757888;
+    border: 1px solid #757888;
+}
+
+.ufd.plain input {
+    line-height: 16px !important;
+    height: 16px;
+    padding: 1px 3px;
+    border: 0px;
+}
+
+.ufd.plain input.disabled {
+	color: #777;
+    background-color: #eee !important;
+}
+
+.ufd.plain input.focus {
+}
+
+.ufd.plain button {
+    width: 18px;
+    height: 18px;
+    margin-left: 1px; /* for divider */
+    background: url(icon.gif) no-repeat 0px 0px;
+}
+
+.ufd.plain button.focus {
+}
+
+
+.ufd.plain button.hover {
+	background-position: -18px 0px;
+}
+
+.ufd.plain button.mouseDown {
+	background-position: -36px 0px;
+}
+
+.ufd.plain button.disabled {
+	background-position: -54px 0px !important;
+}
+
+/* dropdown */
+
+#ufd-container .plain div.list-scroll {
+    border: 1px solid #757888;
+    border-top-width: 0px;
+    background-color: #FFF;
+}
+
+#ufd-container .plain div.list-wrapper-up div.list-scroll {
+    border-top-width: 1px;
+    border-bottom-width: 0px;
+}
+
+#ufd-container .plain li {
+    padding-left: 5px;
+}
+
+#ufd-container .plain li em {
+	font-weight: bold;
+	font-style: normal;
+}
+
+
+#ufd-container .plain li.active {
+	background-color: highlight;
+	color: highlighttext;
+}

@@ -1,0 +1,114 @@
+<html>
+    <head>
+        <title>VideoMetaData Information Retrieval</title>
+        <!-- JQuery JS and CSS -->
+        <script type="text/javascript"  src="miner.js"></script>
+        
+        <!-- JQuery JS and CSS -->
+        <script src="jquery/js/jquery-1.9.1.js"></script>
+        <script src="jquery/js/jquery-ui-1.10.3.vms.js"></script>
+        <script src="jquery/js/jquery.jsonview.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="jquery/css/smoothness/jquery-ui.min.css"/>
+        <link rel="stylesheet" type="text/css" href="css/qe.css"/>
+        <link rel="stylesheet" type="text/css" href="css/jquery.jsonview.css"/>
+        <link rel="stylesheet" type="text/css" href="css/jquery.dataTables_themeroller.css"/>
+        <link rel="stylesheet" type="text/css" href="jquery/css/vms/jquery-ui.css"/>
+
+        <script type="text/javascript"  src="widgets.js"></script>
+        <script type="text/javascript"  src="searchutils.js"></script>
+        <script type="text/javascript"  src="responsemodels.js"></script>
+        <script type="text/javascript"  src="vmsparams.js"></script>
+
+        <script>
+            $(document).ready(function() {
+                $("#miner-tabs").tabs();
+                new MinerDashboard().initialize();
+            });
+        </script>
+    </head>
+
+    <!--
+        HTML body section
+    -->
+    <body style="font-size:12px; background-color: #FFF">
+    <div class="hidden">
+        <!-- es_vmsops.us-east-1.dyntest.netflix.net   ec2-54-242-42-5.compute-1.amazonaws.com -->
+        Elasticsearch cluster hostname
+        <input type="textbox" id="id-elasticsearchhost-box" size="35" value="es_vmsops.us-east-1.dyntest.netflix.net"></input>
+        <button id="mid-hostname-apply-btn" class="ui-widget-content">Refresh</button> 
+    </div>
+    <div id="miner-tabs">
+        <ul>
+            <li><a href="#mid-tab-index">Indexes</a></li>
+            <li><a href="#mid-tab-schema">Schema</a></li>
+            <li><a href="#mid-tab-search">Input Search</a></li>
+        </ul>
+        <div id="mid-tab-index">
+            <div class='ui-widget-content'>
+            <table>
+                    <tr>
+                        <td>Type</td> <td>Index</td> <td>Versions</td>
+                    </tr>
+                    <tr>
+                    <td style="vertical-align:top"><div id="mid-index-types"></div></td>
+                    <td style="vertical-align:top"><div id="mid-index-list"></div></td>
+                    <td style="vertical-align:top"><div id="mid-index-versions"></div></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+            <div id="mid-tab-schema">
+            <div id="tab-01-toolbar" class="ui-widget-header ui-corner-all">
+                Enter index-name (from Indexes tab) <input type="textbox" id="mid-indexname-box" size="26"></input>
+                <button id="mid-indexname-btn">Query</button>
+            </div>
+            <p/>
+            <div class='ui-widget-content'>
+                <table>
+                    <tr>
+                    <td style="vertical-align:top"><div id="mid-indexname-locations"></div></td>
+                    <td style="vertical-align:top"><div id="mid-indexname-results" class='ui-widget-content'></div></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div id="mid-tab-search">
+            <div id="tab-1-toolbar" class="ui-widget-header ui-corner-all">
+                Index name: <input type="textbox" id="mid-search-index-name" size="26"></input>
+                Index type: <input type="textbox" id="mid-search-index-type" size="15"></input>
+                Query: <input type="textbox" id="mid-search-query"></input>
+                Fields: <input type="textbox" id="mid-search-fields"></input>
+                Limit results: <input type="textbox" id="mid-search-size" value="1" size="3"></input>
+                View:
+                <span id="mid-radio-view">
+                    <input type="radio" id="text-view" name="radio"/><label for="text-view">Text</label>
+                    <input type="radio" id="tree-view" name="radio" checked="checked" /><label for="tree-view">Tree</label>
+                </span>
+            </div>
+            <div id="tab-2-toolbar" class="ui-widget-content ui-corner-all">
+                <table style='text-align: right; font-size: 12px;'>
+                    <tr  class = "vms-group">
+                        <td>Keybase version (optional for events):</td>  <td><input type="textbox" id="mid-search-version" size="50"></input></td>
+                        <td>
+                            Vip name (required for events): <input type="textbox" id="mid-search-vip"></input>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <input type="textbox" id="mid-get-search-url" size="150"></input>
+            <button id="mid-build-search-btn">Build Search URL</button>
+            <button id="mid-run-search-btn">Search</button>
+            <p/>
+            <div class='ui-widget-content'>
+                <table>
+                    <tr>
+                    <td style="vertical-align:top"><div id="mid-search-locations"></div></td>
+                    <td style="vertical-align:top"><div id="mid-search-results" class='ui-widget-content'></div></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    </body>
+</html>

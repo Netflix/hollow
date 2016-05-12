@@ -1,0 +1,399 @@
+<html>
+    <head>
+        <title>VMS Server Dashboard</title>
+        <!-- JQuery JS and CSS -->
+        <script src="jquery/js/jquery-1.9.1.js"></script>
+        <script src="jquery/js/jquery.dataTables.js"></script>
+        <script src="jquery/js/jquery-ui-1.10.3.vms.js"></script>
+        <script src="jquery/js/jquery.flot.js"></script>
+        <script src="jquery/js/jquery.jsonview.js"></script>
+
+        <!-- Codemirror -->
+        <link rel="stylesheet" href="codemirror/lib/codemirror.css">
+        <link rel="stylesheet" href="codemirror/addon/dialog/dialog.css">
+        <script src="codemirror/lib/codemirror.js"></script>
+        <script src="codemirror/mode/groovy/groovy.js"></script>
+        <script src="codemirror/addon/dialog/dialog.js"></script>
+        <script src="codemirror/addon/search/searchcursor.js"></script>
+        <script src="codemirror/addon/search/search.js"></script>
+        <style type="text/css">.CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black;}</style>
+
+        <link rel="stylesheet" type="text/css" href="jquery/css/smoothness/jquery-ui.min.css"/>
+        <link rel="stylesheet" type="text/css" href="css/qe.css"/>
+        <link rel="stylesheet" type="text/css" href="css/jquery.jsonview.css"/>
+        <link rel="stylesheet" type="text/css" href="css/jquery.dataTables_themeroller.css"/>
+        <link rel="stylesheet" type="text/css" href="jquery/css/vms/jquery-ui.css"/>
+
+        <!-- this is where the widgets are created -->
+        <script type="text/javascript"  src="okeanosdashboard.js"></script>
+        <script type="text/javascript"  src="vmsserverinfotab.js"></script>
+        <script type="text/javascript"  src="servercyclesummary.js"></script>
+        <script type="text/javascript"  src="inputvalidation.js"></script>
+        <script type="text/javascript"  src="serverpublishtab.js"></script>
+        <script type="text/javascript"  src="cyclereplaytab.js"></script>
+        <script type="text/javascript"  src="serverinputdatatab.js"></script>
+        <script type="text/javascript"  src="widgets.js"></script>
+        <script type="text/javascript"  src="searchutils.js"></script>
+        <script type="text/javascript"  src="responsemodels.js"></script>
+        <script type="text/javascript"  src="vmsparams.js"></script>
+        <script type="text/javascript"  src="formatter.js"></script>
+        <!-- script type="text/javascript"  src="serverStats.js"></script -->
+        <script>
+            $(function() {
+                $("#data-dashboard-tab").tabs();
+                $("#cycle-stats-tabs").tabs();
+                $("#client-dashboard-tab").tabs();
+                $("#stats-client-historic").tabs();
+                $("#stats-titles").tabs();
+                $("#debug-dashboard-tab").tabs();
+                $("#okeanos-tabs").tabs();
+            });
+
+            $(document).ready(function() {new Dashboard().initialize()});
+        </script>
+        
+        <style>
+            .header {
+                border-top:1px solid #99ccff;
+                border-bottom:1px solid #99ccff;
+            }
+            .header_prod {
+                border-top:1px solid #c00;
+                border-bottom:1px solid #c00;
+            }
+            .header_test {
+                border-top:1px solid #009999;
+                border-bottom:1px solid #009999;
+            }
+            .header_int {
+                border-top:1px solid #003399;
+                border-bottom:1px solid #003399;
+            }
+        </style>
+    </head>
+
+    <!--
+        HTML body section
+    -->
+    <body style="font-size:12px; background-color: #FFF">
+        <div id="header" class="header">
+            <table  cellpadding=2 cellspacing=2 border=0>
+              <tr>
+                <th>ENV:</th><td id="id-env-txt">test</td>
+                <td colspan=2 width=50px>&nbsp;</td>
+                <th>VIP:</th><td id="id-vip-txt">local</td>
+              </tr>
+            </table>
+        </div>
+        <div id="okeanos-tabs" >
+            <ul>
+                <li><a href="#cycle-view">Server</a></li>
+                <li><a href="#client-dashboard-tab">Client</a></li>
+                <li><a href="#data-dashboard-tab">Data Metric</a></li>
+                <li><a href="#io-dashboard-tab">Data IO</a></li>
+                <li><a href="#debug-dashboard-tab">Diagnostics</a></li>
+                <li><a href="#cb-dashboard-tab">Circuit Breaker</a></li>
+            </ul>
+            <div id="cycle-view">
+                <div id="stats-tab-toolbar" class="ui-widget-tooolbar">
+                    VMS vip: 
+                    <select id = "id-vms-vip-select" style="display:inline-block;">
+                        <option></option>
+                    </select> 
+                    Select day (UTC):
+                    <select id = "id-vms-index-select" style="display:inline-block;">
+                        <option></option>
+                    </select> 
+                    Select VMS cycle:
+                    <select id = "id-vms-cycle-select" style="display:inline-block;">
+                        <option></option>
+                    </select> 
+                    <div id="id-cycle-date-txt" style="display:inline-block; margin-left: 25px; margin-right: 25px"></div> 
+                    <button id="id-cycle-prev-btn" style="display:inline-block;">Prev</button>
+                    <button id="id-cycle-next-btn" style="display:inline-block;">Next</button>
+                    <button id="id-cycle-refresh-btn" class='hidden'>Apply</button>
+                </div>
+                <div id="cycle-stats-tabs" class="ui-widget-content ui-helper-clearfix">
+                    <ul>
+                        <li><a href="#cycle-status-tab">Cycles</a></li>
+                        <li><a href="#cycle-properties-tab">Properties</a></li>
+                        <li><a href="#cycle-publish-tab">Publish</a></li>
+                        <li><a href="#cycle-error-logs-tab">Errors</a></li>
+                        <li><a href="#cycle-circuitbreaker-tab">Circuit Breaker</a></li>
+                        <li><a href="#cycle-input-validation-tab">Input Validation</a></li>
+                        <li><a href="#cycle-error-codes-tab">Error Codes</a></li>
+                        <li><a href="#cycle-replay-tab">Replay Cycle</a></li>
+                        <li><a href="#cycle-inputdata-tab">Coldstarts and Events</a></li>
+                        <li><a href="#cycle-input-search-tab">Search</a></li>
+                        <li><a href="#cycle-transformations-tab">Transformations</a></li>
+                        <li><a href="#data-injection-tab">Data Injection</a></li>
+                        <li><a href="#expander-tab">+</a></li>
+                    </ul>
+                    <!-- NOTE: the divs below should be in the same order as listed in <ul> section -->
+                    <div id="cycle-status-tab">
+                        <!--   width:55%; style="width:43%;float:left; -->
+                            <div id = "id-cycle-timestamp-div" style="display: none; width:49%; height:825px; float:left;margin-right:0px; overflow-y: auto;"></div>
+                            <div id = "id-vms-server-dashboard" class='ui-widget-content' style="width:50%; float:right;"></div>
+                        <!-- /div -->
+                    </div>
+                    <div id="cycle-properties-tab">
+                        <b>Note:</b> isModified flag is not updated for startup properties.<br>
+                        <div id = "id-properties-table"></div>
+                    </div>
+                    <div id="cycle-publish-tab">
+                        <em>Publish failures</em>
+                        <div id="id-publish-failure-table"></div>
+                        <br>
+                        <em>Publish blobs to s3</em>
+                        <div id="id-s3-publish-table"></div>
+                        <br>
+                    </div>
+                    <div id="cycle-error-logs-tab">
+                        <div id="id-error-toolbar" class="ui-widget-header ui-corner-all" style="display:inline-block; padding: 4px">
+                            Search for ErrorCode (AND optionally id):
+                            <input  type="textbox" id="id-search-error-box" size="25" value=""></input>
+                            Log-level:
+                            <select id="id-loglevel-select" style="display:inline-block;">
+                                <option value="logLevel:error">Error</option>
+                                <option value="logLevel:error AND exception">Errors with Exceptions</option>
+                                <option value="(logLevel:warn OR logLevel:error)">Warn and above</option>
+                                <option value="(logLevel:warn OR logLevel:error OR logLevel:info)">Info and above</option>
+                                <option value="">No filter</option>
+                            </select>
+                            <button id="id-search-error-btn" class='ui-widget-content'>search</button>
+                        </div>
+                        <br>
+                        <div style="margin-top: 5px">
+                            <div id="id-cycle-error-list" style="width:25%; float:left;"></div>
+                            <div id="id-cycle-error-locations" style="width:73%; float:right;"></div>
+                        </div>
+                    </div>
+                    <div id="cycle-circuitbreaker-tab">
+                        <div id="id-cycle-circuitbreaker-locations"></div>
+                    </div>
+                    <div id="cycle-input-validation-tab">
+                        <table style="width:100%;">
+                            <tr>
+                                <td colspan="2">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                <div class='ui-widget-content'>Map Prefix:<input type="text" id="cycle-input-validation-map-filter"></div>
+                                            </td>
+                                            <td>
+                                                <div class='ui-widget-content'>
+                                                  Filter:
+                                                  <select class="target" id="cycle-input-validation-error-filter">
+                                                    <option value="all" selected="selected">All</option>
+                                                    <option value="Error">Error</option>
+                                                    <option value="Warning">Warning</option>
+                                                  </select>
+                                                </div>
+                                            </td>  
+                                            <td>
+                                                <button class='ui-widget-content' id="cycle-input-validation-search" style="font-size:11;">Search</button>
+                                            </td> 
+                                            <td>
+                                                <button class='ui-widget-content' id="cycle-input-validation-show-specification" style="font-size:11;">Show/Hide Specification</button>
+                                            </td> 
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="max-width:400px;" style="vertical-align: top;"><div id="cycle-input-validation-widget" style="max-width:400px; height: 800px;  overflow: scroll;"></div></td>
+                                <td style="width:50%;vertical-align: top;"><div id="cycle-input-validation-results" style="max-width:800px; height: 800px;  overflow: scroll;"></div></td>
+                                <td style="width:50%;">
+                                    <div id="cycle-input-validation-specification-source-div" style="font-size: 11px;">
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                        </div>
+                        <div id="cycle-input-validation-search-dialog" class="hidden">
+                            <div>Key:<input type="text" id="cycle-input-validation-search-dialog-key">
+                        </div>
+                    </div>
+                    <div id="cycle-error-codes-tab">
+                        Search for id (AND error-code-optional):
+                        <input  type="textbox" id="id-search-errorcode-box" size="25" value=""></input>
+                        <button id="id-search-errorcode-btn" class='ui-widget-content'>search</button>
+                        <br>
+                        <div id="id-cycle-errorcode-locations"></div>
+                    </div>
+                    <div id="cycle-replay-tab">
+                        <table>
+                        <tr><td>
+                            <div id="id-live-toolbar" class="ui-widget-header ui-corner-all" style="display:inline-block; padding: 4px">
+                                <div id="id-slowerlive-btn" class='ui-widget-content'></div>
+                                <div id="id-slowlive-btn" class='ui-widget-content'></div>
+                                <div id="id-startlive-btn" class='ui-widget-content'>play</div>
+                                <div id="id-fastlive-btn" class='ui-widget-content'></div>
+                                <div id="id-fasterlive-btn" class='ui-widget-content'></div>
+                            </div>
+                            <div id="id-live-dialog" title="Stop replay?" class="hidden">
+                                <p>
+                                    <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+                                    Replay running for long time, do you wish to continue?
+                                </p>
+                            </div>
+                        </td></tr>
+                        <tr><td>
+                        <div id="id-resolve-events-outer" class="shadow outerframelong">
+                            <div class="splunkfont">Splitter Mutation-Group Eventing Done</div>
+                            <div id="id-resolve-events-live"></div>
+                        </div>
+                        <div id="id-transformations-outer" class="shadow outerframelong">
+                            <div class="splunkfont">Transformations completed</div>
+                            <div id="id-transformations-live" class="innerframelong"></div>
+                        </div>
+                        <div id="id-worker-publish-outer" class="shadow outerframelong">
+                            <div class="splunkfont">State Engines Published</div>
+                            <div id="id-worker-publish-live" class="innerframelong"></div>
+                        </div>
+                        <div id="id-s3-publish-outer" class="shadow outerframelong">
+                            <div class="splunkfont">S3 Blobs Published</div>
+                            <div id="id-s3-publish-live" class="innerframelong"></div>
+                        </div>
+                        <div id="id-s3-copy-outer" class="shadow outerframelong">
+                            <div class="splunkfont">Cross Region Copy</div>
+                            <div id="id-s3-copy-live" class="innerframelong"></div>
+                        </div>
+                        <div id="id-global-tail-outer" class="shadow outerframesuperlong">
+                            <div class="splunkfont">Status</div>
+                            <div id="id-global-tail-div" class="innerframesuperlong"></div>
+                        </div>
+                        </td></tr>
+                        </table>
+                    </div>
+                    <div id="cycle-inputdata-tab">
+                        <div id="cycle-input-data-view">
+                            <h3>Data version:
+                                <div style="display:inline-block;" id="id-cycle-data-version-locations"></div>
+                            </h3>
+                            <br>
+                            <h3>Input:</h3>
+                            <div id="id-cycle-input-shardinfo-locations"></div>
+                            <br>
+                            <h3>Sharded data:</h3>
+                            <div id="id-cycle-output-shardinfo-locations"></div>
+                        </div>
+                    </div>
+                    <div id="cycle-input-search-tab">
+                        Query: <input type="textbox" id="id-input-search-query"></input>
+                        Fields: <input type="textbox" id="id-search-fields"></input>
+                        Limit results: <input type="textbox" id="id-search-size" value="1" size="3"></input>
+                        <input type="checkbox" id="id-search-coldstart" checked>
+                        <label for="id-search-coldstart">coldstarts</label>
+                        <input type="checkbox" id="id-search-events" checked>
+                        <label for="id-search-events">events</label>
+                        <span id="input-search-radio-view">
+                            <input type="radio" id="input-search-text-view" name="radio"/><label for="input-search-text-view">Text</label>
+                            <input type="radio" id="input-search-tree-view" name="radio" checked="checked" /><label for="input-search-tree-view">Tree</label>
+                        </span>
+                        <br>
+                        <input type="textbox" id="id-get-search-url" size="130"></input>
+                        <button id="id-run-search-btn">Search</button>
+                        <table>
+                            <tr>
+                                <td style="vertical-align:top"><div id="id-indexname-locations"></div></td>
+                                <td style="vertical-align:top"><div id="id-search-indexname-types" class='ui-widget-content'></div></td>
+                                <td style="vertical-align:top"><div id="id-search-indexname-results" class='ui-widget-content'></div></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div id="cycle-transformations-tab">
+                        Pipeline worker:
+                        <select id="id-workerid-select">
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                        </select>
+                        <div id="id-cycle-transformations-locations"></div>
+                    </div>
+                    <div id="data-injection-tab">
+                        <div id="datainjection-table">
+                            <table>
+                                <tr>
+                                    <td>Code</td>
+                                    <td>Message</td>
+                                </tr>
+                                <tr>
+                                    <td style="vertical-align: top"><div
+                                            id="id-datainjection-locations"></div></td>
+                                    <td style="vertical-align: top"><div
+                                            id="id-datainjection-results" class='ui-widget-content'
+                                            style="word-wrap: break-word;"></div></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="expander-tab"></div>
+            </div>
+            </div>
+            <div id="client-dashboard-tab">
+                <ul>
+                    <li><a href="#vms-sps">SPS and VMS Announcements</a></li>
+                    <li><a href="#stats-client-historic">Refresh Duration</a></li>
+                    <li><a href="#stats-client-jarversions">Client Jar Versions</a></li>
+                    <li><a href="#stats-client-blobinfo">Blob info</a></li>
+                    <li><a href="#stats-client-usage">Client Usage</a></li>
+                </ul>
+                <div id="stats-client-historic">
+                    <div id = "id-vms-client-dashboard" class='ui-widget-content'></div>
+                </div>
+                <div id="stats-client-jarversions">
+                    <div id = "id-vms-client-jarversions-atlas" class='ui-widget-content'></div>
+                </div>
+                <div id="vms-sps">
+                    <div id = "id-vms-sps-content" class='ui-widget-content'></div>
+                </div>
+                <div id="stats-client-blobinfo">
+                    <div id = "id-vms-blob-info" class='ui-widget-content'></div>
+                </div>
+                <div id="stats-client-usage">
+                    <div id = "id-vms-usage-info" class='ui-widget-content'></div>
+                </div>
+            </div>
+            <div id="data-dashboard-tab">
+                <ul>
+                	<li><a href="#stats-dataval">Data Validation</a></li>
+                    <li><a href="#stats-titles">Content Metrics</a></li>
+                    <li><a href="#stats-events">Mutation Events</a></li>
+                </ul>
+                <div id="stats-dataval">
+                    <div id = "id-dataval-dashboard" class='ui-widget-content'></div>
+                </div>
+                <div id="stats-titles">
+                    <div id = "id-title-stats-dashboard" class='ui-widget-content'></div>
+                </div>
+                <div id="stats-events">
+                    <div id = "id-mutation-events-dashboard" class='ui-widget-content'></div>
+                </div>
+            </div>
+            <div id="debug-dashboard-tab">
+                 <ul>
+                    <li><a href="#stats-vmsiopsys">VMS IOPS</a></li>
+                    <li><a href="#stats-client-vmsdebug">VMS Debug</a></li>
+                </ul>
+                <div id="stats-vmsiopsys">
+                    <div id = "id-vmsiopsys-dashboard" class='ui-widget-content'></div>
+                </div>
+                <div id="stats-client-vmsdebug">
+                    <div id = "id-vmsdebug-tab" class='ui-widget-content'></div>
+                </div>
+             </div>
+            <div id="cb-dashboard-tab">
+                <div id="cb-inset" class="ui-widget-content">  
+                </div>
+            </div>
+            <div id="io-dashboard-tab">
+                <div id="io-inset" class="ui-widget-content">  
+                </div>
+            </div>
+        </div>
+        <!-- TODO: change back es_vmsops.us-east-1.dyntest.netflix.net ec2-54-81-202-224.compute-1.amazonaws.com-->
+        <input  type="textbox" id="id-elasticsearchhost-box" class = "hidden" size="35" value="es_vmsops.us-east-1.dyntest.netflix.net"></input>
+    </body>
+</html>

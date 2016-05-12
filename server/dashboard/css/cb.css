@@ -1,0 +1,294 @@
+body {
+  font-family: 'Open Sans', sans-serif;
+}
+
+table#global-cb {
+  margin: 0 auto;
+  margin-top: 20px;
+}
+
+td.cb-enabled {
+  color: green;
+}
+
+td.cb-disabled {
+  color: red;
+}
+
+table#global-cb td {
+  font-size: 20px;
+  font-weight: bold;
+  padding: 10px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+table#cb {
+  margin: 0 auto;
+  width: 90%;
+  border: 1px solid gray;
+  margin-bottom: 50px;
+}
+
+table#cb th {
+  background-color: #25587E;
+  color: #fff;
+  font-weight: bold;
+  padding: 15px;
+  letter-spacing: 1px;
+}
+
+table#cb td {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+a.ed-override-link, a.threshold-override-link {
+  font-weight: normal;
+  font-size: 14px;
+}
+
+#modal-background {
+  display: none;
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  background-color: #000;
+  z-index: 2;
+  opacity: 0.75;
+}
+
+#enabled-disabled-override-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: auto;
+  width: 1000px;
+  max-height: 500px;
+  overflow: scroll;
+  background-color: #fff;
+  z-index: 3;
+}
+
+#threshold-override-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: auto;
+  width: 600px;
+  max-height: 800px;
+  overflow: scroll;
+  background-color: #fff;
+  z-index: 3;  
+}
+
+#edit-threshold-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: auto;
+  width: 600px;
+  background-color: #fff;
+  z-index: 3;
+}
+
+#edit-threshold-modal-header {
+  border-bottom: 1px solid #000;
+  line-height: 200%;
+  padding: 20px;
+}
+
+#edit-threshold-modal-header p{
+  text-align: center;
+  font-weight: bold;
+  letter-spacing: 1px;
+  font-size: 20px;
+}
+
+#enabled-disabled-override-modal-header {
+  border-bottom: 1px solid #000;
+  line-height: 200%;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-right: 10px;
+}
+
+#enabled-disabled-override-modal-header p{
+  text-align: center;
+  font-weight: bold;
+  letter-spacing: 1px;
+  font-size: 20px;
+}
+
+#threshold-override-modal-header {
+  border-bottom: 1px solid #000;
+  line-height: 200%;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-right: 10px;
+}
+
+#threshold-override-modal-header p{
+  text-align: center;
+  font-weight: bold;
+  letter-spacing: 1px;
+  font-size: 20px;
+}
+
+
+#enabled-disabled-override-modal-table {
+  width: 90%;
+  margin: 0 auto;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+#enabled-disabled-override-modal-table th{
+  border: 1px solid #ddd;
+  padding: 10px;
+  background-color: #25587E;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+#enabled-disabled-override-modal-table td{
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+
+.enabled-override{
+  display: inline-block;
+  border: 1px solid #000;
+  margin: 10px;
+  padding: 5px;
+  color: #fff;
+  background-color: green;
+  cursor: pointer;
+}
+
+.disabled-override{
+  display: inline-block;
+  border: 1px solid gray;
+  margin: 10px;
+  padding: 5px;
+  background-color: red;
+  color: #fff;
+  cursor: pointer;
+}
+
+#enabled-overrides {
+  min-height: 50px;
+  width: 100%;
+}
+
+#disabled-overrides {
+  min-height: 50px;
+  width: 100%;
+}
+
+#add-override-form-container {
+  margin-bottom: 30px;
+}
+
+#add-override-form-heading {
+  text-align: center;
+  padding: 20px;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+#close-enabled-disabled-override-modal, #close-threshold-override-modal, #close-edit-threshold-modal {
+  cursor: pointer;
+}
+
+#overlay {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  z-index: 5;
+  background-color: #fff;
+  top: 0;
+  left: 0;
+}
+
+#overlay p {
+  position: relative;
+  top: 100px;
+  margin: 0 auto;
+  text-align: center;
+  font-weight: bold;
+  font-size: 30px;
+}
+
+#threshold-overrides {
+  width: 80%;
+  margin: 0 auto;
+  margin-top: 20px;
+}
+
+.threshold-override {
+  border: 1px solid gray;
+  padding: 10px;
+  display: inline-block;
+}
+
+.threshold-override-variation {
+  font-weight: bold;
+}
+
+.threshold-override-value {
+  margin-right: 5px;
+}
+
+.edit-threshold-override {
+  cursor: pointer;
+}
+
+.delete-threshold-override {
+  cursor: pointer;
+}
+
+#add-threshold-override-form-container{
+  width: 80%;
+  margin: 0 auto;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+#edit-threshold-override-form-container {
+  widows: 80%;
+  margin: 0 auto;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  display: none;
+}
+
+#add-threshold-override-form-heading, #edit-threshold-override-form-heading {
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+img.edit-cb-threshold {
+  cursor: pointer;
+}
+
+#edit-threshold-form-title {
+  text-align: center;
+  font-size:18px;
+  letter-spacing: 1px;
+  line-height: 200%;
+  padding: 10px;
+}
+
+#edit-threshold-form {
+  text-align: center;
+  padding: 20px;
+  margin-bottom: 40px;
+}

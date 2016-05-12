@@ -1,0 +1,65 @@
+#jsonview {
+  font-family: monospace;
+}
+
+#jsonview .prop {
+  font-weight: bold;
+}
+
+#jsonview .null {
+  color: red;
+}
+
+#jsonview .bool {
+  color: blue;
+}
+
+#jsonview .num {
+  color: blue;
+}
+
+#jsonview .string {
+  color: green;
+}
+
+#jsonview .collapser {
+  position: absolute;
+  left: -1em;
+  cursor: pointer;
+}
+
+#jsonview li {
+  position: relative;
+  list-style-type: none;
+}
+
+#jsonview li:after {
+  content: ',';
+}
+
+#jsonview li:last-child:after {
+  content: '';
+}
+
+#jsonview #error {
+  -moz-border-radius: 8px;
+  border: 1px solid #970000;
+  background-color: #F7E8E8;
+  margin: .5em;
+  padding: .5em;
+}
+
+#jsonview .errormessage {
+  font-family: monospace;
+}
+
+#jsonview ul {
+  list-style: none;
+  margin: 0 0 0 2em;
+  padding: 0;
+}
+
+#jsonview h1 {
+  font-size: 1.2em;
+}
+

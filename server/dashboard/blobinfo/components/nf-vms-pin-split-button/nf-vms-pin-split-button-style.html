@@ -1,0 +1,97 @@
+<link rel="import" href="//reboot.prod.netflix.net/dist/4/components/nf-reboot-style/nf-reboot-style.html" />
+
+<dom-module id="nf-vms-split-button-style">
+  <template>
+    <style include="nf-reboot-style">
+      @-webkit-keyframes orange-glow {
+        from { background-color: #D2A45E; -webkit-box-shadow: 0 0 9px  #D2A45E; }
+        50%  { background-color: #EAA63D; -webkit-box-shadow: 0 0 18px #EAA63D; }
+        to   { background-color: #D2A45E; -webkit-box-shadow: 0 0 9px  #D2A45E; }
+      }
+
+      .capitalize {
+        text-transform: capitalize;
+      }
+      .btn-orange {
+        background-color: #D2A45E;
+        color: #fff;
+        border: 1px solid rgba(0,0,0,0.2);
+        text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        -webkit-animation-name: 'orange-glow';
+        -webkit-animation-duration: 1.5s;
+        -webkit-animation-iteration-count: infinite;
+      }
+
+      /* Bootstrap-style Split Button */
+      .btn-group {
+        position: relative;
+        display: inline-block;
+        vertical-align: middle;
+        margin: 5px;
+      }
+      .btn-group > button {
+        position: relative;
+        float: left;
+        margin: 0;
+      }
+      .btn-group > button:not(.dropdown-toggle) {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+      .btn-group > .dropdown-toggle {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        margin-left: -1px;
+        padding-left: 8px;
+        padding-right: 8px;
+        height: 34px;
+      }
+      .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1000;
+        display: none;
+        float: left;
+        min-width: 160px;
+        padding: 5px 0;
+        margin: 0;
+        font-size: 14px;
+        text-align: left;
+        list-style: none;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ccc;
+        border: 1px solid rgba(0,0,0,.15);
+        border-radius: 4px;
+        box-shadow: 0 6px 12px rgba(0,0,0,.175);
+      }
+      .dropdown-menu > li > a {
+        display: block;
+        padding: 3px 20px;
+        clear: both;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #333;
+        white-space: nowrap;
+      }
+      .caret {
+        display: inline-block;
+        width: 0;
+        height: 0;
+        margin-left: 0;
+        vertical-align: middle;
+        border-top: 4px dashed;
+        border-right: 4px solid transparent;
+        border-left: 4px solid transparent;
+      }
+      .btn-group.open > .dropdown-menu {
+        display: block;
+      }
+      .btn-group.open .dropdown-toggle {
+        box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
+      }
+
+    </style>
+  </template>
+</dom-module>
