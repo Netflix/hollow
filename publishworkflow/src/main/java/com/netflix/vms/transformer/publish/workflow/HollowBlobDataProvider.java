@@ -1,7 +1,19 @@
 package com.netflix.vms.transformer.publish.workflow;
 
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.CircuitBreaker;
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
+
+import com.netflix.hollow.read.engine.HollowBlobReader;
+import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
+import com.netflix.hollow.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.util.HashCodes;
+import com.netflix.hollow.util.HollowChecksum;
+import com.netflix.vms.generated.notemplate.ISOCountryHollow;
+import com.netflix.vms.generated.notemplate.PackageDataHollow;
+import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
+import com.netflix.vms.generated.notemplate.VideoHollow;
+import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TopNVideoViewHoursData;
 import java.io.File;
 import java.io.IOException;
 import java.util.BitSet;
@@ -11,23 +23,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import com.netflix.hollow.read.engine.HollowBlobReader;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
-import com.netflix.hollow.read.engine.object.HollowObjectTypeReadState;
-import com.netflix.hollow.util.HashCodes;
-import com.netflix.hollow.util.HollowChecksum;
-import com.netflix.logging.ILog;
-import com.netflix.logging.LogManager;
-import com.netflix.vms.generated.notemplate.ISOCountryHollow;
-import com.netflix.vms.generated.notemplate.PackageDataHollow;
-import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
-import com.netflix.vms.generated.notemplate.VideoHollow;
-import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TopNVideoViewHoursData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HollowBlobDataProvider {
-    private static final ILog LOGGER = LogManager.getLogger(HollowBlobDataProvider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HollowBlobDataProvider.class);
 
     /* dependencies */
     private final TransformerContext ctx;

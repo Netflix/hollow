@@ -62,6 +62,8 @@ public class HollowPublishWorkflowStager {
     }
 
     public void triggerPublish(long previousVersion, long newVersion) {
+        jobCreator.beginStagingNewCycle();
+
         // Add validation job
         final CircuitBreakerJob circuitBreakerJob = addCircuitBreakerJob(previousVersion, newVersion);
 

@@ -8,6 +8,8 @@ import com.netflix.vms.transformer.publish.PoisonedStateMarker;
 
 public interface PublishWorkflowContext {
 
+    PublishWorkflowContext withCurrentLogger();
+
     String getVip();
 
     TransformerLogger getLogger();

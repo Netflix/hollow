@@ -27,7 +27,7 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
 
     /* fields */
     ///TODO: VIP changes for red/black?
-    private final PublishWorkflowContext ctx;
+    private PublishWorkflowContext ctx;
 
     public DefaultHollowPublishJobCreator(TransformerContext transformerContext,
             HollowBlobDataProvider hollowBlobDataProvider, PlaybackMonkeyTester playbackMonkeyTester,
@@ -41,6 +41,10 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
                                 HermesTopicProvider.HOLLOWBLOB_TOPIC_PREFIX),
                         transformerContext.platformLibraries().getHermesSubscriber(), BIG_RED_BUTTON),
                 vip);
+    }
+
+    public void beginStagingNewCycle() {
+        ctx = ctx.withCurrentLogger();
     }
 
     @Override
