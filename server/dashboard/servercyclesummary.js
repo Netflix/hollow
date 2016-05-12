@@ -14,12 +14,10 @@ function ServerCycleSummaryTab(dashboard) {
     // this is the default view, load at startup
     this.createCycleDurationAtlasIFrame = function() {
         var cluster = createClusterName(dashboard.nflxEnvironment, dashboard.dataNameSpace, dashboard.vipAddress);
-        var hostName = "http://atlasui-global." + dashboard.nflxEnvironment + ".netflix.net/";
-        var path = "atlas/embed#url=http%3A%2F%2Fatlas-main." + dashboard.nflxRegion + "." + dashboard.nflxEnvironment + ".netflix.net";
-        path += "%3A7001%2Fapi%2Fv1%2Fgraph%3Fq%3Dnf.cluster%2C" + cluster;
-        path += "%2C%3Aeq%2Cname%2C(%2Cvms.datainputsplitterservice.lastduration%2Cvms.datapipelineservice.lastduration%2Cvms.stateenginecombinerservice.lastduration%2Cvms.stateengineconverterservice.lastduration%2C)%2C%3Ain%2C%3Aand%2C%3Amax%2C(%2Cname%2C)%2C%3Aby%2C0.0000167%2C%3Amul%2C%3Aarea%2C%24(name)%2C%3Alegend%26l%3D0.1%26ylabel%3DDuration(mins)%26stack%3D1%26";
-        path += "e%3Dnow-" + cycleSummaryTab.getAtlasEndMinusNowTimeMinutes() + "m%26s%3De-2h";
-        path += "%26w%3D489%26h%3D300&ylabel=Duration(mins)&plot=area";
+        var hostName = "http://atlas-global." + dashboard.nflxEnvironment + ".netflix.net/";
+        var path = "api/v1/graph?q=name,(,vms.transformer.ProcessDataDuration,vms.transformer.ReadInputDataDuration,vms.transformer.WaitForNextCycleDuration,vms.transformer.WriteOutputDataDuration,),:in,nf.cluster,vmstransformer-newpipeline-boson,:eq,:and,:sum,(,name,),:by,60000,:div,:stack";
+        path += "&e=now-" + cycleSummaryTab.getAtlasEndMinusNowTimeMinutes() + "m&s=e-2h";
+        path += "&w=360&h=270&ylabel=Duration(mins)&plot=area";
 
         console.log("atlas duration query: " + hostName + path);
         $("#id-vms-server-dashboard").html("");
