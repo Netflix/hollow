@@ -19,7 +19,8 @@ public class VMSInputDataVersionLogger {
                         " latestEventId=" + latestEventId +
                         " coldstartVersionId=" + latestColdstartVersion +
                         " coldstartKeybase=dummyValue" +
-                        " coldstartS3Filename=anotherDummyValue");
+                        " coldstartS3Filename=anotherDummyValue" +
+                        " isColdstartPinned=false");
             }
         }
 
