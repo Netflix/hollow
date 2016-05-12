@@ -1,6 +1,5 @@
 package com.netflix.vms.transformer;
 
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.InputDataVersionIds;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleBegin;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleFailed;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleSuccess;
@@ -16,7 +15,7 @@ import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
-import com.netflix.vms.transformer.input.VMSInputDataLogMessage;
+import com.netflix.vms.transformer.input.VMSInputDataVersionLogger;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
 import com.netflix.vms.transformer.publish.workflow.HollowPublishWorkflowStager;
 import com.netflix.vms.transformer.util.VersionMinter;
@@ -74,8 +73,7 @@ public class TransformCycle {
 
         ctx.getMetricRecorder().recordMetric(ReadInputDataDuration, endTime - startTime);
 
-        VMSInputDataLogMessage message = new VMSInputDataLogMessage(inputClient.getStateEngine().getHeaderTags());
-        ctx.getLogger().info(InputDataVersionIds, message);
+        VMSInputDataVersionLogger.logInputVersions(inputClient.getStateEngine().getHeaderTags(), ctx.getLogger());
     }
 
     private boolean transformTheData() {

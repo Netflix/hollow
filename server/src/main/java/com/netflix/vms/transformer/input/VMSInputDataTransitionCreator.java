@@ -4,15 +4,15 @@ import com.netflix.aws.file.FileAccessItem;
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.client.HollowTransitionCreator;
 import com.netflix.hollow.client.HollowUpdateTransition;
-import com.netflix.logging.ILog;
-import com.netflix.logging.LogManager;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class VMSInputDataTransitionCreator implements HollowTransitionCreator {
 
-    private static final ILog LOGGER = LogManager.getLogger(VMSInputDataTransitionCreator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VMSInputDataTransitionCreator.class);
 
     private final FileStore fileStore;
     private final VMSInputDataKeybaseBuilder keybaseBuilder;
@@ -77,7 +77,7 @@ public class VMSInputDataTransitionCreator implements HollowTransitionCreator {
                 break;
 
             } catch(Exception e) {
-                LOGGER.error(e);
+                LOGGER.error("Failed to find snapshot transition", e);
             }
         }
 
@@ -96,7 +96,7 @@ public class VMSInputDataTransitionCreator implements HollowTransitionCreator {
 
                 return createTransition(fileAccessItem);
             } catch(Exception e) {
-                LOGGER.error(e);
+                LOGGER.error("Failed to find delta transition", e);
             }
         }
 
