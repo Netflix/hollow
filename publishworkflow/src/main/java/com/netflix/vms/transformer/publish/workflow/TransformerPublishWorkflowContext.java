@@ -15,12 +15,14 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
     private final PublishWorkflowConfig config;
     private final PoisonedStateMarker poisonStateMarker;
     private final VipAnnouncer vipAnnouncer;
+    private final TransformerLogger logger;
 
     /* fields */
     private final String vip;
 
     public TransformerPublishWorkflowContext(TransformerContext ctx, PublishWorkflowConfig config, VipAnnouncer vipAnnouncer, String vip) {
         this.transformerCtx = ctx;
+        this.logger = ctx.getLogger();
         this.vip = vip;
         this.config = config;
         this.vipAnnouncer = vipAnnouncer;
@@ -34,7 +36,7 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
 
     @Override
     public TransformerLogger getLogger() {
-        return transformerCtx.getLogger();
+        return logger;
     }
 
     @Override
