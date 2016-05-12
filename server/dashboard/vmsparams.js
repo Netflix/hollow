@@ -66,6 +66,18 @@ RegexParserMapper.prototype.getJobBuilderRegexInfo = function() {
     return fieldRegex;
 };
 
+// "mutationGroup=PERSON_BIO latestEventId=1125975801 coldstartVersionId=1463012034071 coldstartKeybase=dummyValue coldstartS3Filename=anotherDummyValue"
+RegexParserMapper.prototype.getInputDataRegexInfo = function() {
+    var fieldRegex = new Object();
+    fieldRegex["mutationGroup"] = [ /^mutationGroup=(.*)/, 1 ];
+    fieldRegex["latestEventId"] = [ /^latestEventId=(.*)/, 1 ];
+    fieldRegex["coldstartVersionId"] = [ /^coldstartVersionId=(.*)/, 1 ];
+    fieldRegex["coldstartKeybase"] = [ /^coldstartKeybase=(.*)/, 1 ];
+    fieldRegex["coldstartS3Filename"] = [ /^coldstartS3Filename=(.*)/, 1 ];
+    return fieldRegex;
+};
+
+
 // Returning value(2) for property(com.netflix.videometadata.validation.threadpool.size)
 RegexParserMapper.prototype.getStartPropertiesRegexInfo = function() {
     var fieldRegex = new Object();

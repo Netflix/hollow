@@ -505,13 +505,13 @@ function CycleErrorTab(serverInfoView) {
     refFn.refresh();
 
     $("#id-search-error-btn").button().click(function() {
-        var fields = ["message", "partitionId", "ec2InstanceId", "className", "country"]
+        var fields = ["timestamp","message", "instanceId"]
         var tableWidget = new DataTableWidget("#id-cycle-error-locations", "id-table-error-results", fields);
         tableWidget.reformatCellDataFunc = new JavaExceptionFormatter("com.netflix.videometadata.").format;
         var searchQuery = new SearchQuery();
         searchQuery.indexName = $("#id-vms-index-select").val();
         searchQuery.size = "100";
-        searchQuery.add("eventInfo.currentCycle:" + serverInfoView.vmsCycleId + " AND NOT com.netflix.videometadata.audit.LogEventCollectionLogger");
+        searchQuery.add("eventInfo.currentCycle:" + serverInfoView.vmsCycleId);
         searchQuery.add( $("#id-search-error-box").val());
         searchQuery.sort = "eventInfo.timestamp:desc";
         var searchdao = new FieldModelSearchDAO(tableWidget, searchQuery, fields, true);
@@ -574,32 +574,21 @@ function CycleInputDataInformation(serverInfoView) {
         this.init = false;
     };
 
+    this.setPropertiesForQueryObject = function(query, indexType, num) {
+        query.indexName = serverInfoView.vmsIndex;
+        query.indexType = indexType;
+        query.size = num;
+        query.add(serverInfoView.vmsCycleId).add("tag:InputDataVersionIds");
+    };
+
     this.refresh = function() {
-        var regexMap = RegexParserMapper.prototype.getDataVersionRegexInfo();
-        var dataVersionExecutor = new RegexSearchWidgetExecutor(new PlainTextViewWidget("#id-cycle-data-version-locations", "dataVersion"), regexMap);
-        dataVersionExecutor.searchQuery.indexName = serverInfoView.vmsIndex;
-        dataVersionExecutor.searchQuery.size = "1";
-        dataVersionExecutor.searchQuery.add("eventInfo.currentCycle:" + serverInfoView.vmsCycleId);
-        dataVersionExecutor.searchQuery.add("eventInfo.errorCode:ManagerInfo");
-        dataVersionExecutor.searchQuery.add("dataVersion");
-        dataVersionExecutor.updateJsonFromSearch();
+        // mutationGroup=PERSON_BIO latestEventId=1125975801 coldstartVersionId=1463012034071 coldstartKeybase=dummyValue coldstartS3Filename=anotherDummyValue
+        var inputParams = [ "mutationGroup", "latestEventId", "coldstartVersionId", "coldstartKeybase", "coldstartS3Filename" ];
+        var tableWidget = new DataTableWidget("#id-cycle-input-shardinfo-locations", "id-table-input-shardinfo-results", inputParams);
+        var widgetExecutor = new RegexSearchWidgetExecutor(tableWidget, RegexParserMapper.prototype.getInputDataRegexInfo());
 
-        var splitterInpParams = [ "Group", "Source", "keybase", "s3Key", "published", "version","startMutation", "endMutation", "Mutations", "pinned" ];
-        var splitterInputTable = new DataTableWidget("#id-cycle-input-shardinfo-locations", "id-table-input-shardinfo-results", splitterInpParams);
-        var shardWidgetExecutor = new SearchWidgetExecutor(splitterInputTable, new ShardInfoInputModel());
-        shardWidgetExecutor.searchQuery.indexName = serverInfoView.vmsIndex;
-        shardWidgetExecutor.searchQuery.add("eventInfo.currentCycle:" + serverInfoView.vmsCycleId);
-        shardWidgetExecutor.searchQuery.indexType = "ShardInfo";
-        shardWidgetExecutor.updateJsonFromSearch();
-
-        // s3BucketName=netflix.bulkdata.test
-        var splitterOutParams = [ "partitionId", "MutationGroup", "dataSource", "keybase", "s3Key", "version", "size(MB)" ];
-        var splitterOutputTable = new DataTableWidget("#id-cycle-output-shardinfo-locations", "id-table-output-shardinfo-results", splitterOutParams);
-        var shardOutWidgetExecutor = new SearchWidgetExecutor(splitterOutputTable, new ShardInfoOutputModel());
-        shardOutWidgetExecutor.searchQuery.indexName = serverInfoView.vmsIndex;
-        shardOutWidgetExecutor.searchQuery.indexType = "ShardInfo";
-        shardOutWidgetExecutor.searchQuery.add("eventInfo.currentCycle:" + serverInfoView.vmsCycleId);
-        shardOutWidgetExecutor.updateJsonFromSearch();
+        this.setPropertiesForQueryObject(widgetExecutor.searchQuery, "vmsserver", "50");
+        widgetExecutor.updateJsonFromSearch();
         this.init = true;
     };
 }

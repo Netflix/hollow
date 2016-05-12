@@ -2,7 +2,7 @@ function ReplayCycleView(dashboard) {
     var replayCycleTab = this;
     this.autoUpdateWidgets = [];
     this.autoUpdateDAO = [];
-    this.timeStepForAutoUpdate = 30; // seconds
+    this.timeStepForAutoUpdate = 10; // seconds
     this.liveStartTime = 0;
     this.alignedEndTime = null;
     this.alignBoundary = 5; // seconds
@@ -15,7 +15,7 @@ function ReplayCycleView(dashboard) {
         // create live tab
         var stquery = new SearchQuery();
         stquery.indexName = dashboard.vmsIndex;
-        stquery.indexType = "CycleInfo";
+        stquery.indexType = "vmsserver";
         stquery.add("eventInfo.currentCycle:" + dashboard.vmsCycleId);
 
         var starter = new IndexStartTimeDAO(stquery, replayCycleTab.createLiveUpdateTab);
@@ -62,7 +62,7 @@ function ReplayCycleView(dashboard) {
                     }
                 };
 
-                replayCycleTab.timeStepForAutoUpdate = 30;
+                replayCycleTab.timeStepForAutoUpdate =10;
                 replayCycleTab.pauseRealTimeRefresh = false;
                 replayCycleTab.startReplayDate = new Date();
             }
@@ -77,7 +77,7 @@ function ReplayCycleView(dashboard) {
                 primary : "ui-icon-seek-prev"
             }
         }).click(function() {
-            replayCycleTab.timeStepForAutoUpdate = 15;
+            replayCycleTab.timeStepForAutoUpdate = 5;
         });
 
         $("#id-slowerlive-btn").button({
@@ -87,7 +87,7 @@ function ReplayCycleView(dashboard) {
                 primary : " ui-icon-arrowthick-1-w"
             }
         }).click(function() {
-            replayCycleTab.timeStepForAutoUpdate = 5;
+            replayCycleTab.timeStepForAutoUpdate = 1;
         });
 
         $("#id-fastlive-btn").button({
@@ -97,7 +97,7 @@ function ReplayCycleView(dashboard) {
                 primary : "ui-icon-seek-next"
             }
         }).click(function() {
-            replayCycleTab.timeStepForAutoUpdate = 60;
+            replayCycleTab.timeStepForAutoUpdate = 30;
         });
 
         $("#id-fasterlive-btn").button({
@@ -107,7 +107,7 @@ function ReplayCycleView(dashboard) {
                 primary : " ui-icon-arrowthick-1-e"
             }
         }).click(function() {
-            replayCycleTab.timeStepForAutoUpdate = 300;
+            replayCycleTab.timeStepForAutoUpdate = 60;
         });
     };
 
@@ -115,16 +115,14 @@ function ReplayCycleView(dashboard) {
         var graphWidget = new TimeSeriesGraphWidget("#id-transformations-live", 0, "Finished Builders", "");
         replayCycleTab.autoUpdateWidgets.push(graphWidget);
 
-        for (var partitionId = 0; partitionId < 4; partitionId++) {
-            var searchCountDAO = new SearchCountDAO(graphWidget, new SearchQuery(replayCycleTab.liveStartTime, replayCycleTab.timeStepForAutoUpdate),
-                    "worker-" + partitionId, false);
-            searchCountDAO.searchQuery.searchType = "count";
-            searchCountDAO.searchQuery.indexName = dashboard.vmsIndex;
-            searchCountDAO.searchQuery.indexType = "vmsserver";
-            searchCountDAO.searchQuery.add("eventInfo.currentCycle:" + dashboard.vmsCycleId);
-            searchCountDAO.searchQuery.add("EndTransformBuild").add("partitionId:" + partitionId);
-            replayCycleTab.autoUpdateDAO.push(searchCountDAO);
-        }
+        var searchCountDAO = new SearchCountDAO(graphWidget, new SearchQuery(replayCycleTab.liveStartTime, replayCycleTab.timeStepForAutoUpdate),
+                "transformer", false);
+        searchCountDAO.searchQuery.searchType = "count";
+        searchCountDAO.searchQuery.indexName = dashboard.vmsIndex;
+        searchCountDAO.searchQuery.indexType = "vmsserver";
+        searchCountDAO.searchQuery.add("eventInfo.currentCycle:" + dashboard.vmsCycleId);
+        searchCountDAO.searchQuery.add("AnnouncementSuccess");
+        replayCycleTab.autoUpdateDAO.push(searchCountDAO);
         ;
     };
 
@@ -146,7 +144,7 @@ function ReplayCycleView(dashboard) {
 
         var searchCountDAO = new SearchCountDAO(graphWidget, this.getTimeRangeQueryInstance("vmsserver", "count"), "workers finished", false);
         searchCountDAO.searchQuery.add("eventInfo.currentCycle:" + dashboard.vmsCycleId);
-        searchCountDAO.searchQuery.add("errorCode:PublishedBlob").add("shard");
+        searchCountDAO.searchQuery.add("tag:PublishedBlob").add("shard");
         replayCycleTab.autoUpdateDAO.push(searchCountDAO);
     };
 
@@ -155,7 +153,7 @@ function ReplayCycleView(dashboard) {
         replayCycleTab.autoUpdateWidgets.push(graphWidget);
 
         var searchCountDAO = new SearchCountDAO(graphWidget, this.getTimeRangeQueryInstance("vmsserver", "count"), "combiner", false);
-        searchCountDAO.searchQuery.add("errorCode:PublishedBlob").add("NOT shard");
+        searchCountDAO.searchQuery.add("tag:PublishedBlob");
         replayCycleTab.autoUpdateDAO.push(searchCountDAO);
     };
 
@@ -164,35 +162,33 @@ function ReplayCycleView(dashboard) {
         replayCycleTab.autoUpdateWidgets.push(graphWidget);
 
         var searchCountDAO = new SearchCountDAO(graphWidget, this.getTimeRangeQueryInstance("vmsserver", "count"), "combiner", false);
-        searchCountDAO.searchQuery.add("errorCode:CopiedBlobAcrossRegions");
+        searchCountDAO.searchQuery.add("tag:CopiedBlobAcrossRegions");
         replayCycleTab.autoUpdateDAO.push(searchCountDAO);
     };
 
     this.createSplitterEventsTable = function() {
-        var tableWidget = new DataTableWidget("#id-resolve-events-live", "splitter-events-table", [ "timeStamp", "message" ]);
+        var tableWidget = new DataTableWidget("#id-resolve-events-live", "splitter-events-table", [ "timestamp", "message" ]);
         tableWidget.toDataTable = false;
         tableWidget.clearPrevious = false;
         replayCycleTab.autoUpdateWidgets.push(tableWidget);
 
-        var searchFieldModelDAO = new FieldModelSearchDAO(tableWidget, this.getTimeRangeQueryInstance("Splitter"), [ "timeStamp", "message" ], false);
-        searchFieldModelDAO.searchQuery
-                .add("(\"start next batch\" OR getResolvedMessages OR \"splitter done\" OR \"sharding stable\" OR \"resolve events\" OR \"batch finalizing validation\" OR \"batch validation finished\")");
-        searchFieldModelDAO.searchQuery.sort = "eventInfo.timeStamp";
+        var searchFieldModelDAO = new FieldModelSearchDAO(tableWidget, this.getTimeRangeQueryInstance("Splitter"), [ "timestamp", "message" ], false);
+        searchFieldModelDAO.searchQuery.sort = "eventInfo.timestamp";
         searchFieldModelDAO.searchQuery.size = "7";
         searchFieldModelDAO.timestampParserFunc = replayCycleTab.parseTimeStamp;
         replayCycleTab.autoUpdateDAO.push(searchFieldModelDAO);
     };
 
     this.createGlobalServerLogTable = function() {
-        var tableWidget = new DataTableWidget("#id-global-tail-div", "id-global-tail-table", [ "timeStamp", "partitionId", "message" ]);
+        var tableWidget = new DataTableWidget("#id-global-tail-div", "id-global-tail-table", [ "timestamp", "message" ]);
         tableWidget.toDataTable = false;
         tableWidget.clearPrevious = false;
         replayCycleTab.autoUpdateWidgets.push(tableWidget);
 
-        var searchFieldModelDAO = new FieldModelSearchDAO(tableWidget, this.getTimeRangeQueryInstance(null), [ "timeStamp", "partitionId", "message" ],
+        var searchFieldModelDAO = new FieldModelSearchDAO(tableWidget, this.getTimeRangeQueryInstance(null), [ "timestamp", "message" ],
                 false);
         searchFieldModelDAO.searchQuery.size = "5";
-        searchFieldModelDAO.searchQuery.sort = "eventInfo.timeStamp:desc";
+        searchFieldModelDAO.searchQuery.sort = "eventInfo.timestamp:desc";
         replayCycleTab.autoUpdateDAO.push(searchFieldModelDAO);
     };
 

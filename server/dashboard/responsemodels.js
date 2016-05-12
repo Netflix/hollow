@@ -591,7 +591,7 @@ function RegexSourceModel(args) {
         row["cycleId"] = cycleId;
 
         for ( var i in tokens) {
-            token = tokens[i];
+            var token = tokens[i];
             for ( var field in this.fieldsRegex) {
                 var regexInfo = this.fieldsRegex[field];
                 var result = regexInfo[0].exec(token);
