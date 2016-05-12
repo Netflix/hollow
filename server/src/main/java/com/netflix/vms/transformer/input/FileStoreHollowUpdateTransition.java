@@ -1,20 +1,19 @@
 package com.netflix.vms.transformer.input;
 
-import net.jpountz.lz4.LZ4BlockInputStream;
-
 import com.netflix.aws.S3.S3Object;
 import com.netflix.aws.file.FileAccessItem;
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.client.HollowUpdateTransition;
-import com.netflix.logging.ILog;
-import com.netflix.logging.LogManager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import net.jpountz.lz4.LZ4BlockInputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileStoreHollowUpdateTransition extends HollowUpdateTransition {
-    private static final ILog LOGGER = LogManager.getLogger(FileStoreHollowUpdateTransition.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileStoreHollowUpdateTransition.class);
 
     private final String fileStoreKeybase;
     private final String fileStoreVersion;
@@ -51,17 +50,17 @@ public class FileStoreHollowUpdateTransition extends HollowUpdateTransition {
 
             try {
                 S3Object s3Object = fileStore.getPublishedFile(fileStoreKeybase, fileStoreVersion);
-                LOGGER.infof("Copying object %s to %s", s3Object, localFile);
+                LOGGER.info("Copying object {} to {}", s3Object, localFile);
                 fileStore.copyFile(s3Object, localFile);
                 break;
             } catch(Exception e) {
-                LOGGER.error(e);
+                LOGGER.error("Retrieval of transition input stream failed", e);
             }
         }
 
         ///TODO: During testing, do not delete and force re-download of files
-        return new LZ4BlockInputStream(new FileInputStream(localFile));
-        //return new LZ4BlockInputStream(new DeleteOnCloseFileInputStream(localFile));
+        //return new LZ4BlockInputStream(new FileInputStream(localFile));
+        return new LZ4BlockInputStream(new DeleteOnCloseFileInputStream(localFile));
     }
 
 }

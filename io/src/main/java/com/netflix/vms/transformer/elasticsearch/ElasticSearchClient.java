@@ -73,7 +73,7 @@ public class ElasticSearchClient {
                 printStats();
             }
         };
-        queueInfoScheduler.scheduleAtFixedRate(infoUpdater, 60, 60, TimeUnit.SECONDS);
+        queueInfoScheduler.scheduleAtFixedRate(infoUpdater, 600, 600, TimeUnit.SECONDS);
     }
 
     public ElasticSearchClientBridge getElasticSearchClientBridge() {

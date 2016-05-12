@@ -1,16 +1,15 @@
 package com.netflix.vms.transformer.input;
 
-import com.netflix.logging.ILog;
-import com.netflix.logging.LogManager;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DeleteOnCloseFileInputStream extends FileInputStream {
 
-    private final ILog LOGGER = LogManager.getLogger(DeleteOnCloseFileInputStream.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(DeleteOnCloseFileInputStream.class);
 
     private final File file;
 
