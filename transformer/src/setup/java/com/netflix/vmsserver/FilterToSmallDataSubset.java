@@ -22,7 +22,6 @@ import com.netflix.vms.generated.notemplate.VideoHollow;
 import com.netflix.vms.generated.notemplate.VideoNodeTypeHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.io.LZ4VMSInputStream;
-
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -34,10 +33,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-
-import org.junit.Test;
-
 import net.jpountz.lz4.LZ4BlockInputStream;
+import org.junit.Test;
 
 /// NOTE:  This has a dependency on videometadata-common (for LZ4VMSInputStream)
 /// NOTE:  This has a dependency on vms-hollow-generated-notemplate (for output blob API)
@@ -132,6 +129,7 @@ public class FilterToSmallDataSubset {
         includeAll("PersonImages");
         includeAll("TopNVideoData");
         includeAll("GlobalPerson");
+        includeAll("LanguageRights");
 
         ordinalsToInclude.put("L10NResources", findIncludedL10NOrdinals(includedVideoIds));
 

@@ -45,6 +45,7 @@ import com.netflix.vms.transformer.modules.mpl.DrmSystemModule;
 import com.netflix.vms.transformer.modules.mpl.EncodingProfileModule;
 import com.netflix.vms.transformer.modules.mpl.OriginServerModule;
 import com.netflix.vms.transformer.modules.packages.PackageDataModule;
+import com.netflix.vms.transformer.modules.packages.contracts.LanguageRightsModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkFormatModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkImageRecipeModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkTypeModule;
@@ -145,6 +146,7 @@ public class SimpleTransformer {
             });
         }
 
+        // @formatter:off
         // Register Transform Modules
         List<TransformModule> moduleList = Arrays.<TransformModule>asList(
                 new DrmSystemModule(api, ctx, objectMapper),
@@ -162,7 +164,8 @@ public class SimpleTransformer {
                 new GlobalPersonModule(api, ctx, objectMapper, indexer),
                 new TopNVideoDataModule(api, ctx, objectMapper),
                 new PersonImagesModule(api, ctx, objectMapper, indexer),
-                new CharacterImagesModule(api, ctx, objectMapper, indexer)
+                new CharacterImagesModule(api, ctx, objectMapper, indexer),
+                new LanguageRightsModule(api, ctx, objectMapper, indexer)
                 );
 
         // @formatter:on
