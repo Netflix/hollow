@@ -159,9 +159,6 @@ public class CountrySpecificDataModule {
     }
 
     private void populateMetaDataAvailabilityDate(long videoId, String countryCode, Long firstDisplayDate, List<VMSAvailabilityWindow> availabilityWindowList, CompleteVideoCountrySpecificData data) {
-        if (videoId == 60026160L) {
-            System.out.println("zbc");
-        }
         VMSAvailabilityWindow firstWindow = getEarlierstWindow(availabilityWindowList);
         WindowPackageContractInfo packageContractInfo = getWindowPackageContractInfo(firstWindow);
         Integer prePromoDays = packageContractInfo == null ? null : packageContractInfo.videoContractInfo.prePromotionDays;
