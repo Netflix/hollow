@@ -1,0 +1,37 @@
+<link rel="import" href="//reboot.prod.netflix.net/dist/4/components/nf-reboot-style/nf-reboot-style.html" />
+
+<dom-module id="nf-templated-list-style">
+  <template>
+    <style include="nf-reboot-style">
+
+      .striped .row:nth-child(odd) {
+        background-color: #F1F1F1;
+      }
+      .striped .row:nth-child(even) {
+        background-color: transparent;
+      }
+
+      .row {
+        border-color: #D9D9D9;
+        border-style: solid;
+        border-width: 0px 1px 1px 1px;
+      }
+
+      .col {
+        padding: 0.5em;
+      }
+
+      #thead {
+        padding: 0.5em;
+        font-weight: bold;
+        border: 1px #D9D9D9 solid;
+        background-color: rgba(255, 255, 255, 0.25);
+      }
+
+      table td, table th {
+        padding: 0.5em 1em;
+      }
+
+    </style>
+  </template>
+</dom-module>

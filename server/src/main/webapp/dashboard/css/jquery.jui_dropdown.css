@@ -1,0 +1,18 @@
+/*
+DO NOT CHANGE this file, as it will be overwritten in next update.
+Write your own classes in other css file.
+*/
+
+.launcherContainerClass {
+    padding-bottom: 1px;
+}
+
+.launcherClass {
+    padding: 2px;
+}
+
+.menuClass {
+    position: absolute;
+    width: 150px;
+    margin-top: 3px !important;
+}

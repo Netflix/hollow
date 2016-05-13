@@ -1,0 +1,94 @@
+<dom-module id="nf-templated-list-search-style">
+  <template>
+    <style>
+      :host {
+          display: inline-block;
+          position: relative;
+      }
+
+      input {
+          width: 100%;
+          padding: 0.5em 25px 0.6em 25px;
+          display: inline-block;
+          border: 1px solid #D9D9D9;
+          border-radius: 4px;
+          -webkit-box-sizing: border-box;
+          -moz-box-sizing: border-box;
+          box-sizing: border-box;
+          color: #6A6A6A;
+      }
+
+      input::-webkit-input-placeholder {
+          color: #C4C4C4;
+          font-weight: 300;
+      }
+
+      input::-moz-placeholder {
+          color: #C4C4C4;
+          font-weight: 300;
+      }
+
+      input:-ms-input-placeholder {
+          color: #C4C4C4;
+          font-weight: 300;
+      }
+
+      input::placeholder {
+          color: #C4C4C4;
+          font-weight: 300;
+      }
+
+      input:focus {
+          outline: 0;
+          border-color: #129FEA;
+      }
+
+      input[disabled] {
+          cursor: default;
+          background-color: #eaeded;
+          color: #cad2d3;
+      }
+
+      input[readonly] {
+          background: #eee;
+          color: #777;
+          border-color: #D9D9D9;
+      }
+
+      input:focus:invalid,
+      input.is-invalid {
+          color: #b94a48;
+          border-color: #e9322d;
+      }
+
+      label {
+          margin: 0.5em 0 0.2em;
+      }
+
+      #searchIcon {
+          position: absolute;
+          top: 3px;
+          left: 5px;
+      }
+
+      #clearIcon {
+          position: absolute;
+          top: 3px;
+          right: 5px;
+      }
+
+      #progressIndicator {
+          display: none;
+          position: absolute;
+          top: 4px;
+          left: 4px;
+          width: 20px;
+          height: 20px;
+      }
+
+      #progressIndicator.isSearching {
+          display: block;
+      }
+    </style>
+  </template>
+</dom-module>

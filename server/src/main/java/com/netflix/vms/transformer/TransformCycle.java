@@ -3,13 +3,19 @@ package com.netflix.vms.transformer;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleBegin;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleFailed;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleSuccess;
+import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.WritingBlobsFailed;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.WroteBlob;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ConsecutiveCycleFailures;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ProcessDataDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ReadInputDataDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WriteOutputDataDuration;
 
 import com.netflix.hollow.client.HollowClient;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
+import com.netflix.vms.transformer.input.VMSInputDataVersionLogger;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
 import com.netflix.vms.transformer.publish.workflow.HollowPublishWorkflowStager;
 import com.netflix.vms.transformer.util.VersionMinter;
@@ -27,6 +33,7 @@ public class TransformCycle {
 
     private long previousCycleNumber = Long.MIN_VALUE;
     private long currentCycleNumber = Long.MIN_VALUE;
+    private int consecutiveCycleFailures = 0;
 
     public TransformCycle(TransformerContext ctx, HollowPublishWorkflowStager publishStager, String converterVip, String transformerVip) {
         this.transformerVip = transformerVip;
@@ -48,6 +55,8 @@ public class TransformCycle {
             submitToPublishWorkflow();
             endCycleSuccessfully();
         }
+
+        ctx.getMetricRecorder().recordMetric(ConsecutiveCycleFailures, consecutiveCycleFailures);
     }
 
     private void beginCycle() {
@@ -58,10 +67,18 @@ public class TransformCycle {
     }
 
     private void updateTheInput() {
+        long startTime = System.currentTimeMillis();
         inputClient.triggerRefresh();
+        long endTime = System.currentTimeMillis();
+
+        ctx.getMetricRecorder().recordMetric(ReadInputDataDuration, endTime - startTime);
+
+        VMSInputDataVersionLogger.logInputVersions(inputClient.getStateEngine().getHeaderTags(), ctx.getLogger());
     }
 
     private boolean transformTheData() {
+        long startTime = System.currentTimeMillis();
+
         try {
             ctx.setNowMillis(System.currentTimeMillis());
             SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI)inputClient.getAPI(), outputStateEngine, ctx);
@@ -69,7 +86,11 @@ public class TransformCycle {
         } catch(Throwable th) {
             ctx.getLogger().error(TransformCycleFailed, "Transformer failed cycle -- rolling back", th);
             outputStateEngine.resetToLastPrepareForNextCycle();
+            consecutiveCycleFailures++;
             return false;
+        } finally {
+            long endTime = System.currentTimeMillis();
+            ctx.getMetricRecorder().recordMetric(ProcessDataDuration, endTime - startTime);
         }
 
         return true;
@@ -77,6 +98,8 @@ public class TransformCycle {
 
 
     private void writeTheBlobFiles() {
+        long startTime = System.currentTimeMillis();
+
         HollowBlobFileNamer fileNamer = new HollowBlobFileNamer(transformerVip);
 
         try {
@@ -102,9 +125,14 @@ public class TransformCycle {
                 }
             }
         } catch(IOException e) {
-            e.printStackTrace();
-            /// MUST restore from previous state, (or reset to last prepare for next cycle if possible).
+            ctx.getLogger().error(WritingBlobsFailed, "Writing blobs failed", e);
+            consecutiveCycleFailures++;
+            /// TODO: MUST reset to last prepare for next cycle.  We're already writing so that functionality needs to be added to netflix-hollow.
         }
+
+        long endTime = System.currentTimeMillis();
+
+        ctx.getMetricRecorder().recordMetric(WriteOutputDataDuration, endTime - startTime);
     }
 
 
@@ -115,6 +143,7 @@ public class TransformCycle {
     private void endCycleSuccessfully() {
         ctx.getLogger().info(TransformCycleSuccess, "Cycle " + currentCycleNumber + " succeeded");
         previousCycleNumber = currentCycleNumber;
+        consecutiveCycleFailures = 0;
     }
 
 }

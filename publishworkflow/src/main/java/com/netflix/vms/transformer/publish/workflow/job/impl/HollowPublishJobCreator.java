@@ -10,6 +10,9 @@ import com.netflix.vms.transformer.publish.workflow.job.*;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob.PublishType;
 
 public interface HollowPublishJobCreator {
+
+    void                        beginStagingNewCycle();
+
     CircuitBreakerJob               createCircuitBreakerJob (String vip,
                                                              long newVersion,
                                                              File snapshotFile,

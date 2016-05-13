@@ -17,6 +17,8 @@ public interface TransformerContext {
 
     TransformerLogger getLogger();
 
+    TransformerMetricRecorder getMetricRecorder();
+
     TransformerCassandraHelper getCanaryResultsCassandraHelper();
 
     TransformerCassandraHelper getValidationStatsCassandraHelper();

@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer;
 
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.IndividualTransformFailed;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.FailedProcessingIndividualHierarchies;
 
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
@@ -59,6 +60,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SimpleTransformer {
 
@@ -90,8 +92,9 @@ public class SimpleTransformer {
         long startTime = System.currentTimeMillis();
         indexer = new VMSTransformerIndexer((HollowReadStateEngine)api.getDataAccess());
         long endTime = System.currentTimeMillis();
-
         System.out.println("INDEXED IN " + (endTime - startTime) + "ms");
+
+        AtomicInteger failedIndividualTransforms = new AtomicInteger(0);
 
         final ShowHierarchyInitializer hierarchyInitializer = new ShowHierarchyInitializer(api, indexer, ctx);
 
@@ -136,6 +139,7 @@ public class SimpleTransformer {
                         }
                     } catch(Throwable th) {
                         ctx.getLogger().error(IndividualTransformFailed, "Transformation failed for hierarchy with top node " + videoGeneral._getVideoId(), th);
+                        failedIndividualTransforms.incrementAndGet();
                     }
                 }
             });
@@ -172,6 +176,8 @@ public class SimpleTransformer {
 
 
         executor.awaitSuccessfulCompletion();
+
+        ctx.getMetricRecorder().recordMetric(FailedProcessingIndividualHierarchies, failedIndividualTransforms.get());
 
         // Hack
         NamedCollectionHolder holder = new NamedCollectionHolder();

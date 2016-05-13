@@ -1,0 +1,20 @@
+{
+  "name": "nf_vms_blobinfo",
+  "version": "1.0.0",
+  "authors": [
+    "Kunal Kundaje <kkundaje@netflix.com>"
+  ],
+  "description": "VMS Blob Info",
+  "license": "ISC",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "iron-collapse": "PolymerElements/iron-collapse#~1.0.4"
+  }
+}

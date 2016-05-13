@@ -1,0 +1,12 @@
+{
+  "name": "nf_vms_blobinfo",
+  "version": "1.0.0",
+  "description": "VMS Blob Info",
+  "main": "app.js",
+  "dependencies": {
+    "connect-modrewrite": "^0.8.2",
+    "gulp": "^3.9.0",
+    "gulp-connect": "^2.2.0"
+  },"author": "Kunal Kundaje <kkundaje@netflix.com>",
+  "license": "ISC"
+}

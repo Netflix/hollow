@@ -1,0 +1,76 @@
+/**
+	ufd 0.6: http://code.google.com/p/ufd/
+	
+	This is only the structural base CSS, include 1+ skin CSS files also.
+*/
+
+/* master wrapper; emulate select positioning */
+.ufd {
+	display: -moz-inline-stack;
+	display: inline-block;
+    position: relative;
+    white-space: nowrap;
+}
+
+.ufd,
+.ufd input,
+.ufd button,
+#ufd-container div.list-scroll,
+#ufd-container div.list-wrapper,
+#ufd-container ul,
+#ufd-container li  {
+    border: 0;
+    margin: 0;
+    padding: 0;
+        
+}
+
+.ufd,
+.ufd button,
+#ufd-container div.list-scroll,
+#ufd-container div.list-wrapper,
+#ufd-container ul,
+#ufd-container li {
+    overflow: hidden;
+}
+
+.ufd select,
+#ufd-container .invisible,
+.ufd.invisible {
+	display: none;
+}
+
+.ufd input,
+.ufd button {
+	position: relative;
+	float: left;
+	
+	/* quirks mode correction: http://www.quirksmode.org/css/box.html */
+	box-sizing: content-box;
+	-moz-box-sizing: content-box;
+	-ms-box-sizing: content-box;
+	-webkit-box-sizing: content-box;
+}
+
+.ufd button.disabled {
+	cursor: default;
+}
+
+.ufd input.disabled {
+    color: graytext;
+}
+
+#ufd-container div.list-wrapper {
+    position: absolute;
+}
+
+#ufd-container ul {
+    list-style-type: none;
+}
+
+#ufd-container li {
+    cursor: pointer;
+    height: 20px;
+    display: block;
+    white-space: nowrap;
+}

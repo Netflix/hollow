@@ -15,16 +15,26 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
     private final PublishWorkflowConfig config;
     private final PoisonedStateMarker poisonStateMarker;
     private final VipAnnouncer vipAnnouncer;
+    private final TransformerLogger logger;
 
     /* fields */
     private final String vip;
 
     public TransformerPublishWorkflowContext(TransformerContext ctx, PublishWorkflowConfig config, VipAnnouncer vipAnnouncer, String vip) {
+        this(ctx, config, vipAnnouncer, vip, new CassandraBasedPoisonedStateMarker(ctx, vip));
+    }
+
+    private TransformerPublishWorkflowContext(TransformerContext ctx, PublishWorkflowConfig config, VipAnnouncer vipAnnouncer, String vip, PoisonedStateMarker poisonStateMarker) {
         this.transformerCtx = ctx;
         this.vip = vip;
         this.config = config;
         this.vipAnnouncer = vipAnnouncer;
-        this.poisonStateMarker = new CassandraBasedPoisonedStateMarker(ctx, vip);
+        this.poisonStateMarker = poisonStateMarker;
+        this.logger = ctx.getLogger();
+    }
+
+    public TransformerPublishWorkflowContext withCurrentLogger() {
+        return new TransformerPublishWorkflowContext(transformerCtx, config, vipAnnouncer, vip, poisonStateMarker);
     }
 
     @Override
@@ -34,7 +44,7 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
 
     @Override
     public TransformerLogger getLogger() {
-        return transformerCtx.getLogger();
+        return logger;
     }
 
     @Override

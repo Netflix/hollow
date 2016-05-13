@@ -1,0 +1,126 @@
+<!doctype html>
+
+<html>
+<head>
+
+  <meta charset="utf-8">
+  <title>Circuit Breaker Config</title>
+  <link rel="stylesheet" type="text/css" href="css/reset.css">
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+  <link href="http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">  
+  <link rel="stylesheet" type="text/css" href="css/cb.css">
+  <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script> 
+  <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>  
+  <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js"></script>
+  <script type="text/javascript" src="cb.js"></script>
+
+</head>
+
+<body>
+  <table id="global-cb">
+    <tr>
+      <td class="cb-enabled" id="global-cb-text">Circuit Breakers are: </td>
+      <td>
+        <select name="global-cb-select" id="global-cb-select" data-role="slider" >
+          <option value="off">Off</option>
+          <option value="on" selected="true">On</option>
+        </select>        
+      </td>
+    </tr>
+  </table>
+
+
+  <table id="cb">
+    <tr>
+      <th>Name</th>
+      <th>Enabled / Disabled</th>
+      <th>Threshold</th>
+    </tr>
+  </table>
+
+  <div id="modal-background"></div>
+
+  <div id="enabled-disabled-override-modal">
+    <div id="enabled-disabled-override-modal-header">
+    <img src="images/close.png" style="float: right" id="close-enabled-disabled-override-modal"/>
+      <p></p>
+    </div>
+    <table id="enabled-disabled-override-modal-table" data-rule-name="">
+      <tr>
+        <th width="40%">Enabled</th>
+        <th width="40%">Disabled</th>
+        <th width="20%">Drop to delete</th>
+      </tr>
+      <tr>
+        <td id="enabled-overrides-cell"><div id="enabled-overrides"></div></td>
+        <td id="disabled-overrides-cell"><div id="disabled-overrides"></div></td>
+        <td id="delete-enabled-disabled-override-cell"></td>
+      </tr>
+    </table>
+    <div id="add-override-form-container">
+      <p id="add-override-form-heading">Add Override</p>
+      <p style="text-align: center">
+      <select id="enabled-disabled-variations-select" data-role="none"></select>
+      &nbsp;&nbsp;
+      <select data-role="none" id="enabled-disabled-value-select">
+        <option value="on">Enable</option>
+        <option value="off">Disable</option>
+      </select>
+      &nbsp;&nbsp;
+      <input type="button" value="Add" data-role="none" id="add-enabled-disabled-override-button"/>
+      </p>
+    </div>
+  </div>
+
+  <div id="threshold-override-modal">
+    <div id="threshold-override-modal-header">
+    <img src="images/close.png" style="float: right" id="close-threshold-override-modal"/>
+      <p></p>
+    </div>
+    <div id="threshold-overrides"></div>
+    <div id="add-threshold-override-form-container">
+      <p id="add-threshold-override-form-heading">Add Override</p>
+      <p style="text-align: center; padding-top: 20px;">
+        <select data-role="none" id="threshold-variations-select"></select>
+        <input type="text" size="4" data-role="none" id="threshold-value-textbox"/>
+        <input type="button" data-role="none" value="Add" id="add-threshold-override-button"/>
+      </p>
+    </div>
+    <div id="edit-threshold-override-form-container">
+      <p id="edit-threshold-override-form-heading">Edit Override</p>
+      <p style="text-align: center; padding-top: 20px;">
+        <span id="edit-override-variation-name"></span>
+        <input type="text" size="10" data-role="none" id="edit-threshold-override-value-textbox" />
+        <input type="button" data-role="none" value="Edit" id="edit-threshold-override-button" />
+        <a id="cancel-edit-threshold-override" href="#">cancel</a>
+      </p>      
+    </div>
+  </div>
+
+  <div id="edit-threshold-modal">
+    <div id="edit-threshold-modal-header">
+      <img src="images/close.png" height="12" width="12" style="float:right" id="close-edit-threshold-modal" />
+      <p></p>
+    </div>
+    <div id="edit-threshold-form-title">Edit Threshold for the Rule</div>
+    <div id="edit-threshold-form">
+      Threshold:
+      <input type="text" size="10" data-role="none" id="cb-threshold-text"/>
+      &nbsp;&nbsp;
+      <input type="button" value="Update" data-role="none"id="update-cb-threshold-button"/>
+    </div>
+  </div>
+
+  <div id="overlay">
+    <p>
+    PLEASE WAIT WHILE WE QUERY THE STATE OF THE CIRCUIT BREAKER
+    <br/>
+    NOW WOULD BE A GOOD TIME TO GO GET THAT COFFEE
+    </p>
+  </div>
+
+</body>
+</html>

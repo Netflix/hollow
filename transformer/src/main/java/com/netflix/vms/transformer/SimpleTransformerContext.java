@@ -1,27 +1,28 @@
 package com.netflix.vms.transformer;
 
-import java.util.function.Consumer;
-
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerFiles;
 import com.netflix.vms.transformer.common.TransformerLogger;
+import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.TransformerPlatformLibraries;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
 import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
-import com.netflix.vms.transformer.io.LZ4VMSTransformerFiles;
+import java.util.function.Consumer;
 
 public class SimpleTransformerContext implements TransformerContext {
 
     private final TransformerLogger logger;
+    private final TransformerMetricRecorder recorder;
     private final TransformerFiles files;
 
     SimpleTransformerContext() {
-        this(new SysoutTransformerLogger(), new LZ4VMSTransformerFiles());
+        this(new SysoutTransformerLogger(), new NoOpMetricRecorder(), null);
     }
 
-    SimpleTransformerContext(TransformerLogger logger, TransformerFiles files) {
+    SimpleTransformerContext(TransformerLogger logger, TransformerMetricRecorder recorder, TransformerFiles files) {
         this.logger = logger;
         this.files = files;
+        this.recorder = recorder;
     }
 
     private long now;
@@ -50,6 +51,11 @@ public class SimpleTransformerContext implements TransformerContext {
     @Override
     public TransformerLogger getLogger() {
         return logger;
+    }
+
+    @Override
+    public TransformerMetricRecorder getMetricRecorder() {
+        return recorder;
     }
 
     @Override

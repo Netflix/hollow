@@ -1,0 +1,215 @@
+<link rel="import" href="nf-vms-pin-split-button-style.html" />
+
+<dom-module id="nf-vms-pin-split-button">
+
+  <template>
+    <style include="nf-vms-split-button-style"></style>
+
+    <div class="clearfix">
+      <template is="dom-if" if="{{ !_confirmAction }}">
+        <div class$="{{ _buttonGroupClass(_isDropdownOpen) }}">
+          <!-- Primary Action -->
+          <button class$="{{ _primaryButtonClass(_primaryAction.op, '') }}"
+                  on-click="_presentConfirmation"
+                  data-region$="{{ _primaryAction.region }}"
+                  data-op$="{{ _primaryAction.op }}">
+            <span class="capitalize">{{_primaryAction.op}}</span> <span>{{_primaryAction.region}}</span>
+          </button>
+          <button class$="{{ _primaryButtonClass(_primaryAction.op, 'dropdown-toggle') }}"
+                  on-click="_dropdownClick">
+            <span class="caret"></span>
+          </button>
+          <!-- Secondary Actions -->
+          <ul class="dropdown-menu">
+            <template is="dom-repeat" items="{{_secondaryActions}}">
+              <li>
+                <a on-click="_presentConfirmation" data-region$="{{item.region}}" data-op$="{{item.op}}">
+                  <span class="capitalize">{{item.op}}</span> <span>{{item.region}}</span>
+                </a>
+              </li>
+            </template>
+          </ul>
+        </div>
+        <!-- Tertiary Actions -->
+        <div class="nf-left" style="margin-left: 24px;">
+          <template is="dom-repeat" items="{{_tertiaryActions}}">
+            <div>
+              <button class="btn-primary" style="width: 128px;"
+                      on-click="_presentConfirmation"
+                      data-region$="{{item.region}}"
+                      data-op$="{{item.op}}">
+                <span class="capitalize">{{item.op}}</span> <span>{{item.region}}</span>
+              </button>
+            </div>
+          </template>
+        </div>
+      </template>
+
+      <!-- Confirmation button -->
+      <template is="dom-if" if="{{ _confirmAction }}">
+        <div class$="{{ _buttonGroupClass(_isDropdownOpen) }}">
+          <button class="btn-orange"
+                  on-click="_executeAction"
+                  disabled$="{{ _isActionExecuting }}">
+            Confirm <span>{{ _confirmAction.op }}</span> <span>{{ _confirmAction.region }}</span>?
+          </button>
+          <button class="btn-orange dropdown-toggle"
+                  on-click="_dropdownClick"
+                  disabled$="{{ _isActionExecuting }}">
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a on-click="_cancelConfirmation">Cancel</a></li>
+          </ul>
+      </template>
+    </div>
+  </template>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const PIN_OPERATION = 'pin';
+      const UNPIN_OPERATION = 'unpin';
+      const REGION_ALL = 'all';
+
+      Polymer({
+        is: 'nf-vms-pin-split-button',
+
+        properties: {
+          vip: String,
+          version: String,
+          regions: Array,
+
+          _primaryAction: {
+            type: Object,
+            notify: true
+          },
+          _secondaryActions: {
+            type: Array,
+            notify: true
+          },
+          _tertiaryActions: {
+            type: Array,
+            notify: true
+          },
+          _isDropdownOpen: {
+            type: Boolean,
+            value: false,
+            notify: true
+          },
+          _isActionExecuting: {
+            type: Boolean,
+            value: false,
+            notify: true
+          },
+          _confirmAction: {
+            type: Object,
+            value: null,
+            notify: true
+          }
+        },
+
+        attached: function () {
+          this._assignEventHandlers();
+          this._buildActions();
+        },
+
+        _assignEventHandlers: function () {
+          var self = this;
+          document.body.addEventListener('VMSCloseSplitButtons', function () {
+            self._isDropdownOpen = false
+          });
+        },
+
+        _buildActions: function () {
+          var allRegionsPinned = true;
+          var anyRegionsPinned = false;
+          this.regions.forEach(function (regionItem) {
+            if (!regionItem.pinned) {
+              allRegionsPinned = false;
+            } else {
+              anyRegionsPinned = true;
+            }
+          });
+
+          if (allRegionsPinned) {
+            this._primaryAction = { op: UNPIN_OPERATION, region: REGION_ALL };
+            this._secondaryActions = this.regions.map(function (regionItem) {
+              return { op: UNPIN_OPERATION, region: regionItem.region };
+            });
+          }
+          else if (anyRegionsPinned) {
+            var secondaryActions = [];
+            var tertiaryActions = [];
+            this.regions.forEach(function (regionItem) {
+              if (regionItem.pinned) {
+                tertiaryActions.push({ op: UNPIN_OPERATION, region: regionItem.region });
+              } else {
+                secondaryActions.push({ op: PIN_OPERATION, region: regionItem.region });
+              }
+            });
+            this._primaryAction = { op: PIN_OPERATION, region: REGION_ALL };
+            this._secondaryActions = secondaryActions;
+            this._tertiaryActions = tertiaryActions;
+          }
+          else {
+            this._primaryAction = { op: PIN_OPERATION, region: REGION_ALL };
+            this._secondaryActions = this.regions.map(function (regionItem) {
+              return { op: PIN_OPERATION, region: regionItem.region };
+            });
+          }
+        },
+
+        _dropdownClick: function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          this.fire('VMSCloseSplitButtons');
+          this._isDropdownOpen = !self._isDropdownOpen;
+        },
+
+        _buttonGroupClass: function (isDropdownOpen) {
+          return isDropdownOpen ? 'btn-group open nf-left' : 'btn-group nf-left';
+        },
+
+        _primaryButtonClass: function (op, additionalClasses) {
+          return op === 'unpin' ? ('btn-primary ' + additionalClasses) : additionalClasses;
+        },
+
+        _presentConfirmation: function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          this._isDropdownOpen = false;
+          this._confirmAction = {
+            op: e.currentTarget.getAttribute('data-op'),
+            region: e.currentTarget.getAttribute('data-region')
+          };
+        },
+
+        _cancelConfirmation: function (e) {
+          this._confirmAction = null;
+        },
+
+        _executeAction: function (e) {
+          var operation = this._confirmAction.op,
+              region = this._confirmAction.region,
+              version = this.version,
+              vip = this.vip,
+              self = this;
+
+          self._isActionExecuting = true;
+          fetch(`/REST/vms/${operation}clients?vip=${vip}&region=${region}&version=${version}`)
+            .then(function (response) {
+              self._isActionExecuting = false;
+              if (response.ok) {
+                self.fire('VMSPinUnpinSuccess', { op: operation, region: region, version: version });
+              }
+            });
+        }
+
+      });
+    }());
+  </script>
+</dom-module>
