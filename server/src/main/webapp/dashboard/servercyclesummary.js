@@ -1,6 +1,7 @@
 function ServerCycleSummaryTab(dashboard) {
     var cycleSummaryTab = this;
     this.cycleSummarytableWidget = null;
+    this.graphWidth = 0;
 
     this.getAtlasEndMinusNowTimeMinutes = function() {
         var curr = Date.now();
@@ -14,17 +15,22 @@ function ServerCycleSummaryTab(dashboard) {
     // this is the default view, load at startup
     this.createCycleDurationAtlasIFrame = function() {
         var cluster = createClusterName(dashboard.nflxEnvironment, dashboard.dataNameSpace, dashboard.vipAddress);
+        if(cycleSummaryTab.graphWidth == 0) {
+            cycleSummaryTab.graphWidth=$("#id-vms-server-dashboard").width();
+            if(cycleSummaryTab.graphWidth > 100) {
+                cycleSummaryTab.graphWidth = cycleSummaryTab.graphWidth - 60; // atlas does not return the exact width
+            }
+        }
         var hostName = "http://atlas-global." + dashboard.nflxEnvironment + ".netflix.net/";
         var path = "api/v1/graph?q=name,(,"
         path += "vms.transformer.ReadInputDataDuration,vms.transformer.ProcessDataDuration,vms.transformer.WriteOutputDataDuration,vms.transformer.WaitForNextCycleDuration";
         path += ",),:in,nf.cluster," + cluster + ",:eq,:and,:sum,(,name,),:by,60000,:div,:stack";
         path += "&e=now-" + cycleSummaryTab.getAtlasEndMinusNowTimeMinutes() + "m&s=e-2h";
-        path += "&w=460&h=270&ylabel=Duration(mins)&plot=area";
+        path += "&w=" + cycleSummaryTab.graphWidth + "&h=270&ylabel=Duration(mins)&plot=area"; //w = 460
 
         console.log("atlas duration query: " + hostName + path);
         $("#id-vms-server-dashboard").html("");
-        var iframe = new IFrameWidget("#id-vms-server-dashboard", "id-vms-server-dashboard-iframe", hostName, path);
-        iframe.initialize("95%");
+        $("#id-vms-server-dashboard").prepend("<div class='shadow' style='float:right;'> <img id='transformer-durations' style='max-width:100%;' src='" + hostName + path + "' /> </div>");
     };
 
     this.createCycleDurationAtlasIFrame_EmbedNotWorking = function() {

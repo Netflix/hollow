@@ -118,22 +118,21 @@
                         <li><a href="#cycle-status-tab">Cycles</a></li>
                         <li><a href="#cycle-properties-tab">Properties</a></li>
                         <li><a href="#cycle-publish-tab">Publish</a></li>
-                        <li><a href="#cycle-error-logs-tab">Errors</a></li>
+                        <li><a href="#cycle-error-logs-tab">Logs</a></li>
                         <li><a href="#cycle-circuitbreaker-tab">Circuit Breaker</a></li>
                         <li><a href="#cycle-input-validation-tab">Input Validation</a></li>
                         <li><a href="#cycle-error-codes-tab">Error Codes</a></li>
-                        <li><a href="#cycle-replay-tab">Replay Cycle</a></li>
                         <li><a href="#cycle-inputdata-tab">Coldstarts and Events</a></li>
+                        <li><a href="#cycle-replay-tab">Replay Cycle</a></li>
                         <li><a href="#cycle-input-search-tab">Search</a></li>
-                        <li><a href="#cycle-transformations-tab">Transformations</a></li>
                         <li><a href="#data-injection-tab">Data Injection</a></li>
                         <li><a href="#expander-tab">+</a></li>
                     </ul>
                     <!-- NOTE: the divs below should be in the same order as listed in <ul> section -->
                     <div id="cycle-status-tab">
                         <!--   width:55%; style="width:43%;float:left; -->
-                            <div id = "id-cycle-timestamp-div" style="display: none; width:49%; height:825px; float:left;margin-right:0px; overflow-y: auto;"></div>
-                            <div id = "id-vms-server-dashboard" class='ui-widget-content' style="width:50%; float:right;"></div>
+                            <div id = "id-cycle-timestamp-div" style="display: none; width:54%; height:825px; float:left;margin-right:0px; overflow-y: auto;"></div>
+                            <div id = "id-vms-server-dashboard" style="width:45%; float:right;"></div>
                         <!-- /div -->
                     </div>
                     <div id="cycle-properties-tab">
@@ -150,7 +149,7 @@
                     </div>
                     <div id="cycle-error-logs-tab">
                         <div id="id-error-toolbar" class="ui-widget-header ui-corner-all" style="display:inline-block; padding: 4px">
-                            Search for ErrorCode (AND optionally id):
+                            Search for Tag (AND optionally id):
                             <input  type="textbox" id="id-search-error-box" size="25" value=""></input>
                             Log-level:
                             <select id="id-loglevel-select" style="display:inline-block;">
@@ -221,6 +220,16 @@
                         <br>
                         <div id="id-cycle-errorcode-locations"></div>
                     </div>
+                    <div id="cycle-inputdata-tab">
+                        <div id="cycle-input-data-view">
+                            <h3>Data version:
+                                <div style="display:inline-block;" id="id-cycle-data-version-locations"></div>
+                            </h3>
+                            <br>
+                            <h3>Input:</h3>
+                            <div id="id-cycle-input-shardinfo-locations"></div>
+                        </div>
+                    </div>
                     <div id="cycle-replay-tab">
                         <table>
                         <tr><td>
@@ -239,45 +248,20 @@
                             </div>
                         </td></tr>
                         <tr><td>
-                        <div id="id-resolve-events-outer" class="shadow outerframelong">
-                            <div class="splunkfont">Splitter Mutation-Group Eventing Done</div>
-                            <div id="id-resolve-events-live"></div>
+                        <div id="id-global-tail-outer" class="shadow outerframesuperlong">
+                            <div class="splunkfont">Rolling log (latest on top)</div>
+                            <div id="id-global-tail-div" class="innerframesuperlong"></div>
                         </div>
                         <div id="id-transformations-outer" class="shadow outerframelong">
-                            <div class="splunkfont">Transformations completed</div>
+                            <div class="splunkfont">Transformation progression</div>
                             <div id="id-transformations-live" class="innerframelong"></div>
                         </div>
-                        <div id="id-worker-publish-outer" class="shadow outerframelong">
-                            <div class="splunkfont">State Engines Published</div>
-                            <div id="id-worker-publish-live" class="innerframelong"></div>
-                        </div>
-                        <div id="id-s3-publish-outer" class="shadow outerframelong">
-                            <div class="splunkfont">S3 Blobs Published</div>
-                            <div id="id-s3-publish-live" class="innerframelong"></div>
-                        </div>
-                        <div id="id-s3-copy-outer" class="shadow outerframelong">
-                            <div class="splunkfont">Cross Region Copy</div>
-                            <div id="id-s3-copy-live" class="innerframelong"></div>
-                        </div>
-                        <div id="id-global-tail-outer" class="shadow outerframesuperlong">
-                            <div class="splunkfont">Status</div>
-                            <div id="id-global-tail-div" class="innerframesuperlong"></div>
+                        <div id="id-warn-error-outer" class="shadow outerframelong">
+                            <div class="splunkfont">Count of warn-errors</div>
+                            <div id="id-warn-error-live" class="innerframelong"></div>
                         </div>
                         </td></tr>
                         </table>
-                    </div>
-                    <div id="cycle-inputdata-tab">
-                        <div id="cycle-input-data-view">
-                            <h3>Data version:
-                                <div style="display:inline-block;" id="id-cycle-data-version-locations"></div>
-                            </h3>
-                            <br>
-                            <h3>Input:</h3>
-                            <div id="id-cycle-input-shardinfo-locations"></div>
-                            <br>
-                            <h3>Sharded data:</h3>
-                            <div id="id-cycle-output-shardinfo-locations"></div>
-                        </div>
                     </div>
                     <div id="cycle-input-search-tab">
                         Query: <input type="textbox" id="id-input-search-query"></input>
@@ -301,16 +285,6 @@
                                 <td style="vertical-align:top"><div id="id-search-indexname-results" class='ui-widget-content'></div></td>
                             </tr>
                         </table>
-                    </div>
-                    <div id="cycle-transformations-tab">
-                        Pipeline worker:
-                        <select id="id-workerid-select">
-                            <option value="0">0</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                        </select>
-                        <div id="id-cycle-transformations-locations"></div>
                     </div>
                     <div id="data-injection-tab">
                         <div id="datainjection-table">
