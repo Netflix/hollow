@@ -32,9 +32,9 @@ public interface VideoGeneralDelegate extends HollowObjectDelegate {
 
     public int getOriginalLanguageBcpCodeOrdinal(int ordinal);
 
-    public long getMetadataReleaseDays(int ordinal);
+    public int getMetadataReleaseDays(int ordinal);
 
-    public Long getMetadataReleaseDaysBoxed(int ordinal);
+    public Integer getMetadataReleaseDaysBoxed(int ordinal);
 
     public int getOriginCountryCodeOrdinal(int ordinal);
 

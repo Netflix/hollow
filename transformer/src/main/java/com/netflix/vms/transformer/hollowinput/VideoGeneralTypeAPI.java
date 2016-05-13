@@ -160,23 +160,23 @@ public class VideoGeneralTypeAPI extends HollowObjectTypeAPI {
         return getAPI().getStringTypeAPI();
     }
 
-    public long getMetadataReleaseDays(int ordinal) {
+    public int getMetadataReleaseDays(int ordinal) {
         if(fieldIndex[9] == -1)
-            return missingDataHandler().handleLong("VideoGeneral", ordinal, "metadataReleaseDays");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[9]);
+            return missingDataHandler().handleInt("VideoGeneral", ordinal, "metadataReleaseDays");
+        return getTypeDataAccess().readInt(ordinal, fieldIndex[9]);
     }
 
-    public Long getMetadataReleaseDaysBoxed(int ordinal) {
-        long l;
+    public Integer getMetadataReleaseDaysBoxed(int ordinal) {
+        int i;
         if(fieldIndex[9] == -1) {
-            l = missingDataHandler().handleLong("VideoGeneral", ordinal, "metadataReleaseDays");
+            i = missingDataHandler().handleInt("VideoGeneral", ordinal, "metadataReleaseDays");
         } else {
             boxedFieldAccessSampler.recordFieldAccess(fieldIndex[9]);
-            l = getTypeDataAccess().readLong(ordinal, fieldIndex[9]);
+            i = getTypeDataAccess().readInt(ordinal, fieldIndex[9]);
         }
-        if(l == Long.MIN_VALUE)
+        if(i == Integer.MIN_VALUE)
             return null;
-        return Long.valueOf(l);
+        return Integer.valueOf(i);
     }
 
 

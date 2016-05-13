@@ -17,7 +17,7 @@ public class VideoGeneralDelegateCachedImpl extends HollowObjectAbstractDelegate
     private final Long firstReleaseYear;
     private final Boolean testTitle;
     private final int originalLanguageBcpCodeOrdinal;
-    private final Long metadataReleaseDays;
+    private final Integer metadataReleaseDays;
     private final int originCountryCodeOrdinal;
     private final int originalTitleOrdinal;
     private final int testTitleTypesOrdinal;
@@ -102,11 +102,11 @@ public class VideoGeneralDelegateCachedImpl extends HollowObjectAbstractDelegate
         return originalLanguageBcpCodeOrdinal;
     }
 
-    public long getMetadataReleaseDays(int ordinal) {
-        return metadataReleaseDays.longValue();
+    public int getMetadataReleaseDays(int ordinal) {
+        return metadataReleaseDays.intValue();
     }
 
-    public Long getMetadataReleaseDaysBoxed(int ordinal) {
+    public Integer getMetadataReleaseDaysBoxed(int ordinal) {
         return metadataReleaseDays;
     }
 

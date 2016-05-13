@@ -1,14 +1,5 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractAssetHollow;
@@ -31,6 +22,15 @@ import com.netflix.vms.transformer.hollowoutput.VideoImage;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class VMSAvailabilityWindowModule {
 
@@ -62,7 +62,7 @@ public class VMSAvailabilityWindowModule {
         this.transformedPackageData = data;
     }
 
-    public void populateWindowData(Integer videoId, String country, CompleteVideoCountrySpecificData data, VideoRightsHollow videoRights, CountrySpecificRollupValues rollup) {
+    public List<VMSAvailabilityWindow> populateWindowData(Integer videoId, String country, CompleteVideoCountrySpecificData data, VideoRightsHollow videoRights, CountrySpecificRollupValues rollup) {
         boolean isGoLive = isGoLive(videoRights);
 
         VideoRightsRightsHollow rights = videoRights._getRights();
@@ -72,6 +72,7 @@ public class VMSAvailabilityWindowModule {
             populateEpisodeOrStandaloneWindowData(videoId, country, data, rollup, isGoLive, rights);
         }
 
+        return data.mediaAvailabilityWindows;
     }
 
     private void populateEpisodeOrStandaloneWindowData(Integer videoId, String country, CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup, boolean isGoLive, VideoRightsRightsHollow rights) {
@@ -88,6 +89,7 @@ public class VMSAvailabilityWindowModule {
 
         List<VideoRightsWindowHollow> sortedWindows = new ArrayList<VideoRightsWindowHollow>(rights._getWindows());
         Collections.sort(sortedWindows, new Comparator<VideoRightsWindowHollow>() {
+            @Override
             public int compare(VideoRightsWindowHollow o1, VideoRightsWindowHollow o2) {
                 return Long.compare(o1._getStartDate()._getValue(), o2._getStartDate()._getValue());
             }
@@ -242,10 +244,10 @@ public class VMSAvailabilityWindowModule {
                     prePromoDays = entry.getValue().videoContractInfo.prePromotionDays;
                     cupTokens = entry.getValue().videoContractInfo.cupTokens;
                     if(isGoLive) {
-                    	if(isInWindow)
-                    		stillImagesByTypeMap = entry.getValue().videoPackageInfo.stillImagesMap;
-                    	else
-                    		stillImagesByTypeMapForShowLevelExtraction = entry.getValue().videoPackageInfo.stillImagesMap;
+                        if(isInWindow)
+                            stillImagesByTypeMap = entry.getValue().videoPackageInfo.stillImagesMap;
+                        else
+                            stillImagesByTypeMapForShowLevelExtraction = entry.getValue().videoPackageInfo.stillImagesMap;
                     }
                 }
             }
@@ -256,9 +258,9 @@ public class VMSAvailabilityWindowModule {
             if(isGoLive && isInWindow)
                 rollup.newCupTokens(cupTokens);
             if(stillImagesByTypeMap != null)
-            	rollup.newEpisodeStillImagesByTypeMap(stillImagesByTypeMap);
+                rollup.newEpisodeStillImagesByTypeMap(stillImagesByTypeMap);
             else if (stillImagesByTypeMapForShowLevelExtraction != null)
-            	rollup.newEpisodeStillImagesByTypeMapForShowLevelExtraction(stillImagesByTypeMapForShowLevelExtraction);
+                rollup.newEpisodeStillImagesByTypeMapForShowLevelExtraction(stillImagesByTypeMapForShowLevelExtraction);
         }
 
         rollup.newEpisodeData(isGoLive, bundledAssetsGroupId);
@@ -268,67 +270,68 @@ public class VMSAvailabilityWindowModule {
     }
 
 
-	private void populateRolledUpWindowData(CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup, VideoRightsRightsHollow rights, boolean isGoLive) {
-		Set<VideoRightsWindowHollow> windows = rights._getWindows();
+    // Return AvailabilityWindow from MediaData
+    private void populateRolledUpWindowData(CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup, VideoRightsRightsHollow rights, boolean isGoLive) {
+        Set<VideoRightsWindowHollow> windows = rights._getWindows();
 
-		if(windows.isEmpty()) {
-		    data.mediaAvailabilityWindows = Collections.emptyList();
-		    data.imagesAvailabilityWindows = Collections.emptyList();
-		} else {
+        if(windows.isEmpty()) {
+            data.mediaAvailabilityWindows = Collections.emptyList();
+            data.imagesAvailabilityWindows = Collections.emptyList();
+        } else {
 
-		    long minStartDate = Long.MAX_VALUE;
-		    long maxEndDate = 0;
-		    boolean isInWindow = false;
+            long minStartDate = Long.MAX_VALUE;
+            long maxEndDate = 0;
+            boolean isInWindow = false;
 
-		    for(VideoRightsWindowHollow window : windows) {
-		        long startDate = window._getStartDate()._getValue();
-		        long endDate = window._getEndDate()._getValue();
-		        if(startDate < minStartDate)
-		            minStartDate = startDate;
-		        if(endDate > maxEndDate)
-		            maxEndDate = endDate;
+            for(VideoRightsWindowHollow window : windows) {
+                long startDate = window._getStartDate()._getValue();
+                long endDate = window._getEndDate()._getValue();
+                if(startDate < minStartDate)
+                    minStartDate = startDate;
+                if(endDate > maxEndDate)
+                    maxEndDate = endDate;
 
-		        if(startDate < ctx.getNowMillis() && endDate > ctx.getNowMillis())
-		        	isInWindow = true;
+                if(startDate < ctx.getNowMillis() && endDate > ctx.getNowMillis())
+                    isInWindow = true;
 
-		        ////TODO: What was the logic for this before?
-		        if(rollup.doSeason() && startDate < (ctx.getNowMillis() + (7 * 24 * 60 * 60 * 1000))) {
-		            rollup.newSeasonWindow(startDate, endDate, rollup.getSeasonSequenceNumber());
-		        }
-		    }
+                ////TODO: What was the logic for this before?
+                if(rollup.doSeason() && startDate < (ctx.getNowMillis() + (7 * 24 * 60 * 60 * 1000))) {
+                    rollup.newSeasonWindow(startDate, endDate, rollup.getSeasonSequenceNumber());
+                }
+            }
 
-		    VMSAvailabilityWindow outputWindow = new VMSAvailabilityWindow();
-		    outputWindow.startDate = new Date(minStartDate);
-		    outputWindow.endDate = new Date(maxEndDate);
-		    outputWindow.bundledAssetsGroupId = rollup.getFirstEpisodeBundledAssetId();
+            VMSAvailabilityWindow outputWindow = new VMSAvailabilityWindow();
+            outputWindow.startDate = new Date(minStartDate);
+            outputWindow.endDate = new Date(maxEndDate);
+            outputWindow.bundledAssetsGroupId = rollup.getFirstEpisodeBundledAssetId();
 
-		    WindowPackageContractInfo videoImagesContractInfo = createEmptyContractInfoForRollup(outputWindow);
-		    WindowPackageContractInfo videoMediaContractInfo = createEmptyContractInfoForRollup(outputWindow);
+            WindowPackageContractInfo videoImagesContractInfo = createEmptyContractInfoForRollup(outputWindow);
+            WindowPackageContractInfo videoMediaContractInfo = createEmptyContractInfoForRollup(outputWindow);
 
-		    VMSAvailabilityWindow videoImagesAvailabilityWindow = outputWindow.clone();
-		    VMSAvailabilityWindow videoMediaAvailabilityWindow = outputWindow.clone();
+            VMSAvailabilityWindow videoImagesAvailabilityWindow = outputWindow.clone();
+            VMSAvailabilityWindow videoMediaAvailabilityWindow = outputWindow.clone();
 
-		    videoImagesAvailabilityWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
-		    videoMediaAvailabilityWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
+            videoImagesAvailabilityWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
+            videoMediaAvailabilityWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
 
-		    videoImagesAvailabilityWindow.windowInfosByPackageId.put(ZERO, videoImagesContractInfo);
-		    videoMediaAvailabilityWindow.windowInfosByPackageId.put(ZERO, videoMediaContractInfo);
+            videoImagesAvailabilityWindow.windowInfosByPackageId.put(ZERO, videoImagesContractInfo);
+            videoMediaAvailabilityWindow.windowInfosByPackageId.put(ZERO, videoMediaContractInfo);
 
-		    videoImagesContractInfo.videoContractInfo.cupTokens = EMPTY_CUP_TOKENS;
-		    videoMediaContractInfo.videoContractInfo.assetBcp47Codes = rollup.getAssetBcp47Codes();
-		    if(rollup.getPrePromoDays() != 0)
-		        videoMediaContractInfo.videoContractInfo.prePromotionDays = rollup.getPrePromoDays();
-		    videoMediaContractInfo.videoContractInfo.postPromotionDays = 0;
-		    videoMediaContractInfo.videoContractInfo.cupTokens = rollup.getCupTokens() != null ? rollup.getCupTokens() : DEFAULT_CUP_TOKENS;
-		    videoMediaContractInfo.videoPackageInfo.formats = rollup.getVideoFormatDescriptors();
+            videoImagesContractInfo.videoContractInfo.cupTokens = EMPTY_CUP_TOKENS;
+            videoMediaContractInfo.videoContractInfo.assetBcp47Codes = rollup.getAssetBcp47Codes();
+            if(rollup.getPrePromoDays() != 0)
+                videoMediaContractInfo.videoContractInfo.prePromotionDays = rollup.getPrePromoDays();
+            videoMediaContractInfo.videoContractInfo.postPromotionDays = 0;
+            videoMediaContractInfo.videoContractInfo.cupTokens = rollup.getCupTokens() != null ? rollup.getCupTokens() : DEFAULT_CUP_TOKENS;
+            videoMediaContractInfo.videoPackageInfo.formats = rollup.getVideoFormatDescriptors();
 
-		    if(isGoLive && isInWindow)
-		    	videoImagesContractInfo.videoPackageInfo.stillImagesMap = rollup.getVideoImageMap();
+            if(isGoLive && isInWindow)
+                videoImagesContractInfo.videoPackageInfo.stillImagesMap = rollup.getVideoImageMap();
 
-		    data.mediaAvailabilityWindows = Collections.singletonList(videoMediaAvailabilityWindow);
-		    data.imagesAvailabilityWindows = Collections.singletonList(videoImagesAvailabilityWindow);
-		}
-	}
+            data.mediaAvailabilityWindows = Collections.singletonList(videoMediaAvailabilityWindow);
+            data.imagesAvailabilityWindows = Collections.singletonList(videoImagesAvailabilityWindow);
+        }
+    }
 
     private WindowPackageContractInfo createEmptyContractInfoForRollup(VMSAvailabilityWindow outputWindow) {
         WindowPackageContractInfo contractInfo = new WindowPackageContractInfo();
@@ -372,20 +375,20 @@ public class VMSAvailabilityWindowModule {
 
     private boolean shouldFilterOutWindowInfo(boolean isGoLive, VideoRightsContractHollow contract, int unfilteredCount, long startDate, long endDate) {
         if(endDate < ctx.getNowMillis())
-        	return true;
+            return true;
 
         if(!isGoLive) {
-        	if(!contract._getDayAfterBroadcast() && contract._getPrePromotionDays() <= 0)
-        		return true;
+            if(!contract._getDayAfterBroadcast() && contract._getPrePromotionDays() <= 0)
+                return true;
         }
 
         if(unfilteredCount < 3 && endDate > ctx.getNowMillis())
-        	return false;
+            return false;
 
         if(startDate > ctx.getNowMillis() + FUTURE_CUTOFF_IN_MILLIS)
-        	return true;
+            return true;
 
-    	return false;
+        return false;
     }
 
 
