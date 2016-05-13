@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer.modules.l10n;
 
 import com.netflix.i18n.NFResourceID;
-import com.netflix.videometadata.type.HookType;
 
 public class L10nResourceIdLookup {
 
