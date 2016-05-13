@@ -40,9 +40,10 @@ import com.netflix.vms.transformer.hollowoutput.VPerson;
 import com.netflix.vms.transformer.hollowoutput.VRole;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
-import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.util.VideoDateUtil;
+import com.netflix.vms.transformer.util.VideoSetTypeUtil;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -57,13 +58,9 @@ public class VideoMetaDataModule {
     private static final int DIRECTOR_ROLE_ID = 104;
     private static final int CREATOR_ROLE_ID = 108;
 
-    private final VideoSetType PAST = new VideoSetType("Past");
-    private final VideoSetType PRESENT = new VideoSetType("Present");
-    private final VideoSetType FUTURE = new VideoSetType("Future");
-    private final VideoSetType EXTENDED = new VideoSetType("Extended");
-
     private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
+    private final VMSTransformerIndexer indexer;
 
     private final HollowPrimaryKeyIndex videoGeneralIdx;
     private final HollowHashIndex videoTypeCountryIdx;
@@ -81,6 +78,7 @@ public class VideoMetaDataModule {
     public VideoMetaDataModule(VMSHollowInputAPI api, TransformerContext ctx, VMSTransformerIndexer indexer) {
         this.api = api;
         this.ctx = ctx;
+        this.indexer = indexer;
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(VIDEO_GENERAL);
         this.videoPersonIdx = indexer.getHashIndex(PERSONS_BY_VIDEO_ID);
         this.videoPersonRoleIdx = indexer.getHashIndex(PERSON_ROLES_BY_VIDEO_ID);
@@ -258,51 +256,18 @@ public class VideoMetaDataModule {
     }
 
     private void populateSetTypes(Integer videoId, String countryCode, VideoRightsHollow rights, VideoMetaDataCountrySpecificDataKey vmd) {
-        HollowHashIndexResult videoTypeMatches = videoTypeCountryIdx.findMatches((long)videoId, countryCode);
+        HollowHashIndexResult videoTypeMatches = videoTypeCountryIdx.findMatches((long) videoId, countryCode);
         VideoTypeDescriptorHollow typeDescriptor = null;
-        if(videoTypeMatches != null)
+        if (videoTypeMatches != null) {
             typeDescriptor = api.getVideoTypeDescriptorHollow(videoTypeMatches.iterator().next());
-
-        boolean isInWindow = false;
-        boolean isInFuture = false;
-        boolean isExtended = false;
-
-        if(rights != null) {
-            Set<VideoRightsWindowHollow> windows = rights._getRights()._getWindows();
-            for(VideoRightsWindowHollow window : windows) {
-                long windowStart = window._getStartDate()._getValue();
-                if(windowStart < ctx.getNowMillis() && window._getEndDate()._getValue() > ctx.getNowMillis()) {
-                    isInWindow = true;
-                    break;
-                } else if(windowStart > ctx.getNowMillis()) {
-                    isInFuture = true;
-                }
-            }
         }
 
-        if(typeDescriptor != null) {
-            isExtended = "US".equals(countryCode) && typeDescriptor._getExtended();
-        }
-
-        Set<VideoSetType> setOfVideoSetType = new HashSet<VideoSetType>();
-
-        if(isInWindow) {
-            setOfVideoSetType.add(PRESENT);
-        } else if(isInFuture) {
-            setOfVideoSetType.add(FUTURE);
-        } else if(isExtended) {
-            setOfVideoSetType.add(EXTENDED);
-        }
-
-        if(setOfVideoSetType.isEmpty())
-            setOfVideoSetType.add(PAST);
-
-        vmd.videoSetTypes = setOfVideoSetType;
+        vmd.videoSetTypes = VideoSetTypeUtil.computeSetTypes(videoId, countryCode, rights, typeDescriptor, api, ctx, indexer);
         long showMemberTypeId = 0; //@TODO: typeDescriptor._getShowMemberTypeId();
         if(showMemberTypeId != Long.MIN_VALUE)
             vmd.showMemberTypeId = (int)showMemberTypeId;
 
-        StringHollow copyright = typeDescriptor._getCopyright();
+        StringHollow copyright = typeDescriptor == null ? null : typeDescriptor._getCopyright();
         if(copyright != null) {
             vmd.copyright = new Strings(copyright._getValue());
         }

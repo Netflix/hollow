@@ -5,6 +5,7 @@ import com.netflix.vms.transformer.hollowinput.ReleaseDateHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VideoDateWindowHollow;
 import com.netflix.vms.transformer.hollowoutput.Date;
+
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -46,7 +47,7 @@ public class VideoDateUtil {
 
         if(year != null && month != null && day != null){
             Calendar cal = new Calendar.Builder()
-            // NOTE: Upstream is expected to provide the date (that we are build from day, month, year in PST timezone)
+                    // NOTE: Upstream is expected to provide the date (that we are build from day, month, year in PST timezone)
                     .setTimeZone(TimeZone.getTimeZone("America/Los_Angeles")).set(Calendar.DATE, day)
                     // NOTE: Beehive is expected to send us 1 based month and Calendar uses 0 based month.
                     // Ex: Beehive gives 1 for January and Calendar expects 0 for January
@@ -54,5 +55,17 @@ public class VideoDateUtil {
             result_ = new Date(cal.getTimeInMillis());
         }
         return result_;
+    }
+
+    private static final long ONE_HOUR = 3600000L;
+    public static Date roundToHour(Date d, Date videoAvailabilityDate) {
+        if (d == null) return null;
+
+        d = new Date(d.val / ONE_HOUR * ONE_HOUR);
+        if (videoAvailabilityDate != null && videoAvailabilityDate.val > d.val && (videoAvailabilityDate.val - d.val) <= ONE_HOUR * 2) {
+            return videoAvailabilityDate;
+        }
+
+        return d;
     }
 }

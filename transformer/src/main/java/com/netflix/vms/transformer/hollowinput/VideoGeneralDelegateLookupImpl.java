@@ -68,11 +68,11 @@ public class VideoGeneralDelegateLookupImpl extends HollowObjectAbstractDelegate
         return typeAPI.getOriginalLanguageBcpCodeOrdinal(ordinal);
     }
 
-    public long getMetadataReleaseDays(int ordinal) {
+    public int getMetadataReleaseDays(int ordinal) {
         return typeAPI.getMetadataReleaseDays(ordinal);
     }
 
-    public Long getMetadataReleaseDaysBoxed(int ordinal) {
+    public Integer getMetadataReleaseDaysBoxed(int ordinal) {
         return typeAPI.getMetadataReleaseDaysBoxed(ordinal);
     }
 

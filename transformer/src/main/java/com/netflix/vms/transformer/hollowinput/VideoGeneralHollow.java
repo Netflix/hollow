@@ -77,11 +77,11 @@ public class VideoGeneralHollow extends HollowObject {
         return  api().getStringHollow(refOrdinal);
     }
 
-    public long _getMetadataReleaseDays() {
+    public int _getMetadataReleaseDays() {
         return delegate().getMetadataReleaseDays(ordinal);
     }
 
-    public Long _getMetadataReleaseDaysBoxed() {
+    public Integer _getMetadataReleaseDaysBoxed() {
         return delegate().getMetadataReleaseDaysBoxed(ordinal);
     }
 
