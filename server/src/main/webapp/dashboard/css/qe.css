@@ -145,7 +145,7 @@ label.aligned {
     float: left;
     margin: 10px 10px 10px 10px;
     width:1020px;
-    height:300px;
+    height:400px;
 }
 
 .innerframesuperlong {
@@ -153,7 +153,7 @@ label.aligned {
     left:25px;
     top: 35px;
     width:975px;
-    height:260px;
+    height:360px;
     overflow: auto;
     overflow-x: hidden;
 }

@@ -13,7 +13,6 @@ function VmsServerInfoTab(dashboard) {
     this.cycleErrorsView = null; // same file, see below
     this.cycleDataInjectionView = null; // same file, see below
     this.cycleErrorCodesView = null; // same file, see below
-    this.cycleTransformationsView = null; // same file, see below
     this.cycleInputDataView = null; // same file, see below
     this.cycleCircuitBreakerView = null; // same file, see below
     this.propertiesTabView = null; // same file, see below
@@ -164,7 +163,6 @@ function VmsServerInfoTab(dashboard) {
         this.cycleReplayView.startRealTimeStatsTimer();
         this.cyclePublishView = new ServerPublishTab(serverInfoView);
         this.cycleInputSearchView = new ServerInputSearchTab(serverInfoView);
-        this.cycleTransformationsView = new CycleTransformationsTab(serverInfoView);
         this.propertiesTabView = new CyclePropertiesTab(serverInfoView);
         this.cycleErrorCodesTabView = new CycleErrorCodesTab(serverInfoView);
         this.cycleInputDataView = new CycleInputDataInformation(serverInfoView);
@@ -195,7 +193,7 @@ function VmsServerInfoTab(dashboard) {
 
     this.toggleExpandTabs = function(effect) {
         var lowUseTabs = ["#cycle-circuitbreaker-tab", "#cycle-input-validation-tab", "#cycle-error-codes-tab",
-                            "#cycle-input-search-tab", "#cycle-transformations-tab", "#data-injection-tab"];
+                            "#cycle-input-search-tab", "#data-injection-tab"];
         if(expandedTabs == true) {
             $.each(lowUseTabs, function(i, tabRef) {
                 if(effect == "none") {
@@ -307,7 +305,6 @@ function VmsServerInfoTab(dashboard) {
 
     this.clearLazyLoadElements = function() {
         $("#cycle-input-validation-results").html("");
-        serverInfoView.cycleTransformationsView.clear();
         serverInfoView.propertiesTabView.clear();
         serverInfoView.cyclePublishView.clear();
         serverInfoView.cycleInputSearchView.clear();
@@ -324,11 +321,7 @@ function VmsServerInfoTab(dashboard) {
             }
         }
 
-        if (id == "cycle-transformations-tab") {
-            if (action.forceRefresh || !serverInfoView.cycleTransformationsView.initialized()) {
-                serverInfoView.cycleTransformationsView.refresh();
-            }
-        } else if (id == "cycle-circuitbreaker-tab") {
+        if (id == "cycle-circuitbreaker-tab") {
             if (action.forceRefresh || !serverInfoView.cycleCircuitBreakerView.initialized()) {
                 serverInfoView.cycleCircuitBreakerView.refresh();
             }
@@ -393,44 +386,6 @@ function CyclePropertiesTab(serverInfoView) {
         var searchFieldModelDAO = new FieldArrayModelDAO(tableWidget, query, tableFields, true);
         searchFieldModelDAO.dataNode ="properties";
         searchFieldModelDAO.updateJsonFromSearch();
-        this.init = true;
-    };
-}
-
-// --------------------------------------------------------------------
-// CycleTransformationsTab
-// --------------------------------------------------------------------
-function CycleTransformationsTab(serverInfoView) {
-    var refFn = this;
-    this.init = false;
-    this.htmlDiv = "#id-cycle-transformations-locations";
-
-    $("#id-workerid-select").change(function() {
-        refFn.refresh();
-    });
-
-    this.initialized = function() {
-        return this.init;
-    };
-
-    this.clear = function() {
-        $(this.htmlDiv).html("");
-        this.init = false;
-    };
-
-    this.refresh = function() {
-        var tableWidget = new DataTableWidget(this.htmlDiv, "builder-stats-table", [ "cycleId", "partitionId", "builder", "input-size", "size-after",
-                "timestamp", "duration(ms)", "success" ]);
-
-        var widgetExecutor = new RegexSearchWidgetExecutor(tableWidget, RegexParserMapper.prototype.getTransformBuilderRegexInfo());
-        widgetExecutor.searchQuery.indexName = serverInfoView.vmsIndex;
-        widgetExecutor.searchQuery.indexType = "vmsserver";
-        widgetExecutor.searchQuery.size = "1500";
-        widgetExecutor.searchQuery.sort = "eventInfo.timeStamp:desc";
-        widgetExecutor.searchQuery.add(serverInfoView.vmsCycleId);
-
-        widgetExecutor.searchQuery.add("EndTransformBuild").add("partitionId:" + $("#id-workerid-select").val());
-        widgetExecutor.updateJsonFromSearch();
         this.init = true;
     };
 }
