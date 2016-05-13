@@ -8,14 +8,12 @@ import com.netflix.hollow.util.memory.WastefulRecycler;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
-
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-
 import org.junit.Test;
 
 public class ShowMeTheProgress {
@@ -72,6 +70,7 @@ public class ShowMeTheProgress {
         filter.addTypeRecursive("CharacterImages", outputSchemas);
         filter.addTypeRecursive("DrmInfoData", outputSchemas);
         filter.addTypeRecursive("FileEncodingData", outputSchemas);
+        filter.addTypeRecursive("LanguageRights", outputSchemas);
         return filter;
     }
 

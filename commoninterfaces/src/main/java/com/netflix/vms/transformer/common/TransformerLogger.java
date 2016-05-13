@@ -1,8 +1,7 @@
 package com.netflix.vms.transformer.common;
 
-import java.util.Collection;
-
 import java.util.Arrays;
+import java.util.Collection;
 
 public interface TransformerLogger {
 
@@ -21,6 +20,7 @@ public interface TransformerLogger {
         UnknownArtworkImageType,
         MissingLocaleForArtwork,
         InvalidImagesTerritoryCode,
+        LanguageRightsError,
 
 
         //// PUBLISH WORKFLOW ////
