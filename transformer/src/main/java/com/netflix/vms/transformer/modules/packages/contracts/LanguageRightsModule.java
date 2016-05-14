@@ -43,7 +43,7 @@ public class LanguageRightsModule extends AbstractTransformModule {
             bcp47Mapping.load(istream);
         } catch (Exception e) {
             ctx.getLogger().error(LogTag.LanguageRightsError, "bcp47mapping not loaded", e);
-            throw new RuntimeException(e);
+            // throw new RuntimeException(e); TODO: test that it works in deployment as well
         } finally {
             IOUtils.closeQuietly(istream);
         }
@@ -93,7 +93,6 @@ public class LanguageRightsModule extends AbstractTransformModule {
         for (LanguageRights langRights : contractMovieRights.values()) {
             mapper.addObject(langRights);
         }
-        System.out.println("TOTAL_ADDED=" + contractMovieRights.size());
     }
 
     private int getlanguageId(Strings bcpCode) {

@@ -8,6 +8,7 @@ import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
@@ -104,8 +105,13 @@ public class SimpleTransformer {
         SimultaneousExecutor executor = new SimultaneousExecutor();
 
         startTime = System.currentTimeMillis();
-
+        int progressDivisor = getProgressDivisor();
+        int processedCount = 0;
         for(VideoGeneralHollow videoGeneral : api.getAllVideoGeneralHollow()) {
+            processedCount++;
+            if (processedCount % progressDivisor == 0) {
+                ctx.getLogger().info(LogTag.TransformProgress, ("percent finished = " + (processedCount / progressDivisor)));
+            }
 
             executor.execute(new Runnable() {
                 @Override
@@ -179,7 +185,7 @@ public class SimpleTransformer {
 
 
         executor.awaitSuccessfulCompletion();
-
+        ctx.getLogger().info(LogTag.TransformProgress, "percent finished = 100");
         ctx.getMetricRecorder().recordMetric(FailedProcessingIndividualHierarchies, failedIndividualTransforms.get());
 
         // Hack
@@ -201,6 +207,12 @@ public class SimpleTransformer {
         System.out.println("Processed all videos in " + (endTime - startTime) + "ms");
 
         return writeStateEngine;
+    }
+
+    private int getProgressDivisor() {
+        int totalCount = api.getAllVideoGeneralHollow().size();
+        totalCount = (totalCount / 100) * 100 + 100;
+        return totalCount / 100;
     }
 
     private VideoCollectionsModule getVideoCollectionsModule() {

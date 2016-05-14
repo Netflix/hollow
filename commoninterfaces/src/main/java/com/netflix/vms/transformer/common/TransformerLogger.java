@@ -10,6 +10,7 @@ public interface TransformerLogger {
         TransformCycleBegin,
         TransformCycleSuccess,
         TransformCycleFailed,
+        TransformProgress,
         IndividualTransformFailed,
         InputDataVersionIds,
         WroteBlob,
