@@ -16,8 +16,6 @@ import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
 import com.netflix.vms.transformer.hollowoutput.GlobalVideo;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
-import com.netflix.vms.transformer.hollowoutput.L10NResources;
-import com.netflix.vms.transformer.hollowoutput.LanguageRights;
 import com.netflix.vms.transformer.hollowoutput.NamedCollectionHolder;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
@@ -38,6 +36,7 @@ import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHiera
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
 import com.netflix.vms.transformer.modules.countryspecific.CountrySpecificDataModule;
 import com.netflix.vms.transformer.modules.deploymentintent.CacheDeploymentIntentModule;
+import com.netflix.vms.transformer.modules.l10n.L10NResourcesModule;
 import com.netflix.vms.transformer.modules.media.VideoMediaDataModule;
 import com.netflix.vms.transformer.modules.meta.VideoImagesDataModule;
 import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
@@ -172,7 +171,8 @@ public class SimpleTransformer {
                 new TopNVideoDataModule(api, ctx, objectMapper),
                 new PersonImagesModule(api, ctx, objectMapper, indexer),
                 new CharacterImagesModule(api, ctx, objectMapper, indexer),
-                new LanguageRightsModule(api, ctx, objectMapper, indexer)
+                new LanguageRightsModule(api, ctx, objectMapper, indexer),
+                new L10NResourcesModule(api, ctx, objectMapper, indexer)
                 );
 
         // @formatter:on
@@ -184,7 +184,6 @@ public class SimpleTransformer {
             System.out.println(String.format("Finished Trasform for module=%s, duration=%s", m.getName(), tDuration));
         }
 
-
         executor.awaitSuccessfulCompletion();
         ctx.getLogger().info(LogTag.TransformProgress, "percent finished = 100");
         ctx.getMetricRecorder().recordMetric(FailedProcessingIndividualHierarchies, failedIndividualTransforms.get());
@@ -193,15 +192,6 @@ public class SimpleTransformer {
         NamedCollectionHolder holder = new NamedCollectionHolder();
         holder.country = new ISOCountry("-1");
         objectMapper.addObject(holder);
-
-        LanguageRights languageRights = new LanguageRights();
-        languageRights.contractId = -1;
-        languageRights.videoId = new Video(-1);
-        objectMapper.addObject(languageRights);
-
-        L10NResources l10n = new L10NResources();
-        l10n.resourceIdStr = new char[] { 'c' };
-        objectMapper.addObject(l10n);
         // End of Hack
 
         endTime = System.currentTimeMillis();
