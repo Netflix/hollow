@@ -106,12 +106,8 @@ public class SimpleTransformer {
 
         startTime = System.currentTimeMillis();
         int progressDivisor = getProgressDivisor();
-        int processedCount = 0;
+        AtomicInteger processedCount = new AtomicInteger();
         for(VideoGeneralHollow videoGeneral : api.getAllVideoGeneralHollow()) {
-            processedCount++;
-            if (processedCount % progressDivisor == 0) {
-                ctx.getLogger().info(LogTag.TransformProgress, ("percent finished = " + (processedCount / progressDivisor)));
-            }
 
             executor.execute(new Runnable() {
                 @Override
@@ -148,6 +144,11 @@ public class SimpleTransformer {
                         ctx.getLogger().error(IndividualTransformFailed, "Transformation failed for hierarchy with top node " + videoGeneral._getVideoId(), th);
                         failedIndividualTransforms.incrementAndGet();
                     }
+                    int count = processedCount.incrementAndGet();
+                    if (count % progressDivisor == 0) {
+                        ctx.getLogger().info(LogTag.TransformProgress, ("percent finished = " + (count / progressDivisor)));
+                    }
+
                 }
             });
         }
