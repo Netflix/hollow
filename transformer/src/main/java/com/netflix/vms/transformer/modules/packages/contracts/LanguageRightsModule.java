@@ -20,8 +20,6 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,11 +37,10 @@ public class LanguageRightsModule extends AbstractTransformModule {
         this.videoRightsIdx = indexer.getHashIndex(IndexSpec.ALL_VIDEO_RIGHTS);
         InputStream istream = null;
         try {
-            istream = new FileInputStream(getBcpLanguageIdsFilePath());
-            bcp47Mapping.load(istream);
+            bcp47Mapping.load(this.getClass().getClassLoader().getResourceAsStream("bcp47.properties"));
         } catch (Exception e) {
             ctx.getLogger().error(LogTag.LanguageRightsError, "bcp47mapping not loaded", e);
-            // throw new RuntimeException(e); TODO: test that it works in deployment as well
+            // throw new RuntimeException(e); // TODO: test that it works in deployment as well
         } finally {
             IOUtils.closeQuietly(istream);
         }
@@ -109,14 +106,4 @@ public class LanguageRightsModule extends AbstractTransformModule {
         return new Strings(str_._getValue());
     }
 
-    // TODO: may need to put location of bcp47.properties at a specific place
-    private String getBcpLanguageIdsFilePath() {
-        final String projectPath = new File(".").getAbsolutePath();
-        final String searchStr = "videometadata-transformer";
-        final int n = projectPath.indexOf(searchStr);
-        if (n == -1) {
-            throw new RuntimeException("could not determine project-path");
-        }
-        return projectPath.substring(0, n) + searchStr + "/transformer/src/main/resources/bcp47.properties";
-    }
 }
