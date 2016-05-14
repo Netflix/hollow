@@ -145,7 +145,7 @@ public class SimpleTransformer {
                     }
                     int count = processedCount.incrementAndGet();
                     if (count % progressDivisor == 0) {
-                        ctx.getLogger().info(LogTag.TransformProgress, ("percent finished = " + (count / progressDivisor)));
+                        ctx.getLogger().info(LogTag.TransformProgress, ("finished percent=" + (count / progressDivisor)));
                     }
 
                 }
@@ -185,7 +185,7 @@ public class SimpleTransformer {
         }
 
         executor.awaitSuccessfulCompletion();
-        ctx.getLogger().info(LogTag.TransformProgress, "percent finished = 100");
+        ctx.getLogger().info(LogTag.TransformProgress, "finished percent=100");
         ctx.getMetricRecorder().recordMetric(FailedProcessingIndividualHierarchies, failedIndividualTransforms.get());
 
         // Hack
