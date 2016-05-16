@@ -544,6 +544,7 @@ function ProgressBarWidget(selectId, labelId) {
 
     this.applyParserData = function(dataModel) {
         if(dataModel == null) {
+            progressbar.progressbar( "value", 0);
             return;
         }
         var refWidget = this;
@@ -738,6 +739,9 @@ function TimeSeriesGraphWidget(divId, y2, y1label, y2label) {
         $.plot($(this.divId), dataSeries, {
             lines : {
                 fill: this.fill
+            },
+            legend: {
+                position: "nw"
             },
             xaxis : {
                 mode : "time",

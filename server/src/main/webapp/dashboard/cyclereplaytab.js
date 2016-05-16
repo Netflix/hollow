@@ -6,7 +6,7 @@ function ReplayCycleView(dashboard) {
     this.liveStartTime = 0;
     this.alignedEndTime = null;
     this.alignBoundary = 5; // seconds
-    this.maxRunTime = 300; // seconds
+    this.maxRunTime = 600; // seconds
     this.startReplayDate = null;
     this.pauseRealTimeRefresh = true;
 
@@ -203,7 +203,7 @@ function ReplayCycleView(dashboard) {
 
     this.startRealTimeStatsTimer = function() {
         replayCycleTab.refreshRealTimeStats();
-        setTimeout(replayCycleTab.startRealTimeStatsTimer, 1500);
+        setTimeout(replayCycleTab.startRealTimeStatsTimer, 2000);
     };
 
     this.refreshRealTimeStats = function() {
