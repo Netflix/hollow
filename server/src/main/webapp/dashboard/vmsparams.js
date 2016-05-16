@@ -110,3 +110,9 @@ RegexParserMapper.prototype.getDataVersionRegexInfo = function() {
     fieldRegex["dataVersion"] = [ /^dataVersion=(.*)$/, 1 ];
     return fieldRegex;
 };
+
+RegexParserMapper.prototype.getProgressRegexInfo = function() {
+    var fieldRegex = new Object();
+    fieldRegex["percent"] = [ /^percent=(.*)$/, 1 ];
+    return fieldRegex;
+};

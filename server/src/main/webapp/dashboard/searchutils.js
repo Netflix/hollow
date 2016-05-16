@@ -65,6 +65,7 @@ function SearchDAO(model, widget, refresh) {
         }
         if (this.doRefresh == true) {
             this.widget.refresh();
+            this.responseModel.clear(); //RegexModel
         }
     };
 

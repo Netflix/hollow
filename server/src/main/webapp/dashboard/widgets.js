@@ -513,6 +513,49 @@ function SelectOptionsWidget(selectId, field, formatFunction, dochange, defaulto
     };
 }
 
+
+// Wrapper for JQuery progress-bar
+function ProgressBarWidget(selectId, labelId) {
+    this.divId = selectId;
+    this.doSort = false;
+    this.value = 0;
+    this.fieldName = "percent";
+
+    var progressbar = $( this.divId ),
+    progressLabel = $( labelId );
+ 
+    progressbar.progressbar({
+      value: false,
+      change: function() {
+        progressLabel.text( progressbar.progressbar( "value" ) + "%" );
+      },
+      complete: function() {
+        progressLabel.text( "Complete" );
+      }
+    });
+
+    this.getType = function() {
+        return "ProgressBarWidget";
+    };
+
+    this.clear = function() {
+        progressbar.progressbar( "value", 0);
+    };
+
+    this.applyParserData = function(dataModel) {
+        if(dataModel == null) {
+            return;
+        }
+        var refWidget = this;
+        var obj = dataModel[0];
+        refWidget.value = parseInt(obj[refWidget.fieldName]);
+        progressbar.progressbar( "value", refWidget.value);
+    };
+
+    this.refresh = function() {
+    };
+}
+
 // --------------------------------------------------------------------
 // IFrameWidget
 // --------------------------------------------------------------------
@@ -602,6 +645,7 @@ function TimeSeriesGraphWidget(divId, y2, y1label, y2label) {
     this.deltaName = null;
     this.minTickSize = 1;
     this.numTicks = 5;
+    this.fill = false;
 
     this.getType = function() {
         return "TimeSeriesGraphWidget";
@@ -692,6 +736,9 @@ function TimeSeriesGraphWidget(divId, y2, y1label, y2label) {
         }
 
         $.plot($(this.divId), dataSeries, {
+            lines : {
+                fill: this.fill
+            },
             xaxis : {
                 mode : "time",
                 ticks : this.numTicks
@@ -727,6 +774,7 @@ function TimeSeriesGraphWidget(divId, y2, y1label, y2label) {
         this.dataNames = new Array();
     };
 }
+
 
 // helper fake widget
 function HelperValidationWidget(callback, indexName, indexType, currentCycle, queries, fields, sorts) {
