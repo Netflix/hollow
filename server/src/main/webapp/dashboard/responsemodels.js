@@ -577,6 +577,10 @@ function RegexSourceModel(args) {
     this.fieldsRegex = args.fieldsRegex;
     this.dataModel = new Array();
 
+    this.clear = function() {
+        this.dataModel = new Array();
+    }
+
     this.addHitInfo = function(jsonHitData) {
         var timestamp = jsonHitData._source.eventInfo["timestamp"]; // hard-coded
         var cycleId = jsonHitData._source.eventInfo["currentCycle"];

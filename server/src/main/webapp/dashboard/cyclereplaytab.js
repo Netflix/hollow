@@ -6,7 +6,7 @@ function ReplayCycleView(dashboard) {
     this.liveStartTime = 0;
     this.alignedEndTime = null;
     this.alignBoundary = 5; // seconds
-    this.maxRunTime = 300; // seconds
+    this.maxRunTime = 600; // seconds
     this.startReplayDate = null;
     this.pauseRealTimeRefresh = true;
 
@@ -27,6 +27,7 @@ function ReplayCycleView(dashboard) {
         replayCycleTab.autoUpdateWidgets = new Array();
         replayCycleTab.autoUpdateDAO = new Array();
 
+        replayCycleTab.createProgressBar();
         replayCycleTab.createGlobalServerLogTable();
         replayCycleTab.createProcessGraph();
         replayCycleTab.createWarnErrorGraph();
@@ -140,11 +141,29 @@ function ReplayCycleView(dashboard) {
 
     this.createWarnErrorGraph = function() {
         var graphWidget = new TimeSeriesGraphWidget("#id-warn-error-live", 0, "Warning/Errors", "");
+        graphWidget.fill = true;
         replayCycleTab.autoUpdateWidgets.push(graphWidget);
 
         var searchCountDAO = new SearchCountDAO(graphWidget, this.getTimeRangeQueryInstance("vmsserver", "count"), "warnings/errors", false);
         searchCountDAO.searchQuery.add(" (logLevel:warn OR logLevel:warn)");
         replayCycleTab.autoUpdateDAO.push(searchCountDAO);
+    };
+
+     this.createProgressBar = function() {
+        var graphWidget = new ProgressBarWidget("#id-transformations-progress", "#id-transformations-progress-label");
+        replayCycleTab.autoUpdateWidgets.push(graphWidget);
+
+        var regexSourceModel = ResponseModelsFactory.prototype.getModel("RegexModel", {
+            sourceField : "message",
+            fieldsRegex : RegexParserMapper.prototype.getProgressRegexInfo()
+        });
+
+        var searchDao = new SearchDAO(regexSourceModel, graphWidget, true);
+        searchDao.searchQuery = this.getTimeRangeQueryInstance("vmsserver", null);
+        searchDao.searchQuery.size = "1";
+        searchDao.searchQuery.add("tag:TransformProgress");
+        searchDao.searchQuery.sort = "eventInfo.timestamp:desc";
+        replayCycleTab.autoUpdateDAO.push(searchDao);
     };
 
     this.createGlobalServerLogTable = function() {
@@ -153,9 +172,10 @@ function ReplayCycleView(dashboard) {
         tableWidget.clearPrevious = false;
         replayCycleTab.autoUpdateWidgets.push(tableWidget);
 
-        var searchFieldModelDAO = new FieldModelSearchDAO(tableWidget, this.getTimeRangeQueryInstance(null), [ "timestamp", "message" ],
-                false);
-        searchFieldModelDAO.searchQuery.size = "7";
+        var searchFieldModelDAO = new FieldModelSearchDAO(tableWidget, this.getTimeRangeQueryInstance(null), [ "timestamp", "message" ], false);
+        searchFieldModelDAO.timestampParserFunc = this.parseTimeStamp;
+        searchFieldModelDAO.searchQuery.add("NOT tag:TransformProgress");
+        searchFieldModelDAO.searchQuery.size = "100";
         searchFieldModelDAO.searchQuery.sort = "eventInfo.timestamp:desc";
         replayCycleTab.autoUpdateDAO.push(searchFieldModelDAO);
     };
