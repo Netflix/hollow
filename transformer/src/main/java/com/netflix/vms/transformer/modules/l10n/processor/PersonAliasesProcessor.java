@@ -13,12 +13,14 @@ public class PersonAliasesProcessor extends AbstractL10NProcessor {
     }
 
     @Override
-    public void processResources() {
+    public int processResources() {
         for (PersonAliasesHollow item : api.getAllPersonAliasesHollow()) {
             final int itemId = (int) item._getAliasId();
 
             final String resourceId = L10nResourceIdLookup.getPersonAliasID(itemId);
             addL10NResources(resourceId, item._getName()._getTranslatedTexts());
         }
+
+        return api.getAllPersonAliasesHollow().size();
     }
 }

@@ -25,8 +25,7 @@ public class PersonsProcessor extends AbstractL10NProcessor {
     }
 
     @Override
-    public void processResources() {
-
+    public int processResources() {
         for (PersonsHollow item : api.getAllPersonsHollow()) {
             final int itemId = (int) item._getPersonId();
 
@@ -59,5 +58,7 @@ public class PersonsProcessor extends AbstractL10NProcessor {
                 }
             }
         }
+
+        return api.getAllPersonsHollow().size();
     }
 }

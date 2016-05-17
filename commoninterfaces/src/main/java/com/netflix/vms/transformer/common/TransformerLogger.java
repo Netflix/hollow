@@ -23,6 +23,10 @@ public interface TransformerLogger {
         InvalidImagesTerritoryCode,
         LanguageRightsError,
 
+        //// TRANSFORMATION MISC ////
+
+        L10NProcessing,
+
 
         //// PUBLISH WORKFLOW ////
 
@@ -34,8 +38,7 @@ public interface TransformerLogger {
         MarkedPoisonState,
         ObservedPoisonState,
         AnnouncementSuccess,
-        AnnouncementFailure
-
+ AnnouncementFailure,
     }
 
     public static enum Severity {

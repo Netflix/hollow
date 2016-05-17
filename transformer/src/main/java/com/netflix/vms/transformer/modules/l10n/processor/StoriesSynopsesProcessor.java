@@ -15,7 +15,7 @@ public class StoriesSynopsesProcessor extends AbstractL10NProcessor {
     }
 
     @Override
-    public void processResources() {
+    public int processResources() {
         for (StoriesSynopsesHollow item : api.getAllStoriesSynopsesHollow()) {
             final int itemId = (int) item._getMovieId();
 
@@ -32,5 +32,7 @@ public class StoriesSynopsesProcessor extends AbstractL10NProcessor {
                 }
             }
         }
+
+        return api.getAllStoriesSynopsesHollow().size();
     }
 }

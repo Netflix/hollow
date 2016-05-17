@@ -13,7 +13,7 @@ public class MoviesProcessor extends AbstractL10NProcessor {
     }
 
     @Override
-    public void processResources() {
+    public int processResources() {
         for (MoviesHollow item : api.getAllMoviesHollow()) {
             final int itemId = (int) item._getMovieId();
 
@@ -58,7 +58,8 @@ public class MoviesProcessor extends AbstractL10NProcessor {
                 final String resourceId = L10nResourceIdLookup.getMovieTransliteratedTitleResourceID(itemId);
                 addL10NResources(resourceId, item._getTransliterated()._getTranslatedTexts());
             }
-
         }
+
+        return api.getAllMoviesHollow().size();
     }
 }

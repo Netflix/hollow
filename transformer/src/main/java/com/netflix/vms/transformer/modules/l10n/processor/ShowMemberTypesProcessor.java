@@ -13,12 +13,14 @@ public class ShowMemberTypesProcessor extends AbstractL10NProcessor {
     }
 
     @Override
-    public void processResources() {
+    public int processResources() {
         for (ShowMemberTypesHollow item : api.getAllShowMemberTypesHollow()) {
             final int itemId = (int) item._getShowMemberTypeId();
 
             final String resourceId = L10nResourceIdLookup.getShowMemberTypeNameID(itemId);
             addL10NResources(resourceId, item._getDisplayName()._getTranslatedTexts());
         }
+
+        return api.getAllShowMemberTypesHollow().size();
     }
 }

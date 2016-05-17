@@ -19,10 +19,17 @@ public abstract class AbstractL10NProcessor implements L10NProcessor {
     protected final TransformerContext ctx;
     protected final HollowObjectMapper mapper;
 
+    protected int itemsAdded;
+
     AbstractL10NProcessor(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
         this.api = api;
         this.ctx = ctx;
         this.mapper = mapper;
+    }
+
+    @Override
+    public int getItemsAdded() {
+        return itemsAdded;
     }
 
     protected void addL10NResources(String id, MapOfTranslatedTextHollow mapOfTranslatedText) {
@@ -34,6 +41,7 @@ public abstract class AbstractL10NProcessor implements L10NProcessor {
         l10n.resourceIdStr = id.toCharArray();
         l10n.localizedStrings = mapOfTranslatedText;
         mapper.addObject(l10n);
+        itemsAdded++;
     }
 
     protected Map<NFLocale, L10NStrings> processTranslatedText(MapOfTranslatedTextHollow mapOfTranslatedText) {
