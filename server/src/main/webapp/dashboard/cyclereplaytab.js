@@ -143,10 +143,8 @@ function ReplayCycleView(dashboard) {
         var graphWidget = new TimeSeriesGraphWidget("#id-warn-error-live", 0, "Warning/Errors", "");
         graphWidget.fill = true;
         replayCycleTab.autoUpdateWidgets.push(graphWidget);
-
-        var searchCountDAO = new SearchCountDAO(graphWidget, this.getTimeRangeQueryInstance("vmsserver", "count"), "warnings/errors", false);
-        searchCountDAO.searchQuery.add(" (logLevel:warn OR logLevel:warn)");
-        replayCycleTab.autoUpdateDAO.push(searchCountDAO);
+        replayCycleTab.autoUpdateDAO.push(this.getSearchCountDao(graphWidget, "Warn", "logLevel:warn"));
+        replayCycleTab.autoUpdateDAO.push(this.getSearchCountDao(graphWidget, "Error", "logLevel:error"));
     };
 
      this.createProgressBar = function() {
@@ -192,13 +190,13 @@ function ReplayCycleView(dashboard) {
         var tmillis = new Date().getTime();
         var tseconds = addOrSubtract >= 0 ? Math.ceil(tmillis / 1000) : Math.floor(tmillis / 1000);
         var delta = ((tseconds % 60) % this.alignBoundary);
-        this.alignedEndTime = (tseconds + addOrSubtract * delta) * 1000;
+        this.alignedEndTime = (tseconds + addOrSubtract * delta) * 1000 + (addOrSubtract * replayCycleTab.alignBoundary * 1000);
     };
 
     this.alignTimeToBoundary = function(tmillis, addOrSubtract) {
         var tseconds = addOrSubtract >= 0 ? Math.ceil(tmillis / 1000) : Math.floor(tmillis / 1000);
         var delta = ((tseconds % 60) % this.alignBoundary);
-        return (tseconds + addOrSubtract * delta) * 1000;
+        return ((tseconds + addOrSubtract * delta) * 1000 -  (replayCycleTab.alignBoundary * 1000));
     };
 
     this.startRealTimeStatsTimer = function() {
@@ -231,7 +229,7 @@ function ReplayCycleView(dashboard) {
             });
         }
 
-        replayCycleTab.alignEndTimeToCurrentTimeBoundary(1);
+        replayCycleTab.alignEndTimeToCurrentTimeBoundary(-1);
 
         for (var iwidget = 0; iwidget < replayCycleTab.autoUpdateWidgets.length; iwidget++) {
             replayCycleTab.autoUpdateWidgets[iwidget].refresh();
