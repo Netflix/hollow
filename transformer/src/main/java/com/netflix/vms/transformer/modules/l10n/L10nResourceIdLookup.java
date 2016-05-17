@@ -163,12 +163,12 @@ public class L10nResourceIdLookup {
         return "st" + memberTypeID + ".n";
     }
 
-    public static String getHookTextId(final Integer id, final HookType type) {
-        return "m" + id + ".h" + "." + type.getId();
+    public static String getHookTextId(final Integer movieId, final HookType type) {
+        return "m" + movieId + ".h" + "." + type.getId();
     }
 
-    public static String getNarrativeTextId(final Integer id) {
-        return "m" + id + ".n";
+    public static String getNarrativeTextId(final Integer movieId) {
+        return "m" + movieId + ".n";
     }
 
     public static String getTrackLabelId(final String id) {
@@ -179,35 +179,27 @@ public class L10nResourceIdLookup {
         return resourceIdPrefix + id + "." + attribName;
     }
 
-    public static String createRolloutAttribResourceId(final Integer id, final String name, final String label) {
-        return String.format("rv_%d_%s_%s", id, name, label);
+    public static String getRolloutAttribResourceId(final Integer movieId, final String name, final String label) {
+        return String.format("rv_%d_%s_%s", movieId, name, label);
     }
 
-    public static String createCharacterAttribResourceId(final Integer id, final String name, final String label) {
-        return String.format("rc_%d_%s_%s", id, name, label);
+    public static String getCharacterAttribResourceId(final Integer characterId, final String name, final String label) {
+        return String.format("rc_%d_%s_%s", characterId, name, label);
     }
 
-    public static String getRolloutAttribResourceId(final Integer id, final String name, final String label) {
-        return createRolloutAttribResourceId(id, name, label);
+    public static String getMovieAkaTitleResourceID(Integer movieId) {
+        return "m" + movieId + ".ak";
     }
 
-    public static String getCharacterAttribResourceId(final Integer id, final String name, final String label) {
-        return createCharacterAttribResourceId(id, name, label);
+    public static String getMovieTransliteratedTitleResourceID(Integer movieId) {
+        return "m" + movieId + ".tl";
     }
 
-    public static String getMovieAkaTitleResourceID(Integer id) {
-        return "m" + id + ".ak";
+    public static String getPersonAkaNameResourceID(Integer personId) {
+        return "p" + personId + ".ak";
     }
 
-    public static String getMovieTransliteratedTitleResourceID(Integer id) {
-        return "m" + id + ".tl";
-    }
-
-    public static String getPersonAkaNameResourceID(Integer id) {
-        return "p" + id + ".ak";
-    }
-
-    public static String getPersonTransliteratedNameResourceID(Integer id) {
-        return "p" + id + ".tl";
+    public static String getPersonTransliteratedNameResourceID(Integer personId) {
+        return "p" + personId + ".tl";
     }
 }
