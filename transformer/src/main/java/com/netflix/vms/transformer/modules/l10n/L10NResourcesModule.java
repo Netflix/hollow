@@ -7,6 +7,9 @@ import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
 import com.netflix.vms.transformer.modules.l10n.processor.AltGenresProcessor;
+import com.netflix.vms.transformer.modules.l10n.processor.CategoriesProcessor;
+import com.netflix.vms.transformer.modules.l10n.processor.CharactersProcessor;
+import com.netflix.vms.transformer.modules.l10n.processor.EpisodesProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.L10NProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.MoviesProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.PersonAliasesProcessor;
@@ -25,6 +28,9 @@ public class L10NResourcesModule extends AbstractTransformModule {
         super(api, ctx, mapper);
 
         processorList.add(new AltGenresProcessor(api, ctx, mapper));
+        processorList.add(new CategoriesProcessor(api, ctx, mapper));
+        processorList.add(new CharactersProcessor(api, ctx, mapper));
+        processorList.add(new EpisodesProcessor(api, ctx, mapper));
         processorList.add(new MoviesProcessor(api, ctx, mapper));
         processorList.add(new PersonAliasesProcessor(api, ctx, mapper));
         processorList.add(new PersonsProcessor(api, ctx, mapper));

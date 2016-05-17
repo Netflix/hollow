@@ -1,11 +1,11 @@
 package com.netflix.vms.transformer.modules.l10n.processor;
 
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
-import com.netflix.videometadata.l10n.L10nResourceIdLookup;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.TranslatedTextHollow;
 import com.netflix.vms.transformer.hollowinput.TurboCollectionsHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+import com.netflix.vms.transformer.modules.l10n.L10nResourceIdLookup;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +48,7 @@ public class TurboCollectionsProcessor extends AbstractL10NProcessor {
                 TranslatedTextHollow value = entry.getValue();
                 if (value == null) continue;
 
-                String resourceId = L10nResourceIdLookup.getGenericResourceId(itemId, prefix, key).toString();
+                String resourceId = L10nResourceIdLookup.getGenericResourceId(itemId, prefix, key);
                 addL10NResources(resourceId, value._getTranslatedTexts());
             }
         }
