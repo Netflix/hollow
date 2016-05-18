@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer.modules.l10n.processor;
 
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
-import com.netflix.type.MediaType;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.ConsolidatedVideoCountryRatingHollow;
 import com.netflix.vms.transformer.hollowinput.ConsolidatedVideoRatingHollow;
@@ -31,7 +30,7 @@ public class VideoRatingsProcessor extends AbstractL10NProcessor<ConsolidatedVid
         // Hard-coding the media type to ED is acceptable in this case for two reasons:
         //   - the upstream feed only provides us with ED ratings
         //   - downstream clients can only ask for ED ratings
-        String mediaType = MediaType.ED.toString();
+        String mediaType = "ED";//MediaType.ED.toString();
 
         for (ConsolidatedVideoRatingHollow videoRating : input._getRatings()) {
             for (ConsolidatedVideoCountryRatingHollow countryRating : videoRating._getCountryRatings()) {
