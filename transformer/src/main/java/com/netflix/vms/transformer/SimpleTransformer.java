@@ -349,15 +349,17 @@ public class SimpleTransformer {
         // ----------------------
         // Process FallbackUSArtwork
         Map<Integer, VideoImages> usArtworkMap = imagesDataByCountry.get("US");
-        for (Map.Entry<Integer, VideoImages> usArtwork : usArtworkMap.entrySet()) {
-            int videoId = usArtwork.getKey();
-            VideoImages images = usArtwork.getValue();
+        if (usArtworkMap != null) {
+            for (Map.Entry<Integer, VideoImages> usArtwork : usArtworkMap.entrySet()) {
+                int videoId = usArtwork.getKey();
+                VideoImages images = usArtwork.getValue();
 
-            FallbackUSArtwork artwork = new FallbackUSArtwork();
-            artwork.id = new Video(videoId);
-            artwork.artworksByType = images.artworks;
-            artwork.typeFormatIdx = images.artworkFormatsByType;
-            objectMapper.addObject(artwork);
+                FallbackUSArtwork artwork = new FallbackUSArtwork();
+                artwork.id = new Video(videoId);
+                artwork.artworksByType = images.artworks;
+                artwork.typeFormatIdx = images.artworkFormatsByType;
+                objectMapper.addObject(artwork);
+            }
         }
     }
 

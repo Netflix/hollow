@@ -6,6 +6,7 @@ import java.util.Map;
 public class ArtworkDerivatives implements Cloneable {
 
     public List<ArtworkDerivative> list = null;
+    public Map<ArtWorkImageTypeEntry, Map<ArtWorkImageFormatEntry, List<Integer>>> typeFormatIndex = null;
     public Map<ArtWorkImageFormatEntry, List<Integer>> formatToDerivativeIndex = null;
 
     public boolean equals(Object other) {
@@ -17,6 +18,9 @@ public class ArtworkDerivatives implements Cloneable {
         if(o.list == null) {
             if(list != null) return false;
         } else if(!o.list.equals(list)) return false;
+        if(o.typeFormatIndex == null) {
+            if(typeFormatIndex != null) return false;
+        } else if(!o.typeFormatIndex.equals(typeFormatIndex)) return false;
         if(o.formatToDerivativeIndex == null) {
             if(formatToDerivativeIndex != null) return false;
         } else if(!o.formatToDerivativeIndex.equals(formatToDerivativeIndex)) return false;
@@ -26,6 +30,7 @@ public class ArtworkDerivatives implements Cloneable {
     public int hashCode() {
         int hashCode = 1;
         hashCode = hashCode * 31 + (list == null ? 1237 : list.hashCode());
+        hashCode = hashCode * 31 + (typeFormatIndex == null ? 1237 : typeFormatIndex.hashCode());
         hashCode = hashCode * 31 + (formatToDerivativeIndex == null ? 1237 : formatToDerivativeIndex.hashCode());
         return hashCode;
     }
@@ -33,6 +38,7 @@ public class ArtworkDerivatives implements Cloneable {
     public String toString() {
         StringBuilder builder = new StringBuilder("ArtworkDerivatives{");
         builder.append("list=").append(list);
+        builder.append(",typeFormatIndex=").append(typeFormatIndex);
         builder.append(",formatToDerivativeIndex=").append(formatToDerivativeIndex);
         builder.append("}");
         return builder.toString();

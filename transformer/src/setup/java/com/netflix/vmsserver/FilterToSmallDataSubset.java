@@ -11,6 +11,7 @@ import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.write.HollowBlobWriter;
+import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
 import com.netflix.vms.generated.notemplate.GlobalVideoHollow;
 import com.netflix.vms.generated.notemplate.L10NResourcesHollow;
@@ -117,6 +118,13 @@ public class FilterToSmallDataSubset {
             }
         });
 
+        findIncludedOrdinals("FallbackUSArtwork", includedVideoIds, new VideoIdDeriver() {
+            @Override
+            public Integer deriveId(int ordinal) {
+                return outputAPI.getFallbackUSArtworkHollow(ordinal)._getId()._getValueBoxed();
+            }
+        });
+
         //includeAll("NamedCollectionHolder");   //// TODO: Filter this to included Video IDs only
         includeAll("EncodingProfile");
         includeAll("OriginServer");
@@ -161,7 +169,7 @@ public class FilterToSmallDataSubset {
                 "PackageData", "id");
 
 
-        writeFilteredBlob(FILTERED_OUTPUT_BLOB_LOCATION);
+        writeFilteredBlob(FILTERED_OUTPUT_BLOB_LOCATION, stateEngine, ordinalsToInclude);
         return includedVideoIds;
     }
 
@@ -321,7 +329,7 @@ public class FilterToSmallDataSubset {
         includeAll("PersonBio");
         includeAll("VMSAward");
 
-        writeFilteredBlob(FILTERED_INPUT_BLOB_LOCATION);
+        writeFilteredBlob(FILTERED_INPUT_BLOB_LOCATION, stateEngine, ordinalsToInclude);
     }
 
     private void includeAll(String type) {
@@ -505,16 +513,22 @@ public class FilterToSmallDataSubset {
         Integer deriveId(int ordinal);
     }
 
-    private void writeFilteredBlob(String filename) throws FileNotFoundException, IOException {
-        HollowCombiner combiner = new HollowCombiner(new HollowCombinerIncludeOrdinalsCopyDirector(ordinalsToInclude), stateEngine);
+    private static void writeFilteredBlob(String filename, HollowReadStateEngine inputStateEngine, Map<String, BitSet> ordinalsToInclude) throws FileNotFoundException, IOException {
+        Map<String, String> headerTags = inputStateEngine.getHeaderTags();
+        HollowCombiner combiner = new HollowCombiner(new HollowCombinerIncludeOrdinalsCopyDirector(ordinalsToInclude), inputStateEngine);
 
         combiner.combine();
+        HollowWriteStateEngine outputStateEngine = combiner.getCombinedStateEngine();
+        outputStateEngine.addHeaderTags(headerTags);
 
-        HollowBlobWriter writer = new HollowBlobWriter(combiner.getCombinedStateEngine());
+        HollowBlobWriter writer = new HollowBlobWriter(outputStateEngine);
         BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(filename));
         writer.writeSnapshot(os);
         os.close();
+
+        System.out.println(String.format("writeFilteredBlob file=%s, headers:", filename));
+        for (Map.Entry<String, String> entry : headerTags.entrySet()) {
+            System.out.println(String.format("\t %s=%s", entry.getKey(), entry.getValue()));
+        }
     }
-
-
 }
