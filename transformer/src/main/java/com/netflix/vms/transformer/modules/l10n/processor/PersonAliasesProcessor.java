@@ -6,21 +6,24 @@ import com.netflix.vms.transformer.hollowinput.PersonAliasesHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.modules.l10n.L10nResourceIdLookup;
 
-public class PersonAliasesProcessor extends AbstractL10NProcessor {
+import java.util.Collection;
+
+public class PersonAliasesProcessor extends AbstractL10NProcessor<PersonAliasesHollow> {
 
     public PersonAliasesProcessor(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
         super(api, ctx, mapper);
     }
 
     @Override
-    public int processResources() {
-        for (PersonAliasesHollow item : api.getAllPersonAliasesHollow()) {
-            final int itemId = (int) item._getAliasId();
+    public Collection<PersonAliasesHollow> getInputs() {
+        return api.getAllPersonAliasesHollow();
+    }
 
-            final String resourceId = L10nResourceIdLookup.getPersonAliasID(itemId);
-            addL10NResources(resourceId, item._getName()._getTranslatedTexts());
-        }
+    @Override
+    public void processInput(PersonAliasesHollow input) {
+        final int inputId = (int) input._getAliasId();
 
-        return api.getAllPersonAliasesHollow().size();
+        final String resourceId = L10nResourceIdLookup.getPersonAliasID(inputId);
+        addL10NResources(resourceId, input._getName());
     }
 }

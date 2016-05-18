@@ -7,33 +7,36 @@ import com.netflix.vms.transformer.hollowinput.AltGenresHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.modules.l10n.L10nResourceIdLookup;
 
-public class AltGenresProcessor extends AbstractL10NProcessor {
+import java.util.Collection;
+
+public class AltGenresProcessor extends AbstractL10NProcessor<AltGenresHollow> {
 
     public AltGenresProcessor(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
         super(api, ctx, mapper);
     }
 
     @Override
-    public int processResources() {
-        for (AltGenresHollow item : api.getAllAltGenresHollow()) {
-            final int itemId = (int) item._getAltGenreId();
+    public Collection<AltGenresHollow> getInputs() {
+        return api.getAllAltGenresHollow();
+    }
 
-            {
-                final String resourceId = L10nResourceIdLookup.getAltGenreNameID(itemId);
-                addL10NResources(resourceId, item._getDisplayName()._getTranslatedTexts());
-            }
+    @Override
+    public void processInput(AltGenresHollow input) {
+        final int inputId = (int) input._getAltGenreId();
 
-            {
-                final String resourceId = L10nResourceIdLookup.getAltGenreShortNameID(itemId);
-                addL10NResources(resourceId, item._getShortName()._getTranslatedTexts());
-            }
-
-            for (AltGenresAlternateNamesHollow altName : item._getAlternateNames()) {
-                final String resourceId = L10nResourceIdLookup.getAltGenreAlternateNameID(itemId, (int) altName._getTypeId());
-                addL10NResources(resourceId, altName._getTranslatedTexts());
-            }
+        {
+            final String resourceId = L10nResourceIdLookup.getAltGenreNameID(inputId);
+            addL10NResources(resourceId, input._getDisplayName());
         }
 
-        return api.getAllAltGenresHollow().size();
+        {
+            final String resourceId = L10nResourceIdLookup.getAltGenreShortNameID(inputId);
+            addL10NResources(resourceId, input._getShortName());
+        }
+
+        for (AltGenresAlternateNamesHollow altName : input._getAlternateNames()) {
+            final String resourceId = L10nResourceIdLookup.getAltGenreAlternateNameID(inputId, (int) altName._getTypeId());
+            addL10NResources(resourceId, altName._getTranslatedTexts());
+        }
     }
 }

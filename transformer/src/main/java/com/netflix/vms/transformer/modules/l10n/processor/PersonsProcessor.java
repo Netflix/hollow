@@ -9,11 +9,12 @@ import com.netflix.vms.transformer.hollowoutput.NFLocale;
 import com.netflix.vms.transformer.modules.l10n.L10nResourceIdLookup;
 import com.netflix.vms.transformer.util.NFLocaleUtil;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class PersonsProcessor extends AbstractL10NProcessor {
+public class PersonsProcessor extends AbstractL10NProcessor<PersonsHollow> {
 
     private Set<NFLocale> transliteratedPersonLocales;
 
@@ -25,40 +26,41 @@ public class PersonsProcessor extends AbstractL10NProcessor {
     }
 
     @Override
-    public int processResources() {
-        for (PersonsHollow item : api.getAllPersonsHollow()) {
-            final int itemId = (int) item._getPersonId();
+    public Collection<PersonsHollow> getInputs() {
+        return api.getAllPersonsHollow();
+    }
 
-            { // Process Person Bio
-                final String resourceId = L10nResourceIdLookup.getPersonBioID(itemId);
-                addL10NResources(resourceId, item._getBio()._getTranslatedTexts());
-            }
+    @Override
+    public void processInput(PersonsHollow input) {
+        final int inputId = (int) input._getPersonId();
 
-            { // Process Person Names
-                Map<NFLocale, L10NStrings> rawNameMap = processTranslatedText(item._getName()._getTranslatedTexts());
-                Map<NFLocale, L10NStrings> regularNameMap = new HashMap<>();
-                Map<NFLocale, L10NStrings> transliteratedNameMap = new HashMap<>();
-                for (Map.Entry<NFLocale, L10NStrings> entry : rawNameMap.entrySet()) {
-                    NFLocale locale = entry.getKey();
-                    L10NStrings value = entry.getValue();
-                    if (transliteratedPersonLocales.contains(locale)) {
-                        transliteratedNameMap.put(locale, value);
-                    } else {
-                        regularNameMap.put(locale, value);
-                    }
-                }
-
-                {
-                    final String resourceId = L10nResourceIdLookup.getPersonNameID(itemId);
-                    addL10NResources(resourceId, regularNameMap);
-                }
-                {
-                    final String resourceId = L10nResourceIdLookup.getPersonTransliteratedNameResourceID(itemId);
-                    addL10NResources(resourceId, transliteratedNameMap);
-                }
-            }
+        { // Process Person Bio
+            final String resourceId = L10nResourceIdLookup.getPersonBioID(inputId);
+            addL10NResources(resourceId, input._getBio());
         }
 
-        return api.getAllPersonsHollow().size();
+        { // Process Person Names
+            Map<NFLocale, L10NStrings> rawNameMap = processTranslatedText(input._getName()._getTranslatedTexts());
+            Map<NFLocale, L10NStrings> regularNameMap = new HashMap<>();
+            Map<NFLocale, L10NStrings> transliteratedNameMap = new HashMap<>();
+            for (Map.Entry<NFLocale, L10NStrings> entry : rawNameMap.entrySet()) {
+                NFLocale locale = entry.getKey();
+                L10NStrings value = entry.getValue();
+                if (transliteratedPersonLocales.contains(locale)) {
+                    transliteratedNameMap.put(locale, value);
+                } else {
+                    regularNameMap.put(locale, value);
+                }
+            }
+
+            {
+                final String resourceId = L10nResourceIdLookup.getPersonNameID(inputId);
+                addL10NResources(resourceId, regularNameMap);
+            }
+            {
+                final String resourceId = L10nResourceIdLookup.getPersonTransliteratedNameResourceID(inputId);
+                addL10NResources(resourceId, transliteratedNameMap);
+            }
+        }
     }
 }
