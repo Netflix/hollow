@@ -47,6 +47,8 @@ public abstract class AbstractL10NProcessor<K> implements L10NProcessor<K> {
     }
 
     protected void addL10NResources(String id, TranslatedTextHollow translatedText) {
+        if (translatedText == null) return;
+
         addL10NResources(id, processTranslatedText(translatedText._getTranslatedTexts()));
     }
 
