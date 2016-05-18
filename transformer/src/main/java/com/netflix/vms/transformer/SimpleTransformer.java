@@ -14,6 +14,7 @@ import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
+import com.netflix.vms.transformer.hollowoutput.FallbackUSArtwork;
 import com.netflix.vms.transformer.hollowoutput.GlobalVideo;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.NamedCollectionHolder;
@@ -54,6 +55,7 @@ import com.netflix.vms.transformer.modules.passthrough.beehive.RolloutCharacterM
 import com.netflix.vms.transformer.modules.passthrough.mpl.EncodingProfileGroupModule;
 import com.netflix.vms.transformer.modules.person.GlobalPersonModule;
 import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -279,6 +281,7 @@ public class SimpleTransformer {
 
         Map<Video, Map<ISOCountry, CompleteVideo>> globalVideoMap = new ConcurrentHashMap<>();
 
+        // ----------------------
         // Process Complete Video
         for(Map.Entry<String, VideoCollectionsDataHierarchy> countryHierarchyEntry : vcdByCountry.entrySet()) {
             String countryId = countryHierarchyEntry.getKey();
@@ -313,6 +316,7 @@ public class SimpleTransformer {
             }
         }
 
+        // ----------------------
         // Process GlobalVideo
         for (Map.Entry<Video, Map<ISOCountry, CompleteVideo>> globalEntry : globalVideoMap.entrySet()) {
             Set<ISOCountry> availableCountries = new HashSet<ISOCountry>();
@@ -340,6 +344,20 @@ public class SimpleTransformer {
             gVideo.availableCountries = availableCountries;
             gVideo.isSupplementalVideo = (representativeVideo.facetData.videoCollectionsData.nodeType == VideoCollectionsDataHierarchy.SUPPLEMENTAL);
             objectMapper.addObject(gVideo);
+        }
+
+        // ----------------------
+        // Process FallbackUSArtwork
+        Map<Integer, VideoImages> usArtworkMap = imagesDataByCountry.get("US");
+        for (Map.Entry<Integer, VideoImages> usArtwork : usArtworkMap.entrySet()) {
+            int videoId = usArtwork.getKey();
+            VideoImages images = usArtwork.getValue();
+
+            FallbackUSArtwork artwork = new FallbackUSArtwork();
+            artwork.id = new Video(videoId);
+            artwork.artworksByType = images.artworks;
+            artwork.typeFormatIdx = images.artworkFormatsByType;
+            objectMapper.addObject(artwork);
         }
     }
 
