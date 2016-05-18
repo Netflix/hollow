@@ -8,6 +8,7 @@ import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
@@ -53,7 +54,6 @@ import com.netflix.vms.transformer.modules.passthrough.beehive.RolloutCharacterM
 import com.netflix.vms.transformer.modules.passthrough.mpl.EncodingProfileGroupModule;
 import com.netflix.vms.transformer.modules.person.GlobalPersonModule;
 import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -106,7 +106,8 @@ public class SimpleTransformer {
         SimultaneousExecutor executor = new SimultaneousExecutor();
 
         startTime = System.currentTimeMillis();
-
+        int progressDivisor = getProgressDivisor();
+        AtomicInteger processedCount = new AtomicInteger();
         for(VideoGeneralHollow videoGeneral : api.getAllVideoGeneralHollow()) {
 
             executor.execute(new Runnable() {
@@ -144,6 +145,11 @@ public class SimpleTransformer {
                         ctx.getLogger().error(IndividualTransformFailed, "Transformation failed for hierarchy with top node " + videoGeneral._getVideoId(), th);
                         failedIndividualTransforms.incrementAndGet();
                     }
+                    int count = processedCount.incrementAndGet();
+                    if (count % progressDivisor == 0) {
+                        ctx.getLogger().info(LogTag.TransformProgress, ("finished percent=" + (count / progressDivisor)));
+                    }
+
                 }
             });
         }
@@ -181,6 +187,7 @@ public class SimpleTransformer {
         }
 
         executor.awaitSuccessfulCompletion();
+        ctx.getLogger().info(LogTag.TransformProgress, "finished percent=100");
         ctx.getMetricRecorder().recordMetric(FailedProcessingIndividualHierarchies, failedIndividualTransforms.get());
 
         // Hack
@@ -193,6 +200,12 @@ public class SimpleTransformer {
         System.out.println("Processed all videos in " + (endTime - startTime) + "ms");
 
         return writeStateEngine;
+    }
+
+    private int getProgressDivisor() {
+        int totalCount = api.getAllVideoGeneralHollow().size();
+        totalCount = (totalCount / 100) * 100 + 100;
+        return totalCount / 100;
     }
 
     private VideoCollectionsModule getVideoCollectionsModule() {

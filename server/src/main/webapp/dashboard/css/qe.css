@@ -145,7 +145,7 @@ label.aligned {
     float: left;
     margin: 10px 10px 10px 10px;
     width:1020px;
-    height:400px;
+    height:300px;
 }
 
 .innerframesuperlong {
@@ -153,7 +153,7 @@ label.aligned {
     left:25px;
     top: 35px;
     width:975px;
-    height:360px;
+    height:250px;
     overflow: auto;
     overflow-x: hidden;
 }
@@ -165,7 +165,20 @@ label.aligned {
     width:430px;
     height:300px;
 }
+/* .progress-bar.width/2 - n */
+.progress-label {
+    position: absolute;
+    margin: 4px 4px;
+    left: 500px;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #fff;
+}
 
+.progress-bar {
+    float: left;
+    margin: 10px 10px 10px 10px;
+    width:1020px;
+}
 
 .innerframesmall {
     width:400px;
