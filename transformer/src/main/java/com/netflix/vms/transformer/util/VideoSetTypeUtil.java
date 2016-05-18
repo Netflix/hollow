@@ -3,6 +3,8 @@ package com.netflix.vms.transformer.util;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_RIGHTS;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 
+import com.netflix.vms.transformer.CycleConstants;
+
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
@@ -13,21 +15,16 @@ import com.netflix.vms.transformer.hollowinput.VideoRightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-
 import java.util.HashSet;
 import java.util.Set;
 
 public class VideoSetTypeUtil {
-    public static final VideoSetType PAST = new VideoSetType("Past");
-    public static final VideoSetType PRESENT = new VideoSetType("Present");
-    public static final VideoSetType FUTURE = new VideoSetType("Future");
-    public static final VideoSetType EXTENDED = new VideoSetType("Extended");
 
-    public static Set<VideoSetType> computeSetTypes(long videoId, String countryCode, VMSHollowInputAPI api, TransformerContext ctx, VMSTransformerIndexer indexer) {
-        return computeSetTypes(videoId, countryCode, null, null, api, ctx, indexer);
+    public static Set<VideoSetType> computeSetTypes(long videoId, String countryCode, VMSHollowInputAPI api, TransformerContext ctx, CycleConstants constants, VMSTransformerIndexer indexer) {
+        return computeSetTypes(videoId, countryCode, null, null, api, ctx, constants, indexer);
     }
 
-    public static Set<VideoSetType> computeSetTypes(long videoId, String countryCode, VideoRightsHollow rights, VideoTypeDescriptorHollow typeDescriptor, VMSHollowInputAPI api, TransformerContext ctx, VMSTransformerIndexer indexer) {
+    public static Set<VideoSetType> computeSetTypes(long videoId, String countryCode, VideoRightsHollow rights, VideoTypeDescriptorHollow typeDescriptor, VMSHollowInputAPI api, TransformerContext ctx, CycleConstants constants, VMSTransformerIndexer indexer) {
         boolean isInWindow = false;
         boolean isInFuture = false;
         boolean isExtended = false;
@@ -59,21 +56,22 @@ public class VideoSetTypeUtil {
                 typeDescriptor = api.getVideoTypeDescriptorHollow(videoTypeMatches.iterator().next());
             }
         }
+
         if (typeDescriptor != null) {
             isExtended = "US".equals(countryCode) && typeDescriptor._getExtended();
         }
 
         Set<VideoSetType> setOfVideoSetType = new HashSet<VideoSetType>();
         if (isInWindow) {
-            setOfVideoSetType.add(PRESENT);
+            setOfVideoSetType.add(constants.PRESENT);
         } else if (isInFuture) {
-            setOfVideoSetType.add(FUTURE);
+            setOfVideoSetType.add(constants.FUTURE);
         } else if (isExtended) {
-            setOfVideoSetType.add(EXTENDED);
+            setOfVideoSetType.add(constants.EXTENDED);
         }
 
         if (setOfVideoSetType.isEmpty())
-            setOfVideoSetType.add(PAST);
+            setOfVideoSetType.add(constants.PAST);
 
         return setOfVideoSetType;
     }

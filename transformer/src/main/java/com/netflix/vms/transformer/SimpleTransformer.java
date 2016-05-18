@@ -76,6 +76,7 @@ public class SimpleTransformer {
     private final VMSHollowInputAPI api;
     private final HollowWriteStateEngine writeStateEngine;
     private final TransformerContext ctx;
+    private final CycleConstants cycleConstants;
     private VMSTransformerIndexer indexer;
 
     SimpleTransformer(VMSHollowInputAPI inputAPI, VMSTransformerWriteStateEngine outputStateEngine) {
@@ -87,6 +88,7 @@ public class SimpleTransformer {
         this.api = inputAPI;
         this.writeStateEngine = outputStateEngine;
         this.ctx = ctx;
+        this.cycleConstants = new CycleConstants();
     }
 
     public HollowWriteStateEngine transform() throws Exception {
@@ -196,7 +198,7 @@ public class SimpleTransformer {
     private VideoCollectionsModule getVideoCollectionsModule() {
         VideoCollectionsModule module = collectionsModuleRef.get();
         if(module == null) {
-            module = new VideoCollectionsModule(api, indexer);
+            module = new VideoCollectionsModule(api, cycleConstants, indexer);
             collectionsModuleRef.set(module);
         }
         return module;
@@ -205,7 +207,7 @@ public class SimpleTransformer {
     private VideoMetaDataModule getVideoMetaDataModule() {
         VideoMetaDataModule module = metadataModuleRef.get();
         if(module == null) {
-            module = new VideoMetaDataModule(api, ctx, indexer);
+            module = new VideoMetaDataModule(api, ctx, cycleConstants, indexer);
             metadataModuleRef.set(module);
         }
         return module;
@@ -250,7 +252,7 @@ public class SimpleTransformer {
     private CountrySpecificDataModule getCountrySpecificDataModule() {
         CountrySpecificDataModule module = countrySpecificModuleRef.get();
         if(module == null) {
-            module = new CountrySpecificDataModule(api, ctx, indexer);
+            module = new CountrySpecificDataModule(api, ctx, cycleConstants, indexer);
             countrySpecificModuleRef.set(module);
         }
         return module;
@@ -278,7 +280,7 @@ public class SimpleTransformer {
                     objectMapper, country, countryId, videoCollectionsData, hierarchy.getTopNode().topNode, globalVideoMap);
 
             // Process Show children
-            if(topNode.facetData.videoCollectionsData.nodeType == VideoCollectionsDataHierarchy.SHOW) {
+            if(topNode.facetData.videoCollectionsData.nodeType == cycleConstants.SHOW) {
                 int sequenceNumber = 0;
                 // Process Seasons
                 for(Map.Entry<Integer, VideoCollectionsData> showEntry : hierarchy.getOrderedSeasons().entrySet()) {
@@ -325,7 +327,7 @@ public class SimpleTransformer {
             gVideo.completeVideo = representativeVideo;
             gVideo.aliases = aliases;
             gVideo.availableCountries = availableCountries;
-            gVideo.isSupplementalVideo = (representativeVideo.facetData.videoCollectionsData.nodeType == VideoCollectionsDataHierarchy.SUPPLEMENTAL);
+            gVideo.isSupplementalVideo = (representativeVideo.facetData.videoCollectionsData.nodeType == cycleConstants.SUPPLEMENTAL);
             objectMapper.addObject(gVideo);
         }
     }
