@@ -25,7 +25,7 @@ public class MoviesProcessor extends AbstractL10NProcessor<MoviesHollow> {
 
         {
             final String resourceId = L10nResourceIdLookup.getMovieTitleID(inputId);
-            addL10NResources(resourceId, input._getTransliterated());
+            addL10NResources(resourceId, input._getDisplayName());
         }
 
         {
