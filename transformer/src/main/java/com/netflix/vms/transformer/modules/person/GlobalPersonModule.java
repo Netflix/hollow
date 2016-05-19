@@ -33,6 +33,12 @@ public class GlobalPersonModule extends AbstractTransformModule {
 
     @Override
     public void transform() {
+        transformPersons();
+    }
+
+    public List<GlobalPerson> transformPersons() {
+        List<GlobalPerson> personList = new ArrayList<GlobalPerson>();
+
         for (VideoPersonHollow input : api.getAllVideoPersonHollow()) {
             GlobalPerson output = new GlobalPerson();
             output.id = (int) input._getPersonId();
@@ -51,7 +57,10 @@ public class GlobalPersonModule extends AbstractTransformModule {
             }
 
             mapper.addObject(output);
+            personList.add(output);
         }
+
+        return personList;
     }
 
     private List<Video> videoList(ListOfVideoIdsHollow videos) {

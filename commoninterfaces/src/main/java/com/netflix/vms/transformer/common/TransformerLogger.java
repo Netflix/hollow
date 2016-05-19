@@ -15,6 +15,7 @@ public interface TransformerLogger {
         InputDataVersionIds,
         WroteBlob,
         WritingBlobsFailed,
+        NonVideoSpecificTransformDuration,
 
         //// TRANSFORMATION ERRORS ////
 
