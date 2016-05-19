@@ -1,0 +1,121 @@
+{
+  "inputs": {
+    "projectType": "java-service",
+    "generatorTasks": [
+      "generate",
+      "jenkins",
+      "spinnaker",
+      "stash"
+    ],
+    "repoOwnerType": "project",
+    "repoOwner": "VMS",
+    "repoName": "vmstransformer",
+    "stashUser": "timt",
+    "projectName": "vmstransformer",
+    "projectClassName": "VMSTransformer",
+    "applicationName": "zzzvmstransformer",
+    "packageName": "com.netflix.vms.transformer",
+    "teamEmail": "vms-team@netflix.com",
+    "editorType": "eclipse",
+    "deployableArtifactName": "vmstransformer",
+    "jenkinsServer": "vms",
+    "jenkinsUser": "timt",
+    "triggerSpinnakerPipelineOnPromotion": true,
+    "triggerSpinnakerPipelineOnPullRequest": true
+  },
+  "generator_user": "toolbear",
+  "project_generator_version": "1.9.9",
+  "project_resources": {
+    "jenkins": {
+      "jobs": [
+        {
+          "name": "VMS-vmstransformer-build-master",
+          "friendlyName": "Build Master",
+          "source": "build-master.xml",
+          "url": "https://vms.builds.test.netflix.net/job/VMS-vmstransformer-build-master"
+        },
+        {
+          "name": "VMS-vmstransformer-build-pull-request",
+          "friendlyName": "Build Pull Request",
+          "source": "build-pull-request.xml",
+          "url": "https://vms.builds.test.netflix.net/job/VMS-vmstransformer-build-pull-request"
+        },
+        {
+          "name": "VMS-vmstransformer-promote-candidate",
+          "friendlyName": "Promote Candidate",
+          "source": "promote-candidate.xml",
+          "url": "https://vms.builds.test.netflix.net/job/VMS-vmstransformer-promote-candidate"
+        },
+        {
+          "name": "VMS-vmstransformer-trigger-spinnaker",
+          "friendlyName": "Trigger Spinnaker",
+          "source": "trigger-spinnaker.xml",
+          "url": "https://vms.builds.test.netflix.net/job/VMS-vmstransformer-trigger-spinnaker"
+        },
+        {
+          "name": "VMS-vmstransformer-update-gradlew",
+          "friendlyName": "Update Gradle wrapper",
+          "source": null,
+          "url": "https://vms.builds.test.netflix.net/job/VMS-vmstransformer-update-gradlew"
+        },
+        {
+          "name": "VMS-vmstransformer-update-dependencies-lock",
+          "friendlyName": "Update dependencies",
+          "source": null,
+          "url": "https://vms.builds.test.netflix.net/job/VMS-vmstransformer-update-dependencies-lock"
+        }
+      ],
+      "server": "vms"
+    },
+    "CI Pipeline Flowchart": "https://stash.corp.netflix.com/snippets/raw/e1a37a54f882423fafae1f2c9fc10269/Generated_ci_pipeline_flowchart.txt",
+    "spinnaker": {
+      "application": {
+        "name": "zzzvmstransformer",
+        "friendlyName": "zzzvmstransformer",
+        "source": "application.json",
+        "url": "http://spinnaker.prod.netflix.net/#/applications/zzzvmstransformer"
+      },
+      "securityGroups": [
+        {
+          "name": "zzzvmstransformer",
+          "friendlyName": "Test Security Group",
+          "source": "test-security-group.json",
+          "account": "test",
+          "region": "us-east-1",
+          "vpcId": "vpc-4de2b628",
+          "url": "http://spinnaker.prod.netflix.net/#/applications/zzzvmstransformer/securityGroups"
+        },
+        {
+          "name": "zzzvmstransformer",
+          "friendlyName": "Prod Security Group",
+          "source": "prod-security-group.json",
+          "account": "prod",
+          "region": "us-east-1",
+          "vpcId": "vpc-46f5a223",
+          "url": "http://spinnaker.prod.netflix.net/#/applications/zzzvmstransformer/securityGroups"
+        }
+      ],
+      "pipelines": [
+        {
+          "name": "deploy-branch",
+          "friendlyName": "deploy-branch pipeline",
+          "source": "pull-request-pipeline.json",
+          "url": "http://spinnaker.prod.netflix.net/#/applications/zzzvmstransformer/executions?pipeline=deploy-branch"
+        },
+        {
+          "name": "deploy-to-test",
+          "friendlyName": "deploy-to-test pipeline",
+          "source": "master-pipeline.json",
+          "url": "http://spinnaker.prod.netflix.net/#/applications/zzzvmstransformer/executions?pipeline=deploy-to-test"
+        },
+        {
+          "name": "deploy-to-prod",
+          "friendlyName": "deploy-to-prod pipeline",
+          "source": "promote-pipeline.json",
+          "url": "http://spinnaker.prod.netflix.net/#/applications/zzzvmstransformer/executions?pipeline=deploy-to-prod"
+        }
+      ]
+    }
+  },
+  "ci_generator_version": "0.6.2"
+}
