@@ -8,7 +8,7 @@ import com.netflix.vms.transformer.modules.l10n.L10nResourceIdLookup;
 
 import java.util.Collection;
 
-public class CategoryGroupsProcessor extends AbstractL10NProcessor<CategoryGroupsHollow> {
+public class CategoryGroupsProcessor extends AbstractL10NMiscProcessor<CategoryGroupsHollow> {
 
     public CategoryGroupsProcessor(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
         super(api, ctx, mapper);

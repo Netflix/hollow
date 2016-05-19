@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TurboCollectionsProcessor extends AbstractL10NProcessor<TurboCollectionsHollow> {
+public class TurboCollectionsProcessor extends AbstractL10NMiscProcessor<TurboCollectionsHollow> {
 
     public TurboCollectionsProcessor(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
         super(api, ctx, mapper);

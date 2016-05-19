@@ -8,7 +8,7 @@ import com.netflix.vms.transformer.modules.l10n.L10nResourceIdLookup;
 
 import java.util.Collection;
 
-public class AwardsProcessor extends AbstractL10NProcessor<AwardsHollow> {
+public class AwardsProcessor extends AbstractL10NMiscProcessor<AwardsHollow> {
 
     public AwardsProcessor(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
         super(api, ctx, mapper);

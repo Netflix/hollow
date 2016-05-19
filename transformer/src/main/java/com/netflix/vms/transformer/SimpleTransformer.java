@@ -37,7 +37,8 @@ import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHiera
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
 import com.netflix.vms.transformer.modules.countryspecific.CountrySpecificDataModule;
 import com.netflix.vms.transformer.modules.deploymentintent.CacheDeploymentIntentModule;
-import com.netflix.vms.transformer.modules.l10n.L10NResourcesModule;
+import com.netflix.vms.transformer.modules.l10n.L10NMiscResourcesModule;
+import com.netflix.vms.transformer.modules.l10n.L10NVideoResourcesModule;
 import com.netflix.vms.transformer.modules.media.VideoMediaDataModule;
 import com.netflix.vms.transformer.modules.meta.VideoImagesDataModule;
 import com.netflix.vms.transformer.modules.meta.VideoMetaDataModule;
@@ -58,6 +59,7 @@ import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
 import com.netflix.vms.transformer.namedlist.NamedListCompletionModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule.VideoNamedListPopulator;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -147,6 +149,9 @@ public class SimpleTransformer {
                                     countryDecoratorModule.decorateVideoEpisodes(country, vcdByCountry.get(country));
                                 }
                             }
+
+                            // Process Video Related L10N
+                            new L10NVideoResourcesModule(api, ctx, objectMapper, indexer).transform(showHierarchiesByCountry);
                         }
                     } catch(Throwable th) {
                         ctx.getLogger().error(IndividualTransformFailed, "Transformation failed for hierarchy with top node " + videoGeneral._getVideoId(), th);
@@ -180,7 +185,7 @@ public class SimpleTransformer {
                 new PersonImagesModule(api, ctx, objectMapper, indexer),
                 new CharacterImagesModule(api, ctx, objectMapper, indexer),
                 new LanguageRightsModule(api, ctx, objectMapper, indexer),
-                new L10NResourcesModule(api, ctx, objectMapper, indexer)
+                new L10NMiscResourcesModule(api, ctx, objectMapper, indexer)
                 );
 
         // @formatter:on

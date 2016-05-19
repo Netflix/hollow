@@ -12,7 +12,6 @@ public enum IndexSpec {
     STORAGE_GROUPS(PRIMARY_KEY, "StorageGroups", "id.value"),
     CDNS(PRIMARY_KEY, "Cdn", "id"),
     PROTECTION_TYPES(PRIMARY_KEY, "ProtectionTypes", "id"),
-    STORIES_SYNOPSES(PRIMARY_KEY, "StoriesSynopses", "movieId"),
     STREAM_PROFILE(PRIMARY_KEY, "StreamProfiles", "id"),
     STREAM_PROFILE_GROUP(PRIMARY_KEY, "StreamProfileGroups", "groupName.value"),
     DEPLOYABLE_PACKAGES(PRIMARY_KEY, "DeployablePackages", "packageId"),
@@ -27,6 +26,11 @@ public enum IndexSpec {
     CERT_SYSTEM_RATING(PRIMARY_KEY, "ConsolidatedCertSystemRating", "ratingId"),
     PACKAGES(PRIMARY_KEY, "Package", "packageId"),
     PERSON_BIO(PRIMARY_KEY, "PersonBio", "personId"),
+
+    L10N_STORIES_SYNOPSES(PRIMARY_KEY, "StoriesSynopses", "movieId"),
+    L10N_MOVIES(PRIMARY_KEY, "Movies", "movieId"),
+    L10N_EPISODES(PRIMARY_KEY, "Episodes", "movieId"),
+    L10N_LOCALIZEDMETADATA(PRIMARY_KEY, "LocalizedMetadata", "movieId"),
 
     ARTWORK_BY_VIDEO_ID(HASH, "VideoArtwork", "", "movieId"),
     SHOW_SEASON_EPISODE(HASH, "ShowSeasonEpisode", "", "movieId"),

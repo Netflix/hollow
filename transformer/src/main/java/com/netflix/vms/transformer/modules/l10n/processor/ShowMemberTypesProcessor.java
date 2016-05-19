@@ -8,7 +8,7 @@ import com.netflix.vms.transformer.modules.l10n.L10nResourceIdLookup;
 
 import java.util.Collection;
 
-public class ShowMemberTypesProcessor extends AbstractL10NProcessor<ShowMemberTypesHollow> {
+public class ShowMemberTypesProcessor extends AbstractL10NMiscProcessor<ShowMemberTypesHollow> {
 
     public ShowMemberTypesProcessor(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
         super(api, ctx, mapper);

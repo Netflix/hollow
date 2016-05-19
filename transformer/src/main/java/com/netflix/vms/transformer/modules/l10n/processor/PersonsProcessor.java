@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class PersonsProcessor extends AbstractL10NProcessor<PersonsHollow> {
+public class PersonsProcessor extends AbstractL10NMiscProcessor<PersonsHollow> {
 
     private Set<NFLocale> transliteratedPersonLocales;
 

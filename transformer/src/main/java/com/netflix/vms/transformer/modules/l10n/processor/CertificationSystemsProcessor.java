@@ -9,7 +9,7 @@ import com.netflix.vms.transformer.modules.l10n.L10nResourceIdLookup;
 
 import java.util.Collection;
 
-public class CertificationSystemsProcessor extends AbstractL10NProcessor<ConsolidatedCertificationSystemsHollow> {
+public class CertificationSystemsProcessor extends AbstractL10NMiscProcessor<ConsolidatedCertificationSystemsHollow> {
 
     public CertificationSystemsProcessor(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
         super(api, ctx, mapper);

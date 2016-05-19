@@ -8,7 +8,7 @@ import com.netflix.vms.transformer.modules.l10n.L10nResourceIdLookup;
 
 import java.util.Collection;
 
-public class AssetMetaDatasProcessor extends AbstractL10NProcessor<AssetMetaDatasHollow> {
+public class AssetMetaDatasProcessor extends AbstractL10NMiscProcessor<AssetMetaDatasHollow> {
 
     public AssetMetaDatasProcessor(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
         super(api, ctx, mapper);

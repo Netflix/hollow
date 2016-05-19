@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CharactersProcessor extends AbstractL10NProcessor<CharactersHollow> {
+public class CharactersProcessor extends AbstractL10NMiscProcessor<CharactersHollow> {
 
     public CharactersProcessor(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
         super(api, ctx, mapper);

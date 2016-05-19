@@ -13,27 +13,22 @@ import com.netflix.vms.transformer.modules.l10n.processor.CategoriesProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.CategoryGroupsProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.CertificationSystemsProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.CharactersProcessor;
-import com.netflix.vms.transformer.modules.l10n.processor.EpisodesProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.FestivalsProcessor;
-import com.netflix.vms.transformer.modules.l10n.processor.L10NProcessor;
+import com.netflix.vms.transformer.modules.l10n.processor.L10NMiscProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.LanguagesProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.LocalizedCharacterProcessor;
-import com.netflix.vms.transformer.modules.l10n.processor.LocalizedMetadataProcessor;
-import com.netflix.vms.transformer.modules.l10n.processor.MoviesProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.PersonAliasesProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.PersonsProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.ShowMemberTypesProcessor;
-import com.netflix.vms.transformer.modules.l10n.processor.StoriesSynopsesProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.TurboCollectionsProcessor;
-import com.netflix.vms.transformer.modules.l10n.processor.VideoRatingsProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class L10NResourcesModule extends AbstractTransformModule {
-    private List<L10NProcessor<?>> processorList = new ArrayList<>();
+public class L10NMiscResourcesModule extends AbstractTransformModule {
+    private List<L10NMiscProcessor<?>> processorList = new ArrayList<>();
 
-    public L10NResourcesModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+    public L10NMiscResourcesModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
         super(api, ctx, mapper);
 
         processorList.add(new AltGenresProcessor(api, ctx, mapper));
@@ -43,27 +38,27 @@ public class L10NResourcesModule extends AbstractTransformModule {
         processorList.add(new CategoryGroupsProcessor(api, ctx, mapper));
         processorList.add(new CertificationSystemsProcessor(api, ctx, mapper));
         processorList.add(new CharactersProcessor(api, ctx, mapper));
-        processorList.add(new EpisodesProcessor(api, ctx, mapper));
         processorList.add(new FestivalsProcessor(api, ctx, mapper));
-        processorList.add(new MoviesProcessor(api, ctx, mapper));
         processorList.add(new LanguagesProcessor(api, ctx, mapper));
         processorList.add(new LocalizedCharacterProcessor(api, ctx, mapper));
-        processorList.add(new LocalizedMetadataProcessor(api, ctx, mapper));
         processorList.add(new PersonAliasesProcessor(api, ctx, mapper));
         processorList.add(new PersonsProcessor(api, ctx, mapper));
         processorList.add(new ShowMemberTypesProcessor(api, ctx, mapper));
-        processorList.add(new StoriesSynopsesProcessor(api, ctx, mapper));
         processorList.add(new TurboCollectionsProcessor(api, ctx, mapper));
-        processorList.add(new VideoRatingsProcessor(api, ctx, mapper));
+
     }
 
     @Override
     public void transform() {
-        for (L10NProcessor<?> processor : processorList) {
+        for (L10NMiscProcessor<?> processor : processorList) {
+            long start = System.currentTimeMillis();
+
             String processorName = processor.getClass().getSimpleName();
             int itemsProcessed = processor.processResources();
             int itemsAdded = processor.getItemsAdded();
-            ctx.getLogger().info(LogTag.L10NProcessing, String.format("processorName=%s, itemsProcessed=%s, itemsAdded=%s", processorName, itemsProcessed, itemsAdded));
+
+            long duration = System.currentTimeMillis() - start;
+            ctx.getLogger().info(LogTag.L10NProcessing, String.format("processorName=%s, itemsProcessed=%s, itemsAdded=%s, duraction=%s", processorName, itemsProcessed, itemsAdded, duration));
         }
     }
 }

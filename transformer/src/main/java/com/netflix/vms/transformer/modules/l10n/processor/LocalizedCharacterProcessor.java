@@ -8,7 +8,7 @@ import com.netflix.vms.transformer.modules.l10n.L10nResourceIdLookup;
 
 import java.util.Collection;
 
-public class LocalizedCharacterProcessor extends AbstractL10NProcessor<LocalizedCharacterHollow> {
+public class LocalizedCharacterProcessor extends AbstractL10NMiscProcessor<LocalizedCharacterHollow> {
 
     public LocalizedCharacterProcessor(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
         super(api, ctx, mapper);

@@ -9,7 +9,7 @@ import com.netflix.vms.transformer.modules.l10n.L10nResourceIdLookup;
 
 import java.util.Collection;
 
-public class AltGenresProcessor extends AbstractL10NProcessor<AltGenresHollow> {
+public class AltGenresProcessor extends AbstractL10NMiscProcessor<AltGenresHollow> {
 
     public AltGenresProcessor(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
         super(api, ctx, mapper);

@@ -12,7 +12,6 @@ import com.netflix.vms.transformer.hollowoutput.L10NStrings;
 import com.netflix.vms.transformer.hollowoutput.NFLocale;
 import com.netflix.vms.transformer.util.NFLocaleUtil;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,18 +26,6 @@ public abstract class AbstractL10NProcessor<K> implements L10NProcessor<K> {
         this.api = api;
         this.ctx = ctx;
         this.mapper = mapper;
-    }
-
-    /**
-     * Process Resources and return the number of items processed
-     */
-    @Override
-    public final int processResources() {
-        Collection<K> inputs = getInputs();
-        for (K input : inputs) {
-            processInput(input);
-        }
-        return inputs.size();
     }
 
     @Override

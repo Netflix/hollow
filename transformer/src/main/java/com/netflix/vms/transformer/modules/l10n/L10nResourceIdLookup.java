@@ -1,6 +1,12 @@
 package com.netflix.vms.transformer.modules.l10n;
 
 public class L10nResourceIdLookup {
+    // Episode attributes
+    public static String getEpisodeTitleID(Integer episodeID) {
+        return "e" + episodeID + ".t";
+    }
+
+
     // Movie attributes
     public static String getMovieTitleID(Integer movieID) {
         return "m" + movieID + ".t";
@@ -15,7 +21,6 @@ public class L10nResourceIdLookup {
     }
 
     public static String getMovieOriginalTitleID(Integer movieID) {
-        // if this changes, update ResourceLookupLogic and TestResourceLookupLogic
         return "m" + movieID + ".o";
     }
 
@@ -35,10 +40,66 @@ public class L10nResourceIdLookup {
         return "m" + movieID + ".f";
     }
 
-    // Episode attributes
-    public static String getEpisodeTitleID(Integer episodeID) {
-        return "e" + episodeID + ".t";
+    public static String getHookTextId(final Integer movieId, final HookType type) {
+        return "m" + movieId + ".h" + "." + type.getId();
     }
+
+    public static String getNarrativeTextId(final Integer movieId) {
+        return "m" + movieId + ".n";
+    }
+
+    public static String getMovieAkaTitleResourceID(Integer movieId) {
+        return "m" + movieId + ".ak";
+    }
+
+    public static String getMovieTransliteratedTitleResourceID(Integer movieId) {
+        return "m" + movieId + ".tl";
+    }
+
+
+    // Rollout
+    public static String getRolloutAttribResourceId(final Integer movieId, final String name, final String label) {
+        return String.format("rv_%d_%s_%s", movieId, name, label);
+    }
+
+    public static String getCharacterAttribResourceId(final Integer characterId, final String name, final String label) {
+        return String.format("rc_%d_%s_%s", characterId, name, label);
+    }
+
+
+    // Character attributes
+    public static String getCharacterNameID(Integer characterId) {
+        return "ch" + characterId + ".cn";
+    }
+
+    public static String getCharacterBioID(Integer characterId) {
+        return "ch" + characterId + ".b";
+    }
+
+
+    // Person attributes
+    public static String getPersonNameID(Integer personID) {
+        return "p" + personID + ".n";
+    }
+
+    public static String getPersonBioID(Integer personID) {
+        return "p" + personID + ".b";
+    }
+
+    public static String getPersonAkaNameResourceID(Integer personId) {
+        return "p" + personId + ".ak";
+    }
+
+    public static String getPersonTransliteratedNameResourceID(Integer personId) {
+        return "p" + personId + ".tl";
+    }
+
+
+    // Person alias attributes
+    public static String getPersonAliasID(Integer aliasID) {
+        return "pa" + aliasID + ".a";
+    }
+
 
     // Genre attributes
     public static String getGenreNameID(Integer genreID) {
@@ -49,20 +110,6 @@ public class L10nResourceIdLookup {
         return "g" + genreID + ".d";
     }
 
-    // Person attributes
-    public static String getPersonNameID(Integer personID) {
-        // if this changes, update ResourceLookupLogic and TestResourceLookupLogic
-        return "p" + personID + ".n";
-    }
-
-    public static String getPersonBioID(Integer personID) {
-        return "p" + personID + ".b";
-    }
-
-    // Person alias attributes
-    public static String getPersonAliasID(Integer aliasID) {
-        return "pa" + aliasID + ".a";
-    }
 
     // Certification systems, certifications, movie certifications
     public static String getCertificationSystemNameID(Integer systemID) {
@@ -84,6 +131,7 @@ public class L10nResourceIdLookup {
     public static String getMovieCertificationDescriptionID(Integer movieID, Integer systemID, String media) {
         return "mr" + movieID + "_" + systemID + "_" + media + ".r";
     }
+
 
     // Film festival attributes
     public static String getFestivalNameID(Integer festivalID) {
@@ -110,7 +158,8 @@ public class L10nResourceIdLookup {
         return "f" + festivalID + ".c";
     }
 
-    // Movie award attributes
+
+    // Award attributes
     public static String getAwardNameID(Integer awardID) {
         return "a" + awardID + ".n";
     }
@@ -122,6 +171,7 @@ public class L10nResourceIdLookup {
     public static String getAwardAlternateNameID(Integer awardID) {
         return "a" + awardID + ".t";
     }
+
 
     // QT (altgenre, tags, categories) attributes
     public static String getAltGenreNameID(Integer altgenreID) {
@@ -144,62 +194,25 @@ public class L10nResourceIdLookup {
         return "cg" + categoryGroupID + ".n";
     }
 
+
     // Language attributes
     public static String getLanguageNameID(Integer nfLanguageID) {
         return "l" + nfLanguageID + ".n";
     }
 
-    // Character attributes
-    public static String getCharacterNameID(Integer characterId) {
-        return "ch" + characterId + ".cn";
-    }
-
-    public static String getCharacterBioID(Integer characterId) {
-        return "ch" + characterId + ".b";
-    }
 
     // Show member type attributes
     public static String getShowMemberTypeNameID(Integer memberTypeID) {
         return "st" + memberTypeID + ".n";
     }
 
-    public static String getHookTextId(final Integer movieId, final HookType type) {
-        return "m" + movieId + ".h" + "." + type.getId();
-    }
 
-    public static String getNarrativeTextId(final Integer movieId) {
-        return "m" + movieId + ".n";
-    }
-
+    // Asset MetaData
     public static String getTrackLabelId(final String id) {
         return "s" + id + ".l";
     }
 
     public static String getGenericResourceId(final Integer id, final String resourceIdPrefix, final String attribName) {
         return resourceIdPrefix + id + "." + attribName;
-    }
-
-    public static String getRolloutAttribResourceId(final Integer movieId, final String name, final String label) {
-        return String.format("rv_%d_%s_%s", movieId, name, label);
-    }
-
-    public static String getCharacterAttribResourceId(final Integer characterId, final String name, final String label) {
-        return String.format("rc_%d_%s_%s", characterId, name, label);
-    }
-
-    public static String getMovieAkaTitleResourceID(Integer movieId) {
-        return "m" + movieId + ".ak";
-    }
-
-    public static String getMovieTransliteratedTitleResourceID(Integer movieId) {
-        return "m" + movieId + ".tl";
-    }
-
-    public static String getPersonAkaNameResourceID(Integer personId) {
-        return "p" + personId + ".ak";
-    }
-
-    public static String getPersonTransliteratedNameResourceID(Integer personId) {
-        return "p" + personId + ".tl";
     }
 }

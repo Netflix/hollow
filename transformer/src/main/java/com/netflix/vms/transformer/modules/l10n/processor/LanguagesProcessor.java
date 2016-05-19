@@ -8,7 +8,7 @@ import com.netflix.vms.transformer.modules.l10n.L10nResourceIdLookup;
 
 import java.util.Collection;
 
-public class LanguagesProcessor extends AbstractL10NProcessor<LanguagesHollow> {
+public class LanguagesProcessor extends AbstractL10NMiscProcessor<LanguagesHollow> {
 
     public LanguagesProcessor(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
         super(api, ctx, mapper);

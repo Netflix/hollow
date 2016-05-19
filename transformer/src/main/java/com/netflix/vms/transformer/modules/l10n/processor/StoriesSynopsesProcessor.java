@@ -5,20 +5,20 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.StoriesSynopsesHollow;
 import com.netflix.vms.transformer.hollowinput.StoriesSynopsesHookHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+import com.netflix.vms.transformer.index.IndexSpec;
+import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.l10n.HookType;
 import com.netflix.vms.transformer.modules.l10n.L10nResourceIdLookup;
 
-import java.util.Collection;
+public class StoriesSynopsesProcessor extends AbstractL10NVideoProcessor<StoriesSynopsesHollow> {
 
-public class StoriesSynopsesProcessor extends AbstractL10NProcessor<StoriesSynopsesHollow> {
-
-    public StoriesSynopsesProcessor(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
-        super(api, ctx, mapper);
+    public StoriesSynopsesProcessor(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+        super(api, ctx, mapper, indexer, IndexSpec.L10N_STORIES_SYNOPSES);
     }
 
     @Override
-    public Collection<StoriesSynopsesHollow> getInputs() {
-        return api.getAllStoriesSynopsesHollow();
+    protected StoriesSynopsesHollow getDataForOrdinal(int ordinal) {
+        return api.getStoriesSynopsesHollow(ordinal);
     }
 
     @Override

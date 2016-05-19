@@ -1,20 +1,19 @@
 package com.netflix.vms.transformer.modules.meta;
 
 import static com.netflix.hollow.read.iterator.HollowOrdinalIterator.NO_MORE_ORDINALS;
+import static com.netflix.vms.transformer.index.IndexSpec.L10N_STORIES_SYNOPSES;
 import static com.netflix.vms.transformer.index.IndexSpec.PERSONS_BY_VIDEO_ID;
 import static com.netflix.vms.transformer.index.IndexSpec.PERSON_ROLES_BY_VIDEO_ID;
-import static com.netflix.vms.transformer.index.IndexSpec.STORIES_SYNOPSES;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_DATE;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_RIGHTS;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 
-import com.netflix.vms.transformer.CycleConstants;
-
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
+import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.ShowHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
@@ -45,6 +44,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.util.VideoDateUtil;
 import com.netflix.vms.transformer.util.VideoSetTypeUtil;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -88,7 +88,7 @@ public class VideoMetaDataModule {
         this.videoDateIdx = indexer.getHashIndex(VIDEO_DATE);
         this.videoRightsIdx = indexer.getPrimaryKeyIndex(VIDEO_RIGHTS);
         this.videoTypeCountryIdx = indexer.getHashIndex(VIDEO_TYPE_COUNTRY);
-        this.storiesSynopsesIdx = indexer.getPrimaryKeyIndex(STORIES_SYNOPSES);
+        this.storiesSynopsesIdx = indexer.getPrimaryKeyIndex(L10N_STORIES_SYNOPSES);
 
         hookTypeMap.put("TV Ratings Hook", new HookType("TV_RATINGS"));
         hookTypeMap.put("Awards/Critical Praise Hook", new HookType("AWARDS_CRITICAL_PRAISE"));
