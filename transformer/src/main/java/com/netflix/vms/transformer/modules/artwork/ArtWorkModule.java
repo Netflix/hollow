@@ -157,17 +157,36 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
 
         result.list = derivatives;
         result.formatToDerivativeIndex = new HashMap<>();
+        result.typeFormatIndex = new HashMap<>();
 
         for (int i = 0; i < derivatives.size(); i++) {
             ArtworkDerivative derivative = derivatives.get(i);
+            Integer index = new Integer(i);
 
-            List<Integer> list = result.formatToDerivativeIndex.get(derivative.format);
-            if (list == null) {
-                list = new ArrayList<Integer>();
-                result.formatToDerivativeIndex.put(derivative.format, list);
+            { // Map ImageType -> Map<Format, List<index>
+                Map<ArtWorkImageFormatEntry, List<Integer>> formatMap = result.typeFormatIndex.get(derivative.type);
+                if (formatMap == null) {
+                    formatMap = new HashMap<>();
+                    result.typeFormatIndex.put(derivative.type, formatMap);
+                }
+
+                List<Integer> idxList = formatMap.get(derivative.format);
+                if (idxList == null) {
+                    idxList = new ArrayList<Integer>();
+                    formatMap.put(derivative.format, idxList);
+                }
+                idxList.add(index);
             }
 
-            list.add(new Integer(i));
+            { // Legacy : just to be backwards compatible for older client < 59.50
+                List<Integer> idxList = result.formatToDerivativeIndex.get(derivative.format);
+                if (idxList == null) {
+                    idxList = new ArrayList<Integer>();
+                    result.formatToDerivativeIndex.put(derivative.format, idxList);
+                }
+                idxList.add(index);
+            }
+
         }
 
         return result;
