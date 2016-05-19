@@ -3171,7 +3171,7 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.51",
+            "locked": "59.54",
             "requested": "latest.release"
         },
         "netflix:vms-hollow-impl": {
@@ -7159,7 +7159,7 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.51",
+            "locked": "59.54",
             "requested": "latest.release"
         },
         "netflix:vms-hollow-impl": {
@@ -11246,7 +11246,7 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.51",
+            "locked": "59.54",
             "requested": "latest.release"
         },
         "netflix:vms-hollow-impl": {
@@ -15235,7 +15235,7 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.51",
+            "locked": "59.54",
             "requested": "latest.release"
         },
         "netflix:vms-hollow-impl": {
@@ -19229,7 +19229,7 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.51",
+            "locked": "59.54",
             "requested": "latest.release"
         },
         "netflix:vms-hollow-impl": {
