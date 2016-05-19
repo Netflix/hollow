@@ -12,6 +12,8 @@ import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -19,10 +21,12 @@ import java.util.Collection;
 import org.junit.Test;
 
 public class ShowMeTheProgress {
+	
+	private static final String ROOT_SUBSET_DATA_DIR = "/space/transformer-data/pinned-subsets";
 
     @Test
     public void start() throws Throwable {
-        VMSHollowInputAPI api = new VMSHollowInputAPI(loadStateEngine("/filtered-input.hollow"));
+        VMSHollowInputAPI api = new VMSHollowInputAPI(loadStateEngine("filtered-input"));
 
         VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
 
@@ -30,7 +34,7 @@ public class ShowMeTheProgress {
 
         transformer.transform();
         HollowReadStateEngine actualOutputReadStateEngine = roundTripOutputStateEngine(outputStateEngine);
-        HollowReadStateEngine expectedOutputStateEngine = loadStateEngine("/expected-output.hollow", getDiffFilter(actualOutputReadStateEngine.getSchemas()));
+        HollowReadStateEngine expectedOutputStateEngine = loadStateEngine("control-output", getDiffFilter(actualOutputReadStateEngine.getSchemas()));
 
         ShowMeTheProgressDiffTool.startTheDiff(expectedOutputStateEngine, actualOutputReadStateEngine);
     }
@@ -84,7 +88,7 @@ public class ShowMeTheProgress {
     }
 
     private HollowReadStateEngine loadStateEngine(String resourceFilename, HollowFilterConfig filter) throws IOException {
-        return loadStateEngine(new BufferedInputStream(this.getClass().getResourceAsStream(resourceFilename)), filter);
+        return loadStateEngine(new BufferedInputStream(new FileInputStream(new File(ROOT_SUBSET_DATA_DIR, resourceFilename))), filter);
     }
 
     private HollowReadStateEngine loadStateEngine(InputStream is, HollowFilterConfig filter) throws IOException {
