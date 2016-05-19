@@ -21,15 +21,16 @@ import java.util.Collection;
 import org.junit.Test;
 
 public class ShowMeTheProgress {
-	
-	private static final String ROOT_SUBSET_DATA_DIR = "/space/transformer-data/pinned-subsets";
+
+    private static final String ROOT_SUBSET_DATA_DIR = "/space/transformer-data/pinned-subsets";
 
     @Test
     public void start() throws Throwable {
-        VMSHollowInputAPI api = new VMSHollowInputAPI(loadStateEngine("filtered-input"));
+        HollowReadStateEngine inputStateEngine = loadStateEngine("filtered-input");
+        VMSHollowInputAPI api = new VMSHollowInputAPI(inputStateEngine);
 
         VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
-        //outputStateEngine.addHeaderTags(inputStateEngine.getHeaderTags());
+        outputStateEngine.addHeaderTags(inputStateEngine.getHeaderTags());
 
         SimpleTransformer transformer = new SimpleTransformer(api, outputStateEngine);
 
