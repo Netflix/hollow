@@ -519,7 +519,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.8",
+            "locked": "1.9",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -2644,7 +2644,7 @@
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.17",
+            "locked": "1.20",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -4622,7 +4622,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.8",
+            "locked": "1.9",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -6744,7 +6744,7 @@
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.17",
+            "locked": "1.20",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -8744,7 +8744,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.8",
+            "locked": "1.9",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -10869,7 +10869,7 @@
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.17",
+            "locked": "1.20",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -13939,7 +13939,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.8",
+            "locked": "1.9",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -16064,7 +16064,7 @@
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.17",
+            "locked": "1.20",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -18042,7 +18042,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.8",
+            "locked": "1.9",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -20164,7 +20164,7 @@
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.17",
+            "locked": "1.20",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -22133,14 +22133,14 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.8",
+            "locked": "1.9",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.8",
+            "locked": "1.9",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -24290,7 +24290,7 @@
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.17",
+            "locked": "1.20",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -26323,14 +26323,14 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.8",
+            "locked": "1.9",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.8",
+            "locked": "1.9",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -28480,7 +28480,7 @@
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.17",
+            "locked": "1.20",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
