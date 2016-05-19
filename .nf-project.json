@@ -2,7 +2,7 @@
   "inputs": {
     "projectType": "java-service",
     "generatorTasks": [
-      "generate",
+      "webhook",
       "jenkins",
       "spinnaker",
       "stash"
@@ -21,10 +21,11 @@
     "jenkinsServer": "vms",
     "jenkinsUser": "timt",
     "triggerSpinnakerPipelineOnPromotion": true,
-    "triggerSpinnakerPipelineOnPullRequest": true
+    "triggerSpinnakerPipelineOnPullRequest": true,
+    "useType": "modify"
   },
   "generator_user": "toolbear",
-  "project_generator_version": "1.9.9",
+  "project_generator_version": "1.9.10",
   "project_resources": {
     "jenkins": {
       "jobs": [
