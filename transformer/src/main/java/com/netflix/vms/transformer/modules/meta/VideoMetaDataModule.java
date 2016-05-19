@@ -9,6 +9,8 @@ import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_RIGHTS;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 
+import com.netflix.vms.transformer.CycleConstants;
+
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
@@ -43,7 +45,6 @@ import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.util.VideoDateUtil;
 import com.netflix.vms.transformer.util.VideoSetTypeUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -60,6 +61,7 @@ public class VideoMetaDataModule {
 
     private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
+    private final CycleConstants constants;
     private final VMSTransformerIndexer indexer;
 
     private final HollowPrimaryKeyIndex videoGeneralIdx;
@@ -75,9 +77,10 @@ public class VideoMetaDataModule {
 
     private final Map<String, HookType> hookTypeMap = new HashMap<String, HookType>();
 
-    public VideoMetaDataModule(VMSHollowInputAPI api, TransformerContext ctx, VMSTransformerIndexer indexer) {
+    public VideoMetaDataModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants constants, VMSTransformerIndexer indexer) {
         this.api = api;
         this.ctx = ctx;
+        this.constants = constants;
         this.indexer = indexer;
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(VIDEO_GENERAL);
         this.videoPersonIdx = indexer.getHashIndex(PERSONS_BY_VIDEO_ID);
@@ -262,7 +265,7 @@ public class VideoMetaDataModule {
             typeDescriptor = api.getVideoTypeDescriptorHollow(videoTypeMatches.iterator().next());
         }
 
-        vmd.videoSetTypes = VideoSetTypeUtil.computeSetTypes(videoId, countryCode, rights, typeDescriptor, api, ctx, indexer);
+        vmd.videoSetTypes = VideoSetTypeUtil.computeSetTypes(videoId, countryCode, rights, typeDescriptor, api, ctx, constants, indexer);
         long showMemberTypeId = 0; //@TODO: typeDescriptor._getShowMemberTypeId();
         if(showMemberTypeId != Long.MIN_VALUE)
             vmd.showMemberTypeId = (int)showMemberTypeId;

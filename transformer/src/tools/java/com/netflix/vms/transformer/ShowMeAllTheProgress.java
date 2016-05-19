@@ -1,22 +1,19 @@
 package com.netflix.vms.transformer;
 
-import net.jpountz.lz4.LZ4BlockInputStream;
-
-import java.io.FileInputStream;
-import java.io.BufferedInputStream;
-import com.netflix.hollow.filter.HollowFilterConfig;
 import com.netflix.hollow.read.engine.HollowBlobReader;
+import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.memory.WastefulRecycler;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+import net.jpountz.lz4.LZ4BlockInputStream;
 import org.junit.Test;
 
 public class ShowMeAllTheProgress {
 
     @Test
-    public void start() throws Exception {
+    public void start() throws Throwable {
         VMSHollowInputAPI api = new VMSHollowInputAPI(loadStateEngine());
 
         VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();

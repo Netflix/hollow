@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.collections;
 
+import com.netflix.vms.transformer.CycleConstants;
+
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.ShowHierarchy;
 import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
@@ -14,7 +16,6 @@ import com.netflix.vms.transformer.hollowoutput.SupplementalVideo;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,10 +29,12 @@ public class VideoCollectionsModule {
 
     private final VMSHollowInputAPI videoAPI;
     private final HollowPrimaryKeyIndex supplementalIndex;
+    private final CycleConstants cycleConstants;
 
-    public VideoCollectionsModule(VMSHollowInputAPI videoAPI, VMSTransformerIndexer indexer) {
+    public VideoCollectionsModule(VMSHollowInputAPI videoAPI, CycleConstants constants, VMSTransformerIndexer indexer) {
         this.videoAPI = videoAPI;
         this.supplementalIndex = indexer.getPrimaryKeyIndex(IndexSpec.SUPPLEMENTAL);
+        this.cycleConstants = constants;
     }
 
     public Map<String, VideoCollectionsDataHierarchy> buildVideoCollectionsDataByCountry(Map<String, ShowHierarchy> showHierarchiesByCountry) {
@@ -51,7 +54,7 @@ public class VideoCollectionsModule {
                 continue;
             }
 
-            VideoCollectionsDataHierarchy hierarchy = new VideoCollectionsDataHierarchy(topNodeId, showHierarchy.isStandalone(), getSupplementalVideos(showHierarchy, topNodeId));
+            VideoCollectionsDataHierarchy hierarchy = new VideoCollectionsDataHierarchy(topNodeId, showHierarchy.isStandalone(), getSupplementalVideos(showHierarchy, topNodeId), cycleConstants);
             for(int i=0;i<showHierarchy.getSeasonIds().length;i++) {
                 int seasonId = showHierarchy.getSeasonIds()[i];
                 int seasonSequenceNumber = showHierarchy.getSeasonSequenceNumbers()[i];

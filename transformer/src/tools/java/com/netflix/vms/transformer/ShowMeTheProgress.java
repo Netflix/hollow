@@ -21,7 +21,7 @@ import org.junit.Test;
 public class ShowMeTheProgress {
 
     @Test
-    public void start() throws Exception {
+    public void start() throws Throwable {
         VMSHollowInputAPI api = new VMSHollowInputAPI(loadStateEngine("/filtered-input.hollow"));
 
         VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
