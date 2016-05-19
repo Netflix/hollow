@@ -7975,6 +7975,95 @@
             ]
         }
     },
+    "findbugs": {
+        "com.google.code.findbugs:annotations": {
+            "locked": "3.0.0",
+            "transitive": [
+                "com.google.code.findbugs:findbugs"
+            ]
+        },
+        "com.google.code.findbugs:bcel-findbugs": {
+            "locked": "6.0",
+            "transitive": [
+                "com.google.code.findbugs:findbugs"
+            ]
+        },
+        "com.google.code.findbugs:findbugs": {
+            "locked": "3.0.0"
+        },
+        "com.google.code.findbugs:jFormatString": {
+            "locked": "3.0.0",
+            "transitive": [
+                "com.google.code.findbugs:findbugs"
+            ]
+        },
+        "commons-lang:commons-lang": {
+            "locked": "2.6",
+            "transitive": [
+                "com.google.code.findbugs:findbugs"
+            ]
+        },
+        "dom4j:dom4j": {
+            "locked": "1.6.1",
+            "transitive": [
+                "com.google.code.findbugs:findbugs"
+            ]
+        },
+        "jaxen:jaxen": {
+            "locked": "1.1.6",
+            "transitive": [
+                "com.google.code.findbugs:findbugs"
+            ]
+        },
+        "org.ow2.asm:asm-debug-all": {
+            "locked": "5.0.2",
+            "transitive": [
+                "com.google.code.findbugs:findbugs"
+            ]
+        },
+        "xml-apis:xml-apis": {
+            "locked": "1.0.b2",
+            "transitive": [
+                "dom4j:dom4j"
+            ]
+        }
+    },
+    "jacocoAgent": {
+        "org.jacoco:org.jacoco.agent": {
+            "locked": "0.7.1.201405082137"
+        }
+    },
+    "jacocoAnt": {
+        "org.jacoco:org.jacoco.agent": {
+            "locked": "0.7.1.201405082137",
+            "transitive": [
+                "org.jacoco:org.jacoco.ant"
+            ]
+        },
+        "org.jacoco:org.jacoco.ant": {
+            "locked": "0.7.1.201405082137"
+        },
+        "org.jacoco:org.jacoco.core": {
+            "locked": "0.7.1.201405082137",
+            "transitive": [
+                "org.jacoco:org.jacoco.ant",
+                "org.jacoco:org.jacoco.report"
+            ]
+        },
+        "org.jacoco:org.jacoco.report": {
+            "locked": "0.7.1.201405082137",
+            "transitive": [
+                "org.jacoco:org.jacoco.ant"
+            ]
+        },
+        "org.ow2.asm:asm-debug-all": {
+            "locked": "5.0.1",
+            "transitive": [
+                "org.jacoco:org.jacoco.core",
+                "org.jacoco:org.jacoco.report"
+            ]
+        }
+    },
     "resolutionRules": {
         "com.netflix.nebula:gradle-resolution-rules": {
             "locked": "0.19.0",
