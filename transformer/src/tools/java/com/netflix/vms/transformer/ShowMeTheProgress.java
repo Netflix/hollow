@@ -22,9 +22,11 @@ public class ShowMeTheProgress {
 
     @Test
     public void start() throws Throwable {
-        VMSHollowInputAPI api = new VMSHollowInputAPI(loadStateEngine("/filtered-input.hollow"));
+        HollowReadStateEngine inputStateEngine = loadStateEngine("/filtered-input.hollow");
+        VMSHollowInputAPI api = new VMSHollowInputAPI(inputStateEngine);
 
         VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
+        outputStateEngine.addHeaderTags(inputStateEngine.getHeaderTags());
 
         SimpleTransformer transformer = new SimpleTransformer(api, outputStateEngine);
 
