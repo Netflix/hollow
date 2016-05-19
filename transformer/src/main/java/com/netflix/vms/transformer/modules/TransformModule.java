@@ -4,5 +4,5 @@ public interface TransformModule {
 
     public String getName();
 
-    public void transform();
+    public void transform() throws Throwable;
 }
