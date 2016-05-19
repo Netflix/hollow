@@ -29,6 +29,7 @@ public class ShowMeTheProgress {
         VMSHollowInputAPI api = new VMSHollowInputAPI(loadStateEngine("filtered-input"));
 
         VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
+        //outputStateEngine.addHeaderTags(inputStateEngine.getHeaderTags());
 
         SimpleTransformer transformer = new SimpleTransformer(api, outputStateEngine);
 
