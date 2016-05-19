@@ -6,8 +6,14 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'nebula.javadoc-jar'
     apply plugin: 'nebula.dependency-lock'
+    apply plugin: 'netflix.jacoco'
+    apply plugin: 'netflix.findbugs'
 
     group = "com.netflix.vms.transformer"
+
+    findbugs {
+        ignoreFailures = true
+    }
 
     dependencyLock {
         includeTransitives = true
