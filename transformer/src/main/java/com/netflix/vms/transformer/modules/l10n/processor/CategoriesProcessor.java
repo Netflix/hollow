@@ -6,23 +6,25 @@ import com.netflix.vms.transformer.hollowinput.CategoriesHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.modules.l10n.L10nResourceIdLookup;
 
-public class CategoriesProcessor extends AbstractL10NProcessor {
+import java.util.Collection;
+
+public class CategoriesProcessor extends AbstractL10NProcessor<CategoriesHollow> {
 
     public CategoriesProcessor(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
         super(api, ctx, mapper);
     }
 
+
     @Override
-    public int processResources() {
-        for (CategoriesHollow item : api.getAllCategoriesHollow()) {
-            final int itemId = (int) item._getCategoryId();
+    public Collection<CategoriesHollow> getInputs() {
+        return api.getAllCategoriesHollow();
+    }
 
-            {
-                final String resourceId = L10nResourceIdLookup.getCategoryNameID(itemId);
-                addL10NResources(resourceId, item._getDisplayName()._getTranslatedTexts());
-            }
-        }
+    @Override
+    public void processInput(CategoriesHollow input) {
+        final int inputId = (int) input._getCategoryId();
 
-        return api.getAllCategoriesHollow().size();
+        final String resourceId = L10nResourceIdLookup.getCategoryNameID(inputId);
+        addL10NResources(resourceId, input._getDisplayName());
     }
 }

@@ -1,6 +1,15 @@
 package com.netflix.vms.transformer.modules.l10n.processor;
 
-public interface L10NProcessor {
+import java.util.Collection;
+
+public interface L10NProcessor<K> {
+
+    /**
+     * Return the inputs
+     */
+    Collection<K> getInputs();
+
+    void processInput(K input);
 
     /**
      * Process Resources and return the number of items processed

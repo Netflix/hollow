@@ -6,21 +6,24 @@ import com.netflix.vms.transformer.hollowinput.ShowMemberTypesHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.modules.l10n.L10nResourceIdLookup;
 
-public class ShowMemberTypesProcessor extends AbstractL10NProcessor {
+import java.util.Collection;
+
+public class ShowMemberTypesProcessor extends AbstractL10NProcessor<ShowMemberTypesHollow> {
 
     public ShowMemberTypesProcessor(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
         super(api, ctx, mapper);
     }
 
     @Override
-    public int processResources() {
-        for (ShowMemberTypesHollow item : api.getAllShowMemberTypesHollow()) {
-            final int itemId = (int) item._getShowMemberTypeId();
+    public Collection<ShowMemberTypesHollow> getInputs() {
+        return api.getAllShowMemberTypesHollow();
+    }
 
-            final String resourceId = L10nResourceIdLookup.getShowMemberTypeNameID(itemId);
-            addL10NResources(resourceId, item._getDisplayName()._getTranslatedTexts());
-        }
+    @Override
+    public void processInput(ShowMemberTypesHollow input) {
+        final int inputId = (int) input._getShowMemberTypeId();
 
-        return api.getAllShowMemberTypesHollow().size();
+        final String resourceId = L10nResourceIdLookup.getShowMemberTypeNameID(inputId);
+        addL10NResources(resourceId, input._getDisplayName());
     }
 }

@@ -8,31 +8,34 @@ import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.modules.l10n.HookType;
 import com.netflix.vms.transformer.modules.l10n.L10nResourceIdLookup;
 
-public class StoriesSynopsesProcessor extends AbstractL10NProcessor {
+import java.util.Collection;
+
+public class StoriesSynopsesProcessor extends AbstractL10NProcessor<StoriesSynopsesHollow> {
 
     public StoriesSynopsesProcessor(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
         super(api, ctx, mapper);
     }
 
     @Override
-    public int processResources() {
-        for (StoriesSynopsesHollow item : api.getAllStoriesSynopsesHollow()) {
-            final int itemId = (int) item._getMovieId();
+    public Collection<StoriesSynopsesHollow> getInputs() {
+        return api.getAllStoriesSynopsesHollow();
+    }
 
-            { // narrativeText
-                final String resourceId = L10nResourceIdLookup.getNarrativeTextId(itemId);
-                addL10NResources(resourceId, item._getNarrativeText()._getTranslatedTexts());
-            }
+    @Override
+    public void processInput(StoriesSynopsesHollow input) {
+        final int inputId = (int) input._getMovieId();
 
-            { // hooks
-                for (StoriesSynopsesHookHollow hook : item._getHooks()) {
-                    String type = hook._getType()._getValue();
-                    final String resourceId = L10nResourceIdLookup.getHookTextId(itemId, HookType.toHookType(type));
-                    addL10NResources(resourceId, hook._getTranslatedTexts());
-                }
-            }
+        { // narrativeText
+            final String resourceId = L10nResourceIdLookup.getNarrativeTextId(inputId);
+            addL10NResources(resourceId, input._getNarrativeText());
         }
 
-        return api.getAllStoriesSynopsesHollow().size();
+        { // hooks
+            for (StoriesSynopsesHookHollow hook : input._getHooks()) {
+                String type = hook._getType()._getValue();
+                final String resourceId = L10nResourceIdLookup.getHookTextId(inputId, HookType.toHookType(type));
+                addL10NResources(resourceId, hook._getTranslatedTexts());
+            }
+        }
     }
 }
