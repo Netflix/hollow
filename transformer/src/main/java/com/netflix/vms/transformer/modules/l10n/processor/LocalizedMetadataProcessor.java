@@ -11,7 +11,7 @@ import com.netflix.vms.transformer.modules.l10n.L10nResourceIdLookup;
 public class LocalizedMetadataProcessor extends AbstractL10NVideoProcessor<LocalizedMetadataHollow> {
 
     public LocalizedMetadataProcessor(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
-        super(api, ctx, mapper, indexer, IndexSpec.L10N_LOCALIZEDMETADATA);
+        super(api, ctx, mapper, indexer, IndexSpec.L10N_LOCALIZEDMETADATA_BY_VIDEO);
     }
 
     @Override

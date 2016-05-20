@@ -30,7 +30,7 @@ public enum IndexSpec {
     L10N_STORIES_SYNOPSES(PRIMARY_KEY, "StoriesSynopses", "movieId"),
     L10N_MOVIES(PRIMARY_KEY, "Movies", "movieId"),
     L10N_EPISODES(PRIMARY_KEY, "Episodes", "movieId"),
-    L10N_LOCALIZEDMETADATA(PRIMARY_KEY, "LocalizedMetadata", "movieId"),
+    L10N_LOCALIZEDMETADATA_BY_VIDEO(HASH, "LocalizedMetadata", "", "movieId"),
 
     ARTWORK_BY_VIDEO_ID(HASH, "VideoArtwork", "", "movieId"),
     SHOW_SEASON_EPISODE(HASH, "ShowSeasonEpisode", "", "movieId"),
