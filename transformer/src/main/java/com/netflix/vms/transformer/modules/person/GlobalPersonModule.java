@@ -1,14 +1,20 @@
 package com.netflix.vms.transformer.modules.person;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.hollowinput.*;
+import com.netflix.vms.transformer.hollowinput.ExplicitDateHollow;
+import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
+import com.netflix.vms.transformer.hollowinput.ListOfVideoIdsHollow;
+import com.netflix.vms.transformer.hollowinput.PersonBioHollow;
+import com.netflix.vms.transformer.hollowinput.PersonVideoAliasIdHollow;
+import com.netflix.vms.transformer.hollowinput.PersonVideoAliasIdsListHollow;
+import com.netflix.vms.transformer.hollowinput.PersonVideoHollow;
+import com.netflix.vms.transformer.hollowinput.PersonVideoRoleHollow;
+import com.netflix.vms.transformer.hollowinput.PersonVideoRolesListHollow;
+import com.netflix.vms.transformer.hollowinput.StringHollow;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+import com.netflix.vms.transformer.hollowinput.VideoIdHollow;
 import com.netflix.vms.transformer.hollowoutput.BirthDate;
 import com.netflix.vms.transformer.hollowoutput.GlobalPerson;
 import com.netflix.vms.transformer.hollowoutput.Integer;
@@ -20,6 +26,11 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 public class GlobalPersonModule extends AbstractTransformModule {
 
@@ -39,13 +50,13 @@ public class GlobalPersonModule extends AbstractTransformModule {
     public List<GlobalPerson> transformPersons() {
         List<GlobalPerson> personList = new ArrayList<GlobalPerson>();
 
-        for (VideoPersonHollow input : api.getAllVideoPersonHollow()) {
+        for (PersonVideoHollow input : api.getAllPersonVideoHollow()) {
             GlobalPerson output = new GlobalPerson();
             output.id = (int) input._getPersonId();
 
             VPerson person = new VPerson(output.id);
-            output.aliasesIds = getAliasIds(input._getAlias());
-            output.personRoles = getPersonRoles(person, input._getCast());
+            output.aliasesIds = getAliasIds(input._getAliasIds());
+            output.personRoles = getPersonRoles(person, input._getRoles());
 
             int personBioOrdinal = personBioIndex.getMatchingOrdinal(input._getPersonId());
             if (personBioOrdinal != -1) {
@@ -94,34 +105,39 @@ public class GlobalPersonModule extends AbstractTransformModule {
         return result;
     }
 
-    private List<PersonRole> getPersonRoles(VPerson person, VideoPersonCastListHollow castList) {
-        if (castList == null || castList.isEmpty()) return Collections.emptyList();
+    private List<PersonRole> getPersonRoles(VPerson person, PersonVideoRolesListHollow roleList) {
+        if (roleList == null || roleList.isEmpty()) return Collections.emptyList();
 
         List<PersonRole> result = new ArrayList<>();
-        Iterator<VideoPersonCastHollow> iter = castList.iterator();
+        Iterator<PersonVideoRoleHollow> iter = roleList.iterator();
         while (iter.hasNext()) {
-            VideoPersonCastHollow item = iter.next();
+            PersonVideoRoleHollow item = iter.next();
             PersonRole output = new PersonRole();
 
             output.person = person;
-            output.roleType = new VRole((int) item._getRoleTypeId());
+            output.roleType = new VRole(item._getRoleTypeId());
             output.video = new Video((int) item._getVideoId());
-            output.weight = (int) item._getSequenceNumber();
+            output.weight = item._getSequenceNumber();
+
+            // @TODO: Zeno/Hollow should have a constant defined
+            if (output.weight == java.lang.Integer.MIN_VALUE) {
+                output.weight = 0;
+            }
 
             result.add(output);
         }
         return result;
     }
 
-    private List<Integer> getAliasIds(VideoPersonAliasListHollow aliasList) {
+    private List<Integer> getAliasIds(PersonVideoAliasIdsListHollow aliasList) {
         if (aliasList == null || aliasList.isEmpty()) return Collections.emptyList();
 
         List<Integer> result = new ArrayList<>();
-        Iterator<VideoPersonAliasHollow> iter = aliasList.iterator();
+        Iterator<PersonVideoAliasIdHollow> iter = aliasList.iterator();
         while (iter.hasNext()) {
-            VideoPersonAliasHollow item = iter.next();
+            PersonVideoAliasIdHollow item = iter.next();
 
-            result.add(new Integer((int) item._getAliasId()));
+            result.add(new Integer(item._getValue()));
         }
 
         return result;

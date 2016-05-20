@@ -325,7 +325,7 @@ public class FilterToSmallDataSubset {
         includeAll("StreamProfiles");
         includeAll("TerritoryCountries");
         includeAll("TurboCollections");
-        includeAll("VideoPerson");
+        includeAll("PersonVideo");
         includeAll("PersonBio");
         includeAll("VMSAward");
 

@@ -17,6 +17,8 @@ import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.ShowHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
+import com.netflix.vms.transformer.hollowinput.PersonVideoHollow;
+import com.netflix.vms.transformer.hollowinput.PersonVideoRoleHollow;
 import com.netflix.vms.transformer.hollowinput.ReleaseDateHollow;
 import com.netflix.vms.transformer.hollowinput.StoriesSynopsesHollow;
 import com.netflix.vms.transformer.hollowinput.StoriesSynopsesHookHollow;
@@ -26,8 +28,6 @@ import com.netflix.vms.transformer.hollowinput.VideoDateWindowHollow;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralAliasHollow;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralTitleTypeHollow;
-import com.netflix.vms.transformer.hollowinput.VideoPersonCastHollow;
-import com.netflix.vms.transformer.hollowinput.VideoPersonHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsFlagsHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsWindowHollow;
@@ -67,8 +67,8 @@ public class VideoMetaDataModule {
     private final HollowPrimaryKeyIndex videoGeneralIdx;
     private final HollowHashIndex videoTypeCountryIdx;
     private final HollowHashIndex videoDateIdx;
-    private final HollowHashIndex videoPersonIdx;
-    private final HollowHashIndex videoPersonRoleIdx;
+    private final HollowHashIndex PersonVideoIdx;
+    private final HollowHashIndex PersonVideoRoleIdx;
     private final HollowPrimaryKeyIndex videoRightsIdx;
     private final HollowPrimaryKeyIndex storiesSynopsesIdx;
 
@@ -83,8 +83,8 @@ public class VideoMetaDataModule {
         this.constants = constants;
         this.indexer = indexer;
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(VIDEO_GENERAL);
-        this.videoPersonIdx = indexer.getHashIndex(PERSONS_BY_VIDEO_ID);
-        this.videoPersonRoleIdx = indexer.getHashIndex(PERSON_ROLES_BY_VIDEO_ID);
+        this.PersonVideoIdx = indexer.getHashIndex(PERSONS_BY_VIDEO_ID);
+        this.PersonVideoRoleIdx = indexer.getHashIndex(PERSON_ROLES_BY_VIDEO_ID);
         this.videoDateIdx = indexer.getHashIndex(VIDEO_DATE);
         this.videoRightsIdx = indexer.getPrimaryKeyIndex(VIDEO_RIGHTS);
         this.videoTypeCountryIdx = indexer.getHashIndex(VIDEO_TYPE_COUNTRY);
@@ -338,24 +338,24 @@ public class VideoMetaDataModule {
 
     private void populateRoleLists(Integer videoId, VideoMetaData vmd) {
         Map<VRole, List<VPerson>> roles = new HashMap<>();
-        HollowHashIndexResult personMatches = videoPersonIdx.findMatches((long)videoId);
+        HollowHashIndexResult personMatches = PersonVideoIdx.findMatches((long) videoId);
         if(personMatches != null) {
             HollowOrdinalIterator iter = personMatches.iterator();
 
             int personOrdinal = iter.next();
             while(personOrdinal != NO_MORE_ORDINALS) {
-                VideoPersonHollow person = api.getVideoPersonHollow(personOrdinal);
+                PersonVideoHollow person = api.getPersonVideoHollow(personOrdinal);
 
                 long personId = person._getPersonId();
 
-                HollowHashIndexResult roleMatches = videoPersonRoleIdx.findMatches(personId, (long)videoId);
+                HollowHashIndexResult roleMatches = PersonVideoRoleIdx.findMatches(personId, (long) videoId);
                 HollowOrdinalIterator roleIter = roleMatches.iterator();
 
                 int roleOrdinal = roleIter.next();
                 while(roleOrdinal != NO_MORE_ORDINALS) {
-                    VideoPersonCastHollow role = api.getVideoPersonCastHollow(roleOrdinal);
+                    PersonVideoRoleHollow role = api.getPersonVideoRoleHollow(roleOrdinal);
 
-                    VRole vRole = new VRole((int) role._getRoleTypeId());
+                    VRole vRole = new VRole(role._getRoleTypeId());
                     List<VPerson> list = roles.get(vRole);
                     if (list == null) {
                         list = new ArrayList<>();

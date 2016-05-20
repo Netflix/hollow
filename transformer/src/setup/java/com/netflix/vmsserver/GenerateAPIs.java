@@ -9,16 +9,19 @@ import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.hollow.zenoadapter.HollowSerializationFramework;
 import com.netflix.videometadata.hollow.VMSObjectHashCodeFinder;
 import com.netflix.videometadata.serializer.framework.VMSSerializerFactory;
+
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collection;
+
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 public class GenerateAPIs {
 
-    private static final String TRANSFORMER_PROJECT_BASE_DIR = "/common/git/videometadata-transformer/transformer";
-    private static final String CONVERTER_PROJECT_BASE_DIR = "/common/git/videometadata-converter";
+    private static final String TRANSFORMER_PROJECT_BASE_DIR = "/common/git/vmstransformer/transformer";
+    private static final String CONVERTER_PROJECT_BASE_DIR = "/common/git/vmsconverter";
 
     @Test
     public void generateInputAPI() throws IOException {
@@ -28,7 +31,10 @@ public class GenerateAPIs {
         HollowWriteStateEngine stateEngine = HollowWriteStateCreator.createWithSchemas(configuredSchemas);
 
         HollowAPIGenerator videosGenerator = new HollowAPIGenerator("VMSHollowInputAPI", "com.netflix.vms.transformer.hollowinput", stateEngine);
-        videosGenerator.generateFiles(TRANSFORMER_PROJECT_BASE_DIR + "/src/main/java/com/netflix/vms/transformer/hollowinput");
+
+        String outputFolder = TRANSFORMER_PROJECT_BASE_DIR + "/src/main/java/com/netflix/vms/transformer/hollowinput";
+        cleanupFolder(outputFolder);
+        videosGenerator.generateFiles(outputFolder);
     }
 
 
@@ -39,7 +45,20 @@ public class GenerateAPIs {
 
         HollowPOJOGenerator generator = new HollowPOJOGenerator("com.netflix.vms.transformer.hollowoutput", stateEngine);
 
-        generator.generateFiles(TRANSFORMER_PROJECT_BASE_DIR + "/src/main/java/com/netflix/vms/transformer/hollowoutput");
+        String outputFolder = TRANSFORMER_PROJECT_BASE_DIR + "/src/main/java/com/netflix/vms/transformer/hollowoutput";
+        cleanupFolder(outputFolder);
+        generator.generateFiles(outputFolder);
+    }
+
+    private void cleanupFolder(String folder) {
+        System.out.println("Cleaning up folder: " + folder);
+        File dir = new File(folder);
+        if (dir.exists()) {
+            for (File file : dir.listFiles()) {
+                System.out.println("\t deleting file:" + file.getName());
+                file.delete();
+            }
+        }
     }
 
 }

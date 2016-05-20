@@ -4,23 +4,23 @@ import com.netflix.hollow.objects.delegate.HollowObjectAbstractDelegate;
 import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.HollowObjectSchema;
 
-public class VideoPersonAliasDelegateLookupImpl extends HollowObjectAbstractDelegate implements VideoPersonAliasDelegate {
+public class PersonVideoAliasIdDelegateLookupImpl extends HollowObjectAbstractDelegate implements PersonVideoAliasIdDelegate {
 
-    private final VideoPersonAliasTypeAPI typeAPI;
+    private final PersonVideoAliasIdTypeAPI typeAPI;
 
-    public VideoPersonAliasDelegateLookupImpl(VideoPersonAliasTypeAPI typeAPI) {
+    public PersonVideoAliasIdDelegateLookupImpl(PersonVideoAliasIdTypeAPI typeAPI) {
         this.typeAPI = typeAPI;
     }
 
-    public long getAliasId(int ordinal) {
-        return typeAPI.getAliasId(ordinal);
+    public int getValue(int ordinal) {
+        return typeAPI.getValue(ordinal);
     }
 
-    public Long getAliasIdBoxed(int ordinal) {
-        return typeAPI.getAliasIdBoxed(ordinal);
+    public Integer getValueBoxed(int ordinal) {
+        return typeAPI.getValueBoxed(ordinal);
     }
 
-    public VideoPersonAliasTypeAPI getTypeAPI() {
+    public PersonVideoAliasIdTypeAPI getTypeAPI() {
         return typeAPI;
     }
 

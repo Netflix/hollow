@@ -3,19 +3,20 @@ package com.netflix.vms.transformer.hollowinput;
 import com.netflix.hollow.objects.provider.HollowFactory;
 import com.netflix.hollow.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.read.customapi.HollowTypeAPI;
+import com.netflix.hollow.objects.delegate.HollowListCachedDelegate;
 
-public class VideoPersonHollowFactory<T extends VideoPersonHollow> extends HollowFactory<T> {
+public class PersonVideoRolesListHollowFactory<T extends PersonVideoRolesListHollow> extends HollowFactory<T> {
 
     @Override
     @SuppressWarnings("unchecked")
     public T newHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return (T)new VideoPersonHollow(((VideoPersonTypeAPI)typeAPI).getDelegateLookupImpl(), ordinal);
+        return (T)new PersonVideoRolesListHollow(((PersonVideoRolesListTypeAPI)typeAPI).getDelegateLookupImpl(), ordinal);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public T newCachedHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return (T)new VideoPersonHollow(new VideoPersonDelegateCachedImpl((VideoPersonTypeAPI)typeAPI, ordinal), ordinal);
+        return (T)new PersonVideoRolesListHollow(new HollowListCachedDelegate((PersonVideoRolesListTypeAPI)typeAPI, ordinal), ordinal);
     }
 
 }

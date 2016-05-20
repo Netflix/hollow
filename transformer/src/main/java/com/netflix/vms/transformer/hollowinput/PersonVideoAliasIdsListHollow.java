@@ -5,16 +5,16 @@ import com.netflix.hollow.HollowListSchema;
 import com.netflix.hollow.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
-public class VideoPersonCastListHollow extends HollowList<VideoPersonCastHollow> {
+public class PersonVideoAliasIdsListHollow extends HollowList<PersonVideoAliasIdHollow> {
 
-    public VideoPersonCastListHollow(HollowListDelegate delegate, int ordinal) {
+    public PersonVideoAliasIdsListHollow(HollowListDelegate delegate, int ordinal) {
         super(delegate, ordinal);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public VideoPersonCastHollow instantiateElement(int ordinal) {
-        return (VideoPersonCastHollow) api().getVideoPersonCastHollow(ordinal);
+    public PersonVideoAliasIdHollow instantiateElement(int ordinal) {
+        return (PersonVideoAliasIdHollow) api().getPersonVideoAliasIdHollow(ordinal);
     }
 
     @Override
@@ -26,8 +26,8 @@ public class VideoPersonCastListHollow extends HollowList<VideoPersonCastHollow>
         return typeApi().getAPI();
     }
 
-    public VideoPersonCastListTypeAPI typeApi() {
-        return (VideoPersonCastListTypeAPI) delegate.getTypeAPI();
+    public PersonVideoAliasIdsListTypeAPI typeApi() {
+        return (PersonVideoAliasIdsListTypeAPI) delegate.getTypeAPI();
     }
 
 }

@@ -1,0 +1,21 @@
+package com.netflix.vms.transformer.hollowinput;
+
+import com.netflix.hollow.objects.delegate.HollowObjectDelegate;
+
+public interface PersonVideoRoleDelegate extends HollowObjectDelegate {
+
+    public int getSequenceNumber(int ordinal);
+
+    public Integer getSequenceNumberBoxed(int ordinal);
+
+    public int getRoleTypeId(int ordinal);
+
+    public Integer getRoleTypeIdBoxed(int ordinal);
+
+    public long getVideoId(int ordinal);
+
+    public Long getVideoIdBoxed(int ordinal);
+
+    public PersonVideoRoleTypeAPI getTypeAPI();
+
+}

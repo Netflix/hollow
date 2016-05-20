@@ -6,22 +6,22 @@ import com.netflix.hollow.HollowObjectSchema;
 import com.netflix.hollow.read.customapi.HollowTypeAPI;
 import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 
-public class VideoPersonAliasDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, VideoPersonAliasDelegate {
+public class PersonVideoAliasIdDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, PersonVideoAliasIdDelegate {
 
-    private final Long aliasId;
-   private VideoPersonAliasTypeAPI typeAPI;
+    private final Integer value;
+   private PersonVideoAliasIdTypeAPI typeAPI;
 
-    public VideoPersonAliasDelegateCachedImpl(VideoPersonAliasTypeAPI typeAPI, int ordinal) {
-        this.aliasId = typeAPI.getAliasIdBoxed(ordinal);
+    public PersonVideoAliasIdDelegateCachedImpl(PersonVideoAliasIdTypeAPI typeAPI, int ordinal) {
+        this.value = typeAPI.getValueBoxed(ordinal);
         this.typeAPI = typeAPI;
     }
 
-    public long getAliasId(int ordinal) {
-        return aliasId.longValue();
+    public int getValue(int ordinal) {
+        return value.intValue();
     }
 
-    public Long getAliasIdBoxed(int ordinal) {
-        return aliasId;
+    public Integer getValueBoxed(int ordinal) {
+        return value;
     }
 
     @Override
@@ -34,12 +34,12 @@ public class VideoPersonAliasDelegateCachedImpl extends HollowObjectAbstractDele
         return typeAPI.getTypeDataAccess();
     }
 
-    public VideoPersonAliasTypeAPI getTypeAPI() {
+    public PersonVideoAliasIdTypeAPI getTypeAPI() {
         return typeAPI;
     }
 
     public void updateTypeAPI(HollowTypeAPI typeAPI) {
-        this.typeAPI = (VideoPersonAliasTypeAPI) typeAPI;
+        this.typeAPI = (PersonVideoAliasIdTypeAPI) typeAPI;
     }
 
 }

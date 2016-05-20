@@ -1,0 +1,47 @@
+package com.netflix.vms.transformer.hollowinput;
+
+import com.netflix.hollow.read.customapi.HollowObjectTypeAPI;
+import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
+
+public class PersonVideoAliasIdTypeAPI extends HollowObjectTypeAPI {
+
+    private final PersonVideoAliasIdDelegateLookupImpl delegateLookupImpl;
+
+    PersonVideoAliasIdTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+        super(api, typeDataAccess, new String[] {
+            "value"
+        });
+        this.delegateLookupImpl = new PersonVideoAliasIdDelegateLookupImpl(this);
+    }
+
+    public int getValue(int ordinal) {
+        if(fieldIndex[0] == -1)
+            return missingDataHandler().handleInt("PersonVideoAliasId", ordinal, "value");
+        return getTypeDataAccess().readInt(ordinal, fieldIndex[0]);
+    }
+
+    public Integer getValueBoxed(int ordinal) {
+        int i;
+        if(fieldIndex[0] == -1) {
+            i = missingDataHandler().handleInt("PersonVideoAliasId", ordinal, "value");
+        } else {
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[0]);
+            i = getTypeDataAccess().readInt(ordinal, fieldIndex[0]);
+        }
+        if(i == Integer.MIN_VALUE)
+            return null;
+        return Integer.valueOf(i);
+    }
+
+
+
+    public PersonVideoAliasIdDelegateLookupImpl getDelegateLookupImpl() {
+        return delegateLookupImpl;
+    }
+
+    @Override
+    public VMSHollowInputAPI getAPI() {
+        return (VMSHollowInputAPI) api;
+    }
+
+}
