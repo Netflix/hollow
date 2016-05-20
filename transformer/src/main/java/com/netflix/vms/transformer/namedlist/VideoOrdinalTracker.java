@@ -1,8 +1,10 @@
 package com.netflix.vms.transformer.namedlist;
 
-import com.netflix.vms.transformer.hollowoutput.Episode;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.vms.transformer.hollowoutput.Episode;
 import com.netflix.vms.transformer.hollowoutput.Video;
 
 public class VideoOrdinalTracker {
@@ -33,13 +35,25 @@ public class VideoOrdinalTracker {
         }
         return -1;
     }
-
+    
     public Video getVideoForOrdinal(int videoOrdinal) {
         return videos[videoOrdinal];
     }
 
     public Episode getEpisodeForOrdinal(int episodeOrdinal) {
         return episodes[episodeOrdinal];
+    }
+    
+    public Map<Integer, Integer> getVideoIdToOrdinalMap() {
+    	Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+    	
+    	for(int i=0;i<videos.length;i++) {
+    		if(videos[i] != null) {
+    			map.put(videos[i].value, i);
+    		}
+    	}
+    	
+    	return map;
     }
 
     public void prepareEpisodes() {

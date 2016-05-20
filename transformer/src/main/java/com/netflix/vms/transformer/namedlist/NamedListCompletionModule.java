@@ -1,21 +1,6 @@
 package com.netflix.vms.transformer.namedlist;
 
 
-import java.util.concurrent.ExecutionException;
-
-import com.netflix.vms.transformer.hollowoutput.NFResourceID;
-import com.netflix.vms.transformer.modules.TransformModule;
-import com.netflix.hollow.bitsandbytes.ThreadSafeBitSet;
-import com.netflix.hollow.util.SimultaneousExecutor;
-import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
-import com.netflix.vms.transformer.hollowoutput.Episode;
-import com.netflix.vms.transformer.hollowoutput.GlobalPerson;
-import com.netflix.vms.transformer.hollowoutput.ISOCountry;
-import com.netflix.vms.transformer.hollowoutput.NamedCollectionHolder;
-import com.netflix.vms.transformer.hollowoutput.PersonRole;
-import com.netflix.vms.transformer.hollowoutput.Strings;
-import com.netflix.vms.transformer.hollowoutput.VPerson;
-import com.netflix.vms.transformer.hollowoutput.Video;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,6 +8,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.netflix.hollow.bitsandbytes.ThreadSafeBitSet;
+import com.netflix.hollow.util.SimultaneousExecutor;
+import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.vms.transformer.hollowoutput.Episode;
+import com.netflix.vms.transformer.hollowoutput.GlobalPerson;
+import com.netflix.vms.transformer.hollowoutput.ISOCountry;
+import com.netflix.vms.transformer.hollowoutput.NFResourceID;
+import com.netflix.vms.transformer.hollowoutput.NamedCollectionHolder;
+import com.netflix.vms.transformer.hollowoutput.PersonRole;
+import com.netflix.vms.transformer.hollowoutput.Strings;
+import com.netflix.vms.transformer.hollowoutput.VPerson;
+import com.netflix.vms.transformer.hollowoutput.Video;
+import com.netflix.vms.transformer.modules.TransformModule;
 
 public class NamedListCompletionModule implements TransformModule {
 
@@ -46,6 +45,8 @@ public class NamedListCompletionModule implements TransformModule {
 
         VideoOrdinalTracker videoOrdinalTracker = videoNamedLists.getVideoOrdinalTracker();
         videoOrdinalTracker.prepareEpisodes();
+        
+        Map<Integer, Integer> videoIdToOrdinalMap = videoOrdinalTracker.getVideoIdToOrdinalMap();
 
         for(Map.Entry<String, ConcurrentHashMap<VideoNamedListType, ThreadSafeBitSet>> countryEntry : videoNamedLists.getVideoListsByCountryAndName().entrySet()) {
             String country = countryEntry.getKey();
@@ -99,7 +100,7 @@ public class NamedListCompletionModule implements TransformModule {
 
                 for(GlobalPerson person : persons) {
                     for(PersonRole personRole : person.personRoles) {
-                        int videoOrdinal = videoOrdinalTracker.getVideoOrdinal(personRole.video);
+                        int videoOrdinal = videoIdToOrdinalMap.get(personRole.video.value);
                         if(validVideosForCountry.get(videoOrdinal)) {
                             personSet.add(personRole.person);
                             break;
