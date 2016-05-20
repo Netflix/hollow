@@ -31,18 +31,15 @@ import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
 import com.netflix.vms.transformer.hollowoutput.StreamData;
 import com.netflix.vms.transformer.hollowoutput.Video;
+import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
 import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.contracts.ContractRestrictionModule;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.xml.bind.DatatypeConverter;
 
 public class PackageDataModule {
@@ -76,8 +73,8 @@ public class PackageDataModule {
         this.encodeSummaryModule = new EncodeSummaryDescriptorModule(api, indexer);
     }
 
-    public Map<Integer, List<PackageData>> transform(Map<String, ShowHierarchy> showHierarchiesByCountry) {
-        Map<Integer, List<PackageData>> transformedPackages = new HashMap<Integer, List<PackageData>>();
+    public Map<Integer, VideoPackageData> transform(Map<String, ShowHierarchy> showHierarchiesByCountry) {
+        Map<Integer, VideoPackageData> transformedPackages = new HashMap<Integer, VideoPackageData>();
 
         Set<Integer> videoIds = gatherVideoIds(showHierarchiesByCountry);
 
@@ -86,8 +83,10 @@ public class PackageDataModule {
 
             if(packagesForVideo != null) {
                 HollowOrdinalIterator iter = packagesForVideo.iterator();
-
-                List<PackageData> transformedVideoPackages = new ArrayList<PackageData>();
+                
+                VideoPackageData videoPackageData = new VideoPackageData();
+                videoPackageData.videoId = new Video(videoId);
+                videoPackageData.packages = new HashSet<PackageData>();
 
                 int packageOrdinal = iter.next();
                 while(packageOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
@@ -98,12 +97,15 @@ public class PackageDataModule {
                     populateDrmKeysByGroupId(packages, videoId);
                     PackageData transformedPackage = convertPackage(packages);
 
-                    transformedVideoPackages.add(transformedPackage);
+                    
+                    videoPackageData.packages.add(transformedPackage);
 
                     packageOrdinal = iter.next();
                 }
 
-                transformedPackages.put(videoId, transformedVideoPackages);
+                transformedPackages.put(videoId, videoPackageData);
+                
+                mapper.addObject(videoPackageData);
             }
         }
 
@@ -194,7 +196,6 @@ public class PackageDataModule {
 
         encodeSummaryModule.summarize(pkg);
 
-        mapper.addObject(pkg);
         mapper.addObject(drmInfoData);
 
         return pkg;

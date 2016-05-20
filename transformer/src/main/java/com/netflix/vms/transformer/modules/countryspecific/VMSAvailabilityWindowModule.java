@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
+
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractAssetHollow;
@@ -22,7 +24,6 @@ import com.netflix.vms.transformer.hollowoutput.VideoImage;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -41,7 +42,7 @@ public class VMSAvailabilityWindowModule {
     private final LinkedHashSetOfStrings EMPTY_CUP_TOKENS;
     private final LinkedHashSetOfStrings DEFAULT_CUP_TOKENS;
 
-    private Map<Integer, List<PackageData>> transformedPackageData;
+    private Map<Integer, VideoPackageData> transformedPackageData;
 
     private final WindowPackageContractInfoModule windowPackageContractInfoModule;
 
@@ -58,7 +59,7 @@ public class VMSAvailabilityWindowModule {
     }
 
 
-    public void setTransformedPackageData(Map<Integer, List<PackageData>> data) {
+    public void setTransformedPackageData(Map<Integer, VideoPackageData> data) {
         this.transformedPackageData = data;
     }
 
@@ -359,13 +360,13 @@ public class VMSAvailabilityWindowModule {
     }
 
     private PackageData getPackageData(Integer videoId, long packageId) {
-        List<PackageData> list = transformedPackageData.get(videoId);
-        if(list == null)
+        Set<PackageData> set = transformedPackageData.get(videoId).packages;
+        if(set == null)
             return null;
 
-        for(int i=0;i<list.size();i++) {
-            if(list.get(i).id == packageId)
-                return list.get(i);
+        for(PackageData packageData : set) {
+            if(packageData.id == packageId)
+                return packageData;
         }
 
         return null;
