@@ -100,7 +100,9 @@ public class NamedListCompletionModule implements TransformModule {
 
                 for(GlobalPerson person : persons) {
                     for(PersonRole personRole : person.personRoles) {
-                        int videoOrdinal = videoIdToOrdinalMap.get(personRole.video.value);
+                        Integer videoOrdinal = videoIdToOrdinalMap.get(personRole.video.value);
+                        if (videoOrdinal==null) continue;
+
                         if(validVideosForCountry.get(videoOrdinal)) {
                             personSet.add(personRole.person);
                             break;

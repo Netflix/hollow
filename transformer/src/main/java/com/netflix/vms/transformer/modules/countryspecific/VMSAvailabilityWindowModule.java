@@ -1,7 +1,5 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
-import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
-
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractAssetHollow;
@@ -21,9 +19,11 @@ import com.netflix.vms.transformer.hollowoutput.VMSAvailabilityWindow;
 import com.netflix.vms.transformer.hollowoutput.VideoContractInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoImage;
+import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -360,7 +360,10 @@ public class VMSAvailabilityWindowModule {
     }
 
     private PackageData getPackageData(Integer videoId, long packageId) {
-        Set<PackageData> set = transformedPackageData.get(videoId).packages;
+        VideoPackageData vpData = transformedPackageData.get(videoId);
+        if (vpData == null) return null;
+
+        Set<PackageData> set = vpData.packages;
         if(set == null)
             return null;
 
