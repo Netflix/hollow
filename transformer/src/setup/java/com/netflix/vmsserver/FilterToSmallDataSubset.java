@@ -1,5 +1,22 @@
 package com.netflix.vmsserver;
 
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+
+import net.jpountz.lz4.LZ4BlockInputStream;
+
+import org.junit.Test;
+
 import com.netflix.hollow.combine.HollowCombiner;
 import com.netflix.hollow.combine.HollowCombinerIncludeOrdinalsCopyDirector;
 import com.netflix.hollow.index.HollowHashIndex;
@@ -12,38 +29,38 @@ import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
+import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
+import com.netflix.vms.generated.notemplate.EpisodeHollow;
+import com.netflix.vms.generated.notemplate.GlobalPersonHollow;
 import com.netflix.vms.generated.notemplate.GlobalVideoHollow;
 import com.netflix.vms.generated.notemplate.L10NResourcesHollow;
+import com.netflix.vms.generated.notemplate.NamedCollectionHolderHollow;
+import com.netflix.vms.generated.notemplate.PersonRoleHollow;
+import com.netflix.vms.generated.notemplate.SetOfEpisodeHollow;
+import com.netflix.vms.generated.notemplate.SetOfVPersonHollow;
+import com.netflix.vms.generated.notemplate.SetOfVideoHollow;
+import com.netflix.vms.generated.notemplate.StringsHollow;
 import com.netflix.vms.generated.notemplate.SupplementalVideoHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
+import com.netflix.vms.generated.notemplate.VPersonHollow;
 import com.netflix.vms.generated.notemplate.VideoCollectionsDataHollow;
 import com.netflix.vms.generated.notemplate.VideoEpisodeHollow;
 import com.netflix.vms.generated.notemplate.VideoHollow;
 import com.netflix.vms.generated.notemplate.VideoNodeTypeHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+import com.netflix.vms.transformer.hollowoutput.Episode;
+import com.netflix.vms.transformer.hollowoutput.ISOCountry;
+import com.netflix.vms.transformer.hollowoutput.NFResourceID;
+import com.netflix.vms.transformer.hollowoutput.NamedCollectionHolder;
+import com.netflix.vms.transformer.hollowoutput.Strings;
+import com.netflix.vms.transformer.hollowoutput.VPerson;
+import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.io.LZ4VMSInputStream;
-
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
-import org.junit.Test;
-
-import net.jpountz.lz4.LZ4BlockInputStream;
 
 /// NOTE:  This has a dependency on videometadata-common (for LZ4VMSInputStream)
 /// NOTE:  This has a dependency on vms-hollow-generated-notemplate (for output blob API)
 
-@SuppressWarnings("deprecation")
 public class FilterToSmallDataSubset {
 
     private static final String WORKING_DIR = "/space/transformer-data";
@@ -144,22 +161,6 @@ public class FilterToSmallDataSubset {
 
         ordinalsToInclude.put("L10NResources", findIncludedL10NOrdinals(includedVideoIds));
 
-        /*joinIncludedOrdinals(completeVideosToInclude,
-                "GlobalPerson", "id",
-                "CompleteVideo", "facetData.videoMetaData.actorList.element.id",
-                                 "facetData.videoMetaData.directorList.element.id",
-                                 "facetData.videoMetaData.creatorList.element.id");*/
-
-        /*joinIncludedOrdinals(completeVideosToInclude,
-                        "PersonImages", "id",
-                        "CompleteVideo", "facetData.videoMetaData.actorList.element.id",
-                                         "facetData.videoMetaData.directorList.element.id",
-                                         "facetData.videoMetaData.creatorList.element.id");*/
-
-        /*joinIncludedOrdinals(rolloutVideosToInclude,
-                        "CharacterImages", "id",
-                        "RolloutVideo", "summaryMap.value.allPhases.element.roles.element.characterId");*/
-
         joinIncludedOrdinals(packagesToInclude,
                 "FileEncodingData", "downloadableId",
                 "PackageData", "streams.element.downloadableId");
@@ -169,10 +170,86 @@ public class FilterToSmallDataSubset {
                 "PackageData", "id");
 
 
-        writeFilteredBlob(FILTERED_OUTPUT_BLOB_LOCATION, stateEngine, ordinalsToInclude);
+        HollowWriteStateEngine writeStateEngine = populateFilteredBlob(stateEngine, ordinalsToInclude);
+        addFilteredNamedLists(stateEngine, outputAPI, writeStateEngine, includedVideoIds);
+        writeBlob(FILTERED_OUTPUT_BLOB_LOCATION, writeStateEngine);
+        
         return includedVideoIds;
     }
-
+    
+    private void addFilteredNamedLists(HollowReadStateEngine readStateEngine, VMSRawHollowAPI api, HollowWriteStateEngine writeStateEngine, Set<Integer> includedVideoIds) {
+    	HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+    	
+    	HollowPrimaryKeyIndex globalPersonIdx = new HollowPrimaryKeyIndex(readStateEngine, "GlobalPerson", "id");
+    	
+    	for(NamedCollectionHolderHollow holder : api.getAllNamedCollectionHolderHollow()) {
+    		NamedCollectionHolder outputHolder = new NamedCollectionHolder();
+    		
+    		outputHolder.country = new ISOCountry(holder._getCountry()._getId());
+    		
+    		outputHolder.videoListMap = new HashMap<Strings, Set<Video>>();
+    		outputHolder.episodeListMap = new HashMap<Strings, Set<Episode>>();
+    		outputHolder.personListMap = new HashMap<Strings, Set<VPerson>>();
+    		outputHolder.resourceIdListMap = Collections.emptyMap();
+    		
+    		for(Map.Entry<StringsHollow, SetOfVideoHollow> entry : holder._getVideoListMap().entrySet()) {
+    			Set<Video> videoSet = new HashSet<Video>();
+    			
+    			for(VideoHollow video : entry.getValue()) {
+    				Integer value = video._getValueBoxed();
+    				
+    				if(includedVideoIds.contains(value)) {
+    					videoSet.add(new Video(value.intValue()));
+    				}
+    			}
+    			
+    			outputHolder.videoListMap.put(new Strings(entry.getKey()._getValue()), videoSet);
+    		}
+    		
+    		for(Map.Entry<StringsHollow, SetOfEpisodeHollow> entry : holder._getEpisodeListMap().entrySet()) {
+    			Set<Episode> episodeSet = new HashSet<Episode>();
+    			
+    			for(EpisodeHollow ep : entry.getValue()) {
+    				Integer id = ep._getIdBoxed();
+    				
+    				if(includedVideoIds.contains(id)) {
+    					episodeSet.add(new Episode(id.intValue()));
+    				}
+    			}
+    			
+    			outputHolder.episodeListMap.put(new Strings(entry.getKey()._getValue()), episodeSet);
+    		}
+    		
+    		for(Map.Entry<StringsHollow, SetOfVPersonHollow> entry : holder._getPersonListMap().entrySet()) {
+    			Set<VPerson> personSet = new HashSet<VPerson>();
+    			
+    			for(VPersonHollow person : entry.getValue()) {
+    				Integer id = person._getIdBoxed();
+    				
+    				int personOrdinal = globalPersonIdx.getMatchingOrdinal(id);
+    				
+    				if(personOrdinal != -1) {
+    					GlobalPersonHollow globalPerson = api.getGlobalPersonHollow(personOrdinal);
+    					
+    					for(PersonRoleHollow personRole : globalPerson._getPersonRoles()) {
+    						if(includedVideoIds.contains(personRole._getVideo()._getValueBoxed())) {
+    							personSet.add(new VPerson(id.intValue()));
+    							break;
+    						}
+    					}
+    				}
+    			}
+    			
+    			outputHolder.personListMap.put(new Strings(entry.getKey()._getValue()), personSet);
+    		}
+    		
+    		
+    		mapper.addObject(outputHolder);
+    	}
+    	
+    	mapper.addObject(new NFResourceID("invalid"));		
+    }
+    
     private void filterInputBlob(Set<Integer> includedVideoIds) throws IOException, FileNotFoundException {
         ordinalsToInclude.clear();
         stateEngine = new HollowReadStateEngine();
@@ -514,21 +591,30 @@ public class FilterToSmallDataSubset {
     }
 
     private static void writeFilteredBlob(String filename, HollowReadStateEngine inputStateEngine, Map<String, BitSet> ordinalsToInclude) throws FileNotFoundException, IOException {
-        Map<String, String> headerTags = inputStateEngine.getHeaderTags();
+        HollowWriteStateEngine outputStateEngine = populateFilteredBlob(inputStateEngine, ordinalsToInclude);
+
+        writeBlob(filename, outputStateEngine);
+    }
+
+	private static void writeBlob(String filename, HollowWriteStateEngine outputStateEngine) throws FileNotFoundException, IOException {
+		HollowBlobWriter writer = new HollowBlobWriter(outputStateEngine);
+        BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(filename));
+        writer.writeSnapshot(os);
+        os.close();
+	}
+
+	private static HollowWriteStateEngine populateFilteredBlob(HollowReadStateEngine inputStateEngine, Map<String, BitSet> ordinalsToInclude) {
+		Map<String, String> headerTags = inputStateEngine.getHeaderTags();
         HollowCombiner combiner = new HollowCombiner(new HollowCombinerIncludeOrdinalsCopyDirector(ordinalsToInclude), inputStateEngine);
 
         combiner.combine();
         HollowWriteStateEngine outputStateEngine = combiner.getCombinedStateEngine();
         outputStateEngine.addHeaderTags(headerTags);
 
-        HollowBlobWriter writer = new HollowBlobWriter(outputStateEngine);
-        BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(filename));
-        writer.writeSnapshot(os);
-        os.close();
-
-        System.out.println(String.format("writeFilteredBlob file=%s, headers:", filename));
+        System.out.println(String.format("writeFilteredBlob headers:"));
         for (Map.Entry<String, String> entry : headerTags.entrySet()) {
-            System.out.println(String.format("\t %s=%s", entry.getKey(), entry.getValue()));
+        	System.out.println(String.format("\t %s=%s", entry.getKey(), entry.getValue()));
         }
-    }
+		return outputStateEngine;
+	}
 }

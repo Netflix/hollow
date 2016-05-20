@@ -1,11 +1,10 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
-import com.netflix.vms.transformer.CycleConstants;
-
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
+import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.ShowHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
@@ -22,9 +21,9 @@ import com.netflix.vms.transformer.hollowinput.VideoRightsHollow;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
 import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.NFLocale;
-import com.netflix.vms.transformer.hollowoutput.PackageData;
 import com.netflix.vms.transformer.hollowoutput.SortedMapOfDateWindowToListOfInteger;
 import com.netflix.vms.transformer.hollowoutput.VMSAvailabilityWindow;
+import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
@@ -64,7 +63,7 @@ public class CountrySpecificDataModule {
         this.availabilityWindowModule = new VMSAvailabilityWindowModule(api, ctx, indexer);
     }
 
-    public Map<String, Map<Integer, CompleteVideoCountrySpecificData>> buildCountrySpecificDataByCountry(Map<String, ShowHierarchy> showHierarchiesByCountry, Map<Integer, List<PackageData>> transformedPackageData) {
+    public Map<String, Map<Integer, CompleteVideoCountrySpecificData>> buildCountrySpecificDataByCountry(Map<String, ShowHierarchy> showHierarchiesByCountry, Map<Integer, VideoPackageData> transformedPackageData) {
         this.availabilityWindowModule.setTransformedPackageData(transformedPackageData);
 
         Map<String, Map<Integer, CompleteVideoCountrySpecificData>> allCountrySpecificDataMap = new HashMap<String, Map<Integer,CompleteVideoCountrySpecificData>>();
