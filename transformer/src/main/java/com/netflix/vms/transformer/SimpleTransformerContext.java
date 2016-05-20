@@ -25,7 +25,7 @@ public class SimpleTransformerContext implements TransformerContext {
         this.recorder = recorder;
     }
 
-    private long now;
+    private long now = System.currentTimeMillis();
     private long currentCycleId;
 
     @Override
