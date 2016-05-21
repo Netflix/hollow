@@ -59,22 +59,25 @@ public class NamedListCompletionModule implements TransformModule {
                 ///// VIDEO LISTS
                 holder.videoListMap = new HashMap<Strings, Set<Video>>();
 
-                for(Map.Entry<VideoNamedListType, ThreadSafeBitSet> listEntry : countryEntry.getValue().entrySet()) {
-                    Set<Video> videoSet = new HashSet<Video>();
-                    VideoNamedListType listName = listEntry.getKey();
-                    ThreadSafeBitSet list = listEntry.getValue();
-
-                    int videoOrdinal = list.nextSetBit(0);
-                    while(videoOrdinal != -1) {
-                        Video v = videoOrdinalTracker.getVideoForOrdinal(videoOrdinal);
-                        videoSet.add(v);
-
-                        videoOrdinal = list.nextSetBit(videoOrdinal + 1);
+                for(VideoNamedListType listName : VideoNamedListType.values()) {
+                    Set<Video> videoSet = Collections.emptySet();
+                    ThreadSafeBitSet list = countryEntry.getValue().get(listName);
+                    
+                    if(list != null) {
+                    	videoSet = new HashSet<>();
+	                    int videoOrdinal = list.nextSetBit(0);
+	                    while(videoOrdinal != -1) {
+	                        Video v = videoOrdinalTracker.getVideoForOrdinal(videoOrdinal);
+	                        videoSet.add(v);
+	
+	                        videoOrdinal = list.nextSetBit(videoOrdinal + 1);
+	                    }
+                    } else {
+                    	videoSet = Collections.emptySet();
                     }
-
+                    
                     holder.videoListMap.put(new Strings(listName.toString()), videoSet);
                 }
-
 
                 /// VALID_EPISODES
                 holder.episodeListMap = new HashMap<Strings, Set<Episode>>();
