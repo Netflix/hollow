@@ -100,7 +100,7 @@ public class FilterToSmallDataSubset {
 
         Set<Integer> includedVideoIds = findRandomVideoIds(stateEngine);
 
-        BitSet completeVideosToInclude = findIncludedOrdinals("CompleteVideo", includedVideoIds, new VideoIdDeriver() {
+        findIncludedOrdinals("CompleteVideo", includedVideoIds, new VideoIdDeriver() {
             @Override
             public Integer deriveId(int ordinal) {
                 return outputAPI.getCompleteVideoHollow(ordinal)._getId()._getValueBoxed();
@@ -114,7 +114,7 @@ public class FilterToSmallDataSubset {
             }
         });
 
-        BitSet rolloutVideosToInclude = findIncludedOrdinals("RolloutVideo", includedVideoIds, new VideoIdDeriver() {
+        findIncludedOrdinals("RolloutVideo", includedVideoIds, new VideoIdDeriver() {
             @Override
             public Integer deriveId(int ordinal) {
                 return outputAPI.getRolloutVideoHollow(ordinal)._getVideo()._getValueBoxed();
@@ -192,6 +192,8 @@ public class FilterToSmallDataSubset {
     		outputHolder.personListMap = new HashMap<Strings, Set<VPerson>>();
     		outputHolder.resourceIdListMap = Collections.emptyMap();
     		
+    		Set<Integer> validVideoIdsForCountry = new HashSet<Integer>();
+    		
     		for(Map.Entry<StringsHollow, SetOfVideoHollow> entry : holder._getVideoListMap().entrySet()) {
     			Set<Video> videoSet = new HashSet<Video>();
     			
@@ -201,6 +203,11 @@ public class FilterToSmallDataSubset {
     				if(includedVideoIds.contains(value)) {
     					videoSet.add(new Video(value.intValue()));
     				}
+    			}
+
+    			if("VALID_VIDEOS".equals(entry.getKey()._getValue())) {
+    				for(Video video : videoSet)
+    					validVideoIdsForCountry.add(video.value);
     			}
     			
     			outputHolder.videoListMap.put(new Strings(entry.getKey()._getValue()), videoSet);
@@ -232,7 +239,7 @@ public class FilterToSmallDataSubset {
     					GlobalPersonHollow globalPerson = api.getGlobalPersonHollow(personOrdinal);
     					
     					for(PersonRoleHollow personRole : globalPerson._getPersonRoles()) {
-    						if(includedVideoIds.contains(personRole._getVideo()._getValueBoxed())) {
+    						if(validVideoIdsForCountry.contains(personRole._getVideo()._getValueBoxed())) {
     							personSet.add(new VPerson(id.intValue()));
     							break;
     						}
