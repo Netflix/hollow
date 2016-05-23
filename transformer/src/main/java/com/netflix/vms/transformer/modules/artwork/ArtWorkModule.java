@@ -56,6 +56,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 public abstract class ArtWorkModule extends AbstractTransformModule{
     protected final String entityType;
     protected final HollowPrimaryKeyIndex imageTypeIdx;
@@ -69,6 +71,9 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     private final Map<String, ArtworkDerivative> derivativeCache;
     private final Map<ArtworkCdn, ArtworkCdn> cdnLocationCache;
 
+    private final boolean isEnableCdnDirectoryOptimization;
+    private final int computedCdnFolderLen;
+
     public ArtWorkModule(String entityType, VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
         super(api, ctx, mapper);
         this.entityType = entityType;
@@ -81,6 +86,10 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         this.imageRecipeCache = new HashMap<String, ArtWorkImageRecipe>();
         this.derivativeCache = new HashMap<String, ArtworkDerivative>();
         this.cdnLocationCache = new HashMap<ArtworkCdn, ArtworkCdn>();
+
+        // @TODO: Need config
+        this.computedCdnFolderLen = 5;
+        this.isEnableCdnDirectoryOptimization = false;
     }
 
     protected void transformArtworks(int entityId, String sourceFileId, int ordinalPriority, int seqNum, ArtworkAttributesHollow attributes, ArtworkDerivativeListHollow derivatives, Set<ArtworkLocaleHollow> localeSet, Set<Artwork> artworkSet) {
@@ -88,7 +97,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         // Process list of derivatives
         List<ArtworkDerivative> derivativeList = new ArrayList<ArtworkDerivative>();
         List<ArtworkCdn> cdnList = new ArrayList<ArtworkCdn>();
-        processDerivatives(entityId, derivatives, derivativeList, cdnList);
+        processDerivatives(entityId, sourceFileId, derivatives, derivativeList, cdnList);
 
         for (final ArtworkLocaleHollow localeHollow : localeSet) {
             createArtworkForLocale(localeHollow, sourceFileId, ordinalPriority, seqNum, attributes, derivativeList, cdnList, artworkSet);
@@ -96,7 +105,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     }
 
     // Process Derivatives to create derivativeList and cdnList
-    protected void processDerivatives(int entityId, ArtworkDerivativeListHollow derivatives, List<ArtworkDerivative> derivativeList, List<ArtworkCdn> cdnList) {
+    protected void processDerivatives(int entityId, String sourceFileId, ArtworkDerivativeListHollow derivatives, List<ArtworkDerivative> derivativeList, List<ArtworkCdn> cdnList) {
         for (ArtworkDerivativeHollow derivativeHollow : sortInputDerivatives(derivatives)) {
             ArtWorkImageFormatEntry formatEntry = getImageFormatEntry(derivativeHollow);
             ArtWorkImageTypeEntry typeEntry = getImageTypeEntry(derivativeHollow);
@@ -125,7 +134,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
 
             ArtworkCdn cdn = new ArtworkCdn();
             cdn.cdnId = java.lang.Integer.parseInt(derivativeHollow._getCdnId()._getValue()); // @TODO: Is it Integer or String
-            cdn.cdnDirectory = new Strings(derivativeHollow._getCdnDirectory()._getValue());
+            cdn.cdnDirectory = getCdnDirectory(sourceFileId, derivativeHollow);
 
             ArtworkCdn canonicalCdn = cdnLocationCache.get(cdn);
             if(canonicalCdn != null) {
@@ -136,6 +145,33 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
 
             cdnList.add(cdn);
         }
+    }
+
+    protected final Strings getCdnDirectory(String sourceId, ArtworkDerivativeHollow derivative) {
+        String cdnDirectory = derivative._getCdnDirectory()._getValue();
+        if (isEnableCdnDirectoryOptimization) {
+            String recipeDescriptor = derivative._getRecipeDescriptor()._getValue();
+            String filename_without_extension = createFilenameWithoutExtension(sourceId, recipeDescriptor);
+
+            String derivedCdnDirectory = getCdnFolderFromFilename(filename_without_extension, computedCdnFolderLen);
+            if (derivedCdnDirectory != null && derivedCdnDirectory.equals(cdnDirectory)) {
+                // cdnFolder is also derivable (client already has this logic) so not need to eat-up blob space
+                return null;
+            }
+        }
+        return new Strings(cdnDirectory);
+    }
+
+    private static String getCdnFolderFromFilename(String filename, int len) {
+        if (len <= 0) return "";
+        if (filename == null || filename.length() <= len) return filename;
+        return filename.substring(filename.length() - len);
+    }
+
+    private static String createFilenameWithoutExtension(String sourceId, String recipeDescriptor) {
+        String filename_work_in_progress = sourceId + "_" + recipeDescriptor;
+        String filename_without_extension = DigestUtils.sha1Hex(filename_work_in_progress);
+        return filename_without_extension;
     }
 
     protected void createArtworkForLocale(ArtworkLocaleHollow localeHollow, String sourceFileId, int ordinalPriority, int seqNum, ArtworkAttributesHollow attributes, List<ArtworkDerivative> derivativeList, List<ArtworkCdn> cdnList, Set<Artwork> artworkSet) {

@@ -1,13 +1,12 @@
 package com.netflix.vms.transformer.modules.meta;
 
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
-
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.ShowHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeListHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
@@ -25,6 +24,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoImages;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.artwork.ArtWorkModule;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -107,7 +107,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
 
         List<ArtworkDerivative> derivativeList = new ArrayList<ArtworkDerivative>();
         List<ArtworkCdn> cdnList = new ArrayList<ArtworkCdn>();
-        processDerivatives(entityId, derivatives, derivativeList, cdnList);
+        processDerivatives(entityId, sourceFileId, derivatives, derivativeList, cdnList);
 
         // Support Country based data
         for (ArtworkLocaleHollow localeHollow : localeSet) {
