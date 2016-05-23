@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class VideoMediaData implements Cloneable {
 
-    public boolean isAvailableForED = false;
     public boolean isGoLive = false;
     public boolean isOriginal = false;
     public boolean isAutoPlayEnabled = false;
@@ -19,7 +18,6 @@ public class VideoMediaData implements Cloneable {
             return false;
 
         VideoMediaData o = (VideoMediaData) other;
-        if(o.isAvailableForED != isAvailableForED) return false;
         if(o.isGoLive != isGoLive) return false;
         if(o.isOriginal != isOriginal) return false;
         if(o.isAutoPlayEnabled != isAutoPlayEnabled) return false;
@@ -35,7 +33,6 @@ public class VideoMediaData implements Cloneable {
 
     public int hashCode() {
         int hashCode = 1;
-        hashCode = hashCode * 31 + (isAvailableForED? 1231 : 1237);
         hashCode = hashCode * 31 + (isGoLive? 1231 : 1237);
         hashCode = hashCode * 31 + (isOriginal? 1231 : 1237);
         hashCode = hashCode * 31 + (isAutoPlayEnabled? 1231 : 1237);
@@ -49,8 +46,7 @@ public class VideoMediaData implements Cloneable {
 
     public String toString() {
         StringBuilder builder = new StringBuilder("VideoMediaData{");
-        builder.append("isAvailableForED=").append(isAvailableForED);
-        builder.append(",isGoLive=").append(isGoLive);
+        builder.append("isGoLive=").append(isGoLive);
         builder.append(",isOriginal=").append(isOriginal);
         builder.append(",isAutoPlayEnabled=").append(isAutoPlayEnabled);
         builder.append(",dvdReleaseDate=").append(dvdReleaseDate);
