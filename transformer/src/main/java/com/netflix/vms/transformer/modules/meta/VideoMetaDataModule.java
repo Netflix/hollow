@@ -42,6 +42,7 @@ import com.netflix.vms.transformer.hollowoutput.VRole;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoDateUtil;
 import com.netflix.vms.transformer.util.VideoSetTypeUtil;
 
@@ -266,9 +267,8 @@ public class VideoMetaDataModule {
         }
 
         vmd.videoSetTypes = VideoSetTypeUtil.computeSetTypes(videoId, countryCode, rights, typeDescriptor, api, ctx, constants, indexer);
-        long showMemberTypeId = 0; //@TODO: typeDescriptor._getShowMemberTypeId();
-        if(showMemberTypeId != Long.MIN_VALUE)
-            vmd.showMemberTypeId = (int)showMemberTypeId;
+        int showMemberTypeId = Integer.MIN_VALUE; //@TODO: typeDescriptor._getShowMemberTypeId(); -- need to use new feed
+        vmd.showMemberTypeId = showMemberTypeId;
 
         StringHollow copyright = typeDescriptor == null ? null : typeDescriptor._getCopyright();
         if(copyright != null) {
@@ -312,6 +312,7 @@ public class VideoMetaDataModule {
 
 
             vmd.isTestTitle = general._getTestTitle();
+            vmd.metadataReleaseDays = OutputUtil.getNullableInteger(general._getMetadataReleaseDays());
         }
     }
 
