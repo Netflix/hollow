@@ -1,7 +1,9 @@
 package com.netflix.vms.transformer.namedlist;
 
-import com.netflix.vms.transformer.hollowoutput.VideoEpisode;
+import java.util.GregorianCalendar;
 
+import java.util.Calendar;
+import com.netflix.vms.transformer.hollowoutput.VideoEpisode;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import java.util.Map;
@@ -61,6 +63,7 @@ public class VideoNamedListModule {
 
     public class VideoNamedListPopulator {
 
+    	private String country;
         private ConcurrentHashMap<VideoNamedListType, ThreadSafeBitSet> listsByName = null;
         private ThreadSafeBitSet episodeList;
         private CompleteVideo video;
@@ -68,11 +71,18 @@ public class VideoNamedListModule {
         private int videoIdOrdinal;
         private boolean isAvailableForED;
         private boolean isAvailableIn3D;
+        private boolean isSupplemental;
         private long currentAvailabilityDate;
+        private final Calendar calendar = new GregorianCalendar();
+        private final int currentYear;
 
-        private VideoNamedListPopulator() { }
+        private VideoNamedListPopulator() { 
+        	calendar.setTimeInMillis(ctx.getNowMillis());
+        	currentYear = calendar.get(Calendar.YEAR);
+        }
 
         public void setCountry(String country) {
+        	this.country = country;
             listsByName = videoListsByCountryAndName.get(country);
             if(listsByName == null) {
                 listsByName = new ConcurrentHashMap<>();
@@ -92,6 +102,10 @@ public class VideoNamedListModule {
                     episodeList = existingEpisodeList;
             }
         }
+        
+        public String getCountry() {
+        	return country;
+        }
 
         public void addCompleteVideo(CompleteVideo video, boolean isTopNode) {
             this.video = video;
@@ -100,6 +114,8 @@ public class VideoNamedListModule {
                 this.topNodeVideoIdOrdinal = this.videoIdOrdinal;
 
             setMediaAvailabilityBooleans(video);
+            
+            this.isSupplemental = video.facetData.videoCollectionsData.nodeType == constants.SUPPLEMENTAL;
 
             process();
         }
@@ -120,16 +136,16 @@ public class VideoNamedListModule {
                     addToList(VideoNamedListType.ED_TOP_NODES);
             }
 
-            if(isAvailableForED && nodeType == constants.EPISODE)
+            if(isAvailableForED && nodeType == constants.SHOW)
                 addToList(VideoNamedListType.ED_SHOWS);
-            else if(isAvailableForED && nodeType == constants.SEASON)
+            else if(isAvailableForED && nodeType == constants.EPISODE)
                 addToList(VideoNamedListType.ED_EPISODES);
-            else if(isAvailableForED && nodeType == constants.SHOW)
+            else if(isAvailableForED && nodeType == constants.SEASON)
                 addToList(VideoNamedListType.ED_SEASONS);
             else if(isAvailableForED && nodeType == constants.MOVIE)
                 addToList(VideoNamedListType.ED_MOVIES);
 
-            if(nodeType == constants.SUPPLEMENTAL) {
+            if(isSupplemental) {
                 addToList(VideoNamedListType.VALID_SUPPLEMENTALS);
                 if(isAvailableForED)
                     addToList(VideoNamedListType.ED_SUPPLEMENTALS);
@@ -160,8 +176,8 @@ public class VideoNamedListModule {
                     addToList(VideoNamedListType.EXTENDED_VIDEOS);
                 }
             }
-
-            boolean isSensitive = video.countrySpecificData.metadataAvailabilityDate != null && video.countrySpecificData.metadataAvailabilityDate.val > ctx.getNowMillis();
+            
+            boolean isSensitive = video.countrySpecificData.metadataAvailabilityDate == null || video.countrySpecificData.metadataAvailabilityDate.val > ctx.getNowMillis();
 
             if(isSensitive)
                 addToList(VideoNamedListType.SENSITIVE_VIDEOS);
@@ -173,18 +189,20 @@ public class VideoNamedListModule {
                 addTopNodeToList(VideoNamedListType.VALID_ORIGINAL_TOP_NODES);
             }
 
-            if(video.facetData.videoMediaData == null || !video.facetData.videoMediaData.isAutoPlayEnabled) {
+            if(video.facetData.videoMediaData != null && !video.facetData.videoMediaData.isAutoPlayEnabled) {
                 addToList(VideoNamedListType.AUTO_PLAY_DISABLED);
             }
-
+            
+            boolean isRecentlyAdded = video.countrySpecificData.firstDisplayDate != null && video.countrySpecificData.firstDisplayDate.val > (ctx.getNowMillis() - (MS_IN_DAY * 30));
+            
             if(isAvailableForED) {
-                long theatricalReleaseDate = video.facetData.videoMetaData.theatricalReleaseDate == null ? Long.MIN_VALUE : video.facetData.videoMetaData.theatricalReleaseDate.val;
-                long dvdReleaseDate = video.facetData.videoMediaData.dvdReleaseDate == null ? Long.MIN_VALUE : video.facetData.videoMediaData.dvdReleaseDate.val;
+                long theatricalReleaseDate = video.facetData.videoMetaData.theatricalReleaseDate == null ? 0 : video.facetData.videoMetaData.theatricalReleaseDate.val;
+                long dvdReleaseDate = video.facetData.videoMediaData.dvdReleaseDate == null ? 0 : video.facetData.videoMediaData.dvdReleaseDate.val;
 
                 long theatricalReleaseDaysAgo = (ctx.getNowMillis() - theatricalReleaseDate) / MS_IN_DAY;
                 long dvdReleaseDaysAgo = (ctx.getNowMillis() - dvdReleaseDate) / MS_IN_DAY;
                 long currentAvailabilityDaysAgo = (ctx.getNowMillis() - currentAvailabilityDate) / MS_IN_DAY;
-
+                
                 boolean isTV = video.facetData.videoMetaData.isTV;
 
                 if(dvdReleaseDaysAgo <= -1000)
@@ -237,14 +255,37 @@ public class VideoNamedListModule {
                         }
                     }
                 }
-            }
+                
+                
+                if(isRecentlyAdded) {
+                	addTopNodeToList(VideoNamedListType.RECENTLY_ADDED_ED_VIDEOS);
+                	
+                	if(isTV) {
+                		addTopNodeToList(VideoNamedListType.RECENTLY_ADDED_TV_ED_VIDEOS);
+                	} else {
+                		addTopNodeToList(VideoNamedListType.RECENTLY_ADDED_NON_TV_ED_VIDEOS);
 
+                		if(theatricalReleaseDate != 0) {
+	                		calendar.setTimeInMillis(video.facetData.videoMetaData.theatricalReleaseDate.val);
+	                		int theatricalReleaseYear = calendar.get(Calendar.YEAR);
+	                		if(nodeType != constants.EPISODE && theatricalReleaseYear >= (currentYear-3)) {
+	                			addTopNodeToList(VideoNamedListType.RECENT_THEATRICAL_RELEASES_NON_TV_ED_VIDEOS);
+	                		}
+                		}
+                	}
+                	
+                }
+                
+                
+            }
+            
             if(topNodeVideoIdOrdinal == videoIdOrdinal) {
                 for(VideoEpisode ep : video.facetData.videoCollectionsData.videoEpisodes) {
                     int episodeOrdinal = videoOrdinalTracker.getVideoOrdinal(ep.deliverableVideo);
                     episodeList.set(episodeOrdinal);
                 }
             }
+            
         }
 
         private void addToList(VideoNamedListType type) {
@@ -253,8 +294,10 @@ public class VideoNamedListModule {
         }
 
         private void addTopNodeToList(VideoNamedListType type) {
-            ThreadSafeBitSet list = getNamedList(listsByName, type);
-            list.set(topNodeVideoIdOrdinal);
+        	if(!isSupplemental) {
+	            ThreadSafeBitSet list = getNamedList(listsByName, type);
+	            list.set(topNodeVideoIdOrdinal);
+        	}
         }
 
         private ThreadSafeBitSet getNamedList(ConcurrentHashMap<VideoNamedListType, ThreadSafeBitSet> videoLists, VideoNamedListType type) {
@@ -272,7 +315,7 @@ public class VideoNamedListModule {
             isAvailableForED = false;
             isAvailableIn3D = false;
             currentAvailabilityDate = 0;
-
+            
             if(video.facetData.videoMediaData != null && video.facetData.videoMediaData.isGoLive) {
                 for(VMSAvailabilityWindow window : video.countrySpecificData.mediaAvailabilityWindows) {
                     if(window.startDate.val <= ctx.getNowMillis() && window.endDate.val >= ctx.getNowMillis()) {
