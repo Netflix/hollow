@@ -8,6 +8,11 @@
 @rem Set local scope for the variables with windows NT shell
 if "%OS%"=="Windows_NT" setlocal
 
+set DIRNAME=%~dp0
+if "%DIRNAME%" == "" set DIRNAME=.
+set APP_BASE_NAME=%~n0
+set APP_HOME=%DIRNAME%
+
 @rem Netflix: Attempt to use $WORKSPACE/.gradle if we're not told otherwise
 if "%GRADLE_USER_HOME%"=="" (
     if NOT "%WORKSPACE%"=="" (
@@ -17,11 +22,6 @@ if "%GRADLE_USER_HOME%"=="" (
 
 @rem Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
 set DEFAULT_JVM_OPTS=
-
-set DIRNAME=%~dp0
-if "%DIRNAME%" == "" set DIRNAME=.
-set APP_BASE_NAME=%~n0
-set APP_HOME=%DIRNAME%
 
 @rem Find java.exe
 if defined JAVA_HOME goto findJavaFromJavaHome
@@ -53,7 +53,7 @@ echo location of your Java installation.
 goto fail
 
 :init
-@rem Get command-line arguments, handling Windowz variants
+@rem Get command-line arguments, handling Windows variants
 
 if not "%OS%" == "Windows_NT" goto win9xME_args
 if "%@eval[2+2]" == "4" goto 4NT_args
