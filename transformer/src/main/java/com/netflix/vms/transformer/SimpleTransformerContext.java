@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer;
 
+import java.util.Set;
+
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerFiles;
 import com.netflix.vms.transformer.common.TransformerLogger;
@@ -15,7 +17,7 @@ public class SimpleTransformerContext implements TransformerContext {
     private final TransformerMetricRecorder recorder;
     private final TransformerFiles files;
 
-    SimpleTransformerContext() {
+    public SimpleTransformerContext() {
         this(new SysoutTransformerLogger(), new NoOpMetricRecorder(), null);
     }
 
@@ -27,6 +29,8 @@ public class SimpleTransformerContext implements TransformerContext {
 
     private long now = System.currentTimeMillis();
     private long currentCycleId;
+    
+    private Set<Integer> fastlaneIds;
 
     @Override
     public void setCurrentCycleId(long cycleId) {
@@ -46,6 +50,16 @@ public class SimpleTransformerContext implements TransformerContext {
     @Override
     public long getNowMillis() {
         return now;
+    }
+    
+    @Override
+    public void setFastlaneIds(Set<Integer> fastlaneIds) {
+    	this.fastlaneIds = fastlaneIds;
+    }
+    
+    @Override
+    public Set<Integer> getFastlaneIds() {
+    	return fastlaneIds;
     }
 
     @Override

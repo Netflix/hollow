@@ -38,7 +38,7 @@ public class HermesVipAnnouncer implements VipAnnouncer {
 
     @Override
     public boolean announce(String vip, RegionEnum region, boolean canary, long announceVersion, long priorVersion) {
-        if(bigRedButton.get())
+        if(bigRedButton != null && bigRedButton.get())
             return false;
 
         String hermesTopic = canary ? HermesTopicProvider.getDataCanaryTopic(vip) : HermesTopicProvider.getHollowBlobTopic(vip);
@@ -144,28 +144,9 @@ public class HermesVipAnnouncer implements VipAnnouncer {
         }
 
         private static enum FastBlobType {
-            SNAPSHOT("snapshot"), DELTA("delta"), REVERSEDELTA("reversedelta"), STATE("state");
+            SNAPSHOT, DELTA, REVERSEDELTA, STATE;
 
-            private final String key;
-            private final String succLoadMetricName;
-            private final String failLoadMetricName;
-            FastBlobType(final String key) {
-                this.key = key;
-                this.succLoadMetricName = "vms_blob_" + key + "_load_success";
-                this.failLoadMetricName = "vms_blob_" + key + "_load_failed";
-            }
 
-            public String getKey() {
-                return key;
-            }
-
-            public String getSuccLoadMetricName() {
-                return succLoadMetricName;
-            }
-
-            public String getFailLoadMetricName() {
-                return failLoadMetricName;
-            }
         }
 
         @Override

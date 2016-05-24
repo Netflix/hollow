@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class HollowPublishWorkflowStager {
+public class HollowPublishWorkflowStager implements PublishWorkflowStager {
 
     /* dependencies */
     private final TransformerContext ctx;
@@ -61,6 +61,7 @@ public class HollowPublishWorkflowStager {
         exposePublicationHistory();
     }
 
+    @Override
     public void triggerPublish(long previousVersion, long newVersion) {
         jobCreator.beginStagingNewCycle();
 

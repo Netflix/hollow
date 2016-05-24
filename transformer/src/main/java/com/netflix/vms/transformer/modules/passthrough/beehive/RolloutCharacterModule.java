@@ -26,6 +26,10 @@ public class RolloutCharacterModule extends AbstractTransformModule {
 
     @Override
     public void transform() {
+    	/// short-circuit Fastlane
+    	if(ctx.getFastlaneIds() != null)
+    		return;
+    	
         Strings bottomLineKey = new Strings("Blade Bottom Line");
         Strings topLineKey = new Strings("Blade Top Line");
         Strings charBioKey = new Strings("Character Bio");

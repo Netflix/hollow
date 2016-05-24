@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer.modules.packages.contracts;
 
 import com.netflix.config.utils.Pair;
-import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
@@ -17,7 +16,6 @@ import com.netflix.vms.transformer.hollowoutput.LanguageRestrictions;
 import com.netflix.vms.transformer.hollowoutput.LanguageRights;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.Video;
-import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
 import java.io.InputStream;
@@ -27,14 +25,12 @@ import java.util.Properties;
 import org.apache.commons.io.IOUtils;
 
 public class LanguageRightsModule extends AbstractTransformModule {
-    private final HollowHashIndex videoRightsIdx;
     private final VMSHollowInputAPI api;
     private final Properties bcp47Mapping = new Properties();
 
     public LanguageRightsModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
         super(api, ctx, mapper);
         this.api = api;
-        this.videoRightsIdx = indexer.getHashIndex(IndexSpec.ALL_VIDEO_RIGHTS);
         InputStream istream = null;
         try {
             bcp47Mapping.load(this.getClass().getClassLoader().getResourceAsStream("bcp47.properties"));
@@ -48,7 +44,11 @@ public class LanguageRightsModule extends AbstractTransformModule {
 
     @Override
     public void transform() {
-        int numAdded = 0;
+    	/// short circuit FastLane
+    	if(ctx.getFastlaneIds() != null)
+    		return;
+    	
+    	
         Map<Pair<Integer, Integer>, LanguageRights> contractMovieRights = new HashMap<>();
 
         for (VideoRightsHollow videoRights_ : api.getAllVideoRightsHollow()) {

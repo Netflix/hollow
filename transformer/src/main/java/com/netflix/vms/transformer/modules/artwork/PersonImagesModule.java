@@ -25,6 +25,10 @@ public class PersonImagesModule extends ArtWorkModule{
 
     @Override
     public void transform() {
+    	/// short-circuit Fastlane
+    	if(ctx.getFastlaneIds() != null)
+    		return;
+    	
         Map<Integer, Set<Artwork>> artMap = new HashMap<>();
         for(PersonArtworkHollow artworkHollowInput : api.getAllPersonArtworkHollow()) {
             ArtworkLocaleListHollow locales = artworkHollowInput._getLocales();

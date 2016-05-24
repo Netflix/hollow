@@ -17,7 +17,7 @@ import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
 import com.netflix.vms.transformer.input.VMSInputDataVersionLogger;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
-import com.netflix.vms.transformer.publish.workflow.HollowPublishWorkflowStager;
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.util.VersionMinter;
 import java.io.File;
 import java.io.IOException;
@@ -28,14 +28,14 @@ public class TransformCycle {
     private final HollowClient inputClient;
     private final VMSTransformerWriteStateEngine outputStateEngine;
     private final TransformerContext ctx;
-    private final HollowPublishWorkflowStager publishWorkflowStager;
+    private final PublishWorkflowStager publishWorkflowStager;
     private final VersionMinter versionMinter;
 
     private long previousCycleNumber = Long.MIN_VALUE;
     private long currentCycleNumber = Long.MIN_VALUE;
     private int consecutiveCycleFailures = 0;
 
-    public TransformCycle(TransformerContext ctx, HollowPublishWorkflowStager publishStager, String converterVip, String transformerVip) {
+    public TransformCycle(TransformerContext ctx, PublishWorkflowStager publishStager, String converterVip, String transformerVip) {
         this.transformerVip = transformerVip;
         this.inputClient = new VMSInputDataClient(ctx.platformLibraries().getFileStore(), converterVip);
         this.outputStateEngine = new VMSTransformerWriteStateEngine();
@@ -98,6 +98,9 @@ public class TransformCycle {
 
 
     private void writeTheBlobFiles() {
+    	if(rollbackFastlaneStateEngineIfUnchanged())
+    		return;
+    	
         long startTime = System.currentTimeMillis();
 
         HollowBlobFileNamer fileNamer = new HollowBlobFileNamer(transformerVip);
@@ -134,6 +137,15 @@ public class TransformCycle {
 
         ctx.getMetricRecorder().recordMetric(WriteOutputDataDuration, endTime - startTime);
     }
+
+	private boolean rollbackFastlaneStateEngineIfUnchanged() {
+		if(ctx.getFastlaneIds() != null && previousCycleNumber != Long.MIN_VALUE && !outputStateEngine.hasChangedSinceLastCycle()) {
+    		outputStateEngine.resetToLastPrepareForNextCycle();
+    		ctx.getMetricRecorder().recordMetric(WriteOutputDataDuration, 0);
+    		return true;
+    	}
+		return false;
+	}
 
 
     public void submitToPublishWorkflow() {
