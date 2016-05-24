@@ -1,4 +1,4 @@
-package com.netflix.vms.transformer.resource.v1;
+package com.netflix.vms.transformer.rest;
 
 import com.google.inject.Inject;
 import com.netflix.appinfo.InstanceInfo;

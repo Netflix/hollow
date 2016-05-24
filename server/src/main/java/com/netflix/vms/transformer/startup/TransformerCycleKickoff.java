@@ -3,6 +3,8 @@ package com.netflix.vms.transformer.startup;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.WaitForNextCycle;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WaitForNextCycleDuration;
 
+import com.netflix.vms.transformer.rest.VMSPublishWorkflowHistoryAdmin;
+
 import com.google.inject.Inject;
 import com.netflix.aws.file.FileStore;
 import com.netflix.vms.transformer.TransformCycle;
@@ -19,7 +21,6 @@ import com.netflix.vms.transformer.publish.workflow.HollowPublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowConfig;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.fastlane.HollowFastlanePublishWorkflowStager;
-import com.netflix.vms.transformer.resource.v1.VMSPublishWorkflowHistoryAdmin;
 import com.netflix.vms.transformer.servlet.platform.TransformerServerPlatformLibraries;
 import com.netflix.vms.transformer.util.TransformerServerCassandraHelper;
 
