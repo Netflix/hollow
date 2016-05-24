@@ -1,6 +1,7 @@
 dependencies {
     compile project(':vms-transformer-common-interfaces')
     compile 'org.elasticsearch:elasticsearch:1.5.2'
+    compile 'netflix:mutation-stream-client:latest.release'
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.assertj:assertj-core:3.3+'

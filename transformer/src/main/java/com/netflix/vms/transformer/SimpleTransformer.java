@@ -3,6 +3,8 @@ package com.netflix.vms.transformer;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.IndividualTransformFailed;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.FailedProcessingIndividualHierarchies;
 
+import com.netflix.vms.transformer.fastlane.FastlaneIdsExpander;
+
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
@@ -112,11 +114,19 @@ public class SimpleTransformer {
         SimultaneousExecutor executor = new SimultaneousExecutor();
 
         this.videoNamedListModule = new VideoNamedListModule(ctx, cycleConstants, objectMapper);
+        
+        if(ctx.getFastlaneIds() != null) {
+        	FastlaneIdsExpander idExpander = new FastlaneIdsExpander(api, ctx);
+        	idExpander.expand();
+        }
 
         startTime = System.currentTimeMillis();
         int progressDivisor = getProgressDivisor();
         AtomicInteger processedCount = new AtomicInteger();
         for(VideoGeneralHollow videoGeneral : api.getAllVideoGeneralHollow()) {
+        	
+        	if(ctx.getFastlaneIds() != null && !ctx.getFastlaneIds().contains((int)videoGeneral._getVideoId()))
+        		continue;
 
             executor.execute(new Runnable() {
                 @Override
@@ -174,17 +184,17 @@ public class SimpleTransformer {
                 new ArtworkFormatModule(api, ctx, objectMapper),
                 new CacheDeploymentIntentModule(api, ctx, objectMapper),
                 new ArtworkTypeModule(api, ctx, objectMapper),
-
                 new ArtworkImageRecipeModule(api, ctx, objectMapper),
+                new EncodingProfileGroupModule(api, ctx, objectMapper),
                 new DefaultExtensionRecipeModule(api, ctx, objectMapper),
+                
+                new L10NMiscResourcesModule(api, ctx, objectMapper, indexer),
+                new LanguageRightsModule(api, ctx, objectMapper, indexer),
+                new TopNVideoDataModule(api, ctx, objectMapper),
                 new RolloutCharacterModule(api, ctx, objectMapper),
                 new RolloutVideoModule(api, ctx, objectMapper, indexer),
-                new EncodingProfileGroupModule(api, ctx, objectMapper),
-                new TopNVideoDataModule(api, ctx, objectMapper),
                 new PersonImagesModule(api, ctx, objectMapper, indexer),
-                new CharacterImagesModule(api, ctx, objectMapper, indexer),
-                new LanguageRightsModule(api, ctx, objectMapper, indexer),
-                new L10NMiscResourcesModule(api, ctx, objectMapper, indexer)
+                new CharacterImagesModule(api, ctx, objectMapper, indexer)
                 );
 
         // @formatter:on

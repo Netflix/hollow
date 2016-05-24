@@ -50,22 +50,13 @@ public class TransformerServerLogger implements TransformerLogger {
             String taggedMessage = tag.toString() + ": " + message;
             switch(severity) {
             case ERROR:
-                if(th == null)
-                    consoleLogger.error(taggedMessage, th);
-                else
-                    consoleLogger.error(taggedMessage);
+                consoleLogger.error(taggedMessage, th);
                 break;
             case WARN:
-                if(th == null)
-                    consoleLogger.warn(taggedMessage, th);
-                else
-                    consoleLogger.warn(taggedMessage);
+                consoleLogger.warn(taggedMessage, th);
                 break;
             case INFO:
-                if(th == null)
-                    consoleLogger.info(taggedMessage);
-                else
-                    consoleLogger.info(taggedMessage, th);
+                consoleLogger.info(taggedMessage, th);
                 break;
             }
 
