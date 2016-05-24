@@ -61,13 +61,15 @@ import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
 import com.netflix.vms.transformer.namedlist.NamedListCompletionModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule.VideoNamedListPopulator;
+
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class SimpleTransformer {
@@ -311,7 +313,7 @@ public class SimpleTransformer {
 
         VideoNamedListPopulator namedListPopulator = videoNamedListModule.getPopulator();
 
-        Map<Video, Map<ISOCountry, CompleteVideo>> globalVideoMap = new ConcurrentHashMap<>();
+        Map<Video, Map<ISOCountry, CompleteVideo>> globalVideoMap = new HashMap<>();
 
         // ----------------------
         // Process Complete Video
@@ -453,7 +455,7 @@ public class SimpleTransformer {
         Video video = completeVideo.id;
         Map<ISOCountry, CompleteVideo> countryMap = globalVideoMap.get(video);
         if (countryMap == null) {
-            countryMap = new ConcurrentHashMap<>();
+            countryMap = new TreeMap<>(countryComparator);
             globalVideoMap.put(video, countryMap);
         }
 
@@ -478,6 +480,18 @@ public class SimpleTransformer {
             countries.put(id, country);
         }
         return country;
+    }
+
+    private static Comparator<ISOCountry> countryComparator = new ISOCountryComparator();
+    private static class ISOCountryComparator implements Comparator<ISOCountry> {
+
+        @Override
+        public int compare(ISOCountry o1, ISOCountry o2) {
+            String s1 = new String(o1.id);
+            String s2 = new String(o2.id);
+            return s1.compareTo(s2);
+        }
+
     }
 
 }

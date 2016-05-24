@@ -18,7 +18,6 @@ public class ArtworkBasicPassthrough implements Cloneable {
     public List<__passthrough_string> personIdStrs = null;
     public NullablePrimitiveBoolean approval_state = null;
 
-    @Override
     public boolean equals(Object other) {
         if(other == this)  return true;
         if(!(other instanceof ArtworkBasicPassthrough))
@@ -59,7 +58,6 @@ public class ArtworkBasicPassthrough implements Cloneable {
         return true;
     }
 
-    @Override
     public int hashCode() {
         int hashCode = 1;
         hashCode = hashCode * 31 + (themes == null ? 1237 : themes.hashCode());
@@ -76,7 +74,6 @@ public class ArtworkBasicPassthrough implements Cloneable {
         return hashCode;
     }
 
-    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder("ArtworkBasicPassthrough{");
         builder.append("themes=").append(themes);
@@ -94,7 +91,6 @@ public class ArtworkBasicPassthrough implements Cloneable {
         return builder.toString();
     }
 
-    @Override
     public ArtworkBasicPassthrough clone() {
         try {
             ArtworkBasicPassthrough clone = (ArtworkBasicPassthrough)super.clone();
