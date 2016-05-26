@@ -33,9 +33,8 @@ public interface TransformerConfig {
 
     @DefaultValue("true")
     @PropertyName(name="vms.circuitBreakerEnabled.${0}")
-    public Boolean isCircuitBreakerEnabled(String ruleName);
+    public boolean isCircuitBreakerEnabled(String ruleName);
 
-    @DefaultValue("true")
     @PropertyName(name="vms.circuitBreakerEnabled.${0}.${1}")
     public Boolean isCircuitBreakerEnabled(String ruleName, String country);
 
