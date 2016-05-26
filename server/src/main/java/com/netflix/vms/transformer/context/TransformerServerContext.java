@@ -1,7 +1,8 @@
 package com.netflix.vms.transformer.context;
 
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
+import com.netflix.vms.transformer.common.config.OctoberSkyData;
 
+import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import java.io.IOException;
 import com.netflix.archaius.ConfigProxyFactory;
 import java.io.StringReader;
@@ -49,6 +50,7 @@ public class TransformerServerContext implements TransformerContext {
     public TransformerServerContext(
             TransformerServerLogger logger,
             Config config,
+            OctoberSkyData octoberSkyData,
             TransformerMetricRecorder metricRecorder,
             TransformerCassandraHelper poisonStatesHelper,
             TransformerCassandraHelper hollowValidationStats,
@@ -169,5 +171,11 @@ public class TransformerServerContext implements TransformerContext {
 
     	return builder.toString();
     }
+
+	@Override
+	public OctoberSkyData getOctoberSkyData() {
+		// TODO Auto-generated method stub
+		return null;
+	}
     
 }

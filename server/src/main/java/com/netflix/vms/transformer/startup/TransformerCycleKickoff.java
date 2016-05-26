@@ -3,6 +3,8 @@ package com.netflix.vms.transformer.startup;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.WaitForNextCycle;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WaitForNextCycleDuration;
 
+import com.netflix.vms.transformer.common.config.OctoberSkyData;
+
 import com.google.inject.Inject;
 import com.netflix.archaius.api.Config;
 import com.netflix.aws.file.FileStore;
@@ -33,11 +35,12 @@ public class TransformerCycleKickoff {
     		ElasticSearchClient esClient, 
     		TransformerConfig transformerConfig,
     		Config config,
+    		OctoberSkyData octoberSkyData,
     		FastlaneIdRetriever fastlaneIdRetriever) {
     	
         FileStore.useMultipartUploadWhenApplicable(true);
 
-        TransformerContext ctx = ctx(platformLibs, esClient, transformerConfig, config);
+        TransformerContext ctx = ctx(platformLibs, esClient, transformerConfig, config, octoberSkyData);
         PublishWorkflowStager publishStager = publishStager(ctx);
 
         TransformCycle cycle = new TransformCycle(
@@ -97,10 +100,11 @@ public class TransformerCycleKickoff {
         t.start();
     }
 
-    private final TransformerContext ctx(TransformerServerPlatformLibraries platformLibs, ElasticSearchClient esClient, TransformerConfig transformerConfig, Config config) {
+    private final TransformerContext ctx(TransformerServerPlatformLibraries platformLibs, ElasticSearchClient esClient, TransformerConfig transformerConfig, Config config, OctoberSkyData octoberSkyData) {
         return new TransformerServerContext(
                 new TransformerServerLogger(transformerConfig, esClient),
                 config,
+                octoberSkyData,
                 new AtlasTransformerMetricRecorder(),
                 new TransformerServerCassandraHelper(platformLibs.getAstyanax(), "cass_dpt", "vms_poison_states", "poison_states"),
                 new TransformerServerCassandraHelper(platformLibs.getAstyanax(), "cass_dpt", "hollow_publish_workflow", "hollow_validation_stats"),
