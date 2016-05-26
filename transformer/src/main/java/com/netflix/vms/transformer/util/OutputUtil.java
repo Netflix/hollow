@@ -9,4 +9,10 @@ public class OutputUtil {
 
         return new Integer(value);
     }
+
+    public static int sanitize(int value) {
+        if (java.lang.Integer.MIN_VALUE == value) return 0;
+
+        return value;
+    }
 }

@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import static com.netflix.vms.transformer.util.OutputUtil.sanitize;
+
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractAssetHollow;
@@ -242,7 +244,7 @@ public class VMSAvailabilityWindowModule {
                     maxPackageId = entry.getKey().val;
                     assetBcp47CodesFromMaxPackageId = entry.getValue().videoContractInfo.assetBcp47Codes;
                     videoFormatDescriptorsFromMaxPackageId = entry.getValue().videoPackageInfo.formats;
-                    prePromoDays = entry.getValue().videoContractInfo.prePromotionDays;
+                    prePromoDays = sanitize(entry.getValue().videoContractInfo.prePromotionDays);
                     cupTokens = entry.getValue().videoContractInfo.cupTokens;
                     if(isGoLive) {
                         if(isInWindow)
@@ -320,8 +322,7 @@ public class VMSAvailabilityWindowModule {
 
             videoImagesContractInfo.videoContractInfo.cupTokens = EMPTY_CUP_TOKENS;
             videoMediaContractInfo.videoContractInfo.assetBcp47Codes = rollup.getAssetBcp47Codes();
-            if(rollup.getPrePromoDays() != 0)
-                videoMediaContractInfo.videoContractInfo.prePromotionDays = rollup.getPrePromoDays();
+            videoMediaContractInfo.videoContractInfo.prePromotionDays = rollup.getPrePromoDays();
             videoMediaContractInfo.videoContractInfo.postPromotionDays = 0;
             videoMediaContractInfo.videoContractInfo.cupTokens = rollup.getCupTokens() != null ? rollup.getCupTokens() : DEFAULT_CUP_TOKENS;
             videoMediaContractInfo.videoPackageInfo.formats = rollup.getVideoFormatDescriptors();
