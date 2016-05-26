@@ -162,7 +162,7 @@ public class VMSAvailabilityWindowModule {
                             }
                         } else {
                             if(shouldFilterOutWindowInfo(isGoLive, contract, includedPackageDataCount, outputWindow.startDate.val, outputWindow.endDate.val)) {
-                                outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractId));
+                                outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractId, videoId));
 
                                 if(maxPackageId == 0) {
                                     bundledAssetsGroupId = (int)contractId;
@@ -188,7 +188,7 @@ public class VMSAvailabilityWindowModule {
 
                                 } else {
                                     /// packagedata not available -- use the contract only
-                                    windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(contract, country);
+                                    windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(contract, country, videoId);
                                     outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfo);
 
                                     if(maxPackageId == 0) {
@@ -210,7 +210,7 @@ public class VMSAvailabilityWindowModule {
 
                     }
                 } else {
-                    outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractIdHollow._getValue()));
+                    outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractIdHollow._getValue(), videoId));
 
                     if(maxPackageId == 0) {
                         bundledAssetsGroupId = (int)contractId;
