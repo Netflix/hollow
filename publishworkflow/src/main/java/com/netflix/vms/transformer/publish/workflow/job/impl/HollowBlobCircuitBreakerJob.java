@@ -53,7 +53,7 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
                 new SnapshotSizeCircuitBreaker(ctx, cycleVersion, snapshotFile.length()),
         };
 
-        this.circuitBreakersDisabled = !ctx.getConfig().areCircuitBreakersEnabled();
+        this.circuitBreakersDisabled = !ctx.getConfig().isCircuitBreakersEnabled();
     }
 
     @Override

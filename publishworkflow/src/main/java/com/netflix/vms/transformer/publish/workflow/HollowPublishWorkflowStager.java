@@ -41,12 +41,12 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     private CanaryValidationJob priorCycleCanaryValidationJob;
     private CanaryRollbackJob priorCycleCanaryRollbackJob;
 
-    public HollowPublishWorkflowStager(TransformerContext ctx, PublishWorkflowConfig config, String vip) {
-        this(ctx, config, new HollowBlobDataProvider(ctx), vip);
+    public HollowPublishWorkflowStager(TransformerContext ctx, String vip) {
+        this(ctx, new HollowBlobDataProvider(ctx), vip);
     }
 
-    private HollowPublishWorkflowStager(TransformerContext ctx, PublishWorkflowConfig config, HollowBlobDataProvider hollowBlobDataProvider, String vip) {
-        this(ctx, new DefaultHollowPublishJobCreator(ctx, hollowBlobDataProvider, new PlaybackMonkeyTester(), new ValidationVideoRanker(hollowBlobDataProvider), vip, config), vip);
+    private HollowPublishWorkflowStager(TransformerContext ctx, HollowBlobDataProvider hollowBlobDataProvider, String vip) {
+        this(ctx, new DefaultHollowPublishJobCreator(ctx, hollowBlobDataProvider, new PlaybackMonkeyTester(), new ValidationVideoRanker(hollowBlobDataProvider), vip), vip);
     }
 
     public HollowPublishWorkflowStager(TransformerContext ctx, HollowPublishJobCreator jobCreator, String vip) {

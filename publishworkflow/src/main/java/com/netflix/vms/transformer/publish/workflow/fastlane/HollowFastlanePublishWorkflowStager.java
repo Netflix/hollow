@@ -1,24 +1,22 @@
 package com.netflix.vms.transformer.publish.workflow.fastlane;
 
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
-
-import com.netflix.vms.transformer.publish.workflow.TransformerPublishWorkflowContext;
-import com.netflix.vms.transformer.publish.workflow.job.impl.HermesBlobAnnouncer;
-import com.netflix.vms.transformer.publish.workflow.job.impl.HermesTopicProvider;
-import com.netflix.vms.transformer.publish.workflow.job.impl.HermesVipAnnouncer;
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowConfig;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.videometadata.publish.PublishRegionProvider;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
+import com.netflix.vms.transformer.publish.workflow.TransformerPublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobDeleteFileJob;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob.PublishType;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJobScheduler;
 import com.netflix.vms.transformer.publish.workflow.job.impl.FastlaneHermesAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.impl.FileStoreHollowBlobPublishJob;
+import com.netflix.vms.transformer.publish.workflow.job.impl.HermesBlobAnnouncer;
+import com.netflix.vms.transformer.publish.workflow.job.impl.HermesTopicProvider;
+import com.netflix.vms.transformer.publish.workflow.job.impl.HermesVipAnnouncer;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,8 +31,8 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
     
     private PublishWorkflowContext ctx;
     
-    public HollowFastlanePublishWorkflowStager(TransformerContext ctx, PublishWorkflowConfig config, String vip) {
-        this.ctx = new TransformerPublishWorkflowContext(ctx, config,
+    public HollowFastlanePublishWorkflowStager(TransformerContext ctx, String vip) {
+        this.ctx = new TransformerPublishWorkflowContext(ctx, 
                 new HermesVipAnnouncer(
                         new HermesBlobAnnouncer(ctx.platformLibraries().getHermesPublisher(),
                                 HermesTopicProvider.HOLLOWBLOB_TOPIC_PREFIX),
@@ -49,7 +47,7 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
     @Override
     public void triggerPublish(long previousVersion, long newVersion) {
     	
-    	ctx = ctx.withCurrentLogger();
+    	ctx = ctx.withCurrentLoggerAndConfig();
 
         // Add publish jobs
         final Map<RegionEnum, List<PublicationJob>> regionalPublishJobs = addPublishJobsAllRegions(previousVersion, newVersion);

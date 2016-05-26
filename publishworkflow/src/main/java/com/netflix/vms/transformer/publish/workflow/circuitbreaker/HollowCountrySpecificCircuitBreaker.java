@@ -27,7 +27,7 @@ public abstract class HollowCountrySpecificCircuitBreaker extends HollowCircuitB
 
         CircuitBreakerResults results = runCircuitBreaker(stateEngine);
 
-        for(String country : ctx.getConfig().getSupportedCountrySet()) {
+        for(String country : ctx.getOctoberSkyData().getSupportedCountries()) {
             if(!comparedCountries.contains(country)
                     && !ctx.getConfig().isCircuitBreakerEnabled(getRuleName(), country)
                     && countryWasPreviouslyCompared(country)) {
