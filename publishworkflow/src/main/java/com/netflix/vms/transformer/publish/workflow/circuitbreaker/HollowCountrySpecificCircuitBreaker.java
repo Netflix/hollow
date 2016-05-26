@@ -28,8 +28,11 @@ public abstract class HollowCountrySpecificCircuitBreaker extends HollowCircuitB
         CircuitBreakerResults results = runCircuitBreaker(stateEngine);
 
         for(String country : ctx.getOctoberSkyData().getSupportedCountries()) {
+        	if(!isEnabled(country))
+        		continue;
+        		
             if(!comparedCountries.contains(country)
-                    && !ctx.getConfig().isCircuitBreakerEnabled(getRuleName(), country)
+                    && ctx.getConfig().isCircuitBreakerEnabled(getRuleName(), country)
                     && countryWasPreviouslyCompared(country)) {
                 results.addResult(false, "Rule " + getRuleName() + ": country " + country + " was previously compared, but no value was found this cycle.");
             }
@@ -43,8 +46,11 @@ public abstract class HollowCountrySpecificCircuitBreaker extends HollowCircuitB
     }
 
     protected CircuitBreakerResults compareMetric(String country, long value) {
+    	if(!isEnabled(country))
+    		return new CircuitBreakerResults(true, "Rule " + getRuleName() + ": disabled for country " + country);
+    	
         comparedCountries.add(country);
-        return compareMetric(metricName(country), value, ctx.getConfig().getCircuitBreakerThreshold(getRuleName(), country));
+        return compareMetric(metricName(country), value, getThreshold(country));
     }
 
     private boolean countryWasPreviouslyCompared(String country) {
@@ -53,6 +59,20 @@ public abstract class HollowCountrySpecificCircuitBreaker extends HollowCircuitB
 
     private String metricName(String country) {
         return getRuleName() + "_" + country;
+    }
+    
+    private double getThreshold(String country) {
+    	Double threshold = ctx.getConfig().getCircuitBreakerThreshold(getRuleName(), country);
+    	if(threshold != null)
+    		return threshold;
+    	return ctx.getConfig().getCircuitBreakerThreshold(getRuleName());
+    }
+    
+    private boolean isEnabled(String country) {
+    	Boolean enabled = ctx.getConfig().isCircuitBreakerEnabled(getRuleName(), country);
+    	if(enabled != null)
+    		return enabled;
+    	return ctx.getConfig().isCircuitBreakerEnabled(getRuleName());
     }
 
 }
