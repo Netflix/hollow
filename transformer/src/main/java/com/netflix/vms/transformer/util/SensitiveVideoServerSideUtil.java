@@ -3,6 +3,7 @@ package com.netflix.vms.transformer.util;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
+
 import java.util.Set;
 
 public class SensitiveVideoServerSideUtil {
@@ -52,6 +53,6 @@ public class SensitiveVideoServerSideUtil {
             }
         }
 
-        return new Date(minValue);
+        return OutputUtil.getRoundedDate(minValue);
     }
 }

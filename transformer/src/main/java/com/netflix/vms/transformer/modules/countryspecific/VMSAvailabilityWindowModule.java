@@ -25,6 +25,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.util.OutputUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -104,8 +105,8 @@ public class VMSAvailabilityWindowModule {
             int thisWindowBundledAssetsGroupId = 0;
 
             VMSAvailabilityWindow outputWindow = new VMSAvailabilityWindow();
-            outputWindow.startDate = new Date(window._getStartDate()._getValue());
-            outputWindow.endDate = new Date(window._getEndDate()._getValue());
+            outputWindow.startDate = OutputUtil.getRoundedDate(window._getStartDate()._getValue());
+            outputWindow.endDate = OutputUtil.getRoundedDate(window._getEndDate()._getValue());
             outputWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
 
             for(VideoRightsContractIdHollow contractIdHollow : window._getContractIds()) {

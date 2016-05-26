@@ -52,7 +52,7 @@ public class VideoDateUtil {
                     // NOTE: Beehive is expected to send us 1 based month and Calendar uses 0 based month.
                     // Ex: Beehive gives 1 for January and Calendar expects 0 for January
                     .set(Calendar.MONTH, month - 1).set(Calendar.YEAR, year).build();
-            result_ = new Date(cal.getTimeInMillis());
+            result_ = OutputUtil.getRoundedDate(cal.getTimeInMillis());
         }
         return result_;
     }
