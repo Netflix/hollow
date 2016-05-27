@@ -39,6 +39,7 @@ public class TransformerServerContext implements TransformerContext {
     private final PublicationHistoryConsumer publicationHistoryConsumer;
     private final TransformerMetricRecorder metricRecorder;
     private final Config config;
+    private final OctoberSkyData octoberSkyData;
 
     /* fields */
     private TransformerConfig staticConfig;
@@ -61,6 +62,7 @@ public class TransformerServerContext implements TransformerContext {
             PublicationHistoryConsumer publicationHistoryConsumer) {
         this.logger = logger;
         this.config = config;
+        this.octoberSkyData = octoberSkyData;
         this.staticConfig = createStaticConfig();
         this.metricRecorder = metricRecorder;
         this.poisonStatesHelper = poisonStatesHelper;
@@ -181,8 +183,7 @@ public class TransformerServerContext implements TransformerContext {
 
 	@Override
 	public OctoberSkyData getOctoberSkyData() {
-		// TODO Auto-generated method stub
-		return null;
+		return octoberSkyData;
 	}
     
 }
