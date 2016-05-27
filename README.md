@@ -21,11 +21,11 @@ Owned by: vms-team@netflix.com
     - Server: vms
 - Ci pipeline flowchart: [https://stash.corp.netflix.com/snippets/raw/e1a37a54f882423fafae1f2c9fc10269/Generated_ci_pipeline_flowchart.txt](https://stash.corp.netflix.com/snippets/raw/e1a37a54f882423fafae1f2c9fc10269/Generated_ci_pipeline_flowchart.txt)
 - Spinnaker:
-    - Application: [zzzvmstransformer](http://spinnaker.prod.netflix.net/#/applications/zzzvmstransformer)
+    - Application: [vmstransformer](http://spinnaker.prod.netflix.net/#/applications/vmstransformer)
     - Securitygroups:
-        - [Test Security Group](http://spinnaker.prod.netflix.net/#/applications/zzzvmstransformer/securityGroups)
-        - [Prod Security Group](http://spinnaker.prod.netflix.net/#/applications/zzzvmstransformer/securityGroups)
+        - [Test Security Group](http://spinnaker.prod.netflix.net/#/applications/vmstransformer/securityGroups)
+        - [Prod Security Group](http://spinnaker.prod.netflix.net/#/applications/vmstransformer/securityGroups)
     - Pipelines:
-        - [deploy-branch pipeline](http://spinnaker.prod.netflix.net/#/applications/zzzvmstransformer/executions?pipeline=deploy-branch)
-        - [deploy-to-test pipeline](http://spinnaker.prod.netflix.net/#/applications/zzzvmstransformer/executions?pipeline=deploy-to-test)
-        - [deploy-to-prod pipeline](http://spinnaker.prod.netflix.net/#/applications/zzzvmstransformer/executions?pipeline=deploy-to-prod)
+        - [deploy-branch pipeline](http://spinnaker.prod.netflix.net/#/applications/vmstransformer/executions?pipeline=deploy-branch)
+        - [deploy-to-test pipeline](http://spinnaker.prod.netflix.net/#/applications/vmstransformer/executions?pipeline=deploy-to-test)
+        - [deploy-to-prod pipeline](http://spinnaker.prod.netflix.net/#/applications/vmstransformer/executions?pipeline=deploy-to-prod)

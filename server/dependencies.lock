@@ -2311,6 +2311,7 @@
         "netflix:country-launch": {
             "locked": "12.12",
             "transitive": [
+                "com.netflix.vms.transformer:vms-transformer-io",
                 "netflix:account-metadata",
                 "netflix:account-partner-metadata",
                 "netflix:videometadata-client"
@@ -6461,6 +6462,7 @@
         "netflix:country-launch": {
             "locked": "12.12",
             "transitive": [
+                "com.netflix.vms.transformer:vms-transformer-io",
                 "netflix:account-metadata",
                 "netflix:account-partner-metadata",
                 "netflix:videometadata-client"
@@ -10611,6 +10613,7 @@
         "netflix:country-launch": {
             "locked": "12.12",
             "transitive": [
+                "com.netflix.vms.transformer:vms-transformer-io",
                 "netflix:account-metadata",
                 "netflix:account-partner-metadata",
                 "netflix:videometadata-client"
@@ -14758,6 +14761,7 @@
         "netflix:country-launch": {
             "locked": "12.12",
             "transitive": [
+                "com.netflix.vms.transformer:vms-transformer-io",
                 "netflix:account-metadata",
                 "netflix:account-partner-metadata",
                 "netflix:videometadata-client"
@@ -18930,6 +18934,7 @@
         "netflix:country-launch": {
             "locked": "12.12",
             "transitive": [
+                "com.netflix.vms.transformer:vms-transformer-io",
                 "netflix:account-metadata",
                 "netflix:account-partner-metadata",
                 "netflix:videometadata-client"
@@ -24172,6 +24177,7 @@
         "netflix:country-launch": {
             "locked": "12.12",
             "transitive": [
+                "com.netflix.vms.transformer:vms-transformer-io",
                 "netflix:account-metadata",
                 "netflix:account-partner-metadata",
                 "netflix:videometadata-client"
@@ -28319,6 +28325,7 @@
         "netflix:country-launch": {
             "locked": "12.12",
             "transitive": [
+                "com.netflix.vms.transformer:vms-transformer-io",
                 "netflix:account-metadata",
                 "netflix:account-partner-metadata",
                 "netflix:videometadata-client"
@@ -32492,6 +32499,7 @@
         "netflix:country-launch": {
             "locked": "12.12",
             "transitive": [
+                "com.netflix.vms.transformer:vms-transformer-io",
                 "netflix:account-metadata",
                 "netflix:account-partner-metadata",
                 "netflix:videometadata-client"
@@ -36729,6 +36737,7 @@
         "netflix:country-launch": {
             "locked": "12.12",
             "transitive": [
+                "com.netflix.vms.transformer:vms-transformer-io",
                 "netflix:account-metadata",
                 "netflix:account-partner-metadata",
                 "netflix:videometadata-client"
@@ -40966,6 +40975,7 @@
         "netflix:country-launch": {
             "locked": "12.12",
             "transitive": [
+                "com.netflix.vms.transformer:vms-transformer-io",
                 "netflix:account-metadata",
                 "netflix:account-partner-metadata",
                 "netflix:videometadata-client"
@@ -45203,6 +45213,7 @@
         "netflix:country-launch": {
             "locked": "12.12",
             "transitive": [
+                "com.netflix.vms.transformer:vms-transformer-io",
                 "netflix:account-metadata",
                 "netflix:account-partner-metadata",
                 "netflix:videometadata-client"

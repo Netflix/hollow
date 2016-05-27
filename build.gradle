@@ -53,8 +53,6 @@ subprojects {
             }
         }
         
-        
-    
         exclude group: 'com.oracle'
         exclude group: 'org.apache.ant', module: 'ant'
         exclude group: 'org.apache.cxf', module: 'cxf'
