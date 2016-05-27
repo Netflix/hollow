@@ -121,11 +121,7 @@ public class SimpleTransformer {
         
         final List<VideoGeneralHollow> allVideoGeneralObjects = new ArrayList<VideoGeneralHollow>(api.getAllVideoGeneralHollow());
         
-        final int numThreads = executor.getCorePoolSize();  
-        
-        for(int i=0;i<numThreads;i++) {
-        	final int threadNumber = i;
-        	
+        for(int i=0;i<executor.getCorePoolSize();i++) {
         	executor.execute(() -> {
         		PackageDataModule packageDataModule = new PackageDataModule(api, objectMapper, indexer);
         		VideoCollectionsModule collectionsModule = new VideoCollectionsModule(api, cycleConstants, indexer);
@@ -136,7 +132,8 @@ public class SimpleTransformer {
         		CountrySpecificDataModule countrySpecificModule = new CountrySpecificDataModule(api, ctx, cycleConstants, indexer);
         		VideoEpisodeCountryDecoratorModule countryDecoratorModule = new VideoEpisodeCountryDecoratorModule(api, objectMapper);
 
-        		for(int idx=threadNumber;idx<allVideoGeneralObjects.size();idx+=numThreads) {
+        		int idx = processedCount.getAndIncrement();
+        		while(idx < allVideoGeneralObjects.size()) {
         			VideoGeneralHollow videoGeneral = allVideoGeneralObjects.get(idx);
         			
         			if(shouldProcessHierarchy(videoGeneral)) {
@@ -170,11 +167,13 @@ public class SimpleTransformer {
 		                }
 	        			
         			}
+        			
+        			if (idx % progressDivisor == 0) {
+        				ctx.getLogger().info(LogTag.TransformProgress, ("finished percent=" + (idx / progressDivisor)));
+        			}
+        			
+        			idx = processedCount.getAndIncrement();
         		}
-                int count = processedCount.incrementAndGet();
-                if (count % progressDivisor == 0) {
-                    ctx.getLogger().info(LogTag.TransformProgress, ("finished percent=" + (count / progressDivisor)));
-                }
         	});
         	
         }
