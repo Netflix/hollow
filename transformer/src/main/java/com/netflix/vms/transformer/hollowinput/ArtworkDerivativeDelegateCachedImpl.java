@@ -9,8 +9,6 @@ import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 public class ArtworkDerivativeDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, ArtworkDerivativeDelegate {
 
     private final int recipeNameOrdinal;
-    private final int fileNameOrdinal;
-    private final Long imageId;
     private final int cdnOriginServerIdOrdinal;
     private final Long width;
     private final int cdnDirectoryOrdinal;
@@ -23,8 +21,6 @@ public class ArtworkDerivativeDelegateCachedImpl extends HollowObjectAbstractDel
 
     public ArtworkDerivativeDelegateCachedImpl(ArtworkDerivativeTypeAPI typeAPI, int ordinal) {
         this.recipeNameOrdinal = typeAPI.getRecipeNameOrdinal(ordinal);
-        this.fileNameOrdinal = typeAPI.getFileNameOrdinal(ordinal);
-        this.imageId = typeAPI.getImageIdBoxed(ordinal);
         this.cdnOriginServerIdOrdinal = typeAPI.getCdnOriginServerIdOrdinal(ordinal);
         this.width = typeAPI.getWidthBoxed(ordinal);
         this.cdnDirectoryOrdinal = typeAPI.getCdnDirectoryOrdinal(ordinal);
@@ -38,18 +34,6 @@ public class ArtworkDerivativeDelegateCachedImpl extends HollowObjectAbstractDel
 
     public int getRecipeNameOrdinal(int ordinal) {
         return recipeNameOrdinal;
-    }
-
-    public int getFileNameOrdinal(int ordinal) {
-        return fileNameOrdinal;
-    }
-
-    public long getImageId(int ordinal) {
-        return imageId.longValue();
-    }
-
-    public Long getImageIdBoxed(int ordinal) {
-        return imageId;
     }
 
     public int getCdnOriginServerIdOrdinal(int ordinal) {

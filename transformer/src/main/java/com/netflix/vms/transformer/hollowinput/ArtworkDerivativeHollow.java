@@ -16,21 +16,6 @@ public class ArtworkDerivativeHollow extends HollowObject {
         return  api().getStringHollow(refOrdinal);
     }
 
-    public StringHollow _getFileName() {
-        int refOrdinal = delegate().getFileNameOrdinal(ordinal);
-        if(refOrdinal == -1)
-            return null;
-        return  api().getStringHollow(refOrdinal);
-    }
-
-    public long _getImageId() {
-        return delegate().getImageId(ordinal);
-    }
-
-    public Long _getImageIdBoxed() {
-        return delegate().getImageIdBoxed(ordinal);
-    }
-
     public StringHollow _getCdnOriginServerId() {
         int refOrdinal = delegate().getCdnOriginServerIdOrdinal(ordinal);
         if(refOrdinal == -1)

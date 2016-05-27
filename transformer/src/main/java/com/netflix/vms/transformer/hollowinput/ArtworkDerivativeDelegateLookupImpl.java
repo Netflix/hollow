@@ -16,18 +16,6 @@ public class ArtworkDerivativeDelegateLookupImpl extends HollowObjectAbstractDel
         return typeAPI.getRecipeNameOrdinal(ordinal);
     }
 
-    public int getFileNameOrdinal(int ordinal) {
-        return typeAPI.getFileNameOrdinal(ordinal);
-    }
-
-    public long getImageId(int ordinal) {
-        return typeAPI.getImageId(ordinal);
-    }
-
-    public Long getImageIdBoxed(int ordinal) {
-        return typeAPI.getImageIdBoxed(ordinal);
-    }
-
     public int getCdnOriginServerIdOrdinal(int ordinal) {
         return typeAPI.getCdnOriginServerIdOrdinal(ordinal);
     }
