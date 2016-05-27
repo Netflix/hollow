@@ -12898,7 +12898,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow-diff-ui": {
-            "locked": "1.4",
+            "locked": "1.5",
             "requested": "latest.release"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -15383,7 +15383,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow-diff-ui": {
-            "locked": "1.4",
+            "locked": "1.5",
             "requested": "latest.release"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -17868,7 +17868,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow-diff-ui": {
-            "locked": "1.4",
+            "locked": "1.5",
             "requested": "latest.release"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -20353,7 +20353,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow-diff-ui": {
-            "locked": "1.4",
+            "locked": "1.5",
             "requested": "latest.release"
         },
         "com.netflix.hystrix:hystrix-core": {
