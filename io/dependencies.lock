@@ -122,7 +122,8 @@
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
@@ -140,7 +141,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -157,7 +159,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
@@ -1579,6 +1582,12 @@
                 "netflix:concurrent"
             ]
         },
+        "netflix:base-server-explorer": {
+            "locked": "2.1573.0",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
         "netflix:base-server-plugins": {
             "locked": "1.16.0",
             "transitive": [
@@ -1602,6 +1611,10 @@
             "transitive": [
                 "netflix:awsutils"
             ]
+        },
+        "netflix:country-launch": {
+            "locked": "12.12",
+            "requested": "latest.release"
         },
         "netflix:epic-plugin": {
             "locked": "1.54.0",
@@ -1676,7 +1689,8 @@
         "netflix:hermes": {
             "locked": "1.162.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vms-transformer-common-interfaces",
+                "netflix:country-launch"
             ]
         },
         "netflix:jarversions": {
@@ -1808,6 +1822,7 @@
             "locked": "2.41",
             "transitive": [
                 "netflix:base-server",
+                "netflix:country-launch",
                 "netflix:nf-filter"
             ]
         },
@@ -2722,7 +2737,8 @@
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
@@ -2740,7 +2756,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -2757,7 +2774,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
@@ -4179,6 +4197,12 @@
                 "netflix:concurrent"
             ]
         },
+        "netflix:base-server-explorer": {
+            "locked": "2.1573.0",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
         "netflix:base-server-plugins": {
             "locked": "1.16.0",
             "transitive": [
@@ -4202,6 +4226,10 @@
             "transitive": [
                 "netflix:awsutils"
             ]
+        },
+        "netflix:country-launch": {
+            "locked": "12.12",
+            "requested": "latest.release"
         },
         "netflix:epic-plugin": {
             "locked": "1.54.0",
@@ -4276,7 +4304,8 @@
         "netflix:hermes": {
             "locked": "1.162.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vms-transformer-common-interfaces",
+                "netflix:country-launch"
             ]
         },
         "netflix:jarversions": {
@@ -4408,6 +4437,7 @@
             "locked": "2.41",
             "transitive": [
                 "netflix:base-server",
+                "netflix:country-launch",
                 "netflix:nf-filter"
             ]
         },
@@ -5322,7 +5352,8 @@
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
@@ -5340,7 +5371,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -5357,7 +5389,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
@@ -6779,6 +6812,12 @@
                 "netflix:concurrent"
             ]
         },
+        "netflix:base-server-explorer": {
+            "locked": "2.1573.0",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
         "netflix:base-server-plugins": {
             "locked": "1.16.0",
             "transitive": [
@@ -6802,6 +6841,10 @@
             "transitive": [
                 "netflix:awsutils"
             ]
+        },
+        "netflix:country-launch": {
+            "locked": "12.12",
+            "requested": "latest.release"
         },
         "netflix:epic-plugin": {
             "locked": "1.54.0",
@@ -6876,7 +6919,8 @@
         "netflix:hermes": {
             "locked": "1.162.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vms-transformer-common-interfaces",
+                "netflix:country-launch"
             ]
         },
         "netflix:jarversions": {
@@ -7008,6 +7052,7 @@
             "locked": "2.41",
             "transitive": [
                 "netflix:base-server",
+                "netflix:country-launch",
                 "netflix:nf-filter"
             ]
         },
@@ -7922,7 +7967,8 @@
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
@@ -7940,7 +7986,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -7957,7 +8004,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
@@ -9379,6 +9427,12 @@
                 "netflix:concurrent"
             ]
         },
+        "netflix:base-server-explorer": {
+            "locked": "2.1573.0",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
         "netflix:base-server-plugins": {
             "locked": "1.16.0",
             "transitive": [
@@ -9402,6 +9456,10 @@
             "transitive": [
                 "netflix:awsutils"
             ]
+        },
+        "netflix:country-launch": {
+            "locked": "12.12",
+            "requested": "latest.release"
         },
         "netflix:epic-plugin": {
             "locked": "1.54.0",
@@ -9476,7 +9534,8 @@
         "netflix:hermes": {
             "locked": "1.162.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vms-transformer-common-interfaces",
+                "netflix:country-launch"
             ]
         },
         "netflix:jarversions": {
@@ -9608,6 +9667,7 @@
             "locked": "2.41",
             "transitive": [
                 "netflix:base-server",
+                "netflix:country-launch",
                 "netflix:nf-filter"
             ]
         },
@@ -10621,7 +10681,8 @@
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
@@ -10639,7 +10700,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -10656,7 +10718,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
@@ -12078,6 +12141,12 @@
                 "netflix:concurrent"
             ]
         },
+        "netflix:base-server-explorer": {
+            "locked": "2.1573.0",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
         "netflix:base-server-plugins": {
             "locked": "1.16.0",
             "transitive": [
@@ -12101,6 +12170,10 @@
             "transitive": [
                 "netflix:awsutils"
             ]
+        },
+        "netflix:country-launch": {
+            "locked": "12.12",
+            "requested": "latest.release"
         },
         "netflix:epic-plugin": {
             "locked": "1.54.0",
@@ -12175,7 +12248,8 @@
         "netflix:hermes": {
             "locked": "1.162.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vms-transformer-common-interfaces",
+                "netflix:country-launch"
             ]
         },
         "netflix:jarversions": {
@@ -12307,6 +12381,7 @@
             "locked": "2.41",
             "transitive": [
                 "netflix:base-server",
+                "netflix:country-launch",
                 "netflix:nf-filter"
             ]
         },
@@ -13221,7 +13296,8 @@
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
@@ -13239,7 +13315,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -13256,7 +13333,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
@@ -14679,6 +14757,12 @@
                 "netflix:concurrent"
             ]
         },
+        "netflix:base-server-explorer": {
+            "locked": "2.1573.0",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
         "netflix:base-server-plugins": {
             "locked": "1.16.0",
             "transitive": [
@@ -14702,6 +14786,10 @@
             "transitive": [
                 "netflix:awsutils"
             ]
+        },
+        "netflix:country-launch": {
+            "locked": "12.12",
+            "requested": "latest.release"
         },
         "netflix:epic-plugin": {
             "locked": "1.54.0",
@@ -14776,7 +14864,8 @@
         "netflix:hermes": {
             "locked": "1.162.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vms-transformer-common-interfaces",
+                "netflix:country-launch"
             ]
         },
         "netflix:jarversions": {
@@ -14908,6 +14997,7 @@
             "locked": "2.41",
             "transitive": [
                 "netflix:base-server",
+                "netflix:country-launch",
                 "netflix:nf-filter"
             ]
         },
@@ -15827,7 +15917,8 @@
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
@@ -15845,7 +15936,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -15862,7 +15954,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
@@ -17285,6 +17378,12 @@
                 "netflix:concurrent"
             ]
         },
+        "netflix:base-server-explorer": {
+            "locked": "2.1573.0",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
         "netflix:base-server-plugins": {
             "locked": "1.16.0",
             "transitive": [
@@ -17308,6 +17407,10 @@
             "transitive": [
                 "netflix:awsutils"
             ]
+        },
+        "netflix:country-launch": {
+            "locked": "12.12",
+            "requested": "latest.release"
         },
         "netflix:epic-plugin": {
             "locked": "1.54.0",
@@ -17382,7 +17485,8 @@
         "netflix:hermes": {
             "locked": "1.162.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vms-transformer-common-interfaces",
+                "netflix:country-launch"
             ]
         },
         "netflix:jarversions": {
@@ -17514,6 +17618,7 @@
             "locked": "2.41",
             "transitive": [
                 "netflix:base-server",
+                "netflix:country-launch",
                 "netflix:nf-filter"
             ]
         },
@@ -18433,7 +18538,8 @@
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
@@ -18451,7 +18557,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -18468,7 +18575,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
@@ -19891,6 +19999,12 @@
                 "netflix:concurrent"
             ]
         },
+        "netflix:base-server-explorer": {
+            "locked": "2.1573.0",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
         "netflix:base-server-plugins": {
             "locked": "1.16.0",
             "transitive": [
@@ -19914,6 +20028,10 @@
             "transitive": [
                 "netflix:awsutils"
             ]
+        },
+        "netflix:country-launch": {
+            "locked": "12.12",
+            "requested": "latest.release"
         },
         "netflix:epic-plugin": {
             "locked": "1.54.0",
@@ -19988,7 +20106,8 @@
         "netflix:hermes": {
             "locked": "1.162.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vms-transformer-common-interfaces",
+                "netflix:country-launch"
             ]
         },
         "netflix:jarversions": {
@@ -20120,6 +20239,7 @@
             "locked": "2.41",
             "transitive": [
                 "netflix:base-server",
+                "netflix:country-launch",
                 "netflix:nf-filter"
             ]
         },
@@ -21039,7 +21159,8 @@
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
@@ -21057,7 +21178,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -21074,7 +21196,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
@@ -22497,6 +22620,12 @@
                 "netflix:concurrent"
             ]
         },
+        "netflix:base-server-explorer": {
+            "locked": "2.1573.0",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
         "netflix:base-server-plugins": {
             "locked": "1.16.0",
             "transitive": [
@@ -22520,6 +22649,10 @@
             "transitive": [
                 "netflix:awsutils"
             ]
+        },
+        "netflix:country-launch": {
+            "locked": "12.12",
+            "requested": "latest.release"
         },
         "netflix:epic-plugin": {
             "locked": "1.54.0",
@@ -22594,7 +22727,8 @@
         "netflix:hermes": {
             "locked": "1.162.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vms-transformer-common-interfaces",
+                "netflix:country-launch"
             ]
         },
         "netflix:jarversions": {
@@ -22726,6 +22860,7 @@
             "locked": "2.41",
             "transitive": [
                 "netflix:base-server",
+                "netflix:country-launch",
                 "netflix:nf-filter"
             ]
         },
