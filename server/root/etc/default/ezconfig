@@ -1,8 +1,11 @@
 # nflx-ezconfig application configuration file. See http://go/ezconfig
+
+# see ezconfig.${EC2_INSTANCE_TYPE} for type specific configs
+CONFIG_SELECT = $EC2_INSTANCE_TYPE
 TOMCAT_VERSION = 8
 
 JAVA_GC          = PAROLD
-
+JAVA_HEAPPERCENT = 80
 JAVA_EXPLICITNEW = enabled
 JAVA_NEWPERCENT  = 10
 
