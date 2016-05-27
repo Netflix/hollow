@@ -1,7 +1,8 @@
 package com.netflix.vms.transformer.context;
 
-import com.netflix.vms.transformer.common.config.OctoberSkyData;
+import java.util.Map;
 
+import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import java.io.IOException;
 import com.netflix.archaius.ConfigProxyFactory;
@@ -157,6 +158,12 @@ public class TransformerServerContext implements TransformerContext {
 		} catch (IOException e) {
 			logger.error(LogTag.ConfigurationFailure, "Failed to parse properties String: " + getPropertiesString());
 		}
+    	
+    	/// log all property values
+    	for(Map.Entry<Object, Object> entry : props.entrySet())
+    		logger.info(LogTag.PropertyValue, "key=" + entry.getKey() + " value=" + entry.getValue());
+    	
+    	
     	return new ConfigProxyFactory(new MapConfig(props)).newProxy(TransformerConfig.class);
     }
 
