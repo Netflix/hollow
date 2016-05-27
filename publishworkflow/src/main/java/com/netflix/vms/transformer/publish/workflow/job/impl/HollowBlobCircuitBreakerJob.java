@@ -3,6 +3,8 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.CircuitBreaker;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleFailed;
 
+import java.util.Collections;
+
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.servo.monitor.DynamicCounter;
@@ -26,7 +28,10 @@ import java.util.concurrent.FutureTask;
 import org.apache.commons.lang.StringUtils;
 
 public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
-    private final HollowBlobDataProvider hollowBlobDataProvider;
+
+	public static List<String> CIRCUIT_BREAKER_NAMES = Collections.emptyList();
+	
+	private final HollowBlobDataProvider hollowBlobDataProvider;
     private final HollowCircuitBreaker circuitBreakerRules[];
 
     private final boolean circuitBreakersDisabled;
@@ -35,8 +40,6 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
         super(ctx, ctx.getVip(), cycleVersion, snapshotFile, deltaFile, reverseDeltaFile);
         this.hollowBlobDataProvider = hollowBlobDataProvider;
 
-        //// add your circuit breakers here.
-        //// IMPORTANT: don't forget to update ClusterConfigModule.java
         this.circuitBreakerRules = new HollowCircuitBreaker[] {
                 new DuplicateDetectionCircuitBreaker(ctx, cycleVersion),
                 new CertificationSystemCircuitBreaker(ctx, cycleVersion),
@@ -52,9 +55,18 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
                 new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "WmDrmKey"),
                 new SnapshotSizeCircuitBreaker(ctx, cycleVersion, snapshotFile.length()),
         };
+        
+        populateCircuitBreakerNames();
 
         this.circuitBreakersDisabled = !ctx.getConfig().isCircuitBreakersEnabled();
     }
+
+	private void populateCircuitBreakerNames() {
+		CIRCUIT_BREAKER_NAMES = new ArrayList<String>();
+        for(HollowCircuitBreaker circuitBreaker : circuitBreakerRules) {
+        	CIRCUIT_BREAKER_NAMES.add(circuitBreaker.getRuleName());
+        }
+	}
 
     @Override
     protected boolean executeJob() {
