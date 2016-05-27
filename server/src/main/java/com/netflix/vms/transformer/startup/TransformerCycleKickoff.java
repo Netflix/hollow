@@ -3,24 +3,25 @@ package com.netflix.vms.transformer.startup;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.WaitForNextCycle;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WaitForNextCycleDuration;
 
-import com.netflix.vms.transformer.rest.VMSPublishWorkflowHistoryAdmin;
+import com.netflix.vms.transformer.common.config.OctoberSkyData;
 
 import com.google.inject.Inject;
+import com.netflix.archaius.api.Config;
 import com.netflix.aws.file.FileStore;
 import com.netflix.vms.transformer.TransformCycle;
-import com.netflix.vms.transformer.TransformerServerContext;
 import com.netflix.vms.transformer.atlas.AtlasTransformerMetricRecorder;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
+import com.netflix.vms.transformer.context.TransformerServerContext;
 import com.netflix.vms.transformer.elasticsearch.ElasticSearchClient;
 import com.netflix.vms.transformer.fastlane.FastlaneIdRetriever;
 import com.netflix.vms.transformer.io.LZ4VMSTransformerFiles;
 import com.netflix.vms.transformer.logger.TransformerServerLogger;
 import com.netflix.vms.transformer.publish.workflow.HollowPublishWorkflowStager;
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowConfig;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.fastlane.HollowFastlanePublishWorkflowStager;
+import com.netflix.vms.transformer.rest.VMSPublishWorkflowHistoryAdmin;
 import com.netflix.vms.transformer.servlet.platform.TransformerServerPlatformLibraries;
 import com.netflix.vms.transformer.util.TransformerServerCassandraHelper;
 
@@ -32,19 +33,21 @@ public class TransformerCycleKickoff {
     public TransformerCycleKickoff(
     		TransformerServerPlatformLibraries platformLibs, 
     		ElasticSearchClient esClient, 
-    		TransformerConfig config,
+    		TransformerConfig transformerConfig,
+    		Config config,
+    		OctoberSkyData octoberSkyData,
     		FastlaneIdRetriever fastlaneIdRetriever) {
     	
         FileStore.useMultipartUploadWhenApplicable(true);
 
-        TransformerContext ctx = ctx(platformLibs, esClient, config);
-        PublishWorkflowStager publishStager = publishStager(ctx, config);
+        TransformerContext ctx = ctx(platformLibs, esClient, transformerConfig, config, octoberSkyData);
+        PublishWorkflowStager publishStager = publishStager(ctx);
 
         TransformCycle cycle = new TransformCycle(
                                             ctx,
                                             publishStager,
-                                            config.getConverterVip(),
-                                            config.getTransformerVip());
+                                            transformerConfig.getConverterVip(),
+                                            transformerConfig.getTransformerVip());
 
         Thread t = new Thread(new Runnable() {
             private long previousCycleStartTime;
@@ -54,7 +57,7 @@ public class TransformerCycleKickoff {
                 while(true) {
                     try {
                     	waitForMinCycleTimeToPass();
-                    	if(isFastlane(config))
+                    	if(isFastlane(ctx.getConfig()))
                     		setUpFastlaneContext();
 	                    cycle.cycle();
                     } catch(Throwable th) {
@@ -64,7 +67,7 @@ public class TransformerCycleKickoff {
             }
 
             private void waitForMinCycleTimeToPass() {
-            	if(isFastlane(config))
+            	if(isFastlane(ctx.getConfig()))
             		return;
             	
                 long timeSinceLastCycle = System.currentTimeMillis() - previousCycleStartTime;
@@ -97,9 +100,11 @@ public class TransformerCycleKickoff {
         t.start();
     }
 
-    private final TransformerContext ctx(TransformerServerPlatformLibraries platformLibs, ElasticSearchClient esClient, TransformerConfig config) {
+    private final TransformerContext ctx(TransformerServerPlatformLibraries platformLibs, ElasticSearchClient esClient, TransformerConfig transformerConfig, Config config, OctoberSkyData octoberSkyData) {
         return new TransformerServerContext(
-                new TransformerServerLogger(config, esClient),
+                new TransformerServerLogger(transformerConfig, esClient),
+                config,
+                octoberSkyData,
                 new AtlasTransformerMetricRecorder(),
                 new TransformerServerCassandraHelper(platformLibs.getAstyanax(), "cass_dpt", "vms_poison_states", "poison_states"),
                 new TransformerServerCassandraHelper(platformLibs.getAstyanax(), "cass_dpt", "hollow_publish_workflow", "hollow_validation_stats"),
@@ -109,13 +114,11 @@ public class TransformerCycleKickoff {
                 (history) -> { VMSPublishWorkflowHistoryAdmin.history = history; });
     }
 
-    private final PublishWorkflowStager publishStager(TransformerContext ctx, TransformerConfig cfg) {
-    	PublishWorkflowConfig pubConfig = new PublishWorkflowConfig();
+    private final PublishWorkflowStager publishStager(TransformerContext ctx) {
+    	if(isFastlane(ctx.getConfig()))
+    		return new HollowFastlanePublishWorkflowStager(ctx, ctx.getConfig().getTransformerVip());
     	
-    	if(isFastlane(cfg))
-    		return new HollowFastlanePublishWorkflowStager(ctx, pubConfig, cfg.getTransformerVip());
-    	
-        return new HollowPublishWorkflowStager(ctx, pubConfig, cfg.getTransformerVip());
+        return new HollowPublishWorkflowStager(ctx, ctx.getConfig().getTransformerVip());
     }
     
     private boolean isFastlane(TransformerConfig cfg) {

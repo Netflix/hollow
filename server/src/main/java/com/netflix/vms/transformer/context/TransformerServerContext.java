@@ -1,5 +1,17 @@
-package com.netflix.vms.transformer;
+package com.netflix.vms.transformer.context;
 
+import java.util.Map;
+
+import com.netflix.vms.transformer.common.config.OctoberSkyData;
+import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
+import java.io.IOException;
+import com.netflix.archaius.ConfigProxyFactory;
+import java.io.StringReader;
+import java.util.Properties;
+import java.util.Iterator;
+import com.netflix.archaius.api.Config;
+import com.netflix.archaius.config.MapConfig;
+import com.netflix.vms.transformer.common.config.TransformerConfig;
 import java.util.Set;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.logger.TransformerServerLogger;
@@ -26,8 +38,10 @@ public class TransformerServerContext implements TransformerContext {
     private final TransformerPlatformLibraries platformLibraries;
     private final PublicationHistoryConsumer publicationHistoryConsumer;
     private final TransformerMetricRecorder metricRecorder;
+    private final Config config;
 
     /* fields */
+    private TransformerConfig staticConfig;
     private TransformerServerLogger logger;
     private long currentCycleId;
     private long now = System.currentTimeMillis();
@@ -36,6 +50,8 @@ public class TransformerServerContext implements TransformerContext {
 
     public TransformerServerContext(
             TransformerServerLogger logger,
+            Config config,
+            OctoberSkyData octoberSkyData,
             TransformerMetricRecorder metricRecorder,
             TransformerCassandraHelper poisonStatesHelper,
             TransformerCassandraHelper hollowValidationStats,
@@ -44,6 +60,8 @@ public class TransformerServerContext implements TransformerContext {
             TransformerPlatformLibraries platformLibraries,
             PublicationHistoryConsumer publicationHistoryConsumer) {
         this.logger = logger;
+        this.config = config;
+        this.staticConfig = createStaticConfig();
         this.metricRecorder = metricRecorder;
         this.poisonStatesHelper = poisonStatesHelper;
         this.hollowValidationStats = hollowValidationStats;
@@ -57,6 +75,7 @@ public class TransformerServerContext implements TransformerContext {
     public void setCurrentCycleId(long currentCycleId) {
         this.currentCycleId = currentCycleId;
         this.logger = logger.withCurrentCycleId(currentCycleId);
+        this.staticConfig = createStaticConfig();
     }
 
     @Override
@@ -88,6 +107,11 @@ public class TransformerServerContext implements TransformerContext {
     public TransformerLogger getLogger() {
         return logger;
     }
+	
+	@Override
+	public TransformerConfig getConfig() {
+		return staticConfig;
+	}
 
     @Override
     public TransformerMetricRecorder getMetricRecorder() {
@@ -123,4 +147,42 @@ public class TransformerServerContext implements TransformerContext {
     public Consumer<PublicationHistory> getPublicationHistoryConsumer() {
         return publicationHistoryConsumer;
     }
+    
+    private TransformerConfig createStaticConfig() {
+    	System.out.println(getPropertiesString());
+    	
+    	
+    	Properties props = new Properties();
+    	try {
+			props.load(new StringReader(getPropertiesString()));
+		} catch (IOException e) {
+			logger.error(LogTag.ConfigurationFailure, "Failed to parse properties String: " + getPropertiesString());
+		}
+    	
+    	/// log all property values
+    	for(Map.Entry<Object, Object> entry : props.entrySet())
+    		logger.info(LogTag.PropertyValue, "key=" + entry.getKey() + " value=" + entry.getValue());
+    	
+    	
+    	return new ConfigProxyFactory(new MapConfig(props)).newProxy(TransformerConfig.class);
+    }
+
+    public String getPropertiesString() {
+    	StringBuilder builder = new StringBuilder();
+    	Iterator<String> iter = config.getKeys("vms.");
+    	
+    	while(iter.hasNext()) {
+    		String key = iter.next();
+			builder.append(key).append("=").append(config.getString(key)).append("\n");
+    	}
+
+    	return builder.toString();
+    }
+
+	@Override
+	public OctoberSkyData getOctoberSkyData() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+    
 }

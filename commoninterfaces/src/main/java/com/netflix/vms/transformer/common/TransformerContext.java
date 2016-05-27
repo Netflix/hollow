@@ -1,7 +1,9 @@
 package com.netflix.vms.transformer.common;
 
-import java.util.Set;
+import com.netflix.vms.transformer.common.config.OctoberSkyData;
 
+import com.netflix.vms.transformer.common.config.TransformerConfig;
+import java.util.Set;
 import java.util.function.Consumer;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
 import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
@@ -21,6 +23,8 @@ public interface TransformerContext {
     Set<Integer> getFastlaneIds();
 
     TransformerLogger getLogger();
+    
+    TransformerConfig getConfig();
 
     TransformerMetricRecorder getMetricRecorder();
 
@@ -31,6 +35,8 @@ public interface TransformerContext {
     TransformerCassandraHelper getPoisonStatesHelper();
 
     TransformerFiles files();
+    
+    OctoberSkyData getOctoberSkyData();
 
     TransformerPlatformLibraries platformLibraries();
 

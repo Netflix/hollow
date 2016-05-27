@@ -27,7 +27,14 @@ public class ValidationVideoRanker {
 	public List<VideoCountryKey> getMostValuableChangedVideos(PublishWorkflowContext ctx) {
 		long start = System.currentTimeMillis();
 		// Change will take effect on restart. But can't yet move this to getMostValuableChangedVideos, since before and after test need to get same video country pairs.
-		Set<String> importantCountriesToTest =  ctx.getConfig().getPlaybackMonkeyTestForCountries();
+		String importantCountriesCSV = ctx.getConfig().getPlaybackMonkeyTestForCountries();
+		
+		Set<String> importantCountriesToTest = new HashSet<String>();  
+		
+		for(String country : importantCountriesCSV.split(",")) {
+			importantCountriesToTest.add(country);
+		}
+		
 		// TODO: would be nice optimization to not calculate the most valued videos twice in 1 cycle: 1 for before test and 2nd time for after tests.
 		int maxVideos = ctx.getConfig().getPlaybackMonkeyMaxTestVideosSize();
 
