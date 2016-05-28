@@ -1,28 +1,27 @@
 package com.netflix.vms.transformer.context;
 
-import java.util.Map;
-
-import com.netflix.vms.transformer.common.config.OctoberSkyData;
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
-import java.io.IOException;
 import com.netflix.archaius.ConfigProxyFactory;
-import java.io.StringReader;
-import java.util.Properties;
-import java.util.Iterator;
 import com.netflix.archaius.api.Config;
 import com.netflix.archaius.config.MapConfig;
-import com.netflix.vms.transformer.common.config.TransformerConfig;
-import java.util.Set;
-import com.netflix.vms.transformer.common.TransformerMetricRecorder;
-import com.netflix.vms.transformer.logger.TransformerServerLogger;
-import java.util.function.Consumer;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerFiles;
 import com.netflix.vms.transformer.common.TransformerLogger;
+import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
+import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.TransformerPlatformLibraries;
+import com.netflix.vms.transformer.common.config.OctoberSkyData;
+import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistoryConsumer;
 import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
+import com.netflix.vms.transformer.logger.TransformerConfigLogger;
+import com.netflix.vms.transformer.logger.TransformerServerLogger;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Iterator;
+import java.util.Properties;
+import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Properties go here.
@@ -161,12 +160,9 @@ public class TransformerServerContext implements TransformerContext {
 			logger.error(LogTag.ConfigurationFailure, "Failed to parse properties String: " + getPropertiesString());
 		}
     	
-    	/// log all property values
-    	for(Map.Entry<Object, Object> entry : props.entrySet())
-    		logger.info(LogTag.PropertyValue, "key=" + entry.getKey() + " value=" + entry.getValue());
-    	
-    	
-    	return new ConfigProxyFactory(new MapConfig(props)).newProxy(TransformerConfig.class);
+    	TransformerConfig transformerConfig = new ConfigProxyFactory(new MapConfig(props)).newProxy(TransformerConfig.class);
+    	TransformerConfigLogger.logProperties(transformerConfig, config, logger);
+        return transformerConfig;
     }
 
     public String getPropertiesString() {
