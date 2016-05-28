@@ -1,3 +1,4 @@
+package com.netflix.vms.transformer.util;
 import com.netflix.vms.transformer.util.VersionMinter;
 import org.junit.Test;
 import org.testng.Assert;

@@ -1,12 +1,9 @@
 package com.netflix.vms.transformer.context;
 
-import com.netflix.archaius.ConfigProxyFactory;
 import com.netflix.archaius.api.Config;
-import com.netflix.archaius.config.MapConfig;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerFiles;
 import com.netflix.vms.transformer.common.TransformerLogger;
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.TransformerPlatformLibraries;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
@@ -14,12 +11,8 @@ import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistoryConsumer;
 import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
-import com.netflix.vms.transformer.logger.TransformerConfigLogger;
+import com.netflix.vms.transformer.config.FrozenTransformerConfigFactory;
 import com.netflix.vms.transformer.logger.TransformerServerLogger;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.Iterator;
-import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -37,9 +30,10 @@ public class TransformerServerContext implements TransformerContext {
     private final TransformerPlatformLibraries platformLibraries;
     private final PublicationHistoryConsumer publicationHistoryConsumer;
     private final TransformerMetricRecorder metricRecorder;
-    private final Config config;
     private final OctoberSkyData octoberSkyData;
 
+    private final FrozenTransformerConfigFactory configFactory; 
+    
     /* fields */
     private TransformerConfig staticConfig;
     private TransformerServerLogger logger;
@@ -60,9 +54,7 @@ public class TransformerServerContext implements TransformerContext {
             TransformerPlatformLibraries platformLibraries,
             PublicationHistoryConsumer publicationHistoryConsumer) {
         this.logger = logger;
-        this.config = config;
         this.octoberSkyData = octoberSkyData;
-        this.staticConfig = createStaticConfig();
         this.metricRecorder = metricRecorder;
         this.poisonStatesHelper = poisonStatesHelper;
         this.hollowValidationStats = hollowValidationStats;
@@ -70,13 +62,16 @@ public class TransformerServerContext implements TransformerContext {
         this.files = files;
         this.platformLibraries = platformLibraries;
         this.publicationHistoryConsumer = publicationHistoryConsumer;
+        
+        this.configFactory = new FrozenTransformerConfigFactory(config);
+        this.staticConfig = configFactory.createStaticConfig(logger);
     }
 
     @Override
     public void setCurrentCycleId(long currentCycleId) {
         this.currentCycleId = currentCycleId;
         this.logger = logger.withCurrentCycleId(currentCycleId);
-        this.staticConfig = createStaticConfig();
+        this.staticConfig = configFactory.createStaticConfig(logger);
     }
 
     @Override
@@ -149,34 +144,6 @@ public class TransformerServerContext implements TransformerContext {
         return publicationHistoryConsumer;
     }
     
-    private TransformerConfig createStaticConfig() {
-    	System.out.println(getPropertiesString());
-    	
-    	
-    	Properties props = new Properties();
-    	try {
-			props.load(new StringReader(getPropertiesString()));
-		} catch (IOException e) {
-			logger.error(LogTag.ConfigurationFailure, "Failed to parse properties String: " + getPropertiesString());
-		}
-    	
-    	TransformerConfig transformerConfig = new ConfigProxyFactory(new MapConfig(props)).newProxy(TransformerConfig.class);
-    	TransformerConfigLogger.logProperties(transformerConfig, config, logger);
-        return transformerConfig;
-    }
-
-    public String getPropertiesString() {
-    	StringBuilder builder = new StringBuilder();
-    	Iterator<String> iter = config.getKeys("vms.");
-    	
-    	while(iter.hasNext()) {
-    		String key = iter.next();
-			builder.append(key).append("=").append(config.getString(key)).append("\n");
-    	}
-
-    	return builder.toString();
-    }
-
 	@Override
 	public OctoberSkyData getOctoberSkyData() {
 		return octoberSkyData;
