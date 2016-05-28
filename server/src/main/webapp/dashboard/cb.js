@@ -88,7 +88,7 @@ function setMasterStatus() {
   // Determine whether circuit breakers are on or off
   var circuitBreakerEnabledSDisabledKey = null;
   for(var key in PROPS) {
-    if(key.indexOf("circuitBreakerAggregationEnabled") != -1) {
+    if(key.indexOf("circuitBreakersEnabled") != -1) {
       circuitBreakerEnabledSDisabledKey = key;
       break;
     }
@@ -116,8 +116,8 @@ function setMasterStatus() {
 function gatherRuleNames() {
   for(var key in PROPS) {
     var tokens = key.split('.');
-    if(tokens.length == 2 && tokens[2].indexOf('circuitBreakerEnabled') == 0) {
-      ruleNames.push(tokens[3]);
+    if(tokens.length == 3 && tokens[1].indexOf('circuitBreakerEnabled') == 0) {
+      ruleNames.push(tokens[2]);
     }
   }
 }
@@ -140,12 +140,14 @@ function buildCBRuleConfig() {
   // Now collect the variations
   for(var i = 0; i < ruleNames.length; i++) {
     var ruleName = ruleNames[i];
-    var prefix = 'vms.circuitBreakerEnabled.' + ruleName;
+    var enabledPrefix = 'vms.circuitBreakerEnabled.' + ruleName;
+    var thresholdPrefix = 'vms.circuitBreakerThreshold.' + ruleName;
     var variations = [];
     for(var key in PROPS) {
       var tokens = key.split('.');
-      if(tokens.length == 4 && key.startsWith(prefix)) {
-        variations.push(tokens[3]);
+      if(tokens.length == 4 && (key.startsWith(enabledPrefix) || key.startsWith(thresholdPrefix))) {
+        if(variations.indexOf(tokens[3]) == -1)
+        	variations.push(tokens[3]);
       }
     }
     cbconfig[ruleName].variations = variations;
@@ -162,7 +164,7 @@ function buildCBRuleConfig() {
     for(var j = 0; j < variations.length; j++) {
       var enabledKeyPrefix = 'vms.circuitBreakerEnabled.' + ruleName + '.' + variations[j];
       var thresholdKeyPrefix = 'vms.circuitBreakerThreshold.' + ruleName + '.' + variations[j];
-      if(PROPS[enabledKeyPrefix] != 'vmsconfig_fallback') {
+      if(typeof PROPS[enabledKeyPrefix] != 'undefined') {
         // The circuit breaker has enabled or disabled override for a variation
         // record it
         if(PROPS[enabledKeyPrefix] == 'true')
@@ -170,7 +172,7 @@ function buildCBRuleConfig() {
         if(PROPS[enabledKeyPrefix] == 'false')
           disabledOverrides.push(variations[j]);
       }
-      if(PROPS[thresholdKeyPrefix] != 'vmsconfig_fallback') {
+      if(typeof PROPS[thresholdKeyPrefix] != 'undefined') {
         // There is a threshold override. Record it
         thresholdOverrides[variations[j]] = PROPS[thresholdKeyPrefix];
       }

@@ -13,9 +13,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import netflix.admin.videometadata.RestEntryPoint;
 
-@Path(RestEntryPoint.VMS_CIRCUIT_BREAKER_UI_PATH)
+@Path("/vms/cb")
 @Singleton
 public class VMSCircuitBreakerAdmin {
 
@@ -32,6 +31,8 @@ public class VMSCircuitBreakerAdmin {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String show() {
 		Map<String, String> circuitBreakerProperties = new HashMap<String, String>();
+		
+		circuitBreakerProperties.put("vms.circuitBreakersEnabled", String.valueOf(transformerConfig.isCircuitBreakersEnabled()));
 		
 		for(String circuitBreakerName : HollowBlobCircuitBreakerJob.CIRCUIT_BREAKER_NAMES) {
 			String enabledPropertyName = "vms.circuitBreakerEnabled." + circuitBreakerName;
