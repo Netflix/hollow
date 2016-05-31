@@ -19,12 +19,14 @@ public interface TransformerConfig {
     @DefaultValue("defaultConverterVip")
     String getConverterVip();
 
-
     @DefaultValue("defaultTransformerVip")
     String getTransformerVip();
 
-    String getAwsInstanceId();
+    String getNetflixEnvironment();
     
+    String getAwsRegion();
+    
+    String getAwsInstanceId();
     
     //////////////// PUBLISH WORKFLOW ///////////////////
     
