@@ -3,8 +3,6 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.CircuitBreaker;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleFailed;
 
-import java.util.Collections;
-
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.servo.monitor.DynamicCounter;
@@ -29,8 +27,6 @@ import org.apache.commons.lang.StringUtils;
 
 public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
 
-	public static List<String> CIRCUIT_BREAKER_NAMES = Collections.emptyList();
-	
 	private final HollowBlobDataProvider hollowBlobDataProvider;
     private final HollowCircuitBreaker circuitBreakerRules[];
 
@@ -40,7 +36,13 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
         super(ctx, ctx.getVip(), cycleVersion, snapshotFile, deltaFile, reverseDeltaFile);
         this.hollowBlobDataProvider = hollowBlobDataProvider;
 
-        this.circuitBreakerRules = new HollowCircuitBreaker[] {
+        this.circuitBreakerRules = createCircuitBreakerRules(ctx, cycleVersion, snapshotFile.length());
+        
+        this.circuitBreakersDisabled = !ctx.getConfig().isCircuitBreakersEnabled();
+    }
+    
+	public static HollowCircuitBreaker[] createCircuitBreakerRules(PublishWorkflowContext ctx, long cycleVersion, long snapshotFileLength) {
+		return new HollowCircuitBreaker[] {
                 new DuplicateDetectionCircuitBreaker(ctx, cycleVersion),
                 new CertificationSystemCircuitBreaker(ctx, cycleVersion),
                 new CertificationSystemCircuitBreaker(ctx, cycleVersion, 100),
@@ -53,19 +55,8 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
                 new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "OriginServer"),
                 new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "DrmKey"),
                 new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "WmDrmKey"),
-                new SnapshotSizeCircuitBreaker(ctx, cycleVersion, snapshotFile.length()),
+                new SnapshotSizeCircuitBreaker(ctx, cycleVersion, snapshotFileLength),
         };
-        
-        populateCircuitBreakerNames();
-
-        this.circuitBreakersDisabled = !ctx.getConfig().isCircuitBreakersEnabled();
-    }
-
-	private void populateCircuitBreakerNames() {
-		CIRCUIT_BREAKER_NAMES = new ArrayList<String>();
-        for(HollowCircuitBreaker circuitBreaker : circuitBreakerRules) {
-        	CIRCUIT_BREAKER_NAMES.add(circuitBreaker.getRuleName());
-        }
 	}
 
     @Override

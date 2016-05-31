@@ -17,8 +17,13 @@ public abstract class HollowCountrySpecificCircuitBreaker extends HollowCircuitB
         super(ctx, versionId);
         this.comparedCountries = new HashSet<String>();
     }
-
+    
     @Override
+	public boolean isCountrySpecific() {
+    	return true;
+    }
+
+	@Override
     public CircuitBreakerResults run(HollowReadStateEngine stateEngine) {
         if(!ctx.getConfig().isCircuitBreakerEnabled(getRuleName())) {
             ctx.getLogger().warn(CircuitBreaker, "Circuit breaker rule: " + getRuleName() + " is disabled!");
@@ -31,9 +36,7 @@ public abstract class HollowCountrySpecificCircuitBreaker extends HollowCircuitB
         	if(!isEnabled(country))
         		continue;
         		
-            if(!comparedCountries.contains(country)
-                    && ctx.getConfig().isCircuitBreakerEnabled(getRuleName(), country)
-                    && countryWasPreviouslyCompared(country)) {
+            if(!comparedCountries.contains(country) && countryWasPreviouslyCompared(country)) {
                 results.addResult(false, "Rule " + getRuleName() + ": country " + country + " was previously compared, but no value was found this cycle.");
             }
         }
