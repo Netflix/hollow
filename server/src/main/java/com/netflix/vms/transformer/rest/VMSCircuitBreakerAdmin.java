@@ -1,22 +1,21 @@
 package com.netflix.vms.transformer.rest;
 
-import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
-
-import javax.ws.rs.QueryParam;
-import com.netflix.vms.transformer.common.TransformerPlatformLibraries;
-import com.netflix.vms.transformer.util.TransformerServerCassandraHelper;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.netflix.archaius.api.Config;
+import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.config.NetflixConfiguration.EnvironmentEnum;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.vms.transformer.common.TransformerPlatformLibraries;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.fastproperties.PersistedPropertiesUtil;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuitBreaker;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HollowBlobCircuitBreakerJob;
+import com.netflix.vms.transformer.util.TransformerServerCassandraHelper;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -48,15 +47,31 @@ public class VMSCircuitBreakerAdmin {
         this.cassandraHelper = new TransformerServerCassandraHelper(platformLibs.getAstyanax(), "cass_dpt", "hollow_publish_workflow", "hollow_validation_stats");
         this.vip = transformerConfig.getTransformerVip();
     }
+    
+    @GET
+    @Path("/names")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getCircuitBreakers() {
+        Map<String, String> circuitBreakerNameToIsCountrySpecific = new HashMap<>();
+        
+        for(HollowCircuitBreaker circuitBreaker : getCircuitBreakerJobs()) {
+            circuitBreakerNameToIsCountrySpecific.put(circuitBreaker.getRuleName(), String.valueOf(circuitBreaker.isCountrySpecific()));
+        }
+        
+        return new Gson().toJson(circuitBreakerNameToIsCountrySpecific);
+    }
 
     @GET
+    @Path("/properties")
     @Produces(MediaType.TEXT_PLAIN)
-    public String show() {
+    public String getCircuitBreakerPropertyValues() {
         Map<String, String> circuitBreakerProperties = new HashMap<>();
 
         circuitBreakerProperties.put("vms.circuitBreakersEnabled", String.valueOf(transformerConfig.isCircuitBreakersEnabled()));
 
-        for (String circuitBreakerName : getCircuitBreakerNames()) {
+        for (HollowCircuitBreaker circuitBreaker : getCircuitBreakerJobs()) {
+            String circuitBreakerName = circuitBreaker.getRuleName();
+            
             String enabledPropertyName = "vms.circuitBreakerEnabled." + circuitBreakerName;
             String thresholdPropertyName = "vms.circuitBreakerThreshold." + circuitBreakerName;
 
@@ -68,9 +83,7 @@ public class VMSCircuitBreakerAdmin {
         }
 
         // Convert this into JSON
-        Gson gson = new Gson();
-        return gson.toJson(circuitBreakerProperties);
-
+        return new Gson().toJson(circuitBreakerProperties);
     }
 
     private void addPrefixedProperties(Map<String, String> circuitBreakerProperties, String prefix) {
@@ -123,9 +136,9 @@ public class VMSCircuitBreakerAdmin {
         return "NotFound: " + key;
     }
 
-    @GET
+    @POST
 	@Path("/reset")
-	public String resetCircuitBreakerBaseline(@QueryParam("name") String circuitBreakerName, @QueryParam("country") String country) throws ConnectionException {
+	public String resetCircuitBreakerBaseline(@FormParam("name") String circuitBreakerName, @FormParam("country") String country) throws ConnectionException {
         String cassandraRowName = country == null ? circuitBreakerName : circuitBreakerName + "_" + country;
 
         cassandraHelper.deleteVipKeyValuePair(vip, cassandraRowName);
@@ -133,18 +146,16 @@ public class VMSCircuitBreakerAdmin {
 		return "Deleted Cassandra Row: " + cassandraRowName; 
 	}
 
-    private List<String> getCircuitBreakerNames() {
-        // / adding items to the below list will allow them to show up in the UI
-        // *before* the first
-        // / cycle has completed.
-        List<String> circuitBreakerNames = new ArrayList<String>();
+    private List<HollowCircuitBreaker> getCircuitBreakerJobs() {
+        List<HollowCircuitBreaker> circuitBreakers = new ArrayList<HollowCircuitBreaker>(
+                Arrays.asList(
+                        HollowBlobCircuitBreakerJob.createCircuitBreakerRules(null, -1L, -1L)
+                ));
 
-        for (HollowCircuitBreaker circuitBreaker : HollowBlobCircuitBreakerJob.createCircuitBreakerRules(null, -1L, -1L)) {
-            circuitBreakerNames.add(circuitBreaker.getRuleName());
-        }
+        Collections.sort(circuitBreakers, (cb1, cb2) -> {
+            return cb1.getRuleName().compareTo(cb2.getRuleName());
+        });
 
-        Collections.sort(circuitBreakerNames);
-
-        return circuitBreakerNames;
+        return circuitBreakers;
     }
 }
