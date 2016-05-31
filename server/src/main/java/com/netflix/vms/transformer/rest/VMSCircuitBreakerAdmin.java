@@ -29,8 +29,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Path("/vms/cb")
 @Singleton
+@Path("/vms/cb")
 public class VMSCircuitBreakerAdmin {
 
     private static final String APP_ID = "vmstransformer";
