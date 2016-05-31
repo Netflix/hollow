@@ -10,8 +10,6 @@ public class ArtworkDerivativeTypeAPI extends HollowObjectTypeAPI {
     ArtworkDerivativeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "recipeName",
-            "fileName",
-            "imageId",
             "cdnOriginServerId",
             "width",
             "cdnDirectory",
@@ -34,26 +32,26 @@ public class ArtworkDerivativeTypeAPI extends HollowObjectTypeAPI {
         return getAPI().getStringTypeAPI();
     }
 
-    public int getFileNameOrdinal(int ordinal) {
+    public int getCdnOriginServerIdOrdinal(int ordinal) {
         if(fieldIndex[1] == -1)
-            return missingDataHandler().handleReferencedOrdinal("ArtworkDerivative", ordinal, "fileName");
+            return missingDataHandler().handleReferencedOrdinal("ArtworkDerivative", ordinal, "cdnOriginServerId");
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[1]);
     }
 
-    public StringTypeAPI getFileNameTypeAPI() {
+    public StringTypeAPI getCdnOriginServerIdTypeAPI() {
         return getAPI().getStringTypeAPI();
     }
 
-    public long getImageId(int ordinal) {
+    public long getWidth(int ordinal) {
         if(fieldIndex[2] == -1)
-            return missingDataHandler().handleLong("ArtworkDerivative", ordinal, "imageId");
+            return missingDataHandler().handleLong("ArtworkDerivative", ordinal, "width");
         return getTypeDataAccess().readLong(ordinal, fieldIndex[2]);
     }
 
-    public Long getImageIdBoxed(int ordinal) {
+    public Long getWidthBoxed(int ordinal) {
         long l;
         if(fieldIndex[2] == -1) {
-            l = missingDataHandler().handleLong("ArtworkDerivative", ordinal, "imageId");
+            l = missingDataHandler().handleLong("ArtworkDerivative", ordinal, "width");
         } else {
             boxedFieldAccessSampler.recordFieldAccess(fieldIndex[2]);
             l = getTypeDataAccess().readLong(ordinal, fieldIndex[2]);
@@ -65,41 +63,10 @@ public class ArtworkDerivativeTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public int getCdnOriginServerIdOrdinal(int ordinal) {
-        if(fieldIndex[3] == -1)
-            return missingDataHandler().handleReferencedOrdinal("ArtworkDerivative", ordinal, "cdnOriginServerId");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[3]);
-    }
-
-    public StringTypeAPI getCdnOriginServerIdTypeAPI() {
-        return getAPI().getStringTypeAPI();
-    }
-
-    public long getWidth(int ordinal) {
-        if(fieldIndex[4] == -1)
-            return missingDataHandler().handleLong("ArtworkDerivative", ordinal, "width");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[4]);
-    }
-
-    public Long getWidthBoxed(int ordinal) {
-        long l;
-        if(fieldIndex[4] == -1) {
-            l = missingDataHandler().handleLong("ArtworkDerivative", ordinal, "width");
-        } else {
-            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[4]);
-            l = getTypeDataAccess().readLong(ordinal, fieldIndex[4]);
-        }
-        if(l == Long.MIN_VALUE)
-            return null;
-        return Long.valueOf(l);
-    }
-
-
-
     public int getCdnDirectoryOrdinal(int ordinal) {
-        if(fieldIndex[5] == -1)
+        if(fieldIndex[3] == -1)
             return missingDataHandler().handleReferencedOrdinal("ArtworkDerivative", ordinal, "cdnDirectory");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[5]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[3]);
     }
 
     public StringTypeAPI getCdnDirectoryTypeAPI() {
@@ -107,9 +74,9 @@ public class ArtworkDerivativeTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getCdnIdOrdinal(int ordinal) {
-        if(fieldIndex[6] == -1)
+        if(fieldIndex[4] == -1)
             return missingDataHandler().handleReferencedOrdinal("ArtworkDerivative", ordinal, "cdnId");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[6]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[4]);
     }
 
     public StringTypeAPI getCdnIdTypeAPI() {
@@ -117,9 +84,9 @@ public class ArtworkDerivativeTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getRecipeDescriptorOrdinal(int ordinal) {
-        if(fieldIndex[7] == -1)
+        if(fieldIndex[5] == -1)
             return missingDataHandler().handleReferencedOrdinal("ArtworkDerivative", ordinal, "recipeDescriptor");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[7]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[5]);
     }
 
     public StringTypeAPI getRecipeDescriptorTypeAPI() {
@@ -127,9 +94,9 @@ public class ArtworkDerivativeTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getImageTypeOrdinal(int ordinal) {
-        if(fieldIndex[8] == -1)
+        if(fieldIndex[6] == -1)
             return missingDataHandler().handleReferencedOrdinal("ArtworkDerivative", ordinal, "imageType");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[8]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[6]);
     }
 
     public StringTypeAPI getImageTypeTypeAPI() {
@@ -137,9 +104,9 @@ public class ArtworkDerivativeTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getCdnOriginServerOrdinal(int ordinal) {
-        if(fieldIndex[9] == -1)
+        if(fieldIndex[7] == -1)
             return missingDataHandler().handleReferencedOrdinal("ArtworkDerivative", ordinal, "cdnOriginServer");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[9]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[7]);
     }
 
     public StringTypeAPI getCdnOriginServerTypeAPI() {
@@ -147,18 +114,18 @@ public class ArtworkDerivativeTypeAPI extends HollowObjectTypeAPI {
     }
 
     public long getHeight(int ordinal) {
-        if(fieldIndex[10] == -1)
+        if(fieldIndex[8] == -1)
             return missingDataHandler().handleLong("ArtworkDerivative", ordinal, "height");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[10]);
+        return getTypeDataAccess().readLong(ordinal, fieldIndex[8]);
     }
 
     public Long getHeightBoxed(int ordinal) {
         long l;
-        if(fieldIndex[10] == -1) {
+        if(fieldIndex[8] == -1) {
             l = missingDataHandler().handleLong("ArtworkDerivative", ordinal, "height");
         } else {
-            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[10]);
-            l = getTypeDataAccess().readLong(ordinal, fieldIndex[10]);
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[8]);
+            l = getTypeDataAccess().readLong(ordinal, fieldIndex[8]);
         }
         if(l == Long.MIN_VALUE)
             return null;

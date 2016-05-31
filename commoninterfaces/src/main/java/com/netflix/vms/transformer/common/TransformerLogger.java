@@ -11,15 +11,17 @@ public interface TransformerLogger {
         TransformCycleSuccess,
         TransformCycleFailed,
         TransformProgress,
-        IndividualTransformFailed,
         InputDataVersionIds,
+        PropertyValue,
         WroteBlob,
         WritingBlobsFailed,
         NonVideoSpecificTransformDuration,
+        ConfigurationFailure,
         UnexpectedError,
 
         //// TRANSFORMATION ERRORS ////
 
+        IndividualTransformFailed,
         UnknownArtworkImageType,
         MissingLocaleForArtwork,
         InvalidImagesTerritoryCode,

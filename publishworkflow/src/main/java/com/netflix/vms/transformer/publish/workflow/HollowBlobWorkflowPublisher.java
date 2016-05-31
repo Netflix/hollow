@@ -20,10 +20,10 @@ public class HollowBlobWorkflowPublisher {
     private final HollowPublishWorkflowStager publishWorkflowStager;
     private final HollowBlobFileNamer fileNamer;
 
-    public HollowBlobWorkflowPublisher(String vip, PublishWorkflowConfig circuitBreakerConfig, TransformerContext ctx) {
+    public HollowBlobWorkflowPublisher(String vip, TransformerContext ctx) {
         this.files = ctx.files();
         this.fileNamer = new HollowBlobFileNamer(vip);
-        this.publishWorkflowStager = new HollowPublishWorkflowStager(ctx, circuitBreakerConfig, vip);
+        this.publishWorkflowStager = new HollowPublishWorkflowStager(ctx, vip);
     }
 
     public void initialize(HollowWriteStateEngine stateEngine) {

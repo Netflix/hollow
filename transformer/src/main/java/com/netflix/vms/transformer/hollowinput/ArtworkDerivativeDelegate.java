@@ -6,12 +6,6 @@ public interface ArtworkDerivativeDelegate extends HollowObjectDelegate {
 
     public int getRecipeNameOrdinal(int ordinal);
 
-    public int getFileNameOrdinal(int ordinal);
-
-    public long getImageId(int ordinal);
-
-    public Long getImageIdBoxed(int ordinal);
-
     public int getCdnOriginServerIdOrdinal(int ordinal);
 
     public long getWidth(int ordinal);

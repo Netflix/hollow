@@ -110,9 +110,16 @@ public class ShowHierarchyInitializer {
         return showHierarchiesByCountry;
     }
 
+	private boolean isSupportedCountry(String countryCode) {
+		return ctx.getOctoberSkyData().getSupportedCountries().contains(countryCode);
+	}
+
 
 
     boolean isTopNodeIncluded(long videoId, String countryCode) {
+    	if(!isSupportedCountry(countryCode))
+    		return false;
+    	
         if(!isContentApproved(videoId, countryCode))
             return false;
 
