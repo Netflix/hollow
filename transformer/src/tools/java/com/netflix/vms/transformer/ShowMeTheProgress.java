@@ -1,7 +1,9 @@
 package com.netflix.vms.transformer;
 
+import com.netflix.hollow.HollowBlobHeader;
 import com.netflix.hollow.HollowSchema;
 import com.netflix.hollow.filter.HollowFilterConfig;
+import com.netflix.hollow.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.memory.WastefulRecycler;
@@ -17,29 +19,49 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Map;
 
 import org.junit.Test;
 
 public class ShowMeTheProgress {
 
     private static final String ROOT_SUBSET_DATA_DIR = "/space/transformer-data/pinned-subsets";
+    private static final String PUBLISH_CYCLE_DATATS_HEADER = "publishCycleDataTS";
+
+    private static long getPublishCycleDataTS(Map<String, String> headerTags) {
+        String value = headerTags.get("publishCycleDataTS");
+        if (value == null || value.trim().isEmpty()) return System.currentTimeMillis();
+
+        return Long.parseLong(value);
+    }
 
     @Test
     public void start() throws Throwable {
         HollowReadStateEngine inputStateEngine = loadStateEngine("filtered-input");
         VMSHollowInputAPI api = new VMSHollowInputAPI(inputStateEngine);
 
+        // header control blob header
+        String outpufBlobFilename = "control-output";
+        Map<String, String> headerTags = getHeaderTagsFromStateEngine(outpufBlobFilename);
+        String value = headerTags.get(PUBLISH_CYCLE_DATATS_HEADER);
+        long publishCycleDataTS = value != null ? Long.parseLong(value) : System.currentTimeMillis();
+
+        // setup output header
         VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
         outputStateEngine.addHeaderTags(inputStateEngine.getHeaderTags());
+        outputStateEngine.addHeaderTag(PUBLISH_CYCLE_DATATS_HEADER, String.valueOf(publishCycleDataTS));
 
+        // perform transformation
         SimpleTransformer transformer = new SimpleTransformer(api, outputStateEngine);
-
+        transformer.setPublishCycleDataTS(publishCycleDataTS);
         transformer.transform();
         HollowReadStateEngine actualOutputReadStateEngine = roundTripOutputStateEngine(outputStateEngine);
-        HollowReadStateEngine expectedOutputStateEngine = loadStateEngine("control-output", getDiffFilter(actualOutputReadStateEngine.getSchemas()));
+        HollowReadStateEngine expectedOutputStateEngine = loadStateEngine(outpufBlobFilename, getDiffFilter(actualOutputReadStateEngine.getSchemas()));
 
+        // diff
         ShowMeTheProgressDiffTool.startTheDiff(expectedOutputStateEngine, actualOutputReadStateEngine);
     }
+
 
     public static HollowFilterConfig getDiffFilter(Collection<HollowSchema> outputSchemas) {
         HollowFilterConfig filter = new HollowFilterConfig();
@@ -91,6 +113,12 @@ public class ShowMeTheProgress {
 
     private HollowReadStateEngine loadStateEngine(String resourceFilename, HollowFilterConfig filter) throws IOException {
         return loadStateEngine(new BufferedInputStream(new FileInputStream(new File(ROOT_SUBSET_DATA_DIR, resourceFilename))), filter);
+    }
+
+    private Map<String, String> getHeaderTagsFromStateEngine(String resourceFilename) throws IOException {
+        HollowBlobHeaderReader reader = new HollowBlobHeaderReader();
+        HollowBlobHeader header = reader.readHeader(new BufferedInputStream(new FileInputStream(new File(ROOT_SUBSET_DATA_DIR, resourceFilename))));
+        return header.getHeaderTags();
     }
 
     private HollowReadStateEngine loadStateEngine(InputStream is, HollowFilterConfig filter) throws IOException {
