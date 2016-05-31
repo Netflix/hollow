@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.rest;
 
+import com.netflix.vms.transformer.servlet.platform.TransformerServerPlatformLibraries;
+
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -7,7 +9,6 @@ import com.netflix.archaius.api.Config;
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.config.NetflixConfiguration.EnvironmentEnum;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.vms.transformer.common.TransformerPlatformLibraries;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.fastproperties.PersistedPropertiesUtil;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuitBreaker;
@@ -41,7 +42,7 @@ public class VMSCircuitBreakerAdmin {
     private final String vip;
 
     @Inject
-    public VMSCircuitBreakerAdmin(TransformerConfig transformerConfig, Config config, TransformerPlatformLibraries platformLibs) {
+    public VMSCircuitBreakerAdmin(TransformerConfig transformerConfig, Config config, TransformerServerPlatformLibraries platformLibs) {
         this.transformerConfig = transformerConfig;
         this.config = config;
         this.cassandraHelper = new TransformerServerCassandraHelper(platformLibs.getAstyanax(), "cass_dpt", "hollow_publish_workflow", "hollow_validation_stats");
