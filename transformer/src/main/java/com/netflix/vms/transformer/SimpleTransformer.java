@@ -93,6 +93,10 @@ public class SimpleTransformer {
         this.ctx = ctx;
         this.cycleConstants = new CycleConstants();
     }
+    
+    public void setPublishCycleDataTS(long time) {
+        ctx.setNowMillis(time);
+    }
 
     public HollowWriteStateEngine transform() throws Throwable {
         long startTime = System.currentTimeMillis();

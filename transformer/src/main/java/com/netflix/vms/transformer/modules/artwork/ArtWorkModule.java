@@ -263,6 +263,8 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         for (Artwork artwork : allArtwork) {
             for (ArtworkDerivative derivative : artwork.derivatives.list) {
                 ArtWorkImageTypeEntry imageType = getImageTypeEntry(new String(derivative.type.nameStr));
+                if (imageType == null) continue;
+
                 Set<ArtWorkImageFormatEntry> list = map.get(imageType);
                 if (list == null) {
                     list = new HashSet<ArtWorkImageFormatEntry>();
@@ -406,10 +408,12 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
                 entry.unavailableFileNameStr = "unavailable".toCharArray();
                 entry.nameStr = typeName.toCharArray();
             }else {
-                entry.recipeNameStr = "jpg".toCharArray();
-                entry.allowMultiples = true;
-                entry.unavailableFileNameStr = "unavailable".toCharArray();
-                entry.nameStr = typeName.toCharArray();
+                // RETURN NULL to be backwards compatible
+                return null;
+                //                entry.recipeNameStr = "jpg".toCharArray();
+                //                entry.allowMultiples = true;
+                //                entry.unavailableFileNameStr = "unavailable".toCharArray();
+                //                entry.nameStr = typeName.toCharArray();
             }
 
             imageTypeEntryCache.put(typeName, entry);
