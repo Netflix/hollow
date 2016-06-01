@@ -1,6 +1,8 @@
 dependencies {
     compile project(':vms-transformer-common-interfaces')
     compile 'org.elasticsearch:elasticsearch:1.5.2'
+
+    // TODO: timt: transitive dependency on platform
     compile 'netflix:mutation-stream-client:latest.release'
     compile 'netflix:country-launch:latest.release'
 

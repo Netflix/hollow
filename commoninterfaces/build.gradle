@@ -1,7 +1,8 @@
 dependencies {
     compile 'com.netflix.hollow:netflix-hollow:latest.release'
-    compile 'netflix:nf-archaius2:latest.release'
-    compile 'netflix:hermes:latest.release'
+    compile 'com.netflix.archaius:archaius2-api:latest.release'
+    compile 'com.netflix.astyanax:astyanax-cassandra:latest.release'
+    compile 'netflix:netflix-config:latest.release'
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.assertj:assertj-core:3.3+'
