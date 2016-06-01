@@ -42,7 +42,7 @@ public abstract class HollowCountrySpecificCircuitBreaker extends HollowCircuitB
         return compareMetric(country.getId(), value);
     }
 
-    protected CircuitBreakerResults compareMetric(String country, long value) {
+    protected CircuitBreakerResults compareMetric(String country, double value) {
         comparedCountries.add(country);
         return compareMetric(metricName(country), value, ctx.getConfig().getCircuitBreakerThreshold(getRuleName(), country));
     }

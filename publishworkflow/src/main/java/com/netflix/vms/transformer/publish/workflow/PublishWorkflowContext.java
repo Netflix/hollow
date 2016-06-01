@@ -25,5 +25,7 @@ public interface PublishWorkflowContext {
     FileStore getFileStore();
 
     VipAnnouncer getVipAnnouncer();
+    
+    long getNowMillis();
 
 }

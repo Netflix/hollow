@@ -19,6 +19,7 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
 
     /* fields */
     private final String vip;
+	private final long nowMillis;
 
     public TransformerPublishWorkflowContext(TransformerContext ctx, PublishWorkflowConfig config, VipAnnouncer vipAnnouncer, String vip) {
         this(ctx, config, vipAnnouncer, vip, new CassandraBasedPoisonedStateMarker(ctx, vip));
@@ -31,6 +32,7 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
         this.vipAnnouncer = vipAnnouncer;
         this.poisonStateMarker = poisonStateMarker;
         this.logger = ctx.getLogger();
+        this.nowMillis = ctx.getNowMillis();
     }
 
     public TransformerPublishWorkflowContext withCurrentLogger() {
@@ -76,4 +78,9 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
     public VipAnnouncer getVipAnnouncer() {
         return vipAnnouncer;
     }
+
+	@Override
+	public long getNowMillis() {
+		return nowMillis;
+	}
 }
