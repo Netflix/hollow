@@ -50,6 +50,10 @@ public class L10NMiscResourcesModule extends AbstractTransformModule {
 
     @Override
     public void transform() {
+    	/// short-circuit Fastlane
+    	if(ctx.getFastlaneIds() != null)
+    		return;
+    	
         for (L10NMiscProcessor<?> processor : processorList) {
             long start = System.currentTimeMillis();
 

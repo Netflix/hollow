@@ -34,6 +34,7 @@ gretty {
 // It contains all the OS env variable configurations and anything else that tunes our boxes and
 // tomcat server.
 ospackage {
+    packageName = 'vmstransformer'
     requires('nflx-ezconfig')
     requires('nflx-base-www')
 }

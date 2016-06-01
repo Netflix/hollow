@@ -1,4 +1,4 @@
-package com.netflix.vms.transformer.resource.v1;
+package com.netflix.vms.transformer.rest;
 
 import java.text.SimpleDateFormat;
 import java.util.Collections;

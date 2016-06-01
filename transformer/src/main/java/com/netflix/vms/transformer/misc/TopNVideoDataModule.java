@@ -22,6 +22,10 @@ public class TopNVideoDataModule extends AbstractTransformModule{
 	
     @Override
     public void transform() {
+    	/// short-circuit for FastLane
+    	if(ctx.getFastlaneIds() != null)
+    		return;
+    	
         //Map Video id -> attributes to Country id -> TopNVideoData
         Map<String, TopNVideoData> topNVideoDataMap = new HashMap<>();
         for(TopNHollow topN : api.getAllTopNHollow()) {

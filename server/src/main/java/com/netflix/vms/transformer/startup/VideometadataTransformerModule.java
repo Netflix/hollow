@@ -1,7 +1,9 @@
 package com.netflix.vms.transformer.startup;
 
-import com.netflix.vms.transformer.common.config.TransformerConfig;
+import com.netflix.vms.transformer.octobersky.OctoberSkyDataImpl;
 
+import com.netflix.vms.transformer.common.config.OctoberSkyData;
+import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.google.inject.AbstractModule;
 // Common module dependencies
 import com.google.inject.Provides;
@@ -32,6 +34,7 @@ public final class VideometadataTransformerModule extends AbstractModule {
         });
         install(new JerseyModule());
 
+        bind(OctoberSkyData.class).to(OctoberSkyDataImpl.class);
         bind(TransformerCycleKickoff.class).asEagerSingleton();
     }
 

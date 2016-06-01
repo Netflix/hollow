@@ -24,6 +24,10 @@ public class CharacterImagesModule extends ArtWorkModule{
 
     @Override
     public void transform() {
+    	/// short-circuit Fastlane
+    	if(ctx.getFastlaneIds() != null)
+    		return;
+    	
         Map<Integer, Set<Artwork>> descMap = new HashMap<>();
         for(CharacterArtworkHollow artworkHollowInput : api.getAllCharacterArtworkHollow()) {
             int entityId = (int) artworkHollowInput._getCharacterId();

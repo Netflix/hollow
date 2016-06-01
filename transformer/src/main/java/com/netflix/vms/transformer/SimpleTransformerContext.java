@@ -1,5 +1,11 @@
 package com.netflix.vms.transformer;
 
+import com.netflix.vms.transformer.common.config.OctoberSkyData;
+
+import com.netflix.archaius.config.EmptyConfig;
+import com.netflix.archaius.ConfigProxyFactory;
+import com.netflix.vms.transformer.common.config.TransformerConfig;
+import java.util.Set;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerFiles;
 import com.netflix.vms.transformer.common.TransformerLogger;
@@ -12,21 +18,25 @@ import java.util.function.Consumer;
 public class SimpleTransformerContext implements TransformerContext {
 
     private final TransformerLogger logger;
+    private final TransformerConfig config;
     private final TransformerMetricRecorder recorder;
     private final TransformerFiles files;
 
-    SimpleTransformerContext() {
+    public SimpleTransformerContext() {
         this(new SysoutTransformerLogger(), new NoOpMetricRecorder(), null);
     }
 
     SimpleTransformerContext(TransformerLogger logger, TransformerMetricRecorder recorder, TransformerFiles files) {
         this.logger = logger;
+        this.config = new ConfigProxyFactory(EmptyConfig.INSTANCE).newProxy(TransformerConfig.class);
         this.files = files;
         this.recorder = recorder;
     }
 
     private long now = System.currentTimeMillis();
     private long currentCycleId;
+    
+    private Set<Integer> fastlaneIds;
 
     @Override
     public void setCurrentCycleId(long cycleId) {
@@ -47,11 +57,26 @@ public class SimpleTransformerContext implements TransformerContext {
     public long getNowMillis() {
         return now;
     }
+    
+    @Override
+    public void setFastlaneIds(Set<Integer> fastlaneIds) {
+    	this.fastlaneIds = fastlaneIds;
+    }
+    
+    @Override
+    public Set<Integer> getFastlaneIds() {
+    	return fastlaneIds;
+    }
 
     @Override
     public TransformerLogger getLogger() {
         return logger;
     }
+    
+	@Override
+	public TransformerConfig getConfig() {
+		return config;
+	}
 
     @Override
     public TransformerMetricRecorder getMetricRecorder() {
@@ -77,6 +102,11 @@ public class SimpleTransformerContext implements TransformerContext {
     public TransformerFiles files() {
         return files;
     }
+    
+    @Override
+    public OctoberSkyData getOctoberSkyData() {
+    	return SimpleOctoberSkyData.INSTANCE;
+    }
 
     @Override
     public TransformerPlatformLibraries platformLibraries() {
@@ -87,4 +117,5 @@ public class SimpleTransformerContext implements TransformerContext {
     public Consumer<PublicationHistory> getPublicationHistoryConsumer() {
         throw new UnsupportedOperationException("simple transformer doesn't publish");
     }
+
 }

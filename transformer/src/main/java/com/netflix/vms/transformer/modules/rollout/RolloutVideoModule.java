@@ -59,6 +59,10 @@ public class RolloutVideoModule extends AbstractTransformModule {
         Map<Integer, IndividualSupplementalHollow> trailerIdToTrailerMap = getTrailerIdToTrailerMap();
 
         for (Integer videoId : videoIdToRolloutMap.keySet()) {
+        	/// short circuit irrelevant Videos in Fastlane
+        	if(ctx.getFastlaneIds() != null && !ctx.getFastlaneIds().contains(videoId))
+        		continue;
+        	
             RolloutVideo output = new RolloutVideo();
             output.video = new Video(videoId.intValue());
 

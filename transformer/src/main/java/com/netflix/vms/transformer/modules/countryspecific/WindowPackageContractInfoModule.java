@@ -5,6 +5,7 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractAssetHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractHollow;
 import com.netflix.vms.transformer.hollowoutput.ContractRestriction;
@@ -21,6 +22,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoResolution;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,6 +37,7 @@ public class WindowPackageContractInfoModule {
     private final TransformerContext ctx;
     private final HollowPrimaryKeyIndex packageIdx;
     private final HollowPrimaryKeyIndex streamProfileIdx;
+    private final HollowPrimaryKeyIndex videoGeneralIdx;
 
     private final PackageMomentDataModule packageMomentDataModule;
 
@@ -49,10 +52,11 @@ public class WindowPackageContractInfoModule {
 
         this.packageIdx = indexer.getPrimaryKeyIndex(IndexSpec.PACKAGES);
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
+        this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
 
         this.soundTypesMap = getSoundTypesMap();
 
-        FILTERED_VIDEO_PACKAGE_INFO = getFilteredVideoPackageInfo();
+        FILTERED_VIDEO_PACKAGE_INFO = newEmptyVideoPackageInfo();
     }
 
     public WindowPackageContractInfo buildWindowPackageContractInfo(PackageData packageData, VideoRightsContractHollow contract, String country) {
@@ -151,7 +155,7 @@ public class WindowPackageContractInfoModule {
         return formatStr;
     }
 
-    public WindowPackageContractInfo buildWindowPackageContractInfoWithoutPackage(VideoRightsContractHollow contract, String country) {
+    public WindowPackageContractInfo buildWindowPackageContractInfoWithoutPackage(VideoRightsContractHollow contract, String country, int videoId) {
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
         info.videoContractInfo.contractId = (int) contract._getContractId();
@@ -167,15 +171,15 @@ public class WindowPackageContractInfoModule {
             info.videoContractInfo.assetBcp47Codes.add(new Strings(asset._getBcp47Code()._getValue()));
         }
 
-        info.videoPackageInfo = FILTERED_VIDEO_PACKAGE_INFO;
+        info.videoPackageInfo = getFilteredVideoPackageInfo(videoId);
 
         return info;
     }
 
-    public WindowPackageContractInfo buildFilteredWindowPackageContractInfo(int contractId) {
+    public WindowPackageContractInfo buildFilteredWindowPackageContractInfo(int contractId, int videoId) {
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = getFilteredVideoContractInfo(contractId);
-        info.videoPackageInfo = FILTERED_VIDEO_PACKAGE_INFO;
+        info.videoPackageInfo = getFilteredVideoPackageInfo(videoId);
         return info;
     }
 
@@ -216,7 +220,24 @@ public class WindowPackageContractInfoModule {
         return nextExcludedDownloadables;
     }
 
-    private VideoPackageInfo getFilteredVideoPackageInfo() {
+    private int getApproximateRuntimeInSecods(long videoId) {
+        int ordinal = videoGeneralIdx.getMatchingOrdinal(videoId);
+        VideoGeneralHollow general = api.getVideoGeneralHollow(ordinal);
+        if (general != null)
+            return (int) general._getRuntime();
+        return 0;
+    }
+
+    private VideoPackageInfo getFilteredVideoPackageInfo(long videoId) {
+        int approxRuntimeInSecs = getApproximateRuntimeInSecods(videoId);
+        if (approxRuntimeInSecs == 0) return FILTERED_VIDEO_PACKAGE_INFO;
+
+        VideoPackageInfo result = newEmptyVideoPackageInfo();
+        result.runtimeInSeconds = approxRuntimeInSecs;
+        return result;
+    }
+
+    private static VideoPackageInfo newEmptyVideoPackageInfo() {
         VideoPackageInfo info = new VideoPackageInfo();
         info.packageId = 0;
         info.runtimeInSeconds = 0;
@@ -228,6 +249,7 @@ public class WindowPackageContractInfoModule {
         info.trickPlayMap = Collections.emptyMap();
         info.formats = Collections.emptySet();
         return info;
+
     }
 
     private Map<Integer, Strings> getSoundTypesMap() {

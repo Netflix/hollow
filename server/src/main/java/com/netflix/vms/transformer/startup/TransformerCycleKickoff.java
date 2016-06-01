@@ -3,19 +3,25 @@ package com.netflix.vms.transformer.startup;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.WaitForNextCycle;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WaitForNextCycleDuration;
 
+import com.netflix.vms.transformer.common.config.OctoberSkyData;
+
 import com.google.inject.Inject;
+import com.netflix.archaius.api.Config;
 import com.netflix.aws.file.FileStore;
 import com.netflix.vms.transformer.TransformCycle;
-import com.netflix.vms.transformer.TransformerServerContext;
 import com.netflix.vms.transformer.atlas.AtlasTransformerMetricRecorder;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
+import com.netflix.vms.transformer.context.TransformerServerContext;
 import com.netflix.vms.transformer.elasticsearch.ElasticSearchClient;
+import com.netflix.vms.transformer.fastlane.FastlaneIdRetriever;
 import com.netflix.vms.transformer.io.LZ4VMSTransformerFiles;
 import com.netflix.vms.transformer.logger.TransformerServerLogger;
 import com.netflix.vms.transformer.publish.workflow.HollowPublishWorkflowStager;
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowConfig;
-import com.netflix.vms.transformer.resource.v1.VMSPublishWorkflowHistoryAdmin;
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
+import com.netflix.vms.transformer.publish.workflow.fastlane.HollowFastlanePublishWorkflowStager;
+import com.netflix.vms.transformer.rest.VMSPublishWorkflowHistoryAdmin;
 import com.netflix.vms.transformer.servlet.platform.TransformerServerPlatformLibraries;
 import com.netflix.vms.transformer.util.TransformerServerCassandraHelper;
 
@@ -24,17 +30,24 @@ public class TransformerCycleKickoff {
     private static final long MIN_CYCLE_TIME = 10 * 60 * 1000;
 
     @Inject
-    public TransformerCycleKickoff(TransformerServerPlatformLibraries platformLibs, ElasticSearchClient esClient, TransformerConfig config) {
+    public TransformerCycleKickoff(
+    		TransformerServerPlatformLibraries platformLibs, 
+    		ElasticSearchClient esClient, 
+    		TransformerConfig transformerConfig,
+    		Config config,
+    		OctoberSkyData octoberSkyData,
+    		FastlaneIdRetriever fastlaneIdRetriever) {
+    	
         FileStore.useMultipartUploadWhenApplicable(true);
 
-        TransformerContext ctx = ctx(platformLibs, esClient, config);
-        HollowPublishWorkflowStager publishStager = publishStager(ctx, config);
+        TransformerContext ctx = ctx(platformLibs, esClient, transformerConfig, config, octoberSkyData);
+        PublishWorkflowStager publishStager = publishStager(ctx);
 
         TransformCycle cycle = new TransformCycle(
                                             ctx,
                                             publishStager,
-                                            config.getConverterVip(),
-                                            config.getTransformerVip());
+                                            transformerConfig.getConverterVip(),
+                                            transformerConfig.getTransformerVip());
 
         Thread t = new Thread(new Runnable() {
             private long previousCycleStartTime;
@@ -42,12 +55,21 @@ public class TransformerCycleKickoff {
             @Override
             public void run() {
                 while(true) {
-                    waitForMinCycleTimeToPass();
-                    cycle.cycle();
+                    try {
+                    	waitForMinCycleTimeToPass();
+                    	if(isFastlane(ctx.getConfig()))
+                    		setUpFastlaneContext();
+	                    cycle.cycle();
+                    } catch(Throwable th) {
+                    	ctx.getLogger().error(LogTag.UnexpectedError, "Unexpected error occurred", th);
+                    }
                 }
             }
 
             private void waitForMinCycleTimeToPass() {
+            	if(isFastlane(ctx.getConfig()))
+            		return;
+            	
                 long timeSinceLastCycle = System.currentTimeMillis() - previousCycleStartTime;
                 long msUntilNextCycle = MIN_CYCLE_TIME - timeSinceLastCycle;
 
@@ -67,6 +89,10 @@ public class TransformerCycleKickoff {
 
                 previousCycleStartTime = System.currentTimeMillis();
             }
+            
+            private void setUpFastlaneContext() {
+    			ctx.setFastlaneIds(fastlaneIdRetriever.getFastlaneIds());
+            }
         });
 
         t.setDaemon(true);
@@ -74,9 +100,11 @@ public class TransformerCycleKickoff {
         t.start();
     }
 
-    private final TransformerContext ctx(TransformerServerPlatformLibraries platformLibs, ElasticSearchClient esClient, TransformerConfig config) {
+    private final TransformerContext ctx(TransformerServerPlatformLibraries platformLibs, ElasticSearchClient esClient, TransformerConfig transformerConfig, Config config, OctoberSkyData octoberSkyData) {
         return new TransformerServerContext(
-                new TransformerServerLogger(config, esClient),
+                new TransformerServerLogger(transformerConfig, esClient),
+                config,
+                octoberSkyData,
                 new AtlasTransformerMetricRecorder(),
                 new TransformerServerCassandraHelper(platformLibs.getAstyanax(), "cass_dpt", "vms_poison_states", "poison_states"),
                 new TransformerServerCassandraHelper(platformLibs.getAstyanax(), "cass_dpt", "hollow_publish_workflow", "hollow_validation_stats"),
@@ -86,8 +114,15 @@ public class TransformerCycleKickoff {
                 (history) -> { VMSPublishWorkflowHistoryAdmin.history = history; });
     }
 
-    private final HollowPublishWorkflowStager publishStager(TransformerContext ctx, TransformerConfig cfg) {
-        return new HollowPublishWorkflowStager(ctx, new PublishWorkflowConfig(), cfg.getTransformerVip());
+    private final PublishWorkflowStager publishStager(TransformerContext ctx) {
+    	if(isFastlane(ctx.getConfig()))
+    		return new HollowFastlanePublishWorkflowStager(ctx, ctx.getConfig().getTransformerVip());
+    	
+        return new HollowPublishWorkflowStager(ctx, ctx.getConfig().getTransformerVip());
+    }
+    
+    private boolean isFastlane(TransformerConfig cfg) {
+    	return cfg.getTransformerVip().endsWith("_override");
     }
 
 }

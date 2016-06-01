@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import static com.netflix.vms.transformer.util.OutputUtil.sanitize;
+
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractAssetHollow;
@@ -23,6 +25,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.util.OutputUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -102,9 +105,13 @@ public class VMSAvailabilityWindowModule {
             int thisWindowBundledAssetsGroupId = 0;
 
             VMSAvailabilityWindow outputWindow = new VMSAvailabilityWindow();
-            outputWindow.startDate = new Date(window._getStartDate()._getValue());
-            outputWindow.endDate = new Date(window._getEndDate()._getValue());
+            outputWindow.startDate = OutputUtil.getRoundedDate(window._getStartDate()._getValue());
+            outputWindow.endDate = OutputUtil.getRoundedDate(window._getEndDate()._getValue());
             outputWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
+            
+            if(isGoLive && rollup.doEpisode()) {
+                rollup.newSeasonWindow(window._getStartDate()._getValue(), window._getEndDate()._getValue(), rollup.getSeasonSequenceNumber());
+            }
 
             for(VideoRightsContractIdHollow contractIdHollow : window._getContractIds()) {
                 long contractId = contractIdHollow._getValue();
@@ -160,7 +167,7 @@ public class VMSAvailabilityWindowModule {
                             }
                         } else {
                             if(shouldFilterOutWindowInfo(isGoLive, contract, includedPackageDataCount, outputWindow.startDate.val, outputWindow.endDate.val)) {
-                                outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractId));
+                                outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractId, videoId));
 
                                 if(maxPackageId == 0) {
                                     bundledAssetsGroupId = (int)contractId;
@@ -186,7 +193,7 @@ public class VMSAvailabilityWindowModule {
 
                                 } else {
                                     /// packagedata not available -- use the contract only
-                                    windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(contract, country);
+                                    windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(contract, country, videoId);
                                     outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfo);
 
                                     if(maxPackageId == 0) {
@@ -208,7 +215,7 @@ public class VMSAvailabilityWindowModule {
 
                     }
                 } else {
-                    outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractIdHollow._getValue()));
+                    outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractIdHollow._getValue(), videoId));
 
                     if(maxPackageId == 0) {
                         bundledAssetsGroupId = (int)contractId;
@@ -225,6 +232,7 @@ public class VMSAvailabilityWindowModule {
 
             if(includedWindowPackageData)
                 includedPackageDataCount++;
+            
         }
 
 
@@ -242,7 +250,7 @@ public class VMSAvailabilityWindowModule {
                     maxPackageId = entry.getKey().val;
                     assetBcp47CodesFromMaxPackageId = entry.getValue().videoContractInfo.assetBcp47Codes;
                     videoFormatDescriptorsFromMaxPackageId = entry.getValue().videoPackageInfo.formats;
-                    prePromoDays = entry.getValue().videoContractInfo.prePromotionDays;
+                    prePromoDays = sanitize(entry.getValue().videoContractInfo.prePromotionDays);
                     cupTokens = entry.getValue().videoContractInfo.cupTokens;
                     if(isGoLive) {
                         if(isInWindow)
@@ -294,11 +302,6 @@ public class VMSAvailabilityWindowModule {
 
                 if(startDate < ctx.getNowMillis() && endDate > ctx.getNowMillis())
                     isInWindow = true;
-
-                ////TODO: What was the logic for this before?
-                if(rollup.doSeason() && startDate < (ctx.getNowMillis() + (7 * 24 * 60 * 60 * 1000))) {
-                    rollup.newSeasonWindow(startDate, endDate, rollup.getSeasonSequenceNumber());
-                }
             }
 
             VMSAvailabilityWindow outputWindow = new VMSAvailabilityWindow();
@@ -320,8 +323,7 @@ public class VMSAvailabilityWindowModule {
 
             videoImagesContractInfo.videoContractInfo.cupTokens = EMPTY_CUP_TOKENS;
             videoMediaContractInfo.videoContractInfo.assetBcp47Codes = rollup.getAssetBcp47Codes();
-            if(rollup.getPrePromoDays() != 0)
-                videoMediaContractInfo.videoContractInfo.prePromotionDays = rollup.getPrePromoDays();
+            videoMediaContractInfo.videoContractInfo.prePromotionDays = rollup.getPrePromoDays();
             videoMediaContractInfo.videoContractInfo.postPromotionDays = 0;
             videoMediaContractInfo.videoContractInfo.cupTokens = rollup.getCupTokens() != null ? rollup.getCupTokens() : DEFAULT_CUP_TOKENS;
             videoMediaContractInfo.videoPackageInfo.formats = rollup.getVideoFormatDescriptors();

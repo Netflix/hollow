@@ -48,6 +48,10 @@ public class GlobalPersonModule extends AbstractTransformModule {
     }
 
     public List<GlobalPerson> transformPersons() {
+    	/// short-circuit Fastlane
+    	if(ctx.getFastlaneIds() != null)
+    		return Collections.emptyList();
+    	
         List<GlobalPerson> personList = new ArrayList<GlobalPerson>();
 
         for (PersonVideoHollow input : api.getAllPersonVideoHollow()) {

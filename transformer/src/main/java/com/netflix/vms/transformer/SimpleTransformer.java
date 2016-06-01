@@ -3,6 +3,9 @@ package com.netflix.vms.transformer;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.IndividualTransformFailed;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.FailedProcessingIndividualHierarchies;
 
+import java.util.ArrayList;
+
+import com.netflix.vms.transformer.fastlane.FastlaneIdsExpander;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
@@ -59,7 +62,6 @@ import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
 import com.netflix.vms.transformer.namedlist.NamedListCompletionModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule.VideoNamedListPopulator;
-
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -72,13 +74,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class SimpleTransformer {
 
-    private final ThreadLocal<VideoCollectionsModule> collectionsModuleRef = new ThreadLocal<VideoCollectionsModule>();
-    private final ThreadLocal<VideoMetaDataModule> metadataModuleRef = new ThreadLocal<VideoMetaDataModule>();
-    private final ThreadLocal<PackageDataModule> packageDataModuleRef = new ThreadLocal<PackageDataModule>();
-    private final ThreadLocal<VideoMediaDataModule> mediadataModuleRef = new ThreadLocal<VideoMediaDataModule>();
-    private final ThreadLocal<VideoMiscDataModule> miscdataModuleRef = new ThreadLocal<VideoMiscDataModule>();
-    private final ThreadLocal<VideoImagesDataModule> imagesdataModuleRef = new ThreadLocal<VideoImagesDataModule>();
-    private final ThreadLocal<CountrySpecificDataModule> countrySpecificModuleRef = new ThreadLocal<CountrySpecificDataModule>();
     private VideoNamedListModule videoNamedListModule;
 
     private final VMSHollowInputAPI api;
@@ -98,6 +93,10 @@ public class SimpleTransformer {
         this.ctx = ctx;
         this.cycleConstants = new CycleConstants();
     }
+    
+    public void setPublishCycleDataTS(long time) {
+        ctx.setNowMillis(time);
+    }
 
     public HollowWriteStateEngine transform() throws Throwable {
         long startTime = System.currentTimeMillis();
@@ -114,59 +113,75 @@ public class SimpleTransformer {
         SimultaneousExecutor executor = new SimultaneousExecutor();
 
         this.videoNamedListModule = new VideoNamedListModule(ctx, cycleConstants, objectMapper);
+        
+        if(ctx.getFastlaneIds() != null) {
+        	FastlaneIdsExpander idExpander = new FastlaneIdsExpander(api, ctx);
+        	idExpander.expand();
+        }
 
         startTime = System.currentTimeMillis();
         int progressDivisor = getProgressDivisor();
         AtomicInteger processedCount = new AtomicInteger();
-        for(VideoGeneralHollow videoGeneral : api.getAllVideoGeneralHollow()) {
+        
+        final List<VideoGeneralHollow> allVideoGeneralObjects = new ArrayList<VideoGeneralHollow>(api.getAllVideoGeneralHollow());
+        
+        for(int i=0;i<executor.getCorePoolSize();i++) {
+        	executor.execute(() -> {
+        		PackageDataModule packageDataModule = new PackageDataModule(api, objectMapper, indexer);
+        		VideoCollectionsModule collectionsModule = new VideoCollectionsModule(api, cycleConstants, indexer);
+        		VideoMetaDataModule metadataModule = new VideoMetaDataModule(api, ctx, cycleConstants, indexer);
+        		VideoMediaDataModule mediaDataModule = new VideoMediaDataModule(api, indexer);
+        		VideoMiscDataModule miscDataModule = new VideoMiscDataModule(api, indexer);
+        		VideoImagesDataModule imagesDataModule = new VideoImagesDataModule(api, ctx, objectMapper, indexer);
+        		CountrySpecificDataModule countrySpecificModule = new CountrySpecificDataModule(api, ctx, cycleConstants, indexer);
+        		VideoEpisodeCountryDecoratorModule countryDecoratorModule = new VideoEpisodeCountryDecoratorModule(api, objectMapper);
 
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        PackageDataModule packageDataModule = getPackageDataModule(objectMapper);
-                        VideoCollectionsModule collectionsModule = getVideoCollectionsModule();
-                        VideoMetaDataModule metadataModule = getVideoMetaDataModule();
-                        VideoMediaDataModule mediaDataModule = getVideoMediaDataModule();
-                        VideoMiscDataModule miscDataModule = getVideoMiscDataModule();
-                        VideoImagesDataModule imagesDataModule = getVideoImagesDataModule(objectMapper);
-                        CountrySpecificDataModule countrySpecificModule = getCountrySpecificDataModule();
-                        VideoEpisodeCountryDecoratorModule countryDecoratorModule = new VideoEpisodeCountryDecoratorModule(api, objectMapper);
-
-                        Map<String, ShowHierarchy> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(videoGeneral);
-                        if (showHierarchiesByCountry != null) {
-                            Map<Integer, VideoPackageData> transformedPackageData = packageDataModule.transform(showHierarchiesByCountry);
-                            Map<String, VideoCollectionsDataHierarchy> vcdByCountry = collectionsModule.buildVideoCollectionsDataByCountry(showHierarchiesByCountry);
-                            Map<String, Map<Integer, VideoMetaData>> vmdByCountry = metadataModule.buildVideoMetaDataByCountry(showHierarchiesByCountry);
-                            Map<String, Map<Integer, VideoMediaData>> mediaDataByCountry = mediaDataModule.buildVideoMediaDataByCountry(showHierarchiesByCountry);
-                            Map<String, Map<Integer, VideoImages>> imagesDataByCountry = imagesDataModule.buildVideoImagesByCountry(showHierarchiesByCountry);
-                            Map<Integer, VideoMiscData> miscData = miscDataModule.buildVideoMiscDataByCountry(showHierarchiesByCountry);
-                            Map<String, Map<Integer, CompleteVideoCountrySpecificData>> countrySpecificByCountry = countrySpecificModule.buildCountrySpecificDataByCountry(showHierarchiesByCountry, transformedPackageData);
-
-                            if(vcdByCountry != null) {
-                                writeJustTheCurrentData(vcdByCountry, vmdByCountry, miscData, mediaDataByCountry, imagesDataByCountry, countrySpecificByCountry, objectMapper);
-
-                                for(String country : vcdByCountry.keySet()) {
-                                    countryDecoratorModule.decorateVideoEpisodes(country, vcdByCountry.get(country));
-                                }
-                            }
-
-                            // Process Video Related L10N
-                            new L10NVideoResourcesModule(api, ctx, objectMapper, indexer).transform(showHierarchiesByCountry);
-                        }
-                    } catch(Throwable th) {
-                        ctx.getLogger().error(IndividualTransformFailed, "Transformation failed for hierarchy with top node " + videoGeneral._getVideoId(), th);
-                        failedIndividualTransforms.incrementAndGet();
-                    }
-                    int count = processedCount.incrementAndGet();
-                    if (count % progressDivisor == 0) {
-                        ctx.getLogger().info(LogTag.TransformProgress, ("finished percent=" + (count / progressDivisor)));
-                    }
-
-                }
-            });
+        		int idx = processedCount.getAndIncrement();
+        		while(idx < allVideoGeneralObjects.size()) {
+        			VideoGeneralHollow videoGeneral = allVideoGeneralObjects.get(idx);
+        			
+        			if(shouldProcessHierarchy(videoGeneral)) {
+        			
+	        			try {
+	
+		                    Map<String, ShowHierarchy> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(videoGeneral);
+		                    if (showHierarchiesByCountry != null) {
+		                        Map<Integer, VideoPackageData> transformedPackageData = packageDataModule.transform(showHierarchiesByCountry);
+		                        Map<String, VideoCollectionsDataHierarchy> vcdByCountry = collectionsModule.buildVideoCollectionsDataByCountry(showHierarchiesByCountry);
+		                        Map<String, Map<Integer, VideoMetaData>> vmdByCountry = metadataModule.buildVideoMetaDataByCountry(showHierarchiesByCountry);
+		                        Map<String, Map<Integer, VideoMediaData>> mediaDataByCountry = mediaDataModule.buildVideoMediaDataByCountry(showHierarchiesByCountry);
+		                        Map<String, Map<Integer, VideoImages>> imagesDataByCountry = imagesDataModule.buildVideoImagesByCountry(showHierarchiesByCountry);
+		                        Map<Integer, VideoMiscData> miscData = miscDataModule.buildVideoMiscDataByCountry(showHierarchiesByCountry);
+		                        Map<String, Map<Integer, CompleteVideoCountrySpecificData>> countrySpecificByCountry = countrySpecificModule.buildCountrySpecificDataByCountry(showHierarchiesByCountry, transformedPackageData);
+		
+		                        if(vcdByCountry != null) {
+		                            writeJustTheCurrentData(vcdByCountry, vmdByCountry, miscData, mediaDataByCountry, imagesDataByCountry, countrySpecificByCountry, objectMapper);
+		
+		                            for(String country : vcdByCountry.keySet()) {
+		                                countryDecoratorModule.decorateVideoEpisodes(country, vcdByCountry.get(country));
+		                            }
+		                        }
+		
+		                        // Process Video Related L10N
+		                        new L10NVideoResourcesModule(api, ctx, objectMapper, indexer).transform(showHierarchiesByCountry);
+		                    }
+		                } catch(Throwable th) {
+		                    ctx.getLogger().error(IndividualTransformFailed, "Transformation failed for hierarchy with top node " + videoGeneral._getVideoId(), th);
+		                    failedIndividualTransforms.incrementAndGet();
+		                }
+	        			
+        			}
+        			
+        			if (idx % progressDivisor == 0) {
+        				ctx.getLogger().info(LogTag.TransformProgress, ("finished percent=" + (idx / progressDivisor)));
+        			}
+        			
+        			idx = processedCount.getAndIncrement();
+        		}
+        	});
+        	
         }
-
+        
         // @formatter:off
         // Register Transform Modules
         List<TransformModule> moduleList = Arrays.<TransformModule>asList(
@@ -176,17 +191,17 @@ public class SimpleTransformer {
                 new ArtworkFormatModule(api, ctx, objectMapper),
                 new CacheDeploymentIntentModule(api, ctx, objectMapper),
                 new ArtworkTypeModule(api, ctx, objectMapper),
-
                 new ArtworkImageRecipeModule(api, ctx, objectMapper),
+                new EncodingProfileGroupModule(api, ctx, objectMapper),
                 new DefaultExtensionRecipeModule(api, ctx, objectMapper),
+                
+                new L10NMiscResourcesModule(api, ctx, objectMapper, indexer),
+                new LanguageRightsModule(api, ctx, objectMapper, indexer),
+                new TopNVideoDataModule(api, ctx, objectMapper),
                 new RolloutCharacterModule(api, ctx, objectMapper),
                 new RolloutVideoModule(api, ctx, objectMapper, indexer),
-                new EncodingProfileGroupModule(api, ctx, objectMapper),
-                new TopNVideoDataModule(api, ctx, objectMapper),
                 new PersonImagesModule(api, ctx, objectMapper, indexer),
-                new CharacterImagesModule(api, ctx, objectMapper, indexer),
-                new LanguageRightsModule(api, ctx, objectMapper, indexer),
-                new L10NMiscResourcesModule(api, ctx, objectMapper, indexer)
+                new CharacterImagesModule(api, ctx, objectMapper, indexer)
                 );
 
         // @formatter:on
@@ -223,74 +238,15 @@ public class SimpleTransformer {
 
         return writeStateEngine;
     }
+    
+	private boolean shouldProcessHierarchy(VideoGeneralHollow videoGeneral) {
+		return ctx.getFastlaneIds() == null || ctx.getFastlaneIds().contains((int)videoGeneral._getVideoId());
+	}
 
     private int getProgressDivisor() {
         int totalCount = api.getAllVideoGeneralHollow().size();
         totalCount = (totalCount / 100) * 100 + 100;
         return totalCount / 100;
-    }
-
-    private VideoCollectionsModule getVideoCollectionsModule() {
-        VideoCollectionsModule module = collectionsModuleRef.get();
-        if(module == null) {
-            module = new VideoCollectionsModule(api, cycleConstants, indexer);
-            collectionsModuleRef.set(module);
-        }
-        return module;
-    }
-
-    private VideoMetaDataModule getVideoMetaDataModule() {
-        VideoMetaDataModule module = metadataModuleRef.get();
-        if(module == null) {
-            module = new VideoMetaDataModule(api, ctx, cycleConstants, indexer);
-            metadataModuleRef.set(module);
-        }
-        return module;
-    }
-
-    private PackageDataModule getPackageDataModule(HollowObjectMapper objectMapper) {
-        PackageDataModule module = packageDataModuleRef.get();
-        if(module == null) {
-            module = new PackageDataModule(api, objectMapper, indexer);
-            packageDataModuleRef.set(module);
-        }
-        return module;
-    }
-
-    private VideoMediaDataModule getVideoMediaDataModule() {
-        VideoMediaDataModule module = mediadataModuleRef.get();
-        if (module == null) {
-            module = new VideoMediaDataModule(api, indexer);
-            mediadataModuleRef.set(module);
-        }
-        return module;
-    }
-
-    private VideoMiscDataModule getVideoMiscDataModule() {
-        VideoMiscDataModule module = miscdataModuleRef.get();
-        if(module == null) {
-            module = new VideoMiscDataModule(api, indexer);
-            miscdataModuleRef.set(module);
-        }
-        return module;
-    }
-
-    private VideoImagesDataModule getVideoImagesDataModule(HollowObjectMapper objectMapper) {
-        VideoImagesDataModule module = imagesdataModuleRef.get();
-        if (module == null) {
-            module = new VideoImagesDataModule(api, ctx, objectMapper, indexer);
-            imagesdataModuleRef.set(module);
-        }
-        return module;
-    }
-
-    private CountrySpecificDataModule getCountrySpecificDataModule() {
-        CountrySpecificDataModule module = countrySpecificModuleRef.get();
-        if(module == null) {
-            module = new CountrySpecificDataModule(api, ctx, cycleConstants, indexer);
-            countrySpecificModuleRef.set(module);
-        }
-        return module;
     }
 
     private void writeJustTheCurrentData(Map<String, VideoCollectionsDataHierarchy> vcdByCountry,
