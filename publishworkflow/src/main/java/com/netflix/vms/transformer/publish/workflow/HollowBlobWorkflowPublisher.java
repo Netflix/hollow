@@ -6,6 +6,7 @@ import java.io.OutputStream;
 
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
+import com.netflix.vms.transformer.TransformerPlatformLibraries;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerFiles;
 
@@ -20,10 +21,10 @@ public class HollowBlobWorkflowPublisher {
     private final HollowPublishWorkflowStager publishWorkflowStager;
     private final HollowBlobFileNamer fileNamer;
 
-    public HollowBlobWorkflowPublisher(String vip, TransformerContext ctx) {
+    public HollowBlobWorkflowPublisher(String vip, TransformerContext ctx, TransformerPlatformLibraries platform) {
         this.files = ctx.files();
         this.fileNamer = new HollowBlobFileNamer(vip);
-        this.publishWorkflowStager = new HollowPublishWorkflowStager(ctx, vip);
+        this.publishWorkflowStager = new HollowPublishWorkflowStager(ctx, platform, vip);
     }
 
     public void initialize(HollowWriteStateEngine stateEngine) {

@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 
 import com.netflix.hermes.publisher.FastPropertyPublisher;
 import com.netflix.hermes.subscriber.SubscriptionManager;
-import com.netflix.vms.transformer.common.TransformerPlatformLibraries;
+import com.netflix.vms.transformer.TransformerPlatformLibraries;
 import com.netflix.aws.file.FileStore;
 import com.netflix.cassandra.NFAstyanaxManager;
 

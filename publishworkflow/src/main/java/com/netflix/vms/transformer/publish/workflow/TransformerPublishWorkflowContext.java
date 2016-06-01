@@ -4,6 +4,7 @@ import com.netflix.vms.transformer.common.config.OctoberSkyData;
 
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.aws.file.FileStore;
+import com.netflix.vms.transformer.TransformerPlatformLibraries;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerLogger;
 import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
@@ -22,13 +23,15 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
 
     /* fields */
     private final String vip;
+    private TransformerPlatformLibraries platform;
 
-    public TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer, String vip) {
-        this(ctx, vipAnnouncer, vip, new CassandraBasedPoisonedStateMarker(ctx, vip));
+    public TransformerPublishWorkflowContext(TransformerContext ctx, TransformerPlatformLibraries platform, VipAnnouncer vipAnnouncer, String vip) {
+        this(ctx, platform, vipAnnouncer, vip, new CassandraBasedPoisonedStateMarker(ctx, vip));
     }
 
-    private TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer, String vip, PoisonedStateMarker poisonStateMarker) {
+    private TransformerPublishWorkflowContext(TransformerContext ctx, TransformerPlatformLibraries platform, VipAnnouncer vipAnnouncer, String vip, PoisonedStateMarker poisonStateMarker) {
         this.transformerCtx = ctx;
+        this.platform = platform;
         this.vip = vip;
         this.config = ctx.getConfig();
         this.vipAnnouncer = vipAnnouncer;
@@ -37,7 +40,7 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
     }
 
     public TransformerPublishWorkflowContext withCurrentLoggerAndConfig() {
-        return new TransformerPublishWorkflowContext(transformerCtx, vipAnnouncer, vip, poisonStateMarker);
+        return new TransformerPublishWorkflowContext(transformerCtx, platform, vipAnnouncer, vip, poisonStateMarker);
     }
 
     @Override
@@ -72,7 +75,7 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
 
     @Override
     public FileStore getFileStore() {
-        return transformerCtx.platformLibraries().getFileStore();
+        return platform.getFileStore();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow;
 
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.vms.transformer.TransformerPlatformLibraries;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.job.AfterCanaryAnnounceJob;
@@ -41,12 +42,12 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     private CanaryValidationJob priorCycleCanaryValidationJob;
     private CanaryRollbackJob priorCycleCanaryRollbackJob;
 
-    public HollowPublishWorkflowStager(TransformerContext ctx, String vip) {
-        this(ctx, new HollowBlobDataProvider(ctx), vip);
+    public HollowPublishWorkflowStager(TransformerContext ctx, TransformerPlatformLibraries platform, String vip) {
+        this(ctx, platform, new HollowBlobDataProvider(ctx), vip);
     }
 
-    private HollowPublishWorkflowStager(TransformerContext ctx, HollowBlobDataProvider hollowBlobDataProvider, String vip) {
-        this(ctx, new DefaultHollowPublishJobCreator(ctx, hollowBlobDataProvider, new PlaybackMonkeyTester(), new ValidationVideoRanker(hollowBlobDataProvider), vip), vip);
+    private HollowPublishWorkflowStager(TransformerContext ctx, TransformerPlatformLibraries platform, HollowBlobDataProvider hollowBlobDataProvider, String vip) {
+        this(ctx, new DefaultHollowPublishJobCreator(ctx, platform, hollowBlobDataProvider, new PlaybackMonkeyTester(), new ValidationVideoRanker(hollowBlobDataProvider), vip), vip);
     }
 
     public HollowPublishWorkflowStager(TransformerContext ctx, HollowPublishJobCreator jobCreator, String vip) {

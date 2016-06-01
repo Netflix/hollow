@@ -1,4 +1,4 @@
-package com.netflix.vms.transformer.common;
+package com.netflix.vms.transformer;
 
 import com.netflix.aws.file.FileStore;
 import com.netflix.cassandra.NFAstyanaxManager;

@@ -3,6 +3,7 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 import com.netflix.config.FastProperty;
 import com.netflix.config.FastProperty.BooleanProperty;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.vms.transformer.TransformerPlatformLibraries;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
@@ -39,16 +40,18 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
     private PublishWorkflowContext ctx;
 
     public DefaultHollowPublishJobCreator(TransformerContext transformerContext,
+            TransformerPlatformLibraries platform,
             HollowBlobDataProvider hollowBlobDataProvider, PlaybackMonkeyTester playbackMonkeyTester,
             ValidationVideoRanker videoRanker, String vip) {
         this.hollowBlobDataProvider = hollowBlobDataProvider;
         this.playbackMonkeyTester = playbackMonkeyTester;
         this.videoRanker = videoRanker;
         this.ctx = new TransformerPublishWorkflowContext(transformerContext,
+                platform,
                 new HermesVipAnnouncer(
-                        new HermesBlobAnnouncer(transformerContext.platformLibraries().getHermesPublisher(),
+                        new HermesBlobAnnouncer(platform.getHermesPublisher(),
                                 HermesTopicProvider.HOLLOWBLOB_TOPIC_PREFIX),
-                        transformerContext.platformLibraries().getHermesSubscriber(), BIG_RED_BUTTON),
+                        platform.getHermesSubscriber(), BIG_RED_BUTTON),
                 vip);
     }
 

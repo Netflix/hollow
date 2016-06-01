@@ -35,9 +35,9 @@ public class TransformCycle {
     private long currentCycleNumber = Long.MIN_VALUE;
     private int consecutiveCycleFailures = 0;
 
-    public TransformCycle(TransformerContext ctx, PublishWorkflowStager publishStager, String converterVip, String transformerVip) {
+    public TransformCycle(TransformerContext ctx, TransformerPlatformLibraries platform, PublishWorkflowStager publishStager, String converterVip, String transformerVip) {
         this.transformerVip = transformerVip;
-        this.inputClient = new VMSInputDataClient(ctx.platformLibraries().getFileStore(), converterVip);
+        this.inputClient = new VMSInputDataClient(platform.getFileStore(), converterVip);
         this.outputStateEngine = new VMSTransformerWriteStateEngine();
         this.ctx = ctx;
         this.publishWorkflowStager = publishStager;
