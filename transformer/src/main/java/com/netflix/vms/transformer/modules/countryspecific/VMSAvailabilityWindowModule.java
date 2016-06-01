@@ -108,6 +108,10 @@ public class VMSAvailabilityWindowModule {
             outputWindow.startDate = OutputUtil.getRoundedDate(window._getStartDate()._getValue());
             outputWindow.endDate = OutputUtil.getRoundedDate(window._getEndDate()._getValue());
             outputWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
+            
+            if(isGoLive && rollup.doEpisode()) {
+                rollup.newSeasonWindow(window._getStartDate()._getValue(), window._getEndDate()._getValue(), rollup.getSeasonSequenceNumber());
+            }
 
             for(VideoRightsContractIdHollow contractIdHollow : window._getContractIds()) {
                 long contractId = contractIdHollow._getValue();
@@ -228,6 +232,7 @@ public class VMSAvailabilityWindowModule {
 
             if(includedWindowPackageData)
                 includedPackageDataCount++;
+            
         }
 
 
@@ -297,11 +302,6 @@ public class VMSAvailabilityWindowModule {
 
                 if(startDate < ctx.getNowMillis() && endDate > ctx.getNowMillis())
                     isInWindow = true;
-
-                ////TODO: What was the logic for this before?
-                if(rollup.doSeason() && startDate < (ctx.getNowMillis() + (7 * 24 * 60 * 60 * 1000))) {
-                    rollup.newSeasonWindow(startDate, endDate, rollup.getSeasonSequenceNumber());
-                }
             }
 
             VMSAvailabilityWindow outputWindow = new VMSAvailabilityWindow();
