@@ -12,3 +12,9 @@ dependencies {
     
     testCompile 'com.netflix.hollow:netflix-hollow-diff-ui:latest.release'
 }
+
+configurations {
+  // exclude direct and transitive dependencies on platform
+  all*.exclude group: 'netflix', module: 'platform-core'
+  all*.exclude group: 'netflix', module: 'platform-dependency-command'
+}

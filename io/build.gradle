@@ -9,3 +9,13 @@ dependencies {
     testCompile 'junit:junit:4.11'
     testCompile 'org.assertj:assertj-core:3.3+'
 }
+
+configurations {
+  // exclude direct and transitive dependencies on platform
+  all*.exclude group: 'netflix', module: 'platform'
+  all*.exclude group: 'netflix', module: 'platform-core'
+  all*.exclude group: 'netflix', module: 'nflibrary'
+  all*.exclude group: 'netflix', module: 'hermes'
+  all*.exclude group: 'netflix', module: 'nfi18n-core'
+  all*.exclude group: 'netflix', module: 'nfastyanax'
+}
