@@ -118,9 +118,6 @@ public class CountrySpecificDataModule {
         populateDatesAndWindowData(videoId, countryCode, data, rollup);
         certificationListsModule.populateCertificationLists(videoId, countryCode, data);
 
-        if(70242630 == videoId && "GT".equals(countryCode))
-            System.out.println("watch");
-        
         if(rollup.doShow())
             data.dateWindowWiseSeasonSequenceNumberMap = new SortedMapOfDateWindowToListOfInteger(rollup.getDateWindowWiseSeasonSequenceNumbers()); // VideoCollectionsShowDataHolder.computeEpisodeSeasonSequenceNumberMap(showVideoEpisodeList)
 
