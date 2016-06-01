@@ -14,6 +14,7 @@ import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuit
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuitBreaker.CircuitBreakerResult;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuitBreaker.CircuitBreakerResults;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.SnapshotSizeCircuitBreaker;
+import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TopNViewShareAvailabilityCircuitBreaker;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TypeCardinalityCircuitBreaker;
 import com.netflix.vms.transformer.publish.workflow.job.CircuitBreakerJob;
 import java.io.File;
@@ -51,6 +52,7 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
                 new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "DrmKey"),
                 new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "WmDrmKey"),
                 new SnapshotSizeCircuitBreaker(ctx, cycleVersion, snapshotFile.length()),
+                new TopNViewShareAvailabilityCircuitBreaker(ctx, cycleVersion),
         };
 
         this.circuitBreakersDisabled = !ctx.getConfig().isCircuitBreakersEnabled();
