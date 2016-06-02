@@ -3,6 +3,7 @@ package com.netflix.vms.transformer.publish.workflow;
 import com.netflix.aws.file.FileStore;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerLogger;
+import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
@@ -88,6 +89,11 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
 
 	public OctoberSkyData getOctoberSkyData() {
 		return transformerCtx.getOctoberSkyData();
+	}
+
+	@Override
+	public TransformerMetricRecorder getMetricRecorder() {
+		return transformerCtx.getMetricRecorder();
 	}
 
 }

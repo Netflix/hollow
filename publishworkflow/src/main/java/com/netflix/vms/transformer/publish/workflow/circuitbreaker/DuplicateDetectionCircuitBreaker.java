@@ -44,7 +44,6 @@ public class DuplicateDetectionCircuitBreaker extends HollowCircuitBreaker {
         dupChecker.checkIndex("CharacterImages", "id");
         dupChecker.checkIndex("FileEncodingData", "downloadableId");
         dupChecker.checkIndex("RolloutVideo", "video.value");
-        dupChecker.checkIndex("RolloutCharacter", "id");
 
         CircuitBreakerResults results = dupChecker.getResults();
 

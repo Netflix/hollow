@@ -2,6 +2,8 @@ package com.netflix.vms.transformer.publish.workflow.circuitbreaker;
 
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.CircuitBreaker;
 
+import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
+
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
@@ -56,6 +58,8 @@ public abstract class HollowPerCountryTopNVideoScoringCircuitBreaker extends Hol
 				results.addResult(compareMetric(countryId, missingViewShare));
 				if(missingVideoIDs.size() > 0)
 					ctx.getLogger().warn(CircuitBreaker, getRuleName()+": "+countryId+": Unavailable TopN video IDs: "+missingVideoIDs);
+				
+				ctx.getMetricRecorder().recordMetric(Metric.TopNMissingViewShare, missingViewShare);
 			}
 		}
         return results;
