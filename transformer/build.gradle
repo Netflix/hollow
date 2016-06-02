@@ -3,8 +3,6 @@ dependencies {
     compile 'com.netflix.archaius:archaius2-core:latest.release'
     compile 'com.netflix.hollow:netflix-hollow:latest.release'
     compile 'com.google.guava:guava:14.0.1'
-
-    // TODO: timt: transitive dependency on platform
     compile 'netflix:nfi18n-core:latest.release'
 
     testCompile 'junit:junit:4.11'
