@@ -2993,7 +2993,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.2",
+            "locked": "2.3",
             "requested": "latest.candidate"
         },
         "netflix:registration": {
@@ -6969,7 +6969,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.2",
+            "locked": "2.3",
             "requested": "latest.candidate"
         },
         "netflix:registration": {
@@ -10945,7 +10945,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.2",
+            "locked": "2.3",
             "requested": "latest.candidate"
         },
         "netflix:registration": {
@@ -14921,7 +14921,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.2",
+            "locked": "2.3",
             "requested": "latest.candidate"
         },
         "netflix:registration": {
@@ -18996,7 +18996,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.2",
+            "locked": "2.3",
             "requested": "latest.candidate"
         },
         "netflix:registration": {
@@ -22973,7 +22973,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.2",
+            "locked": "2.3",
             "requested": "latest.candidate"
         },
         "netflix:registration": {
@@ -26955,7 +26955,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.2",
+            "locked": "2.3",
             "requested": "latest.candidate"
         },
         "netflix:registration": {
@@ -30937,7 +30937,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.2",
+            "locked": "2.3",
             "requested": "latest.candidate"
         },
         "netflix:registration": {
@@ -34919,7 +34919,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.2",
+            "locked": "2.3",
             "requested": "latest.candidate"
         },
         "netflix:registration": {
