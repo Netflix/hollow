@@ -42,7 +42,8 @@ public interface TransformerLogger {
         MarkedPoisonState,
         ObservedPoisonState,
         AnnouncementSuccess,
- AnnouncementFailure,
+        AnnouncementFailure,
+        HollowChecksum
     }
 
     public static enum Severity {

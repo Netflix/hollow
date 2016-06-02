@@ -8,11 +8,11 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.videometadata.publish.PublishRegionProvider;
 import com.netflix.vms.transformer.TransformerPlatformLibraries;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
+import com.netflix.vms.transformer.publish.workflow.PublishRegionProvider;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.TransformerPublishWorkflowContext;

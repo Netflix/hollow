@@ -2,6 +2,16 @@ package com.netflix.vms.transformer.publish.workflow;
 
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.CircuitBreaker;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
@@ -13,22 +23,10 @@ import com.netflix.vms.generated.notemplate.PackageDataHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
 import com.netflix.vms.generated.notemplate.VideoHollow;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TopNVideoViewHoursData;
-import java.io.File;
-import java.io.IOException;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class HollowBlobDataProvider {
-    private static final Logger LOGGER = LoggerFactory.getLogger(HollowBlobDataProvider.class);
-
     /* dependencies */
     private final TransformerContext ctx;
 
@@ -89,8 +87,8 @@ public class HollowBlobDataProvider {
         HollowChecksum deltaChecksum = HollowChecksum.forStateEngine(hollowReadStateEngine);
         HollowChecksum snapshotChecksum = HollowChecksum.forStateEngine(anotherStateEngine);
 
-        LOGGER.info("DELTA STATE CHECKSUM: " + deltaChecksum.toString());
-        LOGGER.info("SNAPSHOT STATE CHECKSUM: " + snapshotChecksum.toString());
+        ctx.getLogger().info(LogTag.HollowChecksum, "DELTA STATE CHECKSUM: " + deltaChecksum.toString());
+        ctx.getLogger().info(LogTag.HollowChecksum, "SNAPSHOT STATE CHECKSUM: " + snapshotChecksum.toString());
 
         if(!deltaChecksum.equals(snapshotChecksum))
             throw new RuntimeException("DELTA CHECKSUM VALIDATION FAILURE!");
@@ -99,8 +97,8 @@ public class HollowBlobDataProvider {
             anotherReader.applyDelta(ctx.files().newBlobInputStream(reverseDeltaFile));
             HollowChecksum reverseDeltaChecksum = HollowChecksum.forStateEngine(anotherStateEngine);
 
-            LOGGER.info("INITIAL STATE CHECKSUM: " + initialChecksumBeforeDelta.toString());
-            LOGGER.info("REVERSE DELTA STATE CHECKSUM: " + reverseDeltaChecksum.toString());
+            ctx.getLogger().info(LogTag.HollowChecksum, "INITIAL STATE CHECKSUM: " + initialChecksumBeforeDelta.toString());
+            ctx.getLogger().info(LogTag.HollowChecksum, "REVERSE DELTA STATE CHECKSUM: " + reverseDeltaChecksum.toString());
 
             if(!initialChecksumBeforeDelta.equals(reverseDeltaChecksum))
                 throw new RuntimeException("REVERSE DELTA CHECKSUM VALIDATION FAILURE!");
