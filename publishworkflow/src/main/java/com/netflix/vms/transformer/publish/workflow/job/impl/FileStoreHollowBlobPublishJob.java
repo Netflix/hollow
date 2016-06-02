@@ -81,7 +81,7 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
         String currentVersion =  String.valueOf(getCycleVersion());
 
         long publishedTimestamp = System.currentTimeMillis();
-        BlobMetaDataUtil.addPublisherProps(att, publishedTimestamp, currentVersion, previousVersion);
+        BlobMetaDataUtil.addPublisherProps(ctx.getConfig(), att, publishedTimestamp, currentVersion, previousVersion);
 
         if(jobType == PublishType.REVERSEDELTA) {
             BlobMetaDataUtil.addAttribute(att, "fromVersion", currentVersion);

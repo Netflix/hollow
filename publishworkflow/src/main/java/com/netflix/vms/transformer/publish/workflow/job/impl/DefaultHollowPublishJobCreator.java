@@ -1,7 +1,5 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import com.netflix.config.FastProperty;
-import com.netflix.config.FastProperty.BooleanProperty;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
@@ -27,8 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
-    private static final BooleanProperty BIG_RED_BUTTON = new FastProperty.BooleanProperty("com.netflix.vms.server.bigredbutton", false);
-
     /* dependencies */
     private HollowBlobDataProvider hollowBlobDataProvider;
     private final PlaybackMonkeyTester playbackMonkeyTester;
@@ -48,7 +44,7 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
                 new HermesVipAnnouncer(
                         new HermesBlobAnnouncer(transformerContext.platformLibraries().getHermesPublisher(),
                                 HermesTopicProvider.HOLLOWBLOB_TOPIC_PREFIX),
-                        transformerContext.platformLibraries().getHermesSubscriber(), BIG_RED_BUTTON),
+                        transformerContext.platformLibraries().getHermesSubscriber(), transformerContext.getConfig()),
                 vip);
     }
 

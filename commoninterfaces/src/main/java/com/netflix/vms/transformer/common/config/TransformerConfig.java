@@ -63,6 +63,12 @@ public interface TransformerConfig {
     @DefaultValue("0.01")
     public float getPlaybackMonkeyNoiseTolerance();
     
+    @DefaultValue("false")
+    public boolean isBigRedButton();
+    
+    @DefaultValue("false")
+    public boolean isBigGreenButton();
+    
 
     /////////////// VMS IOPS (ElasticSearch) ///////////////
 
