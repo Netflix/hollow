@@ -3,12 +3,15 @@ package com.netflix.vms.transformer.publish.workflow;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.function.Supplier;
 
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.TransformerPlatformLibraries;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerFiles;
+
+import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 
 public class HollowBlobWorkflowPublisher {
 
@@ -21,10 +24,10 @@ public class HollowBlobWorkflowPublisher {
     private final HollowPublishWorkflowStager publishWorkflowStager;
     private final HollowBlobFileNamer fileNamer;
 
-    public HollowBlobWorkflowPublisher(String vip, TransformerContext ctx, TransformerPlatformLibraries platform) {
+    public HollowBlobWorkflowPublisher(String vip, TransformerContext ctx, TransformerPlatformLibraries platform, Supplier<ServerUploadStatus> uploadStatus) {
         this.files = ctx.files();
         this.fileNamer = new HollowBlobFileNamer(vip);
-        this.publishWorkflowStager = new HollowPublishWorkflowStager(ctx, platform, vip);
+        this.publishWorkflowStager = new HollowPublishWorkflowStager(ctx, platform, uploadStatus, vip);
     }
 
     public void initialize(HollowWriteStateEngine stateEngine) {

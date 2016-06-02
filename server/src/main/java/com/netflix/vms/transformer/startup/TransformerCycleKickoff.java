@@ -3,6 +3,8 @@ package com.netflix.vms.transformer.startup;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.WaitForNextCycle;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WaitForNextCycleDuration;
 
+import java.util.function.Supplier;
+
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 
 import com.google.inject.Inject;
@@ -25,6 +27,9 @@ import com.netflix.vms.transformer.publish.workflow.fastlane.HollowFastlanePubli
 import com.netflix.vms.transformer.rest.VMSPublishWorkflowHistoryAdmin;
 import com.netflix.vms.transformer.servlet.platform.TransformerServerPlatformLibraries;
 import com.netflix.vms.transformer.util.TransformerServerCassandraHelper;
+
+import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
+import netflix.admin.videometadata.uploadstat.VMSServerUploadStatus;
 
 public class TransformerCycleKickoff {
 
@@ -116,10 +121,11 @@ public class TransformerCycleKickoff {
     }
 
     private final PublishWorkflowStager publishStager(TransformerContext ctx, TransformerPlatformLibraries platform) {
+        Supplier<ServerUploadStatus> uploadStatus = () -> VMSServerUploadStatus.get();
         if(isFastlane(ctx.getConfig()))
-            return new HollowFastlanePublishWorkflowStager(ctx, platform, ctx.getConfig().getTransformerVip());
+            return new HollowFastlanePublishWorkflowStager(ctx, platform, uploadStatus, ctx.getConfig().getTransformerVip());
 
-        return new HollowPublishWorkflowStager(ctx, platform, ctx.getConfig().getTransformerVip());
+        return new HollowPublishWorkflowStager(ctx, platform, uploadStatus, ctx.getConfig().getTransformerVip());
     }
     
     private boolean isFastlane(TransformerConfig cfg) {

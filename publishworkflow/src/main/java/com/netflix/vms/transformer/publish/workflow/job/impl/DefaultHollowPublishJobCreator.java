@@ -23,9 +23,13 @@ import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob.PublishType;
 import com.netflix.vms.transformer.publish.workflow.job.PoisonStateMarkerJob;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.PlaybackMonkeyTester;
+
+import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
+
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
     private static final BooleanProperty BIG_RED_BUTTON = new FastProperty.BooleanProperty("com.netflix.vms.server.bigredbutton", false);
@@ -42,7 +46,7 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
     public DefaultHollowPublishJobCreator(TransformerContext transformerContext,
             TransformerPlatformLibraries platform,
             HollowBlobDataProvider hollowBlobDataProvider, PlaybackMonkeyTester playbackMonkeyTester,
-            ValidationVideoRanker videoRanker, String vip) {
+            ValidationVideoRanker videoRanker, Supplier<ServerUploadStatus> serverUploadStatus, String vip) {
         this.hollowBlobDataProvider = hollowBlobDataProvider;
         this.playbackMonkeyTester = playbackMonkeyTester;
         this.videoRanker = videoRanker;
@@ -52,6 +56,7 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
                         new HermesBlobAnnouncer(platform.getHermesPublisher(),
                                 HermesTopicProvider.HOLLOWBLOB_TOPIC_PREFIX),
                         platform.getHermesSubscriber(), BIG_RED_BUTTON),
+                serverUploadStatus,
                 vip);
     }
 

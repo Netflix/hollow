@@ -1,5 +1,12 @@
 package com.netflix.vms.transformer.publish.workflow.fastlane;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.videometadata.publish.PublishRegionProvider;
 import com.netflix.vms.transformer.TransformerPlatformLibraries;
@@ -18,11 +25,8 @@ import com.netflix.vms.transformer.publish.workflow.job.impl.FileStoreHollowBlob
 import com.netflix.vms.transformer.publish.workflow.job.impl.HermesBlobAnnouncer;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HermesTopicProvider;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HermesVipAnnouncer;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 
 public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStager {
 
@@ -32,13 +36,14 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
     
     private PublishWorkflowContext ctx;
     
-    public HollowFastlanePublishWorkflowStager(TransformerContext ctx, TransformerPlatformLibraries platform, String vip) {
+    public HollowFastlanePublishWorkflowStager(TransformerContext ctx, TransformerPlatformLibraries platform, Supplier<ServerUploadStatus> uploadStatus, String vip) {
         this.ctx = new TransformerPublishWorkflowContext(ctx,
                 platform,
                 new HermesVipAnnouncer(
                         new HermesBlobAnnouncer(platform.getHermesPublisher(),
                                 HermesTopicProvider.HOLLOWBLOB_TOPIC_PREFIX),
                         platform.getHermesSubscriber(), null),
+                uploadStatus,
                 vip);
         
         this.scheduler = new PublicationJobScheduler();
