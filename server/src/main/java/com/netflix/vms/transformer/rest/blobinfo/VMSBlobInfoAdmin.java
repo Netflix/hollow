@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer.rest.blobinfo;
 
 import com.google.inject.Singleton;
-
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.netflix.aws.db.Item;
@@ -9,11 +8,12 @@ import com.netflix.aws.db.ItemAttribute;
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.vms.transformer.common.TransformerPlatformLibraries;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.fastproperties.ClientPinningUtil;
 import com.netflix.vms.transformer.rest.blobinfo.BlobImageEntry.AttributeKeys;
 import com.netflix.vms.transformer.rest.blobinfo.BlobImageEntry.BlobType;
+import com.netflix.vms.transformer.servlet.platform.TransformerServerPlatformLibraries;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,10 +25,12 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.TreeMap;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -55,7 +57,7 @@ public class VMSBlobInfoAdmin {
     private final FileStore fileStore;
     
     @Inject
-    public VMSBlobInfoAdmin(TransformerConfig config, TransformerPlatformLibraries libs) {
+    public VMSBlobInfoAdmin(TransformerConfig config, TransformerServerPlatformLibraries libs) {
         this.transformerConfig = config;
         this.fileStore = libs.getFileStore();
     }
