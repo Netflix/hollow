@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.publish.workflow;
 import java.util.function.Supplier;
 
 import com.netflix.aws.file.FileStore;
-import com.netflix.vms.transformer.TransformerPlatformLibraries;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerLogger;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
@@ -24,28 +23,28 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
     private final VipAnnouncer vipAnnouncer;
     private final TransformerLogger logger;
     private final Supplier<ServerUploadStatus> uploadStatus;
+    private final FileStore fileStore;
 
     /* fields */
     private final String vip;
-    private TransformerPlatformLibraries platform;
 
-    public TransformerPublishWorkflowContext(TransformerContext ctx, TransformerPlatformLibraries platform, VipAnnouncer vipAnnouncer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
-        this(ctx, platform, vipAnnouncer, uploadStatus, vip, new CassandraBasedPoisonedStateMarker(ctx, vip));
+    public TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer, Supplier<ServerUploadStatus> uploadStatus, FileStore fileStore, String vip) {
+        this(ctx, vipAnnouncer, uploadStatus, fileStore, vip, new CassandraBasedPoisonedStateMarker(ctx, vip));
     }
 
-    private TransformerPublishWorkflowContext(TransformerContext ctx, TransformerPlatformLibraries platform, VipAnnouncer vipAnnouncer, Supplier<ServerUploadStatus> uploadStatus, String vip, PoisonedStateMarker poisonStateMarker) {
+    private TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer, Supplier<ServerUploadStatus> uploadStatus, FileStore fileStore, String vip, PoisonedStateMarker poisonStateMarker) {
         this.transformerCtx = ctx;
-        this.platform = platform;
         this.vip = vip;
         this.config = ctx.getConfig();
         this.vipAnnouncer = vipAnnouncer;
         this.poisonStateMarker = poisonStateMarker;
         this.uploadStatus = uploadStatus;
+        this.fileStore = fileStore;
         this.logger = ctx.getLogger();
     }
 
     public TransformerPublishWorkflowContext withCurrentLoggerAndConfig() {
-        return new TransformerPublishWorkflowContext(transformerCtx, platform, vipAnnouncer, uploadStatus, vip, poisonStateMarker);
+        return new TransformerPublishWorkflowContext(transformerCtx, vipAnnouncer, uploadStatus, fileStore, vip, poisonStateMarker);
     }
 
     @Override
@@ -80,7 +79,7 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
 
     @Override
     public FileStore getFileStore() {
-        return platform.getFileStore();
+        return fileStore;
     }
 
     @Override

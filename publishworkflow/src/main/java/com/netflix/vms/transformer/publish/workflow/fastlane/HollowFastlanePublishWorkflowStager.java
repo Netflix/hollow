@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.vms.transformer.TransformerPlatformLibraries;
+import com.netflix.hermes.publisher.FastPropertyPublisher;
+import com.netflix.hermes.subscriber.SubscriptionManager;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
@@ -23,7 +25,6 @@ import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob
 import com.netflix.vms.transformer.publish.workflow.job.impl.FastlaneHermesAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.impl.FileStoreHollowBlobPublishJob;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HermesBlobAnnouncer;
-import com.netflix.vms.transformer.publish.workflow.job.impl.HermesTopicProvider;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HermesVipAnnouncer;
 
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
@@ -36,14 +37,13 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
     
     private PublishWorkflowContext ctx;
     
-    public HollowFastlanePublishWorkflowStager(TransformerContext ctx, TransformerPlatformLibraries platform, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+    public HollowFastlanePublishWorkflowStager(TransformerContext ctx, SubscriptionManager hermesSubscriber, FastPropertyPublisher hermesPublisher, FileStore fileStore, Supplier<ServerUploadStatus> uploadStatus, String vip) {
         this.ctx = new TransformerPublishWorkflowContext(ctx,
-                platform,
                 new HermesVipAnnouncer(
-                        new HermesBlobAnnouncer(platform.getHermesPublisher(),
-                                HermesTopicProvider.HOLLOWBLOB_TOPIC_PREFIX),
-                        platform.getHermesSubscriber(), null),
+                        new HermesBlobAnnouncer(hermesPublisher),
+                        hermesSubscriber, null),
                 uploadStatus,
+                fileStore,
                 vip);
         
         this.scheduler = new PublicationJobScheduler();
