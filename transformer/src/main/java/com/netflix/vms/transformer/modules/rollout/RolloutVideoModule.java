@@ -37,6 +37,7 @@ import com.netflix.vms.transformer.hollowoutput.TrailerInfo;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
+import com.netflix.vms.transformer.util.OutputUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,10 +60,10 @@ public class RolloutVideoModule extends AbstractTransformModule {
         Map<Integer, IndividualSupplementalHollow> trailerIdToTrailerMap = getTrailerIdToTrailerMap();
 
         for (Integer videoId : videoIdToRolloutMap.keySet()) {
-        	/// short circuit irrelevant Videos in Fastlane
-        	if(ctx.getFastlaneIds() != null && !ctx.getFastlaneIds().contains(videoId))
-        		continue;
-        	
+            /// short circuit irrelevant Videos in Fastlane
+            if(ctx.getFastlaneIds() != null && !ctx.getFastlaneIds().contains(videoId))
+                continue;
+
             RolloutVideo output = new RolloutVideo();
             output.video = new Video(videoId.intValue());
 
@@ -213,8 +214,8 @@ public class RolloutVideoModule extends AbstractTransformModule {
 
     // src -> dest
     private void copy(RolloutPhaseWindowHollow inputPhaseWindow, AvailabilityWindow w) {
-        w.startDate = new Date(inputPhaseWindow._getStartDate());
-        w.endDate = new Date(inputPhaseWindow._getEndDate());
+        w.startDate = OutputUtil.getRoundedDate(inputPhaseWindow._getStartDate());
+        w.endDate = OutputUtil.getRoundedDate(inputPhaseWindow._getEndDate());
     }
 
     // src -> dest

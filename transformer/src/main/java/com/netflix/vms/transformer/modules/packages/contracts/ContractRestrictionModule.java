@@ -22,12 +22,12 @@ import com.netflix.vms.transformer.hollowinput.VideoRightsWindowHollow;
 import com.netflix.vms.transformer.hollowoutput.AvailabilityWindow;
 import com.netflix.vms.transformer.hollowoutput.ContractRestriction;
 import com.netflix.vms.transformer.hollowoutput.CupKey;
-import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.LanguageRestrictions;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.util.OutputUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -109,8 +109,8 @@ public class ContractRestrictionModule {
                     ContractRestriction restriction = new ContractRestriction();
 
                     restriction.availabilityWindow = new AvailabilityWindow();
-                    restriction.availabilityWindow.startDate = new Date(window._getStartDate()._getValue());
-                    restriction.availabilityWindow.endDate = new Date(window._getEndDate()._getValue());
+                    restriction.availabilityWindow.startDate = OutputUtil.getRoundedDate(window._getStartDate()._getValue());
+                    restriction.availabilityWindow.endDate = OutputUtil.getRoundedDate(window._getEndDate()._getValue());
 
                     restriction.cupKeys = new ArrayList<CupKey>();
                     restriction.languageBcp47RestrictionsMap = new HashMap<Strings, LanguageRestrictions>();
