@@ -14,6 +14,7 @@ import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuit
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuitBreaker.CircuitBreakerResult;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuitBreaker.CircuitBreakerResults;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.SnapshotSizeCircuitBreaker;
+import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TopNViewShareAvailabilityCircuitBreaker;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TypeCardinalityCircuitBreaker;
 import com.netflix.vms.transformer.publish.workflow.job.CircuitBreakerJob;
 import java.io.File;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import org.apache.commons.lang.StringUtils;
@@ -51,6 +53,7 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
                 new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "DrmKey"),
                 new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "WmDrmKey"),
                 new SnapshotSizeCircuitBreaker(ctx, cycleVersion, snapshotFile.length()),
+                new TopNViewShareAvailabilityCircuitBreaker(ctx, cycleVersion),
         };
 
         this.circuitBreakersDisabled = !ctx.getConfig().isCircuitBreakersEnabled();
@@ -129,6 +132,8 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
             }
 
             return isAllDataValid;
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e.getCause());
         } catch(Exception e) {
             /// convert to a RuntimeException and let the publish workflow framework deal with the failure.
             throw new RuntimeException(e);
