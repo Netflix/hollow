@@ -12,7 +12,6 @@ import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.fastproperties.ClientPinningUtil;
 import com.netflix.vms.transformer.rest.blobinfo.BlobImageEntry.AttributeKeys;
 import com.netflix.vms.transformer.rest.blobinfo.BlobImageEntry.BlobType;
-import com.netflix.vms.transformer.servlet.platform.TransformerServerPlatformLibraries;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,9 +56,9 @@ public class VMSBlobInfoAdmin {
     private final FileStore fileStore;
     
     @Inject
-    public VMSBlobInfoAdmin(TransformerConfig config, TransformerServerPlatformLibraries libs) {
+    public VMSBlobInfoAdmin(TransformerConfig config, FileStore fileStore) {
         this.transformerConfig = config;
-        this.fileStore = libs.getFileStore();
+        this.fileStore = fileStore;
     }
 
     @GET

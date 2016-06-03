@@ -1,11 +1,11 @@
 package com.netflix.vms.transformer.rest;
 
-import com.netflix.vms.transformer.servlet.platform.TransformerServerPlatformLibraries;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.netflix.archaius.api.Config;
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
+import com.netflix.cassandra.NFAstyanaxManager;
 import com.netflix.config.NetflixConfiguration.EnvironmentEnum;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
@@ -46,10 +46,10 @@ public class VMSCircuitBreakerAdmin {
     private final String vip;
 
     @Inject
-    public VMSCircuitBreakerAdmin(TransformerConfig transformerConfig, Config config, TransformerServerPlatformLibraries platformLibs, OctoberSkyData ocData) {
+    public VMSCircuitBreakerAdmin(TransformerConfig transformerConfig, Config config, OctoberSkyData ocData, NFAstyanaxManager astyanamaxManager) {
         this.transformerConfig = transformerConfig;
         this.config = config;
-        this.cassandraHelper = new TransformerServerCassandraHelper(platformLibs.getAstyanax(), "cass_dpt", "hollow_publish_workflow", "hollow_validation_stats");
+        this.cassandraHelper = new TransformerServerCassandraHelper(astyanamaxManager, "cass_dpt", "hollow_publish_workflow", "hollow_validation_stats");
         this.vip = transformerConfig.getTransformerVip();
         this.ocData = ocData;
     }
