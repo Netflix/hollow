@@ -25,6 +25,8 @@ public interface TransformerConfig {
 
     String getAwsInstanceId();
     
+    String getAwsAmiId();
+    
     Long getPinInputVersion();
     
     
