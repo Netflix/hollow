@@ -40,7 +40,7 @@ public abstract class HollowPerCountryCompleteVideoScoringCircuitBreaker extends
         CircuitBreakerResults results = new CircuitBreakerResults();
 
         for(int i=0;i<perCountryCertificationCounts.length;i++) {
-            ISOCountryHollow country = hollowApi.getISOCountryHollow(ordinal);
+            ISOCountryHollow country = hollowApi.getISOCountryHollow(i);
             
             if(country == null){
 				ctx.getLogger().warn(LogTag.CircuitBreaker, "Null country ordinal: "+ordinal);
