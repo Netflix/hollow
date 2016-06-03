@@ -137,8 +137,8 @@ public class TransformCycle {
             }
         } catch(IOException e) {
             ctx.getLogger().error(WritingBlobsFailed, "Writing blobs failed", e);
+            outputStateEngine.resetToLastPrepareForNextCycle();
             consecutiveCycleFailures++;
-            /// TODO: MUST reset to last prepare for next cycle.  We're already writing so that functionality needs to be added to netflix-hollow.
         }
 
         long endTime = System.currentTimeMillis();

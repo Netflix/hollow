@@ -707,7 +707,7 @@
             "requested": "[1.12.10,)"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.102",
+            "locked": "0.103",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-businesslogic",
                 "com.netflix.vms.transformer:vms-transformer-common-interfaces",
@@ -3540,7 +3540,7 @@
             "requested": "[1.12.10,)"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.102",
+            "locked": "0.103",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-businesslogic",
                 "com.netflix.vms.transformer:vms-transformer-common-interfaces",
@@ -6373,7 +6373,7 @@
             "requested": "[1.12.10,)"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.102",
+            "locked": "0.103",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-businesslogic",
                 "com.netflix.vms.transformer:vms-transformer-common-interfaces",
@@ -9206,7 +9206,7 @@
             "requested": "[1.12.10,)"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.102",
+            "locked": "0.103",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-businesslogic",
                 "com.netflix.vms.transformer:vms-transformer-common-interfaces",
@@ -12058,7 +12058,7 @@
             "requested": "[1.12.10,)"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.102",
+            "locked": "0.103",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-businesslogic",
                 "com.netflix.vms.transformer:vms-transformer-common-interfaces",
@@ -15983,7 +15983,7 @@
             "requested": "[1.12.10,)"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.102",
+            "locked": "0.103",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-businesslogic",
                 "com.netflix.vms.transformer:vms-transformer-common-interfaces",
@@ -18816,7 +18816,7 @@
             "requested": "[1.12.10,)"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.102",
+            "locked": "0.103",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-businesslogic",
                 "com.netflix.vms.transformer:vms-transformer-common-interfaces",
@@ -21651,7 +21651,7 @@
             "requested": "[1.12.10,)"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.102",
+            "locked": "0.103",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-businesslogic",
                 "com.netflix.vms.transformer:vms-transformer-common-interfaces",
@@ -24581,7 +24581,7 @@
             "requested": "[1.12.10,)"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.102",
+            "locked": "0.103",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-businesslogic",
                 "com.netflix.vms.transformer:vms-transformer-common-interfaces",
@@ -27511,7 +27511,7 @@
             "requested": "[1.12.10,)"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.102",
+            "locked": "0.103",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-businesslogic",
                 "com.netflix.vms.transformer:vms-transformer-common-interfaces",
@@ -30441,7 +30441,7 @@
             "requested": "[1.12.10,)"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.102",
+            "locked": "0.103",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-businesslogic",
                 "com.netflix.vms.transformer:vms-transformer-common-interfaces",
