@@ -106,7 +106,7 @@ public class TransformerCycleKickoff {
         });
 
         t.setDaemon(true);
-        t.setName("vms-transformer-cycler");
+        t.setName("vmstransformer-cycler");
         t.start();
     }
 
