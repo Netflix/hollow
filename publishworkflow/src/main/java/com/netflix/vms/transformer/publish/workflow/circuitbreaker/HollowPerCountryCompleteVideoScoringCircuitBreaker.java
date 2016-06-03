@@ -7,7 +7,6 @@ import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
 import com.netflix.vms.generated.notemplate.ISOCountryHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-
 import java.util.BitSet;
 
 public abstract class HollowPerCountryCompleteVideoScoringCircuitBreaker extends HollowCountrySpecificCircuitBreaker {
@@ -40,7 +39,10 @@ public abstract class HollowPerCountryCompleteVideoScoringCircuitBreaker extends
         CircuitBreakerResults results = new CircuitBreakerResults();
 
         for(int i=0;i<perCountryCertificationCounts.length;i++) {
-            ISOCountryHollow country = hollowApi.getISOCountryHollow(i);
+            ISOCountryHollow country = hollowApi.getISOCountryHollow(ordinal);
+            
+            if(country == null)
+            	continue;
 
             if(perCountryCertificationCounts[i] != 0 && ctx.getConfig().isCircuitBreakerEnabled(getRuleName(), country._getId()))
                 results.addResult(compareMetric(country._getId(), perCountryCertificationCounts[i]));

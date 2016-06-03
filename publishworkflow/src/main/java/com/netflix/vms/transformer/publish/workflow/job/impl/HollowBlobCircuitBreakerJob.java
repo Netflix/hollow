@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import org.apache.commons.lang.StringUtils;
@@ -132,8 +131,6 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
             }
 
             return isAllDataValid;
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e.getCause());
         } catch(Exception e) {
             /// convert to a RuntimeException and let the publish workflow framework deal with the failure.
             throw new RuntimeException(e);
