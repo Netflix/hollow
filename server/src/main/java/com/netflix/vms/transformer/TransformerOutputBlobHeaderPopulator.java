@@ -23,7 +23,7 @@ public class TransformerOutputBlobHeaderPopulator {
         
         outputStateEngine.addHeaderTag("sourceDataVersion", String.valueOf(inputClient.getCurrentVersionId()));
         outputStateEngine.addHeaderTag("publishCycleDataTS", String.valueOf(ctx.getNowMillis()));
-        outputStateEngine.addHeaderTags(BlobMetaDataUtil.getPublisherProps(ctx.getConfig(), System.currentTimeMillis(), String.valueOf(currentCycleNumber), previousCycleNumber == Long.MIN_VALUE ? "" : String.valueOf(previousCycleNumber)));
+        outputStateEngine.addHeaderTags(BlobMetaDataUtil.getPublisherProps(ctx.getConfig().getTransformerVip(), System.currentTimeMillis(), String.valueOf(currentCycleNumber), previousCycleNumber == Long.MIN_VALUE ? "" : String.valueOf(previousCycleNumber)));
         
         /// input versions
         Map<String, String> inputHeaderTags = inputClient.getStateEngine().getHeaderTags();

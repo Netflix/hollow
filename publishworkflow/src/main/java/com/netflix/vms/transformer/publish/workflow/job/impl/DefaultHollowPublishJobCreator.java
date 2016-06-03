@@ -51,7 +51,8 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
         this.ctx = new TransformerPublishWorkflowContext(transformerContext,
                 new HermesVipAnnouncer(
                         new HermesBlobAnnouncer(hermesPublisher),
-                        hermesSubscriber, ctx.getConfig()),
+                        hermesSubscriber, 
+                        transformerContext.getConfig().getTransformerVip()),
                 serverUploadStatus,
                 fileStore,
                 vip);

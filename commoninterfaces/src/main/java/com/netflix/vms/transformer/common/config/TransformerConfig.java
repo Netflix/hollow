@@ -66,9 +66,6 @@ public interface TransformerConfig {
     public float getPlaybackMonkeyNoiseTolerance();
     
     @DefaultValue("false")
-    public boolean isBigRedButton();
-    
-    @DefaultValue("false")
     public boolean isBigGreenButton();
     
 

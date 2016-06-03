@@ -1,7 +1,5 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import com.netflix.vms.transformer.common.config.TransformerConfig;
-
 import com.netflix.appinfo.ApplicationInfoManager;
 import com.netflix.aws.db.ItemAttribute;
 import com.netflix.configadmin.ConfigAdmin;
@@ -18,7 +16,7 @@ public class BlobMetaDataUtil {
     private final static FastDateFormat formatter = FastDateFormat.getInstance("dd-MMM-yyyy HH:mm:ss z", tz);
 
 
-    public static Map<String, String> getPublisherProps(TransformerConfig config, long publishedTimestamp, String currentVersion, String priorVersion) {
+    public static Map<String, String> getPublisherProps(String vip, long publishedTimestamp, String currentVersion, String priorVersion) {
         Map<String, String> map = new HashMap<>();
 
         map.put("producedTime", formatter.format(publishedTimestamp));
@@ -26,7 +24,7 @@ public class BlobMetaDataUtil {
         map.put("dataVersion", currentVersion);
         map.put("priorVersion", priorVersion);
 
-        map.put("VIP", config.getTransformerVip());
+        map.put("VIP", vip);
         map.put("ProducedByServer", getServerId());
         map.put("ProducedByJarVersion", getJarVersion());
 
@@ -41,8 +39,8 @@ public class BlobMetaDataUtil {
         addAttribute(attributes, key.name(), value);
     }
 
-    public static void addPublisherProps(TransformerConfig config, List<ItemAttribute> attributes, long publishedTimestamp, String currentVersion, String priorVersion) {
-        for (Map.Entry<String, String> entry : getPublisherProps(config, publishedTimestamp, currentVersion, priorVersion).entrySet()) {
+    public static void addPublisherProps(String vip, List<ItemAttribute> attributes, long publishedTimestamp, String currentVersion, String priorVersion) {
+        for (Map.Entry<String, String> entry : getPublisherProps(vip, publishedTimestamp, currentVersion, priorVersion).entrySet()) {
             addAttribute(attributes, entry.getKey(), entry.getValue());
         }
     }
