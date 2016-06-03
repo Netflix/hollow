@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.modules.artwork;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_IMAGE_FORMAT;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_RECIPE;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_TERRITORY_COUNTRIES;
-
 import com.google.common.collect.ComparisonChain;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
@@ -43,7 +42,6 @@ import com.netflix.vms.transformer.hollowoutput.__passthrough_string;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
 import com.netflix.vms.transformer.util.NFLocaleUtil;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -55,7 +53,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import org.apache.commons.codec.digest.DigestUtils;
 
 public abstract class ArtWorkModule extends AbstractTransformModule{
@@ -73,6 +70,8 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
 
     private final boolean isEnableCdnDirectoryOptimization;
     private final int computedCdnFolderLen;
+    
+    private final Set<String> unknownArtworkImageTypes = new HashSet<String>();
 
     public ArtWorkModule(String entityType, VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
         super(api, ctx, mapper);
@@ -94,6 +93,8 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
 
     protected void transformArtworks(int entityId, String sourceFileId, int ordinalPriority, int seqNum, ArtworkAttributesHollow attributes, ArtworkDerivativeListHollow derivatives, Set<ArtworkLocaleHollow> localeSet, Set<Artwork> artworkSet) {
 
+        unknownArtworkImageTypes.clear();
+        
         // Process list of derivatives
         List<ArtworkDerivative> derivativeList = new ArrayList<ArtworkDerivative>();
         List<ArtworkCdn> cdnList = new ArrayList<ArtworkCdn>();
@@ -111,7 +112,11 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             ArtWorkImageTypeEntry typeEntry = getImageTypeEntry(derivativeHollow);
             ArtWorkImageRecipe recipeEntry = getImageRecipe(derivativeHollow);
             if (typeEntry == null) {
-                ctx.getLogger().error(LogTag.UnknownArtworkImageType, String.format("Unknown Image Type for entity=%s, id=%s, type=%s; data will be dropped.", entityType, entityId, derivativeHollow._getImageType()._getValue()));
+                String imageType = derivativeHollow._getImageType()._getValue();
+                if(!unknownArtworkImageTypes.contains(imageType)) {
+                    ctx.getLogger().warn(LogTag.UnknownArtworkImageType, String.format("Unknown Image Type for entity=%s, id=%s, type=%s; data will be dropped.", entityType, entityId, imageType));
+                    unknownArtworkImageTypes.add(imageType);
+                }
                 continue;
             }
 

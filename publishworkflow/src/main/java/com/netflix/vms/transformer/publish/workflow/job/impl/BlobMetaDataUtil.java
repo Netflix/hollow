@@ -16,15 +16,15 @@ public class BlobMetaDataUtil {
     private final static FastDateFormat formatter = FastDateFormat.getInstance("dd-MMM-yyyy HH:mm:ss z", tz);
 
 
-    public static Map<String, String> getPublisherProps(long publishedTimestamp, String currentVersion, String priorVersion) {
+    public static Map<String, String> getPublisherProps(String vip, long publishedTimestamp, String currentVersion, String priorVersion) {
         Map<String, String> map = new HashMap<>();
 
         map.put("producedTime", formatter.format(publishedTimestamp));
-        map.put("publishedTimestamp", formatter.format(publishedTimestamp));
+        map.put("publishedTimestamp", String.valueOf(publishedTimestamp));
         map.put("dataVersion", currentVersion);
         map.put("priorVersion", priorVersion);
 
-        //map.put("VIP", MetaDataCommonPropertyManager.getVipAddressProperty());
+        map.put("VIP", vip);
         map.put("ProducedByServer", getServerId());
         map.put("ProducedByJarVersion", getJarVersion());
 
@@ -39,8 +39,8 @@ public class BlobMetaDataUtil {
         addAttribute(attributes, key.name(), value);
     }
 
-    public static void addPublisherProps(List<ItemAttribute> attributes, long publishedTimestamp, String currentVersion, String priorVersion) {
-        for (Map.Entry<String, String> entry : getPublisherProps(publishedTimestamp, currentVersion, priorVersion).entrySet()) {
+    public static void addPublisherProps(String vip, List<ItemAttribute> attributes, long publishedTimestamp, String currentVersion, String priorVersion) {
+        for (Map.Entry<String, String> entry : getPublisherProps(vip, publishedTimestamp, currentVersion, priorVersion).entrySet()) {
             addAttribute(attributes, entry.getKey(), entry.getValue());
         }
     }
@@ -55,11 +55,6 @@ public class BlobMetaDataUtil {
 
     private static String version = null;
 
-    private static void initLib() {
-        final String proposedVersion = ConfigAdmin.getLibraryVersion("transformer-server", BlobMetaDataUtil.class);
-        version = StringUtils.isBlank(proposedVersion) ? "Unknown" : proposedVersion;
-    }
-
     public static String getJarVersion() {
         if (null != version) {
             return version;
@@ -69,5 +64,9 @@ public class BlobMetaDataUtil {
         return version;
     }
 
+    private static void initLib() {
+        final String proposedVersion = ConfigAdmin.getLibraryVersion("vms-transformer-businesslogic", BlobMetaDataUtil.class);
+        version = StringUtils.isBlank(proposedVersion) ? "Unknown" : proposedVersion;
+    }
 
 }

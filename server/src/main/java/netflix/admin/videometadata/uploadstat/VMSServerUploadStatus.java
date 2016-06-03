@@ -5,12 +5,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class VMSServerUploadStatus {
+public class VMSServerUploadStatus implements ServerUploadStatus {
 
-    private final List<VMSServerCycleUploadStatus> cycleStatuses;
+    private final List<ServerCycleUploadStatus> cycleStatuses;
 
     public VMSServerUploadStatus() {
-        this.cycleStatuses = new ArrayList<VMSServerCycleUploadStatus>();
+        this.cycleStatuses = new ArrayList<>();
     }
 
     /**
@@ -19,8 +19,9 @@ public class VMSServerUploadStatus {
      * @param version
      * @return
      */
-    public synchronized VMSServerCycleUploadStatus getCycle(String version) {
-        for(VMSServerCycleUploadStatus status : cycleStatuses) {
+    @Override
+    public synchronized ServerCycleUploadStatus getCycle(String version) {
+        for(ServerCycleUploadStatus status : cycleStatuses) {
             if(version.equals(status.getVersion())) {
                 return status;
             }
@@ -37,11 +38,12 @@ public class VMSServerUploadStatus {
     /**
      * Get all available cycle statuses
      */
-    public synchronized List<VMSServerCycleUploadStatus> getCycleStatuses() {
-        List<VMSServerCycleUploadStatus> cycles = new ArrayList<VMSServerCycleUploadStatus>(cycleStatuses);
+    @Override
+    public synchronized List<ServerCycleUploadStatus> getCycleStatuses() {
+        List<ServerCycleUploadStatus> cycles = new ArrayList<>(cycleStatuses);
 
-        Collections.sort(cycles, new Comparator<VMSServerCycleUploadStatus>() {
-            public int compare(VMSServerCycleUploadStatus o1, VMSServerCycleUploadStatus o2) {
+        Collections.sort(cycles, new Comparator<ServerCycleUploadStatus>() {
+            public int compare(ServerCycleUploadStatus o1, ServerCycleUploadStatus o2) {
                 return o2.getVersion().compareTo(o1.getVersion());
             }
         });
@@ -56,6 +58,7 @@ public class VMSServerUploadStatus {
      *
      * @param desiredCycles
      */
+    @Override
     public synchronized void cleanUpUploadStatuses(int desiredCycles) {
         for(int i=0;i < cycleStatuses.size() - desiredCycles;i++) {
             if(cycleStatuses.get(i).removeAllSuccessful()) {
@@ -65,9 +68,9 @@ public class VMSServerUploadStatus {
         }
     }
 
-    private static final VMSServerUploadStatus theInstance = new VMSServerUploadStatus();
+    private static final ServerUploadStatus theInstance = new VMSServerUploadStatus();
 
-    public static VMSServerUploadStatus get() {
+    public static ServerUploadStatus get() {
         return theInstance;
     }
 

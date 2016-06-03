@@ -5,7 +5,6 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerFiles;
 import com.netflix.vms.transformer.common.TransformerLogger;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
-import com.netflix.vms.transformer.common.TransformerPlatformLibraries;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
@@ -27,7 +26,6 @@ public class TransformerServerContext implements TransformerContext {
     private final TransformerCassandraHelper hollowValidationStats;
     private final TransformerCassandraHelper canaryResults;
     private final TransformerFiles files;
-    private final TransformerPlatformLibraries platformLibraries;
     private final PublicationHistoryConsumer publicationHistoryConsumer;
     private final TransformerMetricRecorder metricRecorder;
     private final OctoberSkyData octoberSkyData;
@@ -51,7 +49,6 @@ public class TransformerServerContext implements TransformerContext {
             TransformerCassandraHelper hollowValidationStats,
             TransformerCassandraHelper canaryResults,
             TransformerFiles files,
-            TransformerPlatformLibraries platformLibraries,
             PublicationHistoryConsumer publicationHistoryConsumer) {
         this.logger = logger;
         this.octoberSkyData = octoberSkyData;
@@ -60,7 +57,6 @@ public class TransformerServerContext implements TransformerContext {
         this.hollowValidationStats = hollowValidationStats;
         this.canaryResults = canaryResults;
         this.files = files;
-        this.platformLibraries = platformLibraries;
         this.publicationHistoryConsumer = publicationHistoryConsumer;
         
         this.configFactory = new FrozenTransformerConfigFactory(config);
@@ -132,11 +128,6 @@ public class TransformerServerContext implements TransformerContext {
     @Override
     public TransformerFiles files() {
         return files;
-    }
-
-    @Override
-    public  TransformerPlatformLibraries platformLibraries() {
-        return platformLibraries;
     }
 
     @Override

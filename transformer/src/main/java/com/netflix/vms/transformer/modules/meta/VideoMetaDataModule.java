@@ -116,7 +116,9 @@ public class VideoMetaDataModule {
                 rollup.newSeason();
 
                 for(int j=0;j<hierarchy.getEpisodeIds()[i].length;j++) {
+                    rollup.setDoEpisode(true);
                     convert(hierarchy.getEpisodeIds()[i][j], countryCode, countryMap, rollup);
+                    rollup.setDoEpisode(false);
                 }
 
                 rollup.setDoSeason(true);

@@ -12,6 +12,7 @@ public interface TransformerLogger {
         TransformCycleFailed,
         TransformProgress,
         InputDataVersionIds,
+        InputDataConverterVersionId,
         PropertyValue,
         WroteBlob,
         WritingBlobsFailed,
@@ -42,7 +43,8 @@ public interface TransformerLogger {
         MarkedPoisonState,
         ObservedPoisonState,
         AnnouncementSuccess,
- AnnouncementFailure,
+        AnnouncementFailure,
+        BlobChecksum
     }
 
     public static enum Severity {

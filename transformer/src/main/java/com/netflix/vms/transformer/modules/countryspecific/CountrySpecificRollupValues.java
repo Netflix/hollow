@@ -1,13 +1,11 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
-import com.netflix.hollow.util.IntList;
 import com.netflix.vms.transformer.hollowoutput.DateWindow;
 import com.netflix.vms.transformer.hollowoutput.LinkedHashSetOfStrings;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoImage;
 import com.netflix.vms.transformer.util.RollupValues;
-
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
@@ -42,7 +40,7 @@ public class CountrySpecificRollupValues extends RollupValues {
     private Map<Strings, List<VideoImage>> seasonLevelTaggedVideoImagesRollup = new HashMap<Strings, List<VideoImage>>();
 
     private int seasonSequenceNumber = 0;
-    private Map<DateWindow, IntList> seasonSequenceNumberMap = new HashMap<>();
+    private Map<DateWindow, BitSet> seasonSequenceNumberMap = new HashMap<>();
 
     int showPrePromoDays = 0;
     int seasonPrePromoDays = 0;
@@ -180,13 +178,13 @@ public class CountrySpecificRollupValues extends RollupValues {
         dateWindow.startDateTimestamp = startDate;
         dateWindow.endDateTimestamp = endDate;
 
-        IntList seasonSeqNums = seasonSequenceNumberMap.get(dateWindow);
+        BitSet seasonSeqNums = seasonSequenceNumberMap.get(dateWindow);
         if(seasonSeqNums == null) {
-            seasonSeqNums = new IntList();
+            seasonSeqNums = new BitSet();
             seasonSequenceNumberMap.put(dateWindow, seasonSeqNums);
         }
 
-        seasonSeqNums.add(sequenceNumber);
+        seasonSeqNums.set(sequenceNumber);
     }
 
     public int getFirstEpisodeBundledAssetId() {
@@ -261,11 +259,9 @@ public class CountrySpecificRollupValues extends RollupValues {
             Long currentEndDate = sortedWindowDates.get(i+1);
             mergedSeqNums.clear();
 
-            for(Map.Entry<DateWindow, IntList> entry : seasonSequenceNumberMap.entrySet()) {
+            for(Map.Entry<DateWindow, BitSet> entry : seasonSequenceNumberMap.entrySet()) {
                 if(entry.getKey().startDateTimestamp <= currentStartDate && entry.getKey().endDateTimestamp >= currentEndDate) {
-                    for(int j=0;j<entry.getValue().size();j++) {
-                        mergedSeqNums.set(entry.getValue().get(j));
-                    }
+                    mergedSeqNums.or(entry.getValue());
                 }
             }
 
