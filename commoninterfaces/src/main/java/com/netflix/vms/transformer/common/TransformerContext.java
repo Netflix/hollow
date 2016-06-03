@@ -38,8 +38,5 @@ public interface TransformerContext {
     
     OctoberSkyData getOctoberSkyData();
 
-    TransformerPlatformLibraries platformLibraries();
-
     Consumer<PublicationHistory> getPublicationHistoryConsumer();
-    
 }

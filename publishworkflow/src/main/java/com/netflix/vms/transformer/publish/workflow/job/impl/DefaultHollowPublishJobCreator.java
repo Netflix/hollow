@@ -1,6 +1,9 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
+import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.hermes.publisher.FastPropertyPublisher;
+import com.netflix.hermes.subscriber.SubscriptionManager;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
@@ -23,6 +26,8 @@ import com.netflix.vms.transformer.publish.workflow.playbackmonkey.PlaybackMonke
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
+import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 
 public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
     /* dependencies */
@@ -35,16 +40,20 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
     private PublishWorkflowContext ctx;
 
     public DefaultHollowPublishJobCreator(TransformerContext transformerContext,
+            SubscriptionManager hermesSubscriber,
+            FastPropertyPublisher hermesPublisher,
+            FileStore fileStore,
             HollowBlobDataProvider hollowBlobDataProvider, PlaybackMonkeyTester playbackMonkeyTester,
-            ValidationVideoRanker videoRanker, String vip) {
+            ValidationVideoRanker videoRanker, Supplier<ServerUploadStatus> serverUploadStatus, String vip) {
         this.hollowBlobDataProvider = hollowBlobDataProvider;
         this.playbackMonkeyTester = playbackMonkeyTester;
         this.videoRanker = videoRanker;
         this.ctx = new TransformerPublishWorkflowContext(transformerContext,
                 new HermesVipAnnouncer(
-                        new HermesBlobAnnouncer(transformerContext.platformLibraries().getHermesPublisher(),
-                                HermesTopicProvider.HOLLOWBLOB_TOPIC_PREFIX),
-                        transformerContext.platformLibraries().getHermesSubscriber(), transformerContext.getConfig()),
+                        new HermesBlobAnnouncer(hermesPublisher),
+                        hermesSubscriber, ctx.getConfig()),
+                serverUploadStatus,
+                fileStore,
                 vip);
     }
 

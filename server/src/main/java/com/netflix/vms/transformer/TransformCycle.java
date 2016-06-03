@@ -10,6 +10,7 @@ import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metri
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ReadInputDataDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WriteOutputDataDuration;
 
+import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.client.HollowClient;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -36,9 +37,9 @@ public class TransformCycle {
     private long currentCycleNumber = Long.MIN_VALUE;
     private int consecutiveCycleFailures = 0;
 
-    public TransformCycle(TransformerContext ctx, PublishWorkflowStager publishStager, String converterVip, String transformerVip) {
+    public TransformCycle(TransformerContext ctx, FileStore fileStore, PublishWorkflowStager publishStager, String converterVip, String transformerVip) {
         this.transformerVip = transformerVip;
-        this.inputClient = new VMSInputDataClient(ctx.platformLibraries().getFileStore(), converterVip);
+        this.inputClient = new VMSInputDataClient(fileStore, converterVip);
         this.outputStateEngine = new VMSTransformerWriteStateEngine();
         this.ctx = ctx;
         this.headerPopulator = new TransformerOutputBlobHeaderPopulator(inputClient, outputStateEngine, ctx);

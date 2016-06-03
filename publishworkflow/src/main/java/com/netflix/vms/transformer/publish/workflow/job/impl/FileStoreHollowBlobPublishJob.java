@@ -1,21 +1,19 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
 import com.netflix.aws.db.ItemAttribute;
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.videometadata.s3.HollowBlobKeybaseBuilder;
+import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
-import netflix.admin.videometadata.uploadstat.VMSFileUploadStatus;
-import netflix.admin.videometadata.uploadstat.VMSFileUploadStatus.UploadStatus;
-import netflix.admin.videometadata.uploadstat.VMSFileUploadStatus.VMSFileRegionUploadStatus;
-import netflix.admin.videometadata.uploadstat.VMSServerCycleUploadStatus;
-import netflix.admin.videometadata.uploadstat.VMSServerUploadStatus;
+
+import netflix.admin.videometadata.uploadstat.FileUploadStatus.FileRegionUploadStatus;
+import netflix.admin.videometadata.uploadstat.FileUploadStatus.UploadStatus;
 
 public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
 
@@ -29,11 +27,13 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
     protected boolean executeJob() {
         FileStore fileStore = ctx.getFileStore();
         String keybase = getKeybase();
-        String fileStoreVersion = jobType == PublishType.DELTA ? String.valueOf(previousVersion) : String.valueOf(getCycleVersion());
+        String currentVersion = String.valueOf(getCycleVersion());
+        String fileStoreVersion = jobType == PublishType.DELTA ? String.valueOf(previousVersion) : currentVersion;
 
-        VMSServerCycleUploadStatus cycleStatus = VMSServerUploadStatus.get().getCycle(String.valueOf(getCycleVersion()));
-        VMSFileUploadStatus fileStatus = cycleStatus.getStatus(keybase, fileToUpload.length());
-        VMSFileRegionUploadStatus status = fileStatus.getUploadStatus(region);
+        long size = fileToUpload.length();
+        RegionEnum region = this.region;
+
+        FileRegionUploadStatus status = fileUploadStatus(currentVersion, keybase, size, region);
 
         boolean success = false;
 
@@ -63,7 +63,12 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
         return success;
     }
 
-    private void logResult(String keybase, VMSFileRegionUploadStatus status, boolean success, long startTime) {
+    private FileRegionUploadStatus fileUploadStatus(String currentVersion, String keybase, long size,
+            RegionEnum region) {
+        return ctx.serverUploadStatus().get().getCycle(currentVersion).getStatus(keybase, size).getUploadStatus(region);
+    }
+
+    private void logResult(String keybase, FileRegionUploadStatus status, boolean success, long startTime) {
         long duration = System.currentTimeMillis() - startTime;
         if(success) {
             status.setStatus(UploadStatus.SUCCESS);

@@ -10,7 +10,6 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerFiles;
 import com.netflix.vms.transformer.common.TransformerLogger;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
-import com.netflix.vms.transformer.common.TransformerPlatformLibraries;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
 import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
 import java.util.function.Consumer;
@@ -109,13 +108,7 @@ public class SimpleTransformerContext implements TransformerContext {
     }
 
     @Override
-    public TransformerPlatformLibraries platformLibraries() {
-        throw new UnsupportedOperationException("simple transformer doesn't publish");
-    }
-
-    @Override
     public Consumer<PublicationHistory> getPublicationHistoryConsumer() {
         throw new UnsupportedOperationException("simple transformer doesn't publish");
     }
-
 }
