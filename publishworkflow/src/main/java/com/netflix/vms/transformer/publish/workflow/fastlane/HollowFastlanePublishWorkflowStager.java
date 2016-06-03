@@ -1,10 +1,20 @@
 package com.netflix.vms.transformer.publish.workflow.fastlane;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.videometadata.publish.PublishRegionProvider;
+import com.netflix.hermes.publisher.FastPropertyPublisher;
+import com.netflix.hermes.subscriber.SubscriptionManager;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
+import com.netflix.vms.transformer.publish.workflow.PublishRegionProvider;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.TransformerPublishWorkflowContext;
@@ -15,13 +25,9 @@ import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJob
 import com.netflix.vms.transformer.publish.workflow.job.impl.FastlaneHermesAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.impl.FileStoreHollowBlobPublishJob;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HermesBlobAnnouncer;
-import com.netflix.vms.transformer.publish.workflow.job.impl.HermesTopicProvider;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HermesVipAnnouncer;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 
 public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStager {
 
@@ -31,12 +37,13 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
     
     private PublishWorkflowContext ctx;
     
-    public HollowFastlanePublishWorkflowStager(TransformerContext ctx, String vip) {
-        this.ctx = new TransformerPublishWorkflowContext(ctx, 
+    public HollowFastlanePublishWorkflowStager(TransformerContext ctx, SubscriptionManager hermesSubscriber, FastPropertyPublisher hermesPublisher, FileStore fileStore, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+        this.ctx = new TransformerPublishWorkflowContext(ctx,
                 new HermesVipAnnouncer(
-                        new HermesBlobAnnouncer(ctx.platformLibraries().getHermesPublisher(),
-                                HermesTopicProvider.HOLLOWBLOB_TOPIC_PREFIX),
-                        ctx.platformLibraries().getHermesSubscriber(), null),
+                        new HermesBlobAnnouncer(hermesPublisher),
+                        hermesSubscriber, null),
+                uploadStatus,
+                fileStore,
                 vip);
         
         this.scheduler = new PublicationJobScheduler();

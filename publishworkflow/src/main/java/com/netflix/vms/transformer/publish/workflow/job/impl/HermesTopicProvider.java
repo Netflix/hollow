@@ -2,12 +2,12 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 
 
 public class HermesTopicProvider {
-    public static final String HOLLOWBLOB_TOPIC_PREFIX = "vms.hollow.blob.";
-    public static final String DATACANARY_TOPIC_PREFIX = "vms.canary.hollow.blob.";
-    public static final String OVERRIDE_TOPIC_PREFIX = "vms.override.hollow.blob.";
-    public static final String OVERRIDE_DATACANARY_TOPIC_PREFIX = "vms.override.canary.hollow.blob.";
+    private static final String HOLLOWBLOB_TOPIC_PREFIX = "vms.hollow.blob.";
+    private static final String DATACANARY_TOPIC_PREFIX = "vms.canary.hollow.blob.";
+    private static final String OVERRIDE_TOPIC_PREFIX = "vms.override.hollow.blob.";
+    private static final String OVERRIDE_DATACANARY_TOPIC_PREFIX = "vms.override.canary.hollow.blob.";
 
-    public static String getTopic(String topicPrefix, String vip) {
+    private static String getTopic(String topicPrefix, String vip) {
         return topicPrefix + vip;
     }
 

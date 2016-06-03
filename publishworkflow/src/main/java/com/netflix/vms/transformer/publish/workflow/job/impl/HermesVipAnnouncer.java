@@ -1,34 +1,32 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import java.util.Map;
-import java.util.concurrent.TimeoutException;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.netflix.config.FastProperty;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.hermes.data.DirectDataPointer;
 import com.netflix.hermes.exception.DataConsumeException;
 import com.netflix.hermes.subscriber.Subscription;
 import com.netflix.hermes.subscriber.SubscriptionManager;
 import com.netflix.vms.transformer.common.publish.workflow.VipAnnouncer;
+import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 public class HermesVipAnnouncer implements VipAnnouncer {
 
     /* dependencies */
     private final HermesBlobAnnouncer hermesAnnouncer;
     private final SubscriptionManager subscriptionManager;
-    private final FastProperty.BooleanProperty bigRedButton;
+    private final String vip;
 
     /* fields */
     private long previouslyAnnouncedCanaryVersion = Long.MAX_VALUE;
     private long currentlyAnnouncedCanaryVersion = Long.MAX_VALUE;
 
-    public HermesVipAnnouncer(HermesBlobAnnouncer hermesAnnouncer, SubscriptionManager hermesSubscriber, FastProperty.BooleanProperty bigRedButton) {
+    public HermesVipAnnouncer(HermesBlobAnnouncer hermesAnnouncer, SubscriptionManager hermesSubscriber, String vip) {
         this.hermesAnnouncer = hermesAnnouncer;
         this.subscriptionManager = hermesSubscriber;
-        this.bigRedButton = bigRedButton;
+        this.vip = vip;
     }
 
     @Override
@@ -38,9 +36,6 @@ public class HermesVipAnnouncer implements VipAnnouncer {
 
     @Override
     public boolean announce(String vip, RegionEnum region, boolean canary, long announceVersion, long priorVersion) {
-        if(bigRedButton != null && bigRedButton.get())
-            return false;
-
         String hermesTopic = canary ? HermesTopicProvider.getDataCanaryTopic(vip) : HermesTopicProvider.getHollowBlobTopic(vip);
 
         boolean success = false;
@@ -66,7 +61,7 @@ public class HermesVipAnnouncer implements VipAnnouncer {
     private Map<String, String> getAttributes(long cycleVersionId, long priorVersion) {
         String currentVersionStr = String.valueOf(cycleVersionId);
         String priorVersionStr = (priorVersion != Long.MIN_VALUE || priorVersion != cycleVersionId)? String.valueOf(priorVersion) : "";
-        return BlobMetaDataUtil.getPublisherProps(System.currentTimeMillis(), currentVersionStr, priorVersionStr);
+        return BlobMetaDataUtil.getPublisherProps(vip, System.currentTimeMillis(), currentVersionStr, priorVersionStr);
     }
 
     @Override

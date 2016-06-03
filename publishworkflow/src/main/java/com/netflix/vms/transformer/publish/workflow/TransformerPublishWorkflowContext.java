@@ -10,6 +10,8 @@ import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraH
 import com.netflix.vms.transformer.common.publish.workflow.VipAnnouncer;
 import com.netflix.vms.transformer.publish.CassandraBasedPoisonedStateMarker;
 import com.netflix.vms.transformer.publish.PoisonedStateMarker;
+import java.util.function.Supplier;
+import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 
 public class TransformerPublishWorkflowContext implements PublishWorkflowContext {
 
@@ -19,27 +21,31 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
     private final PoisonedStateMarker poisonStateMarker;
     private final VipAnnouncer vipAnnouncer;
     private final TransformerLogger logger;
+    private final Supplier<ServerUploadStatus> uploadStatus;
+    private final FileStore fileStore;
 
     /* fields */
     private final String vip;
 	private final long nowMillis;
 
-    public TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer, String vip) {
-        this(ctx, vipAnnouncer, vip, new CassandraBasedPoisonedStateMarker(ctx, vip));
+    public TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer, Supplier<ServerUploadStatus> uploadStatus, FileStore fileStore, String vip) {
+        this(ctx, vipAnnouncer, uploadStatus, fileStore, vip, new CassandraBasedPoisonedStateMarker(ctx, vip));
     }
 
-    private TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer, String vip, PoisonedStateMarker poisonStateMarker) {
+    private TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer, Supplier<ServerUploadStatus> uploadStatus, FileStore fileStore, String vip, PoisonedStateMarker poisonStateMarker) {
         this.transformerCtx = ctx;
         this.vip = vip;
         this.config = ctx.getConfig();
         this.vipAnnouncer = vipAnnouncer;
         this.poisonStateMarker = poisonStateMarker;
+        this.uploadStatus = uploadStatus;
+        this.fileStore = fileStore;
         this.logger = ctx.getLogger();
         this.nowMillis = ctx.getNowMillis();
     }
 
     public TransformerPublishWorkflowContext withCurrentLoggerAndConfig() {
-        return new TransformerPublishWorkflowContext(transformerCtx, vipAnnouncer, vip, poisonStateMarker);
+        return new TransformerPublishWorkflowContext(transformerCtx, vipAnnouncer, uploadStatus, fileStore, vip, poisonStateMarker);
     }
 
     @Override
@@ -74,7 +80,7 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
 
     @Override
     public FileStore getFileStore() {
-        return transformerCtx.platformLibraries().getFileStore();
+        return fileStore;
     }
 
     @Override
@@ -96,4 +102,7 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
 		return transformerCtx.getMetricRecorder();
 	}
 
+	public Supplier<ServerUploadStatus> serverUploadStatus() {
+	    return uploadStatus;
+	}
 }

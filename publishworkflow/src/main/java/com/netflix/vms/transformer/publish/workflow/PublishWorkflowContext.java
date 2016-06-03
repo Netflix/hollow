@@ -8,6 +8,8 @@ import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.publish.workflow.VipAnnouncer;
 import com.netflix.vms.transformer.publish.PoisonedStateMarker;
+import java.util.function.Supplier;
+import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 
 public interface PublishWorkflowContext {
 
@@ -35,4 +37,6 @@ public interface PublishWorkflowContext {
     
     TransformerMetricRecorder getMetricRecorder();
 
+
+    Supplier<ServerUploadStatus> serverUploadStatus();
 }

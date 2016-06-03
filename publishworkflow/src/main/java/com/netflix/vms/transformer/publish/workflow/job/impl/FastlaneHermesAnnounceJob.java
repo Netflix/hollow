@@ -1,20 +1,16 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-
-import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
-import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
-import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.videometadata.audit.ErrorCodeLogger;
-import com.netflix.videometadata.audit.VMSErrorCode.ErrorCode;
-import com.netflix.videometadata.audit.VMSLogManager;
-import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
-import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob.PublishType;
 import java.util.List;
 
-public class FastlaneHermesAnnounceJob extends PublishWorkflowPublicationJob {
+import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
+import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
+import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob.PublishType;
+import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
 
-    private static final ErrorCodeLogger LOGGER = VMSLogManager.getErrorCodeLogger(FastlaneHermesAnnounceJob.class);
+public class FastlaneHermesAnnounceJob extends PublishWorkflowPublicationJob {
 
     private final String vip;
     private final long priorVersion;
@@ -54,13 +50,12 @@ public class FastlaneHermesAnnounceJob extends PublishWorkflowPublicationJob {
     private void logResult(boolean success) {
         // These log error codes will be used in dashboard to mark that version as failed.
         // TODO: need to figure out a way to expose this message in Errors tab.
-        ErrorCode validationResult = ErrorCode.HollowAnnounceFailure;
-        String resultStr = "failure";
+        String format = "Hollow data announce %s: for version %s for vip %s region %s";
         if(success){
-            validationResult = ErrorCode.HollowAnnounceSuccess;
-            resultStr = "success";
+            ctx.getLogger().info(LogTag.AnnouncementSuccess, String.format(format, "success", getCycleVersion(), vip, region));
+        } else {
+            ctx.getLogger().error(LogTag.AnnouncementFailure, String.format(format, "failure", getCycleVersion(), vip, region));
         }
-        LOGGER.logWithExplicitCycleVersion(validationResult, String.valueOf(getCycleVersion()), "Hollow data announce "+resultStr+": for version "+getCycleVersion()+" for vip "+vip+" region "+region);
     }
 
     @Override
