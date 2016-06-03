@@ -41,7 +41,10 @@ public abstract class HollowPerCountryCompleteVideoScoringCircuitBreaker extends
         for(int i=0;i<perCountryCertificationCounts.length;i++) {
             ISOCountryHollow country = hollowApi.getISOCountryHollow(i);
             
-            if(perCountryCertificationCounts[i] != 0 && ctx.getConfig().isCircuitBreakerEnabled(getRuleName(), country._getId()))
+            if(perCountryCertificationCounts[i] != 0 && ctx
+            		.getConfig()
+            		.isCircuitBreakerEnabled(getRuleName(), 
+            				country._getId()))
                 results.addResult(compareMetric(country._getId(), perCountryCertificationCounts[i]));
         }
 
