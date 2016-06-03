@@ -71,7 +71,10 @@ public class TransformCycle {
 
     private void updateTheInput() {
         long startTime = System.currentTimeMillis();
-        inputClient.triggerRefresh();
+        if(ctx.getConfig().getPinInputVersion() == null)
+            inputClient.triggerRefresh();
+        else
+            inputClient.triggerRefreshTo(ctx.getConfig().getPinInputVersion());
         long endTime = System.currentTimeMillis();
 
         ctx.getMetricRecorder().recordMetric(ReadInputDataDuration, endTime - startTime);
