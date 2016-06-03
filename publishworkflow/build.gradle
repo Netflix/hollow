@@ -1,5 +1,5 @@
 dependencies {
-    compile project(':vms-transformer-common-interfaces')
+    compile project(':vmstransformer-common-interfaces')
 
     compile 'com.netflix.hollow:netflix-hollow:latest.release'
     compile 'netflix:vms-hollow-generated-notemplate:latest.release'

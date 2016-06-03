@@ -61,10 +61,10 @@ dependencies {
     compile "com.netflix.aeneas:aeneas-core:latest.release"
 
     // VMS Transformer
-    compile project(':vms-transformer-common-interfaces')
-    compile project(':vms-transformer-io')
-    compile project(':vms-transformer-businesslogic')
-    compile project(':vms-transformer-publish-workflow')
+    compile project(':vmstransformer-common-interfaces')
+    compile project(':vmstransformer-io')
+    compile project(':vmstransformer-business-logic')
+    compile project(':vmstransformer-publish-workflow')
     compile 'netflix:vms-hollow-generated-notemplate:latest.release'
 
     testCompile 'junit:junit:latest.release'

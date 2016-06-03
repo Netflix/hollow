@@ -65,7 +65,7 @@ public class BlobMetaDataUtil {
     }
 
     private static void initLib() {
-        final String proposedVersion = ConfigAdmin.getLibraryVersion("vms-transformer-businesslogic", BlobMetaDataUtil.class);
+        final String proposedVersion = ConfigAdmin.getLibraryVersion("vmstransformer-business-logic", BlobMetaDataUtil.class);
         version = StringUtils.isBlank(proposedVersion) ? "Unknown" : proposedVersion;
     }
 

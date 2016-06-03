@@ -1,5 +1,5 @@
 dependencies {
-    compile project(':vms-transformer-common-interfaces')
+    compile project(':vmstransformer-common-interfaces')
     compile 'com.netflix.archaius:archaius2-core:latest.release'
     compile 'com.netflix.hollow:netflix-hollow:latest.release'
     compile 'com.google.guava:guava:14.0.1'
