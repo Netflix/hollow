@@ -4,6 +4,7 @@ dependencies {
     compile 'com.netflix.hollow:netflix-hollow:latest.release'
     compile 'com.google.guava:guava:14.0.1'
     compile 'netflix:nfi18n-core:latest.release'
+    compile 'commons-codec:commons-codec:latest.release'
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.assertj:assertj-core:3.3+'
