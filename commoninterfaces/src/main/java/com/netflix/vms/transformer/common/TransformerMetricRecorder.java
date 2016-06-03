@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.common;
 
 public interface TransformerMetricRecorder {
 
-    void recordMetric(Metric name, long value);
+    void recordMetric(Metric name, double value);
 
     void incrementCounter(Metric name, long incrementBy);
 
@@ -14,6 +14,8 @@ public interface TransformerMetricRecorder {
 
         ConsecutiveCycleFailures,
         FailedProcessingIndividualHierarchies,
+        
+        TopNMissingViewShare,
 
         CycleSuccessCounter;
 
