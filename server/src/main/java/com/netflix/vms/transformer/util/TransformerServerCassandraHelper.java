@@ -47,6 +47,23 @@ public class TransformerServerCassandraHelper implements TransformerCassandraHel
     }
 
     @Override
+    public void deleteVipKeyValuePair(String vip, String key) throws ConnectionException {
+        deleteKeyValuePair(vipSpecificKey(vip, key));
+    }
+
+    @Override
+    public void deleteKeyValuePair(String key) throws ConnectionException {
+        deleteKeyColumnValue(key, "val");
+    }
+
+    @Override
+    public void deleteKeyColumnValue(String key, String columnName) throws ConnectionException {
+        MutationBatch batch = createMutationBatch();
+        batch.withRow(getColumnFamily(), key).deleteColumn(columnName);
+        batch.execute();
+    }
+
+    @Override
     public String getVipKeyValuePair(String vip, String key) throws ConnectionException {
         return getKeyValuePair(vipSpecificKey(vip, key));
     }

@@ -14,6 +14,12 @@ public interface TransformerCassandraHelper {
 
     void addKeyColumnValue(String key, String columnName, String value) throws ConnectionException;
 
+    void deleteVipKeyValuePair(String vip, String key) throws ConnectionException;
+
+    void deleteKeyValuePair(String key) throws ConnectionException;
+
+    void deleteKeyColumnValue(String key, String columnName) throws ConnectionException;
+    
     String getVipKeyValuePair(String vip, String key) throws ConnectionException;
 
     String getKeyValuePair(String key) throws ConnectionException;

@@ -28,7 +28,8 @@ import java.util.concurrent.FutureTask;
 import org.apache.commons.lang.StringUtils;
 
 public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
-    private final HollowBlobDataProvider hollowBlobDataProvider;
+
+	private final HollowBlobDataProvider hollowBlobDataProvider;
     private final HollowCircuitBreaker circuitBreakerRules[];
 
     private final boolean circuitBreakersDisabled;
@@ -37,9 +38,13 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
         super(ctx, ctx.getVip(), cycleVersion, snapshotFile, deltaFile, reverseDeltaFile);
         this.hollowBlobDataProvider = hollowBlobDataProvider;
 
-        //// add your circuit breakers here.
-        //// IMPORTANT: don't forget to update ClusterConfigModule.java
-        this.circuitBreakerRules = new HollowCircuitBreaker[] {
+        this.circuitBreakerRules = createCircuitBreakerRules(ctx, cycleVersion, snapshotFile.length());
+        
+        this.circuitBreakersDisabled = !ctx.getConfig().isCircuitBreakersEnabled();
+    }
+    
+	public static HollowCircuitBreaker[] createCircuitBreakerRules(PublishWorkflowContext ctx, long cycleVersion, long snapshotFileLength) {
+		return new HollowCircuitBreaker[] {
                 new DuplicateDetectionCircuitBreaker(ctx, cycleVersion),
                 new CertificationSystemCircuitBreaker(ctx, cycleVersion),
                 new CertificationSystemCircuitBreaker(ctx, cycleVersion, 100),
@@ -52,12 +57,10 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
                 new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "OriginServer"),
                 new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "DrmKey"),
                 new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "WmDrmKey"),
-                new SnapshotSizeCircuitBreaker(ctx, cycleVersion, snapshotFile.length()),
+                new SnapshotSizeCircuitBreaker(ctx, cycleVersion, snapshotFileLength),
                 new TopNViewShareAvailabilityCircuitBreaker(ctx, cycleVersion),
         };
-
-        this.circuitBreakersDisabled = !ctx.getConfig().isCircuitBreakersEnabled();
-    }
+	}
 
     @Override
     protected boolean executeJob() {

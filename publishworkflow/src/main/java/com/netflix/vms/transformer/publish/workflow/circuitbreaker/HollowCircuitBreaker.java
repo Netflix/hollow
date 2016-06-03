@@ -17,7 +17,6 @@ public abstract class HollowCircuitBreaker {
 
     public static final CircuitBreakerResults PASSED = new CircuitBreakerResults(true, "");
 
-
     protected final PublishWorkflowContext ctx;
     protected final long versionId;
     private final Map<String, Double> successCountsForCycle;
@@ -29,6 +28,10 @@ public abstract class HollowCircuitBreaker {
     }
 
     public abstract String getRuleName();
+    
+    public boolean isCountrySpecific() {
+    	return false;
+    }
 
     public CircuitBreakerResults run(HollowReadStateEngine stateEngine) {
         if(!ctx.getConfig().isCircuitBreakerEnabled(getRuleName())) {
