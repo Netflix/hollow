@@ -9,22 +9,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class VMSServerCycleUploadStatus {
+public class VMSServerCycleUploadStatus implements ServerCycleUploadStatus {
 
     private final String version;
-    private final ConcurrentHashMap<String, VMSFileUploadStatus> uploadStatusMap;
+    private final ConcurrentHashMap<String, FileUploadStatus> uploadStatusMap;
 
 
     public VMSServerCycleUploadStatus(String version) {
         this.version = version;
-        this.uploadStatusMap = new ConcurrentHashMap<String, VMSFileUploadStatus>();
+        this.uploadStatusMap = new ConcurrentHashMap<>();
     }
 
-    public Collection<VMSFileUploadStatus> getUploadStatuses() {
-        List<VMSFileUploadStatus> statuses = new ArrayList<VMSFileUploadStatus>(uploadStatusMap.values());
+    @Override
+    public Collection<FileUploadStatus> getUploadStatuses() {
+        List<FileUploadStatus> statuses = new ArrayList<>(uploadStatusMap.values());
 
-        Collections.sort(statuses, new Comparator<VMSFileUploadStatus>() {
-            public int compare(VMSFileUploadStatus o1, VMSFileUploadStatus o2) {
+        Collections.sort(statuses, new Comparator<FileUploadStatus>() {
+            public int compare(FileUploadStatus o1, FileUploadStatus o2) {
                 return o1.getKeybase().compareTo(o2.getKeybase());
             }
         });
@@ -32,15 +33,17 @@ public class VMSServerCycleUploadStatus {
         return statuses;
     }
 
+    @Override
     public String getVersion() {
         return version;
     }
 
-    public VMSFileUploadStatus getStatus(String keybase, long size) {
-        VMSFileUploadStatus status = uploadStatusMap.get(keybase);
+    @Override
+    public FileUploadStatus getStatus(String keybase, long size) {
+        FileUploadStatus status = uploadStatusMap.get(keybase);
         if(status == null) {
             status = new VMSFileUploadStatus(keybase, size);
-            VMSFileUploadStatus existing = uploadStatusMap.putIfAbsent(keybase, status);
+            FileUploadStatus existing = uploadStatusMap.putIfAbsent(keybase, status);
             if(existing != null) {
                 status = existing;
             }
@@ -48,21 +51,16 @@ public class VMSServerCycleUploadStatus {
         return status;
     }
 
-    /**
-     * Removes all completely successful artifact statuses from the uploadStatusMap.
-     *
-     * @return true if all artifact statuses were removed.
-     */
-    boolean removeAllSuccessful() {
-        Iterator<Map.Entry<String, VMSFileUploadStatus>> iter  = uploadStatusMap.entrySet().iterator();
+    @Override
+    public boolean removeAllSuccessful() {
+        Iterator<Map.Entry<String, FileUploadStatus>> iter  = uploadStatusMap.entrySet().iterator();
 
         while(iter.hasNext()) {
-            Map.Entry<String, VMSFileUploadStatus> entry = iter.next();
+            Map.Entry<String, FileUploadStatus> entry = iter.next();
             if(entry.getValue().isAllSuccessful())
                 iter.remove();
         }
 
         return uploadStatusMap.isEmpty();
     }
-
 }

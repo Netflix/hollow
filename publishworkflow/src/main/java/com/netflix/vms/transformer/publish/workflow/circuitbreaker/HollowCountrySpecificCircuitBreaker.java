@@ -48,7 +48,7 @@ public abstract class HollowCountrySpecificCircuitBreaker extends HollowCircuitB
         return compareMetric(country.getId(), value);
     }
 
-    protected CircuitBreakerResults compareMetric(String country, long value) {
+    protected CircuitBreakerResults compareMetric(String country, double value) {
     	if(!isEnabled(country))
     		return new CircuitBreakerResults(true, "Rule " + getRuleName() + ": disabled for country " + country);
     	

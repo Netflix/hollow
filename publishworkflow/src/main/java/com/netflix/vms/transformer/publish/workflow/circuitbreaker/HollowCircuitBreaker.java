@@ -19,12 +19,11 @@ public abstract class HollowCircuitBreaker {
 
     protected final PublishWorkflowContext ctx;
     protected final long versionId;
-
-    private final Map<String, Long> successCountsForCycle;
+    private final Map<String, Double> successCountsForCycle;
 
     public HollowCircuitBreaker(PublishWorkflowContext ctx, long versionId) {
         this.ctx = ctx;
-        this.successCountsForCycle = new HashMap<String, Long>();
+        this.successCountsForCycle = new HashMap<String, Double>();
         this.versionId = versionId;
     }
 
@@ -53,19 +52,18 @@ public abstract class HollowCircuitBreaker {
         return compareMetric(getRuleName(), currentValue, changeThresholdPercent);
     }
 
-    protected CircuitBreakerResults compareMetric(String metricName, long currentValue, double changeThresholdPercent) {
+    protected CircuitBreakerResults compareMetric(String metricName, double currentValue, double changeThresholdPercent) {
 
         successCountsForCycle.put(metricName, currentValue);
 
         try {
-            long expectedValue = getExpectedCount(metricName);
-            if((double)Math.abs(expectedValue - currentValue) > (double)(expectedValue * changeThresholdPercent)){
-                return new CircuitBreakerResults(false, "Hollow validation failure for " + metricName + ": "
-                        + "This will result failure of publish and announce of data."
-                        + "Expected value: " + expectedValue + "; Observed value: " + currentValue + "; Threshold: " + changeThresholdPercent);
+            long baseLine = getBaseLine(metricName);
+            if(isCBCheckFailed(currentValue, changeThresholdPercent, baseLine)){
+                return new CircuitBreakerResults(false, getFailedCBMessage(metricName, currentValue, changeThresholdPercent, baseLine));
             }
 
-            return new CircuitBreakerResults(true, "Metric \"" + metricName + "\" current value: " + currentValue + " expected value: " + expectedValue + " threshold: " + changeThresholdPercent);
+            return new CircuitBreakerResults(true, "Metric \"" + metricName + "\" current value: " + currentValue + " expected value: " + baseLine + " threshold: " + changeThresholdPercent);
+        
         } catch(Exception e) {
             ctx.getLogger().info(CircuitBreaker, "Metric \"" + metricName + "\" current value: " + currentValue);
             if(failedBecauseDataNotYetPopulated(e)) {
@@ -76,6 +74,22 @@ public abstract class HollowCircuitBreaker {
             }
         }
     }
+
+    protected String getFailedCBMessage(String metricName, double currentValue, double changeThresholdPercent, long baseLine) {
+    	String changeType = (currentValue < baseLine) ? "drop" : "addition";
+		return "Hollow validation failure for " + metricName + ": "
+		        + "This will result failure of announcement of data to clients."
+		        + "Observed a change percent of "+getChangePercent(currentValue, baseLine)+" ("+changeType+" from: "+baseLine+" to: +"+currentValue+"). "
+		        		+ "Change threshold: " + changeThresholdPercent;
+	}
+
+    protected double getChangePercent(double currentValue, long baseLine) {
+		return((Math.abs(baseLine - currentValue)*100)/baseLine);
+	}
+
+    protected boolean isCBCheckFailed(double currentValue, double changeThresholdPercent, long baseLine) {
+		return (double)Math.abs(baseLine - currentValue) > (double)(baseLine * changeThresholdPercent);
+	}
 
     protected boolean metricExists(String metricName) {
         try {
@@ -97,7 +111,7 @@ public abstract class HollowCircuitBreaker {
         }
     }
 
-    private long getExpectedCount(String objectName) throws NumberFormatException, ConnectionException {
+    protected long getBaseLine(String objectName) throws NumberFormatException, ConnectionException {
         return Long.parseLong(ctx.getValidationStatsCassandraHelper().getVipKeyValuePair(ctx.getVip(), objectName));
     }
 

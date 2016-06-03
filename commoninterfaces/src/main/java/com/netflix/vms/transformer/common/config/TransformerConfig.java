@@ -23,13 +23,17 @@ public interface TransformerConfig {
     String getTransformerVip();
 
     String getNetflixEnvironment();
-    
+
     String getAwsRegion();
-    
+
     String getAwsInstanceId();
-    
+
+    String getAwsAmiId();
+
+    Long getPinInputVersion();
+
     //////////////// PUBLISH WORKFLOW ///////////////////
-    
+
     @DefaultValue("false")
     public boolean isCircuitBreakersEnabled();
 
@@ -64,6 +68,9 @@ public interface TransformerConfig {
 
     @DefaultValue("0.01")
     public float getPlaybackMonkeyNoiseTolerance();
+    
+    @DefaultValue("false")
+    public boolean isBigGreenButton();
     
 
     /////////////// VMS IOPS (ElasticSearch) ///////////////

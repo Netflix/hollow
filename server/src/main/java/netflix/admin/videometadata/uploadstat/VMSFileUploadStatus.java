@@ -6,17 +6,17 @@ import java.util.Collection;
 import java.util.EnumMap;
 import java.util.Map;
 
-public class VMSFileUploadStatus {
+public class VMSFileUploadStatus implements FileUploadStatus {
 
     private final String keybase;
     private final long size;
-    private final Map<RegionEnum, VMSFileRegionUploadStatus> uploadStatusMap;
+    private final Map<RegionEnum, FileRegionUploadStatus> uploadStatusMap;
 
 
     public VMSFileUploadStatus(String keybase, long size) {
         this.keybase = keybase;
         this.size = size;
-        this.uploadStatusMap = new EnumMap<RegionEnum, VMSFileRegionUploadStatus>(RegionEnum.class);
+        this.uploadStatusMap = new EnumMap<RegionEnum, FileRegionUploadStatus>(RegionEnum.class);
     }
 
     public String getKeybase() {
@@ -27,8 +27,8 @@ public class VMSFileUploadStatus {
         return size;
     }
 
-    public VMSFileRegionUploadStatus getUploadStatus(RegionEnum region) {
-        VMSFileRegionUploadStatus upload = uploadStatusMap.get(region);
+    public FileRegionUploadStatus getUploadStatus(RegionEnum region) {
+        FileRegionUploadStatus upload = uploadStatusMap.get(region);
         if(upload == null) {
             upload = new VMSFileRegionUploadStatus(region);
             uploadStatusMap.put(region, upload);
@@ -36,12 +36,12 @@ public class VMSFileUploadStatus {
         return upload;
     }
 
-    public Collection<VMSFileRegionUploadStatus> getUploadStatuses() {
+    public Collection<FileRegionUploadStatus> getUploadStatuses() {
         return uploadStatusMap.values();
     }
 
     public boolean isAllSuccessful() {
-        for(VMSFileRegionUploadStatus uploadStatus : getUploadStatuses()) {
+        for(FileRegionUploadStatus uploadStatus : getUploadStatuses()) {
             if(uploadStatus.getStatus() != UploadStatus.SUCCESS) {
                 return false;
             }
@@ -49,7 +49,7 @@ public class VMSFileUploadStatus {
         return true;
     }
 
-    public static class VMSFileRegionUploadStatus {
+    public static class VMSFileRegionUploadStatus implements FileRegionUploadStatus {
         private final RegionEnum region;
         private UploadStatus status;
         private int retryCount;
@@ -93,14 +93,4 @@ public class VMSFileUploadStatus {
             retryCount++;
         }
     }
-
-    public static enum UploadStatus {
-        UPLOADING,
-        COPYING,
-        RETRYING,
-        FAILED,
-        SUCCESS,
-        ABORTED
-    }
-
 }

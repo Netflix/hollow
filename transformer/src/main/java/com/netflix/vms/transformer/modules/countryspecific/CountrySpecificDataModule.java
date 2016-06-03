@@ -78,14 +78,17 @@ public class CountrySpecificDataModule {
             ShowHierarchy hierarchy = entry.getValue();
 
             for(int i=0;i<hierarchy.getSeasonIds().length;i++) {
+                rollup.setSeasonSequenceNumber(hierarchy.getSeasonSequenceNumbers()[i]);
+
                 for(int j=0;j<hierarchy.getEpisodeIds()[i].length;j++) {
                     int videoId = hierarchy.getEpisodeIds()[i][j];
+                    rollup.setDoEpisode(true);
                     convert(videoId, countryCode, countryMap, rollup);
+                    rollup.setDoEpisode(false);
                     rollup.episodeFound();
                 }
 
                 rollup.setDoSeason(true);
-                rollup.setSeasonSequenceNumber(hierarchy.getSeasonSequenceNumbers()[i]);
                 convert(hierarchy.getSeasonIds()[i], countryCode, countryMap, rollup);
                 rollup.setDoSeason(false);
                 rollup.resetSeason();
