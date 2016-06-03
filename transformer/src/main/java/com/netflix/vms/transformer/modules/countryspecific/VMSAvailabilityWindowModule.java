@@ -13,7 +13,6 @@ import com.netflix.vms.transformer.hollowinput.VideoRightsHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsRightsHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsWindowHollow;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
-import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.LinkedHashSetOfStrings;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
@@ -108,7 +107,7 @@ public class VMSAvailabilityWindowModule {
             outputWindow.startDate = OutputUtil.getRoundedDate(window._getStartDate()._getValue());
             outputWindow.endDate = OutputUtil.getRoundedDate(window._getEndDate()._getValue());
             outputWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
-            
+
             if(isGoLive && rollup.doEpisode()) {
                 rollup.newSeasonWindow(window._getStartDate()._getValue(), window._getEndDate()._getValue(), rollup.getSeasonSequenceNumber());
             }
@@ -232,7 +231,7 @@ public class VMSAvailabilityWindowModule {
 
             if(includedWindowPackageData)
                 includedPackageDataCount++;
-            
+
         }
 
 
@@ -305,8 +304,8 @@ public class VMSAvailabilityWindowModule {
             }
 
             VMSAvailabilityWindow outputWindow = new VMSAvailabilityWindow();
-            outputWindow.startDate = new Date(minStartDate);
-            outputWindow.endDate = new Date(maxEndDate);
+            outputWindow.startDate = OutputUtil.getRoundedDate(minStartDate);
+            outputWindow.endDate = OutputUtil.getRoundedDate(maxEndDate);
             outputWindow.bundledAssetsGroupId = rollup.getFirstEpisodeBundledAssetId();
 
             WindowPackageContractInfo videoImagesContractInfo = createEmptyContractInfoForRollup(outputWindow);

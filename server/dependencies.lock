@@ -1862,13 +1862,13 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.88",
+            "locked": "1.89",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.88",
+            "locked": "1.89",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -4695,13 +4695,13 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.88",
+            "locked": "1.89",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.88",
+            "locked": "1.89",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -7528,13 +7528,13 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.88",
+            "locked": "1.89",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.88",
+            "locked": "1.89",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -10358,13 +10358,13 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.88",
+            "locked": "1.89",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.88",
+            "locked": "1.89",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -13213,13 +13213,13 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.88",
+            "locked": "1.89",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.88",
+            "locked": "1.89",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -17138,13 +17138,13 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.88",
+            "locked": "1.89",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.88",
+            "locked": "1.89",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -19968,13 +19968,13 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.88",
+            "locked": "1.89",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.88",
+            "locked": "1.89",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -22831,13 +22831,13 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.88",
+            "locked": "1.89",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.88",
+            "locked": "1.89",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -25761,13 +25761,13 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.88",
+            "locked": "1.89",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.88",
+            "locked": "1.89",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -28691,13 +28691,13 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.88",
+            "locked": "1.89",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.88",
+            "locked": "1.89",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -31621,13 +31621,13 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.88",
+            "locked": "1.89",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.88",
+            "locked": "1.89",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]

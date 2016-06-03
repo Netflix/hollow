@@ -312,7 +312,6 @@ public class VideoMetaDataModule {
                 vmd.titleTypes = titleTypes;
             }
 
-
             vmd.isTestTitle = general._getTestTitle();
             vmd.metadataReleaseDays = OutputUtil.getNullableInteger(general._getMetadataReleaseDays());
         }
@@ -320,7 +319,6 @@ public class VideoMetaDataModule {
 
     private void populateDates(Integer videoId, String countryCode, VideoMetaDataRollupValues rollup, VideoRightsHollow rights, VideoMetaDataCountrySpecificDataKey vmd) {
         HollowHashIndexResult dateResult = videoDateIdx.findMatches((long)videoId, countryCode);
-
         if(dateResult != null) {
             int ordinal = dateResult.iterator().next();
             VideoDateWindowHollow dateWindow = api.getVideoDateWindowHollow(ordinal);
@@ -328,14 +326,16 @@ public class VideoMetaDataModule {
             ReleaseDateHollow broadcastReleaseDate = VideoDateUtil.getReleaseDateType(VideoDateUtil.ReleaseDateType.Broadcast, dateWindow);
 
             vmd.isTheatricalRelease = theatricalReleaseDate != null;
-            vmd.year = theatricalReleaseDate == null ? 0 : theatricalReleaseDate._getYear();
-            vmd.latestYear = vmd.year;
             vmd.theatricalReleaseDate = VideoDateUtil.convertToHollowOutputDate(theatricalReleaseDate);
             vmd.broadcastYear = broadcastReleaseDate == null ? 0 : broadcastReleaseDate._getYear();
             vmd.broadcastReleaseDate = VideoDateUtil.convertToHollowOutputDate(broadcastReleaseDate);
-        } else {
-            vmd.year = 0;
-            vmd.latestYear = 0;
+        }
+
+        int ordinal = videoGeneralIdx.getMatchingOrdinal((long)videoId);
+        if(ordinal != -1) {
+            VideoGeneralHollow general = api.getVideoGeneralHollow(ordinal);
+            vmd.year = (int) general._getFirstReleaseYear();
+            vmd.latestYear = vmd.year; 
         }
     }
 
