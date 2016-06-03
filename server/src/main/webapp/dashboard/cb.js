@@ -1,3 +1,7 @@
+var cbNames = {};
+var cbProperties = {};
+var cbCountries = [];
+
 var PROPS = {}
 
 var ruleNames = [];
@@ -85,21 +89,7 @@ function fillThresholdOverrideSelect(ruleName, overrides) {
 }
 
 function setMasterStatus() {
-  // Determine whether circuit breakers are on or off
-  var circuitBreakerEnabledSDisabledKey = null;
-  for(var key in PROPS) {
-    if(key.indexOf("circuitBreakersEnabled") != -1) {
-      circuitBreakerEnabledSDisabledKey = key;
-      break;
-    }
-  }
-
-  if(circuitBreakerEnabledSDisabledKey == null) {
-    alert('There was a problem ... reload the page or cross your fingers');
-    return;
-  }
-
-  var circuitBreakersEnabled = (PROPS[circuitBreakerEnabledSDisabledKey] == "true");
+  var circuitBreakersEnabled = (cbProperties['vms.circuitBreakersEnabled'] === "true");
 
   if(circuitBreakersEnabled) {
     $('#global-cb-text').removeClass('cb-disabled').addClass('cb-enabled');
@@ -113,76 +103,41 @@ function setMasterStatus() {
 
 }
 
-function gatherRuleNames() {
-  for(var key in PROPS) {
-    var tokens = key.split('.');
-    if(tokens.length == 3 && tokens[1].indexOf('circuitBreakerEnabled') == 0) {
-      ruleNames.push(tokens[2]);
-    }
-  }
-}
-
-function buildCBRuleConfig() {
+function buildCBRuleConfig2() {
   for(var i = 0; i < ruleNames.length; i++) {
     var ruleName = ruleNames[i];
     // Determine if the rule is enabled or not
-    var enabled = PROPS['vms.circuitBreakerEnabled.' + ruleName];
+    var enabled = cbProperties['vms.circuitBreakerEnabled.' + ruleName]
     // Determine the threshold for the rule
-    var threshold = PROPS['vms.circuitBreakerThreshold.' + ruleName];
-    // Create the config object
+    var threshold = cbProperties['vms.circuitBreakerThreshold.' + ruleName];
     var config = {};
     config.enabled = enabled;
     config.threshold = threshold;
-    // Create a config for this rule
     cbconfig[ruleName] = config;
   }
 
-  // Now collect the variations
+  // Collect variations
   for(var i = 0; i < ruleNames.length; i++) {
     var ruleName = ruleNames[i];
-    var enabledPrefix = 'vms.circuitBreakerEnabled.' + ruleName;
-    var thresholdPrefix = 'vms.circuitBreakerThreshold.' + ruleName;
-    var variations = [];
-    for(var key in PROPS) {
-      var tokens = key.split('.');
-      if(tokens.length == 4 && (key.startsWith(enabledPrefix) || key.startsWith(thresholdPrefix))) {
-        if(variations.indexOf(tokens[3]) == -1)
-        	variations.push(tokens[3]);
-      }
+    var hasVariations = (cbNames[ruleName] === 'true');
+    if(hasVariations) {
+      cbconfig[ruleName].variations = cbCountries;
+    } else {
+      cbconfig[ruleName].variations = [];
     }
-    cbconfig[ruleName].variations = variations;
   }
 
-  // Now collect the enabled / disabled overrides as well as threshold overrides
-  // They are only valid for rules with variations
+  // Set the empty arrays for the following
+  // 1. enabledOverrides
+  // 2. disabledOverrides
   for(var i = 0; i < ruleNames.length; i++) {
     var ruleName = ruleNames[i];
-    var variations = cbconfig[ruleName].variations;
-    var enabledOverrides = [];
-    var disabledOverrides = [];
-    var thresholdOverrides = {};
-    for(var j = 0; j < variations.length; j++) {
-      var enabledKeyPrefix = 'vms.circuitBreakerEnabled.' + ruleName + '.' + variations[j];
-      var thresholdKeyPrefix = 'vms.circuitBreakerThreshold.' + ruleName + '.' + variations[j];
-      if(typeof PROPS[enabledKeyPrefix] != 'undefined') {
-        // The circuit breaker has enabled or disabled override for a variation
-        // record it
-        if(PROPS[enabledKeyPrefix] == 'true')
-          enabledOverrides.push(variations[j]);
-        if(PROPS[enabledKeyPrefix] == 'false')
-          disabledOverrides.push(variations[j]);
-      }
-      if(typeof PROPS[thresholdKeyPrefix] != 'undefined') {
-        // There is a threshold override. Record it
-        thresholdOverrides[variations[j]] = PROPS[thresholdKeyPrefix];
-      }
-    }
-    // Update the cbconfig with the overriding information
-    cbconfig[ruleName].enabledOverrides = enabledOverrides;
-    cbconfig[ruleName].disabledOverrides = disabledOverrides;
-    cbconfig[ruleName].thresholdOverrides = thresholdOverrides;
+    cbconfig[ruleName].enabledOverrides = [];
+    cbconfig[ruleName].disabledOverrides = [];
+    cbconfig[ruleName].thresholdOverrides = {};
   }
 }
+
 
 function paintUI() {
   for(var i = 0; i < ruleNames.length; i++) {
@@ -295,25 +250,35 @@ function hasVariations(ruleName) {
 $(document).ready(function(){
 
   // First get the data from the CircuitBreaker REST entry point
-  $.getJSON('/REST/vms/cb', function(data){
+  $.getJSON('/REST/vms/cb/names', function(names){
 
-    PROPS = data;
+    cbNames = names;
+    ruleNames = Object.keys(cbNames);
 
-    setMasterStatus();
+    // Get the properties
+    $.getJSON('/REST/vms/cb/properties', function(props){
+      cbProperties = props;
 
-    // Gather the list of circuit breaker rules
-    gatherRuleNames();
+      // get the countries
+      $.getJSON('/REST/vms/cb/countries', function(countries){
+        cbCountries = countries.sort();
 
-    // Build rule configuration
-    buildCBRuleConfig();
+        // Rest of the logic of painting the UI
+        setMasterStatus();
 
-    // Paint the UI
-    paintUI();
+        // Build rule configuration object
+        buildCBRuleConfig2();
 
-    // Remove the overlay
-    $('#overlay').remove();
+        // Paint the UI
+        paintUI();
 
-    addEventListeners();
+
+        $('#overlay').remove();
+
+        addEventListeners();
+
+      });
+    });
   });
 });
 

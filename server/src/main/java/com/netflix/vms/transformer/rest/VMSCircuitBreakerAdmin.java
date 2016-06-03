@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer.rest;
 
 import com.netflix.vms.transformer.servlet.platform.TransformerServerPlatformLibraries;
-
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -9,11 +8,13 @@ import com.netflix.archaius.api.Config;
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.config.NetflixConfiguration.EnvironmentEnum;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.fastproperties.PersistedPropertiesUtil;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuitBreaker;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HollowBlobCircuitBreakerJob;
 import com.netflix.vms.transformer.util.TransformerServerCassandraHelper;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +23,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -38,15 +41,25 @@ public class VMSCircuitBreakerAdmin {
     private final TransformerConfig transformerConfig;
     private final Config config;
     private final TransformerServerCassandraHelper cassandraHelper;
+    private final OctoberSkyData ocData;
 
     private final String vip;
 
     @Inject
-    public VMSCircuitBreakerAdmin(TransformerConfig transformerConfig, Config config, TransformerServerPlatformLibraries platformLibs) {
+    public VMSCircuitBreakerAdmin(TransformerConfig transformerConfig, Config config, TransformerServerPlatformLibraries platformLibs, OctoberSkyData ocData) {
         this.transformerConfig = transformerConfig;
         this.config = config;
         this.cassandraHelper = new TransformerServerCassandraHelper(platformLibs.getAstyanax(), "cass_dpt", "hollow_publish_workflow", "hollow_validation_stats");
         this.vip = transformerConfig.getTransformerVip();
+        this.ocData = ocData;
+    }
+    
+    @GET
+    @Path("/countries")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getSupportedCountries() {
+    	Set<String> countries = ocData.getSupportedCountries();
+    	return new Gson().toJson(countries);
     }
     
     @GET
