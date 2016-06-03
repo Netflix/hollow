@@ -1,13 +1,16 @@
 package com.netflix.vms.transformer.publish.workflow;
 
-import com.netflix.vms.transformer.common.config.OctoberSkyData;
+import java.util.function.Supplier;
 
-import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.aws.file.FileStore;
 import com.netflix.vms.transformer.common.TransformerLogger;
+import com.netflix.vms.transformer.common.config.OctoberSkyData;
+import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.publish.workflow.VipAnnouncer;
 import com.netflix.vms.transformer.publish.PoisonedStateMarker;
+
+import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 
 public interface PublishWorkflowContext {
 
@@ -31,5 +34,5 @@ public interface PublishWorkflowContext {
     
     OctoberSkyData getOctoberSkyData();
 
-
+    Supplier<ServerUploadStatus> serverUploadStatus();
 }

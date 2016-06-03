@@ -1,30 +1,26 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
+import java.io.File;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import com.netflix.aws.file.FileStore;
 import com.netflix.config.FastProperty;
 import com.netflix.config.FastProperty.BooleanProperty;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.hermes.publisher.FastPropertyPublisher;
+import com.netflix.hermes.subscriber.SubscriptionManager;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.TransformerPublishWorkflowContext;
-import com.netflix.vms.transformer.publish.workflow.job.AfterCanaryAnnounceJob;
-import com.netflix.vms.transformer.publish.workflow.job.AnnounceJob;
-import com.netflix.vms.transformer.publish.workflow.job.AutoPinbackJob;
-import com.netflix.vms.transformer.publish.workflow.job.BeforeCanaryAnnounceJob;
-import com.netflix.vms.transformer.publish.workflow.job.CanaryAnnounceJob;
-import com.netflix.vms.transformer.publish.workflow.job.CanaryRollbackJob;
-import com.netflix.vms.transformer.publish.workflow.job.CanaryValidationJob;
-import com.netflix.vms.transformer.publish.workflow.job.CircuitBreakerJob;
-import com.netflix.vms.transformer.publish.workflow.job.DelayJob;
-import com.netflix.vms.transformer.publish.workflow.job.HollowBlobDeleteFileJob;
-import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
+import com.netflix.vms.transformer.publish.workflow.job.*;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob.PublishType;
-import com.netflix.vms.transformer.publish.workflow.job.PoisonStateMarkerJob;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.PlaybackMonkeyTester;
-import java.io.File;
-import java.util.List;
-import java.util.Map;
+
+import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 
 public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
     private static final BooleanProperty BIG_RED_BUTTON = new FastProperty.BooleanProperty("com.netflix.vms.server.bigredbutton", false);
@@ -39,16 +35,20 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
     private PublishWorkflowContext ctx;
 
     public DefaultHollowPublishJobCreator(TransformerContext transformerContext,
+            SubscriptionManager hermesSubscriber,
+            FastPropertyPublisher hermesPublisher,
+            FileStore fileStore,
             HollowBlobDataProvider hollowBlobDataProvider, PlaybackMonkeyTester playbackMonkeyTester,
-            ValidationVideoRanker videoRanker, String vip) {
+            ValidationVideoRanker videoRanker, Supplier<ServerUploadStatus> serverUploadStatus, String vip) {
         this.hollowBlobDataProvider = hollowBlobDataProvider;
         this.playbackMonkeyTester = playbackMonkeyTester;
         this.videoRanker = videoRanker;
         this.ctx = new TransformerPublishWorkflowContext(transformerContext,
                 new HermesVipAnnouncer(
-                        new HermesBlobAnnouncer(transformerContext.platformLibraries().getHermesPublisher(),
-                                HermesTopicProvider.HOLLOWBLOB_TOPIC_PREFIX),
-                        transformerContext.platformLibraries().getHermesSubscriber(), BIG_RED_BUTTON),
+                        new HermesBlobAnnouncer(hermesPublisher),
+                        hermesSubscriber, BIG_RED_BUTTON),
+                serverUploadStatus,
+                fileStore,
                 vip);
     }
 

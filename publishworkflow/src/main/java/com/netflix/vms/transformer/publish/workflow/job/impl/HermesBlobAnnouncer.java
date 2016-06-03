@@ -18,12 +18,10 @@ import java.util.Map;
 @Singleton
 public class HermesBlobAnnouncer{
     private final FastPropertyPublisher publisher;
-    private final String topicPrefix;
 
     @Inject
-    public HermesBlobAnnouncer(FastPropertyPublisher publisher, String topicPrefix) {
+    public HermesBlobAnnouncer(FastPropertyPublisher publisher) {
         this.publisher = publisher;
-        this.topicPrefix = topicPrefix;
     }
 
     private boolean publishTopic(RegionEnum region, String topic, String version, HermesVipAnnouncer.HermesAnnounceEvent event) throws JsonProcessingException {
@@ -58,18 +56,6 @@ public class HermesBlobAnnouncer{
     }
 
     /*
-     * Publishes topic for a given region.
-     */
-    public synchronized boolean publish(String vip, RegionEnum region, Map<String, String> attributes) throws Exception{
-        String version = attributes.get("dataVersion");
-        HermesVipAnnouncer.HermesAnnounceEvent event = new HermesVipAnnouncer.HermesAnnounceEvent.Builder()
-                                                    .withAttributes(attributes)
-                                                    .build();
-
-        return publishTopic(region, getTopic(vip), version, event);
-    }
-
-    /*
      * Publishes specified topic for a given region.
      */
     public synchronized boolean publish(RegionEnum region, String topic, Map<String, String> attributes) throws Exception{
@@ -79,9 +65,5 @@ public class HermesBlobAnnouncer{
                                                     .build();
 
         return publishTopic(region, topic, version, event);
-    }
-
-    public String getTopic(String vip) {
-        return HermesTopicProvider.getTopic(topicPrefix, vip);
     }
 }
