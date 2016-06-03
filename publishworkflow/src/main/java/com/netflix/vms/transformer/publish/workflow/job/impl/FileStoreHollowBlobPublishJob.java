@@ -1,9 +1,5 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.netflix.aws.db.ItemAttribute;
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
@@ -11,7 +7,9 @@ import com.netflix.videometadata.s3.HollowBlobKeybaseBuilder;
 import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
-
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import netflix.admin.videometadata.uploadstat.FileUploadStatus.FileRegionUploadStatus;
 import netflix.admin.videometadata.uploadstat.FileUploadStatus.UploadStatus;
 
@@ -86,7 +84,7 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
         String currentVersion =  String.valueOf(getCycleVersion());
 
         long publishedTimestamp = System.currentTimeMillis();
-        BlobMetaDataUtil.addPublisherProps(att, publishedTimestamp, currentVersion, previousVersion);
+        BlobMetaDataUtil.addPublisherProps(vip, att, publishedTimestamp, currentVersion, previousVersion);
 
         if(jobType == PublishType.REVERSEDELTA) {
             BlobMetaDataUtil.addAttribute(att, "fromVersion", currentVersion);
