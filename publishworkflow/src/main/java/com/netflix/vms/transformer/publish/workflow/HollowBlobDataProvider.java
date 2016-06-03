@@ -87,8 +87,8 @@ public class HollowBlobDataProvider {
         HollowChecksum deltaChecksum = HollowChecksum.forStateEngine(hollowReadStateEngine);
         HollowChecksum snapshotChecksum = HollowChecksum.forStateEngine(anotherStateEngine);
 
-        ctx.getLogger().info(LogTag.HollowChecksum, "DELTA STATE CHECKSUM: " + deltaChecksum.toString());
-        ctx.getLogger().info(LogTag.HollowChecksum, "SNAPSHOT STATE CHECKSUM: " + snapshotChecksum.toString());
+        ctx.getLogger().info(LogTag.BlobChecksum, "DELTA STATE CHECKSUM: " + deltaChecksum.toString());
+        ctx.getLogger().info(LogTag.BlobChecksum, "SNAPSHOT STATE CHECKSUM: " + snapshotChecksum.toString());
 
         if(!deltaChecksum.equals(snapshotChecksum))
             throw new RuntimeException("DELTA CHECKSUM VALIDATION FAILURE!");
@@ -97,8 +97,8 @@ public class HollowBlobDataProvider {
             anotherReader.applyDelta(ctx.files().newBlobInputStream(reverseDeltaFile));
             HollowChecksum reverseDeltaChecksum = HollowChecksum.forStateEngine(anotherStateEngine);
 
-            ctx.getLogger().info(LogTag.HollowChecksum, "INITIAL STATE CHECKSUM: " + initialChecksumBeforeDelta.toString());
-            ctx.getLogger().info(LogTag.HollowChecksum, "REVERSE DELTA STATE CHECKSUM: " + reverseDeltaChecksum.toString());
+            ctx.getLogger().info(LogTag.BlobChecksum, "INITIAL STATE CHECKSUM: " + initialChecksumBeforeDelta.toString());
+            ctx.getLogger().info(LogTag.BlobChecksum, "REVERSE DELTA STATE CHECKSUM: " + reverseDeltaChecksum.toString());
 
             if(!initialChecksumBeforeDelta.equals(reverseDeltaChecksum))
                 throw new RuntimeException("REVERSE DELTA CHECKSUM VALIDATION FAILURE!");
