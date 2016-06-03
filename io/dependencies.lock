@@ -25,7 +25,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
@@ -35,7 +35,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.5.4",
+            "locked": "2.6.4",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -46,7 +46,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.5.4",
+            "locked": "2.6.4",
             "transitive": [
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.netflix.archaius:archaius-core",
@@ -76,21 +76,24 @@
             ]
         },
         "com.google.code.findbugs:annotations": {
-            "locked": "2.0.0",
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-statistics",
+                "com.netflix.ribbon:ribbon-core",
+                "com.netflix.ribbon:ribbon-eureka",
                 "netflix:basicTypes"
             ]
         },
         "com.google.code.findbugs:jsr305": {
             "locked": "3.0.1",
             "transitive": [
+                "com.google.code.findbugs:annotations",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix"
             ]
         },
         "com.google.code.gson:gson": {
-            "locked": "2.1",
+            "locked": "2.6.2",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix"
             ]
@@ -104,7 +107,6 @@
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.servo:servo-core",
                 "com.netflix.suro:suro-core",
@@ -194,13 +196,13 @@
         "com.netflix.archaius:archaius2-api": {
             "locked": "2.0.5",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
             "locked": "3.8.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
@@ -218,13 +220,13 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
@@ -232,22 +234,20 @@
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.103",
+            "locked": "0.102",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.netflix-commons:netflix-commons-util": {
-            "locked": "0.1.1",
+            "locked": "0.3.0",
             "transitive": [
-                "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.suro:suro-core"
             ]
@@ -271,7 +271,7 @@
             ]
         },
         "com.netflix.ribbon:ribbon-core": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
@@ -279,21 +279,15 @@
             ]
         },
         "com.netflix.ribbon:ribbon-eureka": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
         },
         "com.netflix.ribbon:ribbon-loadbalancer": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka"
-            ]
-        },
-        "com.netflix.rxjava:rxjava-core": {
-            "locked": "0.19.1",
-            "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "com.netflix.servo:servo-core": {
@@ -301,8 +295,6 @@
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
-                "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.suro:suro-core",
                 "netflix:jarversions",
@@ -313,7 +305,7 @@
             "locked": "0.2.50-platform",
             "requested": "latest.release"
         },
-        "com.netflix.vms.transformer:vms-transformer-common-interfaces": {
+        "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -330,20 +322,20 @@
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client4": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client"
             ]
         },
         "com.sun.jersey:jersey-client": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4"
             ]
         },
         "com.sun.jersey:jersey-core": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey:jersey-client"
@@ -376,13 +368,13 @@
             ]
         },
         "commons-cli:commons-cli": {
-            "locked": "1.1",
+            "locked": "1.2",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
             ]
         },
         "commons-codec:commons-codec": {
-            "locked": "1.6",
+            "locked": "1.7",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "org.apache.cassandra:cassandra-all",
@@ -390,7 +382,7 @@
             ]
         },
         "commons-collections:commons-collections": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration"
@@ -399,7 +391,8 @@
         "commons-configuration:commons-configuration": {
             "locked": "1.8",
             "transitive": [
-                "com.netflix.archaius:archaius-core"
+                "com.netflix.archaius:archaius-core",
+                "com.netflix.ribbon:ribbon-core"
             ]
         },
         "commons-io:commons-io": {
@@ -420,12 +413,13 @@
             "locked": "2.6",
             "transitive": [
                 "com.netflix.astyanax:astyanax-core",
+                "com.netflix.ribbon:ribbon-core",
                 "commons-configuration:commons-configuration",
                 "netflix:mutation-stream-common"
             ]
         },
         "commons-logging:commons-logging": {
-            "locked": "1.1.3",
+            "locked": "1.2",
             "transitive": [
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
@@ -439,9 +433,15 @@
             ]
         },
         "io.netty:netty": {
-            "locked": "3.6.6.Final",
+            "locked": "3.9.0.Final",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "io.reactivex:rxjava": {
+            "locked": "1.1.5",
+            "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "javax.inject:javax.inject": {
@@ -450,7 +450,8 @@
                 "com.google.inject:guice",
                 "com.netflix.archaius:archaius2-api",
                 "com.netflix.governator:governator-api",
-                "com.netflix.governator:governator-core"
+                "com.netflix.governator:governator-core",
+                "com.netflix.netflix-commons:netflix-commons-util"
             ]
         },
         "javax.servlet:servlet-api": {
@@ -480,7 +481,7 @@
             ]
         },
         "joda-time:joda-time": {
-            "locked": "2.3",
+            "locked": "2.9.3",
             "transitive": [
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
@@ -507,6 +508,12 @@
             "transitive": [
                 "netflix:mutation-stream-client",
                 "netflix:mutation-stream-common"
+            ]
+        },
+        "net.jcip:jcip-annotations": {
+            "locked": "1.0",
+            "transitive": [
+                "com.google.code.findbugs:annotations"
             ]
         },
         "net.jpountz.lz4:lz4": {
@@ -562,7 +569,7 @@
         "netflix:netflix-config": {
             "locked": "2.1873.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
@@ -610,8 +617,7 @@
             "locked": "3.4",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.cassandra:cassandra-thrift",
-                "org.apache.thrift:libthrift"
+                "org.apache.cassandra:cassandra-thrift"
             ]
         },
         "org.apache.commons:commons-math": {
@@ -621,7 +627,7 @@
             ]
         },
         "org.apache.httpcomponents:httpclient": {
-            "locked": "4.3.4",
+            "locked": "4.3.6",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4",
@@ -629,7 +635,7 @@
             ]
         },
         "org.apache.httpcomponents:httpcore": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "org.apache.httpcomponents:httpclient",
                 "org.apache.thrift:libthrift"
@@ -735,7 +741,7 @@
             ]
         },
         "org.apache.thrift:libthrift": {
-            "locked": "0.9.1",
+            "locked": "0.9.2",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -808,7 +814,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -834,14 +840,14 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "com.thinkaurelius.thrift:thrift-server"
             ]
         },
         "org.xerial.snappy:snappy-java": {
-            "locked": "1.0.5",
+            "locked": "1.1.1.6",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "org.apache.cassandra:cassandra-all"
@@ -899,7 +905,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
@@ -909,7 +915,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.5.4",
+            "locked": "2.6.4",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -920,7 +926,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.5.4",
+            "locked": "2.6.4",
             "transitive": [
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.netflix.archaius:archaius-core",
@@ -950,21 +956,24 @@
             ]
         },
         "com.google.code.findbugs:annotations": {
-            "locked": "2.0.0",
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-statistics",
+                "com.netflix.ribbon:ribbon-core",
+                "com.netflix.ribbon:ribbon-eureka",
                 "netflix:basicTypes"
             ]
         },
         "com.google.code.findbugs:jsr305": {
             "locked": "3.0.1",
             "transitive": [
+                "com.google.code.findbugs:annotations",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix"
             ]
         },
         "com.google.code.gson:gson": {
-            "locked": "2.1",
+            "locked": "2.6.2",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix"
             ]
@@ -978,7 +987,6 @@
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.servo:servo-core",
                 "com.netflix.suro:suro-core",
@@ -1068,13 +1076,13 @@
         "com.netflix.archaius:archaius2-api": {
             "locked": "2.0.5",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
             "locked": "3.8.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
@@ -1092,13 +1100,13 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
@@ -1106,22 +1114,20 @@
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.103",
+            "locked": "0.102",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.netflix-commons:netflix-commons-util": {
-            "locked": "0.1.1",
+            "locked": "0.3.0",
             "transitive": [
-                "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.suro:suro-core"
             ]
@@ -1145,7 +1151,7 @@
             ]
         },
         "com.netflix.ribbon:ribbon-core": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
@@ -1153,21 +1159,15 @@
             ]
         },
         "com.netflix.ribbon:ribbon-eureka": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
         },
         "com.netflix.ribbon:ribbon-loadbalancer": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka"
-            ]
-        },
-        "com.netflix.rxjava:rxjava-core": {
-            "locked": "0.19.1",
-            "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "com.netflix.servo:servo-core": {
@@ -1175,8 +1175,6 @@
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
-                "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.suro:suro-core",
                 "netflix:jarversions",
@@ -1187,7 +1185,7 @@
             "locked": "0.2.50-platform",
             "requested": "latest.release"
         },
-        "com.netflix.vms.transformer:vms-transformer-common-interfaces": {
+        "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -1204,20 +1202,20 @@
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client4": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client"
             ]
         },
         "com.sun.jersey:jersey-client": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4"
             ]
         },
         "com.sun.jersey:jersey-core": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey:jersey-client"
@@ -1250,13 +1248,13 @@
             ]
         },
         "commons-cli:commons-cli": {
-            "locked": "1.1",
+            "locked": "1.2",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
             ]
         },
         "commons-codec:commons-codec": {
-            "locked": "1.6",
+            "locked": "1.7",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "org.apache.cassandra:cassandra-all",
@@ -1264,7 +1262,7 @@
             ]
         },
         "commons-collections:commons-collections": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration"
@@ -1273,7 +1271,8 @@
         "commons-configuration:commons-configuration": {
             "locked": "1.8",
             "transitive": [
-                "com.netflix.archaius:archaius-core"
+                "com.netflix.archaius:archaius-core",
+                "com.netflix.ribbon:ribbon-core"
             ]
         },
         "commons-io:commons-io": {
@@ -1294,12 +1293,13 @@
             "locked": "2.6",
             "transitive": [
                 "com.netflix.astyanax:astyanax-core",
+                "com.netflix.ribbon:ribbon-core",
                 "commons-configuration:commons-configuration",
                 "netflix:mutation-stream-common"
             ]
         },
         "commons-logging:commons-logging": {
-            "locked": "1.1.3",
+            "locked": "1.2",
             "transitive": [
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
@@ -1313,9 +1313,15 @@
             ]
         },
         "io.netty:netty": {
-            "locked": "3.6.6.Final",
+            "locked": "3.9.0.Final",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "io.reactivex:rxjava": {
+            "locked": "1.1.5",
+            "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "javax.inject:javax.inject": {
@@ -1324,7 +1330,8 @@
                 "com.google.inject:guice",
                 "com.netflix.archaius:archaius2-api",
                 "com.netflix.governator:governator-api",
-                "com.netflix.governator:governator-core"
+                "com.netflix.governator:governator-core",
+                "com.netflix.netflix-commons:netflix-commons-util"
             ]
         },
         "javax.servlet:servlet-api": {
@@ -1354,7 +1361,7 @@
             ]
         },
         "joda-time:joda-time": {
-            "locked": "2.3",
+            "locked": "2.9.3",
             "transitive": [
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
@@ -1381,6 +1388,12 @@
             "transitive": [
                 "netflix:mutation-stream-client",
                 "netflix:mutation-stream-common"
+            ]
+        },
+        "net.jcip:jcip-annotations": {
+            "locked": "1.0",
+            "transitive": [
+                "com.google.code.findbugs:annotations"
             ]
         },
         "net.jpountz.lz4:lz4": {
@@ -1436,7 +1449,7 @@
         "netflix:netflix-config": {
             "locked": "2.1873.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
@@ -1484,8 +1497,7 @@
             "locked": "3.4",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.cassandra:cassandra-thrift",
-                "org.apache.thrift:libthrift"
+                "org.apache.cassandra:cassandra-thrift"
             ]
         },
         "org.apache.commons:commons-math": {
@@ -1495,7 +1507,7 @@
             ]
         },
         "org.apache.httpcomponents:httpclient": {
-            "locked": "4.3.4",
+            "locked": "4.3.6",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4",
@@ -1503,7 +1515,7 @@
             ]
         },
         "org.apache.httpcomponents:httpcore": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "org.apache.httpcomponents:httpclient",
                 "org.apache.thrift:libthrift"
@@ -1609,7 +1621,7 @@
             ]
         },
         "org.apache.thrift:libthrift": {
-            "locked": "0.9.1",
+            "locked": "0.9.2",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -1682,7 +1694,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -1708,14 +1720,14 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "com.thinkaurelius.thrift:thrift-server"
             ]
         },
         "org.xerial.snappy:snappy-java": {
-            "locked": "1.0.5",
+            "locked": "1.1.1.6",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "org.apache.cassandra:cassandra-all"
@@ -1773,7 +1785,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
@@ -1783,7 +1795,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.5.4",
+            "locked": "2.6.4",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -1794,7 +1806,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.5.4",
+            "locked": "2.6.4",
             "transitive": [
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.netflix.archaius:archaius-core",
@@ -1824,21 +1836,24 @@
             ]
         },
         "com.google.code.findbugs:annotations": {
-            "locked": "2.0.0",
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-statistics",
+                "com.netflix.ribbon:ribbon-core",
+                "com.netflix.ribbon:ribbon-eureka",
                 "netflix:basicTypes"
             ]
         },
         "com.google.code.findbugs:jsr305": {
             "locked": "3.0.1",
             "transitive": [
+                "com.google.code.findbugs:annotations",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix"
             ]
         },
         "com.google.code.gson:gson": {
-            "locked": "2.1",
+            "locked": "2.6.2",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix"
             ]
@@ -1852,7 +1867,6 @@
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.servo:servo-core",
                 "com.netflix.suro:suro-core",
@@ -1942,13 +1956,13 @@
         "com.netflix.archaius:archaius2-api": {
             "locked": "2.0.5",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
             "locked": "3.8.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
@@ -1966,13 +1980,13 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
@@ -1980,22 +1994,20 @@
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.103",
+            "locked": "0.102",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.netflix-commons:netflix-commons-util": {
-            "locked": "0.1.1",
+            "locked": "0.3.0",
             "transitive": [
-                "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.suro:suro-core"
             ]
@@ -2019,7 +2031,7 @@
             ]
         },
         "com.netflix.ribbon:ribbon-core": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
@@ -2027,21 +2039,15 @@
             ]
         },
         "com.netflix.ribbon:ribbon-eureka": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
         },
         "com.netflix.ribbon:ribbon-loadbalancer": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka"
-            ]
-        },
-        "com.netflix.rxjava:rxjava-core": {
-            "locked": "0.19.1",
-            "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "com.netflix.servo:servo-core": {
@@ -2049,8 +2055,6 @@
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
-                "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.suro:suro-core",
                 "netflix:jarversions",
@@ -2061,7 +2065,7 @@
             "locked": "0.2.50-platform",
             "requested": "latest.release"
         },
-        "com.netflix.vms.transformer:vms-transformer-common-interfaces": {
+        "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -2078,20 +2082,20 @@
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client4": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client"
             ]
         },
         "com.sun.jersey:jersey-client": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4"
             ]
         },
         "com.sun.jersey:jersey-core": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey:jersey-client"
@@ -2124,13 +2128,13 @@
             ]
         },
         "commons-cli:commons-cli": {
-            "locked": "1.1",
+            "locked": "1.2",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
             ]
         },
         "commons-codec:commons-codec": {
-            "locked": "1.6",
+            "locked": "1.7",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "org.apache.cassandra:cassandra-all",
@@ -2138,7 +2142,7 @@
             ]
         },
         "commons-collections:commons-collections": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration"
@@ -2147,7 +2151,8 @@
         "commons-configuration:commons-configuration": {
             "locked": "1.8",
             "transitive": [
-                "com.netflix.archaius:archaius-core"
+                "com.netflix.archaius:archaius-core",
+                "com.netflix.ribbon:ribbon-core"
             ]
         },
         "commons-io:commons-io": {
@@ -2168,12 +2173,13 @@
             "locked": "2.6",
             "transitive": [
                 "com.netflix.astyanax:astyanax-core",
+                "com.netflix.ribbon:ribbon-core",
                 "commons-configuration:commons-configuration",
                 "netflix:mutation-stream-common"
             ]
         },
         "commons-logging:commons-logging": {
-            "locked": "1.1.3",
+            "locked": "1.2",
             "transitive": [
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
@@ -2187,9 +2193,15 @@
             ]
         },
         "io.netty:netty": {
-            "locked": "3.6.6.Final",
+            "locked": "3.9.0.Final",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "io.reactivex:rxjava": {
+            "locked": "1.1.5",
+            "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "javax.inject:javax.inject": {
@@ -2198,7 +2210,8 @@
                 "com.google.inject:guice",
                 "com.netflix.archaius:archaius2-api",
                 "com.netflix.governator:governator-api",
-                "com.netflix.governator:governator-core"
+                "com.netflix.governator:governator-core",
+                "com.netflix.netflix-commons:netflix-commons-util"
             ]
         },
         "javax.servlet:servlet-api": {
@@ -2228,7 +2241,7 @@
             ]
         },
         "joda-time:joda-time": {
-            "locked": "2.3",
+            "locked": "2.9.3",
             "transitive": [
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
@@ -2255,6 +2268,12 @@
             "transitive": [
                 "netflix:mutation-stream-client",
                 "netflix:mutation-stream-common"
+            ]
+        },
+        "net.jcip:jcip-annotations": {
+            "locked": "1.0",
+            "transitive": [
+                "com.google.code.findbugs:annotations"
             ]
         },
         "net.jpountz.lz4:lz4": {
@@ -2310,7 +2329,7 @@
         "netflix:netflix-config": {
             "locked": "2.1873.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
@@ -2358,8 +2377,7 @@
             "locked": "3.4",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.cassandra:cassandra-thrift",
-                "org.apache.thrift:libthrift"
+                "org.apache.cassandra:cassandra-thrift"
             ]
         },
         "org.apache.commons:commons-math": {
@@ -2369,7 +2387,7 @@
             ]
         },
         "org.apache.httpcomponents:httpclient": {
-            "locked": "4.3.4",
+            "locked": "4.3.6",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4",
@@ -2377,7 +2395,7 @@
             ]
         },
         "org.apache.httpcomponents:httpcore": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "org.apache.httpcomponents:httpclient",
                 "org.apache.thrift:libthrift"
@@ -2483,7 +2501,7 @@
             ]
         },
         "org.apache.thrift:libthrift": {
-            "locked": "0.9.1",
+            "locked": "0.9.2",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -2556,7 +2574,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -2582,14 +2600,14 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "com.thinkaurelius.thrift:thrift-server"
             ]
         },
         "org.xerial.snappy:snappy-java": {
-            "locked": "1.0.5",
+            "locked": "1.1.1.6",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "org.apache.cassandra:cassandra-all"
@@ -2647,7 +2665,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
@@ -2657,7 +2675,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.5.4",
+            "locked": "2.6.4",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -2668,7 +2686,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.5.4",
+            "locked": "2.6.4",
             "transitive": [
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.netflix.archaius:archaius-core",
@@ -2698,21 +2716,24 @@
             ]
         },
         "com.google.code.findbugs:annotations": {
-            "locked": "2.0.0",
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-statistics",
+                "com.netflix.ribbon:ribbon-core",
+                "com.netflix.ribbon:ribbon-eureka",
                 "netflix:basicTypes"
             ]
         },
         "com.google.code.findbugs:jsr305": {
             "locked": "3.0.1",
             "transitive": [
+                "com.google.code.findbugs:annotations",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix"
             ]
         },
         "com.google.code.gson:gson": {
-            "locked": "2.1",
+            "locked": "2.6.2",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix"
             ]
@@ -2726,7 +2747,6 @@
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.servo:servo-core",
                 "com.netflix.suro:suro-core",
@@ -2816,13 +2836,13 @@
         "com.netflix.archaius:archaius2-api": {
             "locked": "2.0.5",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
             "locked": "3.8.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
@@ -2840,13 +2860,13 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
@@ -2854,22 +2874,20 @@
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.103",
+            "locked": "0.102",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.netflix-commons:netflix-commons-util": {
-            "locked": "0.1.1",
+            "locked": "0.3.0",
             "transitive": [
-                "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.suro:suro-core"
             ]
@@ -2893,7 +2911,7 @@
             ]
         },
         "com.netflix.ribbon:ribbon-core": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
@@ -2901,21 +2919,15 @@
             ]
         },
         "com.netflix.ribbon:ribbon-eureka": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
         },
         "com.netflix.ribbon:ribbon-loadbalancer": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka"
-            ]
-        },
-        "com.netflix.rxjava:rxjava-core": {
-            "locked": "0.19.1",
-            "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "com.netflix.servo:servo-core": {
@@ -2923,8 +2935,6 @@
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
-                "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.suro:suro-core",
                 "netflix:jarversions",
@@ -2935,7 +2945,7 @@
             "locked": "0.2.50-platform",
             "requested": "latest.release"
         },
-        "com.netflix.vms.transformer:vms-transformer-common-interfaces": {
+        "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -2952,20 +2962,20 @@
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client4": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client"
             ]
         },
         "com.sun.jersey:jersey-client": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4"
             ]
         },
         "com.sun.jersey:jersey-core": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey:jersey-client"
@@ -2998,13 +3008,13 @@
             ]
         },
         "commons-cli:commons-cli": {
-            "locked": "1.1",
+            "locked": "1.2",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
             ]
         },
         "commons-codec:commons-codec": {
-            "locked": "1.6",
+            "locked": "1.7",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "org.apache.cassandra:cassandra-all",
@@ -3012,7 +3022,7 @@
             ]
         },
         "commons-collections:commons-collections": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration"
@@ -3021,7 +3031,8 @@
         "commons-configuration:commons-configuration": {
             "locked": "1.8",
             "transitive": [
-                "com.netflix.archaius:archaius-core"
+                "com.netflix.archaius:archaius-core",
+                "com.netflix.ribbon:ribbon-core"
             ]
         },
         "commons-io:commons-io": {
@@ -3042,12 +3053,13 @@
             "locked": "2.6",
             "transitive": [
                 "com.netflix.astyanax:astyanax-core",
+                "com.netflix.ribbon:ribbon-core",
                 "commons-configuration:commons-configuration",
                 "netflix:mutation-stream-common"
             ]
         },
         "commons-logging:commons-logging": {
-            "locked": "1.1.3",
+            "locked": "1.2",
             "transitive": [
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
@@ -3061,9 +3073,15 @@
             ]
         },
         "io.netty:netty": {
-            "locked": "3.6.6.Final",
+            "locked": "3.9.0.Final",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "io.reactivex:rxjava": {
+            "locked": "1.1.5",
+            "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "javax.inject:javax.inject": {
@@ -3072,7 +3090,8 @@
                 "com.google.inject:guice",
                 "com.netflix.archaius:archaius2-api",
                 "com.netflix.governator:governator-api",
-                "com.netflix.governator:governator-core"
+                "com.netflix.governator:governator-core",
+                "com.netflix.netflix-commons:netflix-commons-util"
             ]
         },
         "javax.servlet:servlet-api": {
@@ -3102,7 +3121,7 @@
             ]
         },
         "joda-time:joda-time": {
-            "locked": "2.3",
+            "locked": "2.9.3",
             "transitive": [
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
@@ -3129,6 +3148,12 @@
             "transitive": [
                 "netflix:mutation-stream-client",
                 "netflix:mutation-stream-common"
+            ]
+        },
+        "net.jcip:jcip-annotations": {
+            "locked": "1.0",
+            "transitive": [
+                "com.google.code.findbugs:annotations"
             ]
         },
         "net.jpountz.lz4:lz4": {
@@ -3184,7 +3209,7 @@
         "netflix:netflix-config": {
             "locked": "2.1873.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
@@ -3232,8 +3257,7 @@
             "locked": "3.4",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.cassandra:cassandra-thrift",
-                "org.apache.thrift:libthrift"
+                "org.apache.cassandra:cassandra-thrift"
             ]
         },
         "org.apache.commons:commons-math": {
@@ -3243,7 +3267,7 @@
             ]
         },
         "org.apache.httpcomponents:httpclient": {
-            "locked": "4.3.4",
+            "locked": "4.3.6",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4",
@@ -3251,7 +3275,7 @@
             ]
         },
         "org.apache.httpcomponents:httpcore": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "org.apache.httpcomponents:httpclient",
                 "org.apache.thrift:libthrift"
@@ -3357,7 +3381,7 @@
             ]
         },
         "org.apache.thrift:libthrift": {
-            "locked": "0.9.1",
+            "locked": "0.9.2",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -3430,7 +3454,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -3456,14 +3480,14 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "com.thinkaurelius.thrift:thrift-server"
             ]
         },
         "org.xerial.snappy:snappy-java": {
-            "locked": "1.0.5",
+            "locked": "1.1.1.6",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "org.apache.cassandra:cassandra-all"
@@ -3620,7 +3644,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
@@ -3630,7 +3654,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.5.4",
+            "locked": "2.6.4",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -3641,7 +3665,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.5.4",
+            "locked": "2.6.4",
             "transitive": [
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.netflix.archaius:archaius-core",
@@ -3671,21 +3695,24 @@
             ]
         },
         "com.google.code.findbugs:annotations": {
-            "locked": "2.0.0",
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-statistics",
+                "com.netflix.ribbon:ribbon-core",
+                "com.netflix.ribbon:ribbon-eureka",
                 "netflix:basicTypes"
             ]
         },
         "com.google.code.findbugs:jsr305": {
             "locked": "3.0.1",
             "transitive": [
+                "com.google.code.findbugs:annotations",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix"
             ]
         },
         "com.google.code.gson:gson": {
-            "locked": "2.1",
+            "locked": "2.6.2",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix"
             ]
@@ -3699,7 +3726,6 @@
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.servo:servo-core",
                 "com.netflix.suro:suro-core",
@@ -3789,13 +3815,13 @@
         "com.netflix.archaius:archaius2-api": {
             "locked": "2.0.5",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
             "locked": "3.8.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
@@ -3813,13 +3839,13 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
@@ -3827,22 +3853,20 @@
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.103",
+            "locked": "0.102",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.netflix-commons:netflix-commons-util": {
-            "locked": "0.1.1",
+            "locked": "0.3.0",
             "transitive": [
-                "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.suro:suro-core"
             ]
@@ -3866,7 +3890,7 @@
             ]
         },
         "com.netflix.ribbon:ribbon-core": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
@@ -3874,21 +3898,15 @@
             ]
         },
         "com.netflix.ribbon:ribbon-eureka": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
         },
         "com.netflix.ribbon:ribbon-loadbalancer": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka"
-            ]
-        },
-        "com.netflix.rxjava:rxjava-core": {
-            "locked": "0.19.1",
-            "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "com.netflix.servo:servo-core": {
@@ -3896,8 +3914,6 @@
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
-                "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.suro:suro-core",
                 "netflix:jarversions",
@@ -3908,7 +3924,7 @@
             "locked": "0.2.50-platform",
             "requested": "latest.release"
         },
-        "com.netflix.vms.transformer:vms-transformer-common-interfaces": {
+        "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -3925,20 +3941,20 @@
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client4": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client"
             ]
         },
         "com.sun.jersey:jersey-client": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4"
             ]
         },
         "com.sun.jersey:jersey-core": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey:jersey-client"
@@ -3971,13 +3987,13 @@
             ]
         },
         "commons-cli:commons-cli": {
-            "locked": "1.1",
+            "locked": "1.2",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
             ]
         },
         "commons-codec:commons-codec": {
-            "locked": "1.6",
+            "locked": "1.7",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "org.apache.cassandra:cassandra-all",
@@ -3985,7 +4001,7 @@
             ]
         },
         "commons-collections:commons-collections": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration"
@@ -3994,7 +4010,8 @@
         "commons-configuration:commons-configuration": {
             "locked": "1.8",
             "transitive": [
-                "com.netflix.archaius:archaius-core"
+                "com.netflix.archaius:archaius-core",
+                "com.netflix.ribbon:ribbon-core"
             ]
         },
         "commons-io:commons-io": {
@@ -4015,12 +4032,13 @@
             "locked": "2.6",
             "transitive": [
                 "com.netflix.astyanax:astyanax-core",
+                "com.netflix.ribbon:ribbon-core",
                 "commons-configuration:commons-configuration",
                 "netflix:mutation-stream-common"
             ]
         },
         "commons-logging:commons-logging": {
-            "locked": "1.1.3",
+            "locked": "1.2",
             "transitive": [
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
@@ -4034,9 +4052,15 @@
             ]
         },
         "io.netty:netty": {
-            "locked": "3.6.6.Final",
+            "locked": "3.9.0.Final",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "io.reactivex:rxjava": {
+            "locked": "1.1.5",
+            "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "javax.inject:javax.inject": {
@@ -4045,7 +4069,8 @@
                 "com.google.inject:guice",
                 "com.netflix.archaius:archaius2-api",
                 "com.netflix.governator:governator-api",
-                "com.netflix.governator:governator-core"
+                "com.netflix.governator:governator-core",
+                "com.netflix.netflix-commons:netflix-commons-util"
             ]
         },
         "javax.servlet:servlet-api": {
@@ -4075,7 +4100,7 @@
             ]
         },
         "joda-time:joda-time": {
-            "locked": "2.3",
+            "locked": "2.9.3",
             "transitive": [
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
@@ -4102,6 +4127,12 @@
             "transitive": [
                 "netflix:mutation-stream-client",
                 "netflix:mutation-stream-common"
+            ]
+        },
+        "net.jcip:jcip-annotations": {
+            "locked": "1.0",
+            "transitive": [
+                "com.google.code.findbugs:annotations"
             ]
         },
         "net.jpountz.lz4:lz4": {
@@ -4157,7 +4188,7 @@
         "netflix:netflix-config": {
             "locked": "2.1873.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
@@ -4205,8 +4236,7 @@
             "locked": "3.4",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.cassandra:cassandra-thrift",
-                "org.apache.thrift:libthrift"
+                "org.apache.cassandra:cassandra-thrift"
             ]
         },
         "org.apache.commons:commons-math": {
@@ -4216,7 +4246,7 @@
             ]
         },
         "org.apache.httpcomponents:httpclient": {
-            "locked": "4.3.4",
+            "locked": "4.3.6",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4",
@@ -4224,7 +4254,7 @@
             ]
         },
         "org.apache.httpcomponents:httpcore": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "org.apache.httpcomponents:httpclient",
                 "org.apache.thrift:libthrift"
@@ -4330,7 +4360,7 @@
             ]
         },
         "org.apache.thrift:libthrift": {
-            "locked": "0.9.1",
+            "locked": "0.9.2",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -4403,7 +4433,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -4429,14 +4459,14 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "com.thinkaurelius.thrift:thrift-server"
             ]
         },
         "org.xerial.snappy:snappy-java": {
-            "locked": "1.0.5",
+            "locked": "1.1.1.6",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "org.apache.cassandra:cassandra-all"
@@ -4494,7 +4524,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
@@ -4504,7 +4534,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.5.4",
+            "locked": "2.6.4",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -4515,7 +4545,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.5.4",
+            "locked": "2.6.4",
             "transitive": [
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.netflix.archaius:archaius-core",
@@ -4545,21 +4575,24 @@
             ]
         },
         "com.google.code.findbugs:annotations": {
-            "locked": "2.0.0",
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-statistics",
+                "com.netflix.ribbon:ribbon-core",
+                "com.netflix.ribbon:ribbon-eureka",
                 "netflix:basicTypes"
             ]
         },
         "com.google.code.findbugs:jsr305": {
             "locked": "3.0.1",
             "transitive": [
+                "com.google.code.findbugs:annotations",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix"
             ]
         },
         "com.google.code.gson:gson": {
-            "locked": "2.1",
+            "locked": "2.6.2",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix"
             ]
@@ -4573,7 +4606,6 @@
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.servo:servo-core",
                 "com.netflix.suro:suro-core",
@@ -4663,13 +4695,13 @@
         "com.netflix.archaius:archaius2-api": {
             "locked": "2.0.5",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
             "locked": "3.8.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
@@ -4687,13 +4719,13 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
@@ -4701,22 +4733,20 @@
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.103",
+            "locked": "0.102",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.netflix-commons:netflix-commons-util": {
-            "locked": "0.1.1",
+            "locked": "0.3.0",
             "transitive": [
-                "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.suro:suro-core"
             ]
@@ -4740,7 +4770,7 @@
             ]
         },
         "com.netflix.ribbon:ribbon-core": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
@@ -4748,21 +4778,15 @@
             ]
         },
         "com.netflix.ribbon:ribbon-eureka": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
         },
         "com.netflix.ribbon:ribbon-loadbalancer": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka"
-            ]
-        },
-        "com.netflix.rxjava:rxjava-core": {
-            "locked": "0.19.1",
-            "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "com.netflix.servo:servo-core": {
@@ -4770,8 +4794,6 @@
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
-                "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.suro:suro-core",
                 "netflix:jarversions",
@@ -4782,7 +4804,7 @@
             "locked": "0.2.50-platform",
             "requested": "latest.release"
         },
-        "com.netflix.vms.transformer:vms-transformer-common-interfaces": {
+        "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -4799,20 +4821,20 @@
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client4": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client"
             ]
         },
         "com.sun.jersey:jersey-client": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4"
             ]
         },
         "com.sun.jersey:jersey-core": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey:jersey-client"
@@ -4845,13 +4867,13 @@
             ]
         },
         "commons-cli:commons-cli": {
-            "locked": "1.1",
+            "locked": "1.2",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
             ]
         },
         "commons-codec:commons-codec": {
-            "locked": "1.6",
+            "locked": "1.7",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "org.apache.cassandra:cassandra-all",
@@ -4859,7 +4881,7 @@
             ]
         },
         "commons-collections:commons-collections": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration"
@@ -4868,7 +4890,8 @@
         "commons-configuration:commons-configuration": {
             "locked": "1.8",
             "transitive": [
-                "com.netflix.archaius:archaius-core"
+                "com.netflix.archaius:archaius-core",
+                "com.netflix.ribbon:ribbon-core"
             ]
         },
         "commons-io:commons-io": {
@@ -4889,12 +4912,13 @@
             "locked": "2.6",
             "transitive": [
                 "com.netflix.astyanax:astyanax-core",
+                "com.netflix.ribbon:ribbon-core",
                 "commons-configuration:commons-configuration",
                 "netflix:mutation-stream-common"
             ]
         },
         "commons-logging:commons-logging": {
-            "locked": "1.1.3",
+            "locked": "1.2",
             "transitive": [
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
@@ -4908,9 +4932,15 @@
             ]
         },
         "io.netty:netty": {
-            "locked": "3.6.6.Final",
+            "locked": "3.9.0.Final",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "io.reactivex:rxjava": {
+            "locked": "1.1.5",
+            "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "javax.inject:javax.inject": {
@@ -4919,7 +4949,8 @@
                 "com.google.inject:guice",
                 "com.netflix.archaius:archaius2-api",
                 "com.netflix.governator:governator-api",
-                "com.netflix.governator:governator-core"
+                "com.netflix.governator:governator-core",
+                "com.netflix.netflix-commons:netflix-commons-util"
             ]
         },
         "javax.servlet:servlet-api": {
@@ -4949,7 +4980,7 @@
             ]
         },
         "joda-time:joda-time": {
-            "locked": "2.3",
+            "locked": "2.9.3",
             "transitive": [
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
@@ -4977,6 +5008,12 @@
             "transitive": [
                 "netflix:mutation-stream-client",
                 "netflix:mutation-stream-common"
+            ]
+        },
+        "net.jcip:jcip-annotations": {
+            "locked": "1.0",
+            "transitive": [
+                "com.google.code.findbugs:annotations"
             ]
         },
         "net.jpountz.lz4:lz4": {
@@ -5032,7 +5069,7 @@
         "netflix:netflix-config": {
             "locked": "2.1873.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
@@ -5080,8 +5117,7 @@
             "locked": "3.4",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.cassandra:cassandra-thrift",
-                "org.apache.thrift:libthrift"
+                "org.apache.cassandra:cassandra-thrift"
             ]
         },
         "org.apache.commons:commons-math": {
@@ -5091,7 +5127,7 @@
             ]
         },
         "org.apache.httpcomponents:httpclient": {
-            "locked": "4.3.4",
+            "locked": "4.3.6",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4",
@@ -5099,7 +5135,7 @@
             ]
         },
         "org.apache.httpcomponents:httpcore": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "org.apache.httpcomponents:httpclient",
                 "org.apache.thrift:libthrift"
@@ -5205,7 +5241,7 @@
             ]
         },
         "org.apache.thrift:libthrift": {
-            "locked": "0.9.1",
+            "locked": "0.9.2",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -5288,7 +5324,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -5314,14 +5350,14 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "com.thinkaurelius.thrift:thrift-server"
             ]
         },
         "org.xerial.snappy:snappy-java": {
-            "locked": "1.0.5",
+            "locked": "1.1.1.6",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "org.apache.cassandra:cassandra-all"
@@ -5379,7 +5415,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
@@ -5389,7 +5425,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.5.4",
+            "locked": "2.6.4",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -5400,7 +5436,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.5.4",
+            "locked": "2.6.4",
             "transitive": [
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.netflix.archaius:archaius-core",
@@ -5430,21 +5466,24 @@
             ]
         },
         "com.google.code.findbugs:annotations": {
-            "locked": "2.0.0",
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-statistics",
+                "com.netflix.ribbon:ribbon-core",
+                "com.netflix.ribbon:ribbon-eureka",
                 "netflix:basicTypes"
             ]
         },
         "com.google.code.findbugs:jsr305": {
             "locked": "3.0.1",
             "transitive": [
+                "com.google.code.findbugs:annotations",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix"
             ]
         },
         "com.google.code.gson:gson": {
-            "locked": "2.1",
+            "locked": "2.6.2",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix"
             ]
@@ -5458,7 +5497,6 @@
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.servo:servo-core",
                 "com.netflix.suro:suro-core",
@@ -5548,13 +5586,13 @@
         "com.netflix.archaius:archaius2-api": {
             "locked": "2.0.5",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
             "locked": "3.8.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
@@ -5572,13 +5610,13 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
@@ -5586,22 +5624,20 @@
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.103",
+            "locked": "0.102",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.netflix-commons:netflix-commons-util": {
-            "locked": "0.1.1",
+            "locked": "0.3.0",
             "transitive": [
-                "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.suro:suro-core"
             ]
@@ -5625,7 +5661,7 @@
             ]
         },
         "com.netflix.ribbon:ribbon-core": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
@@ -5633,21 +5669,15 @@
             ]
         },
         "com.netflix.ribbon:ribbon-eureka": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
         },
         "com.netflix.ribbon:ribbon-loadbalancer": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka"
-            ]
-        },
-        "com.netflix.rxjava:rxjava-core": {
-            "locked": "0.19.1",
-            "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "com.netflix.servo:servo-core": {
@@ -5655,8 +5685,6 @@
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
-                "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.suro:suro-core",
                 "netflix:jarversions",
@@ -5667,7 +5695,7 @@
             "locked": "0.2.50-platform",
             "requested": "latest.release"
         },
-        "com.netflix.vms.transformer:vms-transformer-common-interfaces": {
+        "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -5684,20 +5712,20 @@
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client4": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client"
             ]
         },
         "com.sun.jersey:jersey-client": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4"
             ]
         },
         "com.sun.jersey:jersey-core": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey:jersey-client"
@@ -5730,13 +5758,13 @@
             ]
         },
         "commons-cli:commons-cli": {
-            "locked": "1.1",
+            "locked": "1.2",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
             ]
         },
         "commons-codec:commons-codec": {
-            "locked": "1.6",
+            "locked": "1.7",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "org.apache.cassandra:cassandra-all",
@@ -5744,7 +5772,7 @@
             ]
         },
         "commons-collections:commons-collections": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration"
@@ -5753,7 +5781,8 @@
         "commons-configuration:commons-configuration": {
             "locked": "1.8",
             "transitive": [
-                "com.netflix.archaius:archaius-core"
+                "com.netflix.archaius:archaius-core",
+                "com.netflix.ribbon:ribbon-core"
             ]
         },
         "commons-io:commons-io": {
@@ -5774,12 +5803,13 @@
             "locked": "2.6",
             "transitive": [
                 "com.netflix.astyanax:astyanax-core",
+                "com.netflix.ribbon:ribbon-core",
                 "commons-configuration:commons-configuration",
                 "netflix:mutation-stream-common"
             ]
         },
         "commons-logging:commons-logging": {
-            "locked": "1.1.3",
+            "locked": "1.2",
             "transitive": [
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
@@ -5793,9 +5823,15 @@
             ]
         },
         "io.netty:netty": {
-            "locked": "3.6.6.Final",
+            "locked": "3.9.0.Final",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "io.reactivex:rxjava": {
+            "locked": "1.1.5",
+            "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "javax.inject:javax.inject": {
@@ -5804,7 +5840,8 @@
                 "com.google.inject:guice",
                 "com.netflix.archaius:archaius2-api",
                 "com.netflix.governator:governator-api",
-                "com.netflix.governator:governator-core"
+                "com.netflix.governator:governator-core",
+                "com.netflix.netflix-commons:netflix-commons-util"
             ]
         },
         "javax.servlet:servlet-api": {
@@ -5834,7 +5871,7 @@
             ]
         },
         "joda-time:joda-time": {
-            "locked": "2.3",
+            "locked": "2.9.3",
             "transitive": [
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
@@ -5862,6 +5899,12 @@
             "transitive": [
                 "netflix:mutation-stream-client",
                 "netflix:mutation-stream-common"
+            ]
+        },
+        "net.jcip:jcip-annotations": {
+            "locked": "1.0",
+            "transitive": [
+                "com.google.code.findbugs:annotations"
             ]
         },
         "net.jpountz.lz4:lz4": {
@@ -5917,7 +5960,7 @@
         "netflix:netflix-config": {
             "locked": "2.1873.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
@@ -5965,8 +6008,7 @@
             "locked": "3.4",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.cassandra:cassandra-thrift",
-                "org.apache.thrift:libthrift"
+                "org.apache.cassandra:cassandra-thrift"
             ]
         },
         "org.apache.commons:commons-math": {
@@ -5976,7 +6018,7 @@
             ]
         },
         "org.apache.httpcomponents:httpclient": {
-            "locked": "4.3.4",
+            "locked": "4.3.6",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4",
@@ -5984,7 +6026,7 @@
             ]
         },
         "org.apache.httpcomponents:httpcore": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "org.apache.httpcomponents:httpclient",
                 "org.apache.thrift:libthrift"
@@ -6090,7 +6132,7 @@
             ]
         },
         "org.apache.thrift:libthrift": {
-            "locked": "0.9.1",
+            "locked": "0.9.2",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -6173,7 +6215,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -6199,14 +6241,14 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "com.thinkaurelius.thrift:thrift-server"
             ]
         },
         "org.xerial.snappy:snappy-java": {
-            "locked": "1.0.5",
+            "locked": "1.1.1.6",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "org.apache.cassandra:cassandra-all"
@@ -6264,7 +6306,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
@@ -6274,7 +6316,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.5.4",
+            "locked": "2.6.4",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -6285,7 +6327,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.5.4",
+            "locked": "2.6.4",
             "transitive": [
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.netflix.archaius:archaius-core",
@@ -6315,21 +6357,24 @@
             ]
         },
         "com.google.code.findbugs:annotations": {
-            "locked": "2.0.0",
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-statistics",
+                "com.netflix.ribbon:ribbon-core",
+                "com.netflix.ribbon:ribbon-eureka",
                 "netflix:basicTypes"
             ]
         },
         "com.google.code.findbugs:jsr305": {
             "locked": "3.0.1",
             "transitive": [
+                "com.google.code.findbugs:annotations",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix"
             ]
         },
         "com.google.code.gson:gson": {
-            "locked": "2.1",
+            "locked": "2.6.2",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix"
             ]
@@ -6343,7 +6388,6 @@
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.servo:servo-core",
                 "com.netflix.suro:suro-core",
@@ -6433,13 +6477,13 @@
         "com.netflix.archaius:archaius2-api": {
             "locked": "2.0.5",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
             "locked": "3.8.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
@@ -6457,13 +6501,13 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
@@ -6471,22 +6515,20 @@
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.103",
+            "locked": "0.102",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.netflix-commons:netflix-commons-util": {
-            "locked": "0.1.1",
+            "locked": "0.3.0",
             "transitive": [
-                "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.suro:suro-core"
             ]
@@ -6510,7 +6552,7 @@
             ]
         },
         "com.netflix.ribbon:ribbon-core": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
@@ -6518,21 +6560,15 @@
             ]
         },
         "com.netflix.ribbon:ribbon-eureka": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
         },
         "com.netflix.ribbon:ribbon-loadbalancer": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka"
-            ]
-        },
-        "com.netflix.rxjava:rxjava-core": {
-            "locked": "0.19.1",
-            "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "com.netflix.servo:servo-core": {
@@ -6540,8 +6576,6 @@
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
-                "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.suro:suro-core",
                 "netflix:jarversions",
@@ -6552,7 +6586,7 @@
             "locked": "0.2.50-platform",
             "requested": "latest.release"
         },
-        "com.netflix.vms.transformer:vms-transformer-common-interfaces": {
+        "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -6569,20 +6603,20 @@
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client4": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client"
             ]
         },
         "com.sun.jersey:jersey-client": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4"
             ]
         },
         "com.sun.jersey:jersey-core": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey:jersey-client"
@@ -6615,13 +6649,13 @@
             ]
         },
         "commons-cli:commons-cli": {
-            "locked": "1.1",
+            "locked": "1.2",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
             ]
         },
         "commons-codec:commons-codec": {
-            "locked": "1.6",
+            "locked": "1.7",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "org.apache.cassandra:cassandra-all",
@@ -6629,7 +6663,7 @@
             ]
         },
         "commons-collections:commons-collections": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration"
@@ -6638,7 +6672,8 @@
         "commons-configuration:commons-configuration": {
             "locked": "1.8",
             "transitive": [
-                "com.netflix.archaius:archaius-core"
+                "com.netflix.archaius:archaius-core",
+                "com.netflix.ribbon:ribbon-core"
             ]
         },
         "commons-io:commons-io": {
@@ -6659,12 +6694,13 @@
             "locked": "2.6",
             "transitive": [
                 "com.netflix.astyanax:astyanax-core",
+                "com.netflix.ribbon:ribbon-core",
                 "commons-configuration:commons-configuration",
                 "netflix:mutation-stream-common"
             ]
         },
         "commons-logging:commons-logging": {
-            "locked": "1.1.3",
+            "locked": "1.2",
             "transitive": [
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
@@ -6678,9 +6714,15 @@
             ]
         },
         "io.netty:netty": {
-            "locked": "3.6.6.Final",
+            "locked": "3.9.0.Final",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "io.reactivex:rxjava": {
+            "locked": "1.1.5",
+            "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "javax.inject:javax.inject": {
@@ -6689,7 +6731,8 @@
                 "com.google.inject:guice",
                 "com.netflix.archaius:archaius2-api",
                 "com.netflix.governator:governator-api",
-                "com.netflix.governator:governator-core"
+                "com.netflix.governator:governator-core",
+                "com.netflix.netflix-commons:netflix-commons-util"
             ]
         },
         "javax.servlet:servlet-api": {
@@ -6719,7 +6762,7 @@
             ]
         },
         "joda-time:joda-time": {
-            "locked": "2.3",
+            "locked": "2.9.3",
             "transitive": [
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
@@ -6747,6 +6790,12 @@
             "transitive": [
                 "netflix:mutation-stream-client",
                 "netflix:mutation-stream-common"
+            ]
+        },
+        "net.jcip:jcip-annotations": {
+            "locked": "1.0",
+            "transitive": [
+                "com.google.code.findbugs:annotations"
             ]
         },
         "net.jpountz.lz4:lz4": {
@@ -6802,7 +6851,7 @@
         "netflix:netflix-config": {
             "locked": "2.1873.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
@@ -6850,8 +6899,7 @@
             "locked": "3.4",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.cassandra:cassandra-thrift",
-                "org.apache.thrift:libthrift"
+                "org.apache.cassandra:cassandra-thrift"
             ]
         },
         "org.apache.commons:commons-math": {
@@ -6861,7 +6909,7 @@
             ]
         },
         "org.apache.httpcomponents:httpclient": {
-            "locked": "4.3.4",
+            "locked": "4.3.6",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4",
@@ -6869,7 +6917,7 @@
             ]
         },
         "org.apache.httpcomponents:httpcore": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "org.apache.httpcomponents:httpclient",
                 "org.apache.thrift:libthrift"
@@ -6975,7 +7023,7 @@
             ]
         },
         "org.apache.thrift:libthrift": {
-            "locked": "0.9.1",
+            "locked": "0.9.2",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -7058,7 +7106,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -7084,14 +7132,14 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "com.thinkaurelius.thrift:thrift-server"
             ]
         },
         "org.xerial.snappy:snappy-java": {
-            "locked": "1.0.5",
+            "locked": "1.1.1.6",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "org.apache.cassandra:cassandra-all"
@@ -7149,7 +7197,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
@@ -7159,7 +7207,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.5.4",
+            "locked": "2.6.4",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -7170,7 +7218,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.5.4",
+            "locked": "2.6.4",
             "transitive": [
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.netflix.archaius:archaius-core",
@@ -7200,21 +7248,24 @@
             ]
         },
         "com.google.code.findbugs:annotations": {
-            "locked": "2.0.0",
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-statistics",
+                "com.netflix.ribbon:ribbon-core",
+                "com.netflix.ribbon:ribbon-eureka",
                 "netflix:basicTypes"
             ]
         },
         "com.google.code.findbugs:jsr305": {
             "locked": "3.0.1",
             "transitive": [
+                "com.google.code.findbugs:annotations",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix"
             ]
         },
         "com.google.code.gson:gson": {
-            "locked": "2.1",
+            "locked": "2.6.2",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix"
             ]
@@ -7228,7 +7279,6 @@
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.servo:servo-core",
                 "com.netflix.suro:suro-core",
@@ -7318,13 +7368,13 @@
         "com.netflix.archaius:archaius2-api": {
             "locked": "2.0.5",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
             "locked": "3.8.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
@@ -7342,13 +7392,13 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
@@ -7356,22 +7406,20 @@
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.12.10",
+            "locked": "1.12.15",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.103",
+            "locked": "0.102",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.netflix-commons:netflix-commons-util": {
-            "locked": "0.1.1",
+            "locked": "0.3.0",
             "transitive": [
-                "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.suro:suro-core"
             ]
@@ -7395,7 +7443,7 @@
             ]
         },
         "com.netflix.ribbon:ribbon-core": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
@@ -7403,21 +7451,15 @@
             ]
         },
         "com.netflix.ribbon:ribbon-eureka": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
         },
         "com.netflix.ribbon:ribbon-loadbalancer": {
-            "locked": "2.0-RC9",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka"
-            ]
-        },
-        "com.netflix.rxjava:rxjava-core": {
-            "locked": "0.19.1",
-            "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "com.netflix.servo:servo-core": {
@@ -7425,8 +7467,6 @@
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
-                "com.netflix.ribbon:ribbon-core",
-                "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "com.netflix.suro:suro-core",
                 "netflix:jarversions",
@@ -7437,7 +7477,7 @@
             "locked": "0.2.50-platform",
             "requested": "latest.release"
         },
-        "com.netflix.vms.transformer:vms-transformer-common-interfaces": {
+        "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -7454,20 +7494,20 @@
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client4": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client"
             ]
         },
         "com.sun.jersey:jersey-client": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4"
             ]
         },
         "com.sun.jersey:jersey-core": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey:jersey-client"
@@ -7500,13 +7540,13 @@
             ]
         },
         "commons-cli:commons-cli": {
-            "locked": "1.1",
+            "locked": "1.2",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
             ]
         },
         "commons-codec:commons-codec": {
-            "locked": "1.6",
+            "locked": "1.7",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "org.apache.cassandra:cassandra-all",
@@ -7514,7 +7554,7 @@
             ]
         },
         "commons-collections:commons-collections": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration"
@@ -7523,7 +7563,8 @@
         "commons-configuration:commons-configuration": {
             "locked": "1.8",
             "transitive": [
-                "com.netflix.archaius:archaius-core"
+                "com.netflix.archaius:archaius-core",
+                "com.netflix.ribbon:ribbon-core"
             ]
         },
         "commons-io:commons-io": {
@@ -7544,12 +7585,13 @@
             "locked": "2.6",
             "transitive": [
                 "com.netflix.astyanax:astyanax-core",
+                "com.netflix.ribbon:ribbon-core",
                 "commons-configuration:commons-configuration",
                 "netflix:mutation-stream-common"
             ]
         },
         "commons-logging:commons-logging": {
-            "locked": "1.1.3",
+            "locked": "1.2",
             "transitive": [
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
@@ -7563,9 +7605,15 @@
             ]
         },
         "io.netty:netty": {
-            "locked": "3.6.6.Final",
+            "locked": "3.9.0.Final",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "io.reactivex:rxjava": {
+            "locked": "1.1.5",
+            "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "javax.inject:javax.inject": {
@@ -7574,7 +7622,8 @@
                 "com.google.inject:guice",
                 "com.netflix.archaius:archaius2-api",
                 "com.netflix.governator:governator-api",
-                "com.netflix.governator:governator-core"
+                "com.netflix.governator:governator-core",
+                "com.netflix.netflix-commons:netflix-commons-util"
             ]
         },
         "javax.servlet:servlet-api": {
@@ -7604,7 +7653,7 @@
             ]
         },
         "joda-time:joda-time": {
-            "locked": "2.3",
+            "locked": "2.9.3",
             "transitive": [
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
@@ -7632,6 +7681,12 @@
             "transitive": [
                 "netflix:mutation-stream-client",
                 "netflix:mutation-stream-common"
+            ]
+        },
+        "net.jcip:jcip-annotations": {
+            "locked": "1.0",
+            "transitive": [
+                "com.google.code.findbugs:annotations"
             ]
         },
         "net.jpountz.lz4:lz4": {
@@ -7687,7 +7742,7 @@
         "netflix:netflix-config": {
             "locked": "2.1873.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
@@ -7735,8 +7790,7 @@
             "locked": "3.4",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.cassandra:cassandra-thrift",
-                "org.apache.thrift:libthrift"
+                "org.apache.cassandra:cassandra-thrift"
             ]
         },
         "org.apache.commons:commons-math": {
@@ -7746,7 +7800,7 @@
             ]
         },
         "org.apache.httpcomponents:httpclient": {
-            "locked": "4.3.4",
+            "locked": "4.3.6",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4",
@@ -7754,7 +7808,7 @@
             ]
         },
         "org.apache.httpcomponents:httpcore": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "org.apache.httpcomponents:httpclient",
                 "org.apache.thrift:libthrift"
@@ -7860,7 +7914,7 @@
             ]
         },
         "org.apache.thrift:libthrift": {
-            "locked": "0.9.1",
+            "locked": "0.9.2",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -7943,7 +7997,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -7969,14 +8023,14 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "com.thinkaurelius.thrift:thrift-server"
             ]
         },
         "org.xerial.snappy:snappy-java": {
-            "locked": "1.0.5",
+            "locked": "1.1.1.6",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "org.apache.cassandra:cassandra-all"
