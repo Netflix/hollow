@@ -111,7 +111,7 @@ public class VMSAvailabilityWindowModule {
             if(isGoLive && rollup.doEpisode()) {
                 rollup.newSeasonWindow(window._getStartDate()._getValue(), window._getEndDate()._getValue(), rollup.getSeasonSequenceNumber());
             }
-
+            
             for(VideoRightsContractIdHollow contractIdHollow : window._getContractIds()) {
                 long contractId = contractIdHollow._getValue();
 
@@ -127,7 +127,14 @@ public class VMSAvailabilityWindowModule {
                         if(windowPackageContractInfo != null) {
                             // MERGE MULTIPLE CONTRACTS
 
-                            if(!shouldFilterOutWindowInfo(isGoLive, contract, includedPackageDataCount, outputWindow.startDate.val, outputWindow.endDate.val)) {
+                            if(shouldFilterOutWindowInfo(isGoLive, contract, includedPackageDataCount, outputWindow.startDate.val, outputWindow.endDate.val)) {
+                                if(contractId > windowPackageContractInfo.videoContractInfo.contractId) {
+                                    windowPackageContractInfo.videoContractInfo.contractId = (int)contractId;
+                                    if(packageId.val == thisWindowMaxPackageId)
+                                        thisWindowBundledAssetsGroupId = Math.max((int)contractId, thisWindowBundledAssetsGroupId);
+                                }
+                                
+                            } else {
                                 ///merge cup tokens
                                 List<Strings> cupTokens = new ArrayList<>();
                                 Strings contractCupToken = new Strings(contract._getCupToken()._getValue());
@@ -168,7 +175,7 @@ public class VMSAvailabilityWindowModule {
                             if(shouldFilterOutWindowInfo(isGoLive, contract, includedPackageDataCount, outputWindow.startDate.val, outputWindow.endDate.val)) {
                                 outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractId, videoId));
 
-                                if(maxPackageId == 0) {
+                                if(thisWindowMaxPackageId == 0) {
                                     bundledAssetsGroupId = (int)contractId;
                                     thisWindowBundledAssetsGroupId = (int) contractId;
                                 }
@@ -281,7 +288,7 @@ public class VMSAvailabilityWindowModule {
     // Return AvailabilityWindow from MediaData
     private void populateRolledUpWindowData(CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup, VideoRightsRightsHollow rights, boolean isGoLive) {
         Set<VideoRightsWindowHollow> windows = rights._getWindows();
-
+        
         if(windows.isEmpty()) {
             data.mediaAvailabilityWindows = Collections.emptyList();
             data.imagesAvailabilityWindows = Collections.emptyList();
