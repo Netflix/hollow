@@ -1649,7 +1649,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.163.0",
+            "locked": "1.167.0",
             "requested": "latest.release"
         },
         "netflix:mapping-registry": {
@@ -4073,7 +4073,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.163.0",
+            "locked": "1.167.0",
             "requested": "latest.release"
         },
         "netflix:mapping-registry": {
@@ -6497,7 +6497,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.163.0",
+            "locked": "1.167.0",
             "requested": "latest.release"
         },
         "netflix:mapping-registry": {
@@ -8921,7 +8921,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.163.0",
+            "locked": "1.167.0",
             "requested": "latest.release"
         },
         "netflix:mapping-registry": {
@@ -11444,7 +11444,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.163.0",
+            "locked": "1.167.0",
             "requested": "latest.release"
         },
         "netflix:mapping-registry": {
@@ -13869,7 +13869,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.163.0",
+            "locked": "1.167.0",
             "requested": "latest.release"
         },
         "netflix:mapping-registry": {
@@ -16299,7 +16299,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.163.0",
+            "locked": "1.167.0",
             "requested": "latest.release"
         },
         "netflix:mapping-registry": {
@@ -18729,7 +18729,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.163.0",
+            "locked": "1.167.0",
             "requested": "latest.release"
         },
         "netflix:mapping-registry": {
@@ -21159,7 +21159,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.163.0",
+            "locked": "1.167.0",
             "requested": "latest.release"
         },
         "netflix:mapping-registry": {
