@@ -350,6 +350,8 @@ public class VMSAvailabilityWindowModule {
 
             if(isGoLive && isInWindow)
                 videoImagesContractInfo.videoPackageInfo.stillImagesMap = rollup.getVideoImageMap();
+            else
+                videoMediaContractInfo.videoPackageInfo.formats = Collections.emptySet();  ///TODO: This seems totally unnecessary.  We should remove this line after parity testing.
 
             data.mediaAvailabilityWindows = Collections.singletonList(videoMediaAvailabilityWindow);
             data.imagesAvailabilityWindows = Collections.singletonList(videoImagesAvailabilityWindow);
