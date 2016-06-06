@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.util;
 
-public class RollupValues {
+public class RollUpOrDownValues {
 
     private boolean doShow = false;
     private boolean doSeason = false;

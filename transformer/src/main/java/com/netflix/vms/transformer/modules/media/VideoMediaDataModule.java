@@ -18,6 +18,7 @@ import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
 import com.netflix.vms.transformer.hollowoutput.VideoMediaData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.util.VideoDateUtil;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -77,18 +78,14 @@ public class VideoMediaDataModule {
         // Integer showId = hierarchy.getTopNodeId();
         VideoMediaData vmd = getVideoMediaDataInstance();
 
-        int rightsOrdinal = videoRightsIdx.getMatchingOrdinal(videoId.longValue(), countryCode);
-        VideoRightsHollow rights = null;
-
         if (populateRights(videoId, countryCode, vmd)) {
-            result.put(videoId, vmd);
-            // NOTE: Previous version below. Apparently logic was not changed, but removing roll-down produces no diffs.
-            // keeping this note just in case.
+            if (level == HierarchyLeveL.EPISODE) {
+                vmd.isGoLive = vmd.isGoLive && showData.isGoLive && seasonData.isGoLive;
+            } else if (level == HierarchyLeveL.SEASON) {
+                vmd.isGoLive = vmd.isGoLive && showData.isGoLive;
+            }
 
-            // #cleanup: why is vms.isGoLive not in the condition?
-            // if (level == HierarchyLeveL.EPISODE) {
-            //    vmd.isGoLive = showData.isGoLive && seasonData.isGoLive;
-            // }
+            result.put(videoId, vmd);
         }
 
         populateGeneral(videoId, vmd);

@@ -1,9 +1,9 @@
 package com.netflix.vms.transformer.modules.meta;
 
-import com.netflix.vms.transformer.util.RollupValues;
+import com.netflix.vms.transformer.util.RollUpOrDownValues;
 
 
-public class VideoMetaDataRollupValues extends RollupValues {
+public class VideoMetaDataRollupValues extends RollUpOrDownValues {
 
     private long earliestFirstDisplayDate = Long.MAX_VALUE;
     private long latestLiveFirstDisplayDate;
