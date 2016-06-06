@@ -205,10 +205,10 @@ public class VMSAvailabilityWindowModule {
                                     windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(contract, country, videoId);
                                     outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfo);
 
-                                    if(maxPackageId == 0) {
-                                        bundledAssetsGroupId = (int)contractId;
-                                        thisWindowBundledAssetsGroupId = (int) contractId;
-                                    }
+                                    if(thisWindowMaxPackageId == 0)
+                                        thisWindowBundledAssetsGroupId = Math.max((int)contractId, thisWindowBundledAssetsGroupId);
+                                    if(maxPackageId == 0)
+                                        bundledAssetsGroupId = Math.max((int)contractId, bundledAssetsGroupId);
                                 }
 
 
