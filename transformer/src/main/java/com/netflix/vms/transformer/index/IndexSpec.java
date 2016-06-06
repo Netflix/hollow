@@ -40,8 +40,8 @@ public enum IndexSpec {
     VIDEO_TYPE_COUNTRY(HASH, "VideoType", "countryInfos.element", "videoId", "countryInfos.element.countryCode.value"),
     PACKAGES_BY_VIDEO(HASH, "Package", "", "movieId"),
     ALL_VIDEO_RIGHTS(HASH, "VideoRights", "", "movieId"),
-    ROLLOUT_VIDEO_TYPE(HASH, "Rollout", "", "movieId", "rolloutType.value");
-
+    ROLLOUT_VIDEO_TYPE(HASH, "Rollout", "", "movieId", "rolloutType.value"), 
+    SHOW_COUNTRY_LABEL(HASH, "ShowCountryLabel", "showMemberTypes.element", "videoId", "showMemberTypes.element.countryCodes.element.value");
 
 
     private final IndexType indexType;

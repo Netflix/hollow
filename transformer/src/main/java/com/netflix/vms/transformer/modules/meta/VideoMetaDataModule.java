@@ -20,6 +20,7 @@ import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.PersonVideoHollow;
 import com.netflix.vms.transformer.hollowinput.PersonVideoRoleHollow;
 import com.netflix.vms.transformer.hollowinput.ReleaseDateHollow;
+import com.netflix.vms.transformer.hollowinput.ShowMemberTypeHollow;
 import com.netflix.vms.transformer.hollowinput.StoriesSynopsesHollow;
 import com.netflix.vms.transformer.hollowinput.StoriesSynopsesHookHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
@@ -41,6 +42,7 @@ import com.netflix.vms.transformer.hollowoutput.VPerson;
 import com.netflix.vms.transformer.hollowoutput.VRole;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
+import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoDateUtil;
@@ -56,6 +58,7 @@ import java.util.Set;
 
 public class VideoMetaDataModule {
 
+    private static final int DEFAULT_SHOW_MEMBER_TYPE_ID = Integer.MIN_VALUE;
     private static final int ACTOR_ROLE_ID = 103;
     private static final int DIRECTOR_ROLE_ID = 104;
     private static final int CREATOR_ROLE_ID = 108;
@@ -68,8 +71,9 @@ public class VideoMetaDataModule {
     private final HollowPrimaryKeyIndex videoGeneralIdx;
     private final HollowHashIndex videoTypeCountryIdx;
     private final HollowHashIndex videoDateIdx;
-    private final HollowHashIndex PersonVideoIdx;
-    private final HollowHashIndex PersonVideoRoleIdx;
+    private final HollowHashIndex personVideoIdx;
+    private final HollowHashIndex personVideoRoleIdx;
+    private final HollowHashIndex showCountryLabelIdx;
     private final HollowPrimaryKeyIndex videoRightsIdx;
     private final HollowPrimaryKeyIndex storiesSynopsesIdx;
 
@@ -84,8 +88,9 @@ public class VideoMetaDataModule {
         this.constants = constants;
         this.indexer = indexer;
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(VIDEO_GENERAL);
-        this.PersonVideoIdx = indexer.getHashIndex(PERSONS_BY_VIDEO_ID);
-        this.PersonVideoRoleIdx = indexer.getHashIndex(PERSON_ROLES_BY_VIDEO_ID);
+        this.personVideoIdx = indexer.getHashIndex(PERSONS_BY_VIDEO_ID);
+        this.personVideoRoleIdx = indexer.getHashIndex(PERSON_ROLES_BY_VIDEO_ID);
+        this.showCountryLabelIdx = indexer.getHashIndex(IndexSpec.SHOW_COUNTRY_LABEL);
         this.videoDateIdx = indexer.getHashIndex(VIDEO_DATE);
         this.videoRightsIdx = indexer.getPrimaryKeyIndex(VIDEO_RIGHTS);
         this.videoTypeCountryIdx = indexer.getHashIndex(VIDEO_TYPE_COUNTRY);
@@ -111,27 +116,28 @@ public class VideoMetaDataModule {
             allVideoMetaDataMap.put(entry.getKey(), countryMap);
 
             ShowHierarchy hierarchy = entry.getValue();
+            int topNodeId = hierarchy.getTopNodeId();
 
             for(int i=0;i<hierarchy.getSeasonIds().length;i++) {
                 rollup.newSeason();
 
                 for(int j=0;j<hierarchy.getEpisodeIds()[i].length;j++) {
                     rollup.setDoEpisode(true);
-                    convert(hierarchy.getEpisodeIds()[i][j], countryCode, countryMap, rollup);
+                    convert(topNodeId, hierarchy.getEpisodeIds()[i][j], countryCode, countryMap, rollup, false);
                     rollup.setDoEpisode(false);
                 }
 
                 rollup.setDoSeason(true);
-                convert(hierarchy.getSeasonIds()[i], countryCode, countryMap, rollup);
+                convert(topNodeId, hierarchy.getSeasonIds()[i], countryCode, countryMap, rollup, true);
                 rollup.setDoSeason(false);
             }
 
             rollup.setDoShow(true);
-            convert(hierarchy.getTopNodeId(), countryCode, countryMap, rollup);
+            convert(topNodeId, hierarchy.getTopNodeId(), countryCode, countryMap, rollup, true);
             rollup.setDoShow(false);
 
             for(int i=0;i<hierarchy.getSupplementalIds().length;i++) {
-                convert(hierarchy.getSupplementalIds()[i], countryCode, countryMap, rollup);
+                convert(topNodeId, hierarchy.getSupplementalIds()[i], countryCode, countryMap, rollup, false);
             }
         }
 
@@ -139,9 +145,9 @@ public class VideoMetaDataModule {
     }
 
     /// Here is a good pattern for processing country-specific data
-    private void convert(Integer videoId, String countryCode, Map<Integer, VideoMetaData> countryMap, VideoMetaDataRollupValues rollup) {
+    private void convert(int topNodeId, Integer videoId, String countryCode, Map<Integer, VideoMetaData> countryMap, VideoMetaDataRollupValues rollup, boolean isPopulateShowMemberTypeId) {
         /// first create the country specific key
-        VideoMetaDataCountrySpecificDataKey countrySpecificKey = createCountrySpecificKey(videoId, countryCode, rollup);
+        VideoMetaDataCountrySpecificDataKey countrySpecificKey = createCountrySpecificKey(topNodeId, videoId, countryCode, rollup, isPopulateShowMemberTypeId);
 
         /// then try to get the country specific clone, return it if it exists
         Map<VideoMetaDataCountrySpecificDataKey, VideoMetaData> countrySpecificMap = this.countrySpecificMap.get(videoId);
@@ -181,7 +187,7 @@ public class VideoMetaDataModule {
         countryMap.put(videoId, countrySpecificClone);
     }
 
-    private VideoMetaDataCountrySpecificDataKey createCountrySpecificKey(Integer videoId, String countryCode, VideoMetaDataRollupValues rollup) {
+    private VideoMetaDataCountrySpecificDataKey createCountrySpecificKey(Integer topNodeId, Integer videoId, String countryCode, VideoMetaDataRollupValues rollup, boolean isPopulateShowMemberTypeId) {
         VideoMetaDataCountrySpecificDataKey countrySpecificKey = new VideoMetaDataCountrySpecificDataKey();
 
         int rightsOrdinal = videoRightsIdx.getMatchingOrdinal((long)videoId, countryCode);
@@ -191,7 +197,7 @@ public class VideoMetaDataModule {
             countrySpecificKey.isSearchOnly = rights._getFlags()._getSearchOnly();
         }
 
-        populateSetTypes(videoId, countryCode, rights, countrySpecificKey);
+        populateSetTypes(topNodeId, videoId, countryCode, rights, countrySpecificKey, isPopulateShowMemberTypeId);
         populateDates(videoId, countryCode, rollup, rights, countrySpecificKey);
 
         boolean isGoLive = false;
@@ -261,7 +267,23 @@ public class VideoMetaDataModule {
         return vmd;
     }
 
-    private void populateSetTypes(Integer videoId, String countryCode, VideoRightsHollow rights, VideoMetaDataCountrySpecificDataKey vmd) {
+    private int getShowMemberTypeId(Integer videoId, Integer cId, String countryCode) {
+        HollowHashIndexResult showCountryLabelMatches = showCountryLabelIdx.findMatches((long) videoId, countryCode);
+        if (showCountryLabelMatches != null) {
+            HollowOrdinalIterator iter = showCountryLabelMatches.iterator();
+            int ordinal = iter.next();
+            while (ordinal != NO_MORE_ORDINALS) {
+                ShowMemberTypeHollow data = api.getShowMemberTypeHollow(ordinal);
+                if (data != null) {
+                    return (int) data._getSequenceLabelId();
+                }
+            }
+        }
+
+        return DEFAULT_SHOW_MEMBER_TYPE_ID;
+    }
+
+    private void populateSetTypes(Integer topNodeId, Integer videoId, String countryCode, VideoRightsHollow rights, VideoMetaDataCountrySpecificDataKey vmd, boolean isPopulateShowMemberTypeId) {
         HollowHashIndexResult videoTypeMatches = videoTypeCountryIdx.findMatches((long) videoId, countryCode);
         VideoTypeDescriptorHollow typeDescriptor = null;
         if (videoTypeMatches != null) {
@@ -269,8 +291,7 @@ public class VideoMetaDataModule {
         }
 
         vmd.videoSetTypes = VideoSetTypeUtil.computeSetTypes(videoId, countryCode, rights, typeDescriptor, api, ctx, constants, indexer);
-        int showMemberTypeId = Integer.MIN_VALUE; //@TODO: typeDescriptor._getShowMemberTypeId(); -- need to use new feed
-        vmd.showMemberTypeId = showMemberTypeId;
+        vmd.showMemberTypeId = isPopulateShowMemberTypeId ? getShowMemberTypeId(topNodeId, videoId, countryCode) : DEFAULT_SHOW_MEMBER_TYPE_ID;
 
         StringHollow copyright = typeDescriptor == null ? null : typeDescriptor._getCopyright();
         if(copyright != null) {
@@ -335,13 +356,13 @@ public class VideoMetaDataModule {
         if(ordinal != -1) {
             VideoGeneralHollow general = api.getVideoGeneralHollow(ordinal);
             vmd.year = (int) general._getFirstReleaseYear();
-            vmd.latestYear = vmd.year; 
+            vmd.latestYear = vmd.year;
         }
     }
 
     private void populateRoleLists(Integer videoId, VideoMetaData vmd) {
         Map<VRole, List<VPerson>> roles = new HashMap<>();
-        HollowHashIndexResult personMatches = PersonVideoIdx.findMatches((long) videoId);
+        HollowHashIndexResult personMatches = personVideoIdx.findMatches((long) videoId);
         if(personMatches != null) {
             HollowOrdinalIterator iter = personMatches.iterator();
 
@@ -351,7 +372,7 @@ public class VideoMetaDataModule {
 
                 long personId = person._getPersonId();
 
-                HollowHashIndexResult roleMatches = PersonVideoRoleIdx.findMatches(personId, (long) videoId);
+                HollowHashIndexResult roleMatches = personVideoRoleIdx.findMatches(personId, (long) videoId);
                 HollowOrdinalIterator roleIter = roleMatches.iterator();
 
                 int roleOrdinal = roleIter.next();
