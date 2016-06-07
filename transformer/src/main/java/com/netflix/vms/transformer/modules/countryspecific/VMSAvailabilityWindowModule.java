@@ -212,13 +212,14 @@ public class VMSAvailabilityWindowModule {
                                 }
 
 
-                                if(window._getEndDate()._getValue() > ctx.getNowMillis() && window._getStartDate()._getValue() < minWindowStartDate) {
-                                    minWindowStartDate = window._getStartDate()._getValue();
-                                    currentOrFirstFutureWindow = outputWindow;
-
-                                    if(isGoLive && window._getStartDate()._getValue() < ctx.getNowMillis())
-                                        isInWindow = true;
-                                }
+                            }
+                            
+                            if(window._getEndDate()._getValue() > ctx.getNowMillis() && window._getStartDate()._getValue() < minWindowStartDate) {
+                                minWindowStartDate = window._getStartDate()._getValue();
+                                currentOrFirstFutureWindow = outputWindow;
+                                
+                                if(isGoLive && window._getStartDate()._getValue() < ctx.getNowMillis())
+                                    isInWindow = true;
                             }
                         }
 
@@ -279,9 +280,11 @@ public class VMSAvailabilityWindowModule {
                 rollup.newEpisodeStillImagesByTypeMap(stillImagesByTypeMap);
             else if (stillImagesByTypeMapForShowLevelExtraction != null)
                 rollup.newEpisodeStillImagesByTypeMapForShowLevelExtraction(stillImagesByTypeMapForShowLevelExtraction);
+            
+            rollup.newEpisodeData(isGoLive, currentOrFirstFutureWindow.bundledAssetsGroupId);
+        } else {
+            rollup.newEpisodeData(isGoLive, bundledAssetsGroupId);
         }
-
-        rollup.newEpisodeData(isGoLive, bundledAssetsGroupId);
 
         data.mediaAvailabilityWindows = availabilityWindows;
         data.imagesAvailabilityWindows = availabilityWindows;
