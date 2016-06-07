@@ -1061,7 +1061,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.2.50-platform",
+            "locked": "0.2.51-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -2453,7 +2453,6 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-thrift",
                 "com.netflix.suro:suro-client",
-                "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:nfastyanax",
@@ -3894,7 +3893,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.2.50-platform",
+            "locked": "0.2.51-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -5286,7 +5285,6 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-thrift",
                 "com.netflix.suro:suro-client",
-                "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:nfastyanax",
@@ -6727,7 +6725,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.2.50-platform",
+            "locked": "0.2.51-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -8119,7 +8117,6 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-thrift",
                 "com.netflix.suro:suro-client",
-                "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:nfastyanax",
@@ -9560,7 +9557,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.2.50-platform",
+            "locked": "0.2.51-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -10949,7 +10946,6 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-thrift",
                 "com.netflix.suro:suro-client",
-                "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:nfastyanax",
@@ -12412,7 +12408,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.2.50-platform",
+            "locked": "0.2.51-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -13804,7 +13800,6 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-thrift",
                 "com.netflix.suro:suro-client",
-                "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:nfastyanax",
@@ -16337,7 +16332,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.2.50-platform",
+            "locked": "0.2.51-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -17729,7 +17724,6 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-thrift",
                 "com.netflix.suro:suro-client",
-                "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:nfastyanax",
@@ -19170,7 +19164,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.2.50-platform",
+            "locked": "0.2.51-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -20559,7 +20553,6 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-thrift",
                 "com.netflix.suro:suro-client",
-                "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:nfastyanax",
@@ -22005,7 +21998,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.2.50-platform",
+            "locked": "0.2.51-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -23429,7 +23422,6 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-thrift",
                 "com.netflix.suro:suro-client",
-                "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:nfastyanax",
@@ -24935,7 +24927,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.2.50-platform",
+            "locked": "0.2.51-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -26359,7 +26351,6 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-thrift",
                 "com.netflix.suro:suro-client",
-                "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:nfastyanax",
@@ -27865,7 +27856,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.2.50-platform",
+            "locked": "0.2.51-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -29289,7 +29280,6 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-thrift",
                 "com.netflix.suro:suro-client",
-                "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:nfastyanax",
@@ -30795,7 +30785,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.2.50-platform",
+            "locked": "0.2.51-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -32219,7 +32209,6 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-thrift",
                 "com.netflix.suro:suro-client",
-                "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:nfastyanax",
