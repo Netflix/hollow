@@ -3,17 +3,14 @@ package com.netflix.vms.transformer;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.IndividualTransformFailed;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.FailedProcessingIndividualHierarchies;
 
-import java.util.ArrayList;
-
-import com.netflix.vms.transformer.fastlane.FastlaneIdsExpander;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.vms.transformer.ShowGrouper.TopNodeProcessGroup;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
-import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
@@ -114,16 +111,14 @@ public class SimpleTransformer {
 
         this.videoNamedListModule = new VideoNamedListModule(ctx, cycleConstants, objectMapper);
         
-        if(ctx.getFastlaneIds() != null) {
-        	FastlaneIdsExpander idExpander = new FastlaneIdsExpander(api, ctx);
-        	idExpander.expand();
-        }
-
         startTime = System.currentTimeMillis();
-        int progressDivisor = getProgressDivisor();
-        AtomicInteger processedCount = new AtomicInteger();
+        ShowGrouper showGrouper = new ShowGrouper(api, ctx);
         
-        final List<VideoGeneralHollow> allVideoGeneralObjects = new ArrayList<VideoGeneralHollow>(api.getAllVideoGeneralHollow());
+        final List<Set<TopNodeProcessGroup>> processGroups = showGrouper.getProcessGroups();
+
+        AtomicInteger processedCount = new AtomicInteger();
+        int progressDivisor = getProgressDivisor(processGroups.size());
+        
         
         for(int i=0;i<executor.getCorePoolSize();i++) {
         	executor.execute(() -> {
@@ -137,41 +132,37 @@ public class SimpleTransformer {
         		VideoEpisodeCountryDecoratorModule countryDecoratorModule = new VideoEpisodeCountryDecoratorModule(api, objectMapper);
 
         		int idx = processedCount.getAndIncrement();
-        		while(idx < allVideoGeneralObjects.size()) {
-        			VideoGeneralHollow videoGeneral = allVideoGeneralObjects.get(idx);
+        		while(idx < processGroups.size()) {
+        			Set<TopNodeProcessGroup> processGroup = processGroups.get(idx);
         			
-        			if(shouldProcessHierarchy(videoGeneral)) {
-        			
-	        			try {
+        			try {
+
+	                    Map<String, ShowHierarchy> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(processGroup);
+	                    if (showHierarchiesByCountry != null) {
+	                        Map<Integer, VideoPackageData> transformedPackageData = packageDataModule.transform(showHierarchiesByCountry);
+	                        Map<String, VideoCollectionsDataHierarchy> vcdByCountry = collectionsModule.buildVideoCollectionsDataByCountry(showHierarchiesByCountry);
+	                        Map<String, Map<Integer, VideoMetaData>> vmdByCountry = metadataModule.buildVideoMetaDataByCountry(showHierarchiesByCountry);
+	                        Map<String, Map<Integer, VideoMediaData>> mediaDataByCountry = mediaDataModule.buildVideoMediaDataByCountry(showHierarchiesByCountry);
+	                        Map<String, Map<Integer, VideoImages>> imagesDataByCountry = imagesDataModule.buildVideoImagesByCountry(showHierarchiesByCountry);
+	                        Map<Integer, VideoMiscData> miscData = miscDataModule.buildVideoMiscDataByCountry(showHierarchiesByCountry);
+	                        Map<String, Map<Integer, CompleteVideoCountrySpecificData>> countrySpecificByCountry = countrySpecificModule.buildCountrySpecificDataByCountry(showHierarchiesByCountry, transformedPackageData);
 	
-		                    Map<String, ShowHierarchy> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(videoGeneral);
-		                    if (showHierarchiesByCountry != null) {
-		                        Map<Integer, VideoPackageData> transformedPackageData = packageDataModule.transform(showHierarchiesByCountry);
-		                        Map<String, VideoCollectionsDataHierarchy> vcdByCountry = collectionsModule.buildVideoCollectionsDataByCountry(showHierarchiesByCountry);
-		                        Map<String, Map<Integer, VideoMetaData>> vmdByCountry = metadataModule.buildVideoMetaDataByCountry(showHierarchiesByCountry);
-		                        Map<String, Map<Integer, VideoMediaData>> mediaDataByCountry = mediaDataModule.buildVideoMediaDataByCountry(showHierarchiesByCountry);
-		                        Map<String, Map<Integer, VideoImages>> imagesDataByCountry = imagesDataModule.buildVideoImagesByCountry(showHierarchiesByCountry);
-		                        Map<Integer, VideoMiscData> miscData = miscDataModule.buildVideoMiscDataByCountry(showHierarchiesByCountry);
-		                        Map<String, Map<Integer, CompleteVideoCountrySpecificData>> countrySpecificByCountry = countrySpecificModule.buildCountrySpecificDataByCountry(showHierarchiesByCountry, transformedPackageData);
-		
-		                        if(vcdByCountry != null) {
-		                            writeJustTheCurrentData(vcdByCountry, vmdByCountry, miscData, mediaDataByCountry, imagesDataByCountry, countrySpecificByCountry, objectMapper);
-		
-		                            for(String country : vcdByCountry.keySet()) {
-		                                countryDecoratorModule.decorateVideoEpisodes(country, vcdByCountry.get(country));
-		                            }
-		                        }
-		
-		                        // Process Video Related L10N
-		                        new L10NVideoResourcesModule(api, ctx, objectMapper, indexer).transform(showHierarchiesByCountry);
-		                    }
-		                } catch(Throwable th) {
-		                    ctx.getLogger().error(IndividualTransformFailed, "Transformation failed for hierarchy with top node " + videoGeneral._getVideoId(), th);
-		                    failedIndividualTransforms.incrementAndGet();
-		                }
+	                        if(vcdByCountry != null) {
+	                            writeJustTheCurrentData(vcdByCountry, vmdByCountry, miscData, mediaDataByCountry, imagesDataByCountry, countrySpecificByCountry, objectMapper);
+	
+	                            for(String country : vcdByCountry.keySet()) {
+	                                countryDecoratorModule.decorateVideoEpisodes(country, vcdByCountry.get(country));
+	                            }
+	                        }
+	
+	                        // Process Video Related L10N
+	                        new L10NVideoResourcesModule(api, ctx, objectMapper, indexer).transform(showHierarchiesByCountry);
+	                    }
+	                } catch(Throwable th) {
+	                    ctx.getLogger().error(IndividualTransformFailed, "Transformation failed for hierarchy with top node(s) " + getTopNodeIdentifierString(processGroup), th);
+	                    failedIndividualTransforms.incrementAndGet();
+	                }
 	        			
-        			}
-        			
         			if (idx % progressDivisor == 0) {
         				ctx.getLogger().info(LogTag.TransformProgress, ("finished percent=" + (idx / progressDivisor)));
         			}
@@ -239,12 +230,8 @@ public class SimpleTransformer {
         return writeStateEngine;
     }
     
-	private boolean shouldProcessHierarchy(VideoGeneralHollow videoGeneral) {
-		return ctx.getFastlaneIds() == null || ctx.getFastlaneIds().contains((int)videoGeneral._getVideoId());
-	}
-
-    private int getProgressDivisor() {
-        int totalCount = api.getAllVideoGeneralHollow().size();
+    private int getProgressDivisor(int numProcessGroups) {
+        int totalCount = numProcessGroups;
         totalCount = (totalCount / 100) * 100 + 100;
         return totalCount / 100;
     }
@@ -406,6 +393,19 @@ public class SimpleTransformer {
         }
 
         countryMap.put(country, completeVideo);
+    }
+    
+    private String getTopNodeIdentifierString(Set<TopNodeProcessGroup> processGroup) {
+        StringBuilder builder = new StringBuilder("(");
+        boolean first = true;
+        for(TopNodeProcessGroup topNodeGroup : processGroup) {
+            if(!first)
+                builder.append(",");
+            builder.append(topNodeGroup);
+            first = false;
+        }
+        builder.append(")");
+        return builder.toString();
     }
 
     private static final VideoSetType VIDEO_SET_TYPE_EXTENDED = new VideoSetType("Extended");
