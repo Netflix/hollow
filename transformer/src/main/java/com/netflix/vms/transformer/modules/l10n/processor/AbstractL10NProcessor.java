@@ -44,11 +44,13 @@ public abstract class AbstractL10NProcessor<K> implements L10NProcessor<K> {
     }
 
     protected void addL10NResources(String id, Map<NFLocale, L10NStrings> mapOfTranslatedText) {
-        L10NResources l10n = new L10NResources();
-        l10n.resourceIdStr = id.toCharArray();
-        l10n.localizedStrings = mapOfTranslatedText;
-        mapper.addObject(l10n);
-        itemsAdded++;
+        if(!mapOfTranslatedText.isEmpty()) {
+            L10NResources l10n = new L10NResources();
+            l10n.resourceIdStr = id.toCharArray();
+            l10n.localizedStrings = mapOfTranslatedText;
+            mapper.addObject(l10n);
+            itemsAdded++;
+        }
     }
 
     protected Map<NFLocale, L10NStrings> processTranslatedText(MapOfTranslatedTextHollow mapOfTranslatedText) {
