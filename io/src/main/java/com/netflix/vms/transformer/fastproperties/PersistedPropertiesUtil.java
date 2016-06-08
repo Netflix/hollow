@@ -44,6 +44,8 @@ public class PersistedPropertiesUtil {
     public static boolean fastPropertyExists(String key, String appId, EnvironmentEnum env, RegionEnum region, String serverId, String stack, String countries) throws IOException {
         String fastPropertyId = getFastPropertyId(key, appId, env, region, serverId, stack, countries);
         String myRegion = NetflixConfiguration.getRegion();
+        if(myRegion == null)
+            myRegion = RegionEnum.US_EAST_1.toString();
         String host = null;
         if(env == EnvironmentEnum.test) host = String.format(ENDPOINT_HOSTNAME_TEST, myRegion);
         else if(env == EnvironmentEnum.prod) host = String.format(ENDPOINT_HOSTNAME_PROD, myRegion);
@@ -90,6 +92,8 @@ public class PersistedPropertiesUtil {
         String fastPropertyId = getFastPropertyId(key, appId, env, region, serverId, stack, countries);
 
         String myRegion = NetflixConfiguration.getRegion();
+        if(myRegion == null)
+            myRegion = RegionEnum.US_EAST_1.toString();
         String host = null;
         if(env == EnvironmentEnum.test) host = String.format(ENDPOINT_HOSTNAME_TEST, myRegion);
         else if(env == EnvironmentEnum.prod) host = String.format(ENDPOINT_HOSTNAME_PROD, myRegion);
@@ -148,6 +152,8 @@ public class PersistedPropertiesUtil {
         String postDataXml = constructCreatePropertyXml(key, value, appId, env, region, serverId, stack, countries);
 
         String myRegion = NetflixConfiguration.getRegion();
+        if(myRegion == null)
+            myRegion = RegionEnum.US_EAST_1.toString();
         String host = null;
         if(env == EnvironmentEnum.test) host = String.format(ENDPOINT_HOSTNAME_TEST, myRegion);
         else if(env == EnvironmentEnum.prod) host = String.format(ENDPOINT_HOSTNAME_PROD, myRegion);
@@ -208,6 +214,8 @@ public class PersistedPropertiesUtil {
         String postDataXml = constructUpdatePropertyXml(fastPropertyId, value);
 
         String myRegion = NetflixConfiguration.getRegion();
+        if(myRegion == null)
+            myRegion = RegionEnum.US_EAST_1.toString();
         String host = null;
         if(env == EnvironmentEnum.test) host = String.format(ENDPOINT_HOSTNAME_TEST, myRegion);
         else if(env == EnvironmentEnum.prod) host = String.format(ENDPOINT_HOSTNAME_PROD, myRegion);
@@ -274,6 +282,8 @@ public class PersistedPropertiesUtil {
         System.out.println("Property Exists -- Deleting ...");
 
         String myRegion = NetflixConfiguration.getRegion();
+        if(myRegion == null)
+            myRegion = RegionEnum.US_EAST_1.toString();
         String host = null;
         if(env == EnvironmentEnum.test) host = String.format(ENDPOINT_HOSTNAME_TEST, myRegion);
         else if(env == EnvironmentEnum.prod) host = String.format(ENDPOINT_HOSTNAME_PROD, myRegion);
