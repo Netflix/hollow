@@ -73,7 +73,7 @@ public class PackageDataModule {
         this.encodeSummaryModule = new EncodeSummaryDescriptorModule(api, indexer);
     }
 
-    public Map<Integer, VideoPackageData> transform(Map<String, ShowHierarchy> showHierarchiesByCountry) {
+    public Map<Integer, VideoPackageData> transform(Map<String, Set<ShowHierarchy>> showHierarchiesByCountry) {
         Map<Integer, VideoPackageData> transformedPackages = new HashMap<Integer, VideoPackageData>();
 
         Set<Integer> videoIds = gatherVideoIds(showHierarchiesByCountry);
@@ -225,23 +225,23 @@ public class PackageDataModule {
         }
     }
 
-    private Set<Integer> gatherVideoIds(Map<String, ShowHierarchy> showHierarchyByCountry) {
+    private Set<Integer> gatherVideoIds(Map<String, Set<ShowHierarchy>> showHierarchyByCountry) {
         Set<Integer> videoIds = new HashSet<Integer>();
-        for(Map.Entry<String, ShowHierarchy> entry : showHierarchyByCountry.entrySet()) {
-            ShowHierarchy showHierarchy = entry.getValue();
-
-            videoIds.add(showHierarchy.getTopNodeId());
-
-            for(int i=0;i<showHierarchy.getSeasonIds().length;i++) {
-                videoIds.add(showHierarchy.getSeasonIds()[i]);
-
-                for(int j=0;j<showHierarchy.getEpisodeIds()[i].length;j++) {
-                    videoIds.add(showHierarchy.getEpisodeIds()[i][j]);
+        for(Map.Entry<String, Set<ShowHierarchy>> entry : showHierarchyByCountry.entrySet()) {
+            for(ShowHierarchy showHierarchy : entry.getValue()) {
+                videoIds.add(showHierarchy.getTopNodeId());
+    
+                for(int i=0;i<showHierarchy.getSeasonIds().length;i++) {
+                    videoIds.add(showHierarchy.getSeasonIds()[i]);
+    
+                    for(int j=0;j<showHierarchy.getEpisodeIds()[i].length;j++) {
+                        videoIds.add(showHierarchy.getEpisodeIds()[i][j]);
+                    }
                 }
-            }
-
-            for(int i=0;i<showHierarchy.getSupplementalIds().length;i++) {
-                videoIds.add(showHierarchy.getSupplementalIds()[i]);
+    
+                for(int i=0;i<showHierarchy.getSupplementalIds().length;i++) {
+                    videoIds.add(showHierarchy.getSupplementalIds()[i]);
+                }
             }
         }
 

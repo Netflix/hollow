@@ -103,50 +103,50 @@ public class VideoMetaDataModule {
         hookTypeMap.put("Unknown", new HookType("UNKNOWN"));
     }
 
-    public Map<String, Map<Integer, VideoMetaData>> buildVideoMetaDataByCountry(Map<String, ShowHierarchy> showHierarchiesByCountry) {
+    public Map<String, Map<Integer, VideoMetaData>> buildVideoMetaDataByCountry(Map<String, Set<ShowHierarchy>> showHierarchiesByCountry) {
         countryAgnosticMap.clear();
         countrySpecificMap.clear();
 
         Map<String, Map<Integer, VideoMetaData>> allVideoMetaDataMap = new HashMap<String, Map<Integer,VideoMetaData>>();
 
-        for(Map.Entry<String, ShowHierarchy> entry : showHierarchiesByCountry.entrySet()) {
+        for(Map.Entry<String, Set<ShowHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
-            ShowHierarchy hierarchy = entry.getValue();
-            int topNodeId = hierarchy.getTopNodeId();
-
-            VideoMetaDataRollupValues rollup = new VideoMetaDataRollupValues();
-            VideoMetaDataRolldownValues rolldown = new VideoMetaDataRolldownValues(topNodeId);
-            rolldown.setShowMemberTypeId(getShowMemberTypeId(topNodeId, countryCode));
-
             Map<Integer, VideoMetaData> countryMap = new HashMap<Integer, VideoMetaData>();
             allVideoMetaDataMap.put(entry.getKey(), countryMap);
 
-            for(int i=0;i<hierarchy.getSeasonIds().length;i++) {
-                rollup.newSeason();
+            for(ShowHierarchy hierarchy : entry.getValue()) {
+                VideoMetaDataRollupValues rollup = new VideoMetaDataRollupValues();
+                int topNodeId = hierarchy.getTopNodeId();
+                VideoMetaDataRolldownValues rolldown = new VideoMetaDataRolldownValues(topNodeId);
+                rolldown.setShowMemberTypeId(getShowMemberTypeId(topNodeId, countryCode));
 
-                for(int j=0;j<hierarchy.getEpisodeIds()[i].length;j++) {
-                    rollup.setDoEpisode(true);
-                    rolldown.setDoEpisode(true);
-                    convert(hierarchy.getEpisodeIds()[i][j], countryCode, countryMap, rollup, rolldown);
-                    rollup.setDoEpisode(false);
-                    rolldown.setDoEpisode(false);
+                for(int i=0;i<hierarchy.getSeasonIds().length;i++) {
+                    rollup.newSeason();
+
+                    for(int j=0;j<hierarchy.getEpisodeIds()[i].length;j++) {
+                        rollup.setDoEpisode(true);
+                        rolldown.setDoEpisode(true);
+                        convert(hierarchy.getEpisodeIds()[i][j], countryCode, countryMap, rollup, rolldown);
+                        rollup.setDoEpisode(false);
+                        rolldown.setDoEpisode(false);
+                    }
+
+                    rollup.setDoSeason(true);
+                    rolldown.setDoSeason(true);
+                    convert(hierarchy.getSeasonIds()[i], countryCode, countryMap, rollup, rolldown);
+                    rollup.setDoSeason(false);
+                    rolldown.setDoSeason(false);
                 }
 
-                rollup.setDoSeason(true);
-                rolldown.setDoSeason(true);
-                convert(hierarchy.getSeasonIds()[i], countryCode, countryMap, rollup, rolldown);
-                rollup.setDoSeason(false);
-                rolldown.setDoSeason(false);
-            }
+                rollup.setDoShow(true);
+                rolldown.setDoShow(true);
+                convert(hierarchy.getTopNodeId(), countryCode, countryMap, rollup, rolldown);
+                rollup.setDoShow(false);
+                rolldown.setDoShow(false);
 
-            rollup.setDoShow(true);
-            rolldown.setDoShow(true);
-            convert(hierarchy.getTopNodeId(), countryCode, countryMap, rollup, rolldown);
-            rollup.setDoShow(false);
-            rolldown.setDoShow(false);
-
-            for(int i=0;i<hierarchy.getSupplementalIds().length;i++) {
-                convert(hierarchy.getSupplementalIds()[i], countryCode, countryMap, rollup, rolldown);
+                for(int i=0;i<hierarchy.getSupplementalIds().length;i++) {
+                    convert(hierarchy.getSupplementalIds()[i], countryCode, countryMap, rollup, rolldown);
+                }
             }
         }
 

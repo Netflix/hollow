@@ -1,7 +1,9 @@
 package com.netflix.vms.transformer.modules.collections;
 
-import com.netflix.vms.transformer.CycleConstants;
+import java.util.HashSet;
 
+import java.util.Set;
+import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.ShowHierarchy;
 import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
@@ -37,38 +39,44 @@ public class VideoCollectionsModule {
         this.cycleConstants = constants;
     }
 
-    public Map<String, VideoCollectionsDataHierarchy> buildVideoCollectionsDataByCountry(Map<String, ShowHierarchy> showHierarchiesByCountry) {
+    public Map<String, Set<VideoCollectionsDataHierarchy>> buildVideoCollectionsDataByCountry(Map<String, Set<ShowHierarchy>> showHierarchiesByCountry) {
 
         Map<ShowHierarchy, VideoCollectionsDataHierarchy> uniqueHierarchies = new HashMap<ShowHierarchy, VideoCollectionsDataHierarchy>();
 
-        Map<String, VideoCollectionsDataHierarchy> countryHierarchies = new HashMap<String, VideoCollectionsDataHierarchy>();
+        Map<String, Set<VideoCollectionsDataHierarchy>> countryHierarchies = new HashMap<String, Set<VideoCollectionsDataHierarchy>>();
 
-        for(Map.Entry<String, ShowHierarchy> entry : showHierarchiesByCountry.entrySet()) {
+        for(Map.Entry<String, Set<ShowHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
-            ShowHierarchy showHierarchy = entry.getValue();
-            int topNodeId = showHierarchy.getTopNodeId();
-
-            VideoCollectionsDataHierarchy alreadyBuiltHierarchy = uniqueHierarchies.get(showHierarchy);
-            if(alreadyBuiltHierarchy != null) {
-                countryHierarchies.put(entry.getKey(), alreadyBuiltHierarchy);
-                continue;
-            }
-
-            VideoCollectionsDataHierarchy hierarchy = new VideoCollectionsDataHierarchy(topNodeId, showHierarchy.isStandalone(), getSupplementalVideos(showHierarchy, topNodeId), cycleConstants);
-            for(int i=0;i<showHierarchy.getSeasonIds().length;i++) {
-                int seasonId = showHierarchy.getSeasonIds()[i];
-                int seasonSequenceNumber = showHierarchy.getSeasonSequenceNumbers()[i];
-                hierarchy.addSeason(seasonId, seasonSequenceNumber, getSupplementalVideos(showHierarchy, seasonId));
-
-                for(int j=0;j<showHierarchy.getEpisodeIds()[i].length;j++) {
-                    int episodeId = showHierarchy.getEpisodeIds()[i][j];
-                    int episodeSequenceNumber = showHierarchy.getEpisodeSequenceNumbers()[i][j];
-                    hierarchy.addEpisode(episodeId, episodeSequenceNumber);
+            
+            Set<VideoCollectionsDataHierarchy> vcdHierarchies = new HashSet<>();
+            
+            for(ShowHierarchy showHierarchy : entry.getValue()) {
+                int topNodeId = showHierarchy.getTopNodeId();
+    
+                VideoCollectionsDataHierarchy alreadyBuiltHierarchy = uniqueHierarchies.get(showHierarchy);
+                if(alreadyBuiltHierarchy != null) {
+                    vcdHierarchies.add(alreadyBuiltHierarchy);
+                    continue;
                 }
+    
+                VideoCollectionsDataHierarchy hierarchy = new VideoCollectionsDataHierarchy(topNodeId, showHierarchy.isStandalone(), getSupplementalVideos(showHierarchy, topNodeId), cycleConstants);
+                for(int i=0;i<showHierarchy.getSeasonIds().length;i++) {
+                    int seasonId = showHierarchy.getSeasonIds()[i];
+                    int seasonSequenceNumber = showHierarchy.getSeasonSequenceNumbers()[i];
+                    hierarchy.addSeason(seasonId, seasonSequenceNumber, getSupplementalVideos(showHierarchy, seasonId));
+    
+                    for(int j=0;j<showHierarchy.getEpisodeIds()[i].length;j++) {
+                        int episodeId = showHierarchy.getEpisodeIds()[i][j];
+                        int episodeSequenceNumber = showHierarchy.getEpisodeSequenceNumbers()[i][j];
+                        hierarchy.addEpisode(episodeId, episodeSequenceNumber);
+                    }
+                }
+                
+                vcdHierarchies.add(hierarchy);
+                uniqueHierarchies.put(showHierarchy, hierarchy);
             }
 
-            countryHierarchies.put(countryCode, hierarchy);
-            uniqueHierarchies.put(showHierarchy, hierarchy);
+            countryHierarchies.put(countryCode, vcdHierarchies);
         }
 
         return countryHierarchies;

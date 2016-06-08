@@ -32,10 +32,12 @@ public class L10NVideoResourcesModule extends AbstractTransformModule {
         processorList.add(new VideoRatingsProcessor(api, ctx, mapper, indexer));
     }
 
-    public void transform(Map<String, ShowHierarchy> showHierarchiesByCountry) {
+    public void transform(Map<String, Set<ShowHierarchy>> showHierarchiesByCountry) {
         Set<Integer> videoSet = new HashSet<>();
-        for (Map.Entry<String, ShowHierarchy> entry : showHierarchiesByCountry.entrySet()) {
-            videoSet.addAll(entry.getValue().getAllIds());
+        for (Map.Entry<String, Set<ShowHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
+            for(ShowHierarchy hierarchy : entry.getValue()) {
+                videoSet.addAll(hierarchy.getAllIds());
+            }
         }
 
         for (L10NVideoProcessor<?> processor : processorList) {

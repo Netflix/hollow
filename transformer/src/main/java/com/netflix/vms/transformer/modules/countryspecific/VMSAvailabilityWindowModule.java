@@ -205,20 +205,21 @@ public class VMSAvailabilityWindowModule {
                                     windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(contract, country, videoId);
                                     outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfo);
 
-                                    if(maxPackageId == 0) {
-                                        bundledAssetsGroupId = (int)contractId;
-                                        thisWindowBundledAssetsGroupId = (int) contractId;
-                                    }
+                                    if(thisWindowMaxPackageId == 0)
+                                        thisWindowBundledAssetsGroupId = Math.max((int)contractId, thisWindowBundledAssetsGroupId);
+                                    if(maxPackageId == 0)
+                                        bundledAssetsGroupId = Math.max((int)contractId, bundledAssetsGroupId);
                                 }
 
 
-                                if(window._getEndDate()._getValue() > ctx.getNowMillis() && window._getStartDate()._getValue() < minWindowStartDate) {
-                                    minWindowStartDate = window._getStartDate()._getValue();
-                                    currentOrFirstFutureWindow = outputWindow;
-
-                                    if(isGoLive && window._getStartDate()._getValue() < ctx.getNowMillis())
-                                        isInWindow = true;
-                                }
+                            }
+                            
+                            if(window._getEndDate()._getValue() > ctx.getNowMillis() && window._getStartDate()._getValue() < minWindowStartDate) {
+                                minWindowStartDate = window._getStartDate()._getValue();
+                                currentOrFirstFutureWindow = outputWindow;
+                                
+                                if(isGoLive && window._getStartDate()._getValue() < ctx.getNowMillis())
+                                    isInWindow = true;
                             }
                         }
 
@@ -279,9 +280,11 @@ public class VMSAvailabilityWindowModule {
                 rollup.newEpisodeStillImagesByTypeMap(stillImagesByTypeMap);
             else if (stillImagesByTypeMapForShowLevelExtraction != null)
                 rollup.newEpisodeStillImagesByTypeMapForShowLevelExtraction(stillImagesByTypeMapForShowLevelExtraction);
+            
+            rollup.newEpisodeData(isGoLive, currentOrFirstFutureWindow.bundledAssetsGroupId);
+        } else {
+            rollup.newEpisodeData(isGoLive, bundledAssetsGroupId);
         }
-
-        rollup.newEpisodeData(isGoLive, bundledAssetsGroupId);
 
         data.mediaAvailabilityWindows = availabilityWindows;
         data.imagesAvailabilityWindows = availabilityWindows;

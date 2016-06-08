@@ -5,6 +5,8 @@ import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_RIGHTS;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 
+import java.util.Set;
+
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
@@ -45,29 +47,30 @@ public class VideoMediaDataModule {
         this.videoDateIdx = indexer.getHashIndex(VIDEO_DATE);
     }
 
-    public Map<String, Map<Integer, VideoMediaData>> buildVideoMediaDataByCountry(Map<String, ShowHierarchy> showHierarchiesByCountry) {
+    public Map<String, Map<Integer, VideoMediaData>> buildVideoMediaDataByCountry(Map<String, Set<ShowHierarchy>> showHierarchiesByCountry) {
         Map<String, Map<Integer, VideoMediaData>> allVideoMediaDataMap = new HashMap<String, Map<Integer, VideoMediaData>>();
 
-        for (Map.Entry<String, ShowHierarchy> entry : showHierarchiesByCountry.entrySet()) {
+        for (Map.Entry<String, Set<ShowHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
             Map<Integer, VideoMediaData> countryMap = new HashMap<Integer, VideoMediaData>();
             allVideoMediaDataMap.put(countryCode, countryMap);
 
-            ShowHierarchy hierarchy = entry.getValue();
-            addToResult(hierarchy.getTopNodeId(), countryCode, hierarchy, HierarchyLeveL.SHOW, countryMap);
-
-            for (int iSeason = 0; iSeason < hierarchy.getSeasonIds().length; iSeason++) {
-                int seasonId = hierarchy.getSeasonIds()[iSeason];
-                addToResult(seasonId, countryCode, hierarchy, HierarchyLeveL.SEASON, countryMap);
-
-                for (int j = 0; j < hierarchy.getEpisodeIds()[iSeason].length; j++) {
-                    Integer episodeId = hierarchy.getEpisodeIds()[iSeason][j];
-                    addToResult(episodeId, countryCode, hierarchy, HierarchyLeveL.EPISODE, countryMap);
+            for(ShowHierarchy hierarchy: entry.getValue()) {
+                addToResult(hierarchy.getTopNodeId(), countryCode, hierarchy, HierarchyLeveL.SHOW, countryMap);
+    
+                for (int iSeason = 0; iSeason < hierarchy.getSeasonIds().length; iSeason++) {
+                    int seasonId = hierarchy.getSeasonIds()[iSeason];
+                    addToResult(seasonId, countryCode, hierarchy, HierarchyLeveL.SEASON, countryMap);
+    
+                    for (int j = 0; j < hierarchy.getEpisodeIds()[iSeason].length; j++) {
+                        Integer episodeId = hierarchy.getEpisodeIds()[iSeason][j];
+                        addToResult(episodeId, countryCode, hierarchy, HierarchyLeveL.EPISODE, countryMap);
+                    }
                 }
-            }
-
-            for (int i = 0; i < hierarchy.getSupplementalIds().length; i++) {
-                addToResult(hierarchy.getSupplementalIds()[i], countryCode, hierarchy, HierarchyLeveL.SUPPLEMENTAL, countryMap);
+    
+                for (int i = 0; i < hierarchy.getSupplementalIds().length; i++) {
+                    addToResult(hierarchy.getSupplementalIds()[i], countryCode, hierarchy, HierarchyLeveL.SUPPLEMENTAL, countryMap);
+                }
             }
         }
 

@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.misc;
 
+import java.util.Set;
+
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
@@ -17,13 +19,15 @@ public class VideoEpisodeCountryDecoratorModule {
         this.mapper = mapper;
     }
 
-    public void decorateVideoEpisodes(String country, VideoCollectionsDataHierarchy videoCollectionsDataHierarchy) {
-        VideoCollectionsData topNodeVcd = videoCollectionsDataHierarchy.getTopNode();
-        for(VideoEpisode episode : topNodeVcd.videoEpisodes) {
-            VideoEpisode_CountryList videoEpisodeDecorator = new VideoEpisode_CountryList();
-            videoEpisodeDecorator.country = new ISOCountry(country);
-            videoEpisodeDecorator.item = episode;
-            mapper.addObject(videoEpisodeDecorator);
+    public void decorateVideoEpisodes(String country, Set<VideoCollectionsDataHierarchy> hierarchies) {
+        for(VideoCollectionsDataHierarchy hierarchy : hierarchies) {
+            VideoCollectionsData topNodeVcd = hierarchy.getTopNode();
+            for(VideoEpisode episode : topNodeVcd.videoEpisodes) {
+                VideoEpisode_CountryList videoEpisodeDecorator = new VideoEpisode_CountryList();
+                videoEpisodeDecorator.country = new ISOCountry(country);
+                videoEpisodeDecorator.item = episode;
+                mapper.addObject(videoEpisodeDecorator);
+            }
         }
     }
 }

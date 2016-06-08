@@ -97,7 +97,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.5",
+            "locked": "2.0.6",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
@@ -536,7 +536,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.5",
+            "locked": "2.0.6",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
@@ -975,7 +975,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.5",
+            "locked": "2.0.6",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
@@ -1414,7 +1414,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.5",
+            "locked": "2.0.6",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
@@ -1952,7 +1952,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.5",
+            "locked": "2.0.6",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
@@ -2391,7 +2391,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.5",
+            "locked": "2.0.6",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
@@ -2841,7 +2841,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.5",
+            "locked": "2.0.6",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
@@ -3291,7 +3291,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.5",
+            "locked": "2.0.6",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
@@ -3741,7 +3741,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.5",
+            "locked": "2.0.6",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {

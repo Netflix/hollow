@@ -41,10 +41,12 @@ public class VideoImagesDataModule extends ArtWorkModule {
         this.videoArtworkIndex = indexer.getHashIndex(IndexSpec.ARTWORK_BY_VIDEO_ID);
     }
 
-    public Map<String, Map<Integer, VideoImages>> buildVideoImagesByCountry(Map<String, ShowHierarchy> showHierarchiesByCountry) {
+    public Map<String, Map<Integer, VideoImages>> buildVideoImagesByCountry(Map<String, Set<ShowHierarchy>> showHierarchiesByCountry) {
         Set<Integer> ids = new HashSet<>();
-        for (Map.Entry<String, ShowHierarchy> entry : showHierarchiesByCountry.entrySet()) {
-            ids.addAll(entry.getValue().getAllIds());
+        for (Map.Entry<String, Set<ShowHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
+            for(ShowHierarchy hierarchy : entry.getValue()) {
+                ids.addAll(hierarchy.getAllIds());
+            }
         }
 
         Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap = new HashMap<>();
