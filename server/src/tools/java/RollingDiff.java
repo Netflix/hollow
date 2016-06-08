@@ -53,10 +53,11 @@ public class RollingDiff {
     }
     
     @Test
-    public void downloadNewPipelineOutputAndInputAndUnpinNewPipeline() throws IOException {
+    public void downloadNewPipelineOutputAndUnpinNewPipeline() throws IOException {
         downloadNewPipelineOutput();
         triggerDiff();
-        downloadNewPipelineInput();
+        //downloadNewPipelineInput();
+        unpinNewPipeline();
     }
     
     private void downloadOldPipelineOutput() throws IOException {
@@ -161,7 +162,7 @@ public class RollingDiff {
         String inputVersionId = header.getHeaderTags().get("sourceDataVersion");
         
         InputStream is = HttpHelper.getInputStream(VMSQuickTestInitializer.PROD_URL_US_EAST + "/" + "filestore-download?keybase=" + new VMSInputDataKeybaseBuilder("noevent").getSnapshotKeybase() + "&version=" + inputVersionId);
-        FileOutputStream fos = new FileOutputStream(new File(dir, "newpipeline-snapshot"));
+        FileOutputStream fos = new FileOutputStream(new File(dir, "input-snapshot"));
 
         IOUtils.copy(is, fos);
         
