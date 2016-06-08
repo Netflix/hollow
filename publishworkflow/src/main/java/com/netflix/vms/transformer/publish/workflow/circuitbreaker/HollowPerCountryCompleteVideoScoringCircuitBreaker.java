@@ -41,24 +41,20 @@ public abstract class HollowPerCountryCompleteVideoScoringCircuitBreaker extends
 
         for(int i=0;i<perCountryCertificationCounts.length;i++) {
             ISOCountryHollow country = hollowApi.getISOCountryHollow(i);
-            
-            if(ctx == null){
-            	System.out.println("ctx is null");
+            if(country == null)
             	continue;
+            try{
+	            if(perCountryCertificationCounts[i] != 0 && 
+	            		ctx
+	            		.getConfig()
+	            		.isCircuitBreakerEnabled(getRuleName(), 
+	            				country._getId()))
+	                results.addResult(compareMetric(country._getId(), perCountryCertificationCounts[i]));
+            } catch(NullPointerException ex){
+            	ctx.getLogger().error(LogTag.CircuitBreaker, "NullPointer cause: "+ex.getCause());
+            	ex.printStackTrace();
+            	throw ex;
             }
-            if(ctx.getConfig() == null){
-            	ctx.getLogger().warn(LogTag.CircuitBreaker, getRuleName()+" cb ctx.getConfig is null");
-            	continue;
-            }
-            if(country == null){
-            	ctx.getLogger().warn(LogTag.CircuitBreaker, "Country at ordinal "+i+" is null");
-            }
-            
-            if(perCountryCertificationCounts[i] != 0 && ctx
-            		.getConfig()
-            		.isCircuitBreakerEnabled(getRuleName(), 
-            				country._getId()))
-                results.addResult(compareMetric(country._getId(), perCountryCertificationCounts[i]));
         }
 
         return results;

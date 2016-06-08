@@ -2,8 +2,6 @@ package com.netflix.vms.transformer.publish.workflow.circuitbreaker;
 
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.CircuitBreaker;
 
-import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
-
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
@@ -12,6 +10,7 @@ import com.netflix.vms.generated.notemplate.IntegerHollow;
 import com.netflix.vms.generated.notemplate.MapOfIntegerToFloatHollow;
 import com.netflix.vms.generated.notemplate.TopNVideoDataHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
+import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import java.util.HashSet;
 import java.util.Map.Entry;
@@ -57,7 +56,8 @@ public abstract class HollowPerCountryTopNVideoScoringCircuitBreaker extends Hol
 				}
 				results.addResult(compareMetric(countryId, missingViewShare));
 				if(missingVideoIDs.size() > 0)
-					ctx.getLogger().warn(CircuitBreaker, getRuleName()+": "+countryId+": Unavailable TopN video IDs: "+missingVideoIDs);
+					ctx.getLogger().warn(CircuitBreaker, getRuleName()+": "+countryId+": Unavailable TopN video IDs: "+missingVideoIDs+
+							" contributing to "+missingViewShare+"% missing view share");
 				
 				ctx.getMetricRecorder().recordMetric(Metric.TopNMissingViewShare, missingViewShare);
 			}
