@@ -5,8 +5,7 @@ import com.netflix.vms.generated.notemplate.VMSAvailabilityWindowHollow;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import java.util.List;
 
-public class TopNViewShareAvailabilityCircuitBreaker extends
-		HollowPerCountryCompleteVideoScoringCircuitBreaker {
+public class TopNViewShareAvailabilityCircuitBreaker extends HollowPerCountryTopNVideoScoringCircuitBreaker {
 
 	public TopNViewShareAvailabilityCircuitBreaker(PublishWorkflowContext ctx, long versionId) {
 		super(ctx, versionId);

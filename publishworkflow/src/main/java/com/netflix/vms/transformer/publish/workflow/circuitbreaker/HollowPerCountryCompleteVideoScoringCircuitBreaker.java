@@ -6,8 +6,8 @@ import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
 import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
 import com.netflix.vms.generated.notemplate.ISOCountryHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
+import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-
 import java.util.BitSet;
 
 public abstract class HollowPerCountryCompleteVideoScoringCircuitBreaker extends HollowCountrySpecificCircuitBreaker {
@@ -41,8 +41,23 @@ public abstract class HollowPerCountryCompleteVideoScoringCircuitBreaker extends
 
         for(int i=0;i<perCountryCertificationCounts.length;i++) {
             ISOCountryHollow country = hollowApi.getISOCountryHollow(i);
-
-            if(perCountryCertificationCounts[i] != 0 && ctx.getConfig().isCircuitBreakerEnabled(getRuleName(), country._getId()))
+            
+            if(ctx == null){
+            	System.out.println("ctx is null");
+            	continue;
+            }
+            if(ctx.getConfig() == null){
+            	ctx.getLogger().warn(LogTag.CircuitBreaker, getRuleName()+" cb ctx.getConfig is null");
+            	continue;
+            }
+            if(country == null){
+            	ctx.getLogger().warn(LogTag.CircuitBreaker, "Country at ordinal "+i+" is null");
+            }
+            
+            if(perCountryCertificationCounts[i] != 0 && ctx
+            		.getConfig()
+            		.isCircuitBreakerEnabled(getRuleName(), 
+            				country._getId()))
                 results.addResult(compareMetric(country._getId(), perCountryCertificationCounts[i]));
         }
 
