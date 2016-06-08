@@ -57,7 +57,6 @@ public class RollingDiff {
         downloadNewPipelineOutput();
         triggerDiff();
         downloadNewPipelineInput();
-        unpinNewPipeline();
     }
     
     private void downloadOldPipelineOutput() throws IOException {
@@ -89,7 +88,7 @@ public class RollingDiff {
                 
                 System.out.println("pinning " + mutationGroup + "=" + latestColdstartVersion);
                 
-                PersistedPropertiesUtil.createFastProperty(
+                PersistedPropertiesUtil.updateFastProperty(
                         "vms.pinnedColdstartVersion." + mutationGroup, 
                         latestColdstartVersion, 
                         "vmsconverter", 
@@ -161,7 +160,7 @@ public class RollingDiff {
         HollowBlobHeader header = new HollowBlobHeaderReader().readHeader(new LZ4VMSInputStream(new FileInputStream(new File(dir, "newpipeline-snapshot"))));
         String inputVersionId = header.getHeaderTags().get("sourceDataVersion");
         
-        InputStream is = HttpHelper.getInputStream(VMSQuickTestInitializer.PROD_URL + "/" + "filestore-download?keybase=" + new VMSInputDataKeybaseBuilder("noevent").getSnapshotKeybase() + "&version=" + inputVersionId);
+        InputStream is = HttpHelper.getInputStream(VMSQuickTestInitializer.PROD_URL_US_EAST + "/" + "filestore-download?keybase=" + new VMSInputDataKeybaseBuilder("noevent").getSnapshotKeybase() + "&version=" + inputVersionId);
         FileOutputStream fos = new FileOutputStream(new File(dir, "newpipeline-snapshot"));
 
         IOUtils.copy(is, fos);
@@ -171,6 +170,7 @@ public class RollingDiff {
     }
 
     
+    @Test
     public void unpinNewPipeline() throws IOException {
         HollowBlobHeaderReader reader = new HollowBlobHeaderReader();
 
