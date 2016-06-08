@@ -63,47 +63,48 @@ public class CountrySpecificDataModule {
         this.availabilityWindowModule = new VMSAvailabilityWindowModule(api, ctx, indexer);
     }
 
-    public Map<String, Map<Integer, CompleteVideoCountrySpecificData>> buildCountrySpecificDataByCountry(Map<String, ShowHierarchy> showHierarchiesByCountry, Map<Integer, VideoPackageData> transformedPackageData) {
+    public Map<String, Map<Integer, CompleteVideoCountrySpecificData>> buildCountrySpecificDataByCountry(Map<String, Set<ShowHierarchy>> showHierarchiesByCountry, Map<Integer, VideoPackageData> transformedPackageData) {
         this.availabilityWindowModule.setTransformedPackageData(transformedPackageData);
 
         Map<String, Map<Integer, CompleteVideoCountrySpecificData>> allCountrySpecificDataMap = new HashMap<String, Map<Integer,CompleteVideoCountrySpecificData>>();
         CountrySpecificRollupValues rollup = new CountrySpecificRollupValues();
 
-        for(Map.Entry<String, ShowHierarchy> entry : showHierarchiesByCountry.entrySet()) {
+        for(Map.Entry<String, Set<ShowHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
 
             Map<Integer, CompleteVideoCountrySpecificData> countryMap = new HashMap<Integer, CompleteVideoCountrySpecificData>();
             allCountrySpecificDataMap.put(entry.getKey(), countryMap);
 
-            ShowHierarchy hierarchy = entry.getValue();
+            for(ShowHierarchy hierarchy : entry.getValue()) {
 
-            for(int i=0;i<hierarchy.getSeasonIds().length;i++) {
-                rollup.setSeasonSequenceNumber(hierarchy.getSeasonSequenceNumbers()[i]);
-
-                for(int j=0;j<hierarchy.getEpisodeIds()[i].length;j++) {
-                    int videoId = hierarchy.getEpisodeIds()[i][j];
-                    rollup.setDoEpisode(true);
-                    convert(videoId, countryCode, countryMap, rollup);
-                    rollup.setDoEpisode(false);
-                    rollup.episodeFound();
+                for(int i=0;i<hierarchy.getSeasonIds().length;i++) {
+                    rollup.setSeasonSequenceNumber(hierarchy.getSeasonSequenceNumbers()[i]);
+    
+                    for(int j=0;j<hierarchy.getEpisodeIds()[i].length;j++) {
+                        int videoId = hierarchy.getEpisodeIds()[i][j];
+                        rollup.setDoEpisode(true);
+                        convert(videoId, countryCode, countryMap, rollup);
+                        rollup.setDoEpisode(false);
+                        rollup.episodeFound();
+                    }
+    
+                    rollup.setDoSeason(true);
+                    convert(hierarchy.getSeasonIds()[i], countryCode, countryMap, rollup);
+                    rollup.setDoSeason(false);
+                    rollup.resetSeason();
                 }
-
-                rollup.setDoSeason(true);
-                convert(hierarchy.getSeasonIds()[i], countryCode, countryMap, rollup);
-                rollup.setDoSeason(false);
-                rollup.resetSeason();
+    
+                rollup.setDoShow(true);
+                convert(hierarchy.getTopNodeId(), countryCode, countryMap, rollup);
+                rollup.setDoShow(false);
+                rollup.resetShow();
+    
+                for(int i=0;i<hierarchy.getSupplementalIds().length;i++) {
+                    convert(hierarchy.getSupplementalIds()[i], countryCode, countryMap, rollup);
+                }
+    
+                rollup.reset();
             }
-
-            rollup.setDoShow(true);
-            convert(hierarchy.getTopNodeId(), countryCode, countryMap, rollup);
-            rollup.setDoShow(false);
-            rollup.resetShow();
-
-            for(int i=0;i<hierarchy.getSupplementalIds().length;i++) {
-                convert(hierarchy.getSupplementalIds()[i], countryCode, countryMap, rollup);
-            }
-
-            rollup.reset();
         }
 
         certificationListsModule.reset();

@@ -1,7 +1,9 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.vms.transformer.ShowGrouper.TopNodeProcessGroup;
+import java.util.Collections;
 
+import java.util.HashSet;
+import com.netflix.vms.transformer.ShowGrouper.TopNodeProcessGroup;
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
@@ -52,8 +54,8 @@ public class ShowHierarchyInitializer {
         this.ctx = ctx;
     }
 
-    public Map<String, ShowHierarchy> getShowHierarchiesByCountry(Set<TopNodeProcessGroup> processGroup) {
-        Map<String, ShowHierarchy> showHierarchiesByCountry = new HashMap<String, ShowHierarchy>();
+    public Map<String, Set<ShowHierarchy>> getShowHierarchiesByCountry(Set<TopNodeProcessGroup> processGroup) {
+        Map<String, Set<ShowHierarchy>> showHierarchiesByCountry = new HashMap<>();
 
         for(TopNodeProcessGroup topNodeGroup : processGroup) {
             long topNodeId = topNodeGroup.getTopNodeId();
@@ -83,7 +85,12 @@ public class ShowHierarchyInitializer {
                             uniqueShowHierarchies.put(showHierarchy, canonicalHierarchy);
                         }
     
-                        showHierarchiesByCountry.put(countryCode, canonicalHierarchy);
+                        Set<ShowHierarchy> hierarchies = showHierarchiesByCountry.get(countryCode);
+                        if(hierarchies == null) {
+                            hierarchies = new HashSet<>();
+                            showHierarchiesByCountry.put(countryCode, hierarchies);
+                        }
+                        hierarchies.add(canonicalHierarchy);
                     }
     
                     showSeasonEpisodeOrdinal = iter.next();
@@ -107,7 +114,7 @@ public class ShowHierarchyInitializer {
                     uniqueShowHierarchies.put(showHierarchy, canonicalHierarchy);
                 }
     
-                showHierarchiesByCountry.put(countryCode, canonicalHierarchy);
+                showHierarchiesByCountry.put(countryCode, Collections.singleton(canonicalHierarchy));
             }
         }
 
