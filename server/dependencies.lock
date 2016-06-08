@@ -2201,14 +2201,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.71",
+            "locked": "59.76",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.71",
+            "locked": "59.76",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
@@ -5033,14 +5033,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.71",
+            "locked": "59.76",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.71",
+            "locked": "59.76",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
@@ -7865,14 +7865,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.71",
+            "locked": "59.76",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.71",
+            "locked": "59.76",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
@@ -10694,14 +10694,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.71",
+            "locked": "59.76",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.71",
+            "locked": "59.76",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
@@ -13548,14 +13548,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.71",
+            "locked": "59.76",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.71",
+            "locked": "59.76",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
@@ -17472,14 +17472,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.71",
+            "locked": "59.76",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.71",
+            "locked": "59.76",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
@@ -20301,14 +20301,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.71",
+            "locked": "59.76",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.71",
+            "locked": "59.76",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
@@ -23163,14 +23163,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.71",
+            "locked": "59.76",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.71",
+            "locked": "59.76",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
@@ -26092,14 +26092,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.71",
+            "locked": "59.76",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.71",
+            "locked": "59.76",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
@@ -29021,14 +29021,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.71",
+            "locked": "59.76",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.71",
+            "locked": "59.76",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
@@ -31950,14 +31950,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.71",
+            "locked": "59.76",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.71",
+            "locked": "59.76",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
