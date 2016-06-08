@@ -103,41 +103,42 @@ public class VideoMetaDataModule {
         hookTypeMap.put("Unknown", new HookType("UNKNOWN"));
     }
 
-    public Map<String, Map<Integer, VideoMetaData>> buildVideoMetaDataByCountry(Map<String, ShowHierarchy> showHierarchiesByCountry) {
+    public Map<String, Map<Integer, VideoMetaData>> buildVideoMetaDataByCountry(Map<String, Set<ShowHierarchy>> showHierarchiesByCountry) {
         countryAgnosticMap.clear();
         countrySpecificMap.clear();
 
         Map<String, Map<Integer, VideoMetaData>> allVideoMetaDataMap = new HashMap<String, Map<Integer,VideoMetaData>>();
 
-        for(Map.Entry<String, ShowHierarchy> entry : showHierarchiesByCountry.entrySet()) {
+        for(Map.Entry<String, Set<ShowHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
-            VideoMetaDataRollupValues rollup = new VideoMetaDataRollupValues();
             Map<Integer, VideoMetaData> countryMap = new HashMap<Integer, VideoMetaData>();
             allVideoMetaDataMap.put(entry.getKey(), countryMap);
 
-            ShowHierarchy hierarchy = entry.getValue();
-            int topNodeId = hierarchy.getTopNodeId();
-
-            for(int i=0;i<hierarchy.getSeasonIds().length;i++) {
-                rollup.newSeason();
-
-                for(int j=0;j<hierarchy.getEpisodeIds()[i].length;j++) {
-                    rollup.setDoEpisode(true);
-                    convert(topNodeId, hierarchy.getEpisodeIds()[i][j], countryCode, countryMap, rollup, false);
-                    rollup.setDoEpisode(false);
+            for(ShowHierarchy hierarchy : entry.getValue()) {
+                VideoMetaDataRollupValues rollup = new VideoMetaDataRollupValues();
+                int topNodeId = hierarchy.getTopNodeId();
+    
+                for(int i=0;i<hierarchy.getSeasonIds().length;i++) {
+                    rollup.newSeason();
+    
+                    for(int j=0;j<hierarchy.getEpisodeIds()[i].length;j++) {
+                        rollup.setDoEpisode(true);
+                        convert(topNodeId, hierarchy.getEpisodeIds()[i][j], countryCode, countryMap, rollup, false);
+                        rollup.setDoEpisode(false);
+                    }
+    
+                    rollup.setDoSeason(true);
+                    convert(topNodeId, hierarchy.getSeasonIds()[i], countryCode, countryMap, rollup, true);
+                    rollup.setDoSeason(false);
                 }
-
-                rollup.setDoSeason(true);
-                convert(topNodeId, hierarchy.getSeasonIds()[i], countryCode, countryMap, rollup, true);
-                rollup.setDoSeason(false);
-            }
-
-            rollup.setDoShow(true);
-            convert(topNodeId, hierarchy.getTopNodeId(), countryCode, countryMap, rollup, true);
-            rollup.setDoShow(false);
-
-            for(int i=0;i<hierarchy.getSupplementalIds().length;i++) {
-                convert(topNodeId, hierarchy.getSupplementalIds()[i], countryCode, countryMap, rollup, false);
+    
+                rollup.setDoShow(true);
+                convert(topNodeId, hierarchy.getTopNodeId(), countryCode, countryMap, rollup, true);
+                rollup.setDoShow(false);
+    
+                for(int i=0;i<hierarchy.getSupplementalIds().length;i++) {
+                    convert(topNodeId, hierarchy.getSupplementalIds()[i], countryCode, countryMap, rollup, false);
+                }
             }
         }
 
