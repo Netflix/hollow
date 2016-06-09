@@ -269,12 +269,10 @@ public class VMSAvailabilityWindowModule {
                     videoFormatDescriptorsFromMaxPackageId = entry.getValue().videoPackageInfo.formats;
                     prePromoDays = sanitize(entry.getValue().videoContractInfo.prePromotionDays);
                     cupTokens = entry.getValue().videoContractInfo.cupTokens;
-                    if(isGoLive) {
-                        if(isInWindow)
-                            stillImagesByTypeMap = entry.getValue().videoPackageInfo.stillImagesMap;
-                        else
-                            stillImagesByTypeMapForShowLevelExtraction = entry.getValue().videoPackageInfo.stillImagesMap;
-                    }
+                    if(isGoLive && isInWindow)
+                        stillImagesByTypeMap = entry.getValue().videoPackageInfo.stillImagesMap;
+                    else
+                        stillImagesByTypeMapForShowLevelExtraction = entry.getValue().videoPackageInfo.stillImagesMap;
                 }
             }
 
