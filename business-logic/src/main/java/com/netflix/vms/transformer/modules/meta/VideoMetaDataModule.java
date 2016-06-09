@@ -8,7 +8,6 @@ import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_DATE;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_RIGHTS;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
-
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
@@ -47,7 +46,6 @@ import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoDateUtil;
 import com.netflix.vms.transformer.util.VideoSetTypeUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -183,6 +181,7 @@ public class VideoMetaDataModule {
         countrySpecificClone.theatricalReleaseDate = countrySpecificKey.theatricalReleaseDate;
         countrySpecificClone.broadcastReleaseDate = countrySpecificKey.broadcastReleaseDate;
         countrySpecificClone.broadcastReleaseYear = countrySpecificKey.broadcastYear;
+        countrySpecificClone.broadcastDistributorName = countrySpecificKey.broadcastDistributorName;
         countrySpecificClone.year = countrySpecificKey.year;
         countrySpecificClone.latestYear = countrySpecificKey.latestYear;
         countrySpecificClone.videoSetTypes = countrySpecificKey.videoSetTypes;
@@ -356,13 +355,23 @@ public class VideoMetaDataModule {
         if(dateResult != null) {
             int ordinal = dateResult.iterator().next();
             VideoDateWindowHollow dateWindow = api.getVideoDateWindowHollow(ordinal);
-            ReleaseDateHollow theatricalReleaseDate = VideoDateUtil.getReleaseDateType(VideoDateUtil.ReleaseDateType.Theatrical, dateWindow);
-            ReleaseDateHollow broadcastReleaseDate = VideoDateUtil.getReleaseDateType(VideoDateUtil.ReleaseDateType.Broadcast, dateWindow);
-
-            vmd.isTheatricalRelease = theatricalReleaseDate != null;
-            vmd.theatricalReleaseDate = VideoDateUtil.convertToHollowOutputDate(theatricalReleaseDate);
-            vmd.broadcastYear = broadcastReleaseDate == null ? 0 : broadcastReleaseDate._getYear();
-            vmd.broadcastReleaseDate = VideoDateUtil.convertToHollowOutputDate(broadcastReleaseDate);
+            
+            List<ReleaseDateHollow> releaseDates = dateWindow._getReleaseDates();
+            if (releaseDates != null) {
+                for (ReleaseDateHollow releaseDate : releaseDates) {
+                    String releaseDateType = releaseDate._getReleaseDateType()._getValue();
+                    if(releaseDateType.equals(VideoDateUtil.ReleaseDateType.Theatrical.toString())) {
+                        vmd.isTheatricalRelease = true;
+                        vmd.theatricalReleaseDate = VideoDateUtil.convertToHollowOutputDate(releaseDate);
+                    } else if(releaseDateType.equals(VideoDateUtil.ReleaseDateType.Broadcast.toString())) {
+                        vmd.broadcastYear = releaseDate._getYear();
+                        vmd.broadcastReleaseDate = VideoDateUtil.convertToHollowOutputDate(releaseDate);
+                        StringHollow distributorName = releaseDate._getDistributorName();
+                        if(distributorName != null)
+                            vmd.broadcastDistributorName = new Strings(distributorName._getValue());
+                    }
+                }            
+            }
         }
 
         int ordinal = videoGeneralIdx.getMatchingOrdinal((long)videoId);

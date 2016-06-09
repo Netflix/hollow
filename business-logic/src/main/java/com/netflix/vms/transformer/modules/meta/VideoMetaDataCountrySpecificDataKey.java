@@ -14,17 +14,18 @@ public class VideoMetaDataCountrySpecificDataKey {
     Date theatricalReleaseDate;
     Date broadcastReleaseDate;
     int broadcastYear;
+    Strings broadcastDistributorName;
     int year;
     int latestYear;
     Set<VideoSetType> videoSetTypes;
     int showMemberTypeId = Integer.MIN_VALUE;
     Strings copyright;
     boolean hasNewContent;
-
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + ((broadcastDistributorName == null) ? 0 : broadcastDistributorName.hashCode());
         result = prime * result + ((broadcastReleaseDate == null) ? 0 : broadcastReleaseDate.hashCode());
         result = prime * result + broadcastYear;
         result = prime * result + ((copyright == null) ? 0 : copyright.hashCode());
@@ -38,7 +39,6 @@ public class VideoMetaDataCountrySpecificDataKey {
         result = prime * result + year;
         return result;
     }
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -48,6 +48,11 @@ public class VideoMetaDataCountrySpecificDataKey {
         if (getClass() != obj.getClass())
             return false;
         VideoMetaDataCountrySpecificDataKey other = (VideoMetaDataCountrySpecificDataKey) obj;
+        if (broadcastDistributorName == null) {
+            if (other.broadcastDistributorName != null)
+                return false;
+        } else if (!broadcastDistributorName.equals(other.broadcastDistributorName))
+            return false;
         if (broadcastReleaseDate == null) {
             if (other.broadcastReleaseDate != null)
                 return false;
@@ -84,5 +89,6 @@ public class VideoMetaDataCountrySpecificDataKey {
             return false;
         return true;
     }
+
 
 }
