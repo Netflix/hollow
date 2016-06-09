@@ -277,10 +277,13 @@ public class VMSAvailabilityWindowModule {
             }
 
             rollup.newAssetBcp47Codes(assetBcp47CodesFromMaxPackageId);
-            rollup.newVideoFormatDescriptors(videoFormatDescriptorsFromMaxPackageId);
             rollup.newPrePromoDays(prePromoDays);
-            if(isGoLive && isInWindow)
+            
+            if(isGoLive && isInWindow) {
+                rollup.newVideoFormatDescriptors(videoFormatDescriptorsFromMaxPackageId);
                 rollup.newCupTokens(cupTokens);
+            }
+            
             if(stillImagesByTypeMap != null)
                 rollup.newEpisodeStillImagesByTypeMap(stillImagesByTypeMap);
             else if (stillImagesByTypeMapForShowLevelExtraction != null)
