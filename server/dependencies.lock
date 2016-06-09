@@ -637,7 +637,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -655,13 +655,13 @@
             ]
         },
         "com.netflix.governator:governator-annotations": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
@@ -673,13 +673,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
@@ -692,18 +692,18 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-jetty": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)"
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)"
         },
         "com.netflix.hollow:netflix-hollow": {
@@ -3469,7 +3469,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -3487,13 +3487,13 @@
             ]
         },
         "com.netflix.governator:governator-annotations": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
@@ -3505,13 +3505,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
@@ -3524,18 +3524,18 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-jetty": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)"
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)"
         },
         "com.netflix.hollow:netflix-hollow": {
@@ -6301,7 +6301,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -6319,13 +6319,13 @@
             ]
         },
         "com.netflix.governator:governator-annotations": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
@@ -6337,13 +6337,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
@@ -6356,18 +6356,18 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-jetty": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)"
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)"
         },
         "com.netflix.hollow:netflix-hollow": {
@@ -9133,7 +9133,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -9151,13 +9151,13 @@
             ]
         },
         "com.netflix.governator:governator-annotations": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
@@ -9169,13 +9169,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
@@ -9188,7 +9188,7 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
@@ -9199,7 +9199,7 @@
             "requested": "[1.12.10,)"
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)"
         },
         "com.netflix.hollow:netflix-hollow": {
@@ -11984,7 +11984,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -12002,13 +12002,13 @@
             ]
         },
         "com.netflix.governator:governator-annotations": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
@@ -12020,13 +12020,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
@@ -12039,18 +12039,18 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-jetty": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)"
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)"
         },
         "com.netflix.hollow:netflix-hollow": {
@@ -15202,7 +15202,7 @@
     },
     "provided": {
         "com.netflix.governator:governator-jetty": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)"
         },
         "javax.servlet:javax.servlet-api": {
@@ -15908,7 +15908,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -15926,13 +15926,13 @@
             ]
         },
         "com.netflix.governator:governator-annotations": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
@@ -15944,13 +15944,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
@@ -15963,18 +15963,18 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-jetty": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)"
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)"
         },
         "com.netflix.hollow:netflix-hollow": {
@@ -18740,7 +18740,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -18758,13 +18758,13 @@
             ]
         },
         "com.netflix.governator:governator-annotations": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
@@ -18776,13 +18776,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
@@ -18795,18 +18795,18 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-jetty": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)"
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)"
         },
         "com.netflix.hollow:netflix-hollow": {
@@ -21574,7 +21574,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -21592,13 +21592,13 @@
             ]
         },
         "com.netflix.governator:governator-annotations": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
@@ -21610,13 +21610,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
@@ -21629,18 +21629,18 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-jetty": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)"
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)"
         },
         "com.netflix.hollow:netflix-hollow": {
@@ -24503,7 +24503,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -24521,13 +24521,13 @@
             ]
         },
         "com.netflix.governator:governator-annotations": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
@@ -24539,13 +24539,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
@@ -24558,18 +24558,18 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-jetty": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)"
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)"
         },
         "com.netflix.hollow:netflix-hollow": {
@@ -27432,7 +27432,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -27450,13 +27450,13 @@
             ]
         },
         "com.netflix.governator:governator-annotations": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
@@ -27468,13 +27468,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
@@ -27487,18 +27487,18 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-jetty": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)"
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)"
         },
         "com.netflix.hollow:netflix-hollow": {
@@ -30361,7 +30361,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -30379,13 +30379,13 @@
             ]
         },
         "com.netflix.governator:governator-annotations": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
@@ -30397,13 +30397,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
@@ -30416,18 +30416,18 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-jetty": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)"
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.12.15",
+            "locked": "1.13.0",
             "requested": "[1.12.10,)"
         },
         "com.netflix.hollow:netflix-hollow": {
