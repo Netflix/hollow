@@ -68,7 +68,7 @@ public class VideoCollectionsModule {
                     for(int j=0;j<showHierarchy.getEpisodeIds()[i].length;j++) {
                         int episodeId = showHierarchy.getEpisodeIds()[i][j];
                         int episodeSequenceNumber = showHierarchy.getEpisodeSequenceNumbers()[i][j];
-                        hierarchy.addEpisode(episodeId, episodeSequenceNumber);
+                        hierarchy.addEpisode(episodeId, episodeSequenceNumber, getSupplementalVideos(showHierarchy, episodeId));
                     }
                 }
                 

@@ -60,7 +60,7 @@ public class VideoCollectionsDataHierarchy {
             topNodeVideoCollectionsData.supplementalVideos = supplementalVideos;
         }
 
-        addSupplementalVideoCollectionsData(supplementalVideos);
+        addSupplementalVideoCollectionsData(supplementalVideos, null);
     }
 
     public void addSeason(Integer videoId, int sequenceNumber, List<SupplementalVideo> supplementalVideos) {
@@ -86,7 +86,7 @@ public class VideoCollectionsDataHierarchy {
         currentSeason.supplementalVideos = supplementalVideos;
         currentSeason.episodesForSeasonSequenceNumberMap = EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
 
-        addSupplementalVideoCollectionsData(supplementalVideos);
+        addSupplementalVideoCollectionsData(supplementalVideos, null);
     }
 
     private void addSupplementalsToTopNode(List<SupplementalVideo> originalList) {
@@ -97,7 +97,7 @@ public class VideoCollectionsDataHierarchy {
         }
     }
 
-    public void addEpisode(int videoId, int sequenceNumber) {
+    public void addEpisode(int videoId, int sequenceNumber, List<SupplementalVideo> supplementalVideos) {
         VideoCollectionsData episode = new VideoCollectionsData();
         Video v = new Video(videoId);
         currentSeason.seasonChildren.add(v);
@@ -125,18 +125,25 @@ public class VideoCollectionsDataHierarchy {
         episode.seasonChildren = Collections.emptyList();
         episode.showParent = topNode;
         episode.seasonParent = currentSeasonVideo;
+        episode.supplementalVideos = supplementalVideos;
         episode.topNode = topNode;
         episode.episodesForSeasonSequenceNumberMap = EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
+        
+        addSupplementalVideoCollectionsData(supplementalVideos, v);
     }
 
-    private void addSupplementalVideoCollectionsData(List<SupplementalVideo> supplementalVideos) {
+    private void addSupplementalVideoCollectionsData(List<SupplementalVideo> supplementalVideos, Video supplementalVideoParent) {
         for(SupplementalVideo suppVideo : supplementalVideos) {
             VideoCollectionsData supplementalVideoCollectionsData = new VideoCollectionsData();
             supplementalVideoCollectionsData.nodeType = constants.SUPPLEMENTAL;
             supplementalVideoCollectionsData.topNodeType = topNodeVideoCollectionsData.nodeType;
             supplementalVideoCollectionsData.videoEpisodes = Collections.emptyList();
             supplementalVideoCollectionsData.showChildren = Collections.emptyList();
-            supplementalVideoCollectionsData.supplementalVideoParents = currentSeasonVideo == null ? Collections.singletonList(topNode) : Arrays.asList(topNode, currentSeasonVideo);
+            if(supplementalVideoParent == null)
+                supplementalVideoCollectionsData.supplementalVideoParents = currentSeasonVideo == null ? Collections.singletonList(topNode) : Arrays.asList(topNode, currentSeasonVideo);
+            else
+                supplementalVideoCollectionsData.supplementalVideoParents = Collections.singletonList(supplementalVideoParent);
+                    
             supplementalVideoCollectionsData.topNode = topNode;
 
             if(supplementalVideoCollectionsData.topNodeType == constants.SHOW)
