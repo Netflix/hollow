@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
-import static com.netflix.vms.transformer.util.OutputUtil.sanitize;
+import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
 
 import java.util.LinkedHashMap;
 
@@ -258,6 +258,7 @@ public class VMSAvailabilityWindowModule {
             Set<Strings> assetBcp47CodesFromMaxPackageId = null;
             Set<VideoFormatDescriptor> videoFormatDescriptorsFromMaxPackageId = null;
             int prePromoDays = 0;
+            boolean hasRollingEpisodes = false;
             LinkedHashSetOfStrings cupTokens = null;
             Map<Strings, List<VideoImage>> stillImagesByTypeMap = null;
             Map<Strings, List<VideoImage>> stillImagesByTypeMapForShowLevelExtraction = null;
@@ -267,7 +268,8 @@ public class VMSAvailabilityWindowModule {
                     maxPackageId = entry.getKey().val;
                     assetBcp47CodesFromMaxPackageId = entry.getValue().videoContractInfo.assetBcp47Codes;
                     videoFormatDescriptorsFromMaxPackageId = entry.getValue().videoPackageInfo.formats;
-                    prePromoDays = sanitize(entry.getValue().videoContractInfo.prePromotionDays);
+                    prePromoDays = minValueToZero(entry.getValue().videoContractInfo.prePromotionDays);
+                    hasRollingEpisodes = entry.getValue().videoContractInfo.hasRollingEpisodes;
                     cupTokens = entry.getValue().videoContractInfo.cupTokens;
                     if(isGoLive && isInWindow)
                         stillImagesByTypeMap = entry.getValue().videoPackageInfo.stillImagesMap;
@@ -278,6 +280,9 @@ public class VMSAvailabilityWindowModule {
 
             rollup.newAssetBcp47Codes(assetBcp47CodesFromMaxPackageId);
             rollup.newPrePromoDays(prePromoDays);
+            
+            if(hasRollingEpisodes)
+                rollup.foundRollingEpisodes();
             
             if(isGoLive && isInWindow) {
                 rollup.newVideoFormatDescriptors(videoFormatDescriptorsFromMaxPackageId);
@@ -367,6 +372,8 @@ public class VMSAvailabilityWindowModule {
             videoImagesContractInfo.videoContractInfo.cupTokens = EMPTY_CUP_TOKENS;
             videoMediaContractInfo.videoContractInfo.assetBcp47Codes = rollup.getAssetBcp47Codes();
             videoMediaContractInfo.videoContractInfo.prePromotionDays = rollup.getPrePromoDays();
+            videoMediaContractInfo.videoContractInfo.isDayAfterBroadcast = rollup.hasRollingEpisodes();
+            videoMediaContractInfo.videoContractInfo.hasRollingEpisodes = rollup.hasRollingEpisodes();
             videoMediaContractInfo.videoContractInfo.postPromotionDays = 0;
             videoMediaContractInfo.videoContractInfo.cupTokens = rollup.getCupTokens() != null ? rollup.getCupTokens() : DEFAULT_CUP_TOKENS;
             videoMediaContractInfo.videoPackageInfo.formats = rollup.getVideoFormatDescriptors();

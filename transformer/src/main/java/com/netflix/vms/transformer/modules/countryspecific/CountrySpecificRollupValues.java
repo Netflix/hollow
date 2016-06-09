@@ -45,6 +45,8 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
 
     int showPrePromoDays = 0;
     int seasonPrePromoDays = 0;
+    boolean showHasRollingEpisodes = false;;
+    boolean seasonHasRollingEpisodes = false;
 
     public void setSeasonSequenceNumber(int seasonSequenceNumber) {
         this.seasonSequenceNumber = seasonSequenceNumber;
@@ -64,6 +66,7 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         aggregatedSeasonAssetCodes = new HashSet<Strings>();
         seasonVideoFormatDescriptors = new HashSet<VideoFormatDescriptor>();
         seasonPrePromoDays = 0;
+        seasonHasRollingEpisodes = false;
         seasonCupTokensFromFirstStreamableEpisode = null;
         seasonFirstEpisodeVideoImagesMap = Collections.emptyMap();
         seasonLevelTaggedVideoImagesRollup = new HashMap<Strings, List<VideoImage>>();
@@ -76,6 +79,7 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         aggregatedShowAssetCodes = new HashSet<Strings>();
         showVideoFormatDescriptors = new HashSet<VideoFormatDescriptor>();
         showPrePromoDays = 0;
+        showHasRollingEpisodes = false;
         showCupTokensFromFirstStreamableEpisode = null;
         showFirstEpisodeVideoImagesMap = Collections.emptyMap();
         showLevelTaggedVideoImagesRollup = new HashMap<Strings, List<VideoImage>>();
@@ -121,6 +125,11 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         }
     }
 
+    public void foundRollingEpisodes() {
+        showHasRollingEpisodes = true;
+        seasonHasRollingEpisodes = true;
+    }
+    
     public void newPrePromoDays(int prePromoDays) {
         if (showPrePromoDays == 0 || prePromoDays < showPrePromoDays)
             showPrePromoDays = prePromoDays;
@@ -216,6 +225,12 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         if (doSeason())
             return seasonPrePromoDays;
         return showPrePromoDays;
+    }
+    
+    public boolean hasRollingEpisodes() {
+        if(doSeason())
+            return seasonHasRollingEpisodes;
+        return showHasRollingEpisodes;
     }
 
     public LinkedHashSetOfStrings getCupTokens() {
