@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import java.util.Arrays;
+
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
@@ -141,7 +143,7 @@ public class PackageMomentDataModule {
                     ListOfStringHollow modifications = stream._getModifications();
                     if(modifications != null && !modifications.isEmpty()) {
                         moment = moment.clone();
-                        moment.videoMomentTypeName = buildModifiedInterestingMomentTag(modifications);
+                        moment.videoMomentTypeName = buildModifiedVideoMomentTypeName(moment.videoMomentTypeName, modifications);
                     }
 
                     List<ImageDownloadable> list = packageMomentData.videoMomentToDownloadableListMap.get(moment);
@@ -176,15 +178,16 @@ public class PackageMomentDataModule {
         }
     }
 
-    private final Map<Integer, Strings> modifiedInterestingMomentTagByModificationsOrdinal = new HashMap<>();
+    private final Map<ModifiedVideoMomentTypeNameKey, Strings> modifiedVideoMomentTypeNameByModificationsOrdinal = new HashMap<>();
 
-    private Strings buildModifiedInterestingMomentTag(ListOfStringHollow modifications) {
-        Integer modificationsOrdinal = Integer.valueOf(modifications.getOrdinal());
-        Strings tag = modifiedInterestingMomentTagByModificationsOrdinal.get(modificationsOrdinal);
+    private Strings buildModifiedVideoMomentTypeName(Strings originalTypeName, ListOfStringHollow modifications) {
+        ModifiedVideoMomentTypeNameKey cacheKey = new ModifiedVideoMomentTypeNameKey(originalTypeName, modifications.getOrdinal());
+        
+        Strings tag = modifiedVideoMomentTypeNameByModificationsOrdinal.get(cacheKey);
         if(tag != null)
             return tag;
 
-        StringBuilder builder = new StringBuilder("INTERESTINGMOMENT");
+        StringBuilder builder = new StringBuilder(new String(originalTypeName.value).toUpperCase());
 
         for(StringHollow modification : modifications) {
             builder.append('_');
@@ -192,8 +195,33 @@ public class PackageMomentDataModule {
         }
 
         tag = new Strings(builder.toString());
-        modifiedInterestingMomentTagByModificationsOrdinal.put(modificationsOrdinal, tag);
+        modifiedVideoMomentTypeNameByModificationsOrdinal.put(cacheKey, tag);
         return tag;
+    }
+    
+    private class ModifiedVideoMomentTypeNameKey {
+        private final Strings videoMomentTypeName;
+        private final int modificationsOrdinal;
+        private final int hashCode;
+        
+        public ModifiedVideoMomentTypeNameKey(Strings videoMomentTypeName, int modificationsOrdinal) {
+            this.videoMomentTypeName = videoMomentTypeName;
+            this.modificationsOrdinal = modificationsOrdinal;
+            this.hashCode = videoMomentTypeName.hashCode() * 997 + modificationsOrdinal;
+        }
+        
+        public int hashCode() {
+            return hashCode;
+        }
+        
+        public boolean equals(Object other) {
+            if(other instanceof ModifiedVideoMomentTypeNameKey) {
+                return ((ModifiedVideoMomentTypeNameKey) other).modificationsOrdinal == modificationsOrdinal 
+                        && Arrays.equals(((ModifiedVideoMomentTypeNameKey) other).videoMomentTypeName.value, videoMomentTypeName.value);
+            }
+            return false;
+        }
+        
     }
 
     private void convertCdnDeploymentsAndAddToList(PackageStreamHollow stream, List<Strings> originServerNames) {
