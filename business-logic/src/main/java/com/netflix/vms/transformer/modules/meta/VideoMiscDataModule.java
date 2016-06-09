@@ -4,17 +4,17 @@ import static com.netflix.vms.transformer.index.IndexSpec.CSM_REVIEW;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_AWARD;
 import static com.netflix.vms.transformer.index.IndexSpec.VMS_AWARD;
 
+import java.util.Set;
+
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.ShowHierarchy;
 import com.netflix.vms.transformer.hollowinput.CSMReviewHollow;
-import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSAwardHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoAwardHollow;
 import com.netflix.vms.transformer.hollowinput.VideoAwardListHollow;
 import com.netflix.vms.transformer.hollowinput.VideoAwardMappingHollow;
-import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.ICSMReview;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VPerson;
@@ -24,6 +24,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoAwardFestival;
 import com.netflix.vms.transformer.hollowoutput.VideoAwardType;
 import com.netflix.vms.transformer.hollowoutput.VideoMiscData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.util.OutputUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -44,23 +45,24 @@ public class VideoMiscDataModule {
         this.csmReviewIdx = indexer.getPrimaryKeyIndex(CSM_REVIEW);
     }
 
-    public Map<Integer, VideoMiscData> buildVideoMiscDataByCountry(Map<String, ShowHierarchy> showHierarchiesByCountry) {
+    public Map<Integer, VideoMiscData> buildVideoMiscDataByCountry(Map<String, Set<ShowHierarchy>> showHierarchiesByCountry) {
         videoMiscMap.clear();
 
-        for(Map.Entry<String, ShowHierarchy> entry : showHierarchiesByCountry.entrySet()) {
-            ShowHierarchy showHierarchy = entry.getValue();
-            addVideoMiscData(showHierarchy.getTopNodeId(), entry.getKey());
-            int[][] seasonEpisodesIds = showHierarchy.getEpisodeIds();
-            for(int seasonIdx = 0; seasonIdx < showHierarchy.getSeasonIds().length; seasonIdx++) {
-                addVideoMiscData(showHierarchy.getSeasonIds()[seasonIdx], entry.getKey());
-
-                for(int episodeIdx = 0; episodeIdx < seasonEpisodesIds[seasonIdx].length; episodeIdx++) {
-                    addVideoMiscData(seasonEpisodesIds[seasonIdx][episodeIdx], entry.getKey());
+        for(Map.Entry<String, Set<ShowHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
+            for(ShowHierarchy showHierarchy : entry.getValue()) {
+                addVideoMiscData(showHierarchy.getTopNodeId(), entry.getKey());
+                int[][] seasonEpisodesIds = showHierarchy.getEpisodeIds();
+                for(int seasonIdx = 0; seasonIdx < showHierarchy.getSeasonIds().length; seasonIdx++) {
+                    addVideoMiscData(showHierarchy.getSeasonIds()[seasonIdx], entry.getKey());
+    
+                    for(int episodeIdx = 0; episodeIdx < seasonEpisodesIds[seasonIdx].length; episodeIdx++) {
+                        addVideoMiscData(seasonEpisodesIds[seasonIdx][episodeIdx], entry.getKey());
+                    }
                 }
-            }
-
-            for(int i=0;i<showHierarchy.getSupplementalIds().length;i++) {
-                addVideoMiscData(showHierarchy.getSupplementalIds()[i], entry.getKey());
+    
+                for(int i=0;i<showHierarchy.getSupplementalIds().length;i++) {
+                    addVideoMiscData(showHierarchy.getSupplementalIds()[i], entry.getKey());
+                }
             }
         }
 
@@ -109,9 +111,9 @@ public class VideoMiscDataModule {
             csmReview.oneLiner = getStrings(csmReviewHollow._getOneLiner());
             csmReview.otherChoices = getStrings(csmReviewHollow._getOtherChoices());
             csmReview.parentsNeedToKnow = getStrings(csmReviewHollow._getParentsNeedToKnow());
-            csmReview.plasticReleaseDate = getDate(csmReviewHollow._getPlasticReleaseDate());
+            csmReview.plasticReleaseDate = OutputUtil.getRoundedDate(csmReviewHollow._getPlasticReleaseDate());
             csmReview.redEndsAge = (int)csmReviewHollow._getRedEndsAge();
-            csmReview.releaseDate = getDate(csmReviewHollow._getReleaseDate());
+            csmReview.releaseDate = OutputUtil.getRoundedDate(csmReviewHollow._getReleaseDate());
             csmReview.reviewerName = getStrings(csmReviewHollow._getReviewerName());
             csmReview.runtimeInMins = (int)csmReviewHollow._getRuntimeInMins();
             csmReview.sexualContent = getStrings(csmReviewHollow._getSexualContent());
@@ -128,10 +130,6 @@ public class VideoMiscDataModule {
         }
 
         return null;
-    }
-
-    private Date getDate(DateHollow dateHollow) {
-        return dateHollow != null ? new Date(dateHollow._getValue()) : null;
     }
 
     private Strings getStrings(StringHollow stringHollow) {

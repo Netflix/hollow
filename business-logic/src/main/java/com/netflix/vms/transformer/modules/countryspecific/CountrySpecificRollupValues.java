@@ -5,7 +5,8 @@ import com.netflix.vms.transformer.hollowoutput.LinkedHashSetOfStrings;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoImage;
-import com.netflix.vms.transformer.util.RollupValues;
+import com.netflix.vms.transformer.util.RollUpOrDownValues;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class CountrySpecificRollupValues extends RollupValues {
+public class CountrySpecificRollupValues extends RollUpOrDownValues {
 
     private boolean showEpisodeFound = false;
     private boolean seasonEpisodeFound = false;
@@ -107,58 +108,58 @@ public class CountrySpecificRollupValues extends RollupValues {
     }
 
     public void newEpisodeData(boolean isGoLive, int bundledAssetId) {
-        if(isGoLive) {
-            if(showBundledAssetFromFirstAvailableEpisode == Integer.MIN_VALUE)
+        if (isGoLive) {
+            if (showBundledAssetFromFirstAvailableEpisode == Integer.MIN_VALUE)
                 showBundledAssetFromFirstAvailableEpisode = bundledAssetId;
-            if(seasonBundledAssetFromFirstAvailableEpisode == Integer.MIN_VALUE)
+            if (seasonBundledAssetFromFirstAvailableEpisode == Integer.MIN_VALUE)
                 seasonBundledAssetFromFirstAvailableEpisode = bundledAssetId;
         } else {
-            if(showBundledAssetFromFirstUnavailableEpisode == Integer.MIN_VALUE)
+            if (showBundledAssetFromFirstUnavailableEpisode == Integer.MIN_VALUE)
                 showBundledAssetFromFirstUnavailableEpisode = bundledAssetId;
-            if(seasonBundledAssetFromFirstUnavailableEpisode == Integer.MIN_VALUE)
+            if (seasonBundledAssetFromFirstUnavailableEpisode == Integer.MIN_VALUE)
                 seasonBundledAssetFromFirstUnavailableEpisode = bundledAssetId;
         }
     }
 
     public void newPrePromoDays(int prePromoDays) {
-        if(showPrePromoDays == 0 || prePromoDays < showPrePromoDays)
+        if (showPrePromoDays == 0 || prePromoDays < showPrePromoDays)
             showPrePromoDays = prePromoDays;
-        if(seasonPrePromoDays == 0 || prePromoDays < seasonPrePromoDays)
+        if (seasonPrePromoDays == 0 || prePromoDays < seasonPrePromoDays)
             seasonPrePromoDays = prePromoDays;
     }
 
     public void newCupTokens(LinkedHashSetOfStrings cupTokens) {
-        if(showCupTokensFromFirstStreamableEpisode == null)
+        if (showCupTokensFromFirstStreamableEpisode == null)
             showCupTokensFromFirstStreamableEpisode = cupTokens;
-        if(seasonCupTokensFromFirstStreamableEpisode == null)
+        if (seasonCupTokensFromFirstStreamableEpisode == null)
             seasonCupTokensFromFirstStreamableEpisode = cupTokens;
     }
 
     public void newEpisodeStillImagesByTypeMap(Map<Strings, List<VideoImage>> map) {
-        if(showFirstEpisodeVideoImagesMap.isEmpty())
+        if (showFirstEpisodeVideoImagesMap.isEmpty())
             showFirstEpisodeVideoImagesMap = map;
-        if(seasonFirstEpisodeVideoImagesMap.isEmpty())
+        if (seasonFirstEpisodeVideoImagesMap.isEmpty())
             seasonFirstEpisodeVideoImagesMap = map;
 
         newEpisodeStillImagesByTypeMapForShowLevelExtraction(map);
     }
 
-	public void newEpisodeStillImagesByTypeMapForShowLevelExtraction(Map<Strings, List<VideoImage>> map) {
-		for(Map.Entry<Strings, List<VideoImage>> entry : map.entrySet()) {
-            for(VideoImage img : entry.getValue()) {
-                for(Strings momentTag : img.videoMoment.momentTags) {
-                    if(new String(momentTag.value).equals("show_level")) {
+    public void newEpisodeStillImagesByTypeMapForShowLevelExtraction(Map<Strings, List<VideoImage>> map) {
+        for (Map.Entry<Strings, List<VideoImage>> entry : map.entrySet()) {
+            for (VideoImage img : entry.getValue()) {
+                for (Strings momentTag : img.videoMoment.momentTags) {
+                    if (new String(momentTag.value).equals("show_level")) {
                         newTagBasedShowLevelVideoImage(entry.getKey(), img);
                         break;
                     }
                 }
             }
         }
-	}
+    }
 
     private void newTagBasedShowLevelVideoImage(Strings type, VideoImage img) {
         List<VideoImage> list = showLevelTaggedVideoImagesRollup.get(type);
-        if(list == null) {
+        if (list == null) {
             list = new ArrayList<VideoImage>();
             showLevelTaggedVideoImagesRollup.put(type, list);
         }
@@ -166,7 +167,7 @@ public class CountrySpecificRollupValues extends RollupValues {
         list.add(img);
 
         list = seasonLevelTaggedVideoImagesRollup.get(type);
-        if(list == null) {
+        if (list == null) {
             list = new ArrayList<VideoImage>();
             seasonLevelTaggedVideoImagesRollup.put(type, list);
         }
@@ -179,7 +180,7 @@ public class CountrySpecificRollupValues extends RollupValues {
         dateWindow.endDateTimestamp = endDate;
 
         BitSet seasonSeqNums = seasonSequenceNumberMap.get(dateWindow);
-        if(seasonSeqNums == null) {
+        if (seasonSeqNums == null) {
             seasonSeqNums = new BitSet();
             seasonSequenceNumberMap.put(dateWindow, seasonSeqNums);
         }
@@ -188,62 +189,62 @@ public class CountrySpecificRollupValues extends RollupValues {
     }
 
     public int getFirstEpisodeBundledAssetId() {
-        if(doSeason()) {
-            if(seasonBundledAssetFromFirstAvailableEpisode != Integer.MIN_VALUE)
+        if (doSeason()) {
+            if (seasonBundledAssetFromFirstAvailableEpisode != Integer.MIN_VALUE)
                 return seasonBundledAssetFromFirstAvailableEpisode;
             return seasonBundledAssetFromFirstUnavailableEpisode;
         }
 
-        if(showBundledAssetFromFirstAvailableEpisode != Integer.MIN_VALUE)
+        if (showBundledAssetFromFirstAvailableEpisode != Integer.MIN_VALUE)
             return showBundledAssetFromFirstAvailableEpisode;
         return showBundledAssetFromFirstUnavailableEpisode;
     }
 
     public Set<Strings> getAssetBcp47Codes() {
-        if(doSeason())
+        if (doSeason())
             return aggregatedSeasonAssetCodes;
         return aggregatedShowAssetCodes;
     }
 
     public Set<VideoFormatDescriptor> getVideoFormatDescriptors() {
-        if(doSeason())
+        if (doSeason())
             return seasonVideoFormatDescriptors;
         return showVideoFormatDescriptors;
     }
 
     public int getPrePromoDays() {
-        if(doSeason())
+        if (doSeason())
             return seasonPrePromoDays;
         return showPrePromoDays;
     }
 
     public LinkedHashSetOfStrings getCupTokens() {
-        if(doSeason())
+        if (doSeason())
             return seasonCupTokensFromFirstStreamableEpisode;
         return showCupTokensFromFirstStreamableEpisode;
     }
 
     public Map<Strings, List<VideoImage>> getVideoImageMap() {
-        if(doSeason()) {
-            if(seasonLevelTaggedVideoImagesRollup.isEmpty())
+        if (doSeason()) {
+            if (seasonLevelTaggedVideoImagesRollup.isEmpty())
                 return seasonFirstEpisodeVideoImagesMap;
             return seasonLevelTaggedVideoImagesRollup;
         }
 
-        if(showLevelTaggedVideoImagesRollup.isEmpty())
+        if (showLevelTaggedVideoImagesRollup.isEmpty())
             return showFirstEpisodeVideoImagesMap;
         return showLevelTaggedVideoImagesRollup;
 
     }
 
     public Map<DateWindow, List<com.netflix.vms.transformer.hollowoutput.Integer>> getDateWindowWiseSeasonSequenceNumbers() {
-        if(seasonSequenceNumberMap.isEmpty())
+        if (seasonSequenceNumberMap.isEmpty())
             return Collections.emptyMap();
 
         /// date windows may be overlapping, need to merge them.
         Set<Long> windowDates = new HashSet<Long>();
 
-        for(Map.Entry<DateWindow, ?> entry : seasonSequenceNumberMap.entrySet()) {
+        for (Map.Entry<DateWindow, ?> entry : seasonSequenceNumberMap.entrySet()) {
             windowDates.add(entry.getKey().startDateTimestamp);
             windowDates.add(entry.getKey().endDateTimestamp);
         }
@@ -254,13 +255,13 @@ public class CountrySpecificRollupValues extends RollupValues {
         Map<DateWindow, List<com.netflix.vms.transformer.hollowoutput.Integer>> mergedWindowSeqNumMap = new HashMap<>();
 
         BitSet mergedSeqNums = new BitSet();
-        for(int i=0;i<sortedWindowDates.size() - 1;i++) {
+        for (int i = 0; i < sortedWindowDates.size() - 1; i++) {
             Long currentStartDate = sortedWindowDates.get(i);
-            Long currentEndDate = sortedWindowDates.get(i+1);
+            Long currentEndDate = sortedWindowDates.get(i + 1);
             mergedSeqNums.clear();
 
-            for(Map.Entry<DateWindow, BitSet> entry : seasonSequenceNumberMap.entrySet()) {
-                if(entry.getKey().startDateTimestamp <= currentStartDate && entry.getKey().endDateTimestamp >= currentEndDate) {
+            for (Map.Entry<DateWindow, BitSet> entry : seasonSequenceNumberMap.entrySet()) {
+                if (entry.getKey().startDateTimestamp <= currentStartDate && entry.getKey().endDateTimestamp >= currentEndDate) {
                     mergedSeqNums.or(entry.getValue());
                 }
             }
@@ -271,12 +272,12 @@ public class CountrySpecificRollupValues extends RollupValues {
 
             List<com.netflix.vms.transformer.hollowoutput.Integer> seqNums = new ArrayList<>();
             int currentSeqNum = mergedSeqNums.nextSetBit(0);
-            while(currentSeqNum != -1) {
+            while (currentSeqNum != -1) {
                 seqNums.add(new com.netflix.vms.transformer.hollowoutput.Integer(currentSeqNum));
                 currentSeqNum = mergedSeqNums.nextSetBit(currentSeqNum + 1);
             }
 
-            if(!seqNums.isEmpty())
+            if (!seqNums.isEmpty())
                 mergedWindowSeqNumMap.put(key, seqNums);
         }
 

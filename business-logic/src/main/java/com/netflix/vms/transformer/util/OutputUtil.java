@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.util;
 
+import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.Integer;
 
@@ -28,5 +29,9 @@ public class OutputUtil {
 
     public static Date getRoundedDate(long value) {
         return new Date(getRoundedTimeStamp(value));
+    }
+
+    public static Date getRoundedDate(DateHollow dateHollow) {
+        return dateHollow != null ? getRoundedDate(dateHollow._getValue()) : null;
     }
 }

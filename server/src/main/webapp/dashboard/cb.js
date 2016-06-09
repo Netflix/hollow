@@ -1,3 +1,7 @@
+var cbNames = {};
+var cbProperties = {};
+var cbCountries = [];
+
 var PROPS = {}
 
 var ruleNames = [];
@@ -85,21 +89,7 @@ function fillThresholdOverrideSelect(ruleName, overrides) {
 }
 
 function setMasterStatus() {
-  // Determine whether circuit breakers are on or off
-  var circuitBreakerEnabledSDisabledKey = null;
-  for(var key in PROPS) {
-    if(key.indexOf("circuitBreakerAggregationEnabled") != -1) {
-      circuitBreakerEnabledSDisabledKey = key;
-      break;
-    }
-  }
-
-  if(circuitBreakerEnabledSDisabledKey == null) {
-    alert('There was a problem ... reload the page or cross your fingers');
-    return;
-  }
-
-  var circuitBreakersEnabled = (PROPS[circuitBreakerEnabledSDisabledKey] == "true");
+  var circuitBreakersEnabled = (cbProperties['vms.circuitBreakersEnabled'] === "true");
 
   if(circuitBreakersEnabled) {
     $('#global-cb-text').removeClass('cb-disabled').addClass('cb-enabled');
@@ -113,74 +103,41 @@ function setMasterStatus() {
 
 }
 
-function gatherRuleNames() {
-  for(var key in PROPS) {
-    var tokens = key.split('.');
-    if(tokens.length == 5 && tokens[3].indexOf('aggregateRuleEnabled_') != -1) {
-      ruleNames.push(tokens[3].replace('aggregateRuleEnabled_',''));
-    }
-  }
-}
-
-function buildCBRuleConfig() {
+function buildCBRuleConfig2() {
   for(var i = 0; i < ruleNames.length; i++) {
     var ruleName = ruleNames[i];
     // Determine if the rule is enabled or not
-    var enabled = PROPS['vms.cyclic.cluster.aggregateRuleEnabled_' + ruleName + '.boolean'];
+    var enabled = cbProperties['vms.circuitBreakerEnabled.' + ruleName]
     // Determine the threshold for the rule
-    var threshold = PROPS['vms.cyclic.cluster.aggregateRuleThreshold_' + ruleName + '.float'];
-    // Create the config object
+    var threshold = cbProperties['vms.circuitBreakerThreshold.' + ruleName];
     var config = {};
     config.enabled = enabled;
     config.threshold = threshold;
-    // Create a config for this rule
     cbconfig[ruleName] = config;
   }
 
-  // Now collect the variations
+  // Collect variations
   for(var i = 0; i < ruleNames.length; i++) {
     var ruleName = ruleNames[i];
-    var prefix = 'vms.cyclic.cluster.aggregateRuleEnabled_' + ruleName;
-    var variations = [];
-    for(var key in PROPS) {
-      var tokens = key.split('.');
-      if(tokens.length == 6 && key.startsWith(prefix)) {
-        variations.push(tokens[4]);
-      }
+    var hasVariations = (cbNames[ruleName] === 'true');
+    if(hasVariations) {
+      cbconfig[ruleName].variations = cbCountries;
+    } else {
+      cbconfig[ruleName].variations = [];
     }
-    cbconfig[ruleName].variations = variations;
   }
 
-  // Now collect the enabled / disabled overrides as well as threshold overrides
-  // They are only valid for rules with variations
+  // Set the empty arrays for the following
+  // 1. enabledOverrides
+  // 2. disabledOverrides
   for(var i = 0; i < ruleNames.length; i++) {
     var ruleName = ruleNames[i];
-    var variations = cbconfig[ruleName].variations;
-    var enabledOverrides = [];
-    var disabledOverrides = [];
-    var thresholdOverrides = {};
-    for(var j = 0; j < variations.length; j++) {
-      var enabledKeyPrefix = 'vms.cyclic.cluster.aggregateRuleEnabled_' + ruleName + '.' + variations[j] + '.boolean';
-      var thresholdKeyPrefix = 'vms.cyclic.cluster.aggregateRuleThreshold_' + ruleName + '.' + variations[j] + '.float';
-      if(PROPS[enabledKeyPrefix] != 'vmsconfig_fallback') {
-        // The circuit breaker has enabled or disabled override for a variation
-        // record it
-        if(PROPS[enabledKeyPrefix] == 'true')
-          enabledOverrides.push(variations[j]);
-        if(PROPS[enabledKeyPrefix] == 'false')
-          disabledOverrides.push(variations[j]);
-      }
-      if(PROPS[thresholdKeyPrefix] != 'vmsconfig_fallback') {
-        // There is a threshold override. Record it
-        thresholdOverrides[variations[j]] = PROPS[thresholdKeyPrefix];
-      }
-    }
-    // Update the cbconfig with the overriding information
-    cbconfig[ruleName].enabledOverrides = enabledOverrides;
-    cbconfig[ruleName].disabledOverrides = disabledOverrides;
-    cbconfig[ruleName].thresholdOverrides = thresholdOverrides;
+    cbconfig[ruleName].enabledOverrides = [];
+    cbconfig[ruleName].disabledOverrides = [];
+    cbconfig[ruleName].thresholdOverrides = {};
   }
 }
+
 
 function paintUI() {
   for(var i = 0; i < ruleNames.length; i++) {
@@ -293,25 +250,35 @@ function hasVariations(ruleName) {
 $(document).ready(function(){
 
   // First get the data from the CircuitBreaker REST entry point
-  $.getJSON('/REST/vms/cb', function(data){
+  $.getJSON('/REST/vms/cb/names', function(names){
 
-    PROPS = data;
+    cbNames = names;
+    ruleNames = Object.keys(cbNames);
 
-    setMasterStatus();
+    // Get the properties
+    $.getJSON('/REST/vms/cb/properties', function(props){
+      cbProperties = props;
 
-    // Gather the list of circuit breaker rules
-    gatherRuleNames();
+      // get the countries
+      $.getJSON('/REST/vms/cb/countries', function(countries){
+        cbCountries = countries.sort();
 
-    // Build rule configuration
-    buildCBRuleConfig();
+        // Rest of the logic of painting the UI
+        setMasterStatus();
 
-    // Paint the UI
-    paintUI();
+        // Build rule configuration object
+        buildCBRuleConfig2();
 
-    // Remove the overlay
-    $('#overlay').remove();
+        // Paint the UI
+        paintUI();
 
-    addEventListeners();
+
+        $('#overlay').remove();
+
+        addEventListeners();
+
+      });
+    });
   });
 });
 
@@ -386,7 +353,7 @@ function addEventListeners() {
         enabled = true;
       }
       // Create the fpkey
-      var fpkey = 'vms.cyclic.cluster.aggregateRuleEnabled_' + ruleName + '.' + variation + '.boolean';
+      var fpkey = 'vms.circuitBreakerEnabled.' + ruleName + '.' + variation;
       // Ask if the user wants to delete the override
       var answer = confirm('Are you sure about deleting the override: ' + ruleName + '(' + variation + ')');
       if(answer) {
@@ -482,7 +449,7 @@ function addEventListeners() {
   $(document).on('change', 'select.cb-rule-enable-disable-switch', function(){
     console.log($(this).val());
     var enabled = ($(this).val() == "on");
-    var fpkey = 'vms.cyclic.cluster.aggregateRuleEnabled_' + $(this).data('rule-name') + '.boolean';
+    var fpkey = 'vms.circuitBreakerEnabled.' + $(this).data('rule-name');
     $.post("/REST/vms/fpadmin/createorupdate",
       {key: fpkey, value: enabled}, 
       function(message){alert(message)},
@@ -520,7 +487,7 @@ function editThresholdOverride() {
   var variation = $.trim($('#edit-override-variation-name').text());
   var threshold = $.trim($('#edit-threshold-override-value-textbox').val());
 
-  var fpkey = 'vms.cyclic.cluster.aggregateRuleThreshold_' + ruleName + '.' + variation + '.float';
+  var fpkey = 'vms.circuitBreakerThreshold.' + ruleName + '.' + variation;
 
   // Create the fast property
   overrideThreshold(ruleName, variation, threshold);
@@ -563,7 +530,7 @@ function deleteThresholdOverride() {
   var ruleName = $.trim($('#threshold-override-modal-header p').text());
   var variation = $(this).parent().attr('variation');
   var variationDiv = $(this).parent();
-  var fpkey = 'vms.cyclic.cluster.aggregateRuleThreshold_' + ruleName + '.' + variation + '.float';
+  var fpkey = 'vms.circuitBreakerThreshold.' + ruleName + '.' + variation;
   var answer = confirm('Are you sure you want to delete the threshold override for ' + ruleName + '(' + variation + ')');
   if(answer) {
     // Delete the fast property
@@ -607,7 +574,7 @@ function updateRuleThreshold() {
     }
   });
   // We should create the fast property key
-  var fpkey = 'vms.cyclic.cluster.aggregateRuleThreshold_' + ruleName + '.float';
+  var fpkey = 'vms.circuitBreakerThreshold.' + ruleName;
   $.post('/REST/vms/fpadmin/createorupdate',
     {key: fpkey, value: threshold},
     function(message){alert(message)},
@@ -873,7 +840,7 @@ function enableOrDisableMasterCircuitBreaker(enabled) {
 }
 
 function overrideThreshold(ruleName, overrideVariation, threshold) {
-  var fpkey = 'vms.cyclic.cluster.aggregateRuleThreshold_' + ruleName + '.' + overrideVariation + '.float';
+  var fpkey = 'vms.circuitBreakerThreshold.' + ruleName + '.' + overrideVariation + '.float';
   $.post('/REST/vms/fpadmin/createorupdate',
     {key: fpkey, value: threshold},
     function(message){alert(message)},
@@ -882,7 +849,7 @@ function overrideThreshold(ruleName, overrideVariation, threshold) {
 }
 
 function overrideEnabledDisabledRule(ruleName, overrideVariation, enabled) {
-  var fpkey = 'vms.cyclic.cluster.aggregateRuleEnabled_' + ruleName + '.' + overrideVariation + '.boolean';
+  var fpkey = 'vms.circuitBreakerEnabled.' + ruleName + '.' + overrideVariation;
   $.post('/REST/vms/fpadmin/createorupdate',
     {key: fpkey, value: enabled},
     function(message){alert(message)},

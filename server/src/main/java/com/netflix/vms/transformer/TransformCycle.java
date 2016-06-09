@@ -10,6 +10,8 @@ import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metri
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ReadInputDataDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WriteOutputDataDuration;
 
+import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
+
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.client.HollowClient;
 import com.netflix.hollow.write.HollowBlobWriter;
@@ -78,6 +80,7 @@ public class TransformCycle {
         long endTime = System.currentTimeMillis();
 
         ctx.getMetricRecorder().recordMetric(ReadInputDataDuration, endTime - startTime);
+        ctx.getLogger().info(LogTag.InputDataConverterVersionId, inputClient.getCurrentVersionId());
 
         VMSInputDataVersionLogger.logInputVersions(inputClient.getStateEngine().getHeaderTags(), ctx.getLogger());
     }
@@ -137,8 +140,8 @@ public class TransformCycle {
             }
         } catch(IOException e) {
             ctx.getLogger().error(WritingBlobsFailed, "Writing blobs failed", e);
+            outputStateEngine.resetToLastPrepareForNextCycle();
             consecutiveCycleFailures++;
-            /// TODO: MUST reset to last prepare for next cycle.  We're already writing so that functionality needs to be added to netflix-hollow.
         }
 
         long endTime = System.currentTimeMillis();

@@ -13,13 +13,14 @@ public class VMSInputDataVersionLogger {
                 String mutationGroup = entry.getKey().substring(0, entry.getKey().indexOf("_coldstart"));
                 String latestColdstartVersion = entry.getValue();
                 String latestEventId = inputBlobHeaders.get(mutationGroup + "_events");
+                String coldstartKeybase = inputBlobHeaders.get(mutationGroup + "_coldstartKeybase");
 
                 logger.info(InputDataVersionIds,
                         "mutationGroup=" + mutationGroup +
                         " latestEventId=" + latestEventId +
                         " coldstartVersionId=" + latestColdstartVersion +
-                        " coldstartKeybase=dummyValue" +
-                        " coldstartS3Filename=anotherDummyValue" +
+                        " coldstartKeybase=" + coldstartKeybase +
+                        " coldstartS3Filename=null" +
                         " isColdstartPinned=false");
             }
         }

@@ -19,19 +19,21 @@ public interface TransformerConfig {
     @DefaultValue("defaultConverterVip")
     String getConverterVip();
 
-
     @DefaultValue("defaultTransformerVip")
     String getTransformerVip();
 
+    String getNetflixEnvironment();
+
+    String getAwsRegion();
+
     String getAwsInstanceId();
-    
+
     String getAwsAmiId();
-    
+
     Long getPinInputVersion();
-    
-    
+
     //////////////// PUBLISH WORKFLOW ///////////////////
-    
+
     @DefaultValue("false")
     public boolean isCircuitBreakersEnabled();
 

@@ -28,13 +28,6 @@ public class ShowMeTheProgress {
     private static final String ROOT_SUBSET_DATA_DIR = "/space/transformer-data/pinned-subsets";
     private static final String PUBLISH_CYCLE_DATATS_HEADER = "publishCycleDataTS";
 
-    private static long getPublishCycleDataTS(Map<String, String> headerTags) {
-        String value = headerTags.get("publishCycleDataTS");
-        if (value == null || value.trim().isEmpty()) return System.currentTimeMillis();
-
-        return Long.parseLong(value);
-    }
-
     @Test
     public void start() throws Throwable {
         HollowReadStateEngine inputStateEngine = loadStateEngine("filtered-input");

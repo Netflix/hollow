@@ -96,7 +96,7 @@ public class EncodeSummaryDescriptorModule {
             }
 
             if(isMuxed(profileType)) {
-                if(data.timedTextType == null && !"MUXED".equals(profileType)) {
+                if(data.timedTextType == null && data.textLanguage != null) {
                     data = data.clone();
                     data.timedTextType = SUBTITLES;
                 }
