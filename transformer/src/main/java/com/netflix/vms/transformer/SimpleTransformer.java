@@ -61,7 +61,6 @@ import com.netflix.vms.transformer.namedlist.VideoNamedListModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule.VideoNamedListPopulator;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -105,8 +104,7 @@ public class SimpleTransformer {
 
         AtomicInteger failedIndividualTransforms = new AtomicInteger(0);
 
-        final ShowHierarchyInitializer filteredHierarchyInitializer = new ShowHierarchyInitializer(api, indexer, ctx, true);
-        final ShowHierarchyInitializer rawHierarchyInitializer = new ShowHierarchyInitializer(api, indexer, ctx, false);
+        final ShowHierarchyInitializer hierarchyInitializer = new ShowHierarchyInitializer(api, indexer, ctx);
 
         final HollowObjectMapper objectMapper = new HollowObjectMapper(writeStateEngine);
 
@@ -137,19 +135,14 @@ public class SimpleTransformer {
                 while (idx < processGroups.size()) {
                     Set<TopNodeProcessGroup> processGroup = processGroups.get(idx);
                     try {
-                        Map<Integer, VideoPackageData> transformedPackageData = Collections.emptyMap();
-                        Map<String, Map<Integer, VideoImages>> imagesDataByCountry = Collections.emptyMap();
-                        Map<String, Set<ShowHierarchy>> rawShowHierarchiesByCountry = rawHierarchyInitializer.getShowHierarchiesByCountry(processGroup);
-                        if (rawShowHierarchiesByCountry != null) {
-                            transformedPackageData = packageDataModule.transform(rawShowHierarchiesByCountry);
-                            imagesDataByCountry = imagesDataModule.buildVideoImagesByCountry(rawShowHierarchiesByCountry);
-                        }
-
-                        Map<String, Set<ShowHierarchy>> showHierarchiesByCountry = filteredHierarchyInitializer.getShowHierarchiesByCountry(processGroup);
+                        Set<Integer> filteredIds = new HashSet<>();
+                        Map<String, Set<ShowHierarchy>> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(processGroup, filteredIds);
                         if (showHierarchiesByCountry != null) {
+                            Map<Integer, VideoPackageData> transformedPackageData = packageDataModule.transform(showHierarchiesByCountry, filteredIds);
                             Map<String, Set<VideoCollectionsDataHierarchy>> vcdByCountry = collectionsModule.buildVideoCollectionsDataByCountry(showHierarchiesByCountry);
                             Map<String, Map<Integer, VideoMetaData>> vmdByCountry = metadataModule.buildVideoMetaDataByCountry(showHierarchiesByCountry);
                             Map<String, Map<Integer, VideoMediaData>> mediaDataByCountry = mediaDataModule.buildVideoMediaDataByCountry(showHierarchiesByCountry);
+                            Map<String, Map<Integer, VideoImages>> imagesDataByCountry = imagesDataModule.buildVideoImagesByCountry(showHierarchiesByCountry);
                             Map<Integer, VideoMiscData> miscData = miscDataModule.buildVideoMiscDataByCountry(showHierarchiesByCountry);
                             Map<String, Map<Integer, CompleteVideoCountrySpecificData>> countrySpecificByCountry = countrySpecificModule.buildCountrySpecificDataByCountry(showHierarchiesByCountry, transformedPackageData);
 

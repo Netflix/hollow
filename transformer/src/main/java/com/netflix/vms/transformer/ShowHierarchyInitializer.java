@@ -41,9 +41,8 @@ public class ShowHierarchyInitializer {
     private final HollowPrimaryKeyIndex videoRightsIndex;
     private final HollowHashIndex rolloutVideoTypeIndex;
     private final TransformerContext ctx;
-    private final boolean isFilterEnabled;
 
-    public ShowHierarchyInitializer(VMSHollowInputAPI api, VMSTransformerIndexer indexer, TransformerContext ctx, boolean isFilterEnabled) {
+    public ShowHierarchyInitializer(VMSHollowInputAPI api, VMSTransformerIndexer indexer, TransformerContext ctx) {
         this.api = api;
         this.supplementalIndex = indexer.getPrimaryKeyIndex(IndexSpec.SUPPLEMENTAL);
         this.videoTypeIndex = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_TYPE);
@@ -53,11 +52,10 @@ public class ShowHierarchyInitializer {
         this.videoRightsIndex = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_RIGHTS);
         this.rolloutVideoTypeIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
         this.ctx = ctx;
-        this.isFilterEnabled = isFilterEnabled;
     }
 
 
-    public Map<String, Set<ShowHierarchy>> getShowHierarchiesByCountry(Set<TopNodeProcessGroup> processGroup) {
+    public Map<String, Set<ShowHierarchy>> getShowHierarchiesByCountry(Set<TopNodeProcessGroup> processGroup, Set<Integer> trackFilteredIds) {
         Map<String, Set<ShowHierarchy>> showHierarchiesByCountry = new HashMap<>();
 
         for(TopNodeProcessGroup topNodeGroup : processGroup) {
@@ -78,8 +76,10 @@ public class ShowHierarchyInitializer {
 
                     for (ISOCountryHollow country : showSeasonEpisode._getCountryCodes()) {
                         String countryCode = country._getValue();
-                        if (!isTopNodeIncluded(topNodeId, countryCode))
+                        if (!isTopNodeIncluded(topNodeId, countryCode)) {
+                            trackFilteredIds.add((int) topNodeId);
                             continue;
+                        }
 
                         ShowHierarchy showHierarchy = new ShowHierarchy((int) topNodeId, isStandalone, showSeasonEpisode, countryCode, this);
                         ShowHierarchy canonicalHierarchy = uniqueShowHierarchies.get(showHierarchy);
@@ -107,8 +107,10 @@ public class ShowHierarchyInitializer {
                 String countryCode = countryType._getCountryCode()._getValue();
                 if (showHierarchiesByCountry.containsKey(countryCode)) continue;
 
-                if (!isTopNodeIncluded(topNodeId, countryCode))
+                if (!isTopNodeIncluded(topNodeId, countryCode)) {
+                    trackFilteredIds.add((int) topNodeId);
                     continue;
+                }
 
                 ShowHierarchy showHierarchy = new ShowHierarchy((int) topNodeId, isStandalone, null, countryCode, this);
                 ShowHierarchy canonicalHierarchy = uniqueShowHierarchies.get(showHierarchy);
@@ -137,9 +139,6 @@ public class ShowHierarchyInitializer {
         if (!isSupportedCountry(countryCode))
             return false;
 
-        if (!isFilterEnabled)
-            return true;
-
         if(!isContentApproved(videoId, countryCode))
             return false;
 
@@ -156,9 +155,6 @@ public class ShowHierarchyInitializer {
     }
 
     boolean isChildNodeIncluded(long videoId, String countryCode) {
-        if (!isFilterEnabled)
-            return true;
-
         if(!isContentApproved(videoId, countryCode))
             return false;
 
@@ -245,7 +241,7 @@ public class ShowHierarchyInitializer {
         return false;
     }
 
-    void addSupplementalVideos(long videoId, String countryCode, IntList toList) {
+    void addSupplementalVideos(long videoId, String countryCode, IntList toList, Set<Integer> trackFilteredIds) {
         int supplementalsOrdinal = supplementalIndex.getMatchingOrdinal(videoId);
 
         if(supplementalsOrdinal == -1)
@@ -254,8 +250,11 @@ public class ShowHierarchyInitializer {
         SupplementalsHollow supplementals = api.getSupplementalsHollow(supplementalsOrdinal);
         for (IndividualSupplementalHollow supplemental : supplementals._getSupplementals()) {
             int supplementalId = (int)supplemental._getMovieId();
-            if(isChildNodeIncluded(supplementalId, countryCode))
+            if (isChildNodeIncluded(supplementalId, countryCode)) {
                 toList.add(supplementalId);
+            } else {
+                trackFilteredIds.add(supplementalId);
+            }
         }
     }
 
