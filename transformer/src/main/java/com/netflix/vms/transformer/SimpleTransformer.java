@@ -135,9 +135,9 @@ public class SimpleTransformer {
                 while (idx < processGroups.size()) {
                     Set<TopNodeProcessGroup> processGroup = processGroups.get(idx);
                     try {
-                        Set<Integer> filteredIds = new HashSet<>();
-                        Map<String, Set<ShowHierarchy>> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(processGroup, filteredIds);
-                        Map<Integer, VideoPackageData> transformedPackageData = packageDataModule.transform(showHierarchiesByCountry, filteredIds);
+                        Set<Integer> droppedIds = new HashSet<>();
+                        Map<String, Set<ShowHierarchy>> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(processGroup, droppedIds);
+                        Map<Integer, VideoPackageData> transformedPackageData = packageDataModule.transform(showHierarchiesByCountry, droppedIds);
 
                         if (showHierarchiesByCountry != null) {
                             Map<String, Set<VideoCollectionsDataHierarchy>> vcdByCountry = collectionsModule.buildVideoCollectionsDataByCountry(showHierarchiesByCountry);

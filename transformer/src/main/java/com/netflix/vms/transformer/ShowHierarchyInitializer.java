@@ -57,7 +57,7 @@ public class ShowHierarchyInitializer {
     }
 
 
-    public Map<String, Set<ShowHierarchy>> getShowHierarchiesByCountry(Set<TopNodeProcessGroup> processGroup, Set<Integer> trackFilteredIds) {
+    public Map<String, Set<ShowHierarchy>> getShowHierarchiesByCountry(Set<TopNodeProcessGroup> processGroup, Set<Integer> droppedIds) {
         Map<String, Set<ShowHierarchy>> showHierarchiesByCountry = new HashMap<>();
 
         for(TopNodeProcessGroup topNodeGroup : processGroup) {
@@ -80,12 +80,12 @@ public class ShowHierarchyInitializer {
                         String countryCode = country._getValue();
 
                         if (!isTopNodeIncluded(topNodeId, countryCode)) {
-                            addShowAndAllChildren(showSeasonEpisode, trackFilteredIds);
+                            addShowAndAllChildren(showSeasonEpisode, droppedIds);
                             continue;
                         }
 
                         ShowHierarchy showHierarchy = new ShowHierarchy((int) topNodeId, isStandalone, showSeasonEpisode, countryCode, this);
-                        trackFilteredIds.addAll(showHierarchy.getFilteredIds());
+                        droppedIds.addAll(showHierarchy.getDroppedIds());
 
                         ShowHierarchy canonicalHierarchy = uniqueShowHierarchies.get(showHierarchy);
                         if (canonicalHierarchy == null) {
@@ -109,19 +109,19 @@ public class ShowHierarchyInitializer {
             int videoTypeOrdinal = videoTypeIndex.getMatchingOrdinal(topNodeId);
             VideoTypeHollow videoType = api.getVideoTypeHollow(videoTypeOrdinal);
             if (videoType == null || videoType._getCountryInfos().isEmpty()) {
-                addVideoAndAssociatedSupplementals(topNodeId, trackFilteredIds);
+                addVideoAndAssociatedSupplementals(topNodeId, droppedIds);
             } else {
                 for (VideoTypeDescriptorHollow countryType : videoType._getCountryInfos()) {
                     String countryCode = countryType._getCountryCode()._getValue();
                     if (showHierarchiesByCountry.containsKey(countryCode)) continue;
 
                     if (!isTopNodeIncluded(topNodeId, countryCode)) {
-                        addVideoAndAssociatedSupplementals(topNodeId, trackFilteredIds);
+                        addVideoAndAssociatedSupplementals(topNodeId, droppedIds);
                         continue;
                     }
 
                     ShowHierarchy showHierarchy = new ShowHierarchy((int) topNodeId, isStandalone, null, countryCode, this);
-                    trackFilteredIds.addAll(showHierarchy.getFilteredIds());
+                    droppedIds.addAll(showHierarchy.getDroppedIds());
 
                     ShowHierarchy canonicalHierarchy = uniqueShowHierarchies.get(showHierarchy);
                     if(canonicalHierarchy == null) {
@@ -252,7 +252,7 @@ public class ShowHierarchyInitializer {
         return false;
     }
 
-    void addSupplementalVideos(long videoId, String countryCode, IntList toList, Set<Integer> trackFilteredIds) {
+    void addSupplementalVideos(long videoId, String countryCode, IntList toList, Set<Integer> droppedIds) {
         int supplementalsOrdinal = supplementalIndex.getMatchingOrdinal(videoId);
 
         if(supplementalsOrdinal == -1)
@@ -264,7 +264,7 @@ public class ShowHierarchyInitializer {
             if (isChildNodeIncluded(supplementalId, countryCode)) {
                 toList.add(supplementalId);
             } else {
-                trackFilteredIds.add(supplementalId);
+                droppedIds.add(supplementalId);
             }
         }
     }
