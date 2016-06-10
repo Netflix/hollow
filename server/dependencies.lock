@@ -1525,18 +1525,13 @@
             "locked": "3.1.0",
             "requested": "3.1.0",
             "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
-            "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:base-server",
                 "netflix:nf-eventbus",
                 "netflix:server-context",
+                "org.eclipse.jetty:jetty-server",
                 "org.mortbay.jetty:servlet-api"
             ]
         },
@@ -2201,14 +2196,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.76",
+            "locked": "59.79",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.76",
+            "locked": "59.79",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
@@ -4357,18 +4352,13 @@
             "locked": "3.1.0",
             "requested": "3.1.0",
             "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
-            "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:base-server",
                 "netflix:nf-eventbus",
                 "netflix:server-context",
+                "org.eclipse.jetty:jetty-server",
                 "org.mortbay.jetty:servlet-api"
             ]
         },
@@ -5033,14 +5023,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.76",
+            "locked": "59.79",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.76",
+            "locked": "59.79",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
@@ -7189,18 +7179,13 @@
             "locked": "3.1.0",
             "requested": "3.1.0",
             "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
-            "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:base-server",
                 "netflix:nf-eventbus",
                 "netflix:server-context",
+                "org.eclipse.jetty:jetty-server",
                 "org.mortbay.jetty:servlet-api"
             ]
         },
@@ -7865,14 +7850,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.76",
+            "locked": "59.79",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.76",
+            "locked": "59.79",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
@@ -10694,14 +10679,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.76",
+            "locked": "59.79",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.76",
+            "locked": "59.79",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
@@ -12872,18 +12857,13 @@
             "locked": "3.1.0",
             "requested": "3.1.0",
             "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
-            "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:base-server",
                 "netflix:nf-eventbus",
                 "netflix:server-context",
+                "org.eclipse.jetty:jetty-server",
                 "org.mortbay.jetty:servlet-api"
             ]
         },
@@ -13548,14 +13528,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.76",
+            "locked": "59.79",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.76",
+            "locked": "59.79",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
@@ -15262,7 +15242,7 @@
     },
     "resolutionRules": {
         "com.netflix.nebula:gradle-resolution-rules": {
-            "locked": "0.24.0",
+            "locked": "0.25.0",
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
@@ -16796,18 +16776,13 @@
             "locked": "3.1.0",
             "requested": "3.1.0",
             "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
-            "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:base-server",
                 "netflix:nf-eventbus",
                 "netflix:server-context",
+                "org.eclipse.jetty:jetty-server",
                 "org.mortbay.jetty:servlet-api"
             ]
         },
@@ -17472,14 +17447,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.76",
+            "locked": "59.79",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.76",
+            "locked": "59.79",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
@@ -19626,10 +19601,7 @@
         },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.1.0",
-            "requested": "3.1.0"
-        },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
+            "requested": "3.1.0",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
@@ -20301,14 +20273,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.76",
+            "locked": "59.79",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.76",
+            "locked": "59.79",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
@@ -22475,18 +22447,13 @@
             "locked": "3.1.0",
             "requested": "3.1.0",
             "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
-            "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:base-server",
                 "netflix:nf-eventbus",
                 "netflix:server-context",
+                "org.eclipse.jetty:jetty-server",
                 "org.mortbay.jetty:servlet-api"
             ]
         },
@@ -23163,14 +23130,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.76",
+            "locked": "59.79",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.76",
+            "locked": "59.79",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
@@ -25404,18 +25371,13 @@
             "locked": "3.1.0",
             "requested": "3.1.0",
             "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
-            "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:base-server",
                 "netflix:nf-eventbus",
                 "netflix:server-context",
+                "org.eclipse.jetty:jetty-server",
                 "org.mortbay.jetty:servlet-api"
             ]
         },
@@ -26092,14 +26054,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.76",
+            "locked": "59.79",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.76",
+            "locked": "59.79",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
@@ -28333,18 +28295,13 @@
             "locked": "3.1.0",
             "requested": "3.1.0",
             "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
-            "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:base-server",
                 "netflix:nf-eventbus",
                 "netflix:server-context",
+                "org.eclipse.jetty:jetty-server",
                 "org.mortbay.jetty:servlet-api"
             ]
         },
@@ -29021,14 +28978,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.76",
+            "locked": "59.79",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.76",
+            "locked": "59.79",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
@@ -31262,18 +31219,13 @@
             "locked": "3.1.0",
             "requested": "3.1.0",
             "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
-            "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:base-server",
                 "netflix:nf-eventbus",
                 "netflix:server-context",
+                "org.eclipse.jetty:jetty-server",
                 "org.mortbay.jetty:servlet-api"
             ]
         },
@@ -31950,14 +31902,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.76",
+            "locked": "59.79",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.76",
+            "locked": "59.79",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-publish-workflow"
             ]
