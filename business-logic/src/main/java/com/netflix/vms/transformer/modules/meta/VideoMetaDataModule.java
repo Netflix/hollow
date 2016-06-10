@@ -8,6 +8,9 @@ import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_DATE;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_RIGHTS;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
+
+import com.netflix.vms.transformer.hollowinput.VideoGeneralEpisodeTypeHollow;
+
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
@@ -327,7 +330,7 @@ public class VideoMetaDataModule {
             List<VideoGeneralAliasHollow> inputAliases = general._getAliases();
 
             if(inputAliases != null) {
-                Set<Strings> aliasList = new HashSet<Strings>();
+                Set<Strings> aliasList = new HashSet<>();
                 for(VideoGeneralAliasHollow alias : inputAliases) {
                     aliasList.add(new Strings(alias._getValue()._getValue()));
                 }
@@ -337,12 +340,23 @@ public class VideoMetaDataModule {
             List<VideoGeneralTitleTypeHollow> inputTitleTypes = general._getTestTitleTypes();
 
             if(inputTitleTypes != null) {
-                Set<Strings> titleTypes = new HashSet<Strings>();
+                Set<Strings> titleTypes = new HashSet<>();
                 for(VideoGeneralTitleTypeHollow titleType : inputTitleTypes) {
                     titleTypes.add(new Strings(titleType._getValue()._getValue()));
                 }
 
                 vmd.titleTypes = titleTypes;
+            }
+            
+            List<VideoGeneralEpisodeTypeHollow> inputEpisodeTypes = general._getEpisodeTypes();
+            
+            if(inputEpisodeTypes != null) {
+                Set<Strings> epTypes = new HashSet<>();
+                for(VideoGeneralEpisodeTypeHollow epType : inputEpisodeTypes) {
+                    epTypes.add(new Strings(epType._getValue()._getValue()));
+                }
+                
+                vmd.episodeTypes = epTypes;
             }
 
             vmd.isTestTitle = general._getTestTitle();

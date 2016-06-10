@@ -680,7 +680,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)",
+            "requested": "1.12.15",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
@@ -693,18 +693,18 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)",
+            "requested": "1.12.15",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-jetty": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
@@ -1525,18 +1525,13 @@
             "locked": "3.1.0",
             "requested": "3.1.0",
             "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
-            "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:base-server",
                 "netflix:nf-eventbus",
                 "netflix:server-context",
+                "org.eclipse.jetty:jetty-server",
                 "org.mortbay.jetty:servlet-api"
             ]
         },
@@ -2201,14 +2196,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.76",
+            "locked": "59.79",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.76",
+            "locked": "59.79",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -3511,7 +3506,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)",
+            "requested": "1.12.15",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
@@ -3524,18 +3519,18 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)",
+            "requested": "1.12.15",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-jetty": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
@@ -4356,18 +4351,13 @@
             "locked": "3.1.0",
             "requested": "3.1.0",
             "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
-            "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:base-server",
                 "netflix:nf-eventbus",
                 "netflix:server-context",
+                "org.eclipse.jetty:jetty-server",
                 "org.mortbay.jetty:servlet-api"
             ]
         },
@@ -5032,14 +5022,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.76",
+            "locked": "59.79",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.76",
+            "locked": "59.79",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -6342,7 +6332,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)",
+            "requested": "1.12.15",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
@@ -6355,18 +6345,18 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)",
+            "requested": "1.12.15",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-jetty": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
@@ -7187,18 +7177,13 @@
             "locked": "3.1.0",
             "requested": "3.1.0",
             "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
-            "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:base-server",
                 "netflix:nf-eventbus",
                 "netflix:server-context",
+                "org.eclipse.jetty:jetty-server",
                 "org.mortbay.jetty:servlet-api"
             ]
         },
@@ -7863,14 +7848,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.76",
+            "locked": "59.79",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.76",
+            "locked": "59.79",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -9173,7 +9158,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)",
+            "requested": "1.12.15",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
@@ -9186,18 +9171,18 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)",
+            "requested": "1.12.15",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-jetty": {
             "project": true,
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
@@ -10691,14 +10676,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.76",
+            "locked": "59.79",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.76",
+            "locked": "59.79",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -12024,7 +12009,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)",
+            "requested": "1.12.15",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
@@ -12037,18 +12022,18 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)",
+            "requested": "1.12.15",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-jetty": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
@@ -12869,18 +12854,13 @@
             "locked": "3.1.0",
             "requested": "3.1.0",
             "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
-            "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:base-server",
                 "netflix:nf-eventbus",
                 "netflix:server-context",
+                "org.eclipse.jetty:jetty-server",
                 "org.mortbay.jetty:servlet-api"
             ]
         },
@@ -13545,14 +13525,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.76",
+            "locked": "59.79",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.76",
+            "locked": "59.79",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -15201,7 +15181,7 @@
     "provided": {
         "com.netflix.governator:governator-jetty": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.1.0",
@@ -15260,7 +15240,7 @@
     },
     "resolutionRules": {
         "com.netflix.nebula:gradle-resolution-rules": {
-            "locked": "0.24.0",
+            "locked": "0.25.0",
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
@@ -15949,7 +15929,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)",
+            "requested": "1.12.15",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
@@ -15962,18 +15942,18 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)",
+            "requested": "1.12.15",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-jetty": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
@@ -16794,18 +16774,13 @@
             "locked": "3.1.0",
             "requested": "3.1.0",
             "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
-            "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:base-server",
                 "netflix:nf-eventbus",
                 "netflix:server-context",
+                "org.eclipse.jetty:jetty-server",
                 "org.mortbay.jetty:servlet-api"
             ]
         },
@@ -17470,14 +17445,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.76",
+            "locked": "59.79",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.76",
+            "locked": "59.79",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -18780,7 +18755,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)",
+            "requested": "1.12.15",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
@@ -18793,18 +18768,18 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)",
+            "requested": "1.12.15",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-jetty": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
@@ -19623,10 +19598,7 @@
         },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.1.0",
-            "requested": "3.1.0"
-        },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
+            "requested": "3.1.0",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
@@ -20298,14 +20270,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.76",
+            "locked": "59.79",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.76",
+            "locked": "59.79",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -21613,7 +21585,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)",
+            "requested": "1.12.15",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
@@ -21626,18 +21598,18 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)",
+            "requested": "1.12.15",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-jetty": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
@@ -22471,18 +22443,13 @@
             "locked": "3.1.0",
             "requested": "3.1.0",
             "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
-            "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:base-server",
                 "netflix:nf-eventbus",
                 "netflix:server-context",
+                "org.eclipse.jetty:jetty-server",
                 "org.mortbay.jetty:servlet-api"
             ]
         },
@@ -23159,14 +23126,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.76",
+            "locked": "59.79",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.76",
+            "locked": "59.79",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -24541,7 +24508,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)",
+            "requested": "1.12.15",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
@@ -24554,18 +24521,18 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)",
+            "requested": "1.12.15",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-jetty": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
@@ -25399,18 +25366,13 @@
             "locked": "3.1.0",
             "requested": "3.1.0",
             "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
-            "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:base-server",
                 "netflix:nf-eventbus",
                 "netflix:server-context",
+                "org.eclipse.jetty:jetty-server",
                 "org.mortbay.jetty:servlet-api"
             ]
         },
@@ -26087,14 +26049,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.76",
+            "locked": "59.79",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.76",
+            "locked": "59.79",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -27469,7 +27431,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)",
+            "requested": "1.12.15",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
@@ -27482,18 +27444,18 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)",
+            "requested": "1.12.15",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-jetty": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
@@ -28327,18 +28289,13 @@
             "locked": "3.1.0",
             "requested": "3.1.0",
             "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
-            "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:base-server",
                 "netflix:nf-eventbus",
                 "netflix:server-context",
+                "org.eclipse.jetty:jetty-server",
                 "org.mortbay.jetty:servlet-api"
             ]
         },
@@ -29015,14 +28972,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.76",
+            "locked": "59.79",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.76",
+            "locked": "59.79",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -30397,7 +30354,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)",
+            "requested": "1.12.15",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
@@ -30410,18 +30367,18 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)",
+            "requested": "1.12.15",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-jetty": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.12.15",
-            "requested": "[1.12.10,)"
+            "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
@@ -31255,18 +31212,13 @@
             "locked": "3.1.0",
             "requested": "3.1.0",
             "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
-            "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:base-server",
                 "netflix:nf-eventbus",
                 "netflix:server-context",
+                "org.eclipse.jetty:jetty-server",
                 "org.mortbay.jetty:servlet-api"
             ]
         },
@@ -31943,14 +31895,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.76",
+            "locked": "59.79",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.76",
+            "locked": "59.79",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]

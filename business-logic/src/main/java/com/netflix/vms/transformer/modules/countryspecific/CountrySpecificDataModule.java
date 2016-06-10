@@ -119,7 +119,7 @@ public class CountrySpecificDataModule {
         populateDatesAndWindowData(videoId, countryCode, data, rollup);
         certificationListsModule.populateCertificationLists(videoId, countryCode, data);
 
-        if(rollup.doShow())
+        if(rollup.doShow() && isTopNodeGoLive(videoId, countryCode))
             data.dateWindowWiseSeasonSequenceNumberMap = new SortedMapOfDateWindowToListOfInteger(rollup.getDateWindowWiseSeasonSequenceNumbers()); // VideoCollectionsShowDataHolder.computeEpisodeSeasonSequenceNumberMap(showVideoEpisodeList)
 
         countryMap.put(videoId, data);
@@ -170,7 +170,7 @@ public class CountrySpecificDataModule {
         Integer prePromoDays = packageContractInfo == null ? null : packageContractInfo.videoContractInfo.prePromotionDays;
         Long availabilityDate = firstWindow != null ? firstWindow.startDate.val : null;
 
-        Integer metadataReleaseDays = getMeataDataReleaseDays(videoId);
+        Integer metadataReleaseDays = getMetaDataReleaseDays(videoId);
         Long firstPhaseStartDate = getFirstPhaseStartDate(videoId, countryCode);
 
         Set<VideoSetType> videoSetTypes = VideoSetTypeUtil.computeSetTypes(videoId, countryCode, api, ctx, constants, indexer);
@@ -247,12 +247,23 @@ public class CountrySpecificDataModule {
         return null;
     }
 
-    private Integer getMeataDataReleaseDays(long videoId) {
+    private Integer getMetaDataReleaseDays(long videoId) {
         int ordinal = videoGeneralIdx.getMatchingOrdinal(videoId);
         VideoGeneralHollow general = api.getVideoGeneralHollow(ordinal);
         if (general != null)
             return general._getMetadataReleaseDaysBoxed();
         return null;
+    }
+    
+    private boolean isTopNodeGoLive(int topNodeId, String countryCode) {
+        int rightsOrdinal = videoRightsIdx.getMatchingOrdinal(Long.valueOf(topNodeId), countryCode);
+        if(rightsOrdinal != -1) {
+            VideoRightsHollow rights = api.getVideoRightsHollow(rightsOrdinal);
+            VideoRightsFlagsHollow flags = rights._getFlags();
+            if(flags != null)
+                return flags._getGoLive();
+        }
+        return false;
     }
 
 }

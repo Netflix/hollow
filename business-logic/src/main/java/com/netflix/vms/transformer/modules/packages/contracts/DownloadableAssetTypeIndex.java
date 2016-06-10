@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer.modules.packages.contracts;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -25,7 +24,12 @@ public class DownloadableAssetTypeIndex {
         idList.addDownloadableId(downloadableId);
     }
 
+    int total = 0;
+    
     public void mark(ContractAssetType assetType) {
+        if(assetType.getLang().startsWith("zh"))
+            total++;
+        
         DownloadableIdList idList = downloadableIdsByContract.get(assetType);
         if(idList != null)
             idList.mark();
@@ -39,20 +43,12 @@ public class DownloadableAssetTypeIndex {
 
     public Set<com.netflix.vms.transformer.hollowoutput.Long> getAllUnmarked() {
         Set<com.netflix.vms.transformer.hollowoutput.Long> set = new HashSet<com.netflix.vms.transformer.hollowoutput.Long>();
-        boolean anyMarks = false;
 
         for(Map.Entry<ContractAssetType, DownloadableIdList> entry : downloadableIdsByContract.entrySet()) {
-            if(!entry.getValue().isMarked()) {
+            if(!entry.getValue().isMarked())
                 set.addAll(entry.getValue().getList());
-            } else {
-                anyMarks = true;
-            }
         }
 
-        ///TODO: If we have no assets for a contract, we exclude no downloadables.
-        /// Is this really the right thing to do?  It's what happened in the old pipeline, but is it right?
-        if(!anyMarks)
-            return Collections.emptySet();
         return set;
     }
 
