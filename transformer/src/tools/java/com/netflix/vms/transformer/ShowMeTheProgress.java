@@ -9,6 +9,7 @@ import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.memory.WastefulRecycler;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
+import com.netflix.videometadata.compression.LZ4VMSInputStream;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 
 import java.io.BufferedInputStream;
@@ -18,24 +19,32 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 
 import org.junit.Test;
 
+import net.jpountz.lz4.LZ4BlockInputStream;
+
 public class ShowMeTheProgress {
 
-    private static final String ROOT_SUBSET_DATA_DIR = "/space/transformer-data/pinned-subsets";
+    private static final boolean isUseFastLane = false;
+
+    private static final String ROOT_DATA_DIR = "/space/transformer-data/pinned-" + (isUseFastLane ? "blobs" : "subsets");
+    private static final String CONTROL_FN = isUseFastLane ? "berlin-snapshot" : "control-output";
+    private static final String INPUT_FN = isUseFastLane ? "input-snapshot" : "filtered-input";
+
     private static final String PUBLISH_CYCLE_DATATS_HEADER = "publishCycleDataTS";
 
     @Test
     public void start() throws Throwable {
-        HollowReadStateEngine inputStateEngine = loadStateEngine("filtered-input");
+        HollowReadStateEngine inputStateEngine = loadStateEngine(INPUT_FN);
         VMSHollowInputAPI api = new VMSHollowInputAPI(inputStateEngine);
 
         // header control blob header
-        String outpufBlobFilename = "control-output";
-        Map<String, String> headerTags = getHeaderTagsFromStateEngine(outpufBlobFilename);
+        Map<String, String> headerTags = getHeaderTagsFromStateEngine(CONTROL_FN);
         String value = headerTags.get(PUBLISH_CYCLE_DATATS_HEADER);
         long publishCycleDataTS = value != null ? Long.parseLong(value) : System.currentTimeMillis();
 
@@ -45,11 +54,15 @@ public class ShowMeTheProgress {
         outputStateEngine.addHeaderTag(PUBLISH_CYCLE_DATATS_HEADER, String.valueOf(publishCycleDataTS));
 
         // perform transformation
-        SimpleTransformer transformer = new SimpleTransformer(api, outputStateEngine);
+        SimpleTransformerContext context = new SimpleTransformerContext();
+        if (isUseFastLane) {
+            context.setFastlaneIds(new HashSet<>(Arrays.asList(80115503, 70143860)));
+        }
+        SimpleTransformer transformer = new SimpleTransformer(api, outputStateEngine, context);
         transformer.setPublishCycleDataTS(publishCycleDataTS);
         transformer.transform();
         HollowReadStateEngine actualOutputReadStateEngine = roundTripOutputStateEngine(outputStateEngine);
-        HollowReadStateEngine expectedOutputStateEngine = loadStateEngine(outpufBlobFilename, getDiffFilter(actualOutputReadStateEngine.getSchemas()));
+        HollowReadStateEngine expectedOutputStateEngine = loadStateEngine(CONTROL_FN, getDiffFilter(actualOutputReadStateEngine.getSchemas()));
 
         // diff
         ShowMeTheProgressDiffTool.startTheDiff(expectedOutputStateEngine, actualOutputReadStateEngine);
@@ -105,12 +118,17 @@ public class ShowMeTheProgress {
     }
 
     private HollowReadStateEngine loadStateEngine(String resourceFilename, HollowFilterConfig filter) throws IOException {
-        return loadStateEngine(new BufferedInputStream(new FileInputStream(new File(ROOT_SUBSET_DATA_DIR, resourceFilename))), filter);
+        FileInputStream fio = new FileInputStream(new File(ROOT_DATA_DIR, resourceFilename));
+        InputStream is = isUseFastLane ? new LZ4BlockInputStream(fio) : new BufferedInputStream(fio);
+        return loadStateEngine(is, filter);
     }
 
     private Map<String, String> getHeaderTagsFromStateEngine(String resourceFilename) throws IOException {
+        FileInputStream fio = new FileInputStream(new File(ROOT_DATA_DIR, resourceFilename));
+        InputStream is = isUseFastLane ? new LZ4VMSInputStream(fio) : new BufferedInputStream(fio);
+
         HollowBlobHeaderReader reader = new HollowBlobHeaderReader();
-        HollowBlobHeader header = reader.readHeader(new BufferedInputStream(new FileInputStream(new File(ROOT_SUBSET_DATA_DIR, resourceFilename))));
+        HollowBlobHeader header = reader.readHeader(is);
         return header.getHeaderTags();
     }
 
