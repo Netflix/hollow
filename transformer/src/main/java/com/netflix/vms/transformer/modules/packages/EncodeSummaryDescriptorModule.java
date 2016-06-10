@@ -142,6 +142,8 @@ public class EncodeSummaryDescriptorModule {
 
     private String getNativeLanguage(long videoId) {
         int ordinal = videoGeneralIdx.getMatchingOrdinal(videoId);
+        if (ordinal == -1) return null;
+
         VideoGeneralHollow general = api.getVideoGeneralHollow(ordinal);
         StringHollow originalLangCode = general._getOriginalLanguageBcpCode();
         if(originalLangCode != null)

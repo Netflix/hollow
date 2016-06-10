@@ -36,10 +36,12 @@ import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.contracts.ContractRestrictionModule;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import javax.xml.bind.DatatypeConverter;
 
 public class PackageDataModule {
@@ -73,17 +75,16 @@ public class PackageDataModule {
         this.encodeSummaryModule = new EncodeSummaryDescriptorModule(api, indexer);
     }
 
-    public Map<Integer, VideoPackageData> transform(Map<String, Set<ShowHierarchy>> showHierarchiesByCountry) {
+    public Map<Integer, VideoPackageData> transform(Map<String, Set<ShowHierarchy>> showHierarchiesByCountry, Set<Integer> extraVideoIds) {
         Map<Integer, VideoPackageData> transformedPackages = new HashMap<Integer, VideoPackageData>();
 
-        Set<Integer> videoIds = gatherVideoIds(showHierarchiesByCountry);
-
+        Set<Integer> videoIds = gatherVideoIds(showHierarchiesByCountry, extraVideoIds);
         for(Integer videoId : videoIds) {
             HollowHashIndexResult packagesForVideo = packagesByVideoIdx.findMatches((long)videoId);
 
             if(packagesForVideo != null) {
                 HollowOrdinalIterator iter = packagesForVideo.iterator();
-                
+
                 VideoPackageData videoPackageData = new VideoPackageData();
                 videoPackageData.videoId = new Video(videoId);
                 videoPackageData.packages = new HashSet<PackageData>();
@@ -97,14 +98,14 @@ public class PackageDataModule {
                     populateDrmKeysByGroupId(packages, videoId);
                     PackageData transformedPackage = convertPackage(packages);
 
-                    
+
                     videoPackageData.packages.add(transformedPackage);
 
                     packageOrdinal = iter.next();
                 }
 
                 transformedPackages.put(videoId, videoPackageData);
-                
+
                 mapper.addObject(videoPackageData);
             }
         }
@@ -225,20 +226,22 @@ public class PackageDataModule {
         }
     }
 
-    private Set<Integer> gatherVideoIds(Map<String, Set<ShowHierarchy>> showHierarchyByCountry) {
-        Set<Integer> videoIds = new HashSet<Integer>();
+    private Set<Integer> gatherVideoIds(Map<String, Set<ShowHierarchy>> showHierarchyByCountry, Set<Integer> extraVideoIds) {
+        if (showHierarchyByCountry == null) return extraVideoIds;
+
+        Set<Integer> videoIds = new HashSet<Integer>(extraVideoIds);
         for(Map.Entry<String, Set<ShowHierarchy>> entry : showHierarchyByCountry.entrySet()) {
             for(ShowHierarchy showHierarchy : entry.getValue()) {
                 videoIds.add(showHierarchy.getTopNodeId());
-    
+
                 for(int i=0;i<showHierarchy.getSeasonIds().length;i++) {
                     videoIds.add(showHierarchy.getSeasonIds()[i]);
-    
+
                     for(int j=0;j<showHierarchy.getEpisodeIds()[i].length;j++) {
                         videoIds.add(showHierarchy.getEpisodeIds()[i][j]);
                     }
                 }
-    
+
                 for(int i=0;i<showHierarchy.getSupplementalIds().length;i++) {
                     videoIds.add(showHierarchy.getSupplementalIds()[i]);
                 }

@@ -1,20 +1,19 @@
 package com.netflix.vms.transformer;
 
-import java.util.Collections;
-
-import java.util.HashSet;
-import com.netflix.vms.transformer.ShowGrouper.TopNodeProcessGroup;
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.util.IntList;
+import com.netflix.vms.transformer.ShowGrouper.TopNodeProcessGroup;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.hollowinput.EpisodeHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowHollow;
+import com.netflix.vms.transformer.hollowinput.SeasonHollow;
 import com.netflix.vms.transformer.hollowinput.ShowSeasonEpisodeHollow;
 import com.netflix.vms.transformer.hollowinput.SupplementalsHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
@@ -26,7 +25,10 @@ import com.netflix.vms.transformer.hollowinput.VideoTypeHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeMediaHollow;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -54,37 +56,43 @@ public class ShowHierarchyInitializer {
         this.ctx = ctx;
     }
 
-    public Map<String, Set<ShowHierarchy>> getShowHierarchiesByCountry(Set<TopNodeProcessGroup> processGroup) {
+
+    public Map<String, Set<ShowHierarchy>> getShowHierarchiesByCountry(Set<TopNodeProcessGroup> processGroup, Set<Integer> droppedIds) {
         Map<String, Set<ShowHierarchy>> showHierarchiesByCountry = new HashMap<>();
 
         for(TopNodeProcessGroup topNodeGroup : processGroup) {
             long topNodeId = topNodeGroup.getTopNodeId();
-            
+
             int videoGeneralOrdinal = videoGeneralIndex.getMatchingOrdinal(topNodeId);
-            
-            VideoGeneralHollow videoGeneral = api.getVideoGeneralHollow(videoGeneralOrdinal); 
+
+            VideoGeneralHollow videoGeneral = api.getVideoGeneralHollow(videoGeneralOrdinal);
             boolean isStandalone = VideoNodeType.isStandalone(VideoNodeType.of(videoGeneral._getVideoType()._getValue()));
             Map<ShowHierarchy, ShowHierarchy> uniqueShowHierarchies = new HashMap<ShowHierarchy, ShowHierarchy>();
-    
+
             HollowHashIndexResult matches = showSeasonEpisodeIndex.findMatches(topNodeId);
             if (matches != null) {
                 HollowOrdinalIterator iter = matches.iterator();
                 int showSeasonEpisodeOrdinal = iter.next();
                 while (showSeasonEpisodeOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
                     ShowSeasonEpisodeHollow showSeasonEpisode = api.getShowSeasonEpisodeHollow(showSeasonEpisodeOrdinal);
-    
+
                     for (ISOCountryHollow country : showSeasonEpisode._getCountryCodes()) {
                         String countryCode = country._getValue();
-                        if (!isTopNodeIncluded(topNodeId, countryCode))
+
+                        if (!isTopNodeIncluded(topNodeId, countryCode)) {
+                            addShowAndAllChildren(showSeasonEpisode, droppedIds);
                             continue;
-    
+                        }
+
                         ShowHierarchy showHierarchy = new ShowHierarchy((int) topNodeId, isStandalone, showSeasonEpisode, countryCode, this);
+                        droppedIds.addAll(showHierarchy.getDroppedIds());
+
                         ShowHierarchy canonicalHierarchy = uniqueShowHierarchies.get(showHierarchy);
                         if (canonicalHierarchy == null) {
                             canonicalHierarchy = showHierarchy;
                             uniqueShowHierarchies.put(showHierarchy, canonicalHierarchy);
                         }
-    
+
                         Set<ShowHierarchy> hierarchies = showHierarchiesByCountry.get(countryCode);
                         if(hierarchies == null) {
                             hierarchies = new HashSet<>();
@@ -92,29 +100,37 @@ public class ShowHierarchyInitializer {
                         }
                         hierarchies.add(canonicalHierarchy);
                     }
-    
+
                     showSeasonEpisodeOrdinal = iter.next();
                 }
             }
-    
+
             // Add standalones for countries that are not defined in hierarchy feed (Show,Movie,Supplemental)
             int videoTypeOrdinal = videoTypeIndex.getMatchingOrdinal(topNodeId);
             VideoTypeHollow videoType = api.getVideoTypeHollow(videoTypeOrdinal);
-            for (VideoTypeDescriptorHollow countryType : videoType._getCountryInfos()) {
-                String countryCode = countryType._getCountryCode()._getValue();
-                if (showHierarchiesByCountry.containsKey(countryCode)) continue;
-    
-                if(!isTopNodeIncluded(topNodeId, countryCode))
-                    continue;
-    
-                ShowHierarchy showHierarchy = new ShowHierarchy((int)topNodeId, isStandalone, null, countryCode, this);
-                ShowHierarchy canonicalHierarchy = uniqueShowHierarchies.get(showHierarchy);
-                if(canonicalHierarchy == null) {
-                    canonicalHierarchy = showHierarchy;
-                    uniqueShowHierarchies.put(showHierarchy, canonicalHierarchy);
+            if (videoType == null || videoType._getCountryInfos().isEmpty()) {
+                addVideoAndAssociatedSupplementals(topNodeId, droppedIds);
+            } else {
+                for (VideoTypeDescriptorHollow countryType : videoType._getCountryInfos()) {
+                    String countryCode = countryType._getCountryCode()._getValue();
+                    if (showHierarchiesByCountry.containsKey(countryCode)) continue;
+
+                    if (!isTopNodeIncluded(topNodeId, countryCode)) {
+                        addVideoAndAssociatedSupplementals(topNodeId, droppedIds);
+                        continue;
+                    }
+
+                    ShowHierarchy showHierarchy = new ShowHierarchy((int) topNodeId, isStandalone, null, countryCode, this);
+                    droppedIds.addAll(showHierarchy.getDroppedIds());
+
+                    ShowHierarchy canonicalHierarchy = uniqueShowHierarchies.get(showHierarchy);
+                    if(canonicalHierarchy == null) {
+                        canonicalHierarchy = showHierarchy;
+                        uniqueShowHierarchies.put(showHierarchy, canonicalHierarchy);
+                    }
+
+                    showHierarchiesByCountry.put(countryCode, Collections.singleton(canonicalHierarchy));
                 }
-    
-                showHierarchiesByCountry.put(countryCode, Collections.singleton(canonicalHierarchy));
             }
         }
 
@@ -124,16 +140,16 @@ public class ShowHierarchyInitializer {
         return showHierarchiesByCountry;
     }
 
-	private boolean isSupportedCountry(String countryCode) {
-		return ctx.getOctoberSkyData().getSupportedCountries().contains(countryCode);
-	}
+    private boolean isSupportedCountry(String countryCode) {
+        return ctx.getOctoberSkyData().getSupportedCountries().contains(countryCode);
+    }
 
 
 
     boolean isTopNodeIncluded(long videoId, String countryCode) {
-    	if(!isSupportedCountry(countryCode))
-    		return false;
-    	
+        if (!isSupportedCountry(countryCode))
+            return false;
+
         if(!isContentApproved(videoId, countryCode))
             return false;
 
@@ -236,7 +252,7 @@ public class ShowHierarchyInitializer {
         return false;
     }
 
-    void addSupplementalVideos(long videoId, String countryCode, IntList toList) {
+    void addSupplementalVideos(long videoId, String countryCode, IntList toList, Set<Integer> droppedIds) {
         int supplementalsOrdinal = supplementalIndex.getMatchingOrdinal(videoId);
 
         if(supplementalsOrdinal == -1)
@@ -245,9 +261,38 @@ public class ShowHierarchyInitializer {
         SupplementalsHollow supplementals = api.getSupplementalsHollow(supplementalsOrdinal);
         for (IndividualSupplementalHollow supplemental : supplementals._getSupplementals()) {
             int supplementalId = (int)supplemental._getMovieId();
-            if(isChildNodeIncluded(supplementalId, countryCode))
+            if (isChildNodeIncluded(supplementalId, countryCode)) {
                 toList.add(supplementalId);
+            } else {
+                droppedIds.add(supplementalId);
+            }
         }
     }
 
+    void addShowAndAllChildren(ShowSeasonEpisodeHollow showSeasonEpisode, Set<Integer> toSet) {
+        addVideoAndAssociatedSupplementals((int) showSeasonEpisode._getMovieId(), toSet);
+
+        for (SeasonHollow season : showSeasonEpisode._getSeasons()) {
+            addSeasonAndAllChildren(season, toSet);
+        }
+    }
+
+    void addSeasonAndAllChildren(SeasonHollow season, Set<Integer> toSet) {
+        addVideoAndAssociatedSupplementals((int) season._getMovieId(), toSet);
+        for (EpisodeHollow episode : season._getEpisodes()) {
+            addVideoAndAssociatedSupplementals((int) episode._getMovieId(), toSet);
+        }
+    }
+
+    void addVideoAndAssociatedSupplementals(long videoId, Set<Integer> toSet) {
+        toSet.add((int) videoId);
+
+        int supOrdinal = supplementalIndex.getMatchingOrdinal(videoId);
+        if (supOrdinal == -1) return;
+
+        SupplementalsHollow sups = api.getSupplementalsHollow(supOrdinal);
+        for (IndividualSupplementalHollow supplemental : sups._getSupplementals()) {
+            toSet.add((int) supplemental._getMovieId());
+        }
+    }
 }

@@ -16,19 +16,20 @@ public class FilterToSmallDataSubset {
     private static final String FILTERED_OUTPUT_BLOB_LOCATION = WORKING_DIR + "/pinned-subsets/control-output";
     private static final String FILTERED_INPUT_BLOB_LOCATION = WORKING_DIR + "/pinned-subsets/filtered-input";
 
-    
+
     @Test
     public void doFilter() throws Exception {
         DataSlicer slicer = new DataSlicer(
-                ORIGINAL_INPUT_BLOB_LOCATION, 
-                ORIGINAL_OUTPUT_BLOB_LOCATION, 
-                FILTERED_INPUT_BLOB_LOCATION, 
+                ORIGINAL_INPUT_BLOB_LOCATION,
+                ORIGINAL_OUTPUT_BLOB_LOCATION,
+                FILTERED_INPUT_BLOB_LOCATION,
                 FILTERED_OUTPUT_BLOB_LOCATION,
                 TARGET_NUMBER_OF_TOPNODES,
-                80074321, 80006146, 80049872
-        );
-        
-        slicer.slice();
-    }
+                80074321, 80006146 // These two topnodes are a strange case: the same episodes are included in two different show hierarchies for different countries.
+                , 80115503 // These video not available in output data so use isFilterBasedOnInputData=true
+                );
 
+        boolean isFilterBasedOnInputData = true;
+        slicer.slice(isFilterBasedOnInputData);
+    }
 }

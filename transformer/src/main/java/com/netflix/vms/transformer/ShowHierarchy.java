@@ -25,6 +25,7 @@ public class ShowHierarchy {
     private final int supplementalIds[];
     private final int hashCode;
     private final Set<Integer> allIds = new HashSet<>();
+    private final Set<Integer> droppedIds = new HashSet<>();
 
     public ShowHierarchy(int topNodeId, boolean isStandalone, ShowSeasonEpisodeHollow set, String countryCode, ShowHierarchyInitializer initializer) {
         this.topNodeId = topNodeId;
@@ -32,7 +33,7 @@ public class ShowHierarchy {
         int hashCode = HashCodes.hashInt(topNodeId);
 
         IntList supplementalIds = new IntList();
-        initializer.addSupplementalVideos(topNodeId, countryCode, supplementalIds);
+        initializer.addSupplementalVideos(topNodeId, countryCode, supplementalIds, droppedIds);
 
         List<SeasonHollow> seasons = null;
 
@@ -58,12 +59,15 @@ public class ShowHierarchy {
             for(int i=0;i<seasons.size();i++) {
                 SeasonHollow season = seasons.get(i);
 
-                if(!initializer.isChildNodeIncluded(season._getMovieId(), countryCode))
+                int seasonId = (int)season._getMovieId();
+                if(!initializer.isChildNodeIncluded(seasonId, countryCode)) {
+                    initializer.addSeasonAndAllChildren(season, droppedIds);
                     continue;
+                }
 
-                initializer.addSupplementalVideos(season._getMovieId(), countryCode, supplementalIds);
+                initializer.addSupplementalVideos(seasonId, countryCode, supplementalIds, droppedIds);
 
-                seasonIds[seasonCounter] = (int)season._getMovieId();
+                seasonIds[seasonCounter] = seasonId;
                 seasonSequenceNumbers[seasonCounter] = (int)season._getSequenceNumber();
                 hashCode ^= seasonIds[i];
                 hashCode = HashCodes.hashInt(hashCode);
@@ -84,10 +88,13 @@ public class ShowHierarchy {
                 for(int j=0;j<episodes.size();j++) {
                     EpisodeHollow episode = episodes.get(j);
 
-                    if(!initializer.isChildNodeIncluded(episode._getMovieId(), countryCode))
+                    int episodeId = (int) episode._getMovieId();
+                    if (!initializer.isChildNodeIncluded(episodeId, countryCode)) {
+                        initializer.addVideoAndAssociatedSupplementals(episodeId, droppedIds);
                         continue;
+                    }
 
-                    initializer.addSupplementalVideos(episode._getMovieId(), countryCode, supplementalIds);
+                    initializer.addSupplementalVideos(episode._getMovieId(), countryCode, supplementalIds, droppedIds);
 
                     episodeIds[seasonCounter][episodeCounter] = (int)episode._getMovieId();
                     episodeSequenceNumbers[seasonCounter][episodeCounter] = (int)episode._getSequenceNumber();
@@ -134,6 +141,10 @@ public class ShowHierarchy {
         }
         addIds(this.supplementalIds);
 
+    }
+
+    public Set<Integer> getDroppedIds() {
+        return droppedIds;
     }
 
     private void addIds(int... ids) {
