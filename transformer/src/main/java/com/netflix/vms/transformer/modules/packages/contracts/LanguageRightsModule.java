@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.modules.packages.contracts;
 import com.netflix.config.utils.Pair;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.hollowinput.DisallowedAssetBundleHollow;
 import com.netflix.vms.transformer.hollowinput.DisallowedAssetBundlesListHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
@@ -18,28 +17,15 @@ import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
-import org.apache.commons.io.IOUtils;
 
 public class LanguageRightsModule extends AbstractTransformModule {
     private final VMSHollowInputAPI api;
-    private final Properties bcp47Mapping = new Properties();
 
     public LanguageRightsModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
         super(api, ctx, mapper);
         this.api = api;
-        InputStream istream = null;
-        try {
-            bcp47Mapping.load(this.getClass().getClassLoader().getResourceAsStream("bcp47.properties"));
-        } catch (Exception e) {
-            ctx.getLogger().error(LogTag.LanguageRightsError, "bcp47mapping not loaded", e);
-            // throw new RuntimeException(e); // TODO: test that it works in deployment as well
-        } finally {
-            IOUtils.closeQuietly(istream);
-        }
     }
 
     @Override
@@ -80,8 +66,10 @@ public class LanguageRightsModule extends AbstractTransformModule {
 
                 for (DisallowedAssetBundleHollow bundle_ : disallowedBundleList_) {
                     LanguageRestrictions lr = new LanguageRestrictions();
-                    lr.audioLanguage = toStrings(bundle_._getAudioLanguageCode());
-                    lr.audioLanguageId = getlanguageId(lr.audioLanguage);
+                    StringHollow audioLangHollow = bundle_._getAudioLanguageCode();
+                    String audioLang = audioLangHollow == null ? null : audioLangHollow._getValue();
+                    lr.audioLanguage = audioLang == null ? null : new Strings(audioLang); 
+                    lr.audioLanguageId = LanguageIdMapping.getLanguageId(audioLang);
                     lr.requiresForcedSubtitles = bundle_._getForceSubtitleBoxed().booleanValue();
                     lrMap.put(new com.netflix.vms.transformer.hollowoutput.Integer(lr.audioLanguageId), lr);
                 }
@@ -90,20 +78,6 @@ public class LanguageRightsModule extends AbstractTransformModule {
         for (LanguageRights langRights : contractMovieRights.values()) {
             mapper.addObject(langRights);
         }
-    }
-
-    private int getlanguageId(Strings bcpCode) {
-        if (bcpCode == null) {
-            return -1;
-        }
-        String val = bcp47Mapping.getProperty(new String(bcpCode.value), "-1");
-        return Integer.valueOf(val).intValue();
-    }
-
-    private Strings toStrings(StringHollow str_) {
-        if (str_ == null)
-            return null;
-        return new Strings(str_._getValue());
     }
 
 }

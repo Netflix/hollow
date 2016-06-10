@@ -306,8 +306,6 @@ public class SimpleTransformer {
             for (Map.Entry<ISOCountry, CompleteVideo> countryEntry : globalEntry.getValue().entrySet()) {
                 ISOCountry country = countryEntry.getKey();
                 CompleteVideo completeVideo = countryEntry.getValue();
-                if(globalEntry.getKey().value == 80006274 && "JP".equals(new String(country.id)))
-                    System.out.println("asdf");
                 if (completeVideo != null) {
                     representativeVideo = preferredCompleteVideo(representativeVideo, completeVideo);
                     availableCountries.add(country);

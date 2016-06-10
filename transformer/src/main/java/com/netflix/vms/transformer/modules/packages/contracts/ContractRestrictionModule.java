@@ -167,19 +167,22 @@ public class ContractRestrictionModule {
             String audioLangStr = disallowedAssetBundle._getAudioLanguageCode()._getValue();
             Strings audioLanguage = getBcp47Code(audioLangStr);
             langRestriction.audioLanguage = audioLanguage;
-            langRestriction.audioLanguageId = 0;
+            langRestriction.audioLanguageId = LanguageIdMapping.getLanguageId(audioLangStr);
             langRestriction.requiresForcedSubtitles = disallowedAssetBundle._getForceSubtitle();
 
             Set<Strings> disallowedTimedTextCodes = new HashSet<Strings>();
+            Set<com.netflix.vms.transformer.hollowoutput.Integer> disallowedTimedTextIds = new HashSet<>();
             List<DisallowedSubtitleLangCodeHollow> disallowedSubtitles = disallowedAssetBundle._getDisallowedSubtitleLangCodes();
 
             for (DisallowedSubtitleLangCodeHollow sub : disallowedSubtitles) {
                 String subLang = sub._getValue()._getValue();
                 disallowedTimedTextCodes.add(getBcp47Code(subLang));
+                disallowedTimedTextIds.add(new com.netflix.vms.transformer.hollowoutput.Integer(LanguageIdMapping.getLanguageId(subLang)));
             }
 
             langRestriction.disallowedTimedText = Collections.emptySet();
             langRestriction.disallowedTimedTextBcp47codes = disallowedTimedTextCodes;
+            langRestriction.disallowedTimedText = disallowedTimedTextIds;
 
             restriction.languageBcp47RestrictionsMap.put(audioLanguage, langRestriction);
         }
@@ -308,17 +311,20 @@ public class ContractRestrictionModule {
             if (requiresForcedSubtitles || !disallowedTextLangauges.isEmpty()) {
                 LanguageRestrictions langRestriction = new LanguageRestrictions();
                 langRestriction.audioLanguage = getBcp47Code(audioLang);
-                langRestriction.audioLanguageId = 0;
+                langRestriction.audioLanguageId = LanguageIdMapping.getLanguageId(audioLang);
                 langRestriction.requiresForcedSubtitles = requiresForcedSubtitles;
 
-                Set<Strings> disallowedTimedTextCodes = new HashSet<Strings>();
+                Set<Strings> disallowedTimedTextCodes = new HashSet<>();
+                Set<com.netflix.vms.transformer.hollowoutput.Integer> disallowedTimedTextIds = new HashSet<>();
 
                 for (String textLang : disallowedTextLangauges) {
                     disallowedTimedTextCodes.add(getBcp47Code(textLang));
+                    disallowedTimedTextIds.add(new com.netflix.vms.transformer.hollowoutput.Integer(LanguageIdMapping.getLanguageId(textLang)));
                 }
 
                 langRestriction.disallowedTimedText = Collections.emptySet();
                 langRestriction.disallowedTimedTextBcp47codes = disallowedTimedTextCodes;
+                langRestriction.disallowedTimedText = disallowedTimedTextIds;
 
                 restriction.languageBcp47RestrictionsMap.put(langRestriction.audioLanguage, langRestriction);
             }
