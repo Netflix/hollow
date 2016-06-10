@@ -297,7 +297,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.4",
+            "locked": "0.12.6",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
@@ -560,13 +560,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1845.0",
+            "locked": "2.1873.0",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1845.0",
+            "locked": "2.1873.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1170,7 +1170,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.4",
+            "locked": "0.12.6",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
@@ -1433,13 +1433,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1845.0",
+            "locked": "2.1873.0",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1845.0",
+            "locked": "2.1873.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -2043,7 +2043,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.4",
+            "locked": "0.12.6",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
@@ -2306,13 +2306,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1845.0",
+            "locked": "2.1873.0",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1845.0",
+            "locked": "2.1873.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -2916,7 +2916,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.4",
+            "locked": "0.12.6",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
@@ -3179,13 +3179,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1845.0",
+            "locked": "2.1873.0",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1845.0",
+            "locked": "2.1873.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3888,7 +3888,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.4",
+            "locked": "0.12.6",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
@@ -4151,13 +4151,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1845.0",
+            "locked": "2.1873.0",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1845.0",
+            "locked": "2.1873.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -4761,7 +4761,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.4",
+            "locked": "0.12.6",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
@@ -5025,13 +5025,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1845.0",
+            "locked": "2.1873.0",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1845.0",
+            "locked": "2.1873.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -5645,7 +5645,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.4",
+            "locked": "0.12.6",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
@@ -5909,13 +5909,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1845.0",
+            "locked": "2.1873.0",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1845.0",
+            "locked": "2.1873.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -6529,7 +6529,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.4",
+            "locked": "0.12.6",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
@@ -6793,13 +6793,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1845.0",
+            "locked": "2.1873.0",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1845.0",
+            "locked": "2.1873.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -7413,7 +7413,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.4",
+            "locked": "0.12.6",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
@@ -7677,13 +7677,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1845.0",
+            "locked": "2.1873.0",
             "transitive": [
                 "com.netflix.vms.transformer:vms-transformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1845.0",
+            "locked": "2.1873.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
