@@ -5,6 +5,7 @@ body {
 table#global-cb {
   margin: 0 auto;
   margin-top: 20px;
+  width: 90%;
 }
 
 td.cb-enabled {
@@ -203,7 +204,7 @@ a.ed-override-link, a.threshold-override-link {
   font-size: 18px;
 }
 
-#close-enabled-disabled-override-modal, #close-threshold-override-modal, #close-edit-threshold-modal {
+#close-enabled-disabled-override-modal, #close-threshold-override-modal, #close-edit-threshold-modal, #close-reset-baseline-modal {
   cursor: pointer;
 }
 
@@ -291,4 +292,32 @@ img.edit-cb-threshold {
   text-align: center;
   padding: 20px;
   margin-bottom: 40px;
+}
+
+#reset-baseline-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: auto;
+  width: 600px;
+  background-color: #fff;
+  z-index: 3;
+}
+
+#reset-baseline-modal-header {
+  border-bottom: 1px solid #000;
+  line-height: 200%;
+  padding: 20px;
+}
+
+#reset-baseline-modal-header p{
+  text-align: center;
+  font-weight: bold;
+  letter-spacing: 1px;
+  font-size: 20px;
+}
+
+#reset-baseline-form {
+  padding: 40px;
 }
