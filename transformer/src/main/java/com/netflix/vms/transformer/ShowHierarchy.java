@@ -61,7 +61,7 @@ public class ShowHierarchy {
 
                 int seasonId = (int)season._getMovieId();
                 if(!initializer.isChildNodeIncluded(seasonId, countryCode)) {
-                    trackFilteredIds.add(seasonId);
+                    initializer.addSeasonAndAllChildren(season, trackFilteredIds);
                     continue;
                 }
 
@@ -90,7 +90,7 @@ public class ShowHierarchy {
 
                     int episodeId = (int) episode._getMovieId();
                     if (!initializer.isChildNodeIncluded(episodeId, countryCode)) {
-                        trackFilteredIds.add(episodeId);
+                        initializer.addVideoAndAssociatedSupplementals(episodeId, trackFilteredIds);
                         continue;
                     }
 

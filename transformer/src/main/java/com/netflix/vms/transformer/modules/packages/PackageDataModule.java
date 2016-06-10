@@ -37,7 +37,6 @@ import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.contracts.ContractRestrictionModule;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -76,7 +75,7 @@ public class PackageDataModule {
         this.encodeSummaryModule = new EncodeSummaryDescriptorModule(api, indexer);
     }
 
-    public Map<Integer, VideoPackageData> transform(Map<String, Set<ShowHierarchy>> showHierarchiesByCountry, Collection<Integer> extraVideoIds) {
+    public Map<Integer, VideoPackageData> transform(Map<String, Set<ShowHierarchy>> showHierarchiesByCountry, Set<Integer> extraVideoIds) {
         Map<Integer, VideoPackageData> transformedPackages = new HashMap<Integer, VideoPackageData>();
 
         Set<Integer> videoIds = gatherVideoIds(showHierarchiesByCountry, extraVideoIds);
@@ -227,7 +226,9 @@ public class PackageDataModule {
         }
     }
 
-    private Set<Integer> gatherVideoIds(Map<String, Set<ShowHierarchy>> showHierarchyByCountry, Collection<Integer> extraVideoIds) {
+    private Set<Integer> gatherVideoIds(Map<String, Set<ShowHierarchy>> showHierarchyByCountry, Set<Integer> extraVideoIds) {
+        if (showHierarchyByCountry == null) return extraVideoIds;
+
         Set<Integer> videoIds = new HashSet<Integer>(extraVideoIds);
         for(Map.Entry<String, Set<ShowHierarchy>> entry : showHierarchyByCountry.entrySet()) {
             for(ShowHierarchy showHierarchy : entry.getValue()) {
