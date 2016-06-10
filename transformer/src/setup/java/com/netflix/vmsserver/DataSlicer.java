@@ -78,6 +78,10 @@ public class DataSlicer {
         this.ordinalsToInclude = new HashMap<String, BitSet>();
     }
 
+    public void slice() throws IOException {
+        slice(false);
+    }
+
     public void slice(boolean isFilterBasedOnInput) throws IOException {
         Set<Integer> includedVideoIds = new HashSet<>();
         if (isFilterBasedOnInput) {
