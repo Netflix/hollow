@@ -48,7 +48,7 @@ dependencies {
     provided ("com.netflix.governator:governator-jetty:1.12.15") { transitive=false }
     // Same for the servlet libs.
     provided "org.eclipse.jetty:jetty-servlet:9.2.15.v20160210"
-    provided "javax.servlet:javax.servlet-api:3.0.1"
+    provided 'javax.servlet:javax.servlet-api:3.1.0'
     
     compile "netflix:nf-eventbus-guice:latest.release"
     compile "netflix:nf-eventbus:latest.release"

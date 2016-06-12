@@ -24,15 +24,16 @@ public class DownloadableAssetTypeIndex {
         idList.addDownloadableId(downloadableId);
     }
 
-    int total = 0;
-    
     public void mark(ContractAssetType assetType) {
-        if(assetType.getLang().startsWith("zh"))
-            total++;
-        
         DownloadableIdList idList = downloadableIdsByContract.get(assetType);
         if(idList != null)
             idList.mark();
+    }
+    
+    public void markAll() {
+        for(Map.Entry<ContractAssetType, DownloadableIdList> entry : downloadableIdsByContract.entrySet()) {
+            entry.getValue().mark();
+        }
     }
 
     public void resetMarks() {

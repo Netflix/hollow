@@ -22,12 +22,15 @@
 <body>
   <table id="global-cb">
     <tr>
-      <td class="cb-enabled" id="global-cb-text">Circuit Breakers are: </td>
-      <td>
+      <td class="cb-enabled" id="global-cb-text" style="text-align:right">Circuit Breakers are: </td>
+      <td style="text-align: left">
         <select name="global-cb-select" id="global-cb-select" data-role="slider" >
           <option value="off">Off</option>
           <option value="on" selected="true">On</option>
         </select>        
+      </td>
+      <td>
+        <a href="#" id="reset-baseline-link">Reset Baselines</a>
       </td>
     </tr>
   </table>
@@ -111,6 +114,20 @@
       <input type="text" size="10" data-role="none" id="cb-threshold-text"/>
       &nbsp;&nbsp;
       <input type="button" value="Update" data-role="none"id="update-cb-threshold-button"/>
+    </div>
+  </div>
+
+  <div id="reset-baseline-modal">
+    <div id="reset-baseline-modal-header">
+      <img src="images/close.png" height="12" width="12" style="float:right" id="close-reset-baseline-modal" />
+      <p>Reset Baseline Threshold</p>
+    </div>
+    <div id="reset-baseline-form">
+      <select data-role="none" id="reset-baseline-rule-name-select"></select>
+      &nbsp;&nbsp;
+      <select data-role="none" id="reset-baseline-country-select"></select>
+      &nbsp;&nbsp;
+      <input type="button" value="Reset" data-role="none"id="reset-baseline-button"/>
     </div>
   </div>
 

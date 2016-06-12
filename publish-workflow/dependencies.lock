@@ -1953,11 +1953,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.79",
+            "locked": "59.81",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.79",
+            "locked": "59.81",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -4375,11 +4375,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.79",
+            "locked": "59.81",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.79",
+            "locked": "59.81",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -6797,11 +6797,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.79",
+            "locked": "59.81",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.79",
+            "locked": "59.81",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -9219,11 +9219,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.79",
+            "locked": "59.81",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.79",
+            "locked": "59.81",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -9701,8 +9701,7 @@
             ]
         },
         "com.google.code.findbugs:findbugs": {
-            "locked": "3.0.0",
-            "requested": "3.0.0"
+            "locked": "3.0.0"
         },
         "com.google.code.findbugs:jFormatString": {
             "locked": "3.0.0",
@@ -9743,8 +9742,7 @@
     },
     "jacocoAgent": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.7.1.201405082137",
-            "requested": "0.7.1.201405082137"
+            "locked": "0.7.1.201405082137"
         }
     },
     "jacocoAnt": {
@@ -9755,8 +9753,7 @@
             ]
         },
         "org.jacoco:org.jacoco.ant": {
-            "locked": "0.7.1.201405082137",
-            "requested": "0.7.1.201405082137"
+            "locked": "0.7.1.201405082137"
         },
         "org.jacoco:org.jacoco.core": {
             "locked": "0.7.1.201405082137",
@@ -11743,11 +11740,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.79",
+            "locked": "59.81",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.79",
+            "locked": "59.81",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -14166,11 +14163,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.79",
+            "locked": "59.81",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.79",
+            "locked": "59.81",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -16594,11 +16591,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.79",
+            "locked": "59.81",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.79",
+            "locked": "59.81",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -19022,11 +19019,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.79",
+            "locked": "59.81",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.79",
+            "locked": "59.81",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -21450,11 +21447,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.79",
+            "locked": "59.81",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.79",
+            "locked": "59.81",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {

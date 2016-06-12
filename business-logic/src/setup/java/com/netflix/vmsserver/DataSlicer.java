@@ -2,18 +2,16 @@ package com.netflix.vmsserver;
 
 import com.netflix.hollow.combine.HollowCombiner;
 import com.netflix.hollow.combine.HollowCombinerIncludeOrdinalsCopyDirector;
-import com.netflix.hollow.index.HollowHashIndexResult;
+import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.index.traversal.HollowIndexerValueTraverser;
 import com.netflix.hollow.read.engine.HollowBlobReader;
+import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
-import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
-import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
 import com.netflix.vms.generated.notemplate.EpisodeHollow;
 import com.netflix.vms.generated.notemplate.GlobalPersonHollow;
-import com.netflix.vms.generated.notemplate.GlobalVideoHollow;
 import com.netflix.vms.generated.notemplate.L10NResourcesHollow;
 import com.netflix.vms.generated.notemplate.NamedCollectionHolderHollow;
 import com.netflix.vms.generated.notemplate.PersonRoleHollow;
@@ -21,12 +19,9 @@ import com.netflix.vms.generated.notemplate.SetOfEpisodeHollow;
 import com.netflix.vms.generated.notemplate.SetOfVPersonHollow;
 import com.netflix.vms.generated.notemplate.SetOfVideoHollow;
 import com.netflix.vms.generated.notemplate.StringsHollow;
-import com.netflix.vms.generated.notemplate.SupplementalVideoHollow;
+import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
 import com.netflix.vms.generated.notemplate.VPersonHollow;
-import com.netflix.vms.generated.notemplate.VideoCollectionsDataHollow;
-import com.netflix.vms.generated.notemplate.VideoEpisodeHollow;
 import com.netflix.vms.generated.notemplate.VideoHollow;
-import com.netflix.vms.generated.notemplate.VideoNodeTypeHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.Episode;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
@@ -36,6 +31,7 @@ import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VPerson;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.io.LZ4VMSInputStream;
+
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -46,13 +42,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
+
 import net.jpountz.lz4.LZ4BlockInputStream;
-import com.netflix.hollow.index.HollowHashIndex;
-import com.netflix.hollow.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
 
 public class DataSlicer {
 
@@ -61,24 +53,19 @@ public class DataSlicer {
 
     private final String originalOutputBlobLocation;
     private final String originalInputBlobLocation;
-    
+
     private final String filteredOutputBlobLocation;
     private final String filteredInputBlobLocation;
-    
-    
-    private HollowReadStateEngine stateEngine;
-    private HollowPrimaryKeyIndex globalVideoIdx;
-    private HollowPrimaryKeyIndex completeVideoPrimaryKeyIdx;
-    private HollowHashIndex completeVideoHashIdx;
-    private VMSRawHollowAPI outputAPI;
 
+
+    private HollowReadStateEngine stateEngine;
     private Map<String, BitSet> ordinalsToInclude;
 
 
     public DataSlicer(
-            String originalInputLocation, 
-            String originalOutputLocation, 
-            String filteredInputLocation, 
+            String originalInputLocation,
+            String originalOutputLocation,
+            String filteredInputLocation,
             String filteredOutputLocation,
             int numberOfRandomTopNodesToInclude,
             int... specificTopNodeIdsToInclude) {
@@ -88,26 +75,37 @@ public class DataSlicer {
         this.filteredOutputBlobLocation = filteredOutputLocation;
         this.numberOfRandomTopNodesToInclude = numberOfRandomTopNodesToInclude;
         this.specificTopNodeIdsToInclude = specificTopNodeIdsToInclude;
+        this.ordinalsToInclude = new HashMap<String, BitSet>();
     }
-    
+
     public void slice() throws IOException {
-        Set<Integer> includedVideoIds = filterOutputBlob();
-        filterInputBlob(includedVideoIds);
+        slice(false);
     }
-    
-    private Set<Integer> filterOutputBlob() throws IOException, FileNotFoundException {
+
+    public void slice(boolean isFilterBasedOnInput) throws IOException {
+        Set<Integer> includedVideoIds = new HashSet<>();
+        if (isFilterBasedOnInput) {
+            filterInputBlob(includedVideoIds);
+            filterOutputBlob(includedVideoIds);
+        } else {
+            filterOutputBlob(includedVideoIds);
+            filterInputBlob(includedVideoIds);
+        }
+    }
+
+    private void filterOutputBlob(Set<Integer> includedVideoIds) throws IOException, FileNotFoundException {
+        ordinalsToInclude.clear();
         stateEngine = new HollowReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(stateEngine);
         reader.readSnapshot(new LZ4VMSInputStream(new FileInputStream(originalOutputBlobLocation)));
 
-        outputAPI = new VMSRawHollowAPI(stateEngine);
-        globalVideoIdx = new HollowPrimaryKeyIndex(stateEngine, "GlobalVideo", "completeVideo.id.value");
-        completeVideoHashIdx = new HollowHashIndex(stateEngine, "CompleteVideo", "", "id.value");
-        completeVideoPrimaryKeyIdx = new HollowPrimaryKeyIndex(stateEngine, "CompleteVideo", "id.value", "country.id");
-        ordinalsToInclude = new HashMap<String, BitSet>();
+        VMSRawHollowAPI outputAPI = new VMSRawHollowAPI(stateEngine);
 
-
-        Set<Integer> includedVideoIds = findRandomVideoIds(stateEngine);
+        if (includedVideoIds.isEmpty()) {
+            RandomGlobalVideo random = new RandomGlobalVideo(stateEngine);
+            Set<Integer> videoIds = random.findRandomVideoIds(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude);
+            includedVideoIds.addAll(videoIds);
+        }
 
         findIncludedOrdinals("CompleteVideo", includedVideoIds, new VideoIdDeriver() {
             @Override
@@ -182,8 +180,6 @@ public class DataSlicer {
         HollowWriteStateEngine writeStateEngine = populateFilteredBlob(stateEngine, ordinalsToInclude);
         addFilteredNamedLists(stateEngine, outputAPI, writeStateEngine, includedVideoIds);
         writeBlob(filteredOutputBlobLocation, writeStateEngine);
-
-        return includedVideoIds;
     }
 
     private void addFilteredNamedLists(HollowReadStateEngine readStateEngine, VMSRawHollowAPI api, HollowWriteStateEngine writeStateEngine, Set<Integer> includedVideoIds) {
@@ -273,6 +269,12 @@ public class DataSlicer {
         reader.readSnapshot(new LZ4BlockInputStream(new FileInputStream(originalInputBlobLocation)));
 
         final VMSHollowInputAPI inputAPI = new VMSHollowInputAPI(stateEngine);
+
+        if (includedVideoIds.isEmpty()) {
+            RandomShowMovieHierarchy random = new RandomShowMovieHierarchy(stateEngine);
+            Set<Integer> videoIds = random.findRandomVideoIds(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude);
+            includedVideoIds.addAll(videoIds);
+        }
 
         findIncludedOrdinals("ShowSeasonEpisode", includedVideoIds, new VideoIdDeriver() {
             @Override
@@ -449,88 +451,6 @@ public class DataSlicer {
         ordinalsToInclude.put(type, populatedOrdinals);
 
         return populatedOrdinals;
-    }
-
-    private Set<Integer> findRandomVideoIds(HollowReadStateEngine stateEngine) {
-        Random rand = new Random(1000);
-        Set<Integer> topNodeVideoIds = new HashSet<Integer>();
-        Set<Integer> allVideoIds = new HashSet<Integer>();
-
-        int maxGlobalVideoOrdinal = stateEngine.getTypeState("GlobalVideo").maxOrdinal();
-
-        while(topNodeVideoIds.size() < numberOfRandomTopNodesToInclude) {
-            int randomOrdinal = rand.nextInt(maxGlobalVideoOrdinal + 1);
-
-            if(ordinalIsPopulated("GlobalVideo", randomOrdinal)) {
-                GlobalVideoHollow vid = outputAPI.getGlobalVideoHollow(randomOrdinal);
-
-                addIdsBasedOnGlobalVideo(topNodeVideoIds, allVideoIds, vid);
-            }
-        }
-        
-        for(int videoId : specificTopNodeIdsToInclude) {
-            int gvOrdinal = globalVideoIdx.getMatchingOrdinal(videoId);
-            if(gvOrdinal == -1)
-                throw new RuntimeException("Could not find GlobalVideo for id " + videoId);
-            
-            GlobalVideoHollow vid = outputAPI.getGlobalVideoHollow(gvOrdinal);
-            addIdsBasedOnGlobalVideo(topNodeVideoIds, allVideoIds, vid);
-        }
-
-        /// The following two topnodes are a strange case: the same episodes are included in two different
-        /// show hierarchies for different countries.
-        GlobalVideoHollow vid = outputAPI.getGlobalVideoHollow(globalVideoIdx.getMatchingOrdinal(80074321));
-        addIdsBasedOnGlobalVideo(topNodeVideoIds, allVideoIds, vid);
-        vid = outputAPI.getGlobalVideoHollow(globalVideoIdx.getMatchingOrdinal(80006146));
-        addIdsBasedOnGlobalVideo(topNodeVideoIds, allVideoIds, vid);
-
-        return allVideoIds;
-    }
-
-    private void addIdsBasedOnGlobalVideo(Set<Integer> topNodeVideoIds, Set<Integer> allVideoIds, GlobalVideoHollow vid) {
-        HollowHashIndexResult completeVideos = completeVideoHashIdx.findMatches(vid._getCompleteVideo()._getId()._getValueBoxed());
-
-        HollowOrdinalIterator completeVideoIterator = completeVideos.iterator();
-        int completeVideoOrdinal = completeVideoIterator.next();
-
-        while(completeVideoOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
-            CompleteVideoHollow completeVideo = outputAPI.getCompleteVideoHollow(completeVideoOrdinal);
-            String countryCode = completeVideo._getCountry()._getId();
-            VideoCollectionsDataHollow videoCollectionsData = completeVideo._getFacetData()._getVideoCollectionsData();
-            VideoNodeTypeHollow nodeType = videoCollectionsData._getNodeType();
-            if(nodeType._isValueEqual("SHOW") || nodeType._isValueEqual("MOVIE")) {
-                Integer videoId = vid._getCompleteVideo()._getId()._getValueBoxed();
-                topNodeVideoIds.add(videoId);
-                allVideoIds.add(videoId);
-
-                for(VideoEpisodeHollow episode : videoCollectionsData._getVideoEpisodes()) {
-                    Integer episodeId = episode._getDeliverableVideo()._getValueBoxed();
-                    allVideoIds.add(episodeId);
-                    addAllSupplementalVideoIds(episodeId, countryCode, allVideoIds);
-                }
-
-                for(VideoHollow season : videoCollectionsData._getShowChildren()) {
-                    Integer seasonId = season._getValueBoxed();
-                    allVideoIds.add(seasonId);
-                    addAllSupplementalVideoIds(seasonId, countryCode, allVideoIds);
-                }
-
-                addAllSupplementalVideoIds(videoId, countryCode, allVideoIds);
-            }
-
-            completeVideoOrdinal = completeVideoIterator.next();
-        }
-    }
-
-    private void addAllSupplementalVideoIds(Integer videoId, String countryCode, Set<Integer> toSet) {
-        int completeVideoOrdinal = completeVideoPrimaryKeyIdx.getMatchingOrdinal(videoId, countryCode);
-        CompleteVideoHollow vid = outputAPI.getCompleteVideoHollow(completeVideoOrdinal);
-
-        VideoCollectionsDataHollow videoCollectionsData = vid._getFacetData()._getVideoCollectionsData();
-
-        for(SupplementalVideoHollow supplemental : videoCollectionsData._getSupplementalVideos()) {
-            toSet.add(supplemental._getId()._getValueBoxed());
-        }
     }
 
     private BitSet findIncludedL10NOrdinals(Set<Integer> includedVideoIds) {

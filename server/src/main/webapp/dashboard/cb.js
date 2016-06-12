@@ -17,6 +17,15 @@ var PROPS = {}
 
 var cbconfig = {};
 
+function centerResetBaselineModal() {
+  var height = $('#reset-baseline-modal').height();
+  var width = $('#reset-baseline-modal').width();
+  var windowHeight = $(window).height();
+  var windowWidth = $(window).width();
+  var left = (windowWidth - width)/2;
+  $('#reset-baseline-modal').css('left', left).css('top', '20px');
+}
+
 function centerEnabledDisabledModal() {
   var height = $('#enabled-disabled-override-modal').height();
   var width = $('#enabled-disabled-override-modal').width();
@@ -44,6 +53,22 @@ function centerEditThresholdModal() {
   var windowWidth = $(window).width();
   var left = (windowWidth - width) / 2;
   $('#edit-threshold-modal').css('left', left).css('top', '20px');
+}
+
+function populateResetBaselineForm() {
+  for(var i = 0; i < ruleNames.length; i++) {
+    var ruleName = ruleNames[i];
+    if(cbNames[ruleName] === 'false') continue;
+    // Create an option out of it
+    var ruleOption = $('<option>').append(ruleName).attr('value', ruleName);
+    $('#reset-baseline-rule-name-select').append(ruleOption);
+  }
+
+  for(var i = 0; i < cbCountries.length; i++) {
+    var countryCode = cbCountries[i];
+    var countryOption = $('<option>').append(countryCode).attr('value', countryCode);
+    $('#reset-baseline-country-select').append(countryOption);
+  }
 }
 
 function getEnabledDisabledOverrides(ruleName) {
@@ -324,6 +349,9 @@ $(document).ready(function(){
         // Paint the UI
         paintUI();
 
+        // Populate the reset baseline form
+        populateResetBaselineForm();
+
 
         $('#overlay').remove();
 
@@ -526,9 +554,42 @@ function addEventListeners() {
 
   // Edit the threshold override when clicked on the edit button
   $('#edit-threshold-override-button').click(editThresholdOverride);
+
+  //Baseline Reset Related Handlers
+  $('#reset-baseline-link').click(handleResetBaselineLink);
+  $('#close-reset-baseline-modal').click(closeResetBaselineModal);
+  $('#reset-baseline-button').click(resetBaseline);
 }
 
 // ALL THE HANDLERS
+
+function handleResetBaselineLink(event) {
+  event.preventDefault();
+  $('#modal-background').show();
+  centerResetBaselineModal();
+  $('#reset-baseline-modal').show();
+}
+
+function closeResetBaselineModal() {
+  $('#modal-background').hide();
+  $('#reset-baseline-modal').hide();  
+}
+
+function resetBaseline() {
+  // get the rulename
+  var ruleName = $('#reset-baseline-rule-name-select').val();
+  // Get the country code
+  var countryCode = $('#reset-baseline-country-select').val();
+
+  // Do the REST call to reset
+  $.post('/REST/vms/cb/reset',
+    {name: ruleName, country: countryCode},
+    function(message){alert(message)},
+    'text'
+  );
+
+
+}
 
 function editThresholdOverride() {
   // Get the following:
