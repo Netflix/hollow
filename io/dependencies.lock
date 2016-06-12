@@ -194,13 +194,13 @@
         "com.netflix.archaius:archaius2-api": {
             "locked": "2.0.6",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
             "locked": "3.8.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
@@ -240,7 +240,7 @@
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.netflix-commons:netflix-commons-util": {
@@ -297,7 +297,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.6",
+            "locked": "0.12.4",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
@@ -313,7 +313,7 @@
             "locked": "0.2.51-platform",
             "requested": "latest.release"
         },
-        "com.netflix.vms.transformer:vms-transformer-common-interfaces": {
+        "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -560,13 +560,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "2.1845.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "2.1845.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1067,13 +1067,13 @@
         "com.netflix.archaius:archaius2-api": {
             "locked": "2.0.6",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
             "locked": "3.8.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
@@ -1113,7 +1113,7 @@
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.netflix-commons:netflix-commons-util": {
@@ -1170,7 +1170,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.6",
+            "locked": "0.12.4",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
@@ -1186,7 +1186,7 @@
             "locked": "0.2.51-platform",
             "requested": "latest.release"
         },
-        "com.netflix.vms.transformer:vms-transformer-common-interfaces": {
+        "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -1433,13 +1433,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "2.1845.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "2.1845.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1940,13 +1940,13 @@
         "com.netflix.archaius:archaius2-api": {
             "locked": "2.0.6",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
             "locked": "3.8.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
@@ -1986,7 +1986,7 @@
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.netflix-commons:netflix-commons-util": {
@@ -2043,7 +2043,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.6",
+            "locked": "0.12.4",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
@@ -2059,7 +2059,7 @@
             "locked": "0.2.51-platform",
             "requested": "latest.release"
         },
-        "com.netflix.vms.transformer:vms-transformer-common-interfaces": {
+        "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -2306,13 +2306,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "2.1845.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "2.1845.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -2813,13 +2813,13 @@
         "com.netflix.archaius:archaius2-api": {
             "locked": "2.0.6",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
             "locked": "3.8.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
@@ -2859,7 +2859,7 @@
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.netflix-commons:netflix-commons-util": {
@@ -2916,7 +2916,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.6",
+            "locked": "0.12.4",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
@@ -2932,7 +2932,7 @@
             "locked": "0.2.51-platform",
             "requested": "latest.release"
         },
-        "com.netflix.vms.transformer:vms-transformer-common-interfaces": {
+        "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -3179,13 +3179,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "2.1845.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "2.1845.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3785,13 +3785,13 @@
         "com.netflix.archaius:archaius2-api": {
             "locked": "2.0.6",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
             "locked": "3.8.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
@@ -3831,7 +3831,7 @@
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.netflix-commons:netflix-commons-util": {
@@ -3888,7 +3888,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.6",
+            "locked": "0.12.4",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
@@ -3904,7 +3904,7 @@
             "locked": "0.2.51-platform",
             "requested": "latest.release"
         },
-        "com.netflix.vms.transformer:vms-transformer-common-interfaces": {
+        "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -4151,13 +4151,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "2.1845.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "2.1845.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -4658,13 +4658,13 @@
         "com.netflix.archaius:archaius2-api": {
             "locked": "2.0.6",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
             "locked": "3.8.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
@@ -4704,7 +4704,7 @@
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.netflix-commons:netflix-commons-util": {
@@ -4761,7 +4761,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.6",
+            "locked": "0.12.4",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
@@ -4777,7 +4777,7 @@
             "locked": "0.2.51-platform",
             "requested": "latest.release"
         },
-        "com.netflix.vms.transformer:vms-transformer-common-interfaces": {
+        "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -5025,13 +5025,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "2.1845.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "2.1845.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -5542,13 +5542,13 @@
         "com.netflix.archaius:archaius2-api": {
             "locked": "2.0.6",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
             "locked": "3.8.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
@@ -5588,7 +5588,7 @@
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.netflix-commons:netflix-commons-util": {
@@ -5645,7 +5645,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.6",
+            "locked": "0.12.4",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
@@ -5661,7 +5661,7 @@
             "locked": "0.2.51-platform",
             "requested": "latest.release"
         },
-        "com.netflix.vms.transformer:vms-transformer-common-interfaces": {
+        "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -5909,13 +5909,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "2.1845.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "2.1845.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -6426,13 +6426,13 @@
         "com.netflix.archaius:archaius2-api": {
             "locked": "2.0.6",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
             "locked": "3.8.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
@@ -6472,7 +6472,7 @@
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.netflix-commons:netflix-commons-util": {
@@ -6529,7 +6529,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.6",
+            "locked": "0.12.4",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
@@ -6545,7 +6545,7 @@
             "locked": "0.2.51-platform",
             "requested": "latest.release"
         },
-        "com.netflix.vms.transformer:vms-transformer-common-interfaces": {
+        "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -6793,13 +6793,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "2.1845.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "2.1845.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -7310,13 +7310,13 @@
         "com.netflix.archaius:archaius2-api": {
             "locked": "2.0.6",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
             "locked": "3.8.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
@@ -7356,7 +7356,7 @@
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.netflix-commons:netflix-commons-util": {
@@ -7413,7 +7413,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.6",
+            "locked": "0.12.4",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.netflix-commons:netflix-eventbus",
@@ -7429,7 +7429,7 @@
             "locked": "0.2.51-platform",
             "requested": "latest.release"
         },
-        "com.netflix.vms.transformer:vms-transformer-common-interfaces": {
+        "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -7677,13 +7677,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "2.1845.0",
             "transitive": [
-                "com.netflix.vms.transformer:vms-transformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "2.1845.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
