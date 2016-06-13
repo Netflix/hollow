@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.packages;
 
+import com.netflix.vms.transformer.CycleConstants;
+
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.hollowinput.AudioStreamInfoHollow;
@@ -45,7 +47,6 @@ import com.netflix.vms.transformer.hollowoutput.VideoResolution;
 import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -75,7 +76,7 @@ public class StreamDataModule {
 
     private final HollowObjectMapper objectMapper;
 
-    public StreamDataModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer, HollowObjectMapper objectMapper, Map<Integer, Object> drmKeysByGroupId, Map<Integer, DrmInfo> drmInfoByGroupId) {
+    public StreamDataModule(VMSHollowInputAPI api, CycleConstants cycleConstants, VMSTransformerIndexer indexer, HollowObjectMapper objectMapper, Map<Integer, Object> drmKeysByGroupId, Map<Integer, DrmInfo> drmInfoByGroupId) {
         this.api = api;
         this.assetTypeDescriptorMap = getAssetTypeDescriptorMap();
         this.timedTextTypeDescriptorMap = getTimedTextTypeDescriptorMap();
@@ -86,7 +87,7 @@ public class StreamDataModule {
 
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
 
-        this.videoFormatIdentifier = new VideoFormatDescriptorIdentifier(api, indexer);
+        this.videoFormatIdentifier = new VideoFormatDescriptorIdentifier(api, cycleConstants, indexer);
 
         /// only necessary for rogue DrmKeys.
         this.objectMapper = objectMapper;

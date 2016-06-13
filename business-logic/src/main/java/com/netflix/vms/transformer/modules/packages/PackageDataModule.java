@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.packages;
 
+import com.netflix.vms.transformer.CycleConstants;
+
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
@@ -36,12 +38,10 @@ import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.contracts.ContractRestrictionModule;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import javax.xml.bind.DatatypeConverter;
 
 public class PackageDataModule {
@@ -61,7 +61,7 @@ public class PackageDataModule {
     private final ContractRestrictionModule contractRestrictionModule;
     private final EncodeSummaryDescriptorModule encodeSummaryModule;
 
-    public PackageDataModule(VMSHollowInputAPI api, HollowObjectMapper objectMapper, VMSTransformerIndexer indexer) {
+    public PackageDataModule(VMSHollowInputAPI api, HollowObjectMapper objectMapper, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
         this.api = api;
         this.mapper = objectMapper;
         this.packagesByVideoIdx = indexer.getHashIndex(IndexSpec.PACKAGES_BY_VIDEO);
@@ -70,7 +70,7 @@ public class PackageDataModule {
         this.drmKeysByGroupId = new HashMap<Integer, Object>();
         this.drmInfoByGroupId = new HashMap<Integer, DrmInfo>();
 
-        this.streamDataModule = new StreamDataModule(api, indexer, objectMapper, drmKeysByGroupId, drmInfoByGroupId);
+        this.streamDataModule = new StreamDataModule(api, cycleConstants, indexer, objectMapper, drmKeysByGroupId, drmInfoByGroupId);
         this.contractRestrictionModule = new ContractRestrictionModule(api, indexer);
         this.encodeSummaryModule = new EncodeSummaryDescriptorModule(api, indexer);
     }

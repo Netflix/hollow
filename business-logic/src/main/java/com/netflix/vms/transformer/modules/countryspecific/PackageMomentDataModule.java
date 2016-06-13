@@ -1,7 +1,8 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
-import java.util.Arrays;
+import com.netflix.vms.transformer.CycleConstants;
 
+import java.util.Arrays;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
@@ -48,12 +49,12 @@ public class PackageMomentDataModule {
 
     private final Map<Integer, TrickPlayType> trickPlayTypeMap;
 
-    public PackageMomentDataModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer) {
+    public PackageMomentDataModule(VMSHollowInputAPI api, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
         this.api = api;
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
 
         this.videoMomentModule = new VideoMomentModule();
-        this.videoFormatIdentifier = new VideoFormatDescriptorIdentifier(api, indexer);
+        this.videoFormatIdentifier = new VideoFormatDescriptorIdentifier(api, cycleConstants, indexer);
         this.packageMomentDataByPackageId = new HashMap<Integer, PackageMomentData>();
 
         this.trickPlayTypeMap = getTrickPlayTypeMap();

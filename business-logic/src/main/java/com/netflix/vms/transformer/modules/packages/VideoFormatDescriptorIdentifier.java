@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.packages;
 
+import com.netflix.vms.transformer.CycleConstants;
+
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
 import com.netflix.vms.transformer.hollowinput.StreamDimensionsHollow;
@@ -8,26 +10,23 @@ import com.netflix.vms.transformer.hollowinput.StreamProfileGroupsHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfileIdHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoStreamInfoHollow;
-import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class VideoFormatDescriptorIdentifier {
 
-    private final Map<String, VideoFormatDescriptor> videoFormatDescriptorMap;
+    private final CycleConstants cycleConstants;
     private final Set<Integer> ultraHDEncodingProfileIds;
     private final Set<SuperHDIdentifier> validSuperHDIdentifiers;
     private final Set<TargetResolution> aspectRatioVideoFormatIdentifiers;
 
 
-    public VideoFormatDescriptorIdentifier(VMSHollowInputAPI api, VMSTransformerIndexer indexer) {
-        this.videoFormatDescriptorMap = getVideoFormatDescriptorMap();
+    public VideoFormatDescriptorIdentifier(VMSHollowInputAPI api, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
+        this.cycleConstants = cycleConstants;
         this.ultraHDEncodingProfileIds = getUltraHDEncodingProfileIds(api, indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE_GROUP));
         this.validSuperHDIdentifiers = getValidSuperHDIdentifiers();
         this.aspectRatioVideoFormatIdentifiers = getAspectRatioVideoFormatIdentifiers();
@@ -55,7 +54,7 @@ public class VideoFormatDescriptorIdentifier {
 
     public VideoFormatDescriptor selectVideoFormatDescriptor(int encodingProfileId, int bitrate, int height, int width, int targetHeight, int targetWidth) {
         if(ultraHDEncodingProfileIds.contains(Integer.valueOf(encodingProfileId)))
-            return videoFormatDescriptorMap.get("Ultra_HD");
+            return cycleConstants.ULTRA_HD;
 
         if(height == Integer.MIN_VALUE)
             return getUnknownVideoFormatDescriptor();
@@ -68,43 +67,23 @@ public class VideoFormatDescriptorIdentifier {
                 float div = ((float)width / (float)height);
                 final int index = (int)(div * 100) - 100;
 
-                if (index <= 55) return videoFormatDescriptorMap.get("SD");
+                if (index <= 55) return cycleConstants.SD;
 
-                return videoFormatDescriptorMap.get("HD");
+                return cycleConstants.HD;
             }
         }
 
         if(height <= 719)
-            return videoFormatDescriptorMap.get("SD");
+            return cycleConstants.SD;
 
         if(validSuperHDIdentifiers.contains(new SuperHDIdentifier(encodingProfileId, bitrate)))
-            return videoFormatDescriptorMap.get("Super_HD");
+            return cycleConstants.SUPER_HD;
 
-        return videoFormatDescriptorMap.get("HD");
+        return cycleConstants.HD;
     }
     
     public VideoFormatDescriptor getUnknownVideoFormatDescriptor() {
-        return videoFormatDescriptorMap.get("unknown");
-    }
-
-    private Map<String, VideoFormatDescriptor> getVideoFormatDescriptorMap() {
-        Map<String, VideoFormatDescriptor> map = new HashMap<String, VideoFormatDescriptor>();
-
-        map.put("unknown", videoFormatDescriptor(-1, "unknown", "unknown"));
-        map.put("SD", videoFormatDescriptor(2, "SD", "Standard Definition"));
-        map.put("HD", videoFormatDescriptor(1, "HD", "HiDefinition"));
-        map.put("Super_HD", videoFormatDescriptor(3, "Super_HD", "Super HiDefinition"));
-        map.put("Ultra_HD", videoFormatDescriptor(4, "Ultra_HD", "Ultra HiDefinition"));
-
-        return map;
-    }
-
-    private VideoFormatDescriptor videoFormatDescriptor(int id, String name, String description) {
-        VideoFormatDescriptor descriptor = new VideoFormatDescriptor();
-        descriptor.id = id;
-        descriptor.name = new Strings(name);
-        descriptor.description = new Strings(description);
-        return descriptor;
+        return cycleConstants.VIDEOFORMAT_UNKNOWN;
     }
 
     private Set<Integer> getUltraHDEncodingProfileIds(VMSHollowInputAPI api, HollowPrimaryKeyIndex primaryKeyIndex) {

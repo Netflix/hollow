@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
+import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
@@ -12,17 +13,14 @@ import com.netflix.vms.transformer.hollowoutput.ContractRestriction;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.LinkedHashSetOfStrings;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
-import com.netflix.vms.transformer.hollowoutput.PixelAspect;
 import com.netflix.vms.transformer.hollowoutput.StreamData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoContractInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
-import com.netflix.vms.transformer.hollowoutput.VideoResolution;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,11 +42,11 @@ public class WindowPackageContractInfoModule {
     private final Map<Integer, Strings> soundTypesMap;
     private final VideoPackageInfo FILTERED_VIDEO_PACKAGE_INFO;
 
-    public WindowPackageContractInfoModule(VMSHollowInputAPI api, TransformerContext ctx, VMSTransformerIndexer indexer) {
+    public WindowPackageContractInfoModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
         this.api = api;
         this.ctx = ctx;
 
-        this.packageMomentDataModule = new PackageMomentDataModule(api, indexer);
+        this.packageMomentDataModule = new PackageMomentDataModule(api, cycleConstants, indexer);
 
         this.packageIdx = indexer.getPrimaryKeyIndex(IndexSpec.PACKAGES);
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
@@ -88,7 +86,7 @@ public class WindowPackageContractInfoModule {
         Set<String> screenFormats = new TreeSet<String>();
 
         long longestRuntimeInSeconds = 0;
-
+        
         for(StreamData streamData : packageData.streams) {
             int streamProfileOrdinal = streamProfileIdx.getMatchingOrdinal((long) streamData.downloadDescriptor.encodingProfileId);
             StreamProfilesHollow profile = api.getStreamProfilesHollow(streamProfileOrdinal);
@@ -103,17 +101,6 @@ public class WindowPackageContractInfoModule {
 
                 if(streamData.streamDataDescriptor.runTimeInSeconds > longestRuntimeInSeconds && "VIDEO".equals(streamProfileType))
                     longestRuntimeInSeconds = streamData.streamDataDescriptor.runTimeInSeconds;
-
-                PixelAspect pixelAspect = streamData.streamDataDescriptor.pixelAspect;
-                VideoResolution videoResolution = streamData.streamDataDescriptor.videoResolution;
-
-                if(pixelAspect != null && videoResolution != null && videoResolution.height != 0 && videoResolution.width != 0) {
-                    int parHeight = Math.max(pixelAspect.height, 1);
-                    int parWidth = Math.max(pixelAspect.width, 1);
-
-                    float screenFormat = ((float) (videoResolution.width * parWidth)) / (videoResolution.height * parHeight);
-                    screenFormats.add(getScreenFormat(screenFormat));
-                }
 
             } else if("AUDIO".equals(streamProfileType)) {
                 if(excludedDownloadables != null && !excludedDownloadables.contains(new com.netflix.vms.transformer.hollowoutput.Long(streamData.downloadableId)))
@@ -142,17 +129,6 @@ public class WindowPackageContractInfoModule {
         info.videoPackageInfo.runtimeInSeconds = (int) longestRuntimeInSeconds;
 
         return info;
-    }
-
-    private Map<Float, String> screenFormatCache = new HashMap<Float, String>();
-
-    private String getScreenFormat(Float screenFormat) {
-        String formatStr = screenFormatCache.get(screenFormat);
-        if(formatStr == null) {
-            formatStr = String.format("%.2f:1", screenFormat);
-            screenFormatCache.put(screenFormat, formatStr);
-        }
-        return formatStr;
     }
 
     public WindowPackageContractInfo buildWindowPackageContractInfoWithoutPackage(VideoRightsContractHollow contract, String country, int videoId) {

@@ -122,7 +122,7 @@ public class SimpleTransformer {
 
         for(int i=0;i<executor.getCorePoolSize();i++) {
             executor.execute(() -> {
-                PackageDataModule packageDataModule = new PackageDataModule(api, objectMapper, indexer);
+                PackageDataModule packageDataModule = new PackageDataModule(api, objectMapper, cycleConstants, indexer);
                 VideoCollectionsModule collectionsModule = new VideoCollectionsModule(api, cycleConstants, indexer);
                 VideoMetaDataModule metadataModule = new VideoMetaDataModule(api, ctx, cycleConstants, indexer);
                 VideoMediaDataModule mediaDataModule = new VideoMediaDataModule(api, indexer);

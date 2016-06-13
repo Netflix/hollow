@@ -2,8 +2,9 @@ package com.netflix.vms.transformer.modules.countryspecific;
 
 import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
 
-import java.util.LinkedHashMap;
+import com.netflix.vms.transformer.CycleConstants;
 
+import java.util.LinkedHashMap;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractAssetHollow;
@@ -49,10 +50,10 @@ public class VMSAvailabilityWindowModule {
 
     private final WindowPackageContractInfoModule windowPackageContractInfoModule;
 
-    public VMSAvailabilityWindowModule(VMSHollowInputAPI api, TransformerContext ctx, VMSTransformerIndexer indexer) {
+    public VMSAvailabilityWindowModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
         this.ctx = ctx;
 
-        this.windowPackageContractInfoModule = new WindowPackageContractInfoModule(api, ctx, indexer);
+        this.windowPackageContractInfoModule = new WindowPackageContractInfoModule(api, ctx, cycleConstants, indexer);
 
         EMPTY_CUP_TOKENS = new LinkedHashSetOfStrings();
         EMPTY_CUP_TOKENS.ordinals = Collections.emptyList();

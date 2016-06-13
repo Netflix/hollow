@@ -60,7 +60,7 @@ public class CountrySpecificDataModule {
         this.rolloutVideoTypeIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
 
         this.certificationListsModule = new CertificationListsModule(api, indexer);
-        this.availabilityWindowModule = new VMSAvailabilityWindowModule(api, ctx, indexer);
+        this.availabilityWindowModule = new VMSAvailabilityWindowModule(api, ctx, constants, indexer);
     }
 
     public Map<String, Map<Integer, CompleteVideoCountrySpecificData>> buildCountrySpecificDataByCountry(Map<String, Set<ShowHierarchy>> showHierarchiesByCountry, Map<Integer, VideoPackageData> transformedPackageData) {
