@@ -99,6 +99,9 @@ public class VMSAvailabilityWindowModule {
                 return Long.compare(o1._getStartDate()._getValue(), o2._getStartDate()._getValue());
             }
         });
+        
+        if(videoId == 80100629 && "SO".equals(country))
+            System.out.println("watch");
 
         for(VideoRightsWindowHollow window : sortedWindows) {
             boolean includedWindowPackageData = false;
@@ -207,8 +210,8 @@ public class VMSAvailabilityWindowModule {
 
                                 } else {
                                     /// packagedata not available -- use the contract only
-                                    windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(contract, country, videoId);
-                                    outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfo);
+                                    windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(packageId.val, contract, country, videoId);
+                                    outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
 
                                     if(thisWindowMaxPackageId == 0)
                                         thisWindowBundledAssetsGroupId = Math.max((int)contractId, thisWindowBundledAssetsGroupId);

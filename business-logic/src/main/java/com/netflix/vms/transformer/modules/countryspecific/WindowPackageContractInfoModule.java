@@ -160,11 +160,11 @@ public class WindowPackageContractInfoModule {
         return formatStr;
     }
     
-    public WindowPackageContractInfo buildWindowPackageContractInfoWithoutPackage(VideoRightsContractHollow contract, String country, int videoId) {
+    public WindowPackageContractInfo buildWindowPackageContractInfoWithoutPackage(int packageId, VideoRightsContractHollow contract, String country, int videoId) {
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
         info.videoContractInfo.contractId = (int) contract._getContractId();
-        info.videoContractInfo.primaryPackageId = 0;
+        info.videoContractInfo.primaryPackageId = packageId;
         if(contract._getPrePromotionDays() != Long.MIN_VALUE)
             info.videoContractInfo.prePromotionDays = (int) contract._getPrePromotionDays();
         info.videoContractInfo.isDayAfterBroadcast = contract._getDayAfterBroadcast();
@@ -176,7 +176,7 @@ public class WindowPackageContractInfoModule {
             info.videoContractInfo.assetBcp47Codes.add(new Strings(asset._getBcp47Code()._getValue()));
         }
 
-        info.videoPackageInfo = getFilteredVideoPackageInfo(videoId);
+        info.videoPackageInfo = getFilteredVideoPackageInfo(videoId, packageId);
 
         return info;
     }
@@ -239,6 +239,13 @@ public class WindowPackageContractInfoModule {
 
         VideoPackageInfo result = newEmptyVideoPackageInfo();
         result.runtimeInSeconds = approxRuntimeInSecs;
+        return result;
+    }
+    
+    private VideoPackageInfo getFilteredVideoPackageInfo(long videoId, int packageId) {
+        VideoPackageInfo result = newEmptyVideoPackageInfo();
+        result.packageId = packageId;
+        result.runtimeInSeconds = getApproximateRuntimeInSecods(videoId);
         return result;
     }
 
