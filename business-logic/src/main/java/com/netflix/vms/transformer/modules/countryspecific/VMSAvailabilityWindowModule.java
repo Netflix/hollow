@@ -100,9 +100,6 @@ public class VMSAvailabilityWindowModule {
             }
         });
         
-        if(videoId == 80100629 && "SO".equals(country))
-            System.out.println("watch");
-
         for(VideoRightsWindowHollow window : sortedWindows) {
             boolean includedWindowPackageData = false;
             int thisWindowMaxPackageId = 0;
@@ -218,8 +215,6 @@ public class VMSAvailabilityWindowModule {
                                     if(maxPackageId == 0)
                                         bundledAssetsGroupId = Math.max((int)contractId, bundledAssetsGroupId);
                                 }
-
-
                             }
                             
                             if(window._getEndDate()._getValue() > ctx.getNowMillis() && window._getStartDate()._getValue() < minWindowStartDate) {
@@ -240,8 +235,6 @@ public class VMSAvailabilityWindowModule {
                         thisWindowBundledAssetsGroupId = (int) contractId;
                     }
                 }
-
-
             }
 
             outputWindow.bundledAssetsGroupId = thisWindowBundledAssetsGroupId;
@@ -298,6 +291,8 @@ public class VMSAvailabilityWindowModule {
             rollup.newEpisodeData(isGoLive, currentOrFirstFutureWindow.bundledAssetsGroupId);
         } else {
             rollup.newEpisodeData(isGoLive, bundledAssetsGroupId);
+            if(rollup.doEpisode())
+                rollup.newPrePromoDays(0);
         }
 
         data.mediaAvailabilityWindows = availabilityWindows;
