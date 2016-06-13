@@ -1,5 +1,8 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import com.netflix.vms.transformer.hollowoutput.VideoResolution;
+
+import com.netflix.vms.transformer.hollowoutput.PixelAspect;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -102,6 +105,17 @@ public class WindowPackageContractInfoModule {
                 if(streamData.streamDataDescriptor.runTimeInSeconds > longestRuntimeInSeconds && "VIDEO".equals(streamProfileType))
                     longestRuntimeInSeconds = streamData.streamDataDescriptor.runTimeInSeconds;
 
+                PixelAspect pixelAspect = streamData.streamDataDescriptor.pixelAspect;
+                VideoResolution videoResolution = streamData.streamDataDescriptor.videoResolution;
+
+                if(pixelAspect != null && videoResolution != null && videoResolution.height != 0 && videoResolution.width != 0) {
+                    int parHeight = Math.max(pixelAspect.height, 1);
+                    int parWidth = Math.max(pixelAspect.width, 1);
+
+                    float screenFormat = ((float) (videoResolution.width * parWidth)) / (videoResolution.height * parHeight);
+                    screenFormats.add(getScreenFormat(screenFormat));
+                }
+                
             } else if("AUDIO".equals(streamProfileType)) {
                 if(excludedDownloadables != null && !excludedDownloadables.contains(new com.netflix.vms.transformer.hollowoutput.Long(streamData.downloadableId)))
                     soundTypesAudioChannels.add(Integer.valueOf((int)profile._getAudioChannelCount()));
@@ -131,6 +145,17 @@ public class WindowPackageContractInfoModule {
         return info;
     }
 
+    private Map<Float, String> screenFormatCache = new HashMap<Float, String>();
+
+    private String getScreenFormat(Float screenFormat) {
+        String formatStr = screenFormatCache.get(screenFormat);
+        if(formatStr == null) {
+            formatStr = String.format("%.2f:1", screenFormat);
+            screenFormatCache.put(screenFormat, formatStr);
+        }
+        return formatStr;
+    }
+    
     public WindowPackageContractInfo buildWindowPackageContractInfoWithoutPackage(VideoRightsContractHollow contract, String country, int videoId) {
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
