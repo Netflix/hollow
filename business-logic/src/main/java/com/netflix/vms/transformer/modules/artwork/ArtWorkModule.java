@@ -175,7 +175,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
 
     private static String createFilenameWithoutExtension(String sourceId, String recipeDescriptor) {
         String filename_work_in_progress = sourceId + "_" + recipeDescriptor;
-        String filename_without_extension = DigestUtils.sha1Hex(filename_work_in_progress);
+        String filename_without_extension = DigestUtils.shaHex(filename_work_in_progress);
         return filename_without_extension;
     }
 
