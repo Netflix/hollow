@@ -97,10 +97,14 @@ public class WindowPackageContractInfoModule {
 
 
             if("VIDEO".equals(streamProfileType) || "MUXED".equals(streamProfileType)) {
-                /// add the videoFormatDescriptor
-                VideoFormatDescriptor descriptor = streamData.downloadDescriptor.videoFormatDescriptor;
-                if(descriptor.id == 1 || descriptor.id == 3 || descriptor.id == 4)  // Only interested in HD or better
-                    info.videoPackageInfo.formats.add(descriptor);
+                /// TODO: Why don't MUXED streams contribute to the package info's videoFormatDescriptors?
+                if("VIDEO".equals(streamProfileType)) {
+                    /// add the videoFormatDescriptor
+                    VideoFormatDescriptor descriptor = streamData.downloadDescriptor.videoFormatDescriptor;
+                    if(descriptor.id == 1 || descriptor.id == 3 || descriptor.id == 4) {  // Only interested in HD or better
+                        info.videoPackageInfo.formats.add(descriptor);
+                    }
+                }
 
                 if(streamData.streamDataDescriptor.runTimeInSeconds > longestRuntimeInSeconds && "VIDEO".equals(streamProfileType))
                     longestRuntimeInSeconds = streamData.streamDataDescriptor.runTimeInSeconds;
