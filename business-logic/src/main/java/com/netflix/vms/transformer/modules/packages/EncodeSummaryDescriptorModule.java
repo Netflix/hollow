@@ -82,7 +82,7 @@ public class EncodeSummaryDescriptorModule {
                 }
 
                 EncodeSummaryDescriptorDataKey key = new EncodeSummaryDescriptorDataKey(audioData, (int)profile._getAudioChannelCount(), SummaryType.AUDIO);
-                addDownloadableIdToDescriptor(key, stream, descriptorMap);
+                addDownloadableIdToDescriptor(key, profileType, stream, descriptorMap);
             }
 
             if(isText(profileType)) {
@@ -92,7 +92,7 @@ public class EncodeSummaryDescriptorModule {
                 }
 
                 EncodeSummaryDescriptorDataKey key = new EncodeSummaryDescriptorDataKey(data, 0, SummaryType.TEXT);
-                addDownloadableIdToDescriptor(key, stream, descriptorMap);
+                addDownloadableIdToDescriptor(key, profileType, stream, descriptorMap);
             }
 
             if(isMuxed(profileType)) {
@@ -101,7 +101,7 @@ public class EncodeSummaryDescriptorModule {
                     data.timedTextType = SUBTITLES;
                 }
                 EncodeSummaryDescriptorDataKey key = new EncodeSummaryDescriptorDataKey(data, 0, SummaryType.MUXED);
-                addDownloadableIdToDescriptor(key, stream, descriptorMap);
+                addDownloadableIdToDescriptor(key, profileType, stream, descriptorMap);
             }
         }
 
@@ -122,21 +122,22 @@ public class EncodeSummaryDescriptorModule {
     }
 
 
-    private void addDownloadableIdToDescriptor(EncodeSummaryDescriptorDataKey key, StreamData stream, Map<EncodeSummaryDescriptorDataKey, EncodeSummaryDescriptor> descriptorMap) {
+    private void addDownloadableIdToDescriptor(EncodeSummaryDescriptorDataKey key, String profileType, StreamData stream, Map<EncodeSummaryDescriptorDataKey, EncodeSummaryDescriptor> descriptorMap) {
         EncodeSummaryDescriptor descriptor = descriptorMap.get(key);
 
         if(descriptor == null) {
             descriptor = new EncodeSummaryDescriptor();
             descriptor.descriptorData = key.data;
             descriptor.downloadableIds = new ArrayList<com.netflix.vms.transformer.hollowoutput.Long>();
-            descriptor.fromMuxedOnlyStreams = key.getSummaryType() == SummaryType.MUXED;
+            descriptor.fromMuxedOnlyStreams = true;
 
             descriptorMap.put(key, descriptor);
-        }
+        } 
 
         if(key.data.encodingProfileId < descriptor.descriptorData.encodingProfileId)
             descriptor.descriptorData.encodingProfileId = key.data.encodingProfileId;
 
+        descriptor.fromMuxedOnlyStreams = descriptor.fromMuxedOnlyStreams && "MUXED".equals(profileType);
         descriptor.downloadableIds.add(new com.netflix.vms.transformer.hollowoutput.Long(stream.downloadableId));
     }
 
