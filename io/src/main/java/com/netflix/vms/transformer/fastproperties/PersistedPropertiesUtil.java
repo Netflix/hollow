@@ -142,6 +142,14 @@ public class PersistedPropertiesUtil {
         }
     }
 
+    public static void createOrUpdateFastProperty(String key, String value, String appId, EnvironmentEnum env, RegionEnum region, String serverId, String stack, String countries) throws IOException {
+        if(fastPropertyExists(key, appId, env, region, serverId, stack, countries)) {
+            updateFastProperty(key, value, appId, env, region, serverId, stack, countries);
+        } else {
+            createFastProperty(key, value, appId, env, region, serverId, stack, countries);
+        }
+    }
+    
     public static void createFastProperty(String key, String value, String appId, EnvironmentEnum env, RegionEnum region, String serverId, String stack, String countries) throws IOException {
 
         // Create the fast propertyID

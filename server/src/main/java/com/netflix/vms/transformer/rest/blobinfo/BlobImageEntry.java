@@ -61,7 +61,7 @@ public class BlobImageEntry {
     }
 
     private static Long getPublishedTimeStamp(final Item item) {
-        final ItemAttribute attrib = item.getAttribute(AttributeKeys.publishCycleDataTS.name());
+        final ItemAttribute attrib = item.getAttribute(AttributeKeys.publishedTimestamp.name());
         if (attrib==null) return null;
 
         final String value = attrib.getValue();
@@ -202,7 +202,7 @@ public class BlobImageEntry {
     
     
     static enum AttributeKeys {
-        dataVersion, priorVersion, ProducedByServer, ProducedByJarVersion, VIP, sourceDataVersion, publishCycleDataTS
+        dataVersion, priorVersion, ProducedByServer, ProducedByJarVersion, VIP, sourceDataVersion, publishCycleDataTS, publishedTimestamp
     }
     
     private static String toJson(final Object object, final boolean isPrint) {

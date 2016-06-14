@@ -53,7 +53,7 @@ public class RollingDiff {
     }
     
     @Test
-    public void downloadNewPipelineOutputAndUnpinNewPipeline() throws IOException {
+    public void downloadNewPipelineOutputAndTriggerDiffAndUnpinNewPipeline() throws IOException {
         downloadNewPipelineOutput();
         triggerDiff();
         //downloadNewPipelineInput();
@@ -89,7 +89,7 @@ public class RollingDiff {
                 
                 System.out.println("pinning " + mutationGroup + "=" + latestColdstartVersion);
                 
-                PersistedPropertiesUtil.updateFastProperty(
+                PersistedPropertiesUtil.createOrUpdateFastProperty(
                         "vms.pinnedColdstartVersion." + mutationGroup, 
                         latestColdstartVersion, 
                         "vmsconverter", 

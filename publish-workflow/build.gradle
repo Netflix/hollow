@@ -1,0 +1,22 @@
+dependencies {
+    compile project(':vmstransformer-common-interfaces')
+
+    compile 'com.netflix.hollow:netflix-hollow:latest.release'
+    compile 'netflix:vms-hollow-generated-notemplate:latest.release'
+    compile 'netflix:playback-monkey-model:latest.candidate'
+    compile 'netflix:awsutils:latest.release'
+    compile 'netflix:hermes:latest.release'
+    compile 'netflix:vms-utils:latest.release'
+
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.assertj:assertj-core:3.3+'
+}
+configurations {
+  // exclude direct and transitive dependencies on platform
+  all*.exclude group: 'netflix', module: 'platform'
+  all*.exclude group: 'netflix', module: 'playback-content-rest-client'
+  all*.exclude group: 'netflix', module: 'playback-features-model'
+  all*.exclude group: 'netflix', module: 'playback-es-client'
+  all*.exclude group: 'netflix', module: 'mantis-realtime-events'
+  all*.exclude group: 'netflix', module: 'evcache-client2'
+}
