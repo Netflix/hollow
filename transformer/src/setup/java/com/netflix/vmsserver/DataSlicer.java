@@ -61,6 +61,7 @@ public class DataSlicer {
     private HollowReadStateEngine stateEngine;
     private Map<String, BitSet> ordinalsToInclude;
 
+    private boolean isDebugMode = false;
 
     public DataSlicer(
             String originalInputLocation,
@@ -76,6 +77,10 @@ public class DataSlicer {
         this.numberOfRandomTopNodesToInclude = numberOfRandomTopNodesToInclude;
         this.specificTopNodeIdsToInclude = specificTopNodeIdsToInclude;
         this.ordinalsToInclude = new HashMap<String, BitSet>();
+    }
+
+    public void setIsDebugMode(boolean isDebugMode) {
+        this.isDebugMode = isDebugMode;
     }
 
     public void slice() throws IOException {
@@ -105,6 +110,7 @@ public class DataSlicer {
             RandomGlobalVideo random = new RandomGlobalVideo(stateEngine);
             Set<Integer> videoIds = random.findRandomVideoIds(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude);
             includedVideoIds.addAll(videoIds);
+            if (isDebugMode) System.out.println("includedVideoIds=" + includedVideoIds);
         }
 
         findIncludedOrdinals("CompleteVideo", includedVideoIds, new VideoIdDeriver() {
@@ -274,6 +280,7 @@ public class DataSlicer {
             RandomShowMovieHierarchy random = new RandomShowMovieHierarchy(stateEngine);
             Set<Integer> videoIds = random.findRandomVideoIds(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude);
             includedVideoIds.addAll(videoIds);
+            if (isDebugMode) System.out.println("includedVideoIds=" + includedVideoIds);
         }
 
         findIncludedOrdinals("ShowSeasonEpisode", includedVideoIds, new VideoIdDeriver() {

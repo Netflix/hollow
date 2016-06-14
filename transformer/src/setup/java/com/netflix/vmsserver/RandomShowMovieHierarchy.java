@@ -25,17 +25,17 @@ public class RandomShowMovieHierarchy {
     private VMSHollowInputAPI api;
     private HollowPrimaryKeyIndex videoGeneralIdx;
     private HollowPrimaryKeyIndex supplementalIdx;
-    private HollowHashIndex showSeasonHashIdx;
+    private HollowHashIndex showSeasonEpisodeHashIdx;
 
     public RandomShowMovieHierarchy(HollowReadStateEngine stateEngine) {
         this.stateEngine = stateEngine;
         api = new VMSHollowInputAPI(stateEngine);
         videoGeneralIdx = new HollowPrimaryKeyIndex(stateEngine, "VideoGeneral", "videoId");
         supplementalIdx = new HollowPrimaryKeyIndex(stateEngine, "Supplementals", "movieId");
-        showSeasonHashIdx = new HollowHashIndex(stateEngine, "ShowSeasonEpisode", "", "movieId");
+        showSeasonEpisodeHashIdx = new HollowHashIndex(stateEngine, "ShowSeasonEpisode", "", "movieId");
     }
 
-    public Set<Integer> findRandomVideoIds(int numberOfRandomTopNodesToInclude, int[] specificTopNodeIdsToInclude) {
+    public Set<Integer> findRandomVideoIds(int numberOfRandomTopNodesToInclude, int[] specificIdsToInclude) {
         Random rand = new Random(1000);
         Set<Integer> topNodeVideoIds = new HashSet<Integer>();
         Set<Integer> allVideoIds = new HashSet<Integer>();
@@ -43,39 +43,37 @@ public class RandomShowMovieHierarchy {
         int vGeneralMaxOrdinal = stateEngine.getTypeState("VideoGeneral").maxOrdinal();
         while (topNodeVideoIds.size() < numberOfRandomTopNodesToInclude) {
             int randomOrdinal = rand.nextInt(vGeneralMaxOrdinal + 1);
-
             if (ordinalIsPopulated("VideoGeneral", randomOrdinal)) {
                 VideoGeneralHollow vid = api.getVideoGeneralHollow(randomOrdinal);
-
-                addIdsBasedOnVideoGeneral(topNodeVideoIds, allVideoIds, vid);
+                addIdsBasedOnVideoGeneral(topNodeVideoIds, allVideoIds, vid, true);
             }
         }
 
-        for (int videoId : specificTopNodeIdsToInclude) {
+        for (int videoId : specificIdsToInclude) {
             int vOrdinal = videoGeneralIdx.getMatchingOrdinal((long) videoId);
             if (vOrdinal == -1) {
                 throw new RuntimeException("Could not find VideoGeneral for id " + videoId);
             }
 
             VideoGeneralHollow vid = api.getVideoGeneralHollow(vOrdinal);
-            addIdsBasedOnVideoGeneral(topNodeVideoIds, allVideoIds, vid);
+            addIdsBasedOnVideoGeneral(topNodeVideoIds, allVideoIds, vid, false);
         }
 
         return allVideoIds;
     }
 
-    private void addIdsBasedOnVideoGeneral(Set<Integer> topNodeVideoIds, Set<Integer> allVideoIds, VideoGeneralHollow vid) {
+    private void addIdsBasedOnVideoGeneral(Set<Integer> topNodeVideoIds, Set<Integer> allVideoIds, VideoGeneralHollow vid, boolean isEnforceTopNode) {
         VideoNodeType nodeType = VideoNodeType.of(vid._getVideoType()._getValue());
         boolean isTopNode = VideoNodeType.isTopNode(nodeType);
-        if (!isTopNode) return;
+        if (isEnforceTopNode && !isTopNode) return;
 
         int videoId = (int) vid._getVideoId();
-        topNodeVideoIds.add(videoId);
+        if (isTopNode) topNodeVideoIds.add(videoId);
         addVideoAndAssociatedSupplementals(videoId, allVideoIds);
         if (!VideoNodeType.isStandalone(nodeType)) {
             // need to add show members
-            HollowHashIndexResult matches = showSeasonHashIdx.findMatches(vid._getVideoId());
-            if (matches==null) return;
+            HollowHashIndexResult matches = showSeasonEpisodeHashIdx.findMatches(vid._getVideoId());
+            if (matches == null) return;
 
             HollowOrdinalIterator videoIterator = matches.iterator();
             int videoOrdinal = videoIterator.next();
@@ -95,10 +93,10 @@ public class RandomShowMovieHierarchy {
 
     private void addVideoAndAssociatedSupplementals(int videoId, Set<Integer> allVideoIds) {
         allVideoIds.add(videoId);
-        addAllSupplementalVideoIds(videoId, allVideoIds);
+        addAssociatedSupplementals(videoId, allVideoIds);
     }
 
-    private void addAllSupplementalVideoIds(long videoId, Set<Integer> toSet) {
+    private void addAssociatedSupplementals(long videoId, Set<Integer> toSet) {
         int supOrdinal = supplementalIdx.getMatchingOrdinal(videoId);
         if (supOrdinal == -1) return;
 
