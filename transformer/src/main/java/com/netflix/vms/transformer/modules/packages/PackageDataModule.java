@@ -97,9 +97,9 @@ public class PackageDataModule {
                     PackageHollow packages = api.getPackageHollow(packageOrdinal);
                     populateDrmKeysByGroupId(packages, videoId);
                     PackageData transformedPackage = convertPackage(packages);
-
-
-                    videoPackageData.packages.add(transformedPackage);
+                    if (transformedPackage != null) {
+                        videoPackageData.packages.add(transformedPackage);
+                    }
 
                     packageOrdinal = iter.next();
                 }
@@ -154,8 +154,10 @@ public class PackageDataModule {
     }
 
     private PackageData convertPackage(PackageHollow packages) {
-        PackageData pkg = new PackageData();
+        int deployablePackagesOrdinal = deployablePackagesIdx.getMatchingOrdinal(packages._getPackageId());
+        if (deployablePackagesOrdinal == -1) return null; // Pre-condition, package must exist in deployablePackagesFeed
 
+        PackageData pkg = new PackageData();
         pkg.id = (int)packages._getPackageId();
         pkg.video = new Video((int)packages._getMovieId());
         pkg.isPrimaryPackage = true;
@@ -184,7 +186,6 @@ public class PackageDataModule {
 
         //////////// DEPLOYABLE PACKAGES //////////////
 
-        int deployablePackagesOrdinal = deployablePackagesIdx.getMatchingOrdinal(packages._getPackageId());
         if(deployablePackagesOrdinal != -1) {
             pkg.allDeployableCountries = new HashSet<ISOCountry>();
             DeployablePackagesHollow deployablePackages = api.getDeployablePackagesHollow(deployablePackagesOrdinal);
