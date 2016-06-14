@@ -7,7 +7,7 @@ import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
-import com.netflix.vms.transformer.ShowGrouper.TopNodeProcessGroup;
+import com.netflix.vms.transformer.VideoHierarchyGrouper.VideoHierarchyGroup;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
@@ -104,7 +104,7 @@ public class SimpleTransformer {
 
         AtomicInteger failedIndividualTransforms = new AtomicInteger(0);
 
-        final ShowHierarchyInitializer hierarchyInitializer = new ShowHierarchyInitializer(api, indexer, ctx);
+        final VideoHierarchyInitializer hierarchyInitializer = new VideoHierarchyInitializer(api, indexer, ctx);
 
         final HollowObjectMapper objectMapper = new HollowObjectMapper(writeStateEngine);
 
@@ -113,9 +113,9 @@ public class SimpleTransformer {
         this.videoNamedListModule = new VideoNamedListModule(ctx, cycleConstants, objectMapper);
 
         startTime = System.currentTimeMillis();
-        ShowGrouper showGrouper = new ShowGrouper(api, ctx);
+        VideoHierarchyGrouper showGrouper = new VideoHierarchyGrouper(api, ctx);
 
-        final List<Set<TopNodeProcessGroup>> processGroups = showGrouper.getProcessGroups();
+        final List<Set<VideoHierarchyGroup>> processGroups = showGrouper.getProcessGroups();
 
         AtomicInteger processedCount = new AtomicInteger();
         int progressDivisor = getProgressDivisor(processGroups.size());
@@ -133,10 +133,10 @@ public class SimpleTransformer {
 
                 int idx = processedCount.getAndIncrement();
                 while (idx < processGroups.size()) {
-                    Set<TopNodeProcessGroup> processGroup = processGroups.get(idx);
+                    Set<VideoHierarchyGroup> processGroup = processGroups.get(idx);
                     try {
                         Set<Integer> droppedIds = new HashSet<>();
-                        Map<String, Set<ShowHierarchy>> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(processGroup, droppedIds);
+                        Map<String, Set<VideoHierarchy>> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(processGroup, droppedIds);
                         Map<Integer, VideoPackageData> transformedPackageData = packageDataModule.transform(showHierarchiesByCountry, droppedIds);
 
                         if (showHierarchiesByCountry != null) {
@@ -398,10 +398,10 @@ public class SimpleTransformer {
         countryMap.put(country, completeVideo);
     }
 
-    private String getTopNodeIdentifierString(Set<TopNodeProcessGroup> processGroup) {
+    private String getTopNodeIdentifierString(Set<VideoHierarchyGroup> processGroup) {
         StringBuilder builder = new StringBuilder("(");
         boolean first = true;
-        for(TopNodeProcessGroup topNodeGroup : processGroup) {
+        for (VideoHierarchyGroup topNodeGroup : processGroup) {
             if(!first)
                 builder.append(",");
             builder.append(topNodeGroup);

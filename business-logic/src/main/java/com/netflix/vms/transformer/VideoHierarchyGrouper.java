@@ -18,15 +18,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ShowGrouper {
+public class VideoHierarchyGrouper {
 
     private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
     private final Map<Integer, Set<Integer>> topParentMap;
     private final Map<Integer, Set<ShowSeasonEpisodeHollow>> displaySetsByVideoId;
-    private final List<Set<TopNodeProcessGroup>> processGroups;
+    private final List<Set<VideoHierarchyGroup>> processGroups;
 
-    public ShowGrouper(VMSHollowInputAPI api, TransformerContext ctx) {
+    public VideoHierarchyGrouper(VMSHollowInputAPI api, TransformerContext ctx) {
         this.api = api;
         this.ctx = ctx;
         this.topParentMap = new HashMap<>();
@@ -39,7 +39,7 @@ public class ShowGrouper {
         return displaySetsByVideoId;
     }
 
-    public List<Set<TopNodeProcessGroup>> getProcessGroups() {
+    public List<Set<VideoHierarchyGroup>> getProcessGroups() {
         return processGroups;
     }
 
@@ -118,26 +118,26 @@ public class ShowGrouper {
                 Set<ShowSeasonEpisodeHollow> displaySets = displaySetsByVideoId.get(videoId);
 
                 if(displaySets == null) {
-                    processGroups.add(Collections.singleton(new TopNodeProcessGroup(videoId)));
+                    processGroups.add(Collections.singleton(new VideoHierarchyGroup(videoId)));
                 } else {
-                    Map<Integer, TopNodeProcessGroup> theseGroupsByTopNode = new HashMap<>();
+                    Map<Integer, VideoHierarchyGroup> theseGroupsByTopNode = new HashMap<>();
 
-                    theseGroupsByTopNode.put(videoId, new TopNodeProcessGroup(videoId));
+                    theseGroupsByTopNode.put(videoId, new VideoHierarchyGroup(videoId));
 
                     for(ShowSeasonEpisodeHollow displaySet : displaySets) {
                         int thisDisplaySetTopNode = (int)displaySet._getMovieId();
-                        TopNodeProcessGroup topNodeProcessGroup = theseGroupsByTopNode.get(thisDisplaySetTopNode);
+                        VideoHierarchyGroup topNodeProcessGroup = theseGroupsByTopNode.get(thisDisplaySetTopNode);
                         if(topNodeProcessGroup == null) {
-                            topNodeProcessGroup = new TopNodeProcessGroup(thisDisplaySetTopNode);
+                            topNodeProcessGroup = new VideoHierarchyGroup(thisDisplaySetTopNode);
                             theseGroupsByTopNode.put(thisDisplaySetTopNode, topNodeProcessGroup);
                             alreadyAddedTopNodes.add(thisDisplaySetTopNode);
                         }
                         topNodeProcessGroup.addShowSeasonEpisodeHollow(displaySet);
                     }
 
-                    Set<TopNodeProcessGroup> groups = new HashSet<TopNodeProcessGroup>();
+                    Set<VideoHierarchyGroup> groups = new HashSet<VideoHierarchyGroup>();
 
-                    for(Map.Entry<Integer, TopNodeProcessGroup> entry : theseGroupsByTopNode.entrySet()) {
+                    for (Map.Entry<Integer, VideoHierarchyGroup> entry : theseGroupsByTopNode.entrySet()) {
                         groups.add(entry.getValue());
                     }
 
@@ -145,25 +145,24 @@ public class ShowGrouper {
                 }
 
                 alreadyAddedTopNodes.add(videoId);
-                continue;
+            } else {
+                // NOTE: track potential orphans - Needed for Data Parity with legacy pipeline such as PackageData, etc
+                potentialOrphans.add(videoId);
             }
-
-            // track potential orphans
-            potentialOrphans.add(videoId);
         }
 
-        // Make sure orphans don't get dropped from grouping - Need for PackageData parity
+        // Make sure orphans don't get dropped from grouping - Needed for Data Parity with legacy pipeline such as PackageData, etc
         for (int videoId : potentialOrphans) {
             if (alreadyAddedTopNodes.contains(videoId)) continue;
 
             Set<Integer> topParents = topParentMap.get(videoId);
             if (topParents == null) {
-                processGroups.add(Collections.singleton(new TopNodeProcessGroup(videoId)));
+                processGroups.add(Collections.singleton(new VideoHierarchyGroup(videoId)));
             } else {
                 for (int parentId : topParents) {
                     if (alreadyAddedTopNodes.contains(parentId)) continue;
 
-                    processGroups.add(Collections.singleton(new TopNodeProcessGroup(parentId)));
+                    processGroups.add(Collections.singleton(new VideoHierarchyGroup(parentId)));
                 }
             }
         }
@@ -208,12 +207,12 @@ public class ShowGrouper {
         return setOfIds;
     }
 
-    public static class TopNodeProcessGroup {
-        private final int topNodeId;
+    public static class VideoHierarchyGroup {
+        private final int topParentId;
         private final Set<ShowSeasonEpisodeHollow> showSeasonEpisodes;
 
-        public TopNodeProcessGroup(int topNodeId) {
-            this.topNodeId = topNodeId;
+        public VideoHierarchyGroup(int topNodeId) {
+            this.topParentId = topNodeId;
             this.showSeasonEpisodes = new HashSet<ShowSeasonEpisodeHollow>();
         }
 
@@ -221,8 +220,8 @@ public class ShowGrouper {
             this.showSeasonEpisodes.add(hierarchy);
         }
 
-        public int getTopNodeId() {
-            return topNodeId;
+        public int getTopParentId() {
+            return topParentId;
         }
 
         public Set<ShowSeasonEpisodeHollow> getShowSeasonEpisodes() {

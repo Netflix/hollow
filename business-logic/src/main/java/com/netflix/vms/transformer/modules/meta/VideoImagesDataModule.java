@@ -4,7 +4,7 @@ import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
-import com.netflix.vms.transformer.ShowHierarchy;
+import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
@@ -41,10 +41,10 @@ public class VideoImagesDataModule extends ArtWorkModule {
         this.videoArtworkIndex = indexer.getHashIndex(IndexSpec.ARTWORK_BY_VIDEO_ID);
     }
 
-    public Map<String, Map<Integer, VideoImages>> buildVideoImagesByCountry(Map<String, Set<ShowHierarchy>> showHierarchiesByCountry) {
+    public Map<String, Map<Integer, VideoImages>> buildVideoImagesByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
         Set<Integer> ids = new HashSet<>();
-        for (Map.Entry<String, Set<ShowHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
-            for(ShowHierarchy hierarchy : entry.getValue()) {
+        for (Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
+            for(VideoHierarchy hierarchy : entry.getValue()) {
                 ids.addAll(hierarchy.getAllIds());
             }
         }

@@ -14,7 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ShowHierarchy {
+public class VideoHierarchy {
 
     private final int topNodeId;
     private final boolean isStandalone;
@@ -27,7 +27,7 @@ public class ShowHierarchy {
     private final Set<Integer> allIds = new HashSet<>();
     private final Set<Integer> droppedIds = new HashSet<>();
 
-    public ShowHierarchy(int topNodeId, boolean isStandalone, ShowSeasonEpisodeHollow set, String countryCode, ShowHierarchyInitializer initializer) {
+    public VideoHierarchy(int topNodeId, boolean isStandalone, ShowSeasonEpisodeHollow set, String countryCode, VideoHierarchyInitializer initializer) {
         this.topNodeId = topNodeId;
         this.isStandalone = isStandalone;
         int hashCode = HashCodes.hashInt(topNodeId);
@@ -194,9 +194,9 @@ public class ShowHierarchy {
 
     @Override
     public boolean equals(Object obj) {
-        if(!(obj instanceof ShowHierarchy))
+        if(!(obj instanceof VideoHierarchy))
             return false;
-        ShowHierarchy other = (ShowHierarchy)obj;
+        VideoHierarchy other = (VideoHierarchy)obj;
         if(topNodeId != other.topNodeId)
             return false;
         if(!Arrays.equals(seasonIds, other.seasonIds))
