@@ -42,14 +42,16 @@ public class LanguageRightsModule extends AbstractTransformModule {
         for (VideoRightsHollow videoRights_ : api.getAllVideoRightsHollow()) {
             int movieId = (int) videoRights_._getMovieId();
             String countryCode = videoRights_._getCountryCode()._getValue();
-            if(movieId == 70259779 && "AT".equals(countryCode)) {
-            	System.out.println("70259779");
-            }
 
             VideoRightsContractSetHollow contracts_ = videoRights_._getRights()._getContracts();
             for (VideoRightsContractHollow contract_ : contracts_) {
                 int contractId = (int) contract_._getContractId();
                 Pair<Integer, Integer> rightsKey = new Pair<>(contractId, movieId);
+
+                DisallowedAssetBundlesListHollow disallowedBundleList_ = contract_._getDisallowedAssetBundles();
+                if (disallowedBundleList_ == null || disallowedBundleList_.isEmpty()) {
+                    continue;
+                }
 
                 LanguageRights langRights = contractMovieRights.get(rightsKey);
                 if (langRights == null) {
@@ -59,11 +61,6 @@ public class LanguageRightsModule extends AbstractTransformModule {
                     langRights.languageRestrictionsMap = new HashMap<ISOCountry, Map<com.netflix.vms.transformer.hollowoutput.Integer, LanguageRestrictions>>();
                     langRights.fallbackRestrictionsMap = new HashMap<Strings, Map<com.netflix.vms.transformer.hollowoutput.Integer, LanguageRestrictions>>();
                     contractMovieRights.put(rightsKey, langRights);
-                }
-
-                DisallowedAssetBundlesListHollow disallowedBundleList_ = contract_._getDisallowedAssetBundles();
-                if (disallowedBundleList_ == null || disallowedBundleList_.isEmpty()) {
-                    continue;
                 }
 
                 Map<com.netflix.vms.transformer.hollowoutput.Integer, LanguageRestrictions> lrMap = new HashMap<>();
