@@ -130,14 +130,18 @@ public class SimpleTransformer {
                 VideoImagesDataModule imagesDataModule = new VideoImagesDataModule(api, ctx, objectMapper, indexer);
                 CountrySpecificDataModule countrySpecificModule = new CountrySpecificDataModule(api, ctx, cycleConstants, indexer);
                 VideoEpisodeCountryDecoratorModule countryDecoratorModule = new VideoEpisodeCountryDecoratorModule(api, objectMapper);
+                L10NVideoResourcesModule l10nVideoResourcesModule = new L10NVideoResourcesModule(api, ctx, objectMapper, indexer);
 
                 int idx = processedCount.getAndIncrement();
                 while (idx < processGroups.size()) {
                     Set<VideoHierarchyGroup> processGroup = processGroups.get(idx);
                     try {
-                        Set<Integer> droppedIds = new HashSet<>();
-                        Map<String, Set<VideoHierarchy>> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(processGroup, droppedIds);
-                        Map<Integer, VideoPackageData> transformedPackageData = packageDataModule.transform(showHierarchiesByCountry, droppedIds);
+                        // NOTE: Legacy pipeline seems to propagate data for video that is not considered valid or not valid yet
+                        // so need to keep track of them and allow those use cases to be in parity
+                        Set<Integer> droppedVideoIds = new HashSet<>();
+                        Map<String, Set<VideoHierarchy>> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(processGroup, droppedVideoIds);
+                        Map<Integer, VideoPackageData> transformedPackageData = packageDataModule.transform(showHierarchiesByCountry, droppedVideoIds);
+                        l10nVideoResourcesModule.transform(showHierarchiesByCountry, droppedVideoIds);
 
                         if (showHierarchiesByCountry != null) {
                             Map<String, Set<VideoCollectionsDataHierarchy>> vcdByCountry = collectionsModule.buildVideoCollectionsDataByCountry(showHierarchiesByCountry);
@@ -154,9 +158,6 @@ public class SimpleTransformer {
                                     countryDecoratorModule.decorateVideoEpisodes(country, vcdByCountry.get(country));
                                 }
                             }
-
-                            // Process Video Related L10N
-                            new L10NVideoResourcesModule(api, ctx, objectMapper, indexer).transform(showHierarchiesByCountry);
                         }
                     } catch (Throwable th) {
                         ctx.getLogger().error(IndividualTransformFailed, "Transformation failed for hierarchy with top node(s) " + getTopNodeIdentifierString(processGroup), th);
