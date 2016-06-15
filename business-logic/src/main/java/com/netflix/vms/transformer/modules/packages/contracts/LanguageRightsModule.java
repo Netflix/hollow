@@ -5,6 +5,8 @@ import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.DisallowedAssetBundleHollow;
 import com.netflix.vms.transformer.hollowinput.DisallowedAssetBundlesListHollow;
+import com.netflix.vms.transformer.hollowinput.DisallowedSubtitleLangCodeHollow;
+import com.netflix.vms.transformer.hollowinput.DisallowedSubtitleLangCodesListHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractHollow;
@@ -18,6 +20,7 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 public class LanguageRightsModule extends AbstractTransformModule {
@@ -30,16 +33,18 @@ public class LanguageRightsModule extends AbstractTransformModule {
 
     @Override
     public void transform() {
-    	/// short circuit FastLane
-    	if(ctx.getFastlaneIds() != null)
-    		return;
-    	
-    	
+        /// short circuit FastLane
+        if(ctx.getFastlaneIds() != null)
+            return;
+
         Map<Pair<Integer, Integer>, LanguageRights> contractMovieRights = new HashMap<>();
 
         for (VideoRightsHollow videoRights_ : api.getAllVideoRightsHollow()) {
             int movieId = (int) videoRights_._getMovieId();
             String countryCode = videoRights_._getCountryCode()._getValue();
+            if(movieId == 70259779 && "AT".equals(countryCode)) {
+            	System.out.println("70259779");
+            }
 
             VideoRightsContractSetHollow contracts_ = videoRights_._getRights()._getContracts();
             for (VideoRightsContractHollow contract_ : contracts_) {
@@ -71,6 +76,19 @@ public class LanguageRightsModule extends AbstractTransformModule {
                     lr.audioLanguage = audioLang == null ? null : new Strings(audioLang); 
                     lr.audioLanguageId = LanguageIdMapping.getLanguageId(audioLang);
                     lr.requiresForcedSubtitles = bundle_._getForceSubtitleBoxed().booleanValue();
+                    lr.disallowedTimedText = new HashSet<>();
+                    lr.disallowedTimedTextBcp47codes = new HashSet<>();
+
+                    DisallowedSubtitleLangCodesListHollow disallowedlangs_ = bundle_._getDisallowedSubtitleLangCodes();
+                    for(DisallowedSubtitleLangCodeHollow lang_ : disallowedlangs_) {
+                        StringHollow bcp_ = lang_._getValue();
+                        if (bcp_ != null) {
+                            String bcp = bcp_._getValue();
+                            lr.disallowedTimedTextBcp47codes.add(new Strings(bcp));
+                            lr.disallowedTimedText.add(new com.netflix.vms.transformer.hollowoutput.Integer(LanguageIdMapping.getLanguageId(bcp)));
+                        }
+                    }
+
                     lrMap.put(new com.netflix.vms.transformer.hollowoutput.Integer(lr.audioLanguageId), lr);
                 }
             }
