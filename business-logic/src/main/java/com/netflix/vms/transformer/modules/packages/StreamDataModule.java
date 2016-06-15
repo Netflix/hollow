@@ -1,7 +1,8 @@
 package com.netflix.vms.transformer.modules.packages;
 
-import com.netflix.vms.transformer.hollowinput.StreamAssetMetadataHollow;
+import com.netflix.vms.transformer.hollowoutput.AssetMetaData;
 
+import com.netflix.vms.transformer.hollowinput.StreamAssetMetadataHollow;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
@@ -218,8 +219,9 @@ public class StreamDataModule {
         StreamAssetMetadataHollow assetMetadataId = inputStream._getMetadataId();
         if(assetMetadataId != null) {
             String id = assetMetadataId._getId();
-            if(id != null)
-                outputStream.downloadDescriptor.assetMetaData.id = new Strings(id);
+            if(id != null) {
+                outputStream.downloadDescriptor.assetMetaData = new AssetMetaData(new Strings(id));
+            }
         }
         
 
