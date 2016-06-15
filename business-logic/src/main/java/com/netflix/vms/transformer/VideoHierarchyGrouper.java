@@ -2,6 +2,7 @@ package com.netflix.vms.transformer;
 
 
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.hollowinput.DeployablePackagesHollow;
 import com.netflix.vms.transformer.hollowinput.EpisodeHollow;
 import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
 import com.netflix.vms.transformer.hollowinput.SeasonHollow;
@@ -149,6 +150,11 @@ public class VideoHierarchyGrouper {
                 // NOTE: track potential orphans - Needed for Data Parity with legacy pipeline such as PackageData, etc
                 potentialOrphans.add(videoId);
             }
+        }
+
+        // Make sure to include videoIds from DeployablePackage feed
+        for (DeployablePackagesHollow dp : api.getAllDeployablePackagesHollow()) {
+            potentialOrphans.add((int) dp._getMovieId());
         }
 
         // Make sure orphans don't get dropped from grouping - Needed for Data Parity with legacy pipeline such as PackageData, etc

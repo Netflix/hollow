@@ -49,11 +49,12 @@ public class RandomShowMovieHierarchy {
             }
         }
 
+
         for (int videoId : specificIdsToInclude) {
+            allVideoIds.add(videoId);
+
             int vOrdinal = videoGeneralIdx.getMatchingOrdinal((long) videoId);
-            if (vOrdinal == -1) {
-                throw new RuntimeException("Could not find VideoGeneral for id " + videoId);
-            }
+            if (vOrdinal == -1) continue;
 
             VideoGeneralHollow vid = api.getVideoGeneralHollow(vOrdinal);
             addIdsBasedOnVideoGeneral(topNodeVideoIds, allVideoIds, vid, false);

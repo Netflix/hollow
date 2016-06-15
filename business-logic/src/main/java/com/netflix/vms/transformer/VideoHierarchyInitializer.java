@@ -61,15 +61,26 @@ public class VideoHierarchyInitializer {
         Map<String, Set<VideoHierarchy>> showHierarchiesByCountry = new HashMap<>();
 
         for (VideoHierarchyGroup videoGroup : processGroup) {
-            long topNodeId = videoGroup.getTopParentId();
+            boolean isTopNode = false;
+            boolean isStandalone = false;
+            long topParentId = videoGroup.getTopParentId();
 
-            int videoGeneralOrdinal = videoGeneralIndex.getMatchingOrdinal(topNodeId);
+            int videoGeneralOrdinal = videoGeneralIndex.getMatchingOrdinal(topParentId);
+            if (videoGeneralOrdinal != -1) {
+                VideoGeneralHollow videoGeneral = api.getVideoGeneralHollow(videoGeneralOrdinal);
+                VideoNodeType nodeType = VideoNodeType.of(videoGeneral._getVideoType()._getValue());
+                isTopNode = VideoNodeType.isTopNode(nodeType);
+                isStandalone = VideoNodeType.isStandalone(nodeType);
+            }
 
-            VideoGeneralHollow videoGeneral = api.getVideoGeneralHollow(videoGeneralOrdinal);
-            boolean isStandalone = VideoNodeType.isStandalone(VideoNodeType.of(videoGeneral._getVideoType()._getValue()));
+            if (!isTopNode) { // track that non-topNode video are being dropped
+                addVideoAndAssociatedSupplementals(topParentId, droppedIds);
+                continue;
+            }
+
             Map<VideoHierarchy, VideoHierarchy> uniqueShowHierarchies = new HashMap<VideoHierarchy, VideoHierarchy>();
 
-            HollowHashIndexResult matches = showSeasonEpisodeIndex.findMatches(topNodeId);
+            HollowHashIndexResult matches = showSeasonEpisodeIndex.findMatches(topParentId);
             if (matches != null) {
                 HollowOrdinalIterator iter = matches.iterator();
                 int showSeasonEpisodeOrdinal = iter.next();
@@ -79,12 +90,12 @@ public class VideoHierarchyInitializer {
                     for (ISOCountryHollow country : showSeasonEpisode._getCountryCodes()) {
                         String countryCode = country._getValue();
 
-                        if (!isTopNodeIncluded(topNodeId, countryCode)) {
+                        if (!isTopNodeIncluded(topParentId, countryCode)) {
                             addShowAndAllChildren(showSeasonEpisode, droppedIds);
                             continue;
                         }
 
-                        VideoHierarchy showHierarchy = new VideoHierarchy((int) topNodeId, isStandalone, showSeasonEpisode, countryCode, this);
+                        VideoHierarchy showHierarchy = new VideoHierarchy((int) topParentId, isStandalone, showSeasonEpisode, countryCode, this);
                         droppedIds.addAll(showHierarchy.getDroppedIds());
 
                         VideoHierarchy canonicalHierarchy = uniqueShowHierarchies.get(showHierarchy);
@@ -106,21 +117,21 @@ public class VideoHierarchyInitializer {
             }
 
             // Add standalones for countries that are not defined in hierarchy feed (Show,Movie,Supplemental)
-            int videoTypeOrdinal = videoTypeIndex.getMatchingOrdinal(topNodeId);
+            int videoTypeOrdinal = videoTypeIndex.getMatchingOrdinal(topParentId);
             VideoTypeHollow videoType = api.getVideoTypeHollow(videoTypeOrdinal);
             if (videoType == null || videoType._getCountryInfos().isEmpty()) {
-                addVideoAndAssociatedSupplementals(topNodeId, droppedIds);
+                addVideoAndAssociatedSupplementals(topParentId, droppedIds);
             } else {
                 for (VideoTypeDescriptorHollow countryType : videoType._getCountryInfos()) {
                     String countryCode = countryType._getCountryCode()._getValue();
                     if (showHierarchiesByCountry.containsKey(countryCode)) continue;
 
-                    if (!isTopNodeIncluded(topNodeId, countryCode)) {
-                        addVideoAndAssociatedSupplementals(topNodeId, droppedIds);
+                    if (!isTopNodeIncluded(topParentId, countryCode)) {
+                        addVideoAndAssociatedSupplementals(topParentId, droppedIds);
                         continue;
                     }
 
-                    VideoHierarchy showHierarchy = new VideoHierarchy((int) topNodeId, isStandalone, null, countryCode, this);
+                    VideoHierarchy showHierarchy = new VideoHierarchy((int) topParentId, isStandalone, null, countryCode, this);
                     droppedIds.addAll(showHierarchy.getDroppedIds());
 
                     VideoHierarchy canonicalHierarchy = uniqueShowHierarchies.get(showHierarchy);
