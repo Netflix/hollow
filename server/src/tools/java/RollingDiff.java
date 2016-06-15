@@ -100,6 +100,20 @@ public class RollingDiff {
                         null);
             }
         }
+        
+        String oldPipelineNowMillis = header.getHeaderTags().get("publishCycleDataTS");
+        if(oldPipelineNowMillis != null) {
+            PersistedPropertiesUtil.createOrUpdateFastProperty(
+                    "vms.nowMillis", 
+                    oldPipelineNowMillis, 
+                    "vmstransformer", 
+                    EnvironmentEnum.prod, 
+                    RegionEnum.US_EAST_1, 
+                    null, 
+                    "newnoevent", 
+                    null);
+        }
+        
     }
     
     private void downloadNewPipelineOutput() throws IOException {
@@ -193,7 +207,15 @@ public class RollingDiff {
                         null);
             }
         }
-
+        
+        PersistedPropertiesUtil.deleteFastProperty(
+                "vms.nowMillis", 
+                "vmstransformer", 
+                EnvironmentEnum.prod, 
+                RegionEnum.US_EAST_1, 
+                null, 
+                "newnoevent", 
+                null);
     }
     
 }
