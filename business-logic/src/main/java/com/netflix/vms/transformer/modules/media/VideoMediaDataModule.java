@@ -10,7 +10,7 @@ import java.util.Set;
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
-import com.netflix.vms.transformer.ShowHierarchy;
+import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.hollowinput.ReleaseDateHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoDateWindowHollow;
@@ -47,15 +47,15 @@ public class VideoMediaDataModule {
         this.videoDateIdx = indexer.getHashIndex(VIDEO_DATE);
     }
 
-    public Map<String, Map<Integer, VideoMediaData>> buildVideoMediaDataByCountry(Map<String, Set<ShowHierarchy>> showHierarchiesByCountry) {
+    public Map<String, Map<Integer, VideoMediaData>> buildVideoMediaDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
         Map<String, Map<Integer, VideoMediaData>> allVideoMediaDataMap = new HashMap<String, Map<Integer, VideoMediaData>>();
 
-        for (Map.Entry<String, Set<ShowHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
+        for (Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
             Map<Integer, VideoMediaData> countryMap = new HashMap<Integer, VideoMediaData>();
             allVideoMediaDataMap.put(countryCode, countryMap);
 
-            for(ShowHierarchy hierarchy: entry.getValue()) {
+            for(VideoHierarchy hierarchy: entry.getValue()) {
                 addToResult(hierarchy.getTopNodeId(), countryCode, hierarchy, HierarchyLeveL.SHOW, countryMap);
     
                 for (int iSeason = 0; iSeason < hierarchy.getSeasonIds().length; iSeason++) {
@@ -77,7 +77,7 @@ public class VideoMediaDataModule {
         return allVideoMediaDataMap;
     }
 
-    private void addToResult(Integer videoId, String countryCode, ShowHierarchy hierarchy, HierarchyLeveL level, Map<Integer, VideoMediaData> result) {
+    private void addToResult(Integer videoId, String countryCode, VideoHierarchy hierarchy, HierarchyLeveL level, Map<Integer, VideoMediaData> result) {
         // Integer showId = hierarchy.getTopNodeId();
         VideoMediaData vmd = getVideoMediaDataInstance();
 

@@ -16,7 +16,7 @@ import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.vms.transformer.CycleConstants;
-import com.netflix.vms.transformer.ShowHierarchy;
+import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.PersonVideoHollow;
@@ -104,18 +104,18 @@ public class VideoMetaDataModule {
         hookTypeMap.put("Unknown", new HookType("UNKNOWN"));
     }
 
-    public Map<String, Map<Integer, VideoMetaData>> buildVideoMetaDataByCountry(Map<String, Set<ShowHierarchy>> showHierarchiesByCountry) {
+    public Map<String, Map<Integer, VideoMetaData>> buildVideoMetaDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
         countryAgnosticMap.clear();
         countrySpecificMap.clear();
 
         Map<String, Map<Integer, VideoMetaData>> allVideoMetaDataMap = new HashMap<String, Map<Integer,VideoMetaData>>();
 
-        for(Map.Entry<String, Set<ShowHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
+        for(Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
             Map<Integer, VideoMetaData> countryMap = new HashMap<Integer, VideoMetaData>();
             allVideoMetaDataMap.put(entry.getKey(), countryMap);
 
-            for(ShowHierarchy hierarchy : entry.getValue()) {
+            for(VideoHierarchy hierarchy : entry.getValue()) {
                 VideoMetaDataRollupValues rollup = new VideoMetaDataRollupValues();
                 int topNodeId = hierarchy.getTopNodeId();
                 VideoMetaDataRolldownValues rolldown = new VideoMetaDataRolldownValues(topNodeId);

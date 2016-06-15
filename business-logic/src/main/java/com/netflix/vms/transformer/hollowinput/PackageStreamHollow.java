@@ -25,13 +25,6 @@ public class PackageStreamHollow extends HollowObject {
         return delegate().getStreamProfileIdBoxed(ordinal);
     }
 
-    public ListOfStringHollow _getModifications() {
-        int refOrdinal = delegate().getModificationsOrdinal(ordinal);
-        if(refOrdinal == -1)
-            return null;
-        return  api().getListOfStringHollow(refOrdinal);
-    }
-
     public StreamFileIdentificationHollow _getFileIdentification() {
         int refOrdinal = delegate().getFileIdentificationOrdinal(ordinal);
         if(refOrdinal == -1)
@@ -79,6 +72,20 @@ public class PackageStreamHollow extends HollowObject {
         if(refOrdinal == -1)
             return null;
         return  api().getStreamDeploymentHollow(refOrdinal);
+    }
+
+    public ListOfStringHollow _getModifications() {
+        int refOrdinal = delegate().getModificationsOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getListOfStringHollow(refOrdinal);
+    }
+
+    public StreamAssetMetadataHollow _getMetadataId() {
+        int refOrdinal = delegate().getMetadataIdOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getStreamAssetMetadataHollow(refOrdinal);
     }
 
     public VMSHollowInputAPI api() {

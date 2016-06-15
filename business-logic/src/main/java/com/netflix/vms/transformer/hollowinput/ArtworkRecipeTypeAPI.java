@@ -11,7 +11,8 @@ public class ArtworkRecipeTypeAPI extends HollowObjectTypeAPI {
         super(api, typeDataAccess, new String[] {
             "recipeName",
             "cdnFolder",
-            "extension"
+            "extension",
+            "hostName"
         });
         this.delegateLookupImpl = new ArtworkRecipeDelegateLookupImpl(this);
     }
@@ -43,6 +44,16 @@ public class ArtworkRecipeTypeAPI extends HollowObjectTypeAPI {
     }
 
     public StringTypeAPI getExtensionTypeAPI() {
+        return getAPI().getStringTypeAPI();
+    }
+
+    public int getHostNameOrdinal(int ordinal) {
+        if(fieldIndex[3] == -1)
+            return missingDataHandler().handleReferencedOrdinal("ArtworkRecipe", ordinal, "hostName");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[3]);
+    }
+
+    public StringTypeAPI getHostNameTypeAPI() {
         return getAPI().getStringTypeAPI();
     }
 

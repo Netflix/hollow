@@ -2,8 +2,11 @@ package com.netflix.vms.transformer.modules.countryspecific;
 
 import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
 
-import com.netflix.vms.transformer.CycleConstants;
+import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 
+import com.netflix.vms.transformer.index.IndexSpec;
+import com.netflix.hollow.index.HollowPrimaryKeyIndex;
+import com.netflix.vms.transformer.CycleConstants;
 import java.util.LinkedHashMap;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
@@ -39,7 +42,9 @@ import java.util.Set;
 
 public class VMSAvailabilityWindowModule {
 
+    private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
+    private final HollowPrimaryKeyIndex videoGeneralIdx;
 
     private final com.netflix.vms.transformer.hollowoutput.Integer ZERO = new com.netflix.vms.transformer.hollowoutput.Integer(0);
 
@@ -51,7 +56,9 @@ public class VMSAvailabilityWindowModule {
     private final WindowPackageContractInfoModule windowPackageContractInfoModule;
 
     public VMSAvailabilityWindowModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
+        this.api = api;
         this.ctx = ctx;
+        this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
 
         this.windowPackageContractInfoModule = new WindowPackageContractInfoModule(api, ctx, cycleConstants, indexer);
 
@@ -72,7 +79,7 @@ public class VMSAvailabilityWindowModule {
         
         VideoRightsRightsHollow rights = videoRights._getRights();
         if((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
-            populateRolledUpWindowData(data, rollup, rights, isGoLive);
+            populateRolledUpWindowData(videoId, data, rollup, rights, isGoLive);
         } else {
             populateEpisodeOrStandaloneWindowData(videoId, country, data, rollup, isGoLive, rights);
         }
@@ -330,7 +337,7 @@ public class VMSAvailabilityWindowModule {
 
 
     // Return AvailabilityWindow from MediaData
-    private void populateRolledUpWindowData(CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup, VideoRightsRightsHollow rights, boolean isGoLive) {
+    private void populateRolledUpWindowData(Integer videoId, CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup, VideoRightsRightsHollow rights, boolean isGoLive) {
         Set<VideoRightsWindowHollow> windows = rights._getWindows();
         
         if(windows.isEmpty()) {
@@ -397,6 +404,14 @@ public class VMSAvailabilityWindowModule {
                 videoImagesContractInfo.videoPackageInfo.stillImagesMap = rollup.getVideoImageMap();
             else
                 videoMediaContractInfo.videoPackageInfo.formats = Collections.emptySet();  ///TODO: This seems totally unnecessary.  We should remove this line after parity testing.
+            
+            int videoGeneralOrdinal = videoGeneralIdx.getMatchingOrdinal(Long.valueOf(videoId.intValue()));
+            if(videoGeneralOrdinal != -1) {
+                VideoGeneralHollow general = api.getVideoGeneralHollow(videoGeneralOrdinal);
+                long runtime = general._getRuntime();
+                if(runtime != Long.MIN_VALUE)
+                    videoImagesContractInfo.videoPackageInfo.runtimeInSeconds = (int)runtime;
+            }
 
             data.mediaAvailabilityWindows = Collections.singletonList(videoMediaAvailabilityWindow);
             data.imagesAvailabilityWindows = Collections.singletonList(videoImagesAvailabilityWindow);

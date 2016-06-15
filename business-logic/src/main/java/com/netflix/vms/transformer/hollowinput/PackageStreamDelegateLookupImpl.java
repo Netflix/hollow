@@ -28,10 +28,6 @@ public class PackageStreamDelegateLookupImpl extends HollowObjectAbstractDelegat
         return typeAPI.getStreamProfileIdBoxed(ordinal);
     }
 
-    public int getModificationsOrdinal(int ordinal) {
-        return typeAPI.getModificationsOrdinal(ordinal);
-    }
-
     public int getFileIdentificationOrdinal(int ordinal) {
         return typeAPI.getFileIdentificationOrdinal(ordinal);
     }
@@ -58,6 +54,14 @@ public class PackageStreamDelegateLookupImpl extends HollowObjectAbstractDelegat
 
     public int getDeploymentOrdinal(int ordinal) {
         return typeAPI.getDeploymentOrdinal(ordinal);
+    }
+
+    public int getModificationsOrdinal(int ordinal) {
+        return typeAPI.getModificationsOrdinal(ordinal);
+    }
+
+    public int getMetadataIdOrdinal(int ordinal) {
+        return typeAPI.getMetadataIdOrdinal(ordinal);
     }
 
     public PackageStreamTypeAPI getTypeAPI() {

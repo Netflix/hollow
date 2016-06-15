@@ -7,7 +7,7 @@ import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
-import com.netflix.vms.transformer.ShowHierarchy;
+import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.hollowinput.ChunkDurationsStringHollow;
 import com.netflix.vms.transformer.hollowinput.CodecPrivateDataStringHollow;
 import com.netflix.vms.transformer.hollowinput.DeployablePackagesHollow;
@@ -75,7 +75,7 @@ public class PackageDataModule {
         this.encodeSummaryModule = new EncodeSummaryDescriptorModule(api, indexer);
     }
 
-    public Map<Integer, VideoPackageData> transform(Map<String, Set<ShowHierarchy>> showHierarchiesByCountry, Set<Integer> extraVideoIds) {
+    public Map<Integer, VideoPackageData> transform(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Set<Integer> extraVideoIds) {
         Map<Integer, VideoPackageData> transformedPackages = new HashMap<Integer, VideoPackageData>();
 
         Set<Integer> videoIds = gatherVideoIds(showHierarchiesByCountry, extraVideoIds);
@@ -97,9 +97,9 @@ public class PackageDataModule {
                     PackageHollow packages = api.getPackageHollow(packageOrdinal);
                     populateDrmKeysByGroupId(packages, videoId);
                     PackageData transformedPackage = convertPackage(packages);
-
-
-                    videoPackageData.packages.add(transformedPackage);
+                    if (transformedPackage != null) {
+                        videoPackageData.packages.add(transformedPackage);
+                    }
 
                     packageOrdinal = iter.next();
                 }
@@ -154,8 +154,10 @@ public class PackageDataModule {
     }
 
     private PackageData convertPackage(PackageHollow packages) {
-        PackageData pkg = new PackageData();
+        int deployablePackagesOrdinal = deployablePackagesIdx.getMatchingOrdinal(packages._getPackageId());
+        if (deployablePackagesOrdinal == -1) return null; // Pre-condition, package must exist in deployablePackagesFeed
 
+        PackageData pkg = new PackageData();
         pkg.id = (int)packages._getPackageId();
         pkg.video = new Video((int)packages._getMovieId());
         pkg.isPrimaryPackage = true;
@@ -184,7 +186,6 @@ public class PackageDataModule {
 
         //////////// DEPLOYABLE PACKAGES //////////////
 
-        int deployablePackagesOrdinal = deployablePackagesIdx.getMatchingOrdinal(packages._getPackageId());
         if(deployablePackagesOrdinal != -1) {
             pkg.allDeployableCountries = new HashSet<ISOCountry>();
             DeployablePackagesHollow deployablePackages = api.getDeployablePackagesHollow(deployablePackagesOrdinal);
@@ -226,12 +227,12 @@ public class PackageDataModule {
         }
     }
 
-    private Set<Integer> gatherVideoIds(Map<String, Set<ShowHierarchy>> showHierarchyByCountry, Set<Integer> extraVideoIds) {
+    private Set<Integer> gatherVideoIds(Map<String, Set<VideoHierarchy>> showHierarchyByCountry, Set<Integer> extraVideoIds) {
         if (showHierarchyByCountry == null) return extraVideoIds;
 
         Set<Integer> videoIds = new HashSet<Integer>(extraVideoIds);
-        for(Map.Entry<String, Set<ShowHierarchy>> entry : showHierarchyByCountry.entrySet()) {
-            for(ShowHierarchy showHierarchy : entry.getValue()) {
+        for(Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchyByCountry.entrySet()) {
+            for(VideoHierarchy showHierarchy : entry.getValue()) {
                 videoIds.add(showHierarchy.getTopNodeId());
 
                 for(int i=0;i<showHierarchy.getSeasonIds().length;i++) {

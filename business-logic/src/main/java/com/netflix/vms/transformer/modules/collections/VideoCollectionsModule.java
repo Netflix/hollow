@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
-import com.netflix.vms.transformer.ShowHierarchy;
+import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
 import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
@@ -39,18 +39,18 @@ public class VideoCollectionsModule {
         this.cycleConstants = constants;
     }
 
-    public Map<String, Set<VideoCollectionsDataHierarchy>> buildVideoCollectionsDataByCountry(Map<String, Set<ShowHierarchy>> showHierarchiesByCountry) {
+    public Map<String, Set<VideoCollectionsDataHierarchy>> buildVideoCollectionsDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
 
-        Map<ShowHierarchy, VideoCollectionsDataHierarchy> uniqueHierarchies = new HashMap<ShowHierarchy, VideoCollectionsDataHierarchy>();
+        Map<VideoHierarchy, VideoCollectionsDataHierarchy> uniqueHierarchies = new HashMap<VideoHierarchy, VideoCollectionsDataHierarchy>();
 
         Map<String, Set<VideoCollectionsDataHierarchy>> countryHierarchies = new HashMap<String, Set<VideoCollectionsDataHierarchy>>();
 
-        for(Map.Entry<String, Set<ShowHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
+        for(Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
             
             Set<VideoCollectionsDataHierarchy> vcdHierarchies = new HashSet<>();
             
-            for(ShowHierarchy showHierarchy : entry.getValue()) {
+            for(VideoHierarchy showHierarchy : entry.getValue()) {
                 int topNodeId = showHierarchy.getTopNodeId();
     
                 VideoCollectionsDataHierarchy alreadyBuiltHierarchy = uniqueHierarchies.get(showHierarchy);
@@ -82,7 +82,7 @@ public class VideoCollectionsModule {
         return countryHierarchies;
     }
 
-    private List<SupplementalVideo> getSupplementalVideos(ShowHierarchy hierarchy, long videoId) {
+    private List<SupplementalVideo> getSupplementalVideos(VideoHierarchy hierarchy, long videoId) {
         int supplementalsOrdinal = supplementalIndex.getMatchingOrdinal(videoId);
 
         if(supplementalsOrdinal == -1)

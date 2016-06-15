@@ -1,7 +1,9 @@
 package com.netflix.vms.transformer.modules.packages;
 
-import com.netflix.vms.transformer.CycleConstants;
+import com.netflix.vms.transformer.hollowoutput.AssetMetaData;
 
+import com.netflix.vms.transformer.hollowinput.StreamAssetMetadataHollow;
+import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.hollowinput.AudioStreamInfoHollow;
@@ -68,7 +70,6 @@ public class StreamDataModule {
     private final Map<Integer, DrmInfo> drmInfoByGroupId;
 
     private final VideoFormatDescriptorIdentifier videoFormatIdentifier;
-
 
     private final HollowPrimaryKeyIndex streamProfileIdx;
 
@@ -214,6 +215,15 @@ public class StreamDataModule {
         } else {
             outputStream.downloadDescriptor.assetTypeDescriptor = assetTypeDescriptorMap.get("primary");
         }
+        
+        StreamAssetMetadataHollow assetMetadataId = inputStream._getMetadataId();
+        if(assetMetadataId != null) {
+            String id = assetMetadataId._getId();
+            if(id != null) {
+                outputStream.downloadDescriptor.assetMetaData = new AssetMetaData(new Strings(id));
+            }
+        }
+        
 
 
         if(inputNonImageInfo != null) {

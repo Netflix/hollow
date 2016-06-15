@@ -10,7 +10,6 @@ public class PackageStreamDelegateCachedImpl extends HollowObjectAbstractDelegat
 
     private final Long downloadableId;
     private final Long streamProfileId;
-    private final int modificationsOrdinal;
     private final int fileIdentificationOrdinal;
     private final int dimensionsOrdinal;
     private final int tagsOrdinal;
@@ -18,12 +17,13 @@ public class PackageStreamDelegateCachedImpl extends HollowObjectAbstractDelegat
     private final int imageInfoOrdinal;
     private final int nonImageInfoOrdinal;
     private final int deploymentOrdinal;
+    private final int modificationsOrdinal;
+    private final int metadataIdOrdinal;
    private PackageStreamTypeAPI typeAPI;
 
     public PackageStreamDelegateCachedImpl(PackageStreamTypeAPI typeAPI, int ordinal) {
         this.downloadableId = typeAPI.getDownloadableIdBoxed(ordinal);
         this.streamProfileId = typeAPI.getStreamProfileIdBoxed(ordinal);
-        this.modificationsOrdinal = typeAPI.getModificationsOrdinal(ordinal);
         this.fileIdentificationOrdinal = typeAPI.getFileIdentificationOrdinal(ordinal);
         this.dimensionsOrdinal = typeAPI.getDimensionsOrdinal(ordinal);
         this.tagsOrdinal = typeAPI.getTagsOrdinal(ordinal);
@@ -31,6 +31,8 @@ public class PackageStreamDelegateCachedImpl extends HollowObjectAbstractDelegat
         this.imageInfoOrdinal = typeAPI.getImageInfoOrdinal(ordinal);
         this.nonImageInfoOrdinal = typeAPI.getNonImageInfoOrdinal(ordinal);
         this.deploymentOrdinal = typeAPI.getDeploymentOrdinal(ordinal);
+        this.modificationsOrdinal = typeAPI.getModificationsOrdinal(ordinal);
+        this.metadataIdOrdinal = typeAPI.getMetadataIdOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -48,10 +50,6 @@ public class PackageStreamDelegateCachedImpl extends HollowObjectAbstractDelegat
 
     public Long getStreamProfileIdBoxed(int ordinal) {
         return streamProfileId;
-    }
-
-    public int getModificationsOrdinal(int ordinal) {
-        return modificationsOrdinal;
     }
 
     public int getFileIdentificationOrdinal(int ordinal) {
@@ -80,6 +78,14 @@ public class PackageStreamDelegateCachedImpl extends HollowObjectAbstractDelegat
 
     public int getDeploymentOrdinal(int ordinal) {
         return deploymentOrdinal;
+    }
+
+    public int getModificationsOrdinal(int ordinal) {
+        return modificationsOrdinal;
+    }
+
+    public int getMetadataIdOrdinal(int ordinal) {
+        return metadataIdOrdinal;
     }
 
     @Override

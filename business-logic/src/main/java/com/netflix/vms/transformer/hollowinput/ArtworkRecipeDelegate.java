@@ -10,6 +10,8 @@ public interface ArtworkRecipeDelegate extends HollowObjectDelegate {
 
     public int getExtensionOrdinal(int ordinal);
 
+    public int getHostNameOrdinal(int ordinal);
+
     public ArtworkRecipeTypeAPI getTypeAPI();
 
 }

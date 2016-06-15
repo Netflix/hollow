@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.modules.l10n;
 
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
-import com.netflix.vms.transformer.ShowHierarchy;
+import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
@@ -32,10 +32,10 @@ public class L10NVideoResourcesModule extends AbstractTransformModule {
         processorList.add(new VideoRatingsProcessor(api, ctx, mapper, indexer));
     }
 
-    public void transform(Map<String, Set<ShowHierarchy>> showHierarchiesByCountry) {
+    public void transform(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
         Set<Integer> videoSet = new HashSet<>();
-        for (Map.Entry<String, Set<ShowHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
-            for(ShowHierarchy hierarchy : entry.getValue()) {
+        for (Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
+            for(VideoHierarchy hierarchy : entry.getValue()) {
                 videoSet.addAll(hierarchy.getAllIds());
             }
         }

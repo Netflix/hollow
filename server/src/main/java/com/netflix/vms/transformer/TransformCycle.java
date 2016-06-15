@@ -89,7 +89,7 @@ public class TransformCycle {
         long startTime = System.currentTimeMillis();
 
         try {
-            ctx.setNowMillis(System.currentTimeMillis());
+            setNowMillis();
             SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI)inputClient.getAPI(), outputStateEngine, ctx);
             transformer.transform();
         } catch(Throwable th) {
@@ -103,6 +103,14 @@ public class TransformCycle {
         }
 
         return true;
+    }
+
+    private void setNowMillis() {
+        Long pinnedNowMillis = ctx.getConfig().getNowMillis();
+        if(pinnedNowMillis != null)
+            ctx.setNowMillis(pinnedNowMillis.longValue());
+        else
+            ctx.setNowMillis(System.currentTimeMillis());
     }
 
 

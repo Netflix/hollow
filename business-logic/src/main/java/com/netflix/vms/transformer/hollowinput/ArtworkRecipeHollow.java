@@ -30,6 +30,13 @@ public class ArtworkRecipeHollow extends HollowObject {
         return  api().getStringHollow(refOrdinal);
     }
 
+    public StringHollow _getHostName() {
+        int refOrdinal = delegate().getHostNameOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getStringHollow(refOrdinal);
+    }
+
     public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
