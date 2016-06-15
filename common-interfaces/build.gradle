@@ -7,3 +7,7 @@ dependencies {
     testCompile 'junit:junit:4.11'
     testCompile 'org.assertj:assertj-core:3.3+'
 }
+
+jar {
+  from 'src/main/java'
+}

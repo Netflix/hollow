@@ -82,3 +82,9 @@ configurations.grettyRunnerTomcat7 {
 configurations.grettyRunnerTomcat8 {
     exclude group: 'org.slf4j', module: 'log4j-over-slf4j'
 }
+
+war {
+  into('WEB-INF/classes') {
+    from 'src/main/java'
+  }
+}

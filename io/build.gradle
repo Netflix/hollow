@@ -19,3 +19,8 @@ configurations {
   all*.exclude group: 'netflix', module: 'nfi18n-core'
   all*.exclude group: 'netflix', module: 'nfastyanax'
 }
+
+jar {
+  from 'src/main/java'
+}
+
