@@ -20,3 +20,8 @@ configurations {
   all*.exclude group: 'netflix', module: 'mantis-realtime-events'
   all*.exclude group: 'netflix', module: 'evcache-client2'
 }
+
+jar {
+  from 'src/main/java'
+}
+

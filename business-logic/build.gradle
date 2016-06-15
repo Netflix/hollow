@@ -17,3 +17,8 @@ configurations {
   all*.exclude group: 'netflix', module: 'platform-core'
   all*.exclude group: 'netflix', module: 'platform-dependency-command'
 }
+
+jar {
+  from 'src/main/java'
+}
+
