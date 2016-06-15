@@ -1,7 +1,9 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.vms.transformer.hollowoutput.Strings;
+import java.util.Collections;
 
+import com.netflix.vms.transformer.hollowoutput.VideoImages;
+import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.Date;
 import org.joda.time.DateTime;
@@ -31,6 +33,8 @@ public class CycleConstants {
     public final VideoFormatDescriptor SUPER_HD = videoFormatDescriptor(3, "Super_HD", "Super HiDefinition");
     public final VideoFormatDescriptor ULTRA_HD = videoFormatDescriptor(4, "Ultra_HD", "Ultra HiDefinition");
     
+    public final VideoImages EMPTY_VIDEO_IMAGES = emptyVideoImages(); 
+    
     
     private static VideoFormatDescriptor videoFormatDescriptor(int id, String name, String description) {
         VideoFormatDescriptor descriptor = new VideoFormatDescriptor();
@@ -38,5 +42,12 @@ public class CycleConstants {
         descriptor.name = new Strings(name);
         descriptor.description = new Strings(description);
         return descriptor;
+    }
+    
+    private static VideoImages emptyVideoImages() {
+        VideoImages videoImages = new VideoImages();
+        videoImages.artworks = Collections.emptyMap();
+        videoImages.artworkFormatsByType = Collections.emptyMap();
+        return videoImages;
     }
 }
