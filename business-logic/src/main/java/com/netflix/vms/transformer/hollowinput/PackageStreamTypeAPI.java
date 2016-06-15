@@ -11,14 +11,15 @@ public class PackageStreamTypeAPI extends HollowObjectTypeAPI {
         super(api, typeDataAccess, new String[] {
             "downloadableId",
             "streamProfileId",
-            "modifications",
             "fileIdentification",
             "dimensions",
             "tags",
             "assetType",
             "imageInfo",
             "nonImageInfo",
-            "deployment"
+            "deployment",
+            "modifications",
+            "metadataId"
         });
         this.delegateLookupImpl = new PackageStreamDelegateLookupImpl(this);
     }
@@ -65,20 +66,10 @@ public class PackageStreamTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public int getModificationsOrdinal(int ordinal) {
-        if(fieldIndex[2] == -1)
-            return missingDataHandler().handleReferencedOrdinal("PackageStream", ordinal, "modifications");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[2]);
-    }
-
-    public ListOfStringTypeAPI getModificationsTypeAPI() {
-        return getAPI().getListOfStringTypeAPI();
-    }
-
     public int getFileIdentificationOrdinal(int ordinal) {
-        if(fieldIndex[3] == -1)
+        if(fieldIndex[2] == -1)
             return missingDataHandler().handleReferencedOrdinal("PackageStream", ordinal, "fileIdentification");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[3]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[2]);
     }
 
     public StreamFileIdentificationTypeAPI getFileIdentificationTypeAPI() {
@@ -86,9 +77,9 @@ public class PackageStreamTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getDimensionsOrdinal(int ordinal) {
-        if(fieldIndex[4] == -1)
+        if(fieldIndex[3] == -1)
             return missingDataHandler().handleReferencedOrdinal("PackageStream", ordinal, "dimensions");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[4]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[3]);
     }
 
     public StreamDimensionsTypeAPI getDimensionsTypeAPI() {
@@ -96,9 +87,9 @@ public class PackageStreamTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getTagsOrdinal(int ordinal) {
-        if(fieldIndex[5] == -1)
+        if(fieldIndex[4] == -1)
             return missingDataHandler().handleReferencedOrdinal("PackageStream", ordinal, "tags");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[5]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[4]);
     }
 
     public StringTypeAPI getTagsTypeAPI() {
@@ -106,9 +97,9 @@ public class PackageStreamTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getAssetTypeOrdinal(int ordinal) {
-        if(fieldIndex[6] == -1)
+        if(fieldIndex[5] == -1)
             return missingDataHandler().handleReferencedOrdinal("PackageStream", ordinal, "assetType");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[6]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[5]);
     }
 
     public StreamAssetTypeTypeAPI getAssetTypeTypeAPI() {
@@ -116,9 +107,9 @@ public class PackageStreamTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getImageInfoOrdinal(int ordinal) {
-        if(fieldIndex[7] == -1)
+        if(fieldIndex[6] == -1)
             return missingDataHandler().handleReferencedOrdinal("PackageStream", ordinal, "imageInfo");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[7]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[6]);
     }
 
     public ImageStreamInfoTypeAPI getImageInfoTypeAPI() {
@@ -126,9 +117,9 @@ public class PackageStreamTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getNonImageInfoOrdinal(int ordinal) {
-        if(fieldIndex[8] == -1)
+        if(fieldIndex[7] == -1)
             return missingDataHandler().handleReferencedOrdinal("PackageStream", ordinal, "nonImageInfo");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[8]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[7]);
     }
 
     public StreamNonImageInfoTypeAPI getNonImageInfoTypeAPI() {
@@ -136,13 +127,33 @@ public class PackageStreamTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getDeploymentOrdinal(int ordinal) {
-        if(fieldIndex[9] == -1)
+        if(fieldIndex[8] == -1)
             return missingDataHandler().handleReferencedOrdinal("PackageStream", ordinal, "deployment");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[9]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[8]);
     }
 
     public StreamDeploymentTypeAPI getDeploymentTypeAPI() {
         return getAPI().getStreamDeploymentTypeAPI();
+    }
+
+    public int getModificationsOrdinal(int ordinal) {
+        if(fieldIndex[9] == -1)
+            return missingDataHandler().handleReferencedOrdinal("PackageStream", ordinal, "modifications");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[9]);
+    }
+
+    public ListOfStringTypeAPI getModificationsTypeAPI() {
+        return getAPI().getListOfStringTypeAPI();
+    }
+
+    public int getMetadataIdOrdinal(int ordinal) {
+        if(fieldIndex[10] == -1)
+            return missingDataHandler().handleReferencedOrdinal("PackageStream", ordinal, "metadataId");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[10]);
+    }
+
+    public StreamAssetMetadataTypeAPI getMetadataIdTypeAPI() {
+        return getAPI().getStreamAssetMetadataTypeAPI();
     }
 
     public PackageStreamDelegateLookupImpl getDelegateLookupImpl() {

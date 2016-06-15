@@ -24,6 +24,10 @@ public class ArtworkRecipeDelegateLookupImpl extends HollowObjectAbstractDelegat
         return typeAPI.getExtensionOrdinal(ordinal);
     }
 
+    public int getHostNameOrdinal(int ordinal) {
+        return typeAPI.getHostNameOrdinal(ordinal);
+    }
+
     public ArtworkRecipeTypeAPI getTypeAPI() {
         return typeAPI;
     }

@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.passthrough.artwork;
 
+import com.netflix.vms.transformer.hollowinput.StringHollow;
+
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.ArtworkRecipeHollow;
@@ -20,7 +22,9 @@ public class ArtworkImageRecipeModule extends AbstractTransformModule {
             outRecipe.recipeNameStr = inRecipe._getRecipeName()._getValue().toCharArray();
             outRecipe.extensionStr = inRecipe._getExtension()._getValue().toCharArray();
             outRecipe.cdnFolderStr = inRecipe._getCdnFolder()._getValue().toCharArray();
-            outRecipe.hostNameStr = null;
+            StringHollow hostName = inRecipe._getHostName();
+            if(hostName != null && hostName._getValue() != null)
+                outRecipe.hostNameStr = hostName._getValue().toCharArray();
             mapper.addObject(outRecipe);
         }
     }
