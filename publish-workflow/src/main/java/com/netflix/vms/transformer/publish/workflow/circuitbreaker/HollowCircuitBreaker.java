@@ -70,7 +70,8 @@ public abstract class HollowCircuitBreaker {
                 return new CircuitBreakerResults(true, "Hollow validation infrastructure error: I failed to grab the expected count for " +
                             metricName + ", but I believe the failure was due to no previous cycle on this object/vip combo.  Proceeding.");
             } else {
-                return new CircuitBreakerResults(false, "Hollow ValidationFailed");
+                ctx.getLogger().error(CircuitBreaker, "Rule failed with Exception.  Rule: " + getRuleName() + " metric: " + metricName, e);
+                return new CircuitBreakerResults(false, "Hollow Validation Failed");
             }
         }
     }
