@@ -5,7 +5,7 @@ import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.vms.transformer.CycleConstants;
-import com.netflix.vms.transformer.ShowHierarchy;
+import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
@@ -63,19 +63,19 @@ public class CountrySpecificDataModule {
         this.availabilityWindowModule = new VMSAvailabilityWindowModule(api, ctx, constants, indexer);
     }
 
-    public Map<String, Map<Integer, CompleteVideoCountrySpecificData>> buildCountrySpecificDataByCountry(Map<String, Set<ShowHierarchy>> showHierarchiesByCountry, Map<Integer, VideoPackageData> transformedPackageData) {
+    public Map<String, Map<Integer, CompleteVideoCountrySpecificData>> buildCountrySpecificDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<Integer, VideoPackageData> transformedPackageData) {
         this.availabilityWindowModule.setTransformedPackageData(transformedPackageData);
 
         Map<String, Map<Integer, CompleteVideoCountrySpecificData>> allCountrySpecificDataMap = new HashMap<String, Map<Integer,CompleteVideoCountrySpecificData>>();
         CountrySpecificRollupValues rollup = new CountrySpecificRollupValues();
 
-        for(Map.Entry<String, Set<ShowHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
+        for(Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
 
             Map<Integer, CompleteVideoCountrySpecificData> countryMap = new HashMap<Integer, CompleteVideoCountrySpecificData>();
             allCountrySpecificDataMap.put(entry.getKey(), countryMap);
 
-            for(ShowHierarchy hierarchy : entry.getValue()) {
+            for(VideoHierarchy hierarchy : entry.getValue()) {
 
                 for(int i=0;i<hierarchy.getSeasonIds().length;i++) {
                     rollup.setSeasonSequenceNumber(hierarchy.getSeasonSequenceNumbers()[i]);

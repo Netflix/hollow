@@ -7,7 +7,7 @@ import static com.netflix.vms.transformer.index.IndexSpec.VMS_AWARD;
 import java.util.Set;
 
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
-import com.netflix.vms.transformer.ShowHierarchy;
+import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.hollowinput.CSMReviewHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSAwardHollow;
@@ -45,11 +45,11 @@ public class VideoMiscDataModule {
         this.csmReviewIdx = indexer.getPrimaryKeyIndex(CSM_REVIEW);
     }
 
-    public Map<Integer, VideoMiscData> buildVideoMiscDataByCountry(Map<String, Set<ShowHierarchy>> showHierarchiesByCountry) {
+    public Map<Integer, VideoMiscData> buildVideoMiscDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
         videoMiscMap.clear();
 
-        for(Map.Entry<String, Set<ShowHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
-            for(ShowHierarchy showHierarchy : entry.getValue()) {
+        for(Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
+            for(VideoHierarchy showHierarchy : entry.getValue()) {
                 addVideoMiscData(showHierarchy.getTopNodeId(), entry.getKey());
                 int[][] seasonEpisodesIds = showHierarchy.getEpisodeIds();
                 for(int seasonIdx = 0; seasonIdx < showHierarchy.getSeasonIds().length; seasonIdx++) {

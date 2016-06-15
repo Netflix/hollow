@@ -5,7 +5,7 @@ import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.util.IntList;
-import com.netflix.vms.transformer.ShowGrouper.TopNodeProcessGroup;
+import com.netflix.vms.transformer.VideoHierarchyGrouper.VideoHierarchyGroup;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.EpisodeHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
@@ -32,7 +32,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class ShowHierarchyInitializer {
+public class VideoHierarchyInitializer {
 
     private final VMSHollowInputAPI api;
     private final HollowPrimaryKeyIndex supplementalIndex;
@@ -44,7 +44,7 @@ public class ShowHierarchyInitializer {
     private final HollowHashIndex rolloutVideoTypeIndex;
     private final TransformerContext ctx;
 
-    public ShowHierarchyInitializer(VMSHollowInputAPI api, VMSTransformerIndexer indexer, TransformerContext ctx) {
+    public VideoHierarchyInitializer(VMSHollowInputAPI api, VMSTransformerIndexer indexer, TransformerContext ctx) {
         this.api = api;
         this.supplementalIndex = indexer.getPrimaryKeyIndex(IndexSpec.SUPPLEMENTAL);
         this.videoTypeIndex = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_TYPE);
@@ -57,17 +57,17 @@ public class ShowHierarchyInitializer {
     }
 
 
-    public Map<String, Set<ShowHierarchy>> getShowHierarchiesByCountry(Set<TopNodeProcessGroup> processGroup, Set<Integer> droppedIds) {
-        Map<String, Set<ShowHierarchy>> showHierarchiesByCountry = new HashMap<>();
+    public Map<String, Set<VideoHierarchy>> getShowHierarchiesByCountry(Set<VideoHierarchyGroup> processGroup, Set<Integer> droppedIds) {
+        Map<String, Set<VideoHierarchy>> showHierarchiesByCountry = new HashMap<>();
 
-        for(TopNodeProcessGroup topNodeGroup : processGroup) {
-            long topNodeId = topNodeGroup.getTopNodeId();
+        for (VideoHierarchyGroup videoGroup : processGroup) {
+            long topNodeId = videoGroup.getTopParentId();
 
             int videoGeneralOrdinal = videoGeneralIndex.getMatchingOrdinal(topNodeId);
 
             VideoGeneralHollow videoGeneral = api.getVideoGeneralHollow(videoGeneralOrdinal);
             boolean isStandalone = VideoNodeType.isStandalone(VideoNodeType.of(videoGeneral._getVideoType()._getValue()));
-            Map<ShowHierarchy, ShowHierarchy> uniqueShowHierarchies = new HashMap<ShowHierarchy, ShowHierarchy>();
+            Map<VideoHierarchy, VideoHierarchy> uniqueShowHierarchies = new HashMap<VideoHierarchy, VideoHierarchy>();
 
             HollowHashIndexResult matches = showSeasonEpisodeIndex.findMatches(topNodeId);
             if (matches != null) {
@@ -84,16 +84,16 @@ public class ShowHierarchyInitializer {
                             continue;
                         }
 
-                        ShowHierarchy showHierarchy = new ShowHierarchy((int) topNodeId, isStandalone, showSeasonEpisode, countryCode, this);
+                        VideoHierarchy showHierarchy = new VideoHierarchy((int) topNodeId, isStandalone, showSeasonEpisode, countryCode, this);
                         droppedIds.addAll(showHierarchy.getDroppedIds());
 
-                        ShowHierarchy canonicalHierarchy = uniqueShowHierarchies.get(showHierarchy);
+                        VideoHierarchy canonicalHierarchy = uniqueShowHierarchies.get(showHierarchy);
                         if (canonicalHierarchy == null) {
                             canonicalHierarchy = showHierarchy;
                             uniqueShowHierarchies.put(showHierarchy, canonicalHierarchy);
                         }
 
-                        Set<ShowHierarchy> hierarchies = showHierarchiesByCountry.get(countryCode);
+                        Set<VideoHierarchy> hierarchies = showHierarchiesByCountry.get(countryCode);
                         if(hierarchies == null) {
                             hierarchies = new HashSet<>();
                             showHierarchiesByCountry.put(countryCode, hierarchies);
@@ -120,10 +120,10 @@ public class ShowHierarchyInitializer {
                         continue;
                     }
 
-                    ShowHierarchy showHierarchy = new ShowHierarchy((int) topNodeId, isStandalone, null, countryCode, this);
+                    VideoHierarchy showHierarchy = new VideoHierarchy((int) topNodeId, isStandalone, null, countryCode, this);
                     droppedIds.addAll(showHierarchy.getDroppedIds());
 
-                    ShowHierarchy canonicalHierarchy = uniqueShowHierarchies.get(showHierarchy);
+                    VideoHierarchy canonicalHierarchy = uniqueShowHierarchies.get(showHierarchy);
                     if(canonicalHierarchy == null) {
                         canonicalHierarchy = showHierarchy;
                         uniqueShowHierarchies.put(showHierarchy, canonicalHierarchy);
