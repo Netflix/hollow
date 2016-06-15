@@ -31,6 +31,8 @@ public interface TransformerConfig {
     String getAwsAmiId();
 
     Long getPinInputVersion();
+    
+    Long getNowMillis();
 
     //////////////// PUBLISH WORKFLOW ///////////////////
 
