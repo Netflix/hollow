@@ -233,5 +233,10 @@ public class VideoHierarchyGrouper {
         public Set<ShowSeasonEpisodeHollow> getShowSeasonEpisodes() {
             return showSeasonEpisodes;
         }
+
+        @Override
+        public String toString() {
+            return "VideoHierarchyGroup: topParentId=" + topParentId;
+        }
     }
 }
