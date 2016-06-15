@@ -53,6 +53,7 @@ public interface HollowPublishJobCreator {
 
     HollowBlobPublishJob                   createPublishJob (String vip,
                                                              PublishType jobType,
+                                                             long inputVersion,
                                                              long previousVersion,
                                                              long version,
                                                              RegionEnum region,

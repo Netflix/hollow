@@ -33,6 +33,8 @@ public interface TransformerConfig {
     Long getPinInputVersion();
     
     Long getNowMillis();
+    
+    String getFollowVip();
 
     //////////////// PUBLISH WORKFLOW ///////////////////
 
