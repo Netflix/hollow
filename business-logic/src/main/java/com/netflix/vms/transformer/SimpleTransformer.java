@@ -371,7 +371,7 @@ public class SimpleTransformer {
         completeVideo.facetData.videoMetaData = vmdByCountry.get(countryId).get(completeVideo.id.value);
         completeVideo.facetData.videoMediaData = mediaDataByCountry.get(countryId).get(completeVideo.id.value);
         completeVideo.facetData.videoImages = getVideoImages(countryId, completeVideo.id.value, imagesDataByCountry);
-
+        
         if(!isExtended(completeVideo))  /// "Extended" videos have VideoMiscData excluded.
             completeVideo.facetData.videoMiscData = miscData.get(completeVideo.id.value);
         completeVideo.countrySpecificData = countrySpecificByCountry.get(countryId).get(completeVideo.id.value);
@@ -384,8 +384,10 @@ public class SimpleTransformer {
 
     private VideoImages getVideoImages(String countryId, Integer videoId, Map<String, Map<Integer, VideoImages>> imagesDataByCountry) {
         Map<Integer, VideoImages> countryDataMap = imagesDataByCountry.get(countryId);
-        if (countryDataMap == null) return null;
-        return countryDataMap.get(videoId);
+        VideoImages images = null;
+        if (countryDataMap != null) 
+            images = countryDataMap.get(videoId);
+        return images == null ? cycleConstants.EMPTY_VIDEO_IMAGES : images;
     }
 
     private void addToGlobalVideoMap(CompleteVideo completeVideo, ISOCountry country, Map<Video, Map<ISOCountry, CompleteVideo>> globalVideoMap) {

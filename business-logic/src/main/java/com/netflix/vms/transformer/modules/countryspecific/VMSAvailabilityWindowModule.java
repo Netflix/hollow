@@ -27,7 +27,6 @@ import com.netflix.vms.transformer.hollowoutput.VideoContractInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoImage;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
-import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.util.OutputUtil;
@@ -423,15 +422,10 @@ public class VMSAvailabilityWindowModule {
         contractInfo.videoContractInfo = new VideoContractInfo();
         contractInfo.videoContractInfo.contractId = outputWindow.bundledAssetsGroupId;
         contractInfo.videoContractInfo.primaryPackageId = 0;
+        contractInfo.videoContractInfo.assetBcp47Codes = Collections.emptySet();
+        contractInfo.videoContractInfo.cupTokens = EMPTY_CUP_TOKENS;
 
-        contractInfo.videoPackageInfo = new VideoPackageInfo();
-        contractInfo.videoPackageInfo.packageId = 0;
-        contractInfo.videoPackageInfo.runtimeInSeconds = 0;
-        contractInfo.videoPackageInfo.soundTypes = Collections.emptyList();
-        contractInfo.videoPackageInfo.screenFormats = Collections.emptyList();
-        contractInfo.videoPackageInfo.phoneSnacks = Collections.emptyList();
-        contractInfo.videoPackageInfo.videoClipMap = Collections.emptyMap();
-        contractInfo.videoPackageInfo.trickPlayMap = Collections.emptyMap();
+        contractInfo.videoPackageInfo = WindowPackageContractInfoModule.newEmptyVideoPackageInfo();
         return contractInfo;
     }
 

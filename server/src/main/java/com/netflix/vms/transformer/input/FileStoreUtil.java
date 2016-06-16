@@ -30,6 +30,33 @@ public class FileStoreUtil {
 
         return Long.parseLong(fromVersionStr);
     }
+    
+    public static String getConverterVip(FileAccessItem fileItem) {
+        return getAttribute(fileItem, "converterVip");
+    }
+    
+    public static long getInputDataVersion(FileAccessItem fileItem) {
+        String inputVersionStr = getAttribute(fileItem, "inputVersion");
+
+        try {
+            return Long.parseLong(inputVersionStr);
+        } catch(Throwable th) {
+            LOGGER.error(th);
+            return Long.MIN_VALUE;
+        }
+    }
+    
+
+    public static long getPublishCycleDataTS(FileAccessItem fileItem) {
+        String publishCycleDataTS = getAttribute(fileItem, "publishCycleDataTS");
+
+        try {
+            return Long.parseLong(publishCycleDataTS);
+        } catch(Throwable th) {
+            LOGGER.error(th);
+            return Long.MIN_VALUE;
+        }
+    }
 
     public static String getAttribute(FileAccessItem fileItem, String attributeName) {
         List<ItemAttribute> attributes = fileItem.getAttributes();

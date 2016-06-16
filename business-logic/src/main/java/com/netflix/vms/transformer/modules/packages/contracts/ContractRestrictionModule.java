@@ -13,6 +13,7 @@ import com.netflix.vms.transformer.hollowinput.StreamNonImageInfoHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractAssetHollow;
+import com.netflix.vms.transformer.hollowinput.VideoRightsContractAssetsSetHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractIdHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsContractPackageHollow;
@@ -187,7 +188,9 @@ public class ContractRestrictionModule {
             restriction.languageBcp47RestrictionsMap.put(audioLanguage, langRestriction);
         }
 
-        markAssetTypeIndexForExcludedDownloadablesCalculation(assetTypeIdx, contract);
+        VideoRightsContractAssetsSetHollow contractAssets = contract._getAssets();
+        if(!markAllAssetsIfNoAssetsPresent(assetTypeIdx, contractAssets))
+            markAssetTypeIndexForExcludedDownloadablesCalculation(assetTypeIdx, contractAssets);
 
         String cupToken = contract._getCupToken()._getValue();
         restriction.cupKeys.add(getCupKey(cupToken));
@@ -210,7 +213,7 @@ public class ContractRestrictionModule {
             if (selectedContract == null || contract._getContractId() > selectedContract._getContractId())
                 selectedContract = contract;
 
-            markAssetTypeIndexForExcludedDownloadablesCalculation(assetTypeIdx, contract);
+            markAssetTypeIndexForExcludedDownloadablesCalculation(assetTypeIdx, contract._getAssets());
 
             for (DisallowedAssetBundleHollow disallowedAssetBundle : contract._getDisallowedAssetBundles()) {
                 String audioLang = disallowedAssetBundle._getAudioLanguageCode()._getValue();
@@ -356,23 +359,26 @@ public class ContractRestrictionModule {
         return cupKey;
     }
 
-    private void markAssetTypeIndexForExcludedDownloadablesCalculation(DownloadableAssetTypeIndex assetTypeIdx, VideoRightsContractHollow contract) {
-        Set<VideoRightsContractAssetHollow> assets = contract._getAssets();
-        if (assets.isEmpty()) {
-            assetTypeIdx.markAll(); // If there are no assets present, don't list any excluded downloadables.
-                                    // This seems wrong -- If there *were* asset(s) present, but none of them matched
-                                    // available streams, then we would have indicated instead that all downloadable ids were excluded.
-        } else {
-            for (VideoRightsContractAssetHollow asset : assets) {
-                String contractAssetType = asset._getAssetType()._getValue();
+    // If there are no assets present for a single-contract window, don't list any excluded downloadables.
+    // This seems wrong -- If there *were* asset(s) present, but none of them matched
+    // available streams, then we would have indicated instead that all downloadable ids were excluded.
+    private boolean markAllAssetsIfNoAssetsPresent(DownloadableAssetTypeIndex assetTypeIdx, Set<VideoRightsContractAssetHollow> contractAssets) {
+        boolean emptyAssets = contractAssets.isEmpty();
+        if(emptyAssets)
+            assetTypeIdx.markAll();
+        return emptyAssets;
+    }
+    
+    private void markAssetTypeIndexForExcludedDownloadablesCalculation(DownloadableAssetTypeIndex assetTypeIdx, Set<VideoRightsContractAssetHollow> contractAssets) {
+        for (VideoRightsContractAssetHollow asset : contractAssets) {
+            String contractAssetType = asset._getAssetType()._getValue();
 
-                if (StreamContractAssetTypeDeterminer.CLOSEDCAPTIONING.equals(contractAssetType))
-                    contractAssetType = StreamContractAssetTypeDeterminer.SUBTITLES;
-                if (StreamContractAssetTypeDeterminer.SECONDARY_AUDIO.equals(contractAssetType))
-                    contractAssetType = StreamContractAssetTypeDeterminer.PRIMARYVIDEO_AUDIOMUXED;
+            if (StreamContractAssetTypeDeterminer.CLOSEDCAPTIONING.equals(contractAssetType))
+                contractAssetType = StreamContractAssetTypeDeterminer.SUBTITLES;
+            if (StreamContractAssetTypeDeterminer.SECONDARY_AUDIO.equals(contractAssetType))
+                contractAssetType = StreamContractAssetTypeDeterminer.PRIMARYVIDEO_AUDIOMUXED;
 
-                assetTypeIdx.mark(new ContractAssetType(contractAssetType, asset._getBcp47Code()._getValue()));
-            }
+            assetTypeIdx.mark(new ContractAssetType(contractAssetType, asset._getBcp47Code()._getValue()));
         }
     }
 

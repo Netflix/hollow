@@ -52,12 +52,12 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
     }
 
     @Override
-    public void triggerPublish(long previousVersion, long newVersion) {
+    public void triggerPublish(long inputDataVersion, long previousVersion, long newVersion) {
     	
     	ctx = ctx.withCurrentLoggerAndConfig();
 
         // Add publish jobs
-        final Map<RegionEnum, List<PublicationJob>> regionalPublishJobs = addPublishJobsAllRegions(previousVersion, newVersion);
+        final Map<RegionEnum, List<PublicationJob>> regionalPublishJobs = addPublishJobsAllRegions(inputDataVersion, previousVersion, newVersion);
 
         for(RegionEnum region : PublishRegionProvider.ALL_REGIONS) {
             createAnnounceJobForRegion(region, previousVersion, newVersion, regionalPublishJobs.get(region));
@@ -71,35 +71,35 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
 
     }
 
-    private Map<RegionEnum, List<PublicationJob>> addPublishJobsAllRegions(long previousVersion, long newVersion){
+    private Map<RegionEnum, List<PublicationJob>> addPublishJobsAllRegions(long inputDataVersion, long previousVersion, long newVersion){
         Map<RegionEnum, List<PublicationJob>> publishJobsByRegion = new HashMap<>(RegionEnum.values().length);
         for(RegionEnum region : PublishRegionProvider.ALL_REGIONS) {
             List<PublicationJob> allPublishJobs = new ArrayList<>();
-            List<PublicationJob> publishJobs = addPublishJobs(region, previousVersion, newVersion);
+            List<PublicationJob> publishJobs = addPublishJobs(region, inputDataVersion, previousVersion, newVersion);
             allPublishJobs.addAll(publishJobs);
             publishJobsByRegion.put(region, allPublishJobs);
         }
         return publishJobsByRegion;
     }
 
-    private List<PublicationJob> addPublishJobs(RegionEnum region, long previousVersion, long newVersion) {
+    private List<PublicationJob> addPublishJobs(RegionEnum region, long inputDataVersion, long previousVersion, long newVersion) {
         File snapshotFile = new File(fileNamer.getSnapshotFileName(newVersion));
         File reverseDeltaFile = new File(fileNamer.getReverseDeltaFileName(newVersion, previousVersion));
         File deltaFile = new File(fileNamer.getDeltaFileName(previousVersion, newVersion));
 
         List<PublicationJob> submittedJobs = new ArrayList<>();
         if(snapshotFile.exists()){
-            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, previousVersion, newVersion, PublishType.SNAPSHOT, region, snapshotFile);
+            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, inputDataVersion, previousVersion, newVersion, PublishType.SNAPSHOT, region, snapshotFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
         if(deltaFile.exists()){
-            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, previousVersion, newVersion, PublishType.DELTA, region, deltaFile);
+            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, inputDataVersion, previousVersion, newVersion, PublishType.DELTA, region, deltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
         if(reverseDeltaFile.exists()){
-            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, previousVersion, newVersion, PublishType.REVERSEDELTA, region, reverseDeltaFile);
+            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, inputDataVersion, previousVersion, newVersion, PublishType.REVERSEDELTA, region, reverseDeltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }

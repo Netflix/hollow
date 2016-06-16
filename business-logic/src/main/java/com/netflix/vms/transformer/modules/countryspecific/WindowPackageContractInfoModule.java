@@ -78,7 +78,7 @@ public class WindowPackageContractInfoModule {
             info.videoContractInfo.assetBcp47Codes.add(new Strings(asset._getBcp47Code()._getValue()));
         }
 
-        info.videoPackageInfo = new VideoPackageInfo();
+        info.videoPackageInfo = newEmptyVideoPackageInfo();
         info.videoPackageInfo.packageId = packageData.id;
         info.videoPackageInfo.formats = new HashSet<VideoFormatDescriptor>();
         info.videoPackageInfo.soundTypes = new ArrayList<Strings>();
@@ -249,7 +249,7 @@ public class WindowPackageContractInfoModule {
         return result;
     }
 
-    private static VideoPackageInfo newEmptyVideoPackageInfo() {
+    static VideoPackageInfo newEmptyVideoPackageInfo() {
         VideoPackageInfo info = new VideoPackageInfo();
         info.packageId = 0;
         info.runtimeInSeconds = 0;

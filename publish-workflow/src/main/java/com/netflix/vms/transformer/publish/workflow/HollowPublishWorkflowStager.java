@@ -59,14 +59,14 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     }
 
     @Override
-    public void triggerPublish(long previousVersion, long newVersion) {
+    public void triggerPublish(long inputDataVersion, long previousVersion, long newVersion) {
         jobCreator.beginStagingNewCycle();
 
         // Add validation job
         final CircuitBreakerJob circuitBreakerJob = addCircuitBreakerJob(previousVersion, newVersion);
 
         // Add publish jobs
-        final Map<RegionEnum, List<PublicationJob>> addPublishJobsAllRegions = addPublishJobsAllRegions(previousVersion, newVersion, circuitBreakerJob);
+        final Map<RegionEnum, List<PublicationJob>> addPublishJobsAllRegions = addPublishJobsAllRegions(inputDataVersion, previousVersion, newVersion, circuitBreakerJob);
 
         // / add canary announcement and validation jobs
         final CanaryValidationJob canaryValidationJob = addCanaryJobs(previousVersion, newVersion, circuitBreakerJob, addPublishJobsAllRegions);
@@ -105,11 +105,11 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         return announceJob;
     }
 
-    private Map<RegionEnum, List<PublicationJob>> addPublishJobsAllRegions(long previousVersion, long newVersion, CircuitBreakerJob circuitBreakerJob) {
+    private Map<RegionEnum, List<PublicationJob>> addPublishJobsAllRegions(long inputDataVersion, long previousVersion, long newVersion, CircuitBreakerJob circuitBreakerJob) {
         Map<RegionEnum, List<PublicationJob>> publishJobsByRegion = new HashMap<>(RegionEnum.values().length);
         for (RegionEnum region : PublishRegionProvider.ALL_REGIONS) {
             List<PublicationJob> allPublishJobs = new ArrayList<>();
-            List<PublicationJob> publishJobs = addPublishJobs(region, previousVersion, newVersion);
+            List<PublicationJob> publishJobs = addPublishJobs(region, inputDataVersion, previousVersion, newVersion);
             allPublishJobs.addAll(publishJobs);
             publishJobsByRegion.put(region, allPublishJobs);
         }
@@ -167,24 +167,24 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         scheduler.submitJob(jobCreator.createDeleteFileJob(publishJobsForCycle, nextVersion, fileNamer.getDeltaFileName(previousVersion, nextVersion), fileNamer.getReverseDeltaFileName(nextVersion, previousVersion), fileNamer.getSnapshotFileName(nextVersion)));
     }
 
-    private List<PublicationJob> addPublishJobs(RegionEnum region, long previousVersion, long newVersion) {
+    private List<PublicationJob> addPublishJobs(RegionEnum region, long inputDataVersion, long previousVersion, long newVersion) {
         File snapshotFile = new File(fileNamer.getSnapshotFileName(newVersion));
         File reverseDeltaFile = new File(fileNamer.getReverseDeltaFileName(newVersion, previousVersion));
         File deltaFile = new File(fileNamer.getDeltaFileName(previousVersion, newVersion));
 
         List<PublicationJob> submittedJobs = new ArrayList<>();
         if (snapshotFile.exists()) {
-            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.SNAPSHOT, previousVersion, newVersion, region, snapshotFile);
+            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.SNAPSHOT, inputDataVersion, previousVersion, newVersion, region, snapshotFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
         if (deltaFile.exists()) {
-            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.DELTA, previousVersion, newVersion, region, deltaFile);
+            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.DELTA, inputDataVersion, previousVersion, newVersion, region, deltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
         if (reverseDeltaFile.exists()) {
-            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.REVERSEDELTA, previousVersion, newVersion, region, reverseDeltaFile);
+            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.REVERSEDELTA, inputDataVersion, previousVersion, newVersion, region, reverseDeltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
