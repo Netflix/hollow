@@ -13,7 +13,7 @@ public abstract class HollowFixedBaseLineCountrySpecificCircuitBreaker extends H
     	return (currentValue > changeThresholdPercent);
     }
     
-    protected long getBaseLine(String objectName) throws NumberFormatException, ConnectionException {
+    protected double getBaseLine(String objectName) throws NumberFormatException, ConnectionException {
     	return 0;
     }
 		
