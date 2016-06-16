@@ -68,8 +68,8 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
     }
 
     @Override
-    public HollowBlobPublishJob createPublishJob(String vip, PublishType jobType, long previousVersion, long version, RegionEnum region, File fileToUpload) {
-        return new FileStoreHollowBlobPublishJob(ctx, previousVersion, version, jobType, region, fileToUpload);
+    public HollowBlobPublishJob createPublishJob(String vip, PublishType jobType, long inputVersion, long previousVersion, long version, RegionEnum region, File fileToUpload) {
+        return new FileStoreHollowBlobPublishJob(ctx, inputVersion, previousVersion, version, jobType, region, fileToUpload);
     }
 
     @Override
