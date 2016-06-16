@@ -9,6 +9,7 @@ import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
 import com.netflix.vms.transformer.hollowinput.MovieRatingsHollow;
 import com.netflix.vms.transformer.hollowinput.SeasonHollow;
 import com.netflix.vms.transformer.hollowinput.ShowSeasonEpisodeHollow;
+import com.netflix.vms.transformer.hollowinput.StoriesSynopsesHollow;
 import com.netflix.vms.transformer.hollowinput.SupplementalsHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
@@ -162,11 +163,14 @@ public class VideoHierarchyGrouper {
             }
 
             // Make sure to include videoIds from l10n feeds - for L10n Parity
-            for (EpisodesHollow ep : api.getAllEpisodesHollow()) {
-                potentialOrphans.add((int) ep._getMovieId());
+            for (EpisodesHollow item : api.getAllEpisodesHollow()) {
+                potentialOrphans.add((int) item._getMovieId());
             }
-            for (MovieRatingsHollow rating : api.getAllMovieRatingsHollow()) {
-                potentialOrphans.add((int) rating._getMovieId());
+            for (MovieRatingsHollow item : api.getAllMovieRatingsHollow()) {
+                potentialOrphans.add((int) item._getMovieId());
+            }
+            for (StoriesSynopsesHollow item : api.getAllStoriesSynopsesHollow()) {
+                potentialOrphans.add((int) item._getMovieId());
             }
         }
 
