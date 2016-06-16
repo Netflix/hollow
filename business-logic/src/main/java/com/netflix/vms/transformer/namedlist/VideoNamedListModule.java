@@ -121,7 +121,6 @@ public class VideoNamedListModule {
         }
 
         public void process() {
-
             addToList(VideoNamedListType.VALID_VIDEOS);
 
             VideoNodeType nodeType = video.facetData.videoCollectionsData.nodeType;
@@ -176,7 +175,7 @@ public class VideoNamedListModule {
                     addToList(VideoNamedListType.EXTENDED_VIDEOS);
                 }
             }
-            
+
             boolean isSensitive = video.countrySpecificData.metadataAvailabilityDate == null || video.countrySpecificData.metadataAvailabilityDate.val > ctx.getNowMillis();
 
             if(isSensitive)
@@ -192,17 +191,18 @@ public class VideoNamedListModule {
             if(video.facetData.videoMediaData != null && !video.facetData.videoMediaData.isAutoPlayEnabled) {
                 addToList(VideoNamedListType.AUTO_PLAY_DISABLED);
             }
-            
+
             boolean isRecentlyAdded = video.countrySpecificData.firstDisplayDate != null && video.countrySpecificData.firstDisplayDate.val > (ctx.getNowMillis() - (MS_IN_DAY * 30));
-            
+
             if(isAvailableForED) {
                 long theatricalReleaseDate = video.facetData.videoMetaData.theatricalReleaseDate == null ? 0 : video.facetData.videoMetaData.theatricalReleaseDate.val;
                 long dvdReleaseDate = video.facetData.videoMediaData.dvdReleaseDate == null ? 0 : video.facetData.videoMediaData.dvdReleaseDate.val;
+                long broadcastReleaseDate = video.facetData.videoMetaData.broadcastReleaseDate == null ? 0 : video.facetData.videoMetaData.broadcastReleaseDate.val;
 
                 long theatricalReleaseDaysAgo = (ctx.getNowMillis() - theatricalReleaseDate) / MS_IN_DAY;
                 long dvdReleaseDaysAgo = (ctx.getNowMillis() - dvdReleaseDate) / MS_IN_DAY;
                 long currentAvailabilityDaysAgo = (ctx.getNowMillis() - currentAvailabilityDate) / MS_IN_DAY;
-                
+
                 boolean isTV = video.facetData.videoMetaData.isTV;
 
                 if(dvdReleaseDaysAgo <= -1000)
@@ -255,37 +255,31 @@ public class VideoNamedListModule {
                         }
                     }
                 }
-                
-                
-                if(isRecentlyAdded) {
-                	addTopNodeToList(VideoNamedListType.RECENTLY_ADDED_ED_VIDEOS);
-                	
-                	if(isTV) {
-                		addTopNodeToList(VideoNamedListType.RECENTLY_ADDED_TV_ED_VIDEOS);
-                	} else {
-                		addTopNodeToList(VideoNamedListType.RECENTLY_ADDED_NON_TV_ED_VIDEOS);
 
-                		if(theatricalReleaseDate != 0) {
-	                		calendar.setTimeInMillis(video.facetData.videoMetaData.theatricalReleaseDate.val);
-	                		int theatricalReleaseYear = calendar.get(Calendar.YEAR);
-	                		if(nodeType != constants.EPISODE && theatricalReleaseYear >= (currentYear-3)) {
-	                			addTopNodeToList(VideoNamedListType.RECENT_THEATRICAL_RELEASES_NON_TV_ED_VIDEOS);
-	                		}
-                		}
-                	}
-                	
+                if(!isTV && nodeType != constants.EPISODE) {
+                    int theatricalReleaseYear = video.facetData.videoMetaData.year; 
+                    if(theatricalReleaseYear >= (currentYear-3)) {
+                        addTopNodeToList(VideoNamedListType.RECENT_THEATRICAL_RELEASES_NON_TV_ED_VIDEOS);
+                    }
                 }
-                
-                
+
+                if(isRecentlyAdded) {
+                    addTopNodeToList(VideoNamedListType.RECENTLY_ADDED_ED_VIDEOS);
+
+                    if(isTV) {
+                        addTopNodeToList(VideoNamedListType.RECENTLY_ADDED_TV_ED_VIDEOS);
+                    } else {
+                        addTopNodeToList(VideoNamedListType.RECENTLY_ADDED_NON_TV_ED_VIDEOS);
+                    }
+                }
             }
-            
+
             if(topNodeVideoIdOrdinal == videoIdOrdinal) {
                 for(VideoEpisode ep : video.facetData.videoCollectionsData.videoEpisodes) {
                     int episodeOrdinal = videoOrdinalTracker.getVideoOrdinal(ep.deliverableVideo);
                     episodeList.set(episodeOrdinal);
                 }
             }
-            
         }
 
         private void addToList(VideoNamedListType type) {
