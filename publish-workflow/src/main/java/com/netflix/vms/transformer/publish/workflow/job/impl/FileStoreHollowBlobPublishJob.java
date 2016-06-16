@@ -16,9 +16,9 @@ import netflix.admin.videometadata.uploadstat.FileUploadStatus.UploadStatus;
 public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
 
     private static final int  RETRY_ATTEMPTS = 10;
-
-    public FileStoreHollowBlobPublishJob(PublishWorkflowContext ctx, long previousVersion, long version, PublishType jobType, RegionEnum region, File fileToUpload) {
-        super(ctx, ctx.getVip(), previousVersion, version, jobType, region, fileToUpload);
+    
+    public FileStoreHollowBlobPublishJob(PublishWorkflowContext ctx, long inputVersion, long previousVersion, long version, PublishType jobType, RegionEnum region, File fileToUpload) {
+        super(ctx, ctx.getVip(), inputVersion, previousVersion, version, jobType, region, fileToUpload);
     }
 
     @Override
@@ -94,6 +94,10 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
                 BlobMetaDataUtil.addAttribute(att, "fromVersion", previousVersion);
             BlobMetaDataUtil.addAttribute(att, "toVersion", currentVersion);
         }
+        
+        BlobMetaDataUtil.addAttribute(att, "converterVip", ctx.getConfig().getConverterVip());
+        BlobMetaDataUtil.addAttribute(att, "inputVersion", String.valueOf(inputVersion));
+        BlobMetaDataUtil.addAttribute(att, "publishCycleDataTS", String.valueOf(ctx.getNowMillis()));
 
         return att;
     }

@@ -121,6 +121,8 @@ public class CountrySpecificDataModule {
 
         if(rollup.doShow() && isTopNodeGoLive(videoId, countryCode))
             data.dateWindowWiseSeasonSequenceNumberMap = new SortedMapOfDateWindowToListOfInteger(rollup.getDateWindowWiseSeasonSequenceNumbers()); // VideoCollectionsShowDataHolder.computeEpisodeSeasonSequenceNumberMap(showVideoEpisodeList)
+        else
+            data.dateWindowWiseSeasonSequenceNumberMap = constants.EMPTY_DATE_WINDOW_SEASON_SEQ_MAP;
 
         countryMap.put(videoId, data);
     }

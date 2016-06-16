@@ -26,7 +26,8 @@ public class FilterToSmallDataSubset {
                 FILTERED_OUTPUT_BLOB_LOCATION,
                 TARGET_NUMBER_OF_TOPNODES,
                 80074321, 80006146 // These two topnodes are a strange case: the same episodes are included in two different show hierarchies for different countries.
-                , 80115503, 80101868, 80038305, 80038400, 80038302, 80020110, 70258608 // These video not available in output data so use isFilterBasedOnInputData=true
+                , 80115503, 80101868, 80038305, 80038400, 80038302, 80020110, 70258608, 70178217, 70293581 // These video not available in output data so use isFilterBasedOnInputData=true
+                , 70309714, 70016909, 80042504
                 );
 
         boolean isFilterBasedOnInputData = true;

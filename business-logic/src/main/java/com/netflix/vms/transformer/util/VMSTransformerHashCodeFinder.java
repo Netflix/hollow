@@ -3,11 +3,8 @@ package com.netflix.vms.transformer.util;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
-
 import com.netflix.hollow.util.HollowObjectHashCodeFinder;
+import com.netflix.vms.transformer.hollowoutput.ArtWorkImageFormatEntry;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageTypeEntry;
 import com.netflix.vms.transformer.hollowoutput.DrmKeyString;
 import com.netflix.vms.transformer.hollowoutput.Episode;
@@ -17,14 +14,19 @@ import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.SupplementalInfoType;
 import com.netflix.vms.transformer.hollowoutput.TrickPlayType;
 import com.netflix.vms.transformer.hollowoutput.VPerson;
+import com.netflix.vms.transformer.hollowoutput.VRole;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
 
 public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder {
 
     static enum RecordType {
         ArtWorkImageTypeEntry,
+        ArtWorkImageFormatEntry,
         DrmKeyString,
         Episode,
         ISOCountry,
@@ -35,6 +37,7 @@ public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder 
         SupplementalInfoType,
         TrickPlayType,
         VPerson,
+        VRole,
         Video,
         VideoFormatDescriptor,
         VideoSetType;
@@ -54,33 +57,37 @@ public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder 
 
         switch(recordType) {
         case DrmKeyString:
-            return new String(((DrmKeyString)objectToHash).value).hashCode();
+            return stringHashCode(((DrmKeyString)objectToHash).value);
         case Episode:
             return ((Episode)objectToHash).id;
         case Integer:
             return ((com.netflix.vms.transformer.hollowoutput.Integer)objectToHash).val;
         case ISOCountry:
-            return new String(((ISOCountry)objectToHash).id).hashCode();
+            return stringHashCode(((ISOCountry)objectToHash).id);
         case Long:
             return Long.hashCode(((com.netflix.vms.transformer.hollowoutput.Long)objectToHash).val);
         case NFLocale:
-            return new String(((NFLocale)objectToHash).value).hashCode();
+            return stringHashCode(((NFLocale)objectToHash).value);
         case Strings:
-            return new String(((Strings)objectToHash).value).hashCode();
+            return stringHashCode(((Strings)objectToHash).value);
         case SupplementalInfoType:
-            return new String(((SupplementalInfoType)objectToHash).value).hashCode();
+            return stringHashCode(((SupplementalInfoType)objectToHash).value);
         case TrickPlayType:
-            return new String(((TrickPlayType)objectToHash).value).hashCode();
+            return stringHashCode(((TrickPlayType)objectToHash).value);
         case VPerson:
             return ((VPerson)objectToHash).id;
+        case VRole:
+            return ((VRole)objectToHash).id;
         case Video:
             return ((Video)objectToHash).hashCode();
         case VideoFormatDescriptor:
             return ((VideoFormatDescriptor)objectToHash).id;
         case VideoSetType:
-            return new String(((VideoSetType)objectToHash).value).hashCode();
+            return stringHashCode(((VideoSetType)objectToHash).value);
         case ArtWorkImageTypeEntry:
-            return new String(((ArtWorkImageTypeEntry)objectToHash).nameStr).hashCode();
+            return stringHashCode(((ArtWorkImageTypeEntry)objectToHash).nameStr);
+        case ArtWorkImageFormatEntry:
+            return stringHashCode(((ArtWorkImageFormatEntry)objectToHash).nameStr);
         default:
             throw new IllegalArgumentException();
         }
@@ -101,4 +108,12 @@ public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder 
     public int hashCode(int ordinal, Object objectToHash) {
         throw new UnsupportedOperationException();
     }
+    
+    private static int stringHashCode(char[] str) {
+        int h = 0;
+        for(int i=0;i<str.length;i++)
+            h = 31*h + str[i];
+        return h;
+    }
+
 }

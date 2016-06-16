@@ -7,8 +7,8 @@ import com.netflix.hollow.client.HollowClientMemoryConfig;
 import com.netflix.hollow.client.HollowUpdateListener;
 import com.netflix.hollow.read.customapi.HollowAPI;
 import com.netflix.hollow.read.dataaccess.HollowDataAccess;
-import com.netflix.hollow.util.DefaultHashCodeFinder;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+import com.netflix.vms.transformer.util.VMSTransformerHashCodeFinder;
 import java.util.Collections;
 
 public class VMSInputDataClient extends HollowClient {
@@ -18,7 +18,7 @@ public class VMSInputDataClient extends HollowClient {
               new VMSInputDataUpdateDirector(fileStore, converterVip),
               HollowUpdateListener.DEFAULT_LISTENER,
               new VMSInputDataAPIFactory(),
-              new DefaultHashCodeFinder(),
+              new VMSTransformerHashCodeFinder(),
               HollowClientMemoryConfig.DEFAULT_CONFIG);
     }
 
