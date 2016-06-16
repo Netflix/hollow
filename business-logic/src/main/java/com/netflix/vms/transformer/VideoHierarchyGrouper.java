@@ -4,7 +4,9 @@ package com.netflix.vms.transformer;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.DeployablePackagesHollow;
 import com.netflix.vms.transformer.hollowinput.EpisodeHollow;
+import com.netflix.vms.transformer.hollowinput.EpisodesHollow;
 import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
+import com.netflix.vms.transformer.hollowinput.MovieRatingsHollow;
 import com.netflix.vms.transformer.hollowinput.SeasonHollow;
 import com.netflix.vms.transformer.hollowinput.ShowSeasonEpisodeHollow;
 import com.netflix.vms.transformer.hollowinput.SupplementalsHollow;
@@ -152,9 +154,20 @@ public class VideoHierarchyGrouper {
             }
         }
 
-        // Make sure to include videoIds from DeployablePackage feed
-        for (DeployablePackagesHollow dp : api.getAllDeployablePackagesHollow()) {
-            potentialOrphans.add((int) dp._getMovieId());
+        // NOTE: TODO need to follow up with beehive to make sure this are part of VideoGeneral
+        {
+            // Make sure to include videoIds from DeployablePackage feed - for PackageData parity
+            for (DeployablePackagesHollow dp : api.getAllDeployablePackagesHollow()) {
+                potentialOrphans.add((int) dp._getMovieId());
+            }
+
+            // Make sure to include videoIds from l10n feeds - for L10n Parity
+            for (EpisodesHollow ep : api.getAllEpisodesHollow()) {
+                potentialOrphans.add((int) ep._getMovieId());
+            }
+            for (MovieRatingsHollow rating : api.getAllMovieRatingsHollow()) {
+                potentialOrphans.add((int) rating._getMovieId());
+            }
         }
 
         // Make sure orphans don't get dropped from grouping - Needed for Data Parity with legacy pipeline such as PackageData, etc
