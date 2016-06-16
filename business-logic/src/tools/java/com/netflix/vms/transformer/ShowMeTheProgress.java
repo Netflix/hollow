@@ -9,9 +9,8 @@ import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.memory.WastefulRecycler;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
-import com.netflix.videometadata.compression.LZ4VMSInputStream;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
-
+import com.netflix.vms.transformer.io.LZ4VMSInputStream;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -23,10 +22,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
-
-import org.junit.Test;
-
 import net.jpountz.lz4.LZ4BlockInputStream;
+import org.junit.Test;
 
 public class ShowMeTheProgress {
 
