@@ -3,11 +3,8 @@ package com.netflix.vms.transformer.util;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
-
 import com.netflix.hollow.util.HollowObjectHashCodeFinder;
+import com.netflix.vms.transformer.hollowoutput.ArtWorkImageFormatEntry;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageTypeEntry;
 import com.netflix.vms.transformer.hollowoutput.DrmKeyString;
 import com.netflix.vms.transformer.hollowoutput.Episode;
@@ -17,14 +14,19 @@ import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.SupplementalInfoType;
 import com.netflix.vms.transformer.hollowoutput.TrickPlayType;
 import com.netflix.vms.transformer.hollowoutput.VPerson;
+import com.netflix.vms.transformer.hollowoutput.VRole;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
 
 public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder {
 
     static enum RecordType {
         ArtWorkImageTypeEntry,
+        ArtWorkImageFormatEntry,
         DrmKeyString,
         Episode,
         ISOCountry,
@@ -35,6 +37,7 @@ public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder 
         SupplementalInfoType,
         TrickPlayType,
         VPerson,
+        VRole,
         Video,
         VideoFormatDescriptor,
         VideoSetType;
@@ -73,6 +76,8 @@ public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder 
             return new String(((TrickPlayType)objectToHash).value).hashCode();
         case VPerson:
             return ((VPerson)objectToHash).id;
+        case VRole:
+            return ((VRole)objectToHash).id;
         case Video:
             return ((Video)objectToHash).hashCode();
         case VideoFormatDescriptor:
@@ -81,6 +86,8 @@ public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder 
             return new String(((VideoSetType)objectToHash).value).hashCode();
         case ArtWorkImageTypeEntry:
             return new String(((ArtWorkImageTypeEntry)objectToHash).nameStr).hashCode();
+        case ArtWorkImageFormatEntry:
+            return new String(((ArtWorkImageFormatEntry)objectToHash).nameStr).hashCode();
         default:
             throw new IllegalArgumentException();
         }
