@@ -1,7 +1,5 @@
 package com.netflix.vms.transformer.elasticsearch;
 
-import javax.inject.Singleton;
-
 import com.google.inject.Inject;
 import com.netflix.discovery.EurekaClient;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
@@ -14,6 +12,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.inject.Singleton;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.support.replication.ReplicationType;
@@ -54,7 +53,7 @@ public class ElasticSearchClient {
         if(config.isElasticSearchLoggingEnabled()) {
 
             for (int i = 0; i < maxTransportThreads; i++) {
-                RunnableTransportClient client = new RunnableTransportClient(propertyManager, indexDataQueue);
+                RunnableTransportClient client = new RunnableTransportClient(propertyManager, indexDataQueue, eureka);
                 Thread clientThread = new Thread(client);
                 transportClients.add(client);
                 transportThreads.add(clientThread);
@@ -129,16 +128,21 @@ public class ElasticSearchClient {
         return maxTime / 1000;
     }
 
-    class RunnableTransportClient implements Runnable {
+    static class RunnableTransportClient implements Runnable {
         private static final int MAX_WAIT_INITIALIZE_SECONDS = 60;
 
         private final LinkedBlockingQueue<ElasticSearchLogMessage> indexableItemQueue;
-        private final ElasticSearchClientBridge esClientBridge;
+        private static ElasticSearchClientBridge esClientBridge = null;
+        private static final Object initLock = new Object();
         private volatile Boolean runState = new Boolean(true);
 
-        RunnableTransportClient(TransformerConfig config, LinkedBlockingQueue<ElasticSearchLogMessage> jsonQueue) {
+        RunnableTransportClient(TransformerConfig config, LinkedBlockingQueue<ElasticSearchLogMessage> jsonQueue, EurekaClient eureka) {
             this.indexableItemQueue = jsonQueue;
-            this.esClientBridge = new ElasticSearchClientBridge(config, eureka);
+            synchronized (initLock) {
+                if (esClientBridge == null) {
+                    esClientBridge = new ElasticSearchClientBridge(config, eureka);
+                }
+            }
         }
 
         public void quit() {
