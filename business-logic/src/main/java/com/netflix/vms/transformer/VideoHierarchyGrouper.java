@@ -4,9 +4,12 @@ package com.netflix.vms.transformer;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.DeployablePackagesHollow;
 import com.netflix.vms.transformer.hollowinput.EpisodeHollow;
+import com.netflix.vms.transformer.hollowinput.EpisodesHollow;
 import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
+import com.netflix.vms.transformer.hollowinput.MovieRatingsHollow;
 import com.netflix.vms.transformer.hollowinput.SeasonHollow;
 import com.netflix.vms.transformer.hollowinput.ShowSeasonEpisodeHollow;
+import com.netflix.vms.transformer.hollowinput.StoriesSynopsesHollow;
 import com.netflix.vms.transformer.hollowinput.SupplementalsHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
@@ -152,9 +155,23 @@ public class VideoHierarchyGrouper {
             }
         }
 
-        // Make sure to include videoIds from DeployablePackage feed
-        for (DeployablePackagesHollow dp : api.getAllDeployablePackagesHollow()) {
-            potentialOrphans.add((int) dp._getMovieId());
+        // NOTE: TODO need to follow up with beehive to make sure this are part of VideoGeneral
+        {
+            // Make sure to include videoIds from DeployablePackage feed - for PackageData parity
+            for (DeployablePackagesHollow dp : api.getAllDeployablePackagesHollow()) {
+                potentialOrphans.add((int) dp._getMovieId());
+            }
+
+            // Make sure to include videoIds from l10n feeds - for L10n Parity
+            for (EpisodesHollow item : api.getAllEpisodesHollow()) {
+                potentialOrphans.add((int) item._getMovieId());
+            }
+            for (MovieRatingsHollow item : api.getAllMovieRatingsHollow()) {
+                potentialOrphans.add((int) item._getMovieId());
+            }
+            for (StoriesSynopsesHollow item : api.getAllStoriesSynopsesHollow()) {
+                potentialOrphans.add((int) item._getMovieId());
+            }
         }
 
         // Make sure orphans don't get dropped from grouping - Needed for Data Parity with legacy pipeline such as PackageData, etc

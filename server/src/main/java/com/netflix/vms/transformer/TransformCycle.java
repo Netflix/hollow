@@ -10,8 +10,11 @@ import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metri
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ReadInputDataDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WriteOutputDataDuration;
 
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
+import java.util.Date;
 
+import com.netflix.vms.transformer.input.FollowVipPinExtractor;
+import com.netflix.vms.transformer.input.FollowVipPin;
+import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.client.HollowClient;
 import com.netflix.hollow.write.HollowBlobWriter;
@@ -34,7 +37,8 @@ public class TransformCycle {
     private final TransformerOutputBlobHeaderPopulator headerPopulator;
     private final PublishWorkflowStager publishWorkflowStager;
     private final VersionMinter versionMinter;
-
+    private final FollowVipPinExtractor followVipPinExtractor;
+    
     private long previousCycleNumber = Long.MIN_VALUE;
     private long currentCycleNumber = Long.MIN_VALUE;
     private int consecutiveCycleFailures = 0;
@@ -47,6 +51,7 @@ public class TransformCycle {
         this.headerPopulator = new TransformerOutputBlobHeaderPopulator(inputClient, outputStateEngine, ctx);
         this.publishWorkflowStager = publishStager;
         this.versionMinter = new VersionMinter();
+        this.followVipPinExtractor = new FollowVipPinExtractor(fileStore);
     }
 
     public void cycle() {
@@ -70,17 +75,35 @@ public class TransformCycle {
 
         ctx.getLogger().info(TransformCycleBegin, "Beginning cycle " + currentCycleNumber);
     }
-
+    
     private void updateTheInput() {
         long startTime = System.currentTimeMillis();
-        if(ctx.getConfig().getPinInputVersion() == null)
+        
+        FollowVipPin followVipPin = followVipPinExtractor.retrieveFollowVipPin(ctx);
+        
+        /// load the input data
+        Long pinnedInputVersion = ctx.getConfig().getPinInputVersion();
+        if(pinnedInputVersion == null && followVipPin != null)
+            pinnedInputVersion = followVipPin.getInputVersionId();
+        
+        if(pinnedInputVersion == null)
             inputClient.triggerRefresh();
         else
-            inputClient.triggerRefreshTo(ctx.getConfig().getPinInputVersion());
+            inputClient.triggerRefreshTo(pinnedInputVersion);
+
+        //// set the now millis
+        Long nowMillis = ctx.getConfig().getNowMillis();
+        if(nowMillis == null && followVipPin != null)
+            nowMillis = followVipPin.getNowMillis();
+        if(nowMillis == null)
+            nowMillis = System.currentTimeMillis();
+        ctx.setNowMillis(nowMillis.longValue());
+
         long endTime = System.currentTimeMillis();
 
         ctx.getMetricRecorder().recordMetric(ReadInputDataDuration, endTime - startTime);
         ctx.getLogger().info(LogTag.InputDataConverterVersionId, inputClient.getCurrentVersionId());
+        ctx.getLogger().info(LogTag.ProcessNowMillis, "Using transform timestamp of " + nowMillis + " (" + new Date(nowMillis).toString() + ")");
 
         VMSInputDataVersionLogger.logInputVersions(inputClient.getStateEngine().getHeaderTags(), ctx.getLogger());
     }
@@ -89,7 +112,6 @@ public class TransformCycle {
         long startTime = System.currentTimeMillis();
 
         try {
-            setNowMillis();
             SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI)inputClient.getAPI(), outputStateEngine, ctx);
             transformer.transform();
         } catch(Throwable th) {
@@ -104,15 +126,6 @@ public class TransformCycle {
 
         return true;
     }
-
-    private void setNowMillis() {
-        Long pinnedNowMillis = ctx.getConfig().getNowMillis();
-        if(pinnedNowMillis != null)
-            ctx.setNowMillis(pinnedNowMillis.longValue());
-        else
-            ctx.setNowMillis(System.currentTimeMillis());
-    }
-
 
     private void writeTheBlobFiles() {
     	if(rollbackFastlaneStateEngineIfUnchanged())
@@ -168,7 +181,7 @@ public class TransformCycle {
 
 
     public void submitToPublishWorkflow() {
-        publishWorkflowStager.triggerPublish(previousCycleNumber, currentCycleNumber);
+        publishWorkflowStager.triggerPublish(inputClient.getCurrentVersionId(), previousCycleNumber, currentCycleNumber);
     }
 
     private void endCycleSuccessfully() {
