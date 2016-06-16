@@ -61,7 +61,7 @@ public class VMSFollowVipSameVersionAdmin {
         
         StringBuilder response = new StringBuilder();
         
-        for(int i=0;i<100;i++) {
+        for(int i=0;i<versionPairs.size();i++) {
             response.append(versionPairs.get(i).getFromVersion()).append("=").append(versionPairs.get(i).getToVersion()).append("\n");
         }
         
