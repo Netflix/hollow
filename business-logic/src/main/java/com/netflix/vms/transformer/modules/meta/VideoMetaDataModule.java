@@ -362,6 +362,10 @@ public class VideoMetaDataModule {
             vmd.isTestTitle = general._getTestTitle();
             vmd.metadataReleaseDays = OutputUtil.getNullableInteger(general._getMetadataReleaseDays());
         }
+        
+        if(vmd.titleTypes == null)    vmd.titleTypes = Collections.emptySet();
+        if(vmd.episodeTypes == null)  vmd.episodeTypes = Collections.emptySet();
+        if(vmd.aliases == null)       vmd.aliases = Collections.emptySet();
     }
 
     private void populateDates(Integer videoId, String countryCode, VideoMetaDataRollupValues rollup, VideoRightsHollow rights, VideoMetaDataCountrySpecificDataKey vmd) {
