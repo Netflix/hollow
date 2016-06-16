@@ -465,9 +465,10 @@ function CycleErrorTab(serverInfoView) {
         tableWidget.reformatCellDataFunc = new JavaExceptionFormatter("com.netflix.videometadata.").format;
         var searchQuery = new SearchQuery();
         searchQuery.indexName = $("#id-vms-index-select").val();
-        searchQuery.size = "100";
+        searchQuery.size = "200";
         searchQuery.add("eventInfo.currentCycle:" + serverInfoView.vmsCycleId);
         searchQuery.add( $("#id-search-error-box").val());
+        searchQuery.add($("#id-loglevel-select").val());
         searchQuery.sort = "eventInfo.timestamp:desc";
         var searchdao = new FieldModelSearchDAO(tableWidget, searchQuery, fields, true);
         searchdao.updateJsonFromSearch();
