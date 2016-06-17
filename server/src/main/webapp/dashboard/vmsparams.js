@@ -96,6 +96,13 @@ RegexParserMapper.prototype.getBlobPublishRegexInfo = function() {
     return fieldRegex;
 };
 
+RegexParserMapper.prototype.getPropertiesRegexInfo = function() {
+    var fieldRegex = new Object();
+    fieldRegex["propertyName"] = [ /^key=(.*)/, 1 ];
+    fieldRegex["propertyValue"] = [ /^value=(.*)/, 1 ];
+    return fieldRegex;
+};
+
 RegexParserMapper.prototype.getBlobStatusRegexInfo = function() {
     var fieldRegex = new Object();
     fieldRegex["keybase"] = [ /^keybase=(.*),/, 1 ];

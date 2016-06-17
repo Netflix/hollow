@@ -69,6 +69,8 @@ function DataTableWidget(divId, tableId, fields) {
     this.clearPrevious = true;
     this.jsTreeArray = new Array();
     this.reformatCellDataFunc = null;
+    this.emptyTableMessage = null; // show message, instead of empty table
+    
     // provide a custom function for more elaborate reformating, when you need it, e.g.
     // datatableWidget.reformatCellDataFunc = function(cellValue, row, col) {
     //    return cellValue.replace(/(?:\r\n|\r|\n)/g, '<br />');
@@ -96,6 +98,10 @@ function DataTableWidget(divId, tableId, fields) {
         var numRows = 0;
         if (tableDataModel != null) {
             numRows = tableDataModel.length;
+        }
+        if(numRows == 0 && this.emptyTableMessage != null) {
+            this.html = this.emptyTableMessage;
+            return;
         }
 
         this.html = "<table id='" + this.tableId + "' class='prettytable' style='width:100%'><thead><tr>";

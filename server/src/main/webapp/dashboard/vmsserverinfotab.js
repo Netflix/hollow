@@ -376,16 +376,16 @@ function CyclePropertiesTab(serverInfoView) {
     };
 
     this.refresh = function() {
-        var tableFields = ["refreshMode", "propertyName", "propertyValue", "isModified", "defaultValue"];
+        var tableFields = ["propertyName", "propertyValue"];
         var tableWidget = new DataTableWidget(this.htmlDiv, "cycle-properties-table", tableFields);
-        var query = new SearchQuery();
+        var widgetExecutor = new RegexSearchWidgetExecutor(tableWidget, RegexParserMapper.prototype.getPropertiesRegexInfo());
+        var query = widgetExecutor.searchQuery;
         query.indexName = serverInfoView.vmsIndex;
-        query.indexType = "propertyInfo";
-        query.size = "1";
-        query.add(serverInfoView.vmsCycleId);
-        var searchFieldModelDAO = new FieldArrayModelDAO(tableWidget, query, tableFields, true);
-        searchFieldModelDAO.dataNode ="properties";
-        searchFieldModelDAO.updateJsonFromSearch();
+        query.indexType = "vmsserver";
+        query.size = "200";
+        query.sort = "eventInfo.timestamp:desc";
+        query.add(serverInfoView.vmsCycleId).add("tag:PropertyValue");
+        widgetExecutor.updateJsonFromSearch();
         this.init = true;
     };
 }

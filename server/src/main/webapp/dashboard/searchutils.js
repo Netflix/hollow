@@ -53,6 +53,10 @@ function SearchDAO(model, widget, refresh) {
 
     // Extract fields as required, and update widget
     this.handleJson = function(jsonData) {
+        if (this.doRefresh == true) { 
+            this.responseModel.clear(); //RegexModel
+        }
+
         var hits = parseInt(jsonData.hits.total);
         if (hits < 1) {
             this.widget.applyParserData(null);
@@ -65,7 +69,6 @@ function SearchDAO(model, widget, refresh) {
         }
         if (this.doRefresh == true) {
             this.widget.refresh();
-            this.responseModel.clear(); //RegexModel
         }
     };
 
@@ -82,6 +85,7 @@ function SearchDAO(model, widget, refresh) {
         });
     };
 }// searchDAO
+
 
 // NOTE: Key has to be from eventInfo
 function KeyValueSearchDAO(widget, eventInfoKey, refresh, keysOnly) {

@@ -121,11 +121,9 @@
                         <li><a href="#cycle-error-logs-tab">Logs</a></li>
                         <li><a href="#cycle-circuitbreaker-tab">Circuit Breaker</a></li>
                         <li><a href="#cycle-input-validation-tab">Input Validation</a></li>
-                        <li><a href="#cycle-error-codes-tab">Error Codes</a></li>
                         <li><a href="#cycle-inputdata-tab">Coldstarts and Events</a></li>
                         <li><a href="#cycle-replay-tab">Replay Cycle</a></li>
                         <li><a href="#cycle-input-search-tab">Search</a></li>
-                        <li><a href="#data-injection-tab">Data Injection</a></li>
                         <li><a href="#expander-tab">+</a></li>
                     </ul>
                     <!-- NOTE: the divs below should be in the same order as listed in <ul> section -->
@@ -136,15 +134,14 @@
                         <!-- /div -->
                     </div>
                     <div id="cycle-properties-tab">
-                        <b>Note:</b> isModified flag is not updated for startup properties.<br>
                         <div id = "id-properties-table"></div>
                     </div>
                     <div id="cycle-publish-tab">
-                        <em>Publish failures</em>
-                        <div id="id-publish-failure-table"></div>
-                        <br>
                         <em>Publish blobs to s3</em>
                         <div id="id-s3-publish-table"></div>
+                        <br>
+                        <em>Publish failures</em>
+                        <div id="id-publish-failure-table"></div>
                         <br>
                     </div>
                     <div id="cycle-error-logs-tab">
@@ -212,13 +209,6 @@
                         <div id="cycle-input-validation-search-dialog" class="hidden">
                             <div>Key:<input type="text" id="cycle-input-validation-search-dialog-key">
                         </div>
-                    </div>
-                    <div id="cycle-error-codes-tab">
-                        Search for id (AND error-code-optional):
-                        <input  type="textbox" id="id-search-errorcode-box" size="25" value=""></input>
-                        <button id="id-search-errorcode-btn" class='ui-widget-content'>search</button>
-                        <br>
-                        <div id="id-cycle-errorcode-locations"></div>
                     </div>
                     <div id="cycle-inputdata-tab">
                         <div id="cycle-input-data-view">
@@ -288,23 +278,6 @@
                                 <td style="vertical-align:top"><div id="id-search-indexname-results" class='ui-widget-content'></div></td>
                             </tr>
                         </table>
-                    </div>
-                    <div id="data-injection-tab">
-                        <div id="datainjection-table">
-                            <table>
-                                <tr>
-                                    <td>Code</td>
-                                    <td>Message</td>
-                                </tr>
-                                <tr>
-                                    <td style="vertical-align: top"><div
-                                            id="id-datainjection-locations"></div></td>
-                                    <td style="vertical-align: top"><div
-                                            id="id-datainjection-results" class='ui-widget-content'
-                                            style="word-wrap: break-word;"></div></td>
-                                </tr>
-                            </table>
-                        </div>
                     </div>
                     <div id="expander-tab"></div>
             </div>

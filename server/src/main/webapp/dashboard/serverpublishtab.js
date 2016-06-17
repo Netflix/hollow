@@ -28,6 +28,7 @@ function ServerPublishTab(serverInfoView) {
     this.updatePublishFailTable = function() {
         var tableWidget = new DataTableWidget("#id-publish-failure-table", "publish-failure-table", [ "cycleId", "partitionId", "keybase", "version",
                 "timestamp" ]);
+        tableWidget.emptyTableMessage = "(no s3 publish failures)";
         var widgetExecutor = new RegexSearchWidgetExecutor(tableWidget, RegexParserMapper.prototype.getBlobStatusRegexInfo());
 
         this.setPropertiesForQueryObject(widgetExecutor.searchQuery, "vmsserver", "50", "eventInfo.timestamp:desc");

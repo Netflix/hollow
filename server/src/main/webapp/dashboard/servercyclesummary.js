@@ -65,13 +65,12 @@ function ServerCycleSummaryTab(dashboard) {
         this.getIndexSearchQuery = function(purpose, commaSeparatedFieldNames) {
             var query = new SearchQuery();
             query.indexName = dashboard.vmsIndex;
-            if (!commaSeparatedFieldNames) {
-                query.size = "300"; // 24*60/5
-            } else {
-                query.fields = commaSeparatedFieldNames;
-                query.size = "720"; // 24*(60/2)
-            }
+            query.sort = "eventInfo.timestamp:desc";
+            query.size = "720";
 
+            if(!commaSeparatedFieldNames); else {
+                query.fields = commaSeparatedFieldNames;
+            }
             if (purpose == "CacheFail") {
                 query.indexType = "vmsserver";
                 query.add("tag:TransformCycleFailed");
@@ -81,19 +80,17 @@ function ServerCycleSummaryTab(dashboard) {
             } else if (purpose == "CycleInfo") {
                 query.indexType = "vmsserver";
                 query.add("tag:TransformCycleBegin");
-                query.sort = "eventInfo.timestamp:desc";
             } else if (purpose == "BlobPublishFail") {
                 query.indexType = "vmsserver";
                 query.add("tag:BlobPlubishStatus").add("false");
             } else if (purpose == "S3Errors") {
                 query.add("org.jets3t.service.S3ServiceException");
             } else if (purpose == "WorkerPublish") {
-                query.size = "600";
                 query.indexType = "vmsserver";
-                query.add("tag:PublishedBlob").add("netflix.vms.hollowblob." + dashboard.vipAddress + ".all.snapshot");
+                query.add("tag:PublishedBlob").add("\"netflix.vms.hollowblob." + dashboard.vipAddress + ".all.snapshot\"");
             } else if (purpose == "StateEnginePublish") {
                 query.indexType = "vmsserver";
-                query.add("tag:PublishedBlob").add("netflix.vms.hollowblob." + dashboard.vipAddress + ".all.snapshot").add("us-east-1");
+                query.add("tag:PublishedBlob").add("\"netflix.vms.hollowblob." + dashboard.vipAddress + ".all.snapshot\"").add("\"us-east-1\"");
             }  else if (purpose == "hollowPublishRegion") {
                 query.add("tag:AnnouncementSuccess");
             }
@@ -121,8 +118,6 @@ function ServerCycleSummaryTab(dashboard) {
             var cycleSuccess = false;
             var cycleFail = false;
             var publishErrors = false;
-            // html += "<td><img src='images/ok.png'></td>";
-            // html += "<td><img src='images/x.png'></td>";
 
             if (this.cacheSuccessModel.rowFieldEquals("eventInfo.currentCycle", currCycle)) {
                 cycleSuccess = true;
@@ -206,17 +201,24 @@ function ServerCycleSummaryTab(dashboard) {
                 }
             }
 
-            if (!refFn.stateEngineSize[currCycle]) {
+            var publishDataSizes = refFn.stateEngineSize;
+
+            if (!publishDataSizes[currCycle]) {
                 html += "<td style='text-align:right'><img src='images/incomplete.png'></td>";
             } else {
-                var val = refFn.stateEngineSize[currCycle].toFixed(4);
+                var val = publishDataSizes[currCycle].toFixed(4);
                 var valStr = "";
                 if (val < 0) {
                     valStr = val.toString().substring(0, 5);
                 } else {
                     valStr = "+" + val.toString().substring(0, 4);
                 }
-                html += "<td style='text-align:right'>" + valStr + "%</td>";
+                if(valStr == "+0.00" || valStr == "-0.00" || valStr == "+-0.0") {
+                    valStr = "";
+                } else {
+                    valStr = valStr + "%";
+                }
+                html += "<td style='text-align:right'>" + valStr + "</td>";
             }
 
             if (cycleFail) {
@@ -231,7 +233,6 @@ function ServerCycleSummaryTab(dashboard) {
 
         this.populateCycleTimeStampsTable = function() {
             refFn.computeStateEngineSize();
-
             cycleSummaryTab.cycleSummarytableWidget = new ClickableTableWidget("#id-cycle-timestamp-div", "id-cycle-timestamp-table", [ "currentCycle",
                     "timestamp", "custom", "custom", "custom", "custom", "custom", "custom"], [ "Cycle id", "Time", "Success", "S3 access", 
                     "Unpublished regions", "S3 upload Mbps",
@@ -259,16 +260,17 @@ function ServerCycleSummaryTab(dashboard) {
 
         this.fillParallelModelCaches = function() {
             var daoExecutor = new ParallelDAOExecutor(refFn.populateCycleTimeStampsTable);
+            daoExecutor.add(refFn.stateEnginePublishDAO);
             daoExecutor.add(refFn.cacheFailDAO);
             daoExecutor.add(refFn.s3FailDAO);
             daoExecutor.add(refFn.cacheSuccessDAO);
-            daoExecutor.add(refFn.stateEnginePublishDAO);
             daoExecutor.add(refFn.hollowPublishRegionDAO);
             daoExecutor.run();
         };
 
         this.computeStateEngineSize = function() {
-            var stateEngineGroupByVersion = new DataOperator(refFn.stateEnginePublishDAO.responseModel.dataModel).groupBy("version");
+            var dataop = new DataOperator(refFn.stateEnginePublishDAO.responseModel.dataModel);
+            var stateEngineGroupByVersion = dataop.groupBy("version");
             refFn.stateEngineSize = stateEngineGroupByVersion.min("filesize(bytes)").prevDiffPercent().inpDataModel;
         };
 
