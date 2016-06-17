@@ -4571,7 +4571,8 @@
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.hollow:netflix-hollow-diff-ui",
-                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "netflix:vms-hollow-generated-notemplate"
             ]
         },
         "com.netflix.hollow:netflix-hollow-diff-ui": {
@@ -4956,6 +4957,10 @@
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
             ]
+        },
+        "netflix:vms-hollow-generated-notemplate": {
+            "locked": "59.90",
+            "requested": "latest.release"
         },
         "org.antlr:antlr": {
             "locked": "3.2",
@@ -5477,7 +5482,8 @@
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.hollow:netflix-hollow-diff-ui",
-                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "netflix:vms-hollow-generated-notemplate"
             ]
         },
         "com.netflix.hollow:netflix-hollow-diff-ui": {
@@ -5862,6 +5868,10 @@
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
             ]
+        },
+        "netflix:vms-hollow-generated-notemplate": {
+            "locked": "59.90",
+            "requested": "latest.release"
         },
         "org.antlr:antlr": {
             "locked": "3.2",
@@ -6383,7 +6393,8 @@
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.hollow:netflix-hollow-diff-ui",
-                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "netflix:vms-hollow-generated-notemplate"
             ]
         },
         "com.netflix.hollow:netflix-hollow-diff-ui": {
@@ -6768,6 +6779,10 @@
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
             ]
+        },
+        "netflix:vms-hollow-generated-notemplate": {
+            "locked": "59.90",
+            "requested": "latest.release"
         },
         "org.antlr:antlr": {
             "locked": "3.2",
@@ -7289,7 +7304,8 @@
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.hollow:netflix-hollow-diff-ui",
-                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "netflix:vms-hollow-generated-notemplate"
             ]
         },
         "com.netflix.hollow:netflix-hollow-diff-ui": {
@@ -7674,6 +7690,10 @@
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
             ]
+        },
+        "netflix:vms-hollow-generated-notemplate": {
+            "locked": "59.90",
+            "requested": "latest.release"
         },
         "org.antlr:antlr": {
             "locked": "3.2",
