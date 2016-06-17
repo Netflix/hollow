@@ -24,7 +24,8 @@ public class VideoGeneralTypeAPI extends HollowObjectTypeAPI {
             "testTitleTypes",
             "originalTitleBcpCode",
             "internalTitle",
-            "episodeTypes"
+            "episodeTypes",
+            "regulatoryAdvisories"
         });
         this.delegateLookupImpl = new VideoGeneralDelegateLookupImpl(this);
     }
@@ -239,6 +240,16 @@ public class VideoGeneralTypeAPI extends HollowObjectTypeAPI {
 
     public VideoGeneralEpisodeTypeListTypeAPI getEpisodeTypesTypeAPI() {
         return getAPI().getVideoGeneralEpisodeTypeListTypeAPI();
+    }
+
+    public int getRegulatoryAdvisoriesOrdinal(int ordinal) {
+        if(fieldIndex[16] == -1)
+            return missingDataHandler().handleReferencedOrdinal("VideoGeneral", ordinal, "regulatoryAdvisories");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[16]);
+    }
+
+    public SetOfStringTypeAPI getRegulatoryAdvisoriesTypeAPI() {
+        return getAPI().getSetOfStringTypeAPI();
     }
 
     public VideoGeneralDelegateLookupImpl getDelegateLookupImpl() {

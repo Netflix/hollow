@@ -31,6 +31,13 @@ public class StreamDeploymentHollow extends HollowObject {
         return delegate().getDeploymentPriorityBoxed(ordinal);
     }
 
+    public StringHollow _getS3PathComponent() {
+        int refOrdinal = delegate().getS3PathComponentOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getStringHollow(refOrdinal);
+    }
+
     public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }

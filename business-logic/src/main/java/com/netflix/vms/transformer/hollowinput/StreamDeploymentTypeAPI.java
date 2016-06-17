@@ -11,7 +11,8 @@ public class StreamDeploymentTypeAPI extends HollowObjectTypeAPI {
         super(api, typeDataAccess, new String[] {
             "deploymentInfo",
             "deploymentLabel",
-            "deploymentPriority"
+            "deploymentPriority",
+            "s3PathComponent"
         });
         this.delegateLookupImpl = new StreamDeploymentDelegateLookupImpl(this);
     }
@@ -56,6 +57,16 @@ public class StreamDeploymentTypeAPI extends HollowObjectTypeAPI {
     }
 
 
+
+    public int getS3PathComponentOrdinal(int ordinal) {
+        if(fieldIndex[3] == -1)
+            return missingDataHandler().handleReferencedOrdinal("StreamDeployment", ordinal, "s3PathComponent");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[3]);
+    }
+
+    public StringTypeAPI getS3PathComponentTypeAPI() {
+        return getAPI().getStringTypeAPI();
+    }
 
     public StreamDeploymentDelegateLookupImpl getDelegateLookupImpl() {
         return delegateLookupImpl;

@@ -57,7 +57,7 @@ public abstract class HollowCircuitBreaker {
         successCountsForCycle.put(metricName, currentValue);
 
         try {
-            long baseLine = getBaseLine(metricName);
+            double baseLine = getBaseLine(metricName);
             if(isCBCheckFailed(currentValue, changeThresholdPercent, baseLine)){
                 return new CircuitBreakerResults(false, getFailedCBMessage(metricName, currentValue, changeThresholdPercent, baseLine));
             }
@@ -76,7 +76,7 @@ public abstract class HollowCircuitBreaker {
         }
     }
 
-    protected String getFailedCBMessage(String metricName, double currentValue, double changeThresholdPercent, long baseLine) {
+    protected String getFailedCBMessage(String metricName, double currentValue, double changeThresholdPercent, double baseLine) {
     	String changeType = (currentValue < baseLine) ? "drop" : "addition";
 		return "Hollow validation failure for " + metricName + ": "
 		        + "This will result failure of announcement of data to clients."
@@ -84,11 +84,11 @@ public abstract class HollowCircuitBreaker {
 		        		+ "Change threshold: " + changeThresholdPercent;
 	}
 
-    protected double getChangePercent(double currentValue, long baseLine) {
+    protected double getChangePercent(double currentValue, double baseLine) {
 		return((Math.abs(baseLine - currentValue)*100)/baseLine);
 	}
 
-    protected boolean isCBCheckFailed(double currentValue, double changeThresholdPercent, long baseLine) {
+    protected boolean isCBCheckFailed(double currentValue, double changeThresholdPercent, double baseLine) {
 		return (double)Math.abs(baseLine - currentValue) > (double)(baseLine * changeThresholdPercent);
 	}
 
@@ -112,8 +112,8 @@ public abstract class HollowCircuitBreaker {
         }
     }
 
-    protected long getBaseLine(String objectName) throws NumberFormatException, ConnectionException {
-        return Long.parseLong(ctx.getValidationStatsCassandraHelper().getVipKeyValuePair(ctx.getVip(), objectName));
+    protected double getBaseLine(String objectName) throws NumberFormatException, ConnectionException {
+        return Double.parseDouble(ctx.getValidationStatsCassandraHelper().getVipKeyValuePair(ctx.getVip(), objectName));
     }
 
     private boolean failedBecauseDataNotYetPopulated(Exception e) {

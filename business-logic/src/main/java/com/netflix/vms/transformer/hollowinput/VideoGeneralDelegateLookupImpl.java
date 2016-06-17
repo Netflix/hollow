@@ -100,6 +100,10 @@ public class VideoGeneralDelegateLookupImpl extends HollowObjectAbstractDelegate
         return typeAPI.getEpisodeTypesOrdinal(ordinal);
     }
 
+    public int getRegulatoryAdvisoriesOrdinal(int ordinal) {
+        return typeAPI.getRegulatoryAdvisoriesOrdinal(ordinal);
+    }
+
     public VideoGeneralTypeAPI getTypeAPI() {
         return typeAPI;
     }

@@ -127,6 +127,13 @@ public class VideoGeneralHollow extends HollowObject {
         return  api().getVideoGeneralEpisodeTypeListHollow(refOrdinal);
     }
 
+    public SetOfStringHollow _getRegulatoryAdvisories() {
+        int refOrdinal = delegate().getRegulatoryAdvisoriesOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getSetOfStringHollow(refOrdinal);
+    }
+
     public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }

@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import java.util.Set;
 
 public class VideoMediaData implements Cloneable {
 
@@ -11,6 +12,7 @@ public class VideoMediaData implements Cloneable {
     public boolean hasLocalText = false;
     public int approximateRuntimeInSeconds = java.lang.Integer.MIN_VALUE;
     public boolean isLanguageOverride = false;
+    public Set<Strings> regulatoryAdvisories = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
@@ -28,6 +30,9 @@ public class VideoMediaData implements Cloneable {
         if(o.hasLocalText != hasLocalText) return false;
         if(o.approximateRuntimeInSeconds != approximateRuntimeInSeconds) return false;
         if(o.isLanguageOverride != isLanguageOverride) return false;
+        if(o.regulatoryAdvisories == null) {
+            if(regulatoryAdvisories != null) return false;
+        } else if(!o.regulatoryAdvisories.equals(regulatoryAdvisories)) return false;
         return true;
     }
 
@@ -41,6 +46,7 @@ public class VideoMediaData implements Cloneable {
         hashCode = hashCode * 31 + (hasLocalText? 1231 : 1237);
         hashCode = hashCode * 31 + approximateRuntimeInSeconds;
         hashCode = hashCode * 31 + (isLanguageOverride? 1231 : 1237);
+        hashCode = hashCode * 31 + (regulatoryAdvisories == null ? 1237 : regulatoryAdvisories.hashCode());
         return hashCode;
     }
 
@@ -54,6 +60,7 @@ public class VideoMediaData implements Cloneable {
         builder.append(",hasLocalText=").append(hasLocalText);
         builder.append(",approximateRuntimeInSeconds=").append(approximateRuntimeInSeconds);
         builder.append(",isLanguageOverride=").append(isLanguageOverride);
+        builder.append(",regulatoryAdvisories=").append(regulatoryAdvisories);
         builder.append("}");
         return builder.toString();
     }

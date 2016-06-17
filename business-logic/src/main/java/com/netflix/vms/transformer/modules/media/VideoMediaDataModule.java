@@ -5,24 +5,26 @@ import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_RIGHTS;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 
-import java.util.Set;
-
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.hollowinput.ReleaseDateHollow;
+import com.netflix.vms.transformer.hollowinput.SetOfStringHollow;
+import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoDateWindowHollow;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowinput.VideoRightsHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
+import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoMediaData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.util.VideoDateUtil;
-
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class VideoMediaDataModule {
 
@@ -128,6 +130,14 @@ public class VideoMediaDataModule {
         if (ordinal != -1) {
             VideoGeneralHollow general = api.getVideoGeneralHollow(ordinal);
             vmd.approximateRuntimeInSeconds = (int) general._getRuntime();
+            SetOfStringHollow inputRegAdvisories = general._getRegulatoryAdvisories();
+            if(inputRegAdvisories != null) {
+                Set<Strings> outputRegAdv = new HashSet<>();
+                for(StringHollow regAdv : inputRegAdvisories) {
+                	outputRegAdv.add(new Strings(regAdv._getValue()));
+                }
+                vmd.regulatoryAdvisories = outputRegAdv;
+            }
         }
         return (ordinal != -1);
     }

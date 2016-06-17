@@ -11,12 +11,14 @@ public class StreamDeploymentDelegateCachedImpl extends HollowObjectAbstractDele
     private final int deploymentInfoOrdinal;
     private final int deploymentLabelOrdinal;
     private final Integer deploymentPriority;
+    private final int s3PathComponentOrdinal;
    private StreamDeploymentTypeAPI typeAPI;
 
     public StreamDeploymentDelegateCachedImpl(StreamDeploymentTypeAPI typeAPI, int ordinal) {
         this.deploymentInfoOrdinal = typeAPI.getDeploymentInfoOrdinal(ordinal);
         this.deploymentLabelOrdinal = typeAPI.getDeploymentLabelOrdinal(ordinal);
         this.deploymentPriority = typeAPI.getDeploymentPriorityBoxed(ordinal);
+        this.s3PathComponentOrdinal = typeAPI.getS3PathComponentOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -34,6 +36,10 @@ public class StreamDeploymentDelegateCachedImpl extends HollowObjectAbstractDele
 
     public Integer getDeploymentPriorityBoxed(int ordinal) {
         return deploymentPriority;
+    }
+
+    public int getS3PathComponentOrdinal(int ordinal) {
+        return s3PathComponentOrdinal;
     }
 
     @Override

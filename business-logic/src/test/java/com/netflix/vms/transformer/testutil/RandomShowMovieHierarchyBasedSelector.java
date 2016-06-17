@@ -1,4 +1,4 @@
-package com.netflix.vmsserver;
+package com.netflix.vms.transformer.testutil;
 
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
@@ -20,14 +20,14 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-public class RandomShowMovieHierarchy {
+public class RandomShowMovieHierarchyBasedSelector {
     private HollowReadStateEngine stateEngine;
     private VMSHollowInputAPI api;
     private HollowPrimaryKeyIndex videoGeneralIdx;
     private HollowPrimaryKeyIndex supplementalIdx;
     private HollowHashIndex showSeasonEpisodeHashIdx;
 
-    public RandomShowMovieHierarchy(HollowReadStateEngine stateEngine) {
+    public RandomShowMovieHierarchyBasedSelector(HollowReadStateEngine stateEngine) {
         this.stateEngine = stateEngine;
         api = new VMSHollowInputAPI(stateEngine);
         videoGeneralIdx = new HollowPrimaryKeyIndex(stateEngine, "VideoGeneral", "videoId");

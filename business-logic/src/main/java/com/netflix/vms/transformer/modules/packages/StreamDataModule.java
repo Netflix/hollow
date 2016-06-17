@@ -133,6 +133,7 @@ public class StreamDataModule {
         outputStream.drmData = EMPTY_DRM_DATA;
         outputStream.additionalData = new StreamAdditionalData();
         outputStream.additionalData.mostlyConstantData = new StreamMostlyConstantData();
+        outputStream.additionalData.mostlyConstantData.tags = Collections.emptyList();
 
         if(!Float.isNaN(inputVideoStreamInfo._getFps()))
             outputStream.additionalData.frameRate = new FrameRate(inputVideoStreamInfo._getFps());
@@ -191,7 +192,11 @@ public class StreamDataModule {
                 }
             }
         }
-
+        
+        StringHollow conformingGroupId = inputStreamDeployment._getS3PathComponent();
+        if(conformingGroupId != null) {
+            outputStream.additionalData.mostlyConstantData.conformingGroupId = Integer.parseInt(conformingGroupId._getValue());
+        }
 
         int pixelAspectHeight = inputStreamDimensions._getPixelAspectRatioHeight();
         if(pixelAspectHeight != Integer.MIN_VALUE) {

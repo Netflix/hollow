@@ -24,6 +24,7 @@ public class VideoGeneralDelegateCachedImpl extends HollowObjectAbstractDelegate
     private final int originalTitleBcpCodeOrdinal;
     private final int internalTitleOrdinal;
     private final int episodeTypesOrdinal;
+    private final int regulatoryAdvisoriesOrdinal;
    private VideoGeneralTypeAPI typeAPI;
 
     public VideoGeneralDelegateCachedImpl(VideoGeneralTypeAPI typeAPI, int ordinal) {
@@ -43,6 +44,7 @@ public class VideoGeneralDelegateCachedImpl extends HollowObjectAbstractDelegate
         this.originalTitleBcpCodeOrdinal = typeAPI.getOriginalTitleBcpCodeOrdinal(ordinal);
         this.internalTitleOrdinal = typeAPI.getInternalTitleOrdinal(ordinal);
         this.episodeTypesOrdinal = typeAPI.getEpisodeTypesOrdinal(ordinal);
+        this.regulatoryAdvisoriesOrdinal = typeAPI.getRegulatoryAdvisoriesOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -132,6 +134,10 @@ public class VideoGeneralDelegateCachedImpl extends HollowObjectAbstractDelegate
 
     public int getEpisodeTypesOrdinal(int ordinal) {
         return episodeTypesOrdinal;
+    }
+
+    public int getRegulatoryAdvisoriesOrdinal(int ordinal) {
+        return regulatoryAdvisoriesOrdinal;
     }
 
     @Override
