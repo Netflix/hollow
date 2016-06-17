@@ -48,6 +48,8 @@ public interface VideoGeneralDelegate extends HollowObjectDelegate {
 
     public int getEpisodeTypesOrdinal(int ordinal);
 
+    public int getRegulatoryAdvisoriesOrdinal(int ordinal);
+
     public VideoGeneralTypeAPI getTypeAPI();
 
 }
