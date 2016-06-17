@@ -149,7 +149,7 @@ function VmsServerInfoTab(dashboard) {
             cycleWidgetExecutor.searchQuery.indexName = $("#id-vms-index-select").val();
             cycleWidgetExecutor.searchQuery.indexType = "vmsserver";
             cycleWidgetExecutor.searchQuery.add("tag:TransformCycleBegin");
-            cycleWidgetExecutor.searchQuery.size = "300";
+            cycleWidgetExecutor.searchQuery.size = VipAddressHolder.prototype.getSummaryQuerySize();
             cycleWidgetExecutor.searchQuery.sort = "eventInfo.timestamp:desc";
             cycleWidgetExecutor.updateJsonFromSearch();
         });

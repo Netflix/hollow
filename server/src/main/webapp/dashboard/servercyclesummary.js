@@ -66,9 +66,11 @@ function ServerCycleSummaryTab(dashboard) {
             var query = new SearchQuery();
             query.indexName = dashboard.vmsIndex;
             query.sort = "eventInfo.timestamp:desc";
-            query.size = "720";
+            query.size = VipAddressHolder.prototype.getSummaryQuerySize();
 
-            if(!commaSeparatedFieldNames); else {
+            if(!commaSeparatedFieldNames) {
+                query.fields = null;
+            } else {
                 query.fields = commaSeparatedFieldNames;
             }
             if (purpose == "CacheFail") {

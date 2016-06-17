@@ -13,6 +13,14 @@ VipAddressHolder.prototype.getVipAddress = function() {
 	return vip.substring(4, vip.length - 4);
 };
 
+VipAddressHolder.prototype.getSummaryQuerySize = function() {
+    var vip = $("#id-vms-vip-select").val();
+    if(vip.indexOf("_override") == -1) {
+        return 720;
+    }
+    return 2000;
+}
+
 UrlMapper.prototype.getIndexHost = function() {
     // "http://discovery.cloudqa.netflix.net:7001/discovery/resolver/cluster/elasticsearch-vmsiops:7104/"
     var hostname = $("#id-elasticsearchhost-box").val();
