@@ -1,9 +1,10 @@
 
+import static com.netflix.vms.transformer.input.VMSInputDataClient.PROD_PROXY_URL;
+import com.netflix.vms.transformer.input.VMSInputDataClient;
 import com.netflix.config.NetflixConfiguration.EnvironmentEnum;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.hollow.HollowBlobHeader;
 import com.netflix.hollow.read.engine.HollowBlobHeaderReader;
-import com.netflix.videometadata.client.VMSQuickTestInitializer;
 import com.netflix.videometadata.util.HttpHelper;
 import com.netflix.vms.transformer.fastproperties.PersistedPropertiesUtil;
 import com.netflix.vms.transformer.input.VMSInputDataKeybaseBuilder;
@@ -45,7 +46,7 @@ import org.junit.Test;
 public class RollingDiff {
 
     private static String WORKING_DIR = "/space/transformer-data";
-    
+
     @Test
     public void downloadOldPipelineOutputAndPinNewPipeline() throws IOException {
         downloadOldPipelineOutput();
@@ -61,12 +62,12 @@ public class RollingDiff {
     }
     
     private void downloadOldPipelineOutput() throws IOException {
-        String latestNoeventVersion = HttpHelper.getStringResponse(VMSQuickTestInitializer.PROD_URL + "/" + "filestore-version?keybase=" + new HollowBlobKeybaseBuilder("noevent").getSnapshotKeybase());
+        String latestNoeventVersion = HttpHelper.getStringResponse(PROD_PROXY_URL + "/" + "filestore-version?keybase=" + new HollowBlobKeybaseBuilder("noevent").getSnapshotKeybase());
         
         File dir = new File(WORKING_DIR, "rolling-diff");
         dir.mkdir();
         
-        InputStream is = HttpHelper.getInputStream(VMSQuickTestInitializer.PROD_URL + "/" + "filestore-download?keybase=" + new HollowBlobKeybaseBuilder("noevent").getSnapshotKeybase() + "&version=" + latestNoeventVersion);
+        InputStream is = HttpHelper.getInputStream(PROD_PROXY_URL + "/" + "filestore-download?keybase=" + new HollowBlobKeybaseBuilder("noevent").getSnapshotKeybase() + "&version=" + latestNoeventVersion);
         FileOutputStream fos = new FileOutputStream(new File(dir, "oldpipeline-snapshot"));
         
         IOUtils.copyLarge(is, fos);
@@ -117,12 +118,12 @@ public class RollingDiff {
     }
     
     private void downloadNewPipelineOutput() throws IOException {
-        String latestNewNoeventVersion = HttpHelper.getStringResponse(VMSQuickTestInitializer.PROD_URL + "/" + "filestore-version?keybase=" + new HollowBlobKeybaseBuilder("newnoevent").getSnapshotKeybase());
+        String latestNewNoeventVersion = HttpHelper.getStringResponse(PROD_PROXY_URL + "/" + "filestore-version?keybase=" + new HollowBlobKeybaseBuilder("newnoevent").getSnapshotKeybase());
         
         File dir = new File(WORKING_DIR, "rolling-diff");
         dir.mkdir();
         
-        InputStream is = HttpHelper.getInputStream(VMSQuickTestInitializer.PROD_URL + "/" + "filestore-download?keybase=" + new HollowBlobKeybaseBuilder("newnoevent").getSnapshotKeybase() + "&version=" + latestNewNoeventVersion);
+        InputStream is = HttpHelper.getInputStream(PROD_PROXY_URL + "/" + "filestore-download?keybase=" + new HollowBlobKeybaseBuilder("newnoevent").getSnapshotKeybase() + "&version=" + latestNewNoeventVersion);
         FileOutputStream fos = new FileOutputStream(new File(dir, "newpipeline-snapshot"));
         
         IOUtils.copyLarge(is, fos);
@@ -175,7 +176,7 @@ public class RollingDiff {
         HollowBlobHeader header = new HollowBlobHeaderReader().readHeader(new LZ4VMSInputStream(new FileInputStream(new File(dir, "newpipeline-snapshot"))));
         String inputVersionId = header.getHeaderTags().get("sourceDataVersion");
         
-        InputStream is = HttpHelper.getInputStream(VMSQuickTestInitializer.PROD_URL_US_EAST + "/" + "filestore-download?keybase=" + new VMSInputDataKeybaseBuilder("noevent").getSnapshotKeybase() + "&version=" + inputVersionId);
+        InputStream is = HttpHelper.getInputStream(PROD_PROXY_URL + "/" + "filestore-download?keybase=" + new VMSInputDataKeybaseBuilder("noevent").getSnapshotKeybase() + "&version=" + inputVersionId);
         FileOutputStream fos = new FileOutputStream(new File(dir, "input-snapshot"));
 
         IOUtils.copy(is, fos);

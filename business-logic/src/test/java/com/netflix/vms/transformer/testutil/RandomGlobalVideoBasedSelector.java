@@ -1,4 +1,4 @@
-package com.netflix.vmsserver;
+package com.netflix.vms.transformer.testutil;
 
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
@@ -20,14 +20,14 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-public class RandomGlobalVideo {
+public class RandomGlobalVideoBasedSelector {
     private HollowReadStateEngine stateEngine;
     private VMSRawHollowAPI api;
     private HollowPrimaryKeyIndex globalVideoIdx;
     private HollowPrimaryKeyIndex completeVideoPrimaryKeyIdx;
     private HollowHashIndex completeVideoHashIdx;
 
-    public RandomGlobalVideo(HollowReadStateEngine stateEngine) {
+    public RandomGlobalVideoBasedSelector(HollowReadStateEngine stateEngine) {
         this.stateEngine = stateEngine;
         api = new VMSRawHollowAPI(stateEngine);
         globalVideoIdx = new HollowPrimaryKeyIndex(stateEngine, "GlobalVideo", "completeVideo.id.value");

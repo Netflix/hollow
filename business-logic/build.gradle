@@ -9,6 +9,7 @@ dependencies {
     testCompile 'junit:junit:4.11'
     testCompile 'org.assertj:assertj-core:3.3+'
     
+    testCompile 'netflix:vms-hollow-generated-notemplate:latest.release'
     testCompile 'com.netflix.hollow:netflix-hollow-diff-ui:latest.release'
 }
 
