@@ -28,6 +28,10 @@ public class StreamDeploymentDelegateLookupImpl extends HollowObjectAbstractDele
         return typeAPI.getDeploymentPriorityBoxed(ordinal);
     }
 
+    public int getS3PathComponentOrdinal(int ordinal) {
+        return typeAPI.getS3PathComponentOrdinal(ordinal);
+    }
+
     public StreamDeploymentTypeAPI getTypeAPI() {
         return typeAPI;
     }

@@ -192,7 +192,11 @@ public class StreamDataModule {
                 }
             }
         }
-
+        
+        StringHollow conformingGroupId = inputStreamDeployment._getS3PathComponent();
+        if(conformingGroupId != null) {
+            outputStream.additionalData.mostlyConstantData.conformingGroupId = Integer.parseInt(conformingGroupId._getValue());
+        }
 
         int pixelAspectHeight = inputStreamDimensions._getPixelAspectRatioHeight();
         if(pixelAspectHeight != Integer.MIN_VALUE) {
