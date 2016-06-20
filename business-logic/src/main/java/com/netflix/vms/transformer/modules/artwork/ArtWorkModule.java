@@ -459,6 +459,9 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
                 entry.cdnFolderStr = ConversionUtils.getCharArray(artworkRecipeHollow._getCdnFolder());
                 entry.extensionStr = ConversionUtils.getCharArray(artworkRecipeHollow._getExtension());
                 entry.recipeNameStr = ConversionUtils.getCharArray(artworkRecipeHollow._getRecipeName());
+                StringHollow hostName = artworkRecipeHollow._getHostName();
+                if(hostName != null)
+                    entry.hostNameStr = ConversionUtils.getCharArray(hostName);
             }else {
                 entry.cdnFolderStr = ConversionUtils.getCharArray(derivative._getCdnDirectory());
                 entry.extensionStr = recipeName.toCharArray();
