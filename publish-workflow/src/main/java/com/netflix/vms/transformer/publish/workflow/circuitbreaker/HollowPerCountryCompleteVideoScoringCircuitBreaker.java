@@ -51,7 +51,12 @@ public abstract class HollowPerCountryCompleteVideoScoringCircuitBreaker extends
 	            				country._getId()))
 	                results.addResult(compareMetric(country._getId(), perCountryCertificationCounts[i]));
             } catch(NullPointerException ex){
-            	ctx.getLogger().error(LogTag.CircuitBreaker, "NullPointer cause: "+ex.getCause());
+            	ctx.getLogger().error(LogTag.CircuitBreaker, "NullPointer for country ordinal " + i);
+                ctx.getLogger().error(LogTag.CircuitBreaker, "NullPointer for country ordinal " + i + " ctx="+ctx);
+                ctx.getLogger().error(LogTag.CircuitBreaker, "NullPointer for country ordinal " + i + " ctx.getConfig()="+ctx.getConfig());
+                ctx.getLogger().error(LogTag.CircuitBreaker, "NullPointer for country ordinal " + i + " getRuleName()="+getRuleName());
+                ctx.getLogger().error(LogTag.CircuitBreaker, "NullPointer for country ordinal " + i + " country="+country);
+                ctx.getLogger().error(LogTag.CircuitBreaker, "NullPointer for country ordinal " + i + " country ID="+country._getId());
             	ex.printStackTrace();
             	throw ex;
             }

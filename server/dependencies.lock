@@ -21112,6 +21112,7 @@
         "com.google.code.gson:gson": {
             "locked": "2.6.2",
             "transitive": [
+                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
@@ -21610,11 +21611,16 @@
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
             "transitive": [
+                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
                 "netflix:vms-hollow-generated-notemplate"
             ]
+        },
+        "com.netflix.hollow:netflix-hollow-diff-ui": {
+            "locked": "1.5",
+            "requested": "latest.release"
         },
         "com.netflix.hystrix:hystrix-core": {
             "locked": "1.5.3",
@@ -22158,6 +22164,7 @@
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
+                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "commons-httpclient:commons-httpclient",
@@ -22186,7 +22193,8 @@
                 "netflix:platform-core",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:whitecastle"
+                "netflix:whitecastle",
+                "org.apache.velocity:velocity"
             ]
         },
         "commons-configuration:commons-configuration": {
@@ -22228,6 +22236,7 @@
         "commons-io:commons-io": {
             "locked": "2.4",
             "transitive": [
+                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -22269,7 +22278,8 @@
                 "netflix:platform-core",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:platform-utils"
+                "netflix:platform-utils",
+                "org.apache.velocity:velocity"
             ]
         },
         "commons-logging:commons-logging": {
@@ -23389,6 +23399,12 @@
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
+        "org.apache.velocity:velocity": {
+            "locked": "1.7",
+            "transitive": [
+                "com.netflix.hollow:netflix-hollow-diff-ui"
+            ]
+        },
         "org.apache.zookeeper:zookeeper": {
             "locked": "3.4.6",
             "transitive": [
@@ -23492,13 +23508,13 @@
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.3.0.M1",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.3.0.M1",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
@@ -23510,8 +23526,9 @@
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.3.0.M1",
             "transitive": [
+                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "org.eclipse.jetty:jetty-security"
             ]
         },
@@ -23520,7 +23537,7 @@
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.3.0.M1",
             "transitive": [
                 "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-io"
@@ -24035,6 +24052,7 @@
         "com.google.code.gson:gson": {
             "locked": "2.6.2",
             "transitive": [
+                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
@@ -24533,11 +24551,16 @@
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
             "transitive": [
+                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
                 "netflix:vms-hollow-generated-notemplate"
             ]
+        },
+        "com.netflix.hollow:netflix-hollow-diff-ui": {
+            "locked": "1.5",
+            "requested": "latest.release"
         },
         "com.netflix.hystrix:hystrix-core": {
             "locked": "1.5.3",
@@ -25081,6 +25104,7 @@
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
+                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "commons-httpclient:commons-httpclient",
@@ -25109,7 +25133,8 @@
                 "netflix:platform-core",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:whitecastle"
+                "netflix:whitecastle",
+                "org.apache.velocity:velocity"
             ]
         },
         "commons-configuration:commons-configuration": {
@@ -25151,6 +25176,7 @@
         "commons-io:commons-io": {
             "locked": "2.4",
             "transitive": [
+                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -25192,7 +25218,8 @@
                 "netflix:platform-core",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:platform-utils"
+                "netflix:platform-utils",
+                "org.apache.velocity:velocity"
             ]
         },
         "commons-logging:commons-logging": {
@@ -26312,6 +26339,12 @@
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
+        "org.apache.velocity:velocity": {
+            "locked": "1.7",
+            "transitive": [
+                "com.netflix.hollow:netflix-hollow-diff-ui"
+            ]
+        },
         "org.apache.zookeeper:zookeeper": {
             "locked": "3.4.6",
             "transitive": [
@@ -26415,13 +26448,13 @@
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.3.0.M1",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.3.0.M1",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
@@ -26433,8 +26466,9 @@
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.3.0.M1",
             "transitive": [
+                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "org.eclipse.jetty:jetty-security"
             ]
         },
@@ -26443,7 +26477,7 @@
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.3.0.M1",
             "transitive": [
                 "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-io"
@@ -26958,6 +26992,7 @@
         "com.google.code.gson:gson": {
             "locked": "2.6.2",
             "transitive": [
+                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
@@ -27456,11 +27491,16 @@
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
             "transitive": [
+                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
                 "netflix:vms-hollow-generated-notemplate"
             ]
+        },
+        "com.netflix.hollow:netflix-hollow-diff-ui": {
+            "locked": "1.5",
+            "requested": "latest.release"
         },
         "com.netflix.hystrix:hystrix-core": {
             "locked": "1.5.3",
@@ -28004,6 +28044,7 @@
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
+                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "commons-httpclient:commons-httpclient",
@@ -28032,7 +28073,8 @@
                 "netflix:platform-core",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:whitecastle"
+                "netflix:whitecastle",
+                "org.apache.velocity:velocity"
             ]
         },
         "commons-configuration:commons-configuration": {
@@ -28074,6 +28116,7 @@
         "commons-io:commons-io": {
             "locked": "2.4",
             "transitive": [
+                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -28115,7 +28158,8 @@
                 "netflix:platform-core",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:platform-utils"
+                "netflix:platform-utils",
+                "org.apache.velocity:velocity"
             ]
         },
         "commons-logging:commons-logging": {
@@ -29235,6 +29279,12 @@
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
+        "org.apache.velocity:velocity": {
+            "locked": "1.7",
+            "transitive": [
+                "com.netflix.hollow:netflix-hollow-diff-ui"
+            ]
+        },
         "org.apache.zookeeper:zookeeper": {
             "locked": "3.4.6",
             "transitive": [
@@ -29338,13 +29388,13 @@
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.3.0.M1",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.3.0.M1",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
@@ -29356,8 +29406,9 @@
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.3.0.M1",
             "transitive": [
+                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "org.eclipse.jetty:jetty-security"
             ]
         },
@@ -29366,7 +29417,7 @@
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.3.0.M1",
             "transitive": [
                 "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-io"
@@ -29881,6 +29932,7 @@
         "com.google.code.gson:gson": {
             "locked": "2.6.2",
             "transitive": [
+                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
@@ -30379,11 +30431,16 @@
         "com.netflix.hollow:netflix-hollow": {
             "locked": "0.103",
             "transitive": [
+                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
                 "netflix:vms-hollow-generated-notemplate"
             ]
+        },
+        "com.netflix.hollow:netflix-hollow-diff-ui": {
+            "locked": "1.5",
+            "requested": "latest.release"
         },
         "com.netflix.hystrix:hystrix-core": {
             "locked": "1.5.3",
@@ -30927,6 +30984,7 @@
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
+                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "commons-httpclient:commons-httpclient",
@@ -30955,7 +31013,8 @@
                 "netflix:platform-core",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:whitecastle"
+                "netflix:whitecastle",
+                "org.apache.velocity:velocity"
             ]
         },
         "commons-configuration:commons-configuration": {
@@ -30997,6 +31056,7 @@
         "commons-io:commons-io": {
             "locked": "2.4",
             "transitive": [
+                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -31038,7 +31098,8 @@
                 "netflix:platform-core",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:platform-utils"
+                "netflix:platform-utils",
+                "org.apache.velocity:velocity"
             ]
         },
         "commons-logging:commons-logging": {
@@ -32158,6 +32219,12 @@
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
+        "org.apache.velocity:velocity": {
+            "locked": "1.7",
+            "transitive": [
+                "com.netflix.hollow:netflix-hollow-diff-ui"
+            ]
+        },
         "org.apache.zookeeper:zookeeper": {
             "locked": "3.4.6",
             "transitive": [
@@ -32261,13 +32328,13 @@
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.3.0.M1",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.3.0.M1",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
@@ -32279,8 +32346,9 @@
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.3.0.M1",
             "transitive": [
+                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "org.eclipse.jetty:jetty-security"
             ]
         },
@@ -32289,7 +32357,7 @@
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.3.0.M1",
             "transitive": [
                 "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-io"

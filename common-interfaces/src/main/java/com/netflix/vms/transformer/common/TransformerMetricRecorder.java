@@ -13,6 +13,7 @@ public interface TransformerMetricRecorder {
         WriteOutputDataDuration,
 
         ConsecutiveCycleFailures,
+        ConsecutivePublishFailures,
         FailedProcessingIndividualHierarchies,
         
         TopNMissingViewShare,

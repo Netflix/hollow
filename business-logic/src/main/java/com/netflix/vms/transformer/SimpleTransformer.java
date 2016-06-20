@@ -2,7 +2,6 @@ package com.netflix.vms.transformer;
 
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.IndividualTransformFailed;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.FailedProcessingIndividualHierarchies;
-
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
@@ -224,7 +223,10 @@ public class SimpleTransformer {
 
         ctx.getLogger().info(LogTag.TransformProgress, new ProgressMessage(processedCount.get()));
         ctx.getMetricRecorder().recordMetric(FailedProcessingIndividualHierarchies, failedIndividualTransforms.get());
-
+        
+        if(failedIndividualTransforms.get() > ctx.getConfig().getMaxTolerableFailedTransformerHierarchies())
+            throw new RuntimeException("More than " + ctx.getConfig().getMaxTolerableFailedTransformerHierarchies() + " individual hierarchies failed transformation -- not publishing data");
+        
         endTime = System.currentTimeMillis();
         System.out.println("Processed all videos in " + (endTime - startTime) + "ms");
 

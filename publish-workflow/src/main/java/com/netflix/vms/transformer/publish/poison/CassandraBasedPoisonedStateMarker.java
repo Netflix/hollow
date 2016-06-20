@@ -1,4 +1,4 @@
-package com.netflix.vms.transformer.publish;
+package com.netflix.vms.transformer.publish.poison;
 
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.ObservedPoisonState;
 
