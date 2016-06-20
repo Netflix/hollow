@@ -1,6 +1,10 @@
 package com.netflix.vms.transformer.testutil.repro;
-import com.netflix.vms.transformer.testutil.slice.DataSlicer;
+import java.io.InputStream;
 
+import java.util.Properties;
+import com.netflix.vms.transformer.util.HollowBlobKeybaseBuilder;
+import com.netflix.vms.transformer.http.HttpHelper;
+import com.netflix.vms.transformer.testutil.slice.DataSlicer;
 import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.HashCodes;
@@ -21,23 +25,26 @@ import net.jpountz.lz4.LZ4BlockOutputStream;
 public class TransformerScenario {
     
     private final String localBlobStore;
-    private final String converterVip;
-    private final long inputDataVersion;
-    private final long processTimestamp;
+    private final String transformerVip;
+    private final long outputDataVersion;
     private final int[] topNodesToProcess;
+    
+    private String proxyURL = VMSInputDataClient.PROD_PROXY_URL;
+    
+    private String converterVip;
+    private long inputDataVersion;
+    private long processTimestamp;
+    
 
-    public TransformerScenario(String localBlobStore, String converterVip, long inputDataVersion, long processTimestamp, int... topNodesToProcess) {
+    public TransformerScenario(String localBlobStore, String transformerVip, long outputDataVersion, int... topNodesToProcess) {
         this.localBlobStore = localBlobStore;
-        this.converterVip = converterVip;
-        this.inputDataVersion = inputDataVersion;
-        this.processTimestamp = processTimestamp;
+        this.transformerVip = transformerVip;
+        this.outputDataVersion = outputDataVersion;
         this.topNodesToProcess = topNodesToProcess;
     }
     
     public VMSTransformerWriteStateEngine repro() throws Throwable {
-        int scenarioHashCode = createTransformerScenarioHashCode();
-        
-        File scenarioInputFile = new File(localBlobStore, "scenario-" + Integer.toHexString(scenarioHashCode));
+        File scenarioInputFile = scenarioInputDataFile();
         
         HollowReadStateEngine inputStateEngineSlice;
         
@@ -49,13 +56,17 @@ public class TransformerScenario {
         
         VMSHollowInputAPI api = new VMSHollowInputAPI(inputStateEngineSlice);
         VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
-        new SimpleTransformer(api, outputStateEngine, new SimpleTransformerContext()).transform();
+        SimpleTransformerContext ctx = new SimpleTransformerContext();
+        ctx.setNowMillis(processTimestamp);
+        new SimpleTransformer(api, outputStateEngine, ctx).transform();
         
         return outputStateEngine;
     }
 
     private HollowReadStateEngine createStateEngineSlice(File scenarioInputFile) throws IOException {
-        VMSInputDataClient client = new VMSInputDataClient(VMSInputDataClient.PROD_PROXY_URL, localBlobStore, converterVip);
+        determineInputParameters();
+        
+        VMSInputDataClient client = new VMSInputDataClient(proxyURL, localBlobStore, converterVip);
         
         client.triggerRefreshTo(inputDataVersion);
         
@@ -68,9 +79,24 @@ public class TransformerScenario {
         return readStateEngineSlice(scenarioInputFile);
     }
     
-    private int createTransformerScenarioHashCode() {
-        int hashCode = HashCodes.hashLong(inputDataVersion);
-        hashCode ^= HashCodes.hashLong(processTimestamp);
+    private void determineInputParameters() throws IOException {
+        HollowBlobKeybaseBuilder keybaseBuilder = new HollowBlobKeybaseBuilder(transformerVip);
+        
+        Properties dataProps = new Properties();
+        InputStream is = HttpHelper.getInputStream(proxyURL + "/filestore-attribute?keybase=" + keybaseBuilder.getReverseDeltaKeybase() + "&version=" + outputDataVersion);
+        dataProps.load(is);
+        
+        this.converterVip = dataProps.getProperty("converterVip");
+        this.inputDataVersion = Long.parseLong(dataProps.getProperty("inputVersion"));
+        this.processTimestamp = Long.parseLong(dataProps.getProperty("publishCycleDataTS"));
+    }
+    
+    private File scenarioInputDataFile() {
+        return new File(localBlobStore, "scenario-" + transformerVip + "-" + outputDataVersion + "-" + Integer.toHexString(inputVideosHashCode()));
+    }
+    
+    private int inputVideosHashCode() {
+        int hashCode = 0;
         for(int i : topNodesToProcess)
             hashCode ^= HashCodes.hashInt(i);
         return hashCode;
