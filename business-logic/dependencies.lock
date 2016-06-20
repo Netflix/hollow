@@ -4417,9 +4417,8 @@
             ]
         },
         "com.google.code.gson:gson": {
-            "locked": "2.6.2",
+            "locked": "2.1",
             "transitive": [
-                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix"
             ]
@@ -4570,14 +4569,8 @@
             "locked": "0.103",
             "requested": "latest.release",
             "transitive": [
-                "com.netflix.hollow:netflix-hollow-diff-ui",
-                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
-                "netflix:vms-hollow-generated-notemplate"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
-        },
-        "com.netflix.hollow:netflix-hollow-diff-ui": {
-            "locked": "1.5",
-            "requested": "latest.release"
         },
         "com.netflix.karyon:karyon-eureka": {
             "locked": "1.0.28",
@@ -4737,7 +4730,6 @@
             "requested": "1.8+",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
-                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.pytheas:pytheas-core",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.httpcomponents:httpclient"
@@ -4749,8 +4741,7 @@
                 "com.netflix.pytheas:pytheas-core",
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
-                "netflix:nflibrary",
-                "org.apache.velocity:velocity"
+                "netflix:nflibrary"
             ]
         },
         "commons-configuration:commons-configuration": {
@@ -4763,9 +4754,8 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.3",
+            "locked": "1.4",
             "transitive": [
-                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.pytheas:pytheas-core"
             ]
         },
@@ -4780,8 +4770,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-core",
                 "commons-configuration:commons-configuration",
-                "netflix:nflibrary",
-                "org.apache.velocity:velocity"
+                "netflix:nflibrary"
             ]
         },
         "commons-logging:commons-logging": {
@@ -4819,12 +4808,6 @@
                 "com.netflix.governator:governator-core",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
-            ]
-        },
-        "javax.servlet:javax.servlet-api": {
-            "locked": "3.1.0",
-            "transitive": [
-                "org.eclipse.jetty:jetty-server"
             ]
         },
         "javax.servlet:servlet-api": {
@@ -4958,10 +4941,6 @@
                 "netflix:nfi18n-core"
             ]
         },
-        "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.90",
-            "requested": "latest.release"
-        },
         "org.antlr:antlr": {
             "locked": "3.2",
             "transitive": [
@@ -5040,12 +5019,6 @@
                 "org.apache.cassandra:cassandra-thrift"
             ]
         },
-        "org.apache.velocity:velocity": {
-            "locked": "1.7",
-            "transitive": [
-                "com.netflix.hollow:netflix-hollow-diff-ui"
-            ]
-        },
         "org.assertj:assertj-core": {
             "locked": "3.3.0",
             "requested": "3.3+"
@@ -5099,31 +5072,6 @@
             "locked": "3.2.9",
             "transitive": [
                 "netflix:nflibrary"
-            ]
-        },
-        "org.eclipse.jetty:jetty-http": {
-            "locked": "9.3.0.M1",
-            "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "org.eclipse.jetty:jetty-io": {
-            "locked": "9.3.0.M1",
-            "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "org.eclipse.jetty:jetty-server": {
-            "locked": "9.3.0.M1",
-            "transitive": [
-                "com.netflix.hollow:netflix-hollow-diff-ui"
-            ]
-        },
-        "org.eclipse.jetty:jetty-util": {
-            "locked": "9.3.0.M1",
-            "transitive": [
-                "org.eclipse.jetty:jetty-http",
-                "org.eclipse.jetty:jetty-io"
             ]
         },
         "org.freemarker:freemarker": {
@@ -5328,9 +5276,8 @@
             ]
         },
         "com.google.code.gson:gson": {
-            "locked": "2.6.2",
+            "locked": "2.1",
             "transitive": [
-                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix"
             ]
@@ -5481,14 +5428,8 @@
             "locked": "0.103",
             "requested": "latest.release",
             "transitive": [
-                "com.netflix.hollow:netflix-hollow-diff-ui",
-                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
-                "netflix:vms-hollow-generated-notemplate"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
-        },
-        "com.netflix.hollow:netflix-hollow-diff-ui": {
-            "locked": "1.5",
-            "requested": "latest.release"
         },
         "com.netflix.karyon:karyon-eureka": {
             "locked": "1.0.28",
@@ -5648,7 +5589,6 @@
             "requested": "1.8+",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
-                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.pytheas:pytheas-core",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.httpcomponents:httpclient"
@@ -5660,8 +5600,7 @@
                 "com.netflix.pytheas:pytheas-core",
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
-                "netflix:nflibrary",
-                "org.apache.velocity:velocity"
+                "netflix:nflibrary"
             ]
         },
         "commons-configuration:commons-configuration": {
@@ -5674,9 +5613,8 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.3",
+            "locked": "1.4",
             "transitive": [
-                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.pytheas:pytheas-core"
             ]
         },
@@ -5691,8 +5629,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-core",
                 "commons-configuration:commons-configuration",
-                "netflix:nflibrary",
-                "org.apache.velocity:velocity"
+                "netflix:nflibrary"
             ]
         },
         "commons-logging:commons-logging": {
@@ -5730,12 +5667,6 @@
                 "com.netflix.governator:governator-core",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
-            ]
-        },
-        "javax.servlet:javax.servlet-api": {
-            "locked": "3.1.0",
-            "transitive": [
-                "org.eclipse.jetty:jetty-server"
             ]
         },
         "javax.servlet:servlet-api": {
@@ -5869,10 +5800,6 @@
                 "netflix:nfi18n-core"
             ]
         },
-        "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.90",
-            "requested": "latest.release"
-        },
         "org.antlr:antlr": {
             "locked": "3.2",
             "transitive": [
@@ -5951,12 +5878,6 @@
                 "org.apache.cassandra:cassandra-thrift"
             ]
         },
-        "org.apache.velocity:velocity": {
-            "locked": "1.7",
-            "transitive": [
-                "com.netflix.hollow:netflix-hollow-diff-ui"
-            ]
-        },
         "org.assertj:assertj-core": {
             "locked": "3.3.0",
             "requested": "3.3+"
@@ -6010,31 +5931,6 @@
             "locked": "3.2.9",
             "transitive": [
                 "netflix:nflibrary"
-            ]
-        },
-        "org.eclipse.jetty:jetty-http": {
-            "locked": "9.3.0.M1",
-            "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "org.eclipse.jetty:jetty-io": {
-            "locked": "9.3.0.M1",
-            "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "org.eclipse.jetty:jetty-server": {
-            "locked": "9.3.0.M1",
-            "transitive": [
-                "com.netflix.hollow:netflix-hollow-diff-ui"
-            ]
-        },
-        "org.eclipse.jetty:jetty-util": {
-            "locked": "9.3.0.M1",
-            "transitive": [
-                "org.eclipse.jetty:jetty-http",
-                "org.eclipse.jetty:jetty-io"
             ]
         },
         "org.freemarker:freemarker": {
@@ -6239,9 +6135,8 @@
             ]
         },
         "com.google.code.gson:gson": {
-            "locked": "2.6.2",
+            "locked": "2.1",
             "transitive": [
-                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix"
             ]
@@ -6392,14 +6287,8 @@
             "locked": "0.103",
             "requested": "latest.release",
             "transitive": [
-                "com.netflix.hollow:netflix-hollow-diff-ui",
-                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
-                "netflix:vms-hollow-generated-notemplate"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
-        },
-        "com.netflix.hollow:netflix-hollow-diff-ui": {
-            "locked": "1.5",
-            "requested": "latest.release"
         },
         "com.netflix.karyon:karyon-eureka": {
             "locked": "1.0.28",
@@ -6559,7 +6448,6 @@
             "requested": "1.8+",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
-                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.pytheas:pytheas-core",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.httpcomponents:httpclient"
@@ -6571,8 +6459,7 @@
                 "com.netflix.pytheas:pytheas-core",
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
-                "netflix:nflibrary",
-                "org.apache.velocity:velocity"
+                "netflix:nflibrary"
             ]
         },
         "commons-configuration:commons-configuration": {
@@ -6585,9 +6472,8 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.3",
+            "locked": "1.4",
             "transitive": [
-                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.pytheas:pytheas-core"
             ]
         },
@@ -6602,8 +6488,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-core",
                 "commons-configuration:commons-configuration",
-                "netflix:nflibrary",
-                "org.apache.velocity:velocity"
+                "netflix:nflibrary"
             ]
         },
         "commons-logging:commons-logging": {
@@ -6641,12 +6526,6 @@
                 "com.netflix.governator:governator-core",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
-            ]
-        },
-        "javax.servlet:javax.servlet-api": {
-            "locked": "3.1.0",
-            "transitive": [
-                "org.eclipse.jetty:jetty-server"
             ]
         },
         "javax.servlet:servlet-api": {
@@ -6780,10 +6659,6 @@
                 "netflix:nfi18n-core"
             ]
         },
-        "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.90",
-            "requested": "latest.release"
-        },
         "org.antlr:antlr": {
             "locked": "3.2",
             "transitive": [
@@ -6862,12 +6737,6 @@
                 "org.apache.cassandra:cassandra-thrift"
             ]
         },
-        "org.apache.velocity:velocity": {
-            "locked": "1.7",
-            "transitive": [
-                "com.netflix.hollow:netflix-hollow-diff-ui"
-            ]
-        },
         "org.assertj:assertj-core": {
             "locked": "3.3.0",
             "requested": "3.3+"
@@ -6921,31 +6790,6 @@
             "locked": "3.2.9",
             "transitive": [
                 "netflix:nflibrary"
-            ]
-        },
-        "org.eclipse.jetty:jetty-http": {
-            "locked": "9.3.0.M1",
-            "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "org.eclipse.jetty:jetty-io": {
-            "locked": "9.3.0.M1",
-            "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "org.eclipse.jetty:jetty-server": {
-            "locked": "9.3.0.M1",
-            "transitive": [
-                "com.netflix.hollow:netflix-hollow-diff-ui"
-            ]
-        },
-        "org.eclipse.jetty:jetty-util": {
-            "locked": "9.3.0.M1",
-            "transitive": [
-                "org.eclipse.jetty:jetty-http",
-                "org.eclipse.jetty:jetty-io"
             ]
         },
         "org.freemarker:freemarker": {
@@ -7150,9 +6994,8 @@
             ]
         },
         "com.google.code.gson:gson": {
-            "locked": "2.6.2",
+            "locked": "2.1",
             "transitive": [
-                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix"
             ]
@@ -7303,14 +7146,8 @@
             "locked": "0.103",
             "requested": "latest.release",
             "transitive": [
-                "com.netflix.hollow:netflix-hollow-diff-ui",
-                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
-                "netflix:vms-hollow-generated-notemplate"
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
-        },
-        "com.netflix.hollow:netflix-hollow-diff-ui": {
-            "locked": "1.5",
-            "requested": "latest.release"
         },
         "com.netflix.karyon:karyon-eureka": {
             "locked": "1.0.28",
@@ -7470,7 +7307,6 @@
             "requested": "1.8+",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
-                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.pytheas:pytheas-core",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.httpcomponents:httpclient"
@@ -7482,8 +7318,7 @@
                 "com.netflix.pytheas:pytheas-core",
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
-                "netflix:nflibrary",
-                "org.apache.velocity:velocity"
+                "netflix:nflibrary"
             ]
         },
         "commons-configuration:commons-configuration": {
@@ -7496,9 +7331,8 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.3",
+            "locked": "1.4",
             "transitive": [
-                "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.pytheas:pytheas-core"
             ]
         },
@@ -7513,8 +7347,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-core",
                 "commons-configuration:commons-configuration",
-                "netflix:nflibrary",
-                "org.apache.velocity:velocity"
+                "netflix:nflibrary"
             ]
         },
         "commons-logging:commons-logging": {
@@ -7552,12 +7385,6 @@
                 "com.netflix.governator:governator-core",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
-            ]
-        },
-        "javax.servlet:javax.servlet-api": {
-            "locked": "3.1.0",
-            "transitive": [
-                "org.eclipse.jetty:jetty-server"
             ]
         },
         "javax.servlet:servlet-api": {
@@ -7691,10 +7518,6 @@
                 "netflix:nfi18n-core"
             ]
         },
-        "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.90",
-            "requested": "latest.release"
-        },
         "org.antlr:antlr": {
             "locked": "3.2",
             "transitive": [
@@ -7773,12 +7596,6 @@
                 "org.apache.cassandra:cassandra-thrift"
             ]
         },
-        "org.apache.velocity:velocity": {
-            "locked": "1.7",
-            "transitive": [
-                "com.netflix.hollow:netflix-hollow-diff-ui"
-            ]
-        },
         "org.assertj:assertj-core": {
             "locked": "3.3.0",
             "requested": "3.3+"
@@ -7832,31 +7649,6 @@
             "locked": "3.2.9",
             "transitive": [
                 "netflix:nflibrary"
-            ]
-        },
-        "org.eclipse.jetty:jetty-http": {
-            "locked": "9.3.0.M1",
-            "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "org.eclipse.jetty:jetty-io": {
-            "locked": "9.3.0.M1",
-            "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "org.eclipse.jetty:jetty-server": {
-            "locked": "9.3.0.M1",
-            "transitive": [
-                "com.netflix.hollow:netflix-hollow-diff-ui"
-            ]
-        },
-        "org.eclipse.jetty:jetty-util": {
-            "locked": "9.3.0.M1",
-            "transitive": [
-                "org.eclipse.jetty:jetty-http",
-                "org.eclipse.jetty:jetty-io"
             ]
         },
         "org.freemarker:freemarker": {
