@@ -1,5 +1,9 @@
 package com.netflix.vms.transformer.publish.workflow;
 
+import com.netflix.vms.transformer.publish.status.PublishWorkflowStatusIndicator;
+
+import com.netflix.vms.transformer.publish.poison.CassandraBasedPoisonedStateMarker;
+import com.netflix.vms.transformer.publish.poison.PoisonedStateMarker;
 import com.netflix.aws.file.FileStore;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerLogger;
@@ -8,8 +12,6 @@ import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.publish.workflow.VipAnnouncer;
-import com.netflix.vms.transformer.publish.CassandraBasedPoisonedStateMarker;
-import com.netflix.vms.transformer.publish.PoisonedStateMarker;
 import java.util.function.Supplier;
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 
@@ -23,6 +25,7 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
     private final TransformerLogger logger;
     private final Supplier<ServerUploadStatus> uploadStatus;
     private final FileStore fileStore;
+    private final PublishWorkflowStatusIndicator statusIndicator;
 
     /* fields */
     private final String vip;
@@ -40,6 +43,7 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
         this.poisonStateMarker = poisonStateMarker;
         this.uploadStatus = uploadStatus;
         this.fileStore = fileStore;
+        this.statusIndicator = new PublishWorkflowStatusIndicator(ctx.getMetricRecorder());
         this.logger = ctx.getLogger();
         this.nowMillis = ctx.getNowMillis();
     }
@@ -105,4 +109,9 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
 	public Supplier<ServerUploadStatus> serverUploadStatus() {
 	    return uploadStatus;
 	}
+
+    @Override
+    public PublishWorkflowStatusIndicator getStatusIndicator() {
+        return statusIndicator;
+    }
 }
