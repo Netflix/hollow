@@ -24,6 +24,7 @@ public class HermesAnnounceJob extends AnnounceJob {
     @Override
     protected boolean executeJob() {
         boolean success = ctx.getVipAnnouncer().announce(vip, region, false, getCycleVersion(), priorVersion);
+        ctx.getStatusIndicator().markSuccess(getCycleVersion());
         logResult(success);
         return success;
     }
