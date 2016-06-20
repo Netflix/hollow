@@ -96,7 +96,7 @@ RegexParserMapper.prototype.getStartPropertiesRegexInfo = function() {
 
 RegexParserMapper.prototype.getBlobPublishRegexInfo = function() {
     var fieldRegex = new Object();
-    fieldRegex["keybase"] = [ /^keybase=(.*);/, 1 ];
+    fieldRegex["keybase"] = [ /^keybase=(.*)/, 1 ];
     fieldRegex["region"] = [ /^region=(.*)/, 1 ];
     fieldRegex["version"] = [ /^dataVersion=(.*)/, 1 ];
     fieldRegex["filesize(bytes)"] = [ /^size=(.*)/, 1 ];
