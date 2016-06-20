@@ -1,3 +1,6 @@
+package com.netflix.vms.transformer.testutil.repro;
+import com.netflix.vms.transformer.testutil.slice.DataSlicer;
+
 import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.HashCodes;
@@ -8,7 +11,6 @@ import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
-import com.netflix.vms.transformer.testutil.DataSlicer;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

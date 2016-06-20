@@ -1,4 +1,4 @@
-package com.netflix.vms.transformer;
+package com.netflix.vms.transformer.testutil.migration;
 
 import com.netflix.hollow.diff.HollowDiff;
 import com.netflix.hollow.diff.HollowTypeDiff;

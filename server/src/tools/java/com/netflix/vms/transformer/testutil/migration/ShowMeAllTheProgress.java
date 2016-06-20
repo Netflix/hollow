@@ -1,5 +1,9 @@
-package com.netflix.vms.transformer;
+package com.netflix.vms.transformer.testutil.migration;
 
+import com.netflix.vms.transformer.SimpleTransformerContext;
+
+import com.netflix.vms.transformer.SimpleTransformer;
+import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.memory.WastefulRecycler;
@@ -18,7 +22,7 @@ public class ShowMeAllTheProgress {
 
         VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
 
-        SimpleTransformer transformer = new SimpleTransformer(api, outputStateEngine);
+        SimpleTransformer transformer = new SimpleTransformer(api, outputStateEngine, new SimpleTransformerContext());
 
         transformer.transform();
 /*        HollowReadStateEngine actualOutputReadStateEngine = roundTripOutputStateEngine(outputStateEngine);

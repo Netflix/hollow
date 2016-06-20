@@ -1,4 +1,4 @@
-package com.netflix.vms.transformer.testutil;
+package com.netflix.vms.transformer.testutil.slice;
 
 import com.netflix.hollow.combine.HollowCombiner;
 import com.netflix.hollow.combine.HollowCombinerIncludeOrdinalsCopyDirector;

@@ -1,6 +1,6 @@
+package com.netflix.vms.transformer.testutil.migration;
 
 import static com.netflix.vms.transformer.input.VMSInputDataClient.PROD_PROXY_URL;
-import com.netflix.vms.transformer.input.VMSInputDataClient;
 import com.netflix.config.NetflixConfiguration.EnvironmentEnum;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.hollow.HollowBlobHeader;
@@ -171,6 +171,7 @@ public class RollingDiff {
         HttpHelper.getStringResponse(url);
     }
     
+    @SuppressWarnings("unused")
     private void downloadNewPipelineInput() throws IOException {
         File dir = new File(WORKING_DIR, "rolling-diff");
         HollowBlobHeader header = new HollowBlobHeaderReader().readHeader(new LZ4VMSInputStream(new FileInputStream(new File(dir, "newpipeline-snapshot"))));

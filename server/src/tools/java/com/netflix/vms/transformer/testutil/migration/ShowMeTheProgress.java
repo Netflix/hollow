@@ -1,4 +1,8 @@
-package com.netflix.vms.transformer;
+package com.netflix.vms.transformer.testutil.migration;
+
+import com.netflix.vms.transformer.SimpleTransformer;
+import com.netflix.vms.transformer.SimpleTransformerContext;
+import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 
 import com.netflix.hollow.HollowBlobHeader;
 import com.netflix.hollow.HollowSchema;
