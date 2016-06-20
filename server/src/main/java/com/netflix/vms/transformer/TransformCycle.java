@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer;
 
+import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.CycleFastlaneIds;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleBegin;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleFailed;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleSuccess;
@@ -9,9 +10,7 @@ import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metri
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ProcessDataDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ReadInputDataDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WriteOutputDataDuration;
-
 import java.util.Date;
-
 import com.netflix.vms.transformer.input.FollowVipPinExtractor;
 import com.netflix.vms.transformer.input.FollowVipPin;
 import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
@@ -73,6 +72,8 @@ public class TransformCycle {
         currentCycleNumber = versionMinter.mintANewVersion();
         ctx.setCurrentCycleId(currentCycleNumber);
 
+        if(ctx.getFastlaneIds() != null)
+            ctx.getLogger().info(CycleFastlaneIds, ctx.getFastlaneIds());
         ctx.getLogger().info(TransformCycleBegin, "Beginning cycle " + currentCycleNumber);
     }
     
