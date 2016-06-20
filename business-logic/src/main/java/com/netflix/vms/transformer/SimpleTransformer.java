@@ -27,6 +27,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoMiscData;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.logmessage.ProgressMessage;
 import com.netflix.vms.transformer.misc.TopNVideoDataModule;
 import com.netflix.vms.transformer.misc.VideoEpisodeCountryDecoratorModule;
 import com.netflix.vms.transformer.modules.TransformModule;
@@ -163,7 +164,7 @@ public class SimpleTransformer {
                     }
 
                     if (idx % progressDivisor == 0) {
-                        ctx.getLogger().info(LogTag.TransformProgress, ("finished percent=" + (idx / progressDivisor)));
+                        ctx.getLogger().info(LogTag.TransformProgress, new ProgressMessage(idx, progressDivisor));
                     }
 
                     idx = processedCount.getAndIncrement();
@@ -220,7 +221,7 @@ public class SimpleTransformer {
         tDuration = System.currentTimeMillis() - tStart;
         ctx.getLogger().info(LogTag.NonVideoSpecificTransformDuration, String.format("Finished Trasform for module=%s, duration=%s", namedListCompleter.getName(), tDuration));
 
-        ctx.getLogger().info(LogTag.TransformProgress, "finished percent=100");
+        ctx.getLogger().info(LogTag.TransformProgress, new ProgressMessage(processedCount.get()));
         ctx.getMetricRecorder().recordMetric(FailedProcessingIndividualHierarchies, failedIndividualTransforms.get());
         
         if(failedIndividualTransforms.get() > ctx.getConfig().getMaxTolerableFailedTransformerHierarchies())
