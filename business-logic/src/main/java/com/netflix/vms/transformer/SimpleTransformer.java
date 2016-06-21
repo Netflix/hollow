@@ -266,7 +266,7 @@ public class SimpleTransformer {
                 CompleteVideo topNode = addCompleteVideo(vmdByCountry, miscData, mediaDataByCountry, imagesDataByCountry, countrySpecificByCountry,
                         objectMapper, country, countryId, videoCollectionsData, hierarchy.getTopNode().topNode, globalVideoMap);
 
-                namedListPopulator.addCompleteVideo(topNode, true);
+                namedListPopulator.addCompleteVideo(topNode, true); // TODO: timt: refactor away duplicate calls (see globalVideoMap)
 
                 // Process Show children
                 if(topNode.facetData.videoCollectionsData.nodeType == cycleConstants.SHOW) {
@@ -276,14 +276,14 @@ public class SimpleTransformer {
                         CompleteVideo season = addCompleteVideo(vmdByCountry, miscData, mediaDataByCountry, imagesDataByCountry, countrySpecificByCountry,
                                 objectMapper, country, countryId, showEntry.getValue(), new Video(showEntry.getKey().intValue()), globalVideoMap);
 
-                        namedListPopulator.addCompleteVideo(season, false);
+                        namedListPopulator.addCompleteVideo(season, false); // TODO: timt: refactor away duplicate calls (see globalVideoMap)
 
                         // Process Episodes
                         for(Map.Entry<Integer, VideoCollectionsData> episodeEntry : hierarchy.getOrderedSeasonEpisodes(++sequenceNumber).entrySet()) {
                             CompleteVideo episode = addCompleteVideo(vmdByCountry, miscData, mediaDataByCountry, imagesDataByCountry, countrySpecificByCountry,
                                     objectMapper, country, countryId, episodeEntry.getValue(), new Video(episodeEntry.getKey().intValue()), globalVideoMap);
 
-                            namedListPopulator.addCompleteVideo(episode, false);
+                            namedListPopulator.addCompleteVideo(episode, false); // TODO: timt: refactor away duplicate calls (see globalVideoMap)
                         }
                     }
                 }
@@ -293,7 +293,7 @@ public class SimpleTransformer {
                     CompleteVideo supplemental = addCompleteVideo(vmdByCountry, miscData, mediaDataByCountry, imagesDataByCountry, countrySpecificByCountry,
                             objectMapper, country, countryId, supplementalEntry.getValue(), new Video(supplementalEntry.getKey().intValue()), globalVideoMap);
 
-                    namedListPopulator.addCompleteVideo(supplemental, false);
+                    namedListPopulator.addCompleteVideo(supplemental, false); // TODO: timt: refactor away duplicate calls (see globalVideoMap)
                 }
             }
         }
