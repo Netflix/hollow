@@ -154,6 +154,10 @@ public class VideoHierarchyGrouper {
                 potentialOrphans.add(videoId);
             }
         }
+        
+        // If this is the fastlane, don't worry about orphans.
+        if(fastlaneIds != null)
+            return;
 
         // NOTE: TODO need to follow up with beehive to make sure this are part of VideoGeneral
         if (ctx.getConfig().shouldProcessExtraNonVideoGeneralVideoIds()) {

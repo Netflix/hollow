@@ -13,16 +13,13 @@ public class ReproTransformerScenario {
     
     @Test
     public void repro() throws Throwable {
-        TransformerScenario scenario = new TransformerScenario(LOCAL_BLOB_STORE, "boson", 20160617115752422L, 1466299730197L, 70216224);
+        TransformerScenario scenario = new TransformerScenario(LOCAL_BLOB_STORE, "newnoevent", 20160620144352641L, 70216224);
         
         VMSTransformerWriteStateEngine transformedStateEngine = scenario.repro();
         
-        HollowReadStateEngine finalStateEngine = StateEngineRoundTripper.roundTripSnapshot(transformedStateEngine);
-        
-        VMSRawHollowAPI finalAPI = new VMSRawHollowAPI(finalStateEngine);
-        
+        HollowReadStateEngine clientStateEngine = StateEngineRoundTripper.roundTripSnapshot(transformedStateEngine);
+        VMSRawHollowAPI finalAPI = new VMSRawHollowAPI(clientStateEngine);
         CompleteVideoHollow completeVideoHollow = finalAPI.getCompleteVideoHollow(0);
-        
         System.out.println(completeVideoHollow._getId()._getValue());
     }
     

@@ -7,6 +7,7 @@ import com.netflix.videometadata.s3.HollowBlobKeybaseBuilder;
 import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
+import com.netflix.vms.transformer.publish.workflow.logmessage.PublishBlobMessage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +71,7 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
         long duration = System.currentTimeMillis() - startTime;
         if(success) {
             status.setStatus(UploadStatus.SUCCESS);
-            ctx.getLogger().info(LogTag.PublishedBlob, "Uploaded VMS Blob: keybase=" + keybase + "; region=" + status.getRegion() + " version=" +getCycleVersion() + " dataVersion=" + getCycleVersion() +" size=" + fileToUpload.length() + " duration=" +duration+ "ms");
+            ctx.getLogger().info(LogTag.PublishedBlob,  new PublishBlobMessage(keybase, status.getRegion(), getCycleVersion(), getCycleVersion(), fileToUpload.length(), duration));
         } else {
             status.setStatus(UploadStatus.FAILED);
         }

@@ -12,11 +12,9 @@ import java.util.Arrays;
 public class CassandraPoisonStateMarkerJob extends PoisonStateMarkerJob {
 
     private final PublishWorkflowContext ctx;
-    private final long cycleVersion;
 
     public CassandraPoisonStateMarkerJob(PublishWorkflowContext ctx, PublicationJob validationJob, long cycleVersion) {
         super(ctx, validationJob, cycleVersion);
-        this.cycleVersion = cycleVersion;
         this.ctx = ctx;
     }
 
@@ -24,10 +22,12 @@ public class CassandraPoisonStateMarkerJob extends PoisonStateMarkerJob {
     protected boolean executeJob() {
         try {
             ctx.getPoisonStateMarker().markStatePoisoned(getCycleVersion(), true);
+            
+            ctx.getStatusIndicator().markFailure(getCycleVersion());
 
             ctx.getLogger().error(
                     Arrays.asList(MarkedPoisonState, TransformCycleFailed),
-                    "Marked version "+cycleVersion+" poison.");
+                    "Marked version "+getCycleVersion()+" poison.");
 
         } catch (Throwable th) {
             throw new RuntimeException(th);

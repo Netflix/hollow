@@ -6,7 +6,6 @@ import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
 import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
 import com.netflix.vms.generated.notemplate.ISOCountryHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import java.util.BitSet;
 
@@ -40,20 +39,10 @@ public abstract class HollowPerCountryCompleteVideoScoringCircuitBreaker extends
         CircuitBreakerResults results = new CircuitBreakerResults();
 
         for(int i=0;i<perCountryCertificationCounts.length;i++) {
-            ISOCountryHollow country = hollowApi.getISOCountryHollow(i);
-            if(country == null)
-            	continue;
-            try{
-	            if(perCountryCertificationCounts[i] != 0 && 
-	            		ctx
-	            		.getConfig()
-	            		.isCircuitBreakerEnabled(getRuleName(), 
-	            				country._getId()))
-	                results.addResult(compareMetric(country._getId(), perCountryCertificationCounts[i]));
-            } catch(NullPointerException ex){
-            	ctx.getLogger().error(LogTag.CircuitBreaker, "NullPointer cause: "+ex.getCause());
-            	ex.printStackTrace();
-            	throw ex;
+            if(stateEngine.getTypeState("ISOCountry").getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals().get(i)) {
+                ISOCountryHollow country = hollowApi.getISOCountryHollow(i);
+                if(isEnabled(country._getId()))
+                    results.addResult(compareMetric(country._getId(), perCountryCertificationCounts[i]));
             }
         }
 

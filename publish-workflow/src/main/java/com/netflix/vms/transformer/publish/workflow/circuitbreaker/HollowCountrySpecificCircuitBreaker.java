@@ -71,7 +71,7 @@ public abstract class HollowCountrySpecificCircuitBreaker extends HollowCircuitB
     	return ctx.getConfig().getCircuitBreakerThreshold(getRuleName());
     }
     
-    private boolean isEnabled(String country) {
+    protected boolean isEnabled(String country) {
     	Boolean enabled = ctx.getConfig().isCircuitBreakerEnabled(getRuleName(), country);
     	if(enabled != null)
     		return enabled;

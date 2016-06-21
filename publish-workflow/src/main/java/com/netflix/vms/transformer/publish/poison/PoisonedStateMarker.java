@@ -1,4 +1,4 @@
-package com.netflix.vms.transformer.publish;
+package com.netflix.vms.transformer.publish.poison;
 
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 

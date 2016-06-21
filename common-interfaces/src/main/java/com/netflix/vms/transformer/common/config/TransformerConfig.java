@@ -35,6 +35,9 @@ public interface TransformerConfig {
     Long getNowMillis();
 
     String getFollowVip();
+    
+    @DefaultValue("2")
+    int getMaxTolerableFailedTransformerHierarchies();
 
     //////////////// PUBLISH WORKFLOW ///////////////////
 
