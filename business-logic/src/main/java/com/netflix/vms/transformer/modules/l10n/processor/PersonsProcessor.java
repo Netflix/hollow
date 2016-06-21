@@ -21,8 +21,8 @@ public class PersonsProcessor extends AbstractL10NMiscProcessor<PersonsHollow> {
     public PersonsProcessor(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
         super(api, ctx, mapper);
 
-        // @TODO: Need to come from config
-        transliteratedPersonLocales = NFLocaleUtil.parseLocales("ja-Hira,ja-Kana,ja-Latn");
+        String localesStr = ctx.getConfig().getTransliteratedPersonLocales();
+        transliteratedPersonLocales = NFLocaleUtil.parseLocales(localesStr);
     }
 
     @Override

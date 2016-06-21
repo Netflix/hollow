@@ -31,9 +31,9 @@ public interface TransformerConfig {
     String getAwsAmiId();
 
     Long getPinInputVersion();
-    
+
     Long getNowMillis();
-    
+
     String getFollowVip();
     
     @DefaultValue("2")
@@ -70,15 +70,27 @@ public interface TransformerConfig {
     @DefaultValue("true")
     public boolean shouldFailCycleOnPlaybackMonkeyFailure();
 
+    @DefaultValue("true")
+    public boolean shouldProcessExtraNonVideoGeneralVideoIds();
+
+    @DefaultValue("true")
+    public boolean isEnableCdnDirectoryOptimization();
+
+    @DefaultValue("5")
+    public int getComputedCdnFolderLength();
+
+    @DefaultValue("ja-Hira,ja-Kana,ja-Latn")
+    public String getTransliteratedPersonLocales();
+
     @DefaultValue("5")
     public int getPlaybackMonkeyMaxRetriesPerTest();
 
     @DefaultValue("0.01")
     public float getPlaybackMonkeyNoiseTolerance();
-    
+
     @DefaultValue("false")
     public boolean isBigGreenButton();
-    
+
 
     /////////////// VMS IOPS (ElasticSearch) ///////////////
 
