@@ -114,6 +114,6 @@ public class SimpleTransformerContext implements TransformerContext {
 
     @Override
     public TransformerHealthIndicator getHealthIndicator() {
-        return null;
+        throw new UnsupportedOperationException("simple transformer does not require healthcheck");
     }
 }

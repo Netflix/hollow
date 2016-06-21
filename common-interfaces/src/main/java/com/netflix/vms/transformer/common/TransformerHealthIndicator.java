@@ -5,4 +5,5 @@ public interface TransformerHealthIndicator {
 
     void cycleFailed(Throwable th);
 
+    boolean isHealthy();
 }

@@ -58,6 +58,11 @@ public class TransformerServerHealthIndicator implements HealthIndicator, Transf
     }
 
     @Override
+    public boolean isHealthy() {
+        return healthStatus.isHealthy();
+    }
+
+    @Override
     public void check(HealthIndicatorCallback healthCallback) {
         healthCallback.inform(healthStatus);
     }
