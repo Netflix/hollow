@@ -192,12 +192,19 @@ public class VideoNamedListModule {
                 addToList(VideoNamedListType.AUTO_PLAY_DISABLED);
             }
 
-            boolean isRecentlyAdded = video.countrySpecificData.firstDisplayDate != null && video.countrySpecificData.firstDisplayDate.val > (ctx.getNowMillis() - (MS_IN_DAY * 30));
+            final boolean isRecentlyAdded = video.countrySpecificData.firstDisplayDate != null && video.countrySpecificData.firstDisplayDate.val > (ctx.getNowMillis() - (MS_IN_DAY * 30));
 
             if(isAvailableForED) {
                 long theatricalReleaseDate = video.facetData.videoMetaData.theatricalReleaseDate == null ? 0 : video.facetData.videoMetaData.theatricalReleaseDate.val;
                 long dvdReleaseDate = video.facetData.videoMediaData.dvdReleaseDate == null ? 0 : video.facetData.videoMediaData.dvdReleaseDate.val;
                 long broadcastReleaseDate = video.facetData.videoMetaData.broadcastReleaseDate == null ? 0 : video.facetData.videoMetaData.broadcastReleaseDate.val;
+                
+                boolean hasNoReleaseDate = false;
+                if (video.facetData.videoMetaData.theatricalReleaseDate == null && video.facetData.videoMetaData.broadcastReleaseDate == null) {
+                    hasNoReleaseDate = true;
+                } else if(video.facetData.videoMetaData.broadcastReleaseDate != null) {
+                    theatricalReleaseDate = broadcastReleaseDate;
+                }
 
                 long theatricalReleaseDaysAgo = (ctx.getNowMillis() - theatricalReleaseDate) / MS_IN_DAY;
                 long dvdReleaseDaysAgo = (ctx.getNowMillis() - dvdReleaseDate) / MS_IN_DAY;
@@ -217,7 +224,7 @@ public class VideoNamedListModule {
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_HOLLYWOOD);
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES);
                         }
-                    } else if(theatricalReleaseDate == Long.MIN_VALUE) {
+                    } else if(hasNoReleaseDate) {
                         if(dvdReleaseDaysAgo < (6 * 30) && !isTV) {
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_DIRECT_TO_DVD);
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES);
@@ -248,7 +255,7 @@ public class VideoNamedListModule {
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_HOLLYWOOD_EXTENDED);
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_EXTENDED);
                         }
-                    } else if(theatricalReleaseDate == Long.MIN_VALUE) {
+                    } else if(hasNoReleaseDate) {
                         if(dvdReleaseDaysAgo < (6 * 30) && !isTV) {
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_DIRECT_TO_DVD_EXTENDED);
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_EXTENDED);
@@ -263,7 +270,7 @@ public class VideoNamedListModule {
                     }
                 }
 
-                if(isRecentlyAdded) {
+                if(isRecentlyAdded && topNodeVideoIdOrdinal == videoIdOrdinal) {
                     addTopNodeToList(VideoNamedListType.RECENTLY_ADDED_ED_VIDEOS);
 
                     if(isTV) {
