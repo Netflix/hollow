@@ -50,8 +50,8 @@ public class RollingDiff {
 
     private static String WORKING_DIR = "/space/transformer-data";
     private static String CONTROL_PIPELINE_VIP = "noevent";
-    private static String CANARY_TRANSFORMER_VIP = "newnoevent";
     private static String CANARY_CONVERTER_VIP = "noevent";
+    private static String CANARY_TRANSFORMER_VIP = "newnoevent";
     private static String DIFF_NAME_PREFIX = "_ROLLING_DIFF_";
 
     @Test
