@@ -160,7 +160,7 @@ public class VideoHierarchyGrouper {
             return;
 
         // NOTE: TODO need to follow up with beehive to make sure this are part of VideoGeneral
-        {
+        if (ctx.getConfig().shouldProcessExtraNonVideoGeneralVideoIds()) {
             // Make sure to include videoIds from DeployablePackage feed - for PackageData parity
             for (DeployablePackagesHollow dp : api.getAllDeployablePackagesHollow()) {
                 potentialOrphans.add((int) dp._getMovieId());
