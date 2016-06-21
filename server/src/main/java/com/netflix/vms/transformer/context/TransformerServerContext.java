@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.context;
 
+import com.netflix.vms.transformer.common.TransformerHealthIndicator;
+
 import com.netflix.archaius.api.Config;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerFiles;
@@ -29,6 +31,7 @@ public class TransformerServerContext implements TransformerContext {
     private final PublicationHistoryConsumer publicationHistoryConsumer;
     private final TransformerMetricRecorder metricRecorder;
     private final OctoberSkyData octoberSkyData;
+    private final TransformerHealthIndicator healthIndicator;
 
     private final FrozenTransformerConfigFactory configFactory; 
     
@@ -49,7 +52,8 @@ public class TransformerServerContext implements TransformerContext {
             TransformerCassandraHelper hollowValidationStats,
             TransformerCassandraHelper canaryResults,
             TransformerFiles files,
-            PublicationHistoryConsumer publicationHistoryConsumer) {
+            PublicationHistoryConsumer publicationHistoryConsumer, 
+            TransformerHealthIndicator healthIndicator) {
         this.logger = logger;
         this.octoberSkyData = octoberSkyData;
         this.metricRecorder = metricRecorder;
@@ -58,6 +62,7 @@ public class TransformerServerContext implements TransformerContext {
         this.canaryResults = canaryResults;
         this.files = files;
         this.publicationHistoryConsumer = publicationHistoryConsumer;
+        this.healthIndicator = healthIndicator;
         
         this.configFactory = new FrozenTransformerConfigFactory(config);
         this.staticConfig = configFactory.createStaticConfig(logger);
@@ -139,5 +144,9 @@ public class TransformerServerContext implements TransformerContext {
 	public OctoberSkyData getOctoberSkyData() {
 		return octoberSkyData;
 	}
-    
+
+    @Override
+    public TransformerHealthIndicator getHealthIndicator() {
+        return healthIndicator;
+    }
 }
