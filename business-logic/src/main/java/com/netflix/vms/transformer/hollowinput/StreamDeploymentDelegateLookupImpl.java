@@ -32,6 +32,10 @@ public class StreamDeploymentDelegateLookupImpl extends HollowObjectAbstractDele
         return typeAPI.getS3PathComponentOrdinal(ordinal);
     }
 
+    public int getS3FullPathOrdinal(int ordinal) {
+        return typeAPI.getS3FullPathOrdinal(ordinal);
+    }
+
     public StreamDeploymentTypeAPI getTypeAPI() {
         return typeAPI;
     }

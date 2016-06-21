@@ -14,6 +14,8 @@ public interface StreamDeploymentDelegate extends HollowObjectDelegate {
 
     public int getS3PathComponentOrdinal(int ordinal);
 
+    public int getS3FullPathOrdinal(int ordinal);
+
     public StreamDeploymentTypeAPI getTypeAPI();
 
 }

@@ -12,6 +12,7 @@ public class StreamDeploymentDelegateCachedImpl extends HollowObjectAbstractDele
     private final int deploymentLabelOrdinal;
     private final Integer deploymentPriority;
     private final int s3PathComponentOrdinal;
+    private final int s3FullPathOrdinal;
    private StreamDeploymentTypeAPI typeAPI;
 
     public StreamDeploymentDelegateCachedImpl(StreamDeploymentTypeAPI typeAPI, int ordinal) {
@@ -19,6 +20,7 @@ public class StreamDeploymentDelegateCachedImpl extends HollowObjectAbstractDele
         this.deploymentLabelOrdinal = typeAPI.getDeploymentLabelOrdinal(ordinal);
         this.deploymentPriority = typeAPI.getDeploymentPriorityBoxed(ordinal);
         this.s3PathComponentOrdinal = typeAPI.getS3PathComponentOrdinal(ordinal);
+        this.s3FullPathOrdinal = typeAPI.getS3FullPathOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -40,6 +42,10 @@ public class StreamDeploymentDelegateCachedImpl extends HollowObjectAbstractDele
 
     public int getS3PathComponentOrdinal(int ordinal) {
         return s3PathComponentOrdinal;
+    }
+
+    public int getS3FullPathOrdinal(int ordinal) {
+        return s3FullPathOrdinal;
     }
 
     @Override
