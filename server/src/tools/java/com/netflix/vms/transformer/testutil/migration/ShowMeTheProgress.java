@@ -102,7 +102,7 @@ public class ShowMeTheProgress {
         filter.addTypeRecursive("DefaultExtensionRecipe", outputSchemas);
         filter.addTypeRecursive("DeploymentIntent", outputSchemas);
         filter.addTypeRecursive("TopNVideoData", outputSchemas);
-        filter.addTypeRecursive("RolloutCharacter", outputSchemas);
+//        filter.addTypeRecursive("RolloutCharacter", outputSchemas);
         filter.addTypeRecursive("RolloutVideo", outputSchemas);
         filter.addTypeRecursive("EncodingProfileGroup", outputSchemas);
         filter.addTypeRecursive("GlobalPerson", outputSchemas);

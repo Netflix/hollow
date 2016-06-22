@@ -197,6 +197,11 @@ public class StreamDataModule {
         if(conformingGroupId != null) {
             outputStream.additionalData.mostlyConstantData.conformingGroupId = Integer.parseInt(conformingGroupId._getValue());
         }
+        
+        StringHollow s3FullPath = inputStreamDeployment._getS3FullPath();
+        if(s3FullPath != null) {
+            outputStream.additionalData.mostlyConstantData.s3FullPath = s3FullPath._getValue().toCharArray();
+        }
 
         int pixelAspectHeight = inputStreamDimensions._getPixelAspectRatioHeight();
         if(pixelAspectHeight != Integer.MIN_VALUE) {
