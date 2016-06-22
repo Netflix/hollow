@@ -4,6 +4,7 @@ import com.google.inject.Singleton;
 import com.netflix.runtime.health.api.Health;
 import com.netflix.runtime.health.api.HealthIndicator;
 import com.netflix.runtime.health.api.HealthIndicatorCallback;
+import com.netflix.util.Pair;
 import com.netflix.vms.transformer.common.TransformerHealthIndicator;
 
 /**
@@ -67,7 +68,11 @@ public class TransformerServerHealthIndicator implements HealthIndicator, Transf
         healthCallback.inform(healthStatus);
     }
 
-    public void setStartupStatus(Status startupStatus, Throwable th) {
+    public synchronized Pair<Health, Status> getHealthStatus() {
+        return new Pair<Health, Status>(healthStatus, startupStatus);
+    }
+
+    public synchronized void setStartupStatus(Status startupStatus, Throwable th) {
         this.startupStatus = startupStatus;
         if (startupStatus == Status.STARTED_SUCCESSFUL) {
             healthStatus = Health.healthy().withDetail(TRANSFORMER_STATUS_STRING, startupStatus.name()).build();
