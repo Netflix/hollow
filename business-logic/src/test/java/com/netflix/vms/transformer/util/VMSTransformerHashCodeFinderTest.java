@@ -123,7 +123,7 @@ public class VMSTransformerHashCodeFinderTest {
         Video v = new Video(99); // …luftballons
 
         assertThat(subject.hashCode(RecordType.Video.name(), anyOrdinal(), v))
-            .isEqualTo(v.hashCode());
+            .isEqualTo(99);
     }
 
     @Test
