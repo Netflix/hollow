@@ -98,6 +98,9 @@ public class VMSAvailabilityWindowModule {
         int maxPackageId = 0;
         int bundledAssetsGroupId = 0; /// the contract ID for the highest package ID across all windows;
         
+        if(videoId == 80061704 && "US".equals(country))
+            System.out.println("asdf");
+        
         List<VideoRightsWindowHollow> sortedWindows = new ArrayList<VideoRightsWindowHollow>(rights._getWindows());
         Collections.sort(sortedWindows, new Comparator<VideoRightsWindowHollow>() {
             @Override
@@ -189,8 +192,14 @@ public class VMSAvailabilityWindowModule {
                                 }
                             } else {
                                 if(shouldFilterOutWindowInfo) {
-                                    outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractId, videoId));
-    
+                                    WindowPackageContractInfo alreadyFilteredWindowPackageContractInfo = outputWindow.windowInfosByPackageId.get(ZERO);
+                                    if(alreadyFilteredWindowPackageContractInfo != null) {
+                                        if(alreadyFilteredWindowPackageContractInfo.videoContractInfo.contractId < (int)contractId)
+                                            alreadyFilteredWindowPackageContractInfo.videoContractInfo.contractId = (int)contractId;
+                                    } else {
+                                        outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractId, videoId));
+                                    }
+        
                                     if(maxPackageId == 0)
                                         bundledAssetsGroupId = Math.max(bundledAssetsGroupId, (int)contractId);
                                     
