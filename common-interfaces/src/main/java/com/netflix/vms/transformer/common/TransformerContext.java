@@ -38,6 +38,4 @@ public interface TransformerContext {
     OctoberSkyData getOctoberSkyData();
 
     Consumer<PublicationHistory> getPublicationHistoryConsumer();
-
-    TransformerHealthIndicator getHealthIndicator();
 }

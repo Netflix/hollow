@@ -4,7 +4,6 @@ import com.netflix.archaius.ConfigProxyFactory;
 import com.netflix.archaius.config.EmptyConfig;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerFiles;
-import com.netflix.vms.transformer.common.TransformerHealthIndicator;
 import com.netflix.vms.transformer.common.TransformerLogger;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
@@ -110,10 +109,5 @@ public class SimpleTransformerContext implements TransformerContext {
     @Override
     public Consumer<PublicationHistory> getPublicationHistoryConsumer() {
         throw new UnsupportedOperationException("simple transformer doesn't publish");
-    }
-
-    @Override
-    public TransformerHealthIndicator getHealthIndicator() {
-        throw new UnsupportedOperationException("simple transformer does not require healthcheck");
     }
 }

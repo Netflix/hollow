@@ -70,10 +70,10 @@ public class TransformerCycleKickoff {
                         if (isFastlane(ctx.getConfig()))
                             setUpFastlaneContext();
 	                    cycle.cycle();
-                        ctx.getHealthIndicator().cycleSucessful();
+                        healthIndicator.cycleSucessful();
                     } catch(Throwable th) {
                         ctx.getLogger().error(LogTag.UnexpectedError, "Unexpected error occurred", th);
-                        ctx.getHealthIndicator().cycleFailed(th);
+                        healthIndicator.cycleFailed(th);
                     }
                 }
             }
@@ -122,8 +122,9 @@ public class TransformerCycleKickoff {
                 new TransformerServerCassandraHelper(astyanax, "cass_dpt", "hollow_publish_workflow", "hollow_validation_stats"),
                 new TransformerServerCassandraHelper(astyanax, "cass_dpt", "canary_validation", "canary_results"),
                 new LZ4VMSTransformerFiles(),
-                (history) -> { VMSPublishWorkflowHistoryAdmin.history = history; },
-                healthIndicator);
+                (history) -> {
+                    VMSPublishWorkflowHistoryAdmin.history = history;
+                });
     }
 
     private final PublishWorkflowStager publishStager(TransformerContext ctx, SubscriptionManager hermesSubscriber,
