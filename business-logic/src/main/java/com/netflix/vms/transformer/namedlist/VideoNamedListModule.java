@@ -185,7 +185,8 @@ public class VideoNamedListModule {
 
             if(isOriginal) {
                 addToList(VideoNamedListType.VALID_ORIGINAL_VIDEOS);
-                addTopNodeToList(VideoNamedListType.VALID_ORIGINAL_TOP_NODES);
+                if(isTopNode)
+                    addToList(VideoNamedListType.VALID_ORIGINAL_TOP_NODES);
             }
 
             if(video.facetData.videoMediaData != null && !video.facetData.videoMediaData.isAutoPlayEnabled) {
