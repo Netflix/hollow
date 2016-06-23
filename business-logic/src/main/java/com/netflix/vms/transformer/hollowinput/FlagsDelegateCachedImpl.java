@@ -16,7 +16,7 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
     private final Boolean goLive;
     private final Boolean contentApproved;
     private final Boolean autoPlay;
-    private final Long firstDisplayDate;
+    private final int firstDisplayDateOrdinal;
    private FlagsTypeAPI typeAPI;
 
     public FlagsDelegateCachedImpl(FlagsTypeAPI typeAPI, int ordinal) {
@@ -28,7 +28,7 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
         this.goLive = typeAPI.getGoLiveBoxed(ordinal);
         this.contentApproved = typeAPI.getContentApprovedBoxed(ordinal);
         this.autoPlay = typeAPI.getAutoPlayBoxed(ordinal);
-        this.firstDisplayDate = typeAPI.getFirstDisplayDateBoxed(ordinal);
+        this.firstDisplayDateOrdinal = typeAPI.getFirstDisplayDateOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -92,12 +92,8 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
         return autoPlay;
     }
 
-    public long getFirstDisplayDate(int ordinal) {
-        return firstDisplayDate.longValue();
-    }
-
-    public Long getFirstDisplayDateBoxed(int ordinal) {
-        return firstDisplayDate;
+    public int getFirstDisplayDateOrdinal(int ordinal) {
+        return firstDisplayDateOrdinal;
     }
 
     @Override

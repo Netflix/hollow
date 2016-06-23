@@ -130,26 +130,15 @@ public class FlagsTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public long getFirstDisplayDate(int ordinal) {
+    public int getFirstDisplayDateOrdinal(int ordinal) {
         if(fieldIndex[8] == -1)
-            return missingDataHandler().handleLong("Flags", ordinal, "firstDisplayDate");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[8]);
+            return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "firstDisplayDate");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[8]);
     }
 
-    public Long getFirstDisplayDateBoxed(int ordinal) {
-        long l;
-        if(fieldIndex[8] == -1) {
-            l = missingDataHandler().handleLong("Flags", ordinal, "firstDisplayDate");
-        } else {
-            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[8]);
-            l = getTypeDataAccess().readLong(ordinal, fieldIndex[8]);
-        }
-        if(l == Long.MIN_VALUE)
-            return null;
-        return Long.valueOf(l);
+    public DateTypeAPI getFirstDisplayDateTypeAPI() {
+        return getAPI().getDateTypeAPI();
     }
-
-
 
     public FlagsDelegateLookupImpl getDelegateLookupImpl() {
         return delegateLookupImpl;

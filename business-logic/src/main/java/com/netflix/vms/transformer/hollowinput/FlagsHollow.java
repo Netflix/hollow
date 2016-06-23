@@ -72,12 +72,11 @@ public class FlagsHollow extends HollowObject {
         return delegate().getAutoPlayBoxed(ordinal);
     }
 
-    public long _getFirstDisplayDate() {
-        return delegate().getFirstDisplayDate(ordinal);
-    }
-
-    public Long _getFirstDisplayDateBoxed() {
-        return delegate().getFirstDisplayDateBoxed(ordinal);
+    public DateHollow _getFirstDisplayDate() {
+        int refOrdinal = delegate().getFirstDisplayDateOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getDateHollow(refOrdinal);
     }
 
     public VMSHollowInputAPI api() {

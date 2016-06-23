@@ -17,11 +17,11 @@ public class StatusHollow extends HollowObject {
         return delegate().getMovieIdBoxed(ordinal);
     }
 
-    public ISOCountryHollow _getCountryCode() {
+    public StringHollow _getCountryCode() {
         int refOrdinal = delegate().getCountryCodeOrdinal(ordinal);
         if(refOrdinal == -1)
             return null;
-        return  api().getISOCountryHollow(refOrdinal);
+        return  api().getStringHollow(refOrdinal);
     }
 
     public RightsHollow _getRights() {

@@ -1,29 +1,30 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
-import com.netflix.vms.transformer.hollowoutput.VideoResolution;
-
-import com.netflix.vms.transformer.hollowoutput.PixelAspect;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.hollowinput.ContractHollow;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
+import com.netflix.vms.transformer.hollowinput.RightsContractAssetHollow;
+import com.netflix.vms.transformer.hollowinput.RightsContractHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
-import com.netflix.vms.transformer.hollowinput.VideoRightsContractAssetHollow;
-import com.netflix.vms.transformer.hollowinput.VideoRightsContractHollow;
 import com.netflix.vms.transformer.hollowoutput.ContractRestriction;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.LinkedHashSetOfStrings;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
+import com.netflix.vms.transformer.hollowoutput.PixelAspect;
 import com.netflix.vms.transformer.hollowoutput.StreamData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoContractInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
+import com.netflix.vms.transformer.hollowoutput.VideoResolution;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -60,13 +61,13 @@ public class WindowPackageContractInfoModule {
         FILTERED_VIDEO_PACKAGE_INFO = newEmptyVideoPackageInfo();
     }
 
-    public WindowPackageContractInfo buildWindowPackageContractInfo(PackageData packageData, VideoRightsContractHollow contract, String country) {
+    public WindowPackageContractInfo buildWindowPackageContractInfo(PackageData packageData, RightsContractHollow rightsContract, ContractHollow contract, String country) {
         PackageHollow inputPackage = api.getPackageHollow(packageIdx.getMatchingOrdinal((long) packageData.id));
 
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
         info.videoContractInfo.contractId = (int) contract._getContractId();
-        info.videoContractInfo.primaryPackageId = (int) contract._getPackageId();
+        info.videoContractInfo.primaryPackageId = (int) rightsContract._getPackageId();
         if(contract._getPrePromotionDays() != Long.MIN_VALUE)
             info.videoContractInfo.prePromotionDays = (int) contract._getPrePromotionDays();
         info.videoContractInfo.isDayAfterBroadcast = contract._getDayAfterBroadcast();
@@ -74,7 +75,7 @@ public class WindowPackageContractInfoModule {
         info.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(Collections.singletonList(new Strings(contract._getCupToken()._getValue())));
         info.videoContractInfo.assetBcp47Codes = new HashSet<Strings>();
 
-        for(VideoRightsContractAssetHollow asset : contract._getAssets()) {
+        for (RightsContractAssetHollow asset : rightsContract._getAssets()) {
             info.videoContractInfo.assetBcp47Codes.add(new Strings(asset._getBcp47Code()._getValue()));
         }
 
@@ -89,7 +90,7 @@ public class WindowPackageContractInfoModule {
         Set<String> screenFormats = new TreeSet<String>();
 
         long longestRuntimeInSeconds = 0;
-        
+
         for(StreamData streamData : packageData.streams) {
             int streamProfileOrdinal = streamProfileIdx.getMatchingOrdinal((long) streamData.downloadDescriptor.encodingProfileId);
             StreamProfilesHollow profile = api.getStreamProfilesHollow(streamProfileOrdinal);
@@ -119,7 +120,7 @@ public class WindowPackageContractInfoModule {
                     float screenFormat = ((float) (videoResolution.width * parWidth)) / (videoResolution.height * parHeight);
                     screenFormats.add(getScreenFormat(screenFormat));
                 }
-                
+
             } else if("AUDIO".equals(streamProfileType)) {
                 if(excludedDownloadables != null && !excludedDownloadables.contains(new com.netflix.vms.transformer.hollowoutput.Long(streamData.downloadableId)))
                     soundTypesAudioChannels.add(Integer.valueOf((int)profile._getAudioChannelCount()));
@@ -159,8 +160,8 @@ public class WindowPackageContractInfoModule {
         }
         return formatStr;
     }
-    
-    public WindowPackageContractInfo buildWindowPackageContractInfoWithoutPackage(int packageId, VideoRightsContractHollow contract, String country, int videoId) {
+
+    public WindowPackageContractInfo buildWindowPackageContractInfoWithoutPackage(int packageId, RightsContractHollow rightsContract, ContractHollow contract, String country, int videoId) {
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
         info.videoContractInfo.contractId = (int) contract._getContractId();
@@ -172,7 +173,7 @@ public class WindowPackageContractInfoModule {
         info.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(Collections.singletonList(new Strings(contract._getCupToken()._getValue())));
         info.videoContractInfo.assetBcp47Codes = new HashSet<Strings>();
 
-        for(VideoRightsContractAssetHollow asset : contract._getAssets()) {
+        for (RightsContractAssetHollow asset : rightsContract._getAssets()) {
             info.videoContractInfo.assetBcp47Codes.add(new Strings(asset._getBcp47Code()._getValue()));
         }
 
@@ -241,7 +242,7 @@ public class WindowPackageContractInfoModule {
         result.runtimeInSeconds = approxRuntimeInSecs;
         return result;
     }
-    
+
     private VideoPackageInfo getFilteredVideoPackageInfo(long videoId, int packageId) {
         VideoPackageInfo result = newEmptyVideoPackageInfo();
         result.packageId = packageId;

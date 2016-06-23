@@ -72,12 +72,8 @@ public class FlagsDelegateLookupImpl extends HollowObjectAbstractDelegate implem
         return typeAPI.getAutoPlayBoxed(ordinal);
     }
 
-    public long getFirstDisplayDate(int ordinal) {
-        return typeAPI.getFirstDisplayDate(ordinal);
-    }
-
-    public Long getFirstDisplayDateBoxed(int ordinal) {
-        return typeAPI.getFirstDisplayDateBoxed(ordinal);
+    public int getFirstDisplayDateOrdinal(int ordinal) {
+        return typeAPI.getFirstDisplayDateOrdinal(ordinal);
     }
 
     public FlagsTypeAPI getTypeAPI() {

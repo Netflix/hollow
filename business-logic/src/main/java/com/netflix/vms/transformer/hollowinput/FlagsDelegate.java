@@ -34,9 +34,7 @@ public interface FlagsDelegate extends HollowObjectDelegate {
 
     public Boolean getAutoPlayBoxed(int ordinal);
 
-    public long getFirstDisplayDate(int ordinal);
-
-    public Long getFirstDisplayDateBoxed(int ordinal);
+    public int getFirstDisplayDateOrdinal(int ordinal);
 
     public FlagsTypeAPI getTypeAPI();
 

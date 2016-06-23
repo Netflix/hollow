@@ -44,8 +44,8 @@ public class StatusTypeAPI extends HollowObjectTypeAPI {
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[1]);
     }
 
-    public ISOCountryTypeAPI getCountryCodeTypeAPI() {
-        return getAPI().getISOCountryTypeAPI();
+    public StringTypeAPI getCountryCodeTypeAPI() {
+        return getAPI().getStringTypeAPI();
     }
 
     public int getRightsOrdinal(int ordinal) {
