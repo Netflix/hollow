@@ -28,6 +28,7 @@ import com.netflix.vms.transformer.hollowoutput.NamedCollectionHolder;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VPerson;
 import com.netflix.vms.transformer.hollowoutput.Video;
+
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
@@ -239,6 +240,18 @@ public class DataSlicer {
             @Override
             public Integer deriveId(int ordinal) {
                 return Integer.valueOf((int)inputAPI.getVideoRightsHollow(ordinal)._getMovieId());
+            }
+        });
+        findIncludedOrdinals(stateEngine, "Status", videoIdsToInclude, new VideoIdDeriver() {
+            @Override
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int) inputAPI.getStatusHollow(ordinal)._getMovieId());
+            }
+        });
+        findIncludedOrdinals(stateEngine, "Contracts", videoIdsToInclude, new VideoIdDeriver() {
+            @Override
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int) inputAPI.getContractsHollow(ordinal)._getMovieId());
             }
         });
         findIncludedOrdinals(stateEngine, "CSMReview", videoIdsToInclude, new VideoIdDeriver() {
