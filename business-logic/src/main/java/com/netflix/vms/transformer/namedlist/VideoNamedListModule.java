@@ -69,6 +69,7 @@ public class VideoNamedListModule {
         private CompleteVideo video;
         private int topNodeVideoIdOrdinal;
         private int videoIdOrdinal;
+        private boolean isGoLive;
         private boolean isAvailableForED;
         private boolean isAvailableIn3D;
         private boolean isSupplemental;
@@ -201,12 +202,8 @@ public class VideoNamedListModule {
                 long dvdReleaseDate = video.facetData.videoMediaData.dvdReleaseDate == null ? 0 : video.facetData.videoMediaData.dvdReleaseDate.val;
                 long broadcastReleaseDate = video.facetData.videoMetaData.broadcastReleaseDate == null ? 0 : video.facetData.videoMetaData.broadcastReleaseDate.val;
                 
-                boolean hasNoReleaseDate = false;
-                if (video.facetData.videoMetaData.theatricalReleaseDate == null && video.facetData.videoMetaData.broadcastReleaseDate == null) {
-                    hasNoReleaseDate = true;
-                } else if(video.facetData.videoMetaData.broadcastReleaseDate != null) {
+                if(video.facetData.videoMetaData.broadcastReleaseDate != null)
                     theatricalReleaseDate = broadcastReleaseDate;
-                }
 
                 long theatricalReleaseDaysAgo = (ctx.getNowMillis() - theatricalReleaseDate) / MS_IN_DAY;
                 long dvdReleaseDaysAgo = (ctx.getNowMillis() - dvdReleaseDate) / MS_IN_DAY;
@@ -278,7 +275,7 @@ public class VideoNamedListModule {
 
             }
             
-            if(isRecentlyAdded && topNodeVideoIdOrdinal == videoIdOrdinal) {
+            if(isGoLive && isRecentlyAdded && topNodeVideoIdOrdinal == videoIdOrdinal) {
                 addTopNodeToList(VideoNamedListType.RECENTLY_ADDED_ED_VIDEOS);
                 
                 if(isTV) {
@@ -320,11 +317,13 @@ public class VideoNamedListModule {
         }
 
         private void setMediaAvailabilityBooleans(CompleteVideo video) {
+            isGoLive = false;
             isAvailableForED = false;
             isAvailableIn3D = false;
             currentAvailabilityDate = 0;
             
             if(video.facetData.videoMediaData != null && video.facetData.videoMediaData.isGoLive) {
+                isGoLive = true;
                 for(VMSAvailabilityWindow window : video.countrySpecificData.mediaAvailabilityWindows) {
                     if(window.startDate.val <= ctx.getNowMillis() && window.endDate.val >= ctx.getNowMillis()) {
                         int maxPackageId = -1;
