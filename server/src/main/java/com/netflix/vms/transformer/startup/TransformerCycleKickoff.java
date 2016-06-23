@@ -1,6 +1,9 @@
 package com.netflix.vms.transformer.startup;
 
+import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleFailed;
+import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleSuccess;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.WaitForNextCycle;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ConsecutiveCycleFailures;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WaitForNextCycleDuration;
 
 import com.google.inject.Inject;
@@ -12,7 +15,6 @@ import com.netflix.hermes.subscriber.SubscriptionManager;
 import com.netflix.vms.transformer.TransformCycle;
 import com.netflix.vms.transformer.atlas.AtlasTransformerMetricRecorder;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.context.TransformerServerContext;
@@ -61,6 +63,7 @@ public class TransformerCycleKickoff {
 
         Thread t = new Thread(new Runnable() {
             private long previousCycleStartTime;
+            private int consecutiveCycleFailures = 0;
 
             @Override
             public void run() {
@@ -70,10 +73,11 @@ public class TransformerCycleKickoff {
                         if (isFastlane(ctx.getConfig()))
                             setUpFastlaneContext();
 	                    cycle.cycle();
-                        healthIndicator.cycleSucessful();
+                        markCycleSucessful();
                     } catch(Throwable th) {
-                        ctx.getLogger().error(LogTag.UnexpectedError, "Unexpected error occurred", th);
-                        healthIndicator.cycleFailed(th);
+                        markCycleFailed(th);
+                    } finally {
+                        ctx.getMetricRecorder().recordMetric(ConsecutiveCycleFailures, consecutiveCycleFailures);
                     }
                 }
             }
@@ -103,8 +107,21 @@ public class TransformerCycleKickoff {
             }
             
             private void setUpFastlaneContext() {
-    			ctx.setFastlaneIds(fastlaneIdRetriever.getFastlaneIds());
+                ctx.setFastlaneIds(fastlaneIdRetriever.getFastlaneIds());
             }
+
+            private void markCycleFailed(Throwable th) {
+                consecutiveCycleFailures++;
+                healthIndicator.cycleFailed(th);
+                ctx.getLogger().error(TransformCycleFailed, "TransformerCycleKickoff failed cycle", th);
+            }
+
+            private void markCycleSucessful() {
+                consecutiveCycleFailures = 0;
+                ctx.getLogger().info(TransformCycleSuccess, "Cycle succeeded");
+                healthIndicator.cycleSucessful();
+            }
+
         });
 
         t.setDaemon(true);
