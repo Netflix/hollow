@@ -22,8 +22,12 @@ public class FastlaneIdRetriever {
 		Set<Integer> ids = new HashSet<Integer>();
 		
 		try {
-			for(FastlaneVideo vid : fastlaneCassandraHelper.getFastlaneVideos())
-				ids.add(vid.getVideoId());
+		    long now = System.currentTimeMillis();
+		    
+			for(FastlaneVideo vid : fastlaneCassandraHelper.getFastlaneVideos()) {
+			    if(vid.getStartWindow().getTime() < now && now < vid.getEndWindow().getTime())
+			        ids.add(vid.getVideoId());
+			}
 			
 			return ids;
 		} catch(ConnectionException ex) {
