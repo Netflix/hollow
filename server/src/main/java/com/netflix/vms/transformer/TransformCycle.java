@@ -21,6 +21,7 @@ import com.netflix.vms.transformer.input.VMSInputDataClient;
 import com.netflix.vms.transformer.input.VMSInputDataVersionLogger;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
+import com.netflix.vms.transformer.publish.workflow.job.impl.BlobMetaDataUtil;
 import com.netflix.vms.transformer.util.VersionMinter;
 import java.io.File;
 import java.io.IOException;
@@ -73,7 +74,7 @@ public class TransformCycle {
 
         if(ctx.getFastlaneIds() != null)
             ctx.getLogger().info(CycleFastlaneIds, ctx.getFastlaneIds());
-        ctx.getLogger().info(TransformCycleBegin, "Beginning cycle " + currentCycleNumber);
+        ctx.getLogger().info(TransformCycleBegin, "Beginning cycle=" + currentCycleNumber + " jarVersion=" + BlobMetaDataUtil.getJarVersion());
     }
     
     private void updateTheInput() {
