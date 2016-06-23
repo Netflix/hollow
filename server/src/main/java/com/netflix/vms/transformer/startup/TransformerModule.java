@@ -11,7 +11,7 @@ import com.netflix.runtime.health.guice.HealthModule;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
-import com.netflix.vms.transformer.health.CustomHealthIndicator;
+import com.netflix.vms.transformer.health.TransformerServerHealthIndicator;
 import com.netflix.vms.transformer.octobersky.OctoberSkyDataImpl;
 
 
@@ -29,7 +29,7 @@ public final class TransformerModule extends AbstractModule {
         install(new HealthModule() {
             @Override
             protected void configureHealth() {
-                bindAdditionalHealthIndicator().to(CustomHealthIndicator.class);
+                bindAdditionalHealthIndicator().to(TransformerServerHealthIndicator.class);
             }
         });
         install(new JerseyModule());

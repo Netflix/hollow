@@ -79,7 +79,7 @@ public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder 
         case VRole:
             return ((VRole)objectToHash).id;
         case Video:
-            return ((Video)objectToHash).hashCode();
+            return ((Video)objectToHash).value;
         case VideoFormatDescriptor:
             return ((VideoFormatDescriptor)objectToHash).id;
         case VideoSetType:

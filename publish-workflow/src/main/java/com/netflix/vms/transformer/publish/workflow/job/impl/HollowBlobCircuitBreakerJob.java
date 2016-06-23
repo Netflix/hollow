@@ -56,6 +56,7 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
                 new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "OriginServer"),
                 new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "DrmKey"),
                 new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "WmDrmKey"),
+                new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "GlobalPerson"),
                 new SnapshotSizeCircuitBreaker(ctx, cycleVersion, snapshotFileLength),
                 new TopNViewShareAvailabilityCircuitBreaker(ctx, cycleVersion),
         };
