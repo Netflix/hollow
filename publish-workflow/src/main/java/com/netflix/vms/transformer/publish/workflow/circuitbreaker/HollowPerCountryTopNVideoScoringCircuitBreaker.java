@@ -47,7 +47,7 @@ public abstract class HollowPerCountryTopNVideoScoringCircuitBreaker extends Hol
 					int videoId = entryH.getKey()._getVal();
 					int compVideoOrdinal = idx.getMatchingOrdinal(videoId, countryId);
 					
-					int videoScore = getVideoScore(api.getCompleteVideoHollow(compVideoOrdinal));
+					int videoScore = compVideoOrdinal == -1 ? 0 : getVideoScore(api.getCompleteVideoHollow(compVideoOrdinal));
 					if(videoScore < 1){
 						float videoViewShare = (entryH.getValue()._getVal()/countryViewHrs1Day)*100;
 						missingViewShare += videoViewShare;
