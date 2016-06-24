@@ -2,6 +2,8 @@ package com.netflix.vms.transformer.hollowinput;
 
 import com.netflix.hollow.objects.delegate.HollowObjectDelegate;
 
+
+@SuppressWarnings("all")
 public interface CacheDeploymentIntentDelegate extends HollowObjectDelegate {
 
     public long getStreamProfileId(int ordinal);

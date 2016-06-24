@@ -5,6 +5,7 @@ import com.netflix.hollow.HollowListSchema;
 import com.netflix.hollow.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
+@SuppressWarnings("all")
 public class VideoTypeDescriptorListHollow extends HollowList<VideoTypeDescriptorHollow> {
 
     public VideoTypeDescriptorListHollow(HollowListDelegate delegate, int ordinal) {
@@ -12,7 +13,6 @@ public class VideoTypeDescriptorListHollow extends HollowList<VideoTypeDescripto
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public VideoTypeDescriptorHollow instantiateElement(int ordinal) {
         return (VideoTypeDescriptorHollow) api().getVideoTypeDescriptorHollow(ordinal);
     }

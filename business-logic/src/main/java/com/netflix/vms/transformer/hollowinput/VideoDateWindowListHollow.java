@@ -5,6 +5,7 @@ import com.netflix.hollow.HollowListSchema;
 import com.netflix.hollow.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
+@SuppressWarnings("all")
 public class VideoDateWindowListHollow extends HollowList<VideoDateWindowHollow> {
 
     public VideoDateWindowListHollow(HollowListDelegate delegate, int ordinal) {
@@ -12,7 +13,6 @@ public class VideoDateWindowListHollow extends HollowList<VideoDateWindowHollow>
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public VideoDateWindowHollow instantiateElement(int ordinal) {
         return (VideoDateWindowHollow) api().getVideoDateWindowHollow(ordinal);
     }
