@@ -2,6 +2,8 @@ function ServerCycleSummaryTab(dashboard) {
     var cycleSummaryTab = this;
     this.cycleSummarytableWidget = null;
     this.graphWidth = 0;
+    this.autoUpdateFlag = false;
+    this.progressWidget = new ProgressBarWidget("#id-cycle-transform-progress", "#id-cycle-transform-progress-label");
 
     this.getAtlasEndMinusNowTimeMinutes = function() {
         var curr = Date.now();
@@ -46,14 +48,13 @@ function ServerCycleSummaryTab(dashboard) {
             searchDao.updateJsonFromSearch();
     }
 
-    this.createProgressBar = function() {
-        var graphWidget = new ProgressBarWidget("#id-cycle-transform-progress", "#id-cycle-transform-progress-label");
+    this.updateProgressBar = function() {
         var regexSourceModel = ResponseModelsFactory.prototype.getModel("RegexModel", {
             sourceField : "message",
             fieldsRegex : RegexParserMapper.prototype.getProgressRegexInfo()
         });
 
-        var searchDao = new SearchDAO(regexSourceModel, graphWidget, true);
+        var searchDao = new SearchDAO(regexSourceModel, cycleSummaryTab.progressWidget, true);
         searchDao.searchQuery = new SearchQuery();
         searchDao.searchQuery.size = "1";
         searchDao.searchQuery.indexName = dashboard.vmsIndex;
@@ -63,11 +64,16 @@ function ServerCycleSummaryTab(dashboard) {
         searchDao.updateJsonFromSearch();
     }
 
+    this.autoUpdate = function() {
+        if(cycleSummaryTab.autoUpdateFlag) {
+            setTimeout(cycleSummaryTab.updateProgressBar, 2000);
+        }
+    }
 
     this.refresh = function() {
         cycleSummaryTab.createCycleDurationAtlasIFrame();
         cycleSummaryTab.createCycleWarnTable();
-        cycleSummaryTab.createProgressBar();
+        cycleSummaryTab.updateProgressBar();
     };
 
     this.initialize = function() {
