@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.common;
 
+
 public interface TransformerMetricRecorder {
 
     void recordMetric(Metric name, double value);
@@ -17,6 +18,7 @@ public interface TransformerMetricRecorder {
         FailedProcessingIndividualHierarchies,
         
         TopNMissingViewShare,
+        SnapShotSize,
 
         CycleSuccessCounter;
 
@@ -32,5 +34,7 @@ public interface TransformerMetricRecorder {
         }
 
     }
+
+	void recordMetric(Metric metric, double value, String... keyValues);
 
 }

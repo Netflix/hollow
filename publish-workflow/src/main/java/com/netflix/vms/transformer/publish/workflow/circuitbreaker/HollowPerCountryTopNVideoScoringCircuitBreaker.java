@@ -59,7 +59,7 @@ public abstract class HollowPerCountryTopNVideoScoringCircuitBreaker extends Hol
 					ctx.getLogger().warn(CircuitBreaker, getRuleName()+": "+countryId+": Unavailable TopN video IDs: "+missingVideoIDs+
 							" contributing to "+missingViewShare+"% missing view share");
 				
-				ctx.getMetricRecorder().recordMetric(Metric.TopNMissingViewShare, missingViewShare);
+				ctx.getMetricRecorder().recordMetric(Metric.TopNMissingViewShare, missingViewShare, "country", countryId);
 			}
 		}
         return results;
