@@ -41,7 +41,7 @@ public interface TransformerConfig {
 
     //////////////// PUBLISH WORKFLOW ///////////////////
 
-    @DefaultValue("false")
+    @DefaultValue("true")
     public boolean isCircuitBreakersEnabled();
 
     @DefaultValue("true")

@@ -1,8 +1,6 @@
 package com.netflix.vms.transformer.publish.workflow.circuitbreaker;
 
 
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.CircuitBreaker;
-
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.type.ISOCountry;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
@@ -25,11 +23,6 @@ public abstract class HollowCountrySpecificCircuitBreaker extends HollowCircuitB
 
 	@Override
     public CircuitBreakerResults run(HollowReadStateEngine stateEngine) {
-        if(!ctx.getConfig().isCircuitBreakerEnabled(getRuleName())) {
-            ctx.getLogger().warn(CircuitBreaker, "Circuit breaker rule: " + getRuleName() + " is disabled!");
-            return PASSED;
-        }
-
         CircuitBreakerResults results = runCircuitBreaker(stateEngine);
 
         for(String country : ctx.getOctoberSkyData().getSupportedCountries()) {
@@ -49,10 +42,11 @@ public abstract class HollowCountrySpecificCircuitBreaker extends HollowCircuitB
     }
 
     protected CircuitBreakerResults compareMetric(String country, double value) {
-    	if(!isEnabled(country))
+        comparedCountries.add(country);
+
+        if(!isEnabled(country))
     		return new CircuitBreakerResults(true, "Rule " + getRuleName() + ": disabled for country " + country);
     	
-        comparedCountries.add(country);
         return compareMetric(metricName(country), value, getThreshold(country));
     }
 
