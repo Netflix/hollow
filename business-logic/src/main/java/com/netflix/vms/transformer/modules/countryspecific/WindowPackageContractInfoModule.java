@@ -68,13 +68,7 @@ public class WindowPackageContractInfoModule {
         info.videoContractInfo = new VideoContractInfo();
         info.videoContractInfo.contractId = (int) rightsContract._getContractId();
         info.videoContractInfo.primaryPackageId = (int) rightsContract._getPackageId();
-        if (contract != null) {
-            if(contract._getPrePromotionDays() != Long.MIN_VALUE)
-                info.videoContractInfo.prePromotionDays = (int) contract._getPrePromotionDays();
-            info.videoContractInfo.isDayAfterBroadcast = contract._getDayAfterBroadcast();
-            info.videoContractInfo.hasRollingEpisodes = contract._getDayAfterBroadcast();
-            info.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(Collections.singletonList(new Strings(contract._getCupToken()._getValue())));
-        }
+        assignContracInfo(info, contract);
         info.videoContractInfo.assetBcp47Codes = new HashSet<Strings>();
 
         for (RightsContractAssetHollow asset : rightsContract._getAssets()) {
@@ -168,13 +162,7 @@ public class WindowPackageContractInfoModule {
         info.videoContractInfo = new VideoContractInfo();
         info.videoContractInfo.contractId = (int) rightsContract._getContractId();
         info.videoContractInfo.primaryPackageId = packageId;
-        if (contract != null) {
-            if(contract._getPrePromotionDays() != Long.MIN_VALUE)
-                info.videoContractInfo.prePromotionDays = (int) contract._getPrePromotionDays();
-            info.videoContractInfo.isDayAfterBroadcast = contract._getDayAfterBroadcast();
-            info.videoContractInfo.hasRollingEpisodes = contract._getDayAfterBroadcast();
-            info.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(Collections.singletonList(new Strings(contract._getCupToken()._getValue())));
-        }
+        assignContracInfo(info, contract);
         info.videoContractInfo.assetBcp47Codes = new HashSet<Strings>();
 
         for (RightsContractAssetHollow asset : rightsContract._getAssets()) {
@@ -184,6 +172,18 @@ public class WindowPackageContractInfoModule {
         info.videoPackageInfo = getFilteredVideoPackageInfo(videoId, packageId);
 
         return info;
+    }
+
+    private void assignContracInfo(WindowPackageContractInfo info, ContractHollow contract) {
+        if (contract != null) {
+            if (contract._getPrePromotionDays() != Long.MIN_VALUE)
+                info.videoContractInfo.prePromotionDays = (int) contract._getPrePromotionDays();
+            info.videoContractInfo.isDayAfterBroadcast = contract._getDayAfterBroadcast();
+            info.videoContractInfo.hasRollingEpisodes = contract._getDayAfterBroadcast();
+            info.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(Collections.singletonList(new Strings(contract._getCupToken()._getValue())));
+        } else {
+            info.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(Collections.emptyList());
+        }
     }
 
     public WindowPackageContractInfo buildFilteredWindowPackageContractInfo(int contractId, int videoId) {
