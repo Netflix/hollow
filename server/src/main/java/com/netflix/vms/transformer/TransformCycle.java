@@ -9,6 +9,8 @@ import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metri
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ReadInputDataDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WriteOutputDataDuration;
 
+import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
+
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.client.HollowClient;
 import com.netflix.hollow.write.HollowBlobWriter;
@@ -59,12 +61,12 @@ public class TransformCycle {
             transformTheData();
             writeTheBlobFiles();
             submitToPublishWorkflow();
-            endCycleSuccessfully();
         } catch (Throwable th) {
             ctx.getLogger().error(TransformCycleFailed, "Transformer failed cycle -- rolling back", th);
             outputStateEngine.resetToLastPrepareForNextCycle();
             throw th;
         }
+        endCycleSuccessfully();
     }
 
     private void beginCycle() {
@@ -182,6 +184,7 @@ public class TransformCycle {
     }
 
     private void endCycleSuccessfully() {
+        ctx.getMetricRecorder().incrementCounter(Metric.CycleSuccessCounter, 1);
         previousCycleNumber = currentCycleNumber;
     }
 
