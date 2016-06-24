@@ -103,6 +103,13 @@ public class DataSlicer {
             }
         });
 
+        findIncludedOrdinals(stateEngine, "LanguageRights", videoIdsToInclude, new VideoIdDeriver() {
+            @Override
+            public Integer deriveId(int ordinal) {
+                return outputAPI.getLanguageRightsHollow(ordinal)._getVideoId()._getValueBoxed();
+            }
+        });
+
         includeAll(stateEngine, "EncodingProfile");
         includeAll(stateEngine, "OriginServer");
         includeAll(stateEngine, "DeploymentIntent");
@@ -117,7 +124,6 @@ public class DataSlicer {
         includeAll(stateEngine, "PersonImages");
         includeAll(stateEngine, "TopNVideoData");
         includeAll(stateEngine, "GlobalPerson");
-        includeAll(stateEngine, "LanguageRights");
 
         ordinalsToInclude.put("L10NResources", findIncludedL10NOrdinals(stateEngine, videoIdsToInclude));
 
