@@ -50,6 +50,7 @@ public class HermesAutoPinbackJob extends AutoPinbackJob {
         return false;
     }
 
+    @SuppressWarnings("unused")
     private void sleepForASecond() {
         try {
             Thread.sleep(1000);
@@ -57,5 +58,4 @@ public class HermesAutoPinbackJob extends AutoPinbackJob {
             throw new RuntimeException(e);
         }
     }
-
 }
