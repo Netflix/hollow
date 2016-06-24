@@ -464,6 +464,21 @@ function DataOperator(dataModel) {
         return new DataOperator(this.outDataModel);
     };
 
+    // assumes inp is an array (e.g. output of RegexSourceModel),
+    // out is a map of keyField to valueField 
+    this.extractField = function(keyField, valueField) {
+        this.outDataModel = new Object();
+
+        for (var index = 0; index < this.inpDataModel.length; index++) {
+            var obj = this.inpDataModel[index];
+
+            if (obj.hasOwnProperty(keyField)) {
+                this.outDataModel[obj[keyField]] = obj[valueField];
+            }
+        }
+        return new DataOperator(this.outDataModel);
+    };
+
     // assumes input is map from id ->array, with a number field, e.g, output of groupBy
     // output is key-value
     this.min = function(fieldName) {

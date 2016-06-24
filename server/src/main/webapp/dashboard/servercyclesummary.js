@@ -59,6 +59,7 @@ function ServerCycleSummaryTab(dashboard) {
         var refFn = this;
         this.workerPublishMbps = null;
         this.stateEngineSize = null;
+        this.topNodeCounts = null;
         this.statsMbps = null;
         $("#id-cycle-timestamp-div").html("");
 
@@ -82,6 +83,9 @@ function ServerCycleSummaryTab(dashboard) {
             } else if (purpose == "CycleInfo") {
                 query.indexType = "vmsserver";
                 query.add("tag:TransformCycleBegin");
+            } else if (purpose == "TopNodes") {
+                query.indexType = "vmsserver";
+                query.add("tag:TransformInfo").add("topNodes");
             } else if (purpose == "BlobPublishFail") {
                 query.indexType = "vmsserver";
                 query.add("tag:BlobPlubishStatus").add("false");
@@ -223,6 +227,32 @@ function ServerCycleSummaryTab(dashboard) {
                 html += "<td style='text-align:right'>" + valStr + "</td>";
             }
 
+            var topNodeCountDelta = refFn.topNodeCounts;
+            var currCycleNum = Number(currCycle);
+            var topNodeForCycle = topNodeCountDelta[currCycle];
+
+            if (!topNodeCountDelta[currCycle]) {
+                if(topNodeForCycle == 0) {
+                    html += "<td style='text-align:right'> </td>";
+                } else {
+                    html += "<td style='text-align:right'><img src='images/incomplete.png'></td>";
+                }
+            } else {
+                var val = topNodeCountDelta[currCycle].toFixed(4);
+                var valStr = "";
+                if (val < 0) {
+                    valStr = val.toString().substring(0, 5);
+                } else {
+                    valStr = "+" + val.toString().substring(0, 4);
+                }
+                if(valStr == "+0.00" || valStr == "-0.00" || valStr == "+-0.0") {
+                    valStr = "";
+                } else {
+                    valStr = valStr + "%";
+                }
+                html += "<td style='text-align:right'>" + valStr + "</td>";
+            }
+
             if (cycleFail) {
                 rowStyle = "<tr style='background-color:" + redColor + "'>";
             }
@@ -235,10 +265,11 @@ function ServerCycleSummaryTab(dashboard) {
 
         this.populateCycleTimeStampsTable = function() {
             refFn.computeStateEngineSize();
+            refFn.computeTopNodeCounts();
             cycleSummaryTab.cycleSummarytableWidget = new ClickableTableWidget("#id-cycle-timestamp-div", "id-cycle-timestamp-table", [ "currentCycle",
-                    "timestamp", "custom", "custom", "custom", "custom", "custom", "custom"], [ "Cycle id", "Time", "Success", "S3 access", 
+                    "timestamp", "custom", "custom", "custom", "custom", "custom", "custom", "custom"], [ "Cycle id", "Time", "Success", "S3 access", 
                     "Unpublished regions", "S3 upload Mbps",
-                    "Snapshot change"], 0, dashboard.cycleIdSelector, refFn.styleRowBackground);
+                    "Snapshot change", "Topnodes change"], 0, dashboard.cycleIdSelector, refFn.styleRowBackground);
             var searchFieldModelDAO = new FieldModelSearchDAO(cycleSummaryTab.cycleSummarytableWidget, refFn.getIndexSearchQuery("CycleInfo"), [
                     "timestamp", "message", "currentCycle" ], true);
             searchFieldModelDAO.updateJsonFromSearch();
@@ -256,13 +287,22 @@ function ServerCycleSummaryTab(dashboard) {
             sourceField : "message",
             fieldsRegex : s3PublishRegex
         });
-
         this.stateEnginePublishDAO = new SearchDAO(s3PublishRegexInfo, null, true);
         this.stateEnginePublishDAO.searchQuery = refFn.getIndexSearchQuery("StateEnginePublish");
+
+        var topNodeRegex = RegexParserMapper.prototype.getTopNodesRegexInfo();
+        var topNodeRegexInfo = ResponseModelsFactory.prototype.getModel("RegexModel", {
+            sourceField : "message",
+            fieldsRegex : topNodeRegex
+        });
+
+        this.topNodeCountDAO = new SearchDAO(topNodeRegexInfo, null, true);
+        this.topNodeCountDAO.searchQuery = refFn.getIndexSearchQuery("TopNodes");
 
         this.fillParallelModelCaches = function() {
             var daoExecutor = new ParallelDAOExecutor(refFn.populateCycleTimeStampsTable);
             daoExecutor.add(refFn.stateEnginePublishDAO);
+            daoExecutor.add(refFn.topNodeCountDAO);
             daoExecutor.add(refFn.cacheFailDAO);
             daoExecutor.add(refFn.s3FailDAO);
             daoExecutor.add(refFn.cacheSuccessDAO);
@@ -274,6 +314,13 @@ function ServerCycleSummaryTab(dashboard) {
             var dataop = new DataOperator(refFn.stateEnginePublishDAO.responseModel.dataModel);
             var stateEngineGroupByVersion = dataop.groupBy("version");
             refFn.stateEngineSize = stateEngineGroupByVersion.min("filesize(bytes)").prevDiffPercent().inpDataModel;
+        };
+
+        this.computeTopNodeCounts= function() {
+            var dataop = new DataOperator(refFn.topNodeCountDAO.responseModel.dataModel);
+            var topNodes = dataop.extractField("cycleId", "topNodes");
+            // refFn.topNodeCounts = stateEngineGroupByVersion.min("topNodes").prevDiffPercent().inpDataModel;
+            refFn.topNodeCounts = topNodes.prevDiffPercent().inpDataModel;
         };
 
         this.blobPublishDAO = new RegexSearchWidgetExecutor(new EventChainingWidget(this.fillParallelModelCaches), RegexParserMapper.prototype
