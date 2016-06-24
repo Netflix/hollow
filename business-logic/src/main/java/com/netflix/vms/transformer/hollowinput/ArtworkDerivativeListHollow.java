@@ -5,6 +5,7 @@ import com.netflix.hollow.HollowListSchema;
 import com.netflix.hollow.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
+@SuppressWarnings("all")
 public class ArtworkDerivativeListHollow extends HollowList<ArtworkDerivativeHollow> {
 
     public ArtworkDerivativeListHollow(HollowListDelegate delegate, int ordinal) {
@@ -12,7 +13,6 @@ public class ArtworkDerivativeListHollow extends HollowList<ArtworkDerivativeHol
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public ArtworkDerivativeHollow instantiateElement(int ordinal) {
         return (ArtworkDerivativeHollow) api().getArtworkDerivativeHollow(ordinal);
     }

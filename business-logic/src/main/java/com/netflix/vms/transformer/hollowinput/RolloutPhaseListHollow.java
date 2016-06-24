@@ -5,6 +5,7 @@ import com.netflix.hollow.HollowListSchema;
 import com.netflix.hollow.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
+@SuppressWarnings("all")
 public class RolloutPhaseListHollow extends HollowList<RolloutPhaseHollow> {
 
     public RolloutPhaseListHollow(HollowListDelegate delegate, int ordinal) {
@@ -12,7 +13,6 @@ public class RolloutPhaseListHollow extends HollowList<RolloutPhaseHollow> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public RolloutPhaseHollow instantiateElement(int ordinal) {
         return (RolloutPhaseHollow) api().getRolloutPhaseHollow(ordinal);
     }

@@ -4,6 +4,7 @@ import com.netflix.hollow.objects.delegate.HollowObjectAbstractDelegate;
 import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.HollowObjectSchema;
 
+@SuppressWarnings("all")
 public class LocalizedCharacterDelegateLookupImpl extends HollowObjectAbstractDelegate implements LocalizedCharacterDelegate {
 
     private final LocalizedCharacterTypeAPI typeAPI;

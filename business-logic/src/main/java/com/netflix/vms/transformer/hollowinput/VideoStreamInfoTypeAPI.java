@@ -4,6 +4,7 @@ import com.netflix.hollow.read.customapi.HollowObjectTypeAPI;
 import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.write.HollowObjectWriteRecord;
 
+@SuppressWarnings("all")
 public class VideoStreamInfoTypeAPI extends HollowObjectTypeAPI {
 
     private final VideoStreamInfoDelegateLookupImpl delegateLookupImpl;
