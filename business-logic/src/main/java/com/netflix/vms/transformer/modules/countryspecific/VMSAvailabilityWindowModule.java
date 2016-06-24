@@ -98,9 +98,6 @@ public class VMSAvailabilityWindowModule {
         int maxPackageId = 0;
         int bundledAssetsGroupId = 0; /// the contract ID for the highest package ID across all windows;
         
-        if(videoId == 80061704 && "US".equals(country))
-            System.out.println("asdf");
-        
         List<VideoRightsWindowHollow> sortedWindows = new ArrayList<VideoRightsWindowHollow>(rights._getWindows());
         Collections.sort(sortedWindows, new Comparator<VideoRightsWindowHollow>() {
             @Override

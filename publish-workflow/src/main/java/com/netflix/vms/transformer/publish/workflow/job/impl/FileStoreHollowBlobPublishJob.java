@@ -1,6 +1,5 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import com.netflix.aws.db.ItemAttribute;
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.videometadata.s3.HollowBlobKeybaseBuilder;
@@ -78,8 +77,8 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
     }
 
     @SuppressWarnings("deprecation")
-    private List<ItemAttribute> getItemAttributes() {
-        List<ItemAttribute> att = new ArrayList<ItemAttribute>(4);
+    private List<com.netflix.aws.db.ItemAttribute> getItemAttributes() {
+        List<com.netflix.aws.db.ItemAttribute> att = new ArrayList<>(4);
 
         String previousVersion = this.previousVersion == Long.MIN_VALUE ? "" : String.valueOf(this.previousVersion);
         String currentVersion =  String.valueOf(getCycleVersion());

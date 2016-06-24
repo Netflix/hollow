@@ -85,7 +85,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "18.0",
+            "locked": "19.0",
             "requested": "18.0",
             "transitive": [
                 "com.google.inject:guice",
@@ -99,33 +99,33 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -933,7 +933,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "18.0",
+            "locked": "19.0",
             "requested": "18.0",
             "transitive": [
                 "com.google.inject:guice",
@@ -947,33 +947,33 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -1781,7 +1781,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "18.0",
+            "locked": "19.0",
             "requested": "18.0",
             "transitive": [
                 "com.google.inject:guice",
@@ -1795,33 +1795,33 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -2629,7 +2629,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "18.0",
+            "locked": "19.0",
             "requested": "18.0",
             "transitive": [
                 "com.google.inject:guice",
@@ -2643,33 +2643,33 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -3576,7 +3576,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "18.0",
+            "locked": "19.0",
             "requested": "18.0",
             "transitive": [
                 "com.google.inject:guice",
@@ -3590,33 +3590,33 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -4424,7 +4424,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "18.0",
+            "locked": "19.0",
             "requested": "18.0",
             "transitive": [
                 "com.google.inject:guice",
@@ -4438,33 +4438,33 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -5283,7 +5283,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "18.0",
+            "locked": "19.0",
             "requested": "18.0",
             "transitive": [
                 "com.google.inject:guice",
@@ -5297,33 +5297,33 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -6142,7 +6142,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "18.0",
+            "locked": "19.0",
             "requested": "18.0",
             "transitive": [
                 "com.google.inject:guice",
@@ -6156,33 +6156,33 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -7001,7 +7001,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "18.0",
+            "locked": "19.0",
             "requested": "18.0",
             "transitive": [
                 "com.google.inject:guice",
@@ -7015,33 +7015,33 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",

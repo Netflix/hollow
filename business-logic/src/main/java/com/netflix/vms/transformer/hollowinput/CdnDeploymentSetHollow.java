@@ -5,6 +5,7 @@ import com.netflix.hollow.HollowSetSchema;
 import com.netflix.hollow.objects.delegate.HollowSetDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
+@SuppressWarnings("all")
 public class CdnDeploymentSetHollow extends HollowSet<CdnDeploymentHollow> {
 
     public CdnDeploymentSetHollow(HollowSetDelegate delegate, int ordinal) {
@@ -12,7 +13,6 @@ public class CdnDeploymentSetHollow extends HollowSet<CdnDeploymentHollow> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public CdnDeploymentHollow instantiateElement(int ordinal) {
         return (CdnDeploymentHollow) api().getCdnDeploymentHollow(ordinal);
     }

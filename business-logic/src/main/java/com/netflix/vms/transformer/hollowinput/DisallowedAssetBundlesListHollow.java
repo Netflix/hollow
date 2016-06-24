@@ -5,6 +5,7 @@ import com.netflix.hollow.HollowListSchema;
 import com.netflix.hollow.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
+@SuppressWarnings("all")
 public class DisallowedAssetBundlesListHollow extends HollowList<DisallowedAssetBundleHollow> {
 
     public DisallowedAssetBundlesListHollow(HollowListDelegate delegate, int ordinal) {
@@ -12,7 +13,6 @@ public class DisallowedAssetBundlesListHollow extends HollowList<DisallowedAsset
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public DisallowedAssetBundleHollow instantiateElement(int ordinal) {
         return (DisallowedAssetBundleHollow) api().getDisallowedAssetBundleHollow(ordinal);
     }
