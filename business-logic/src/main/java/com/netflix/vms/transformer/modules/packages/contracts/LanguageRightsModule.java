@@ -48,14 +48,12 @@ public class LanguageRightsModule extends AbstractTransformModule {
             int movieId = (int) status._getMovieId();
             String countryCode = status._getCountryCode()._getValue();
 
-            Map<Long, ContractHollow> contractMap = VideoContractUtil.getContractMap(api, indexer, movieId, countryCode);
-
             ListOfRightsContractHollow rightsContracts = status._getRights()._getContracts();
             for (RightsContractHollow rightContract : rightsContracts) {
                 int contractId = (int) rightContract._getContractId();
                 Pair<Integer, Integer> rightsKey = new Pair<>(contractId, movieId);
 
-                ContractHollow contract = contractMap.get(rightContract._getContractId());
+                ContractHollow contract = VideoContractUtil.getContract(api, indexer, movieId, countryCode, rightContract._getContractId());
                 DisallowedAssetBundlesListHollow disallowedBundleList_ = contract == null ? null : contract._getDisallowedAssetBundles();
                 if (disallowedBundleList_ == null || disallowedBundleList_.isEmpty()) {
                     continue;

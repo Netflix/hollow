@@ -37,6 +37,7 @@ import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoContractUtil;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -115,7 +116,7 @@ public class VMSAvailabilityWindowModule {
             }
         });
 
-        Map<Long, ContractHollow> fullContractMap = VideoContractUtil.getContractMap(api, indexer, videoId, country);
+        //Map<Long, ContractHollow> fullContractMap = VideoContractUtil.getContractMap(api, indexer, videoId, country);
 
         ///TODO: Find some way to simplify this logic.
         for (RightsWindowHollow window : sortedWindows) {
@@ -132,10 +133,8 @@ public class VMSAvailabilityWindowModule {
                 rollup.newSeasonWindow(window._getStartDate(), window._getEndDate(), rollup.getSeasonSequenceNumber());
             }
 
-            LinkedHashMap<Long, RightsContractHollow> rightsContractMap = VideoContractUtil.getRightsContractMap(rights, window);
-            LinkedHashMap<Long, ContractHollow> contractMap = VideoContractUtil.getFilteredContractMap(fullContractMap, window);
-
-            boolean shouldFilterOutWindowInfo = shouldFilterOutWindowInfo(isGoLive, contractMap, includedPackageDataCount, outputWindow.startDate.val, outputWindow.endDate.val);
+            LinkedHashMap<Long, RightsContractHollow> rightsContractMap = getRightsContractMap(rights, window);
+            boolean shouldFilterOutWindowInfo = shouldFilterOutWindowInfo(videoId, country, isGoLive, rightsContractMap.keySet(), includedPackageDataCount, outputWindow.startDate.val, outputWindow.endDate.val);
 
             for (Map.Entry<Long, RightsContractHollow> entry : rightsContractMap.entrySet()) {
                 long contractId = entry.getKey();
@@ -338,6 +337,26 @@ public class VMSAvailabilityWindowModule {
         data.imagesAvailabilityWindows = availabilityWindows;
     }
 
+    private final LinkedHashMap<Long, RightsContractHollow> theRightsContractMap = new LinkedHashMap<>();
+    private LinkedHashMap<Long, RightsContractHollow> getRightsContractMap(RightsHollow rights, RightsWindowHollow window) {
+        theRightsContractMap.clear();
+        for (ContractIdHollow id : window._getContractIds()) {
+            Long contractId = id._getValue();
+            RightsContractHollow contract = getRightContract(rights, contractId);
+            theRightsContractMap.put(contractId, contract);
+        }
+
+        return theRightsContractMap;
+    }
+
+    private static RightsContractHollow getRightContract(RightsHollow rights, long contractId) {
+        for (RightsContractHollow contract : rights._getContracts()) {
+            if (contract._getContractId() == contractId)
+                return contract;
+        }
+        return null;
+    }
+
     // Return AvailabilityWindow from MediaData
     private void populateRolledUpWindowData(Integer videoId, CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup, RightsHollow rights, boolean isGoLive) {
         ListOfRightsWindowHollow windows = rights._getWindows();
@@ -451,14 +470,14 @@ public class VMSAvailabilityWindowModule {
 
     private static final long FUTURE_CUTOFF_IN_MILLIS = 360L * 24L * 60L * 60L * 1000L;
 
-    private boolean shouldFilterOutWindowInfo(boolean isGoLive, Map<Long, ContractHollow> contracts, int unfilteredCount, long startDate, long endDate) {
+    private boolean shouldFilterOutWindowInfo(long videoId, String countryCode, boolean isGoLive, Collection<Long> contractIds, int unfilteredCount, long startDate, long endDate) {
         if(endDate < ctx.getNowMillis())
             return true;
 
         if(!isGoLive) {
             boolean isWindowDataNeeded = false;
-            for (Map.Entry<Long, ContractHollow> entry : contracts.entrySet()) {
-                ContractHollow contract = entry.getValue();
+            for (Long contractId : contractIds) {
+                ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, contractId);
                 if(contract != null && (contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0)) {
                     isWindowDataNeeded = true;
                 }

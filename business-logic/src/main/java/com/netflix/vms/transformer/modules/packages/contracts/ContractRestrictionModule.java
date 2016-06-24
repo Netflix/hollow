@@ -105,7 +105,6 @@ public class ContractRestrictionModule {
 
                 int videoId = (int) packages._getMovieId();
                 String countryCode = status._getCountryCode()._getValue();
-                Map<Long, ContractHollow> contractMap = VideoContractUtil.getContractMap(api, indexer, videoId, countryCode);
 
                 Set<ContractRestriction> contractRestrictions = new HashSet<ContractRestriction>();
 
@@ -134,9 +133,9 @@ public class ContractRestrictionModule {
 
                     if (applicableRightsContracts.size() > 0) {
                         if (applicableRightsContracts.size() == 1)
-                            buildRestrictionBasedOnSingleApplicableContract(assetTypeIdx, restriction, applicableRightsContracts.get(0), contractMap);
+                            buildRestrictionBasedOnSingleApplicableContract(assetTypeIdx, restriction, applicableRightsContracts.get(0), videoId, countryCode);
                         else
-                            buildRestrictionBasedOnMultipleApplicableContracts(assetTypeIdx, restriction, applicableRightsContracts, contractMap);
+                            buildRestrictionBasedOnMultipleApplicableContracts(assetTypeIdx, restriction, applicableRightsContracts, videoId, countryCode);
                         contractRestrictions.add(restriction);
                     }
                 }
@@ -173,12 +172,12 @@ public class ContractRestrictionModule {
         return false;
     }
 
-    private void buildRestrictionBasedOnSingleApplicableContract(DownloadableAssetTypeIndex assetTypeIdx, ContractRestriction restriction, RightsContractHollow rightsContract, Map<Long, ContractHollow> contractMap) {
+    private void buildRestrictionBasedOnSingleApplicableContract(DownloadableAssetTypeIndex assetTypeIdx, ContractRestriction restriction, RightsContractHollow rightsContract, long videoId, String countryCode) {
         ListOfRightsContractAssetHollow contractAssets = rightsContract._getAssets();
         if(!markAllAssetsIfNoAssetsPresent(assetTypeIdx, contractAssets))
             markAssetTypeIndexForExcludedDownloadablesCalculation(assetTypeIdx, contractAssets);
 
-        ContractHollow contract = contractMap.get(rightsContract._getContractId());
+        ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, rightsContract._getContractId());
         if (contract!=null) {
             List<DisallowedAssetBundleHollow> disallowedAssetBundles = contract._getDisallowedAssetBundles();
             for (DisallowedAssetBundleHollow disallowedAssetBundle : disallowedAssetBundles) {
@@ -215,7 +214,7 @@ public class ContractRestrictionModule {
 
     // we need to merge both the allowed asset types (for excluded downloadable calculations) and the language bundle restrictions
     // the language bundle restrictions logic is complicated and broken down into steps indicated in the comments.
-    private void buildRestrictionBasedOnMultipleApplicableContracts(DownloadableAssetTypeIndex assetTypeIdx, ContractRestriction restriction, List<RightsContractHollow> applicableRightsContracts, Map<Long, ContractHollow> contractMap) {
+    private void buildRestrictionBasedOnMultipleApplicableContracts(DownloadableAssetTypeIndex assetTypeIdx, ContractRestriction restriction, List<RightsContractHollow> applicableRightsContracts, long videoId, String countryCode) {
         RightsContractHollow selectedRightsContract = null;
 
         // Step 1: gather all of the audio languages which have language bundle restrictions
@@ -230,7 +229,7 @@ public class ContractRestrictionModule {
 
             markAssetTypeIndexForExcludedDownloadablesCalculation(assetTypeIdx, rightsContract._getAssets());
 
-            ContractHollow contract = contractMap.get(rightsContract._getContractId());
+            ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, rightsContract._getContractId());
             if (contract != null) {
                 for (DisallowedAssetBundleHollow disallowedAssetBundle : contract._getDisallowedAssetBundles()) {
                     String audioLang = disallowedAssetBundle._getAudioLanguageCode()._getValue();
@@ -269,7 +268,7 @@ public class ContractRestrictionModule {
                 // merge the disallowed text languages, AND all available text languages
                 // which were *not* disallowed, are allowed.
                 Set<String> bundleRestrictedAudioLanguagesFromThisContract = new HashSet<String>();
-                ContractHollow contract = contractMap.get(rightsContract._getContractId());
+                ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, rightsContract._getContractId());
                 if (contract != null) {
                     for (DisallowedAssetBundleHollow disallowedAssetBundle : contract._getDisallowedAssetBundles()) {
                         String audioLang = disallowedAssetBundle._getAudioLanguageCode()._getValue();
@@ -310,7 +309,7 @@ public class ContractRestrictionModule {
             for (RightsContractHollow rightsContract : applicableRightsContracts) {
                 Set<String> forcedSubtitleLanguagesForThisContract = new HashSet<String>();
 
-                ContractHollow contract = contractMap.get(rightsContract._getContractId());
+                ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, rightsContract._getContractId());
                 if (contract != null) {
                     for (DisallowedAssetBundleHollow assetBundle : contract._getDisallowedAssetBundles()) {
                         if (assetBundle._getForceSubtitle())
@@ -361,7 +360,7 @@ public class ContractRestrictionModule {
         for (String cupToken : new LinkedHashSet<String>(orderedContractIdCupKeyMap.values()))
             restriction.cupKeys.add(getCupKey(cupToken));
 
-        ContractHollow selectedContract = contractMap.get(selectedRightsContract._getContractId());
+        ContractHollow selectedContract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, selectedRightsContract._getContractId());
         finalizeContractRestriction(assetTypeIdx, restriction, selectedContract);
     }
 
