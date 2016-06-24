@@ -554,7 +554,7 @@ function DataOperator(dataModel) {
     // assumes input as key-value (e.g., output from min)
     // assumes keys can be sorted correctly without a function
     // output is % difference from previous value
-    this.prevDiffPercent = function() {
+    this.prevDiff = function(usePercent) {
         this.outDataModel = new Object();
         var keys = new Array();
 
@@ -577,8 +577,10 @@ function DataOperator(dataModel) {
                 continue;
             }
             var val = Number(valStr);
-
-            var vdiff = 100.0 * (val - prevVal) / (prevVal);
+            var vdiff = (val - prevVal);
+            if(usePercent) {
+                vdiff = 100.0 * (val - prevVal) / (prevVal);
+            }
             this.outDataModel[srtKey] = vdiff;
             prevVal = val;
 

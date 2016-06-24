@@ -30,29 +30,44 @@ function ServerCycleSummaryTab(dashboard) {
 
         console.log("atlas duration query: " + hostName + path);
         $("#id-vms-server-dashboard").html("");
-        $("#id-vms-server-dashboard").prepend("<div class='shadow' style='float:right;'> <img id='transformer-durations' style='max-width:100%;' src='" + hostName + path + "' /> </div>");
+        $("#id-vms-server-dashboard").prepend("<div style='float:right;'> <img id='transformer-durations' style='max-width:100%;' src='" + hostName + path + "' /> </div>");
     };
 
-    this.createCycleDurationAtlasIFrame_EmbedNotWorking = function() {
-        var cluster = createClusterName(dashboard.nflxEnvironment, dashboard.dataNameSpace, dashboard.vipAddress);
-        var hostName = "http://atlasui-global." + dashboard.nflxEnvironment + ".netflix.net/";
-        var path = "atlas/embed#url=http%3A%2F%2Fatlas-main." + dashboard.nflxRegion + "." + dashboard.nflxEnvironment + ".netflix.net";
-        path += "%3A7001%2Fapi%2Fv1%2Fgraph%3Fq%3Dnf.cluster%2C" + cluster;
-        path += "%2C%3Aeq%2Cname%2C(%2C";
-        path += "vms.transformer.ProcessDataDuration%2Cvms.transformer.ReadInputDataDuration%2Cvms.transformer.WaitForNextCycleDuration%2vms.transformer.WriteOutputDataDuration%2C)";
-        path += "%2C%3Ain%2C%3Aand%2C%3Amax%2C(%2Cname%2C)%2C%3Aby%2C0.0000167%2C%3Amul%2C%3Aarea%2C%24(name)%2C%3Alegend%26l%3D0.1%26ylabel%3DDuration(mins)%26stack%3D1%26";
-        path += "e%3Dnow-" + cycleSummaryTab.getAtlasEndMinusNowTimeMinutes() + "m%26s%3De-2h";
-        path += "%26w%3D489%26h%3D300&ylabel=Duration(mins)&plot=area";
+    this.createCycleWarnTable = function() {
+            var fieldKeys = [ "key", "doc_count" ];
+            var warnCodesWidget = new ClickableTableWidget("#id-cycle-warn-aggregate", "id-cycle-warn-agg-table", fieldKeys, [ "tag", "Count"], 0);
+            warnCodesWidget.showHeader = false;
+            var query = new SearchQuery();
+            query.indexName = dashboard.vmsIndex;
+            query.add("eventInfo.currentCycle:" + dashboard.vmsCycleId);
+            query.add("(logLevel:warn OR logLevel:error)");
+            query.aggregate = "tag";
+            var searchDao = new SearchAggregationDAO(warnCodesWidget, query, true);
+            searchDao.updateJsonFromSearch();
+    }
 
-        console.log("atlas duration query: " + hostName + path);
-        $("#id-vms-server-dashboard").html("");
-        var iframe = new IFrameWidget("#id-vms-server-dashboard", "id-vms-server-dashboard-iframe", hostName, path);
-        iframe.initialize("95%");
-    };
-    
-    
+    this.createProgressBar = function() {
+        var graphWidget = new ProgressBarWidget("#id-cycle-transform-progress", "#id-cycle-transform-progress-label");
+        var regexSourceModel = ResponseModelsFactory.prototype.getModel("RegexModel", {
+            sourceField : "message",
+            fieldsRegex : RegexParserMapper.prototype.getProgressRegexInfo()
+        });
+
+        var searchDao = new SearchDAO(regexSourceModel, graphWidget, true);
+        searchDao.searchQuery = new SearchQuery();
+        searchDao.searchQuery.size = "1";
+        searchDao.searchQuery.indexName = dashboard.vmsIndex;
+        searchDao.searchQuery.add("eventInfo.currentCycle:" + dashboard.vmsCycleId);
+        searchDao.searchQuery.add("tag:TransformProgress");
+        searchDao.searchQuery.sort = "eventInfo.timestamp:desc";
+        searchDao.updateJsonFromSearch();
+    }
+
+
     this.refresh = function() {
         cycleSummaryTab.createCycleDurationAtlasIFrame();
+        cycleSummaryTab.createCycleWarnTable();
+        cycleSummaryTab.createProgressBar();
     };
 
     this.initialize = function() {
@@ -238,19 +253,7 @@ function ServerCycleSummaryTab(dashboard) {
                     html += "<td style='text-align:right'><img src='images/incomplete.png'></td>";
                 }
             } else {
-                var val = topNodeCountDelta[currCycle].toFixed(4);
-                var valStr = "";
-                if (val < 0) {
-                    valStr = val.toString().substring(0, 5);
-                } else {
-                    valStr = "+" + val.toString().substring(0, 4);
-                }
-                if(valStr == "+0.00" || valStr == "-0.00" || valStr == "+-0.0") {
-                    valStr = "";
-                } else {
-                    valStr = valStr + "%";
-                }
-                html += "<td style='text-align:right'>" + valStr + "</td>";
+                html += "<td style='text-align:right'>" + topNodeCountDelta[currCycle] + "</td>";
             }
 
             if (cycleFail) {
@@ -313,14 +316,13 @@ function ServerCycleSummaryTab(dashboard) {
         this.computeStateEngineSize = function() {
             var dataop = new DataOperator(refFn.stateEnginePublishDAO.responseModel.dataModel);
             var stateEngineGroupByVersion = dataop.groupBy("version");
-            refFn.stateEngineSize = stateEngineGroupByVersion.min("filesize(bytes)").prevDiffPercent().inpDataModel;
+            refFn.stateEngineSize = stateEngineGroupByVersion.min("filesize(bytes)").prevDiff(true).inpDataModel;
         };
 
         this.computeTopNodeCounts= function() {
             var dataop = new DataOperator(refFn.topNodeCountDAO.responseModel.dataModel);
             var topNodes = dataop.extractField("cycleId", "topNodes");
-            // refFn.topNodeCounts = stateEngineGroupByVersion.min("topNodes").prevDiffPercent().inpDataModel;
-            refFn.topNodeCounts = topNodes.prevDiffPercent().inpDataModel;
+            refFn.topNodeCounts = topNodes.prevDiff(false).inpDataModel;
         };
 
         this.blobPublishDAO = new RegexSearchWidgetExecutor(new EventChainingWidget(this.fillParallelModelCaches), RegexParserMapper.prototype

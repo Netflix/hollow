@@ -152,6 +152,7 @@ function ClickableTableWidget(divId, tableId, fields, titles, clickableColumn, c
     this.clickableColumn = clickableColumn;
     this.html = "";
     this.clearPrevious = false;
+    this.showHeader = true;
     this.clickEventFunc = !clickEventFunction ? null : clickEventFunction;
     this.rowIndicatorFunc = !rowIndicatorFunction ? null : rowIndicatorFunction;
     this.onRowClick = null;
@@ -198,12 +199,16 @@ function ClickableTableWidget(divId, tableId, fields, titles, clickableColumn, c
             numRows = tableDataModel.length;
         }
 
-        this.html = "<table id='" + this.tableId + "' class='clickabletable'><thead><tr>";
-        for ( var i in this.titleNames) {
-            this.html += "<th class='ui-state-default'>" + this.titleNames[i] + "</th>";
+        this.html = "<table id='" + this.tableId + "' class='clickabletable'>";
+        if(this.showHeader) {
+            this.html += "<thead><tr>";
+            for ( var i in this.titleNames) {
+                this.html += "<th class='ui-state-default'>" + this.titleNames[i] + "</th>";
+            }
+            this.html += "</tr></thead>";
         }
 
-        this.html += "</tr></thead><tbody>\n";
+        this.html += "<tbody>\n";
 
         for (var row = 0; row < numRows; row++) {
             tableRow = tableDataModel[row];

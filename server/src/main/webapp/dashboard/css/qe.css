@@ -31,6 +31,19 @@
 	   border-bottom-right-radius: 6px;	
 }
 
+.vms-info {
+    background: #e7e7e7;
+    text-align: left;
+    font-weight: bold; 
+    color: #333333;
+    font-size: larger;
+}
+
+.hr-line {
+    padding-top: 5px;
+    border: 1px solid #aaaaaa;
+}
+
 .qe-select { 
         border: 1px solid #bbbbbb;
         background-color: #ffffff;
@@ -170,6 +183,13 @@ label.aligned {
     position: absolute;
     margin: 4px 4px;
     left: 500px;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #fff;
+}
+
+.progress-label-rel {
+    position: absolute;
+    margin: 4px 4px;
     font-weight: bold;
     text-shadow: 1px 1px 0 #fff;
 }

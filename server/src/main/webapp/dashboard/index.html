@@ -129,12 +129,22 @@
                     <!-- NOTE: the divs below should be in the same order as listed in <ul> section -->
                     <div id="cycle-status-tab">
                         <!--   width:55%; style="width:43%;float:left; -->
-                            <div id = "id-cycle-timestamp-div" style="display: none; width:54%; height:825px; float:left;margin-right:0px; overflow-y: auto;"></div>
-                            <div id = "id-vms-server-dashboard" style="width:45%; float:right;"></div>
+                            <div id="id-cycle-timestamp-div" style="display: none; width:64%; height:825px; float:left;margin-right:0px; overflow-y: auto;">
+                            </div>
+                            <div id="id-vms-server-rightpane" class="ui-widget-content ui-helper-clearfix" style="width:35%; float:right;">
+                                <div class='vms-info'>Transform Progress</div>
+                                <div id="id-cycle-transform-progress"><div id="id-cycle-transform-progress-label" class="progress-label-rel"></div></div>
+                                <div class='hr-line'></div>
+                                <div class='vms-info'>Warnings and Errors</div>
+                                <div id="id-cycle-warn-aggregate"></div>
+                                <div class='hr-line'></div>
+                                <div class='vms-info'>Component Durations</div>
+                                <div id="id-vms-server-dashboard"></div>
+                           </div>
                         <!-- /div -->
                     </div>
                     <div id="cycle-properties-tab">
-                        <div id = "id-properties-table"></div>
+                        <div id="id-properties-table"></div>
                     </div>
                     <div id="cycle-publish-tab">
                         <em>Publish blobs to s3</em>
