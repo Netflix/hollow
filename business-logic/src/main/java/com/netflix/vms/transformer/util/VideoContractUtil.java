@@ -6,15 +6,12 @@ import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.vms.transformer.hollowinput.ContractHollow;
-import com.netflix.vms.transformer.hollowinput.ContractIdHollow;
 import com.netflix.vms.transformer.hollowinput.ContractsHollow;
-import com.netflix.vms.transformer.hollowinput.RightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class VideoContractUtil {
@@ -35,8 +32,8 @@ public class VideoContractUtil {
         return null;
     }
 
-    public static Map<Long, ContractHollow> getContractMap1(VMSHollowInputAPI api, VMSTransformerIndexer indexer, long videoId, String countryCode) {
-        Map<Long, ContractHollow> result = new HashMap<>();
+    public static Map<Long, ContractHollow> getContractMap(VMSHollowInputAPI api, VMSTransformerIndexer indexer, long videoId, String countryCode, Map<Long, ContractHollow> resultMap) {
+        Map<Long, ContractHollow> result = resultMap == null ? new HashMap<>() : resultMap;
 
         HollowHashIndex videoContractsIdx = indexer.getHashIndex(IndexSpec.VIDEO_CONTRACTS);
         HollowHashIndexResult results = videoContractsIdx.findMatches(videoId, countryCode);
@@ -54,17 +51,5 @@ public class VideoContractUtil {
         }
 
         return result;
-    }
-
-    public static LinkedHashMap<Long, ContractHollow> getFilteredContractMap(Map<Long, ContractHollow> fullMap, RightsWindowHollow window) {
-        LinkedHashMap<Long, ContractHollow> theContractMap = new LinkedHashMap<>();
-
-        for (ContractIdHollow id : window._getContractIds()) {
-            Long contractId = id._getValue();
-            ContractHollow contract = fullMap.get(contractId);
-            theContractMap.put(contractId, contract);
-        }
-
-        return theContractMap;
     }
 }

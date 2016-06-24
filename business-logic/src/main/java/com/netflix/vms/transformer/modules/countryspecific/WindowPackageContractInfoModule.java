@@ -66,13 +66,15 @@ public class WindowPackageContractInfoModule {
 
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
-        info.videoContractInfo.contractId = (int) contract._getContractId();
+        info.videoContractInfo.contractId = (int) rightsContract._getContractId();
         info.videoContractInfo.primaryPackageId = (int) rightsContract._getPackageId();
-        if(contract._getPrePromotionDays() != Long.MIN_VALUE)
-            info.videoContractInfo.prePromotionDays = (int) contract._getPrePromotionDays();
-        info.videoContractInfo.isDayAfterBroadcast = contract._getDayAfterBroadcast();
-        info.videoContractInfo.hasRollingEpisodes = contract._getDayAfterBroadcast();
-        info.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(Collections.singletonList(new Strings(contract._getCupToken()._getValue())));
+        if (contract != null) {
+            if(contract._getPrePromotionDays() != Long.MIN_VALUE)
+                info.videoContractInfo.prePromotionDays = (int) contract._getPrePromotionDays();
+            info.videoContractInfo.isDayAfterBroadcast = contract._getDayAfterBroadcast();
+            info.videoContractInfo.hasRollingEpisodes = contract._getDayAfterBroadcast();
+            info.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(Collections.singletonList(new Strings(contract._getCupToken()._getValue())));
+        }
         info.videoContractInfo.assetBcp47Codes = new HashSet<Strings>();
 
         for (RightsContractAssetHollow asset : rightsContract._getAssets()) {
@@ -164,13 +166,15 @@ public class WindowPackageContractInfoModule {
     public WindowPackageContractInfo buildWindowPackageContractInfoWithoutPackage(int packageId, RightsContractHollow rightsContract, ContractHollow contract, String country, int videoId) {
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
-        info.videoContractInfo.contractId = (int) contract._getContractId();
+        info.videoContractInfo.contractId = (int) rightsContract._getContractId();
         info.videoContractInfo.primaryPackageId = packageId;
-        if(contract._getPrePromotionDays() != Long.MIN_VALUE)
-            info.videoContractInfo.prePromotionDays = (int) contract._getPrePromotionDays();
-        info.videoContractInfo.isDayAfterBroadcast = contract._getDayAfterBroadcast();
-        info.videoContractInfo.hasRollingEpisodes = contract._getDayAfterBroadcast();
-        info.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(Collections.singletonList(new Strings(contract._getCupToken()._getValue())));
+        if (contract != null) {
+            if(contract._getPrePromotionDays() != Long.MIN_VALUE)
+                info.videoContractInfo.prePromotionDays = (int) contract._getPrePromotionDays();
+            info.videoContractInfo.isDayAfterBroadcast = contract._getDayAfterBroadcast();
+            info.videoContractInfo.hasRollingEpisodes = contract._getDayAfterBroadcast();
+            info.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(Collections.singletonList(new Strings(contract._getCupToken()._getValue())));
+        }
         info.videoContractInfo.assetBcp47Codes = new HashSet<Strings>();
 
         for (RightsContractAssetHollow asset : rightsContract._getAssets()) {
