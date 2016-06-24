@@ -3,22 +3,20 @@ package com.netflix.vms.transformer;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.CycleFastlaneIds;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleBegin;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleFailed;
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleSuccess;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.WritingBlobsFailed;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.WroteBlob;
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ConsecutiveCycleFailures;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ProcessDataDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ReadInputDataDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WriteOutputDataDuration;
-import java.util.Date;
-import com.netflix.vms.transformer.input.FollowVipPinExtractor;
-import com.netflix.vms.transformer.input.FollowVipPin;
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
+
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.client.HollowClient;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+import com.netflix.vms.transformer.input.FollowVipPin;
+import com.netflix.vms.transformer.input.FollowVipPinExtractor;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
 import com.netflix.vms.transformer.input.VMSInputDataVersionLogger;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
@@ -27,6 +25,7 @@ import com.netflix.vms.transformer.util.VersionMinter;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Date;
 
 public class TransformCycle {
     private final String transformerVip;
@@ -40,7 +39,6 @@ public class TransformCycle {
     
     private long previousCycleNumber = Long.MIN_VALUE;
     private long currentCycleNumber = Long.MIN_VALUE;
-    private int consecutiveCycleFailures = 0;
 
     public TransformCycle(TransformerContext ctx, FileStore fileStore, PublishWorkflowStager publishStager, String converterVip, String transformerVip) {
         this.transformerVip = transformerVip;
@@ -53,19 +51,20 @@ public class TransformCycle {
         this.followVipPinExtractor = new FollowVipPinExtractor(fileStore);
     }
 
-    public void cycle() {
-        beginCycle();
-
-        outputStateEngine.prepareForNextCycle();
-
-        updateTheInput();
-        if(transformTheData()) {
+    public void cycle() throws Throwable {
+        try {
+            beginCycle();
+            outputStateEngine.prepareForNextCycle();
+            updateTheInput();
+            transformTheData();
             writeTheBlobFiles();
             submitToPublishWorkflow();
             endCycleSuccessfully();
+        } catch (Throwable th) {
+            ctx.getLogger().error(TransformCycleFailed, "Transformer failed cycle -- rolling back", th);
+            outputStateEngine.resetToLastPrepareForNextCycle();
+            throw th;
         }
-
-        ctx.getMetricRecorder().recordMetric(ConsecutiveCycleFailures, consecutiveCycleFailures);
     }
 
     private void beginCycle() {
@@ -109,17 +108,15 @@ public class TransformCycle {
         VMSInputDataVersionLogger.logInputVersions(inputClient.getStateEngine().getHeaderTags(), ctx.getLogger());
     }
 
-    private boolean transformTheData() {
+    private boolean transformTheData() throws Throwable {
         long startTime = System.currentTimeMillis();
 
         try {
             SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI)inputClient.getAPI(), outputStateEngine, ctx);
             transformer.transform();
         } catch(Throwable th) {
-            ctx.getLogger().error(TransformCycleFailed, "Transformer failed cycle -- rolling back", th);
-            outputStateEngine.resetToLastPrepareForNextCycle();
-            consecutiveCycleFailures++;
-            return false;
+            ctx.getLogger().error(TransformCycleFailed, "transform failed", th);
+            throw th;
         } finally {
             long endTime = System.currentTimeMillis();
             ctx.getMetricRecorder().recordMetric(ProcessDataDuration, endTime - startTime);
@@ -128,7 +125,7 @@ public class TransformCycle {
         return true;
     }
 
-    private void writeTheBlobFiles() {
+    private void writeTheBlobFiles() throws IOException {
     	if(rollbackFastlaneStateEngineIfUnchanged())
     		return;
 
@@ -162,8 +159,7 @@ public class TransformCycle {
             }
         } catch(IOException e) {
             ctx.getLogger().error(WritingBlobsFailed, "Writing blobs failed", e);
-            outputStateEngine.resetToLastPrepareForNextCycle();
-            consecutiveCycleFailures++;
+            throw e;
         }
 
         long endTime = System.currentTimeMillis();
@@ -186,9 +182,7 @@ public class TransformCycle {
     }
 
     private void endCycleSuccessfully() {
-        ctx.getLogger().info(TransformCycleSuccess, "Cycle " + currentCycleNumber + " succeeded");
         previousCycleNumber = currentCycleNumber;
-        consecutiveCycleFailures = 0;
     }
 
 }
