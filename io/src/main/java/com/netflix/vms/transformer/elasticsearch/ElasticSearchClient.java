@@ -38,7 +38,6 @@ public class ElasticSearchClient {
     private final boolean doNotWaitForQueue;
     private final LinkedBlockingQueue<ElasticSearchLogMessage> indexDataQueue;
     private final TransformerConfig propertyManager;
-    private final EurekaClient eureka;
 
     @Inject
     private ElasticSearchClient(TransformerConfig config, EurekaClient eureka) {
@@ -48,7 +47,6 @@ public class ElasticSearchClient {
         this.queueTimeout = config.getElasticSearchQueueTimeoutMillis();
         this.doNotWaitForQueue = config.isElasticSearchNoWaitingEnabled();
         this.indexDataQueue = new LinkedBlockingQueue<ElasticSearchLogMessage>(maxQueueSize);
-        this.eureka = eureka;
 
         if(config.isElasticSearchLoggingEnabled()) {
 

@@ -5,6 +5,7 @@ import com.netflix.hollow.HollowListSchema;
 import com.netflix.hollow.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
+@SuppressWarnings("all")
 public class ShowMemberTypeListHollow extends HollowList<ShowMemberTypeHollow> {
 
     public ShowMemberTypeListHollow(HollowListDelegate delegate, int ordinal) {
@@ -12,7 +13,6 @@ public class ShowMemberTypeListHollow extends HollowList<ShowMemberTypeHollow> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public ShowMemberTypeHollow instantiateElement(int ordinal) {
         return (ShowMemberTypeHollow) api().getShowMemberTypeHollow(ordinal);
     }

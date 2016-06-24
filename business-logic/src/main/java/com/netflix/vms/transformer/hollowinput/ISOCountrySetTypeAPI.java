@@ -5,6 +5,7 @@ import com.netflix.hollow.read.customapi.HollowSetTypeAPI;
 import com.netflix.hollow.read.dataaccess.HollowSetTypeDataAccess;
 import com.netflix.hollow.objects.delegate.HollowSetLookupDelegate;
 
+@SuppressWarnings("all")
 public class ISOCountrySetTypeAPI extends HollowSetTypeAPI {
 
     private final HollowSetLookupDelegate delegateLookupImpl;

@@ -5,6 +5,7 @@ import com.netflix.hollow.HollowSetSchema;
 import com.netflix.hollow.objects.delegate.HollowSetDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
+@SuppressWarnings("all")
 public class VideoRightsContractAssetsSetHollow extends HollowSet<VideoRightsContractAssetHollow> {
 
     public VideoRightsContractAssetsSetHollow(HollowSetDelegate delegate, int ordinal) {
@@ -12,7 +13,6 @@ public class VideoRightsContractAssetsSetHollow extends HollowSet<VideoRightsCon
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public VideoRightsContractAssetHollow instantiateElement(int ordinal) {
         return (VideoRightsContractAssetHollow) api().getVideoRightsContractAssetHollow(ordinal);
     }
