@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import org.codehaus.jackson.JsonProcessingException;
 
 public class PlaybackMonkeyTester {
@@ -41,14 +42,14 @@ public class PlaybackMonkeyTester {
         this.pbmRestClient = createClient();
     }
 
-    public Map<VideoCountryKey, Boolean> testVideoCountryKeysWithRetry(TransformerLogger logger, List<VideoCountryKey> keys, int numOfTries) throws Exception {
-        Map<VideoCountryKey, Boolean> playBackMonkeyResult = new HashMap<>(keys.size());
-        for (VideoCountryKey key : keys) {
+    public Map<VideoCountryKey, Boolean> testVideoCountryKeysWithRetry(TransformerLogger logger, Set<VideoCountryKey> mostValuableChangedVideos, int numOfTries) throws Exception {
+        Map<VideoCountryKey, Boolean> playBackMonkeyResult = new HashMap<>(mostValuableChangedVideos.size());
+        for (VideoCountryKey key : mostValuableChangedVideos) {
             playBackMonkeyResult.put(key, false);
         }
 
         int currentTry = 0;
-        List<VideoCountryKey> videosToTest = keys;
+        List<VideoCountryKey> videosToTest = new ArrayList<>(mostValuableChangedVideos);
         while (currentTry++ <= numOfTries) {
             Map<VideoCountryKey, Boolean> result = testVideoCountryKeys(logger, videosToTest);
 
