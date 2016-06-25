@@ -37,9 +37,10 @@
     font-weight: bold; 
     color: #333333;
     font-size: larger;
+    padding-left: 10px;
     padding-top: 8px;
     padding-bottom: 8px;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .hr-line {
@@ -51,6 +52,42 @@
 
 .ui-group {
     border: 1px solid #aaaaaa;
+}
+
+.ui-inner {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.spinnaker-banner {
+    background: #3a5469;
+    margin-bottom: 0px;
+    margin-top:0px;
+}
+
+.spinnaker-banner-prod {
+    background: #b82525;
+}
+
+.spinnaker-banner-text {
+    display: inline-block;
+    font-size:larger;
+    color: #cccccc;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: center;
+    padding-right: 50px;
+    padding-left: 50px;
+}
+
+.html-reset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    /*font-size: 100%;*/
+    vertical-align: baseline;
+    background: transparent;
 }
 
 .qe-select { 
