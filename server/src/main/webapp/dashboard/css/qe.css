@@ -200,7 +200,7 @@ label.aligned {
     position: absolute;
     margin: 4px 4px;
     font-weight: bold;
-    text-shadow: 1px 1px 0 #fff;
+    /* text-shadow: 1px 1px 0 #fff; */
 }
 
 .progress-bar {
@@ -212,7 +212,7 @@ label.aligned {
 .innerframesmall {
     width:400px;
     height:270px;
-}                           
+}
 
 
 .splunkfont {

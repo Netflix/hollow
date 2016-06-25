@@ -4,6 +4,8 @@ function ServerCycleSummaryTab(dashboard) {
     this.graphWidth = 0;
     this.autoUpdateFlag = false;
     this.progressWidget = new ProgressBarWidget("#id-cycle-transform-progress", "#id-cycle-transform-progress-label");
+    $("#id-cycle-transform-progress > div").css({ 'background': '#a6bf82' });
+    $('#id-cycle-transform-progress').height(18);
 
     this.getAtlasEndMinusNowTimeMinutes = function() {
         var curr = Date.now();
