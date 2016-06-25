@@ -5,22 +5,32 @@ import com.google.inject.Singleton;
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.mutationstream.fastlane.FastlaneCassandraHelper;
 import com.netflix.mutationstream.fastlane.FastlaneVideo;
+import com.netflix.vms.transformer.common.config.TransformerConfig;
+
 import java.util.HashSet;
 import java.util.Set;
 
 @Singleton
 public class FastlaneIdRetriever {
 
+	private final TransformerConfig config;
 	private final FastlaneCassandraHelper fastlaneCassandraHelper;
 	
     @Inject
-    public FastlaneIdRetriever(FastlaneCassandraHelper cassandraHelper) {
+    public FastlaneIdRetriever(TransformerConfig config, FastlaneCassandraHelper cassandraHelper) {
+    	this.config = config;
     	this.fastlaneCassandraHelper = cassandraHelper;
     }
 
 	public Set<Integer> getFastlaneIds() {
-		Set<Integer> ids = new HashSet<Integer>();
-		
+		if(config.getOverrideFastlaneIds() != null)
+			return configuredOverrideFastlaneIds();
+		else
+			return fastlaneIdsFromCassandra();
+	}
+
+	private Set<Integer> fastlaneIdsFromCassandra() {
+		Set<Integer> ids = new HashSet<>();
 		try {
 		    long now = System.currentTimeMillis();
 		    
@@ -33,6 +43,14 @@ public class FastlaneIdRetriever {
 		} catch(ConnectionException ex) {
 			throw new RuntimeException("Unable to retrieve FastLane IDs", ex);
 		}
+	}
+
+	private Set<Integer> configuredOverrideFastlaneIds() {
+		Set<Integer> ids = new HashSet<>();
+		for(String idStr : config.getOverrideFastlaneIds().split(",")) {
+			ids.add(Integer.parseInt(idStr));
+		}
+		return ids;
 	}
     
 }
