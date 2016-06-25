@@ -32,15 +32,24 @@
 }
 
 .vms-info {
-    background: #e7e7e7;
+    background: #f8f8f8;
     text-align: left;
     font-weight: bold; 
     color: #333333;
     font-size: larger;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
 }
 
 .hr-line {
-    padding-top: 5px;
+    margin-top: 10px;
+    border: 0;
+    height: 1px;
+    background-color: #aaaaaa;
+}
+
+.ui-group {
     border: 1px solid #aaaaaa;
 }
 

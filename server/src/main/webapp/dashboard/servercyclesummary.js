@@ -66,7 +66,15 @@ function ServerCycleSummaryTab(dashboard) {
 
     this.autoUpdate = function() {
         if(cycleSummaryTab.autoUpdateFlag) {
-            setTimeout(cycleSummaryTab.updateProgressBar, 2000);
+            if(cycleSummaryTab.progressWidget.value != 100) { // ==
+                // cycleSummaryTab.autoUpdateFlag = false;
+                // return;
+                cycleSummaryTab.updateProgressBar();
+            }
+            // cycleSummaryTab.updateProgressBar();
+            cycleSummaryTab.createCycleWarnTable();
+            cycleSummaryTab.checkForNewCycle();
+            setTimeout(cycleSummaryTab.autoUpdate, 5000);
         }
     }
 
@@ -74,7 +82,31 @@ function ServerCycleSummaryTab(dashboard) {
         cycleSummaryTab.createCycleDurationAtlasIFrame();
         cycleSummaryTab.createCycleWarnTable();
         cycleSummaryTab.updateProgressBar();
-    };
+    }
+
+    this.refreshOnLatestCycle = function(data) {
+        if(data && data.length == 1) {
+            var obj = data[0];
+            var latestCycleId = obj["eventInfo.currentCycle"];
+            if(latestCycleId != dashboard.vmsCycleId) {
+               cycleSummaryTab.autoUpdateFlag = false;
+               // cycleSummaryTab.initialize();
+            }
+        }
+    }
+    
+    this.checkForNewCycle = function() {
+        var callbackFn = new CallbackWidget(cycleSummaryTab.refreshOnLatestCycle);
+        var fieldList = ["eventInfo.currentCycle" ];
+        var searchDao = new FieldModelSearchDAO(callbackFn, new SearchQuery(), fieldList, true);
+        searchDao.searchQuery.size = "1";
+        searchDao.searchQuery.indexType = "vmsserver";
+        searchDao.searchQuery.indexName = dashboard.vmsIndex;
+        searchDao.searchQuery.fields = fieldList;
+        searchDao.searchQuery.add("tag:TransformCycleBegin");
+        searchDao.searchQuery.sort = "eventInfo.timestamp:desc";
+        searchDao.updateJsonFromSearch();
+    }
 
     this.initialize = function() {
         var refFn = this;

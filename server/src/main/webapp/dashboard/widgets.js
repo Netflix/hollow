@@ -454,8 +454,32 @@ function EventChainingWidget(functionToInvoke) {
     this.refresh = function() {
         this.functionToInvoke();
     };
+}
+
+
+// --------------------------------------------------------------------
+// CallbackWidget is not a widget, but the "refresh" is a proxy for
+// invoking a function
+// --------------------------------------------------------------------
+function CallbackWidget(functionToInvoke) {
+    this.functionToInvoke = functionToInvoke;
+    this.modelData = null;
+    var refFn = this;
+
+    this.clear = function() {
+    };
+
+    this.applyParserData = function(model) {
+        refFn.modelData = model;
+    };
+
+    this.refresh = function() {
+        this.functionToInvoke(refFn.modelData);
+    };
 
 }
+
+
 
 // --------------------------------------------------------------------
 // SelectOptionsWidget
