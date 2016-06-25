@@ -278,6 +278,7 @@ label.aligned {
 
 .highlightrow {
    outline-style:double;
+   color:#333333;
 }
 
 .vms-group {
@@ -426,7 +427,6 @@ table.prettytable thead tr .headerSortDown {
     background: #f8f8f8;
     letter-spacing: 0px;
     font-weight: bold;
-    font-size: smaller;
 }
 
 .clickabletable td {

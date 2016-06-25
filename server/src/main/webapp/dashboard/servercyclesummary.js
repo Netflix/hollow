@@ -172,9 +172,10 @@ function ServerCycleSummaryTab(dashboard) {
             var yellowColor = "#FFFFBD";
             var redColor = "#FF9999";
             var orangeColor = "#FFA500";
+            var whiteColor = "#FFFFFF";
 
             var currCycle = new String(rowInfo.currentCycle);
-            var rowStyle = "<tr style='background-color:#FFFFFF'>";
+            var rowStyle = "<tr style='background-color:#FFFFFF; color:#769d3e'>";
             var html = "";
             var cycleSuccess = false;
             var cycleFail = false;
@@ -226,10 +227,10 @@ function ServerCycleSummaryTab(dashboard) {
             } else if (cycleSuccess) {
             	if(showNonAvailability) {
             		html += "<td><img src='images/incomplete.png'></td>";
-            		rowStyle = "<tr style='background-color:" + orangeColor + "'>";
+            		rowStyle = "<tr style='background-color:" + orangeColor + "; color:black'>";
             	}else {
 	                html += "<td><img src='images/ok.png'></td>";
-	                rowStyle = "<tr style='background-color:" + greenColor + "'>";
+	                rowStyle = "<tr style='background-color:" + whiteColor + "'; color:black>";
             	}
             } else if (!cycleFail && !cycleSuccess) {
                 html += "<td><img src='images/incomplete.png'></td>";
@@ -237,7 +238,7 @@ function ServerCycleSummaryTab(dashboard) {
 
             if (publishErrors) {
                 html += "<td><img src='images/x.png'></td>";
-                rowStyle = "<tr style='background-color:" + yellowColor + "'>";
+                rowStyle = "<tr style='background-color:" + yellowColor + "'; color:black>";
             } else if (!refFn.workerPublishMbps[currCycle]) {
                 html += "<td><img src='images/incomplete.png'></td>";
             } else {
@@ -258,7 +259,7 @@ function ServerCycleSummaryTab(dashboard) {
             } else {
                 html += "<td style='text-align:right'>" + refFn.workerPublishMbps[currCycle].toFixed(0) + "</td>";
                 if (refFn.workerPublishMbps[currCycle] < refFn.statsMbps.mean - 2 * refFn.statsMbps.sd) {
-                    rowStyle = "<tr style='background-color:" + yellowColor + "'>";
+                    rowStyle = "<tr style='background-color:" + yellowColor + "; color:black'>";
                 }
             }
 
@@ -297,7 +298,7 @@ function ServerCycleSummaryTab(dashboard) {
             }
 
             if (cycleFail) {
-                rowStyle = "<tr style='background-color:" + redColor + "'>";
+                rowStyle = "<tr style='background-color:" + redColor + "'>; color:black";
             }
 
             return {
