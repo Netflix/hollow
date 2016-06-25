@@ -415,25 +415,29 @@ table.prettytable thead tr .headerSortDown {
     color: #000000;
     max-width:100%;
     min-width:100%;
-    border: 1px silver solid;
-    frame: border;
+    border: 0px silver solid;
 }
 
 .clickabletable th {
     text-align: center;
-    border: 1px silver solid;
+    /* border: 1px silver solid;*/
     padding: 5px;
-    font-size: 11px;
+    color: #333333;
+    background: #f8f8f8;
+    letter-spacing: 0px;
+    font-weight: bold;
+    font-size: smaller;
 }
 
 .clickabletable td {
     text-align: left;
-    border: 1px silver solid;
+    /* border: 1px silver solid; */
     padding: 5px;
 }
 
 .clickabletable tr {
     background: #FFFFFF;
+    border-bottom: 1px silver solid;
 }
 
 .clickablecell {

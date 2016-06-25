@@ -203,7 +203,7 @@ function ClickableTableWidget(divId, tableId, fields, titles, clickableColumn, c
         if(this.showHeader) {
             this.html += "<thead><tr>";
             for ( var i in this.titleNames) {
-                this.html += "<th class='ui-state-default'>" + this.titleNames[i] + "</th>";
+                this.html += "<th>" + this.titleNames[i] + "</th>";
             }
             this.html += "</tr></thead>";
         }
