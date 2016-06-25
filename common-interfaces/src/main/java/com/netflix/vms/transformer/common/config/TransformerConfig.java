@@ -64,7 +64,7 @@ public interface TransformerConfig {
     @DefaultValue("AU,BR,GB,JP,NL,US,CA,CH,DE,MX")
     public String getPlaybackMonkeyTestForCountries();
 
-    @DefaultValue("20000")
+    @DefaultValue("15000")
     public int getPlaybackMonkeyMaxTestVideosSize();
 
     @DefaultValue("true")
