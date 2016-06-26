@@ -158,7 +158,7 @@ function ServerCycleSummaryTab(dashboard) {
             return query;
         };
 
-        this.styleRowBackground = function(rowInfo) {
+        this.styleRowBackground = function(rowInfo, row, numRows) {
             this.cacheFailModel = refFn.cacheFailDAO.responseModel;
             this.s3FailModel = refFn.s3FailDAO.responseModel;
             this.cacheSuccessModel = refFn.cacheSuccessDAO.responseModel;
@@ -226,19 +226,23 @@ function ServerCycleSummaryTab(dashboard) {
                 html += "<td><img src='images/x.png'></td>";
             } else if (cycleSuccess) {
             	if(showNonAvailability) {
-            		html += "<td><img src='images/incomplete.png'></td>";
+            		html += "<td><img src='images/waiting.png'></td>";
             		rowStyle = "<tr style='background-color:" + orangeColor + "; color:black'>";
             	}else {
 	                html += "<td><img src='images/ok.png'></td>";
-	                rowStyle = "<tr style='background-color:" + whiteColor + "'; color:black>";
+	                rowStyle = "<tr style='background-color:" + whiteColor + "; color:black'>";
             	}
             } else if (!cycleFail && !cycleSuccess) {
-                html += "<td><img src='images/incomplete.png'></td>";
+                if(row == 0) {
+                    html += "<td><img src='images/incomplete.png'></td>";
+                } else {
+                    html += "<td><img src='images/restarted.png'></td>";
+                }
             }
 
             if (publishErrors) {
                 html += "<td><img src='images/x.png'></td>";
-                rowStyle = "<tr style='background-color:" + yellowColor + "'; color:black>";
+                rowStyle = "<tr style='background-color:" + yellowColor + "; color:black'>";
             } else if (!refFn.workerPublishMbps[currCycle]) {
                 html += "<td><img src='images/incomplete.png'></td>";
             } else {
@@ -298,7 +302,7 @@ function ServerCycleSummaryTab(dashboard) {
             }
 
             if (cycleFail) {
-                rowStyle = "<tr style='background-color:" + redColor + "'>; color:black";
+                rowStyle = "<tr style='background-color:" + redColor + "; color:black'>";
             }
 
             return {

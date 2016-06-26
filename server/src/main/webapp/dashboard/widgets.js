@@ -217,7 +217,7 @@ function ClickableTableWidget(divId, tableId, fields, titles, clickableColumn, c
             if (!this.rowIndicatorFunc) {
                 this.html += "<tr>";
             } else {
-                customAdditions = this.rowIndicatorFunc(tableRow);
+                customAdditions = this.rowIndicatorFunc(tableRow, row, numRows);
                 this.html += customAdditions.trow;
             }
 
