@@ -156,6 +156,7 @@ function ClickableTableWidget(divId, tableId, fields, titles, clickableColumn, c
     this.clickEventFunc = !clickEventFunction ? null : clickEventFunction;
     this.rowIndicatorFunc = !rowIndicatorFunction ? null : rowIndicatorFunction;
     this.onRowClick = null;
+    this.endBuildTableFunc = null;
 
     this.getType = function() {
         return "ClickableTableWidget";
@@ -171,6 +172,9 @@ function ClickableTableWidget(divId, tableId, fields, titles, clickableColumn, c
             this.clear();
         }
         this.buildTable(model);
+        if(this.endBuildTableFunc != null) {
+            this.endBuildTableFunc();
+        }
     };
 
     this.clearHighlight = function() {

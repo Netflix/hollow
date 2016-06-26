@@ -37,7 +37,9 @@ function ServerPublishTab(serverInfoView) {
     };
 
     this.updateS3PublishTable = function() {
-        var tableWidget = new DataTableWidget("#id-s3-publish-table", "s3-publish-table", [ "cycleId", "keybase", "region", "version", "filesize(bytes)",
+        // var tableWidget = new DataTableWidget("#id-s3-publish-table", "s3-publish-table", [ "cycleId", "keybase", "region", "version", "filesize(bytes)",
+        //        "timestamp", "duration(ms)", "Mbps" ]);
+        var tableWidget = new DataTableWidget("#id-s3-publish-table", "s3-publish-table", [ "keybase", "region", "filesize(bytes)",
                 "timestamp", "duration(ms)", "Mbps" ]);
         var widgetExecutor = new RegexSearchWidgetExecutor(tableWidget, RegexParserMapper.prototype.getBlobPublishRegexInfo());
 

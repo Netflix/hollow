@@ -6,7 +6,8 @@ function ServerCycleSummaryTab(dashboard) {
     this.progressWidget = new ProgressBarWidget("#id-cycle-transform-progress", "#id-cycle-transform-progress-label");
     $("#id-cycle-transform-progress > div").css({ 'background': '#a6bf82' });
     $('#id-cycle-transform-progress').height(18);
-
+    var hidableColumns = [3, 5, 6, 7];
+    
     this.getAtlasEndMinusNowTimeMinutes = function() {
         var curr = Date.now();
         var elapsedMillis = curr - dashboard.vmsCycleDate - 3600 * 1000;
@@ -76,10 +77,23 @@ function ServerCycleSummaryTab(dashboard) {
             // cycleSummaryTab.updateProgressBar();
             cycleSummaryTab.createCycleWarnTable();
             cycleSummaryTab.checkForNewCycle();
+            // $("table[id='id-cycle-timestamp-table']").hideColumn(4); // "id-cycle-timestamp-table"  'table'
             setTimeout(cycleSummaryTab.autoUpdate, 5000);
         }
     }
 
+    this.hideColumns = function() {
+        for(var i=0; i < hidableColumns.length; i++) {
+            $("table[id='id-cycle-timestamp-table']").hideColumn(hidableColumns[i]);
+        }
+    }
+    
+    this.unhideColumns = function() {
+        for(var i=0; i < hidableColumns.length; i++) {
+            $("table[id='id-cycle-timestamp-table']").showColumn(hidableColumns[i]);
+        }
+    }
+    
     this.refresh = function() {
         cycleSummaryTab.createCycleDurationAtlasIFrame();
         cycleSummaryTab.createCycleWarnTable();
@@ -255,7 +269,7 @@ function ServerCycleSummaryTab(dashboard) {
             } else if (!cycleSuccess) {
                 html += "<td><img src='images/incomplete.png'></td>";
             } else {
-                html += ("<td>None</td>");
+                html += ("<td> </td>");
             }
 
             if (!refFn.workerPublishMbps[currCycle]) {
@@ -320,6 +334,7 @@ function ServerCycleSummaryTab(dashboard) {
                     "Snapshot change", "Topnodes change"], 0, dashboard.cycleIdSelector, refFn.styleRowBackground);
             var searchFieldModelDAO = new FieldModelSearchDAO(cycleSummaryTab.cycleSummarytableWidget, refFn.getIndexSearchQuery("CycleInfo"), [
                     "timestamp", "message", "currentCycle" ], true);
+            cycleSummaryTab.cycleSummarytableWidget.endBuildTableFunc = cycleSummaryTab.hideColumns;
             searchFieldModelDAO.updateJsonFromSearch();
         };
 

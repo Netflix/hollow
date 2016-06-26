@@ -7,6 +7,7 @@
         <script src="jquery/js/jquery-ui-1.10.3.vms.js"></script>
         <script src="jquery/js/jquery.flot.js"></script>
         <script src="jquery/js/jquery.jsonview.js"></script>
+        <script src="jquery/js/ash.js"></script>
 
         <!-- Codemirror -->
         <link rel="stylesheet" href="codemirror/lib/codemirror.css">
@@ -93,7 +94,8 @@
                     <button id="id-cycle-refresh-btn" class='hidden'>Apply</button>
                 </div>
                 <!-- class="ui-widget-content ui-helper-clearfix" -->
-                <div id="cycle-stats-tabs">
+                <div id="id-cycle-timestamp-div" style="width:25%; float:left;margin-right:0px; overflow-y: auto;"> </div>
+                <div id="cycle-stats-tabs" style="width:73%;float:right;">
                     <ul>
                         <li><a href="#cycle-status-tab">Cycles</a></li>
                         <li><a href="#cycle-properties-tab">Properties</a></li>
@@ -109,9 +111,8 @@
                     <!-- NOTE: the divs below should be in the same order as listed in <ul> section -->
                     <div id="cycle-status-tab">
                         <div style="padding-top: 8px"></div>
-                        <div id="id-cycle-timestamp-div" style="display: none; width:63%; height:825px; float:left;margin-right:0px; overflow-y: auto;">
-                        </div>
-                        <div id="id-vms-server-rightpane" class="ui-group" style="width:35%; float:right;">
+                        
+                        <div id="id-vms-server-rightpane" class="ui-group ui-helper-clearfix" style="width:40%; float:left">
                                 <div class='vms-info'>Transform Progress</div>
                                 <div class='ui-inner' id="id-cycle-transform-progress">
                                     <div id="id-cycle-transform-progress-label" class="progress-label-rel"></div>
@@ -119,7 +120,8 @@
                                 <div class='hr-line'></div>
                                 <div class='vms-info'>Warnings and Errors</div>
                                 <div class='ui-inner' id="id-cycle-warn-aggregate"></div>
-                                <div class='hr-line'></div>
+                        </div>
+                        <div class="ui-group ui-helper-clearfix" style="width:56%; float:right">
                                 <div class='vms-info'>Component Durations</div>
                                 <div class='ui-inner' id="id-vms-server-dashboard"></div>
                         </div>

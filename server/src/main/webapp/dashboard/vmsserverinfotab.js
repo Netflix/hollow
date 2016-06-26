@@ -469,7 +469,7 @@ function CycleErrorTab(serverInfoView) {
     refFn.refresh();
 
     $("#id-search-error-btn").button().click(function() {
-        var fields = ["timestamp","message", "instanceId"]
+        var fields = ["timestamp","message"]
         var tableWidget = new DataTableWidget("#id-cycle-error-locations", "id-table-error-results", fields);
         tableWidget.reformatCellDataFunc = new JavaExceptionFormatter("com.netflix.videometadata.").format;
         var searchQuery = new SearchQuery();
