@@ -75,7 +75,7 @@ public class SimpleTransformer {
     private VideoNamedListModule videoNamedListModule;
 
     private final VMSHollowInputAPI api;
-    private final HollowWriteStateEngine writeStateEngine;
+    private final VMSTransformerWriteStateEngine writeStateEngine;
     private final TransformerContext ctx;
     private final CycleConstants cycleConstants;
     private VMSTransformerIndexer indexer;
@@ -106,7 +106,7 @@ public class SimpleTransformer {
 
         final VideoHierarchyInitializer hierarchyInitializer = new VideoHierarchyInitializer(api, indexer, ctx);
 
-        final HollowObjectMapper objectMapper = new HollowObjectMapper(writeStateEngine);
+        final HollowObjectMapper objectMapper = writeStateEngine.getObjectMapper();
 
         SimultaneousExecutor executor = new SimultaneousExecutor();
 

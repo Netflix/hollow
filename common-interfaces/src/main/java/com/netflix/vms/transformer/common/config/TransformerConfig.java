@@ -38,6 +38,8 @@ public interface TransformerConfig {
     
     @DefaultValue("0")
     int getMaxTolerableFailedTransformerHierarchies();
+    
+    String getOverrideFastlaneIds();
 
     //////////////// PUBLISH WORKFLOW ///////////////////
 
