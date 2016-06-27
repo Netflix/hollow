@@ -4,6 +4,7 @@ import com.netflix.hollow.objects.delegate.HollowObjectAbstractDelegate;
 import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.HollowObjectSchema;
 
+@SuppressWarnings("all")
 public class StatusDelegateLookupImpl extends HollowObjectAbstractDelegate implements StatusDelegate {
 
     private final StatusTypeAPI typeAPI;

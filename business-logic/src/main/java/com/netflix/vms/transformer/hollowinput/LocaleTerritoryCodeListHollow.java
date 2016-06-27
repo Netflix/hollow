@@ -5,6 +5,7 @@ import com.netflix.hollow.HollowListSchema;
 import com.netflix.hollow.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
+@SuppressWarnings("all")
 public class LocaleTerritoryCodeListHollow extends HollowList<LocaleTerritoryCodeHollow> {
 
     public LocaleTerritoryCodeListHollow(HollowListDelegate delegate, int ordinal) {
@@ -12,7 +13,6 @@ public class LocaleTerritoryCodeListHollow extends HollowList<LocaleTerritoryCod
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public LocaleTerritoryCodeHollow instantiateElement(int ordinal) {
         return (LocaleTerritoryCodeHollow) api().getLocaleTerritoryCodeHollow(ordinal);
     }

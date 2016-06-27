@@ -24,6 +24,8 @@ import com.netflix.hollow.sampling.HollowSamplingDirector;
 import com.netflix.hollow.sampling.SampleResult;
 import com.netflix.hollow.util.AllHollowRecordCollection;
 
+@SuppressWarnings("all")
+
 public class VMSHollowInputAPI extends HollowAPI {
 
     private final HollowObjectCreationSampler objectCreationSampler;

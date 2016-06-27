@@ -1,11 +1,10 @@
 package com.netflix.vms.transformer.startup;
 
 import com.google.common.collect.Maps;
-import com.netflix.runtime.health.servlet.HealthStatusServlet;
 import com.netflix.server.base.NFFilter;
+import com.netflix.vms.transformer.health.TransformerHealthStatusServlet;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
-
 import java.util.Map;
 
 /**
@@ -28,7 +27,7 @@ public final class JerseyModule extends JerseyServletModule {
         serve("/REST/*").with(GuiceContainer.class);
 
         // Set up the healthcheck endpoint to be set by the provided status servlet.
-        serve("/healthcheck").with(HealthStatusServlet.class);
+        serve("/healthcheck").with(TransformerHealthStatusServlet.class);
     }
 
     @Override

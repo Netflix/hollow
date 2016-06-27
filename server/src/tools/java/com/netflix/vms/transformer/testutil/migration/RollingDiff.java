@@ -157,9 +157,10 @@ public class RollingDiff {
 
                 String expectedVersion = expectedColdstartVersions.remove(mutationGroup);
 
-                Assert.assertEquals(mutationGroup + " coldstart versions do not match -- you may just need to wait a bit longer after pinning inputs",
-                        expectedVersion,
-                        latestColdstartVersion);
+                if(latestColdstartVersion != null && expectedVersion != null)
+                    Assert.assertEquals(mutationGroup + " coldstart versions do not match -- you may just need to wait a bit longer after pinning inputs",
+                            expectedVersion,
+                            latestColdstartVersion);
             }
         }
 

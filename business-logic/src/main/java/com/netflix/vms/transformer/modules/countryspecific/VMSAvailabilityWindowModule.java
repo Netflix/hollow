@@ -189,8 +189,14 @@ public class VMSAvailabilityWindowModule {
                                 }
                             } else {
                                 if(shouldFilterOutWindowInfo) {
-                                    outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractId, videoId));
-    
+                                    WindowPackageContractInfo alreadyFilteredWindowPackageContractInfo = outputWindow.windowInfosByPackageId.get(ZERO);
+                                    if(alreadyFilteredWindowPackageContractInfo != null) {
+                                        if(alreadyFilteredWindowPackageContractInfo.videoContractInfo.contractId < (int)contractId)
+                                            alreadyFilteredWindowPackageContractInfo.videoContractInfo.contractId = (int)contractId;
+                                    } else {
+                                        outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractId, videoId));
+                                    }
+        
                                     if(maxPackageId == 0)
                                         bundledAssetsGroupId = Math.max(bundledAssetsGroupId, (int)contractId);
                                     

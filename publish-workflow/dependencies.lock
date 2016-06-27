@@ -298,19 +298,19 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
@@ -320,7 +320,7 @@
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -328,7 +328,7 @@
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -1630,26 +1630,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.114",
+            "locked": "1.116",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.113",
+            "locked": "1.115",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.114",
+            "locked": "1.116",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.167.0",
+            "locked": "1.168.0",
             "requested": "latest.release"
         },
         "netflix:mapping-registry": {
@@ -1953,11 +1953,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.93",
+            "locked": "59.97",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.93",
+            "locked": "59.97",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -2722,19 +2722,19 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
@@ -2744,7 +2744,7 @@
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -2752,7 +2752,7 @@
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -4054,26 +4054,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.114",
+            "locked": "1.116",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.113",
+            "locked": "1.115",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.114",
+            "locked": "1.116",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.167.0",
+            "locked": "1.168.0",
             "requested": "latest.release"
         },
         "netflix:mapping-registry": {
@@ -4377,11 +4377,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.93",
+            "locked": "59.97",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.93",
+            "locked": "59.97",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -5146,19 +5146,19 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
@@ -5168,7 +5168,7 @@
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -5176,7 +5176,7 @@
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -6478,26 +6478,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.114",
+            "locked": "1.116",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.113",
+            "locked": "1.115",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.114",
+            "locked": "1.116",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.167.0",
+            "locked": "1.168.0",
             "requested": "latest.release"
         },
         "netflix:mapping-registry": {
@@ -6801,11 +6801,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.93",
+            "locked": "59.97",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.93",
+            "locked": "59.97",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -7570,19 +7570,19 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
@@ -7592,7 +7592,7 @@
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -7600,7 +7600,7 @@
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -8902,26 +8902,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.114",
+            "locked": "1.116",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.113",
+            "locked": "1.115",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.114",
+            "locked": "1.116",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.167.0",
+            "locked": "1.168.0",
             "requested": "latest.release"
         },
         "netflix:mapping-registry": {
@@ -9225,11 +9225,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.93",
+            "locked": "59.97",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.93",
+            "locked": "59.97",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -10093,19 +10093,19 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
@@ -10115,7 +10115,7 @@
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -10123,7 +10123,7 @@
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -11425,26 +11425,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.114",
+            "locked": "1.116",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.113",
+            "locked": "1.115",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.114",
+            "locked": "1.116",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.167.0",
+            "locked": "1.168.0",
             "requested": "latest.release"
         },
         "netflix:mapping-registry": {
@@ -11748,11 +11748,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.93",
+            "locked": "59.97",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.93",
+            "locked": "59.97",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -12517,19 +12517,19 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
@@ -12539,7 +12539,7 @@
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -12547,7 +12547,7 @@
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -13850,26 +13850,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.114",
+            "locked": "1.116",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.113",
+            "locked": "1.115",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.114",
+            "locked": "1.116",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.167.0",
+            "locked": "1.168.0",
             "requested": "latest.release"
         },
         "netflix:mapping-registry": {
@@ -14173,11 +14173,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.93",
+            "locked": "59.97",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.93",
+            "locked": "59.97",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -14947,19 +14947,19 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
@@ -14969,7 +14969,7 @@
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -14977,7 +14977,7 @@
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -16280,26 +16280,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.114",
+            "locked": "1.116",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.113",
+            "locked": "1.115",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.114",
+            "locked": "1.116",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.167.0",
+            "locked": "1.168.0",
             "requested": "latest.release"
         },
         "netflix:mapping-registry": {
@@ -16603,11 +16603,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.93",
+            "locked": "59.97",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.93",
+            "locked": "59.97",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -17377,19 +17377,19 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
@@ -17399,7 +17399,7 @@
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -17407,7 +17407,7 @@
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -18710,26 +18710,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.114",
+            "locked": "1.116",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.113",
+            "locked": "1.115",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.114",
+            "locked": "1.116",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.167.0",
+            "locked": "1.168.0",
             "requested": "latest.release"
         },
         "netflix:mapping-registry": {
@@ -19033,11 +19033,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.93",
+            "locked": "59.97",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.93",
+            "locked": "59.97",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -19807,19 +19807,19 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
@@ -19829,7 +19829,7 @@
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -19837,7 +19837,7 @@
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -21140,26 +21140,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.114",
+            "locked": "1.116",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.113",
+            "locked": "1.115",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.114",
+            "locked": "1.116",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.167.0",
+            "locked": "1.168.0",
             "requested": "latest.release"
         },
         "netflix:mapping-registry": {
@@ -21463,11 +21463,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.93",
+            "locked": "59.97",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.93",
+            "locked": "59.97",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {

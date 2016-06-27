@@ -139,5 +139,4 @@ public class TransformerServerContext implements TransformerContext {
 	public OctoberSkyData getOctoberSkyData() {
 		return octoberSkyData;
 	}
-    
 }

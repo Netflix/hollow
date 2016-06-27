@@ -13,7 +13,6 @@ import com.netflix.vms.transformer.hollowinput.StoriesSynopsesHollow;
 import com.netflix.vms.transformer.hollowinput.SupplementalsHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -51,6 +50,7 @@ public class VideoHierarchyGrouper {
         processVideoRelationships();
         expandFastlaneIds();
         findProcessGroups();
+        Collections.shuffle(processGroups);
     }
 
     private void processVideoRelationships() {

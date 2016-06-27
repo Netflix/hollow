@@ -1,17 +1,16 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.vms.transformer.common.config.OctoberSkyData;
-
-import com.netflix.archaius.config.EmptyConfig;
 import com.netflix.archaius.ConfigProxyFactory;
-import com.netflix.vms.transformer.common.config.TransformerConfig;
-import java.util.Set;
+import com.netflix.archaius.config.EmptyConfig;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerFiles;
 import com.netflix.vms.transformer.common.TransformerLogger;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
+import com.netflix.vms.transformer.common.config.OctoberSkyData;
+import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
 import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class SimpleTransformerContext implements TransformerContext {
