@@ -56,6 +56,7 @@ public class VMSAvailabilityWindowModule {
 
     private final com.netflix.vms.transformer.hollowoutput.Integer ZERO = new com.netflix.vms.transformer.hollowoutput.Integer(0);
 
+    private final Strings DEFAULT_CUP_TOKEN = new Strings("default");
     private final LinkedHashSetOfStrings EMPTY_CUP_TOKENS;
     private final LinkedHashSetOfStrings DEFAULT_CUP_TOKENS;
 
@@ -75,7 +76,7 @@ public class VMSAvailabilityWindowModule {
         EMPTY_CUP_TOKENS.ordinals = Collections.emptyList();
 
         DEFAULT_CUP_TOKENS = new LinkedHashSetOfStrings();
-        DEFAULT_CUP_TOKENS.ordinals = Collections.singletonList(new Strings("default"));
+        DEFAULT_CUP_TOKENS.ordinals = Collections.singletonList(DEFAULT_CUP_TOKEN);
     }
 
 
@@ -165,7 +166,7 @@ public class VMSAvailabilityWindowModule {
                                 } else {
                                     ///merge cup tokens
                                     List<Strings> cupTokens = new ArrayList<>();
-                                    Strings contractCupToken = new Strings(contract._getCupToken()._getValue());
+                                    Strings contractCupToken = contract == null ? DEFAULT_CUP_TOKEN : new Strings(contract._getCupToken()._getValue());
                                     if(windowPackageContractInfo.videoContractInfo.contractId > contractId) {
                                         cupTokens.addAll(windowPackageContractInfo.videoContractInfo.cupTokens.ordinals);
                                         if(!cupTokens.contains(contractCupToken))
@@ -183,7 +184,6 @@ public class VMSAvailabilityWindowModule {
                                     for (RightsContractAssetHollow asset : rightsContract._getAssets()) {
                                         bcp47Codes.add(new Strings(asset._getBcp47Code()._getValue()));
                                     }
-
 
                                     windowPackageContractInfo = windowPackageContractInfo.clone();
                                     windowPackageContractInfo.videoContractInfo = windowPackageContractInfo.videoContractInfo.clone();
