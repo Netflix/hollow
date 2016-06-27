@@ -5,6 +5,7 @@ import com.netflix.hollow.HollowMapSchema;
 import com.netflix.hollow.objects.delegate.HollowMapDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
+@SuppressWarnings("all")
 public class MultiValuePassthroughMapHollow extends HollowMap<MapKeyHollow, ListOfStringHollow> {
 
     public MultiValuePassthroughMapHollow(HollowMapDelegate delegate, int ordinal) {
@@ -12,13 +13,11 @@ public class MultiValuePassthroughMapHollow extends HollowMap<MapKeyHollow, List
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public MapKeyHollow instantiateKey(int ordinal) {
         return (MapKeyHollow) api().getMapKeyHollow(ordinal);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public ListOfStringHollow instantiateValue(int ordinal) {
         return (ListOfStringHollow) api().getListOfStringHollow(ordinal);
     }

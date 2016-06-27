@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.context;
 import com.netflix.archaius.api.Config;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerFiles;
-import com.netflix.vms.transformer.common.TransformerHealthIndicator;
 import com.netflix.vms.transformer.common.TransformerLogger;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;

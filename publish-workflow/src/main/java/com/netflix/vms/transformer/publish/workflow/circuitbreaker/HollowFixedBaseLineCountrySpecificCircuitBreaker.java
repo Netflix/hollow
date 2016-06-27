@@ -9,15 +9,18 @@ public abstract class HollowFixedBaseLineCountrySpecificCircuitBreaker extends H
 		super(ctx, versionId);
 	}
 
-    protected boolean isCBCheckFailed(double currentValue, double changeThresholdPercent, long baseLine) {
+	@Override
+    protected boolean isCBCheckFailed(double currentValue, double changeThresholdPercent, double baseLine) {
     	return (currentValue > changeThresholdPercent);
     }
     
+	@Override
     protected double getBaseLine(String objectName) throws NumberFormatException, ConnectionException {
     	return 0;
     }
 		
-    protected String getFailedCBMessage(String metricName, double currentValue, double changeThresholdPercent, long baseLine) {
+    @Override
+    protected String getFailedCBMessage(String metricName, double currentValue, double changeThresholdPercent, double baseLine) {
 		return "Hollow validation failure for " + metricName + ": "
 		        + "This will result failure of announcement of data to clients."
 		        + "Observed a value of  " + currentValue + " percent which is more than threshold: " + changeThresholdPercent+" percentage.";

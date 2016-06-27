@@ -2,6 +2,7 @@ package com.netflix.vms.transformer;
 
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.IndividualTransformFailed;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.FailedProcessingIndividualHierarchies;
+
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
@@ -115,6 +116,7 @@ public class SimpleTransformer {
         VideoHierarchyGrouper showGrouper = new VideoHierarchyGrouper(api, ctx);
 
         final List<Set<VideoHierarchyGroup>> processGroups = showGrouper.getProcessGroups();
+        ctx.getLogger().info(LogTag.TransformInfo, "topNodes=" + processGroups.size());
 
         AtomicInteger processedCount = new AtomicInteger();
         int progressDivisor = getProgressDivisor(processGroups.size());

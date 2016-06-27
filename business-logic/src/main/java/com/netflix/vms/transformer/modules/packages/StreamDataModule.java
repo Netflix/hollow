@@ -163,6 +163,7 @@ public class StreamDataModule {
         outputStream.additionalData.downloadLocations = EMPTY_DOWNLOAD_LOCATIONS;
 
         outputStream.streamDataDescriptor = new StreamDataDescriptor();
+        outputStream.streamDataDescriptor.cacheDeployedCountries = Collections.emptySet();
         outputStream.downloadDescriptor = new DownloadDescriptor();
 
         StreamDeploymentInfoHollow deploymentInfo = inputStreamDeployment._getDeploymentInfo();

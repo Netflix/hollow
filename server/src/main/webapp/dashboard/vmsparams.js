@@ -131,3 +131,9 @@ RegexParserMapper.prototype.getProgressRegexInfo = function() {
     fieldRegex["percent"] = [ /^percent=(.*)$/, 1 ];
     return fieldRegex;
 };
+
+RegexParserMapper.prototype.getTopNodesRegexInfo = function() {
+    var fieldRegex = new Object();
+    fieldRegex["topNodes"] = [ /^topNodes=(.*)/, 1 ];
+    return fieldRegex;
+};

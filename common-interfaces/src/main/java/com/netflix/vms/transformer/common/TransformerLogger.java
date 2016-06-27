@@ -12,6 +12,7 @@ public interface TransformerLogger {
         TransformCycleFailed,
         CycleFastlaneIds,
         TransformProgress,
+        TransformInfo,
         InputDataVersionIds,
         FollowVip,
         InputDataConverterVersionId,

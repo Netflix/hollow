@@ -321,6 +321,15 @@ function VmsServerInfoTab(dashboard) {
             }
         }
 
+        if(id == "cycle-status-tab") {
+            if(!this.cycleSummaryView.autoUpdateFlag) {
+                this.cycleSummaryView.autoUpdateFlag = true;
+                this.cycleSummaryView.autoUpdate();
+            }
+        } else {
+            this.cycleSummaryView.autoUpdateFlag = false;
+        }
+
         if (id == "cycle-circuitbreaker-tab") {
             if (action.forceRefresh || !serverInfoView.cycleCircuitBreakerView.initialized()) {
                 serverInfoView.cycleCircuitBreakerView.refresh();

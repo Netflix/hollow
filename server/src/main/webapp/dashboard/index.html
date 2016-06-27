@@ -1,5 +1,5 @@
-<html>
-    <head>
+<html class="html-reset">
+    <head class="html-reset">
         <title>VMS Server Dashboard</title>
         <!-- JQuery JS and CSS -->
         <script src="jquery/js/jquery-1.9.1.js"></script>
@@ -19,10 +19,10 @@
         <style type="text/css">.CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black;}</style>
 
         <link rel="stylesheet" type="text/css" href="jquery/css/smoothness/jquery-ui.min.css"/>
-        <link rel="stylesheet" type="text/css" href="css/qe.css"/>
         <link rel="stylesheet" type="text/css" href="css/jquery.jsonview.css"/>
         <link rel="stylesheet" type="text/css" href="css/jquery.dataTables_themeroller.css"/>
         <link rel="stylesheet" type="text/css" href="jquery/css/vms/jquery-ui.css"/>
+        <link rel="stylesheet" type="text/css" href="css/qe.css"/>
 
         <!-- this is where the widgets are created -->
         <script type="text/javascript"  src="okeanosdashboard.js"></script>
@@ -52,39 +52,17 @@
             $(document).ready(function() {new Dashboard().initialize()});
         </script>
         
-        <style>
-            .header {
-                border-top:1px solid #99ccff;
-                border-bottom:1px solid #99ccff;
-            }
-            .header_prod {
-                border-top:1px solid #c00;
-                border-bottom:1px solid #c00;
-            }
-            .header_test {
-                border-top:1px solid #009999;
-                border-bottom:1px solid #009999;
-            }
-            .header_int {
-                border-top:1px solid #003399;
-                border-bottom:1px solid #003399;
-            }
-        </style>
     </head>
 
     <!--
         HTML body section
     -->
-    <body style="font-size:12px; background-color: #FFF">
-        <div id="header" class="header">
-            <table  cellpadding=2 cellspacing=2 border=0>
-              <tr>
-                <th>ENV:</th><td id="id-env-txt">test</td>
-                <td colspan=2 width=50px>&nbsp;</td>
-                <th>VIP:</th><td id="id-vip-txt">local</td>
-              </tr>
-            </table>
+    <body class="html-reset" style="font-size:12px; background-color: #FFF">
+        <div class='spinnaker-banner'>
+            <div class='spinnaker-banner-text' id='id-env-txt'>TEST</div>
+            <div class='spinnaker-banner-text' id='id-vip-txt'>local</div>
         </div>
+
         <div id="okeanos-tabs" >
             <ul>
                 <li><a href="#cycle-view">Server</a></li>
@@ -95,16 +73,17 @@
                 <li><a href="#cb-dashboard-tab">Circuit Breaker</a></li>
             </ul>
             <div id="cycle-view">
-                <div id="stats-tab-toolbar" class="ui-widget-tooolbar">
-                    VMS vip: 
+                <!-- ui-widget-tooolbar -->
+                <div id="stats-tab-toolbar" class="vms-info">
+                    VIP
                     <select id = "id-vms-vip-select" style="display:inline-block;">
                         <option></option>
                     </select> 
-                    Select day (UTC):
+                    Day (UTC)
                     <select id = "id-vms-index-select" style="display:inline-block;">
                         <option></option>
                     </select> 
-                    Select VMS cycle:
+                    Cycle
                     <select id = "id-vms-cycle-select" style="display:inline-block;">
                         <option></option>
                     </select> 
@@ -113,7 +92,8 @@
                     <button id="id-cycle-next-btn" style="display:inline-block;">Next</button>
                     <button id="id-cycle-refresh-btn" class='hidden'>Apply</button>
                 </div>
-                <div id="cycle-stats-tabs" class="ui-widget-content ui-helper-clearfix">
+                <!-- class="ui-widget-content ui-helper-clearfix" -->
+                <div id="cycle-stats-tabs">
                     <ul>
                         <li><a href="#cycle-status-tab">Cycles</a></li>
                         <li><a href="#cycle-properties-tab">Properties</a></li>
@@ -128,15 +108,28 @@
                     </ul>
                     <!-- NOTE: the divs below should be in the same order as listed in <ul> section -->
                     <div id="cycle-status-tab">
-                        <!--   width:55%; style="width:43%;float:left; -->
-                            <div id = "id-cycle-timestamp-div" style="display: none; width:54%; height:825px; float:left;margin-right:0px; overflow-y: auto;"></div>
-                            <div id = "id-vms-server-dashboard" style="width:45%; float:right;"></div>
-                        <!-- /div -->
+                        <div style="padding-top: 8px"></div>
+                        <div id="id-cycle-timestamp-div" style="display: none; width:63%; height:825px; float:left;margin-right:0px; overflow-y: auto;">
+                        </div>
+                        <div id="id-vms-server-rightpane" class="ui-group" style="width:35%; float:right;">
+                                <div class='vms-info'>Transform Progress</div>
+                                <div class='ui-inner' id="id-cycle-transform-progress">
+                                    <div id="id-cycle-transform-progress-label" class="progress-label-rel"></div>
+                                </div>
+                                <div class='hr-line'></div>
+                                <div class='vms-info'>Warnings and Errors</div>
+                                <div class='ui-inner' id="id-cycle-warn-aggregate"></div>
+                                <div class='hr-line'></div>
+                                <div class='vms-info'>Component Durations</div>
+                                <div class='ui-inner' id="id-vms-server-dashboard"></div>
+                        </div>
                     </div>
                     <div id="cycle-properties-tab">
-                        <div id = "id-properties-table"></div>
+                        <div style="padding-top: 8px"></div>
+                        <div id="id-properties-table"></div>
                     </div>
                     <div id="cycle-publish-tab">
+                        <div style="padding-top: 8px"></div>
                         <em>Publish blobs to s3</em>
                         <div id="id-s3-publish-table"></div>
                         <br>
@@ -145,6 +138,7 @@
                         <br>
                     </div>
                     <div id="cycle-error-logs-tab">
+                        <div style="padding-top: 8px"></div>
                         <div id="id-error-toolbar" class="ui-widget-header ui-corner-all" style="display:inline-block; padding: 4px">
                             Search for Tag (AND optionally id):
                             <input  type="textbox" id="id-search-error-box" size="25" value=""></input>
@@ -168,6 +162,7 @@
                         <div id="id-cycle-circuitbreaker-locations"></div>
                     </div>
                     <div id="cycle-input-validation-tab">
+                        <div style="padding-top: 8px"></div>
                         <table style="width:100%;">
                             <tr>
                                 <td colspan="2">
@@ -211,6 +206,7 @@
                         </div>
                     </div>
                     <div id="cycle-inputdata-tab">
+                        <div style="padding-top: 8px"></div>
                         <div id="cycle-input-data-view">
                             <h3>Data version:
                                 <div style="display:inline-block;" id="id-cycle-data-version-locations"></div>

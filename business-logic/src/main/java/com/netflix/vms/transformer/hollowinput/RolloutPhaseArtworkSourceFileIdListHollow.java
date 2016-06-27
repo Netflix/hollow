@@ -5,6 +5,7 @@ import com.netflix.hollow.HollowListSchema;
 import com.netflix.hollow.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
+@SuppressWarnings("all")
 public class RolloutPhaseArtworkSourceFileIdListHollow extends HollowList<RolloutPhaseArtworkSourceFileIdHollow> {
 
     public RolloutPhaseArtworkSourceFileIdListHollow(HollowListDelegate delegate, int ordinal) {
@@ -12,7 +13,6 @@ public class RolloutPhaseArtworkSourceFileIdListHollow extends HollowList<Rollou
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public RolloutPhaseArtworkSourceFileIdHollow instantiateElement(int ordinal) {
         return (RolloutPhaseArtworkSourceFileIdHollow) api().getRolloutPhaseArtworkSourceFileIdHollow(ordinal);
     }

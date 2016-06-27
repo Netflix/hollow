@@ -878,7 +878,9 @@ body .ui-tooltip {
     font-weight: bold;
     font-size: 1.1em;
     font-family: Verdana,Arial,sans-serif;
-    border-bottom: 2px #428BCA solid;
+    border-bottom: 1px silver solid;
+    /* border-bottom: 2px #428BCA solid; */
+    /* this effects the bottom line of tabs*/
 }
 
 .ui-widget-table-header {
