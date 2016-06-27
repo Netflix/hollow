@@ -121,7 +121,7 @@ public class VMSFollowVipSameVersionAdmin {
 
     private String createDiffLink(String primaryVip, long primaryCycleId, String secondaryVip, long secondaryCycleId) {
         String env = config.getNetflixEnvironment();
-        String diffName = String.format("dataio:(%s:%s|%s:%s)", primaryVip, primaryCycleId, secondaryVip, secondaryCycleId);
+        String diffName = String.format("dataio:(%s:%s::%s:%s)", primaryVip, primaryCycleId, secondaryVip, secondaryCycleId);
         String url = String.format("http://go/vmsdiff-%s?action=submit&diffName=%s&fromVip=%s&fromVersion=%s&toVip=%s&toVersion=%s",
                 env, diffName, primaryVip, primaryCycleId, secondaryVip, secondaryCycleId);
 
