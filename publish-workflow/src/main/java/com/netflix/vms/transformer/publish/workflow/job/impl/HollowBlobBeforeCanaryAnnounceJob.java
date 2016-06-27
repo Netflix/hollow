@@ -2,6 +2,8 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.PlaybackMonkey;
 
+import java.util.Set;
+
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
@@ -18,11 +20,11 @@ import java.util.Map;
 public class HollowBlobBeforeCanaryAnnounceJob extends BeforeCanaryAnnounceJob {
     private final PlaybackMonkeyTester dataTester;
 	private Map<VideoCountryKey, Boolean> testResultVideoCountryKeys;
-	private final ValidationVideoRanker videoRanker;
+	private final ValuableVideoHolder videoRanker;
 
 	public HollowBlobBeforeCanaryAnnounceJob(PublishWorkflowContext ctx, long newVersion, RegionEnum region, CircuitBreakerJob circuitBreakerJob,
 			CanaryValidationJob previousCycleValidationJob, List<PublicationJob> newPublishJobs, CanaryRollbackJob previousCanaryRollBackJob, PlaybackMonkeyTester dataTester,
-			ValidationVideoRanker videoRanker) {
+			ValuableVideoHolder videoRanker) {
 		super(ctx, ctx.getVip(), newVersion, region, circuitBreakerJob, previousCycleValidationJob, newPublishJobs, previousCanaryRollBackJob);
 		this.dataTester = dataTester;
 		this.videoRanker = videoRanker;
@@ -35,7 +37,7 @@ public class HollowBlobBeforeCanaryAnnounceJob extends BeforeCanaryAnnounceJob {
 		if(region.equals(RegionEnum.US_EAST_1) && ctx.getConfig().isPlaybackMonkeyEnabled()){
 			try {
 				long now = System.currentTimeMillis();
-				List<VideoCountryKey> mostValuableChangedVideos = videoRanker.getMostValuableChangedVideos(ctx);
+				Set<VideoCountryKey> mostValuableChangedVideos = videoRanker.getMostValuableChangedVideos(ctx, getCycleVersion());
 				ctx.getLogger().info(PlaybackMonkey, getJobName() + ": got " + mostValuableChangedVideos.size() + " most valuable videos to test.");
 
 				if(mostValuableChangedVideos.size() > 0)
@@ -44,7 +46,6 @@ public class HollowBlobBeforeCanaryAnnounceJob extends BeforeCanaryAnnounceJob {
 				long timeTaken = System.currentTimeMillis() - now;
 				float failedPercent = PlaybackMonkeyUtil.getFailedPercent(testResultVideoCountryKeys);
 				if(testResultsTooNoise(failedPercent)) success = false;
-				PlaybackMonkeyUtil.logResultsToAtlas(PlaybackMonkeyUtil.FAILURE_PERCENT, failedPercent, vip, "before");
 				PlaybackMonkeyUtil.logResultsToAtlas(PlaybackMonkeyUtil.TIME_TAKEN, timeTaken, vip, "before");
 				ctx.getLogger().info(PlaybackMonkey, getJobName() + ": completed with " + testResultVideoCountryKeys.size() + " video country pairs.");
 				ctx.getLogger().info(PlaybackMonkey, getJobName() + ": Success of test: " + success);

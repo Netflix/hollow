@@ -19,6 +19,8 @@ public interface TransformerMetricRecorder {
         
         TopNMissingViewShare,
         SnapShotSize,
+        ViewShareCoveredByPBM,
+        PBMFailuresMissingViewShare,
 
         CycleSuccessCounter;
 

@@ -43,6 +43,7 @@ public interface TransformerLogger {
         PublishedBlob,
         PlaybackMonkey,
         PlaybackMonkeyTestVideo,
+        PlaybackMonkeyWarn,
         DataCanary,
         MarkedPoisonState,
         ObservedPoisonState,

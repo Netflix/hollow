@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class HollowBlobAfterCanaryAnnounceJob extends AfterCanaryAnnounceJob {
 
@@ -22,12 +23,12 @@ public class HollowBlobAfterCanaryAnnounceJob extends AfterCanaryAnnounceJob {
 
 	private final PlaybackMonkeyTester dataTester;
 	private Map<VideoCountryKey, Boolean> testResultVideoCountryKeys;
-	private final ValidationVideoRanker videoRanker;
+	private final ValuableVideoHolder videoRanker;
 
 	public HollowBlobAfterCanaryAnnounceJob(PublishWorkflowContext ctx, long newVersion,
 			RegionEnum region, BeforeCanaryAnnounceJob beforeCanaryAnnounceJob,
 			CanaryAnnounceJob canaryAnnounceJob, PlaybackMonkeyTester dataTester,
-			ValidationVideoRanker videoRanker) {
+			ValuableVideoHolder videoRanker) {
 		super(ctx, ctx.getVip(), newVersion, region, beforeCanaryAnnounceJob, canaryAnnounceJob);
 		this.dataTester = dataTester;
 		this.testResultVideoCountryKeys = Collections.emptyMap();
@@ -41,13 +42,12 @@ public class HollowBlobAfterCanaryAnnounceJob extends AfterCanaryAnnounceJob {
 			final long now = System.currentTimeMillis();
 			try {
 				if(isPlaybackMonkeyInstancesReadyForTest()){
-						List<VideoCountryKey> mostValuableChangedVideos = videoRanker.getMostValuableChangedVideos(ctx);
+						Set<VideoCountryKey> mostValuableChangedVideos = videoRanker.getMostValuableChangedVideos(ctx, getCycleVersion());
 						ctx.getLogger().info(PlaybackMonkey, getJobName() + ": got " + mostValuableChangedVideos.size() + " most valuable videos to test.");
 
 						testResultVideoCountryKeys = dataTester.testVideoCountryKeysWithRetry(ctx.getLogger(), mostValuableChangedVideos, ctx.getConfig().getPlaybackMonkeyMaxRetriesPerTest());
 
 						long timeTaken = System.currentTimeMillis()-now;
-						PlaybackMonkeyUtil.logResultsToAtlas(PlaybackMonkeyUtil.FAILURE_PERCENT, PlaybackMonkeyUtil.getFailedPercent(testResultVideoCountryKeys), vip, "after");
 						PlaybackMonkeyUtil.logResultsToAtlas(PlaybackMonkeyUtil.TIME_TAKEN, timeTaken, vip, "after");
 						ctx.getLogger().info(PlaybackMonkey, getJobName() + ": completed with " + testResultVideoCountryKeys.size() + " video country pairs");
 						ctx.getLogger().info(PlaybackMonkey, getJobName() + ": success of test: " + success);
