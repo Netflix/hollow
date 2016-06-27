@@ -601,6 +601,7 @@ function RegexSourceModel(args) {
     this.addHitInfo = function(jsonHitData) {
         var timestamp = jsonHitData._source.eventInfo["timestamp"]; // hard-coded
         var cycleId = jsonHitData._source.eventInfo["currentCycle"];
+        var instanceId = jsonHitData._source.eventInfo["instanceId"];
         var logline = jsonHitData._source[this.sourceField];
         var tokens = logline.split(" ");
 
@@ -610,6 +611,7 @@ function RegexSourceModel(args) {
         var row = new Object();
         row["timestamp"] = dateString;
         row["cycleId"] = cycleId;
+        row["instanceId"] = instanceId;
 
         for ( var i in tokens) {
             var token = tokens[i];

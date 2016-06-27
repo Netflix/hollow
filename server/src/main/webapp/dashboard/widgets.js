@@ -157,6 +157,7 @@ function ClickableTableWidget(divId, tableId, fields, titles, clickableColumn, c
     this.rowIndicatorFunc = !rowIndicatorFunction ? null : rowIndicatorFunction;
     this.onRowClick = null;
     this.endBuildTableFunc = null;
+    var refFn = this;
 
     this.getType = function() {
         return "ClickableTableWidget";
@@ -186,7 +187,6 @@ function ClickableTableWidget(divId, tableId, fields, titles, clickableColumn, c
 
     // find text in clickable column and highlight it
     this.updateHighlight = function(val) {
-        var refFn = this;
         refFn.clearHighlight();
         var tableRowId = "#" + this.tableId + " tr";
         $(tableRowId).each(function() {
@@ -204,7 +204,7 @@ function ClickableTableWidget(divId, tableId, fields, titles, clickableColumn, c
         }
 
         this.html = "<table id='" + this.tableId + "' class='clickabletable'>";
-        if(this.showHeader) {
+        if(refFn.showHeader) {
             this.html += "<thead><tr>";
             for ( var i in this.titleNames) {
                 this.html += "<th>" + this.titleNames[i] + "</th>";

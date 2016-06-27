@@ -6,6 +6,7 @@ function VmsServerInfoTab(dashboard) {
     var serverInfoView = this;
     var expandedTabs = true;
     this.cycleSummaryView = null;
+    this.cycleStatusView = null;
     this.cycleReplayView = null;
     this.cyclePublishView = null;
     this.cycleValidationView = null;
@@ -161,6 +162,7 @@ function VmsServerInfoTab(dashboard) {
         // get the live timer going (once and only once)
         this.cycleReplayView.setupLiveControl();
         this.cycleReplayView.startRealTimeStatsTimer();
+        this.cycleStatusView = new ServerCycleStatusTab(serverInfoView);
         this.cyclePublishView = new ServerPublishTab(serverInfoView);
         this.cycleInputSearchView = new ServerInputSearchTab(serverInfoView);
         this.propertiesTabView = new CyclePropertiesTab(serverInfoView);
@@ -258,7 +260,7 @@ function VmsServerInfoTab(dashboard) {
         });
 
         // default view
-        this.cycleSummaryView.refresh();
+        this.cycleStatusView.refresh();
     };
 
     this.cycleIdToDate = function() {
@@ -322,12 +324,12 @@ function VmsServerInfoTab(dashboard) {
         }
 
         if(id == "cycle-status-tab") {
-            if(!this.cycleSummaryView.autoUpdateFlag) {
-                this.cycleSummaryView.autoUpdateFlag = true;
-                this.cycleSummaryView.autoUpdate();
+            if(!this.cycleStatusView.autoUpdateFlag) {
+                this.cycleStatusView.autoUpdateFlag = true;
+                this.cycleStatusView.autoUpdate();
             }
         } else {
-            this.cycleSummaryView.autoUpdateFlag = false;
+            this.cycleStatusView.autoUpdateFlag = false;
         }
 
         if (id == "cycle-circuitbreaker-tab") {

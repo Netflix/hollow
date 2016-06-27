@@ -7,6 +7,15 @@ function ServerCycleStatusTab(dashboard) {
     $("#id-cycle-transform-progress > div").css({ 'background': '#a6bf82' });
     $('#id-cycle-transform-progress').height(18);
 
+
+    this.refresh = function() {
+        cycleSummaryTab.createCycleDurationAtlasIFrame();
+        cycleSummaryTab.createCycleWarnTable();
+        cycleSummaryTab.updateProgressBar();
+        cycleSummaryTab.createSystemInfoTable();
+    }
+
+
     this.getAtlasEndMinusNowTimeMinutes = function() {
         var curr = Date.now();
         var elapsedMillis = curr - dashboard.vmsCycleDate - 3600 * 1000;
@@ -39,7 +48,7 @@ function ServerCycleStatusTab(dashboard) {
 
     this.createCycleWarnTable = function() {
             var fieldKeys = [ "key", "doc_count" ];
-            var warnCodesWidget = new ClickableTableWidget("#id-cycle-warn-aggregate", "id-cycle-warn-agg-table", fieldKeys, [ "tag", "Count"], 0);
+            var warnCodesWidget = new ClickableTableWidget("#id-cycle-warn-aggregate", "id-cycle-warn-agg-table", fieldKeys, [ "tag", "Count"], -1);
             warnCodesWidget.showHeader = false;
             var query = new SearchQuery();
             query.indexName = dashboard.vmsIndex;
@@ -80,13 +89,6 @@ function ServerCycleStatusTab(dashboard) {
         }
     }
 
-    this.refresh = function() {
-        cycleSummaryTab.createCycleDurationAtlasIFrame();
-        cycleSummaryTab.createCycleWarnTable();
-        cycleSummaryTab.updateProgressBar();
-    }
-
-    
     this.refreshOnLatestCycle = function(data) {
         if(data && data.length == 1) {
             var obj = data[0];
@@ -97,7 +99,20 @@ function ServerCycleStatusTab(dashboard) {
             }
         }
     }
-    
+
+    this.createSystemInfoTable = function() {
+        var tableFields = ["instanceId", "JarVersion"];
+        var tableHeader = ["Instance", "Jar version"];
+        var tableWidget = new ClickableTableWidget("#id-cycle-system-info", "id-cycle-system-info-table", tableFields, tableHeader);
+        var widgetExecutor = new RegexSearchWidgetExecutor(tableWidget, RegexParserMapper.prototype.getJarVersionRegexInfo());
+        var query = widgetExecutor.searchQuery;
+        query.indexName = dashboard.vmsIndex;
+        query.indexType = "vmsserver";
+        query.size = "1";
+        query.add(dashboard.vmsCycleId).add("tag:TransformCycleBegin");
+        widgetExecutor.updateJsonFromSearch();
+    }
+
     this.checkForNewCycle = function() {
         var callbackFn = new CallbackWidget(cycleSummaryTab.refreshOnLatestCycle);
         var fieldList = ["eventInfo.currentCycle" ];

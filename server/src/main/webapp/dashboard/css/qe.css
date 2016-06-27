@@ -40,23 +40,24 @@
     padding-left: 10px;
     padding-top: 8px;
     padding-bottom: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .hr-line {
-    margin-top: 10px;
+    margin-top: 1px;
     border: 0;
     height: 1px;
     background-color: #aaaaaa;
 }
 
 .ui-group {
-    border: 1px solid #aaaaaa;
+    border: 1px solid #c4c4c4;
 }
 
 .ui-inner {
     margin-left: 10px;
     margin-right: 10px;
+     margin-bottom: 15px;
 }
 
 .spinnaker-banner {
@@ -276,9 +277,11 @@ label.aligned {
   /* border-bottom-style: double;*/
 }
 
-.highlightrow {
-   outline-style:double;
-   color:#333333;
+tr.highlightrow td {
+   /* outline-style:double;*/
+   /* border-color: #a6a6a6;*/
+   border-bottom: 2px solid #229cb3;
+   border-top: 2px solid #229cb3;
 }
 
 .vms-group {

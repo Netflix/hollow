@@ -29,6 +29,7 @@
         <script type="text/javascript"  src="okeanosdashboard.js"></script>
         <script type="text/javascript"  src="vmsserverinfotab.js"></script>
         <script type="text/javascript"  src="servercyclesummary.js"></script>
+        <script type="text/javascript"  src="status.js"></script>
         <script type="text/javascript"  src="inputvalidation.js"></script>
         <script type="text/javascript"  src="serverpublishtab.js"></script>
         <script type="text/javascript"  src="cyclereplaytab.js"></script>
@@ -94,8 +95,8 @@
                     <button id="id-cycle-refresh-btn" class='hidden'>Apply</button>
                 </div>
                 <!-- class="ui-widget-content ui-helper-clearfix" -->
-                <div id="id-cycle-timestamp-div" style="width:25%; float:left;margin-right:0px; overflow-y: auto;"> </div>
-                <div id="cycle-stats-tabs" style="width:73%;float:right;">
+                <div id="id-cycle-timestamp-div" class="ui-group" style="width:30%; float:left;margin-right:0px; overflow-y: auto;"> </div>
+                <div id="cycle-stats-tabs" style="width:67%;float:right;">
                     <ul>
                         <li><a href="#cycle-status-tab">Cycles</a></li>
                         <li><a href="#cycle-properties-tab">Properties</a></li>
@@ -120,6 +121,9 @@
                                 <div class='hr-line'></div>
                                 <div class='vms-info'>Warnings and Errors</div>
                                 <div class='ui-inner' id="id-cycle-warn-aggregate"></div>
+                                <div class='hr-line'></div>
+                                <div class='vms-info'>System Information</div>
+                                <div class='ui-inner' id="id-cycle-system-info"></div>
                         </div>
                         <div class="ui-group ui-helper-clearfix" style="width:56%; float:right">
                                 <div class='vms-info'>Component Durations</div>

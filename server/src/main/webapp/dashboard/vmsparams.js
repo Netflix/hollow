@@ -137,3 +137,9 @@ RegexParserMapper.prototype.getTopNodesRegexInfo = function() {
     fieldRegex["topNodes"] = [ /^topNodes=(.*)/, 1 ];
     return fieldRegex;
 };
+
+RegexParserMapper.prototype.getJarVersionRegexInfo = function() {
+    var fieldRegex = new Object();
+    fieldRegex["JarVersion"] = [ /^jarVersion=(.*)/, 1 ];
+    return fieldRegex;
+};
