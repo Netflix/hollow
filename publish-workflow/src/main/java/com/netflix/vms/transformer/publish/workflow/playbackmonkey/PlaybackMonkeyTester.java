@@ -78,7 +78,6 @@ public class PlaybackMonkeyTester {
      */
     public Map<VideoCountryKey, Boolean> testVideoCountryKeys(TransformerLogger logger, List<VideoCountryKey> keys) throws Exception {
         final String[] testIds = new String[keys.size()];
-        final int retries[] = new int[keys.size()];
         final boolean testCompleted[] = new boolean[keys.size()];
         final boolean testSuccess[] = new boolean[keys.size()];
 
@@ -111,43 +110,52 @@ public class PlaybackMonkeyTester {
         logger.info(PlaybackMonkey, "Initiated " + keys.size() + " number of video country tests.");
 
         executor = new SimultaneousExecutor();
+        
+        // TODO: make timeout a fast property
+        long timeToQuit = System.currentTimeMillis() + 1 * 60 * 1000; 
 
         for (int i = 0; i < numThreads; i++) {
             final int threadNumber = i;
             executor.execute(new Runnable() {
                 public void run() {
                     boolean allComplete = false;
-                    while (!allComplete) {
+                    while(!allComplete) { // retry
+                    	// Quit retrying if we have already tried for enough time. 
+                    	// This will protect against infinite retries. 
+                    	if(System.currentTimeMillis() >= timeToQuit)
+                    		break;
                         allComplete = true;
-                        for (int i = threadNumber; i < keys.size(); i += numThreads) {
-                            if (!testCompleted[i]) {
+                        for(int i=threadNumber;i<keys.size();i += numThreads) {
+                            if(!testCompleted[i]) {
                                 try {
-                                    // LOGGER.logf(ErrorCode.PlayBackMonkeyInfo,"threadNumber: %d keys.size(): %d ; testIds.length: %d ",
-                                    // threadNumber, keys.size(),
-                                    // testIds.length);
+                                	//LOGGER.logf(ErrorCode.PlayBackMonkeyInfo,"threadNumber: %d keys.size(): %d ; testIds.length: %d ", threadNumber, keys.size(), testIds.length);
                                     PlaybackMonkeyTestResults results = getTestResults(testIds[i]);
-                                    if (results.getStatus() != Status.COMPLETE) {
-                                        allComplete = false;
-                                        // System.out.println("PENDING " +
-                                        // testIds[i]);
-                                    } else if (!results.isSuccess()) {
-                                        if (++retries[i] > 3) {
-                                            testCompleted[i] = true;
-                                            // System.out.println("FAILED " +
-                                            // testIds[i]);
-                                        } else {
-                                            // System.out.println("RETRYING " +
-                                            // i + " (" + retries[i] + ")");
-                                            allComplete = false;
-                                        }
-                                    } else {
-                                        // System.out.println("SUCCESS " +
-                                        // testIds[i]);
-                                        testCompleted[i] = true;
-                                        testSuccess[i] = true;
+                                    Status status = results.getStatus();
+                                    switch(status){
+									case COMPLETE:
+										// Test on PBM completed successfully. No retry needed.
+										if (!results.isSuccess()) {
+											// Playback failed
+											testCompleted[i] = true;
+										} else {
+											// Playback passed
+											testCompleted[i] = true;
+											testSuccess[i] = true;
+										}
+										break;
+									case PENDING:
+										// Retry this pbm id again for result
+										allComplete = false;
+										break;
+									case EXPIRED:
+									case FAILED:
+										// For some reason pbm failed processing this id or was dropped from queue.
+										// So quit and leave the id marked failed. No retry needed.
+										testCompleted[i] = true;
+										break;
                                     }
-                                } catch (Exception e) {
-                                    logger.error(PlaybackMonkey, "Could not finish playback monkey test", e);
+                                } catch(Exception e) {
+                                	logger.info(PlaybackMonkey, ": Exception running PBM tests."+ e.getStackTrace());
                                 }
                             }
                         }
