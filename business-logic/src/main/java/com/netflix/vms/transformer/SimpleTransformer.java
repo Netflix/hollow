@@ -106,7 +106,7 @@ public class SimpleTransformer {
 
         final VideoHierarchyInitializer hierarchyInitializer = new VideoHierarchyInitializer(api, indexer, ctx);
 
-        final HollowObjectMapper objectMapper = writeStateEngine.getObjectMapper();
+        final HollowObjectMapper objectMapper = new HollowObjectMapper(writeStateEngine);
 
         SimultaneousExecutor executor = new SimultaneousExecutor();
 
