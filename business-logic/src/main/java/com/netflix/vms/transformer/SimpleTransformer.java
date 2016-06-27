@@ -75,7 +75,7 @@ public class SimpleTransformer {
     private VideoNamedListModule videoNamedListModule;
 
     private final VMSHollowInputAPI api;
-    private final HollowWriteStateEngine writeStateEngine;
+    private final VMSTransformerWriteStateEngine writeStateEngine;
     private final TransformerContext ctx;
     private final CycleConstants cycleConstants;
     private VMSTransformerIndexer indexer;

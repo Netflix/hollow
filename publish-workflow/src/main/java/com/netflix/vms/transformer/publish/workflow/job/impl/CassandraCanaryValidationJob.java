@@ -7,6 +7,7 @@ import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.astyanax.connectionpool.exceptions.NotFoundException;
 import com.netflix.config.FastProperty;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.AfterCanaryAnnounceJob;
@@ -27,12 +28,12 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
 
     private final Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs;
     private final Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs;
-	private final ValidationVideoRanker videoRanker;
+	private final ValuableVideoHolder validationVideoHolder;
 
     public CassandraCanaryValidationJob(PublishWorkflowContext ctx, long cycleVersion, Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs,
-            Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs, ValidationVideoRanker videoRanker) {
+            Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs, ValuableVideoHolder videoRanker) {
         super(ctx, ctx.getVip(), cycleVersion, beforeCanaryAnnounceJobs, afterCanaryAnnounceJobs);
-		this.videoRanker = videoRanker;
+		this.validationVideoHolder = videoRanker;
         this.beforeCanaryAnnounceJobs = beforeCanaryAnnounceJobs;
         this.afterCanaryAnnounceJobs = afterCanaryAnnounceJobs;
     }
@@ -76,7 +77,21 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
             // Clean-up to release the results as the before and after jobs are held onto by the history.
             beforeCanaryAnnounceJob.clearResults();
             afterCanaryAnnounceJob.clearResults();
-            videoRanker.setFailedIDs(failedIDs);
+            validationVideoHolder.onCycleComplete(getCycleVersion(), failedIDs);
+            
+			if(!failedIDs.isEmpty()){
+			    float missingViewShareThreshold = ctx.getConfig().getPlaybackmonkeyMissingViewShareThreshold();
+			    Map<String, Float> viewShareOfFailedVideos = validationVideoHolder.getViewShareOfVideos(failedIDs);
+			    for(String countryId: viewShareOfFailedVideos.keySet()){
+			        Float missingViewShareForCountry = viewShareOfFailedVideos.get(countryId);
+                                if(missingViewShareForCountry != null && 
+			                Float.compare(missingViewShareForCountry, missingViewShareThreshold) > 0){
+                                	pbmSuccess = false;
+                                }
+			        ctx.getMetricRecorder().recordMetric(Metric.PBMFailuresMissingViewShare, missingViewShareForCountry, "country",countryId);
+			    }
+			}
+            
             if (!pbmSuccess) {
                 // Log which results failed
                 String msg = "PBM validation: for region "+region.name()+" failed. " + getFailureReason(befTestResults, failedIDs);
