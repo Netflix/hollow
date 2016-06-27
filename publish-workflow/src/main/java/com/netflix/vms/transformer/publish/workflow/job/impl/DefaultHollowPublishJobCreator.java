@@ -33,7 +33,7 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
     /* dependencies */
     private HollowBlobDataProvider hollowBlobDataProvider;
     private final PlaybackMonkeyTester playbackMonkeyTester;
-    private final ValidationVideoRanker videoRanker;
+    private final ValuableVideoHolder videoRanker;
 
     /* fields */
     ///TODO: VIP changes for red/black?
@@ -44,7 +44,7 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
             FastPropertyPublisher hermesPublisher,
             FileStore fileStore,
             HollowBlobDataProvider hollowBlobDataProvider, PlaybackMonkeyTester playbackMonkeyTester,
-            ValidationVideoRanker videoRanker, Supplier<ServerUploadStatus> serverUploadStatus, String vip) {
+            ValuableVideoHolder videoRanker, Supplier<ServerUploadStatus> serverUploadStatus, String vip) {
         this.hollowBlobDataProvider = hollowBlobDataProvider;
         this.playbackMonkeyTester = playbackMonkeyTester;
         this.videoRanker = videoRanker;

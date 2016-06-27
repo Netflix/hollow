@@ -18,7 +18,7 @@ import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob.Pub
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJobScheduler;
 import com.netflix.vms.transformer.publish.workflow.job.impl.DefaultHollowPublishJobCreator;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HollowPublishJobCreator;
-import com.netflix.vms.transformer.publish.workflow.job.impl.ValidationVideoRanker;
+import com.netflix.vms.transformer.publish.workflow.job.impl.ValuableVideoHolder;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.PlaybackMonkeyTester;
 
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
@@ -43,7 +43,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     }
 
     private HollowPublishWorkflowStager(TransformerContext ctx, SubscriptionManager hermesSubscriber, FastPropertyPublisher hermesPublisher, FileStore fileStore, HollowBlobDataProvider hollowBlobDataProvider, Supplier<ServerUploadStatus> uploadStatus, String vip) {
-        this(ctx, new DefaultHollowPublishJobCreator(ctx, hermesSubscriber, hermesPublisher, fileStore, hollowBlobDataProvider, new PlaybackMonkeyTester(), new ValidationVideoRanker(hollowBlobDataProvider), uploadStatus, vip), vip);
+        this(ctx, new DefaultHollowPublishJobCreator(ctx, hermesSubscriber, hermesPublisher, fileStore, hollowBlobDataProvider, new PlaybackMonkeyTester(), new ValuableVideoHolder(hollowBlobDataProvider), uploadStatus, vip), vip);
     }
 
     public HollowPublishWorkflowStager(TransformerContext ctx, HollowPublishJobCreator jobCreator, String vip) {

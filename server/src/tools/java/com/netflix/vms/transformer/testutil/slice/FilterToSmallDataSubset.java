@@ -36,7 +36,7 @@ public class FilterToSmallDataSubset {
     @Before
     public void setUp() {
         slicer = new DataSlicer(TARGET_NUMBER_OF_TOPNODES, 
-                70216224);
+        		80097047);
     }
     
     @Test
