@@ -1,15 +1,34 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import com.netflix.vms.transformer.util.VMSTransformerHashCodeFinder;
 import com.netflix.hollow.write.HollowWriteStateEngine;
+import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.vms.transformer.hollowoutput.ArtWorkImageFormatEntry;
+import com.netflix.vms.transformer.hollowoutput.ArtWorkImageRecipe;
+import com.netflix.vms.transformer.hollowoutput.ArtWorkImageTypeEntry;
+import com.netflix.vms.transformer.hollowoutput.CharacterImages;
+import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
+import com.netflix.vms.transformer.hollowoutput.DefaultExtensionRecipe;
+import com.netflix.vms.transformer.hollowoutput.DeploymentIntent;
+import com.netflix.vms.transformer.hollowoutput.DrmInfoData;
+import com.netflix.vms.transformer.hollowoutput.DrmKey;
+import com.netflix.vms.transformer.hollowoutput.DrmSystem;
+import com.netflix.vms.transformer.hollowoutput.EncodingProfile;
+import com.netflix.vms.transformer.hollowoutput.EncodingProfileGroup;
+import com.netflix.vms.transformer.hollowoutput.FallbackUSArtwork;
+import com.netflix.vms.transformer.hollowoutput.FileEncodingData;
+import com.netflix.vms.transformer.hollowoutput.GlobalPerson;
+import com.netflix.vms.transformer.hollowoutput.GlobalVideo;
+import com.netflix.vms.transformer.hollowoutput.L10NResources;
+import com.netflix.vms.transformer.hollowoutput.LanguageRights;
+import com.netflix.vms.transformer.hollowoutput.NamedCollectionHolder;
+import com.netflix.vms.transformer.hollowoutput.OriginServer;
+import com.netflix.vms.transformer.hollowoutput.PersonImages;
+import com.netflix.vms.transformer.hollowoutput.RolloutCharacter;
+import com.netflix.vms.transformer.hollowoutput.RolloutVideo;
+import com.netflix.vms.transformer.hollowoutput.VideoEpisode_CountryList;
+import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
+import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
+import com.netflix.vms.transformer.util.VMSTransformerHashCodeFinder;
 
 public class VMSTransformerWriteStateEngine extends HollowWriteStateEngine {
 
@@ -18,71 +37,50 @@ public class VMSTransformerWriteStateEngine extends HollowWriteStateEngine {
     public VMSTransformerWriteStateEngine() {
         super(new VMSTransformerHashCodeFinder());
         this.objectMapper = new HollowObjectMapper(this);
-        initializeAllTypeStates();
+        initializeTopLevelTypeStates();
     }
 
     public HollowObjectMapper getObjectMapper() {
         return objectMapper;
     }
     
-    private void initializeAllTypeStates() {
+    private void initializeTopLevelTypeStates() {
         HollowObjectMapper mapper = new HollowObjectMapper(this);
+
+        ///TODO: When we do the "Unified Primary Key Definitions", then these need to be discovered based on those.
         
-        try {
-            for(Class<?> clazz : getClasses("com.netflix.vms.transformer.hollowoutput")) {
-                mapper.initializeTypeState(clazz);
-            }
-        } catch(Throwable th) {
-            throw new RuntimeException(th);
-        }
+        initializeTypeStates(mapper,
+                CompleteVideo.class,
+                VideoEpisode_CountryList.class,
+                VideoPackageData.class,
+                NamedCollectionHolder.class,
+                EncodingProfile.class,
+                OriginServer.class,
+                LanguageRights.class,
+                DeploymentIntent.class,
+                GlobalPerson.class,
+                GlobalVideo.class,
+                PersonImages.class,
+                ArtWorkImageFormatEntry.class,
+                ArtWorkImageTypeEntry.class,
+                ArtWorkImageRecipe.class,
+                DefaultExtensionRecipe.class,
+                DrmKey.class,
+                WmDrmKey.class,
+                DrmInfoData.class,
+                DrmSystem.class,
+                L10NResources.class,
+                EncodingProfileGroup.class,
+                CharacterImages.class,
+                FileEncodingData.class,
+                RolloutVideo.class,
+                RolloutCharacter.class,
+                FallbackUSArtwork.class
+        );
     }
     
-    /**
-     * Scans all classes accessible from the context class loader which belong to the given package and subpackages.
-     *
-     * @param packageName The base package
-     * @return The classes
-     * @throws ClassNotFoundException
-     * @throws IOException
-     */
-    private static Class<?>[] getClasses(String packageName) throws ClassNotFoundException, IOException {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        assert classLoader != null;
-        String path = packageName.replace('.', '/');
-        Enumeration<URL> resources = classLoader.getResources(path);
-        List<File> dirs = new ArrayList<>();
-        while (resources.hasMoreElements()) {
-            URL resource = resources.nextElement();
-            dirs.add(new File(resource.getFile()));
-        }
-        ArrayList<Class<?>> classes = new ArrayList<>();
-        for (File directory : dirs) {
-            classes.addAll(findClasses(directory, packageName));
-        }
-        return classes.toArray(new Class[classes.size()]);
-    }
-    /**
-     * Recursive method used to find all classes in a given directory and subdirs.
-     *
-     * @param directory   The base directory
-     * @param packageName The package name for classes found inside the base directory
-     * @return The classes
-     * @throws ClassNotFoundException
-     */
-    private static List<Class<?>> findClasses(File directory, String packageName) throws ClassNotFoundException {
-        List<Class<?>> classes = new ArrayList<>();
-        if (!directory.exists()) {
-            return classes;
-        }
-        File[] files = directory.listFiles();
-        for (File file : files) {
-            if (file.isDirectory()) {
-                assert !file.getName().contains(".");
-                classes.addAll(findClasses(file, packageName + "." + file.getName()));
-            } else if (file.getName().endsWith(".class")) {
-                classes.add(Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
-            }
-        }
-        return classes;
+    private void initializeTypeStates(HollowObjectMapper mapper, Class<?>... clazzes) {
+        for(Class<?> clazz : clazzes)
+            mapper.initializeTypeState(clazz);
     }
 }
