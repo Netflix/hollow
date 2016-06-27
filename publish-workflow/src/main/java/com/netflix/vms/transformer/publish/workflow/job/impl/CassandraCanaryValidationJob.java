@@ -86,7 +86,7 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
 			        Float missingViewShareForCountry = viewShareOfFailedVideos.get(countryId);
                                 if(missingViewShareForCountry != null && 
 			                Float.compare(missingViewShareForCountry, missingViewShareThreshold) > 0){
-			            pbmSuccess = false;
+                                	pbmSuccess = false;
                                 }
 			        ctx.getMetricRecorder().recordMetric(Metric.PBMFailuresMissingViewShare, missingViewShareForCountry, "country",countryId);
 			    }

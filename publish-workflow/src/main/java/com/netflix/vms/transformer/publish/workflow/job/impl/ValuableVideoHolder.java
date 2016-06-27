@@ -89,7 +89,7 @@ public class ValuableVideoHolder {
 			
 			TopNVideoViewHoursData topNForCountry = topnByCountry.get(countryId);
 			
-			Set<Integer> excludedVideosForCountry = excludedVideosByCountry.get(NFCountry.findInstance(countryId));
+			Set<Integer> excludedVideosForCountry = excludedVideosByCountry.get(countryId);
 			
 			Set<VideoCountryKey> pastFailedIDsForCountry = pastFailedIDsByCountry.get(countryId);
 			
@@ -106,7 +106,7 @@ public class ValuableVideoHolder {
 						valuedVideosForCountry.add(new VideoCountryKey(countryId, videoId));
 				}
 				
-				// Add failed IDs from past cycle if they are no in exclusion list
+				// Add failed IDs from past cycle if they are not in exclusion list
 				if(pastFailedIDsForCountry != null && !pastFailedIDsForCountry.isEmpty()){
 					ctx.getLogger().info(PlaybackMonkeyTestVideo,"Adding "+ pastFailedIDsForCountry.size()+" failed IDs for country "+countryId+
 							" if not in exclude list: ["+getVideoIDsForVideoCountryKeys(pastFailedIDsForCountry)+"]");
@@ -310,7 +310,8 @@ public class ValuableVideoHolder {
      * @return
      * @throws Exception
      */
-	private Map<String, Set<Integer>> getExcludedVideosBycountry(PublishWorkflowContext ctx){
+	@VisibleForTesting
+    Map<String, Set<Integer>> getExcludedVideosBycountry(PublishWorkflowContext ctx){
         final Map<String, Set<Integer>> tmpMap = new HashMap<>();
         
         String stringToParse = ctx.getConfig().getPlaybackMonkeyVideoCountryToExclude();
