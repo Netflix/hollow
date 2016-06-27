@@ -32,18 +32,11 @@ import com.netflix.vms.transformer.util.VMSTransformerHashCodeFinder;
 
 public class VMSTransformerWriteStateEngine extends HollowWriteStateEngine {
 
-    private final HollowObjectMapper objectMapper;
-    
     public VMSTransformerWriteStateEngine() {
         super(new VMSTransformerHashCodeFinder());
-        this.objectMapper = new HollowObjectMapper(this);
         initializeTopLevelTypeStates();
     }
 
-    public HollowObjectMapper getObjectMapper() {
-        return objectMapper;
-    }
-    
     private void initializeTopLevelTypeStates() {
         HollowObjectMapper mapper = new HollowObjectMapper(this);
 
