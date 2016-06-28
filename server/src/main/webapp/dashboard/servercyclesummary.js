@@ -6,9 +6,11 @@ function ServerCycleSummaryTab(dashboard) {
     this.fullData = false;
     this.hidableColumns =  [3, 5, 6, 7];
 
-    $("#id-summary-toggle-btn").button().click(function() {
+    $("#id-summary-toggle-btn").click(function() {
         cycleSummaryTab.toggleHidableColumns();
     });
+
+    $("#id-summary-toggle-btn").addClass("vtag-right");
 
     this.hideColumns = function() {
         for(var i=0; i < cycleSummaryTab.hidableColumns.length; i++) {
@@ -31,12 +33,17 @@ function ServerCycleSummaryTab(dashboard) {
             for(var i=0; i < cycleSummaryTab.hidableColumns.length; i++) {
                 $("table[id='id-cycle-timestamp-table']").showColumn(cycleSummaryTab.hidableColumns[i]);
             }
-            //$("#id-cycle-timestamp-div").addClass("shadow");
+            $("#id-summary-toggle-btn").removeClass("vtag-right");
+            $("#id-summary-toggle-btn").addClass("vtag-left");
         } else {
-            //$("#id-cycle-timestamp-div").removeClass("shadow");
-            $("#id-cycle-timestamp-div").width("30%");
             cycleSummaryTab.hideColumns();
-            // $("#cycle-stats-tabs").show(400, "linear");
+            $("#id-cycle-timestamp-div").width("30%");
+            $("#id-atlas-durations").width("56%");
+            $("#id-vms-server-rightpane").width("40%");
+            $("#cycle-stats-tabs").animate({width:"67%"});
+
+            $("#id-summary-toggle-btn").removeClass("vtag-left");
+            $("#id-summary-toggle-btn").addClass("vtag-right");
         }
     }
 

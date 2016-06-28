@@ -55,8 +55,27 @@
     border: 1px solid #c4c4c4;
 }
 
-.dark-background {
-    background-color: red;
+.ui-vtag {
+    width:16px;
+    height:60px;
+    -webkit-border-radius: 0px 6px 6px 0px;
+    -moz-border-radius: 0px 6px 6px 0px;
+    border-radius: 0px 6px 6px 0px;
+    background-color:#c4c4c4;
+    padding-left: 0px;
+    margin-left: 0px;
+    background-position: left center;
+    background-repeat: no-repeat;
+    float: left;
+    cursor: pointer;
+}
+
+.vtag-right {
+    background-image: url('arrow-right.png');
+}
+
+.vtag-left {
+    background-image: url('arrow-left.png');
 }
 
 .ui-inner {
