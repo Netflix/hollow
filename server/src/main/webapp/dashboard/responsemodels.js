@@ -464,6 +464,21 @@ function DataOperator(dataModel) {
         return new DataOperator(this.outDataModel);
     };
 
+    // assumes inp is an array (e.g. output of RegexSourceModel),
+    // out is a map of keyField to valueField 
+    this.extractField = function(keyField, valueField) {
+        this.outDataModel = new Object();
+
+        for (var index = 0; index < this.inpDataModel.length; index++) {
+            var obj = this.inpDataModel[index];
+
+            if (obj.hasOwnProperty(keyField)) {
+                this.outDataModel[obj[keyField]] = obj[valueField];
+            }
+        }
+        return new DataOperator(this.outDataModel);
+    };
+
     // assumes input is map from id ->array, with a number field, e.g, output of groupBy
     // output is key-value
     this.min = function(fieldName) {
@@ -539,7 +554,7 @@ function DataOperator(dataModel) {
     // assumes input as key-value (e.g., output from min)
     // assumes keys can be sorted correctly without a function
     // output is % difference from previous value
-    this.prevDiffPercent = function() {
+    this.prevDiff = function(usePercent) {
         this.outDataModel = new Object();
         var keys = new Array();
 
@@ -562,8 +577,10 @@ function DataOperator(dataModel) {
                 continue;
             }
             var val = Number(valStr);
-
-            var vdiff = 100.0 * (val - prevVal) / (prevVal);
+            var vdiff = (val - prevVal);
+            if(usePercent) {
+                vdiff = 100.0 * (val - prevVal) / (prevVal);
+            }
             this.outDataModel[srtKey] = vdiff;
             prevVal = val;
 
@@ -584,6 +601,7 @@ function RegexSourceModel(args) {
     this.addHitInfo = function(jsonHitData) {
         var timestamp = jsonHitData._source.eventInfo["timestamp"]; // hard-coded
         var cycleId = jsonHitData._source.eventInfo["currentCycle"];
+        var instanceId = jsonHitData._source.eventInfo["instanceId"];
         var logline = jsonHitData._source[this.sourceField];
         var tokens = logline.split(" ");
 
@@ -593,6 +611,7 @@ function RegexSourceModel(args) {
         var row = new Object();
         row["timestamp"] = dateString;
         row["cycleId"] = cycleId;
+        row["instanceId"] = instanceId;
 
         for ( var i in tokens) {
             var token = tokens[i];

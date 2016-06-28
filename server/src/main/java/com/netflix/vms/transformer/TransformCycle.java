@@ -9,6 +9,8 @@ import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metri
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ReadInputDataDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WriteOutputDataDuration;
 
+import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
+
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.client.HollowClient;
 import com.netflix.hollow.write.HollowBlobWriter;
@@ -21,6 +23,7 @@ import com.netflix.vms.transformer.input.VMSInputDataClient;
 import com.netflix.vms.transformer.input.VMSInputDataVersionLogger;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
+import com.netflix.vms.transformer.publish.workflow.job.impl.BlobMetaDataUtil;
 import com.netflix.vms.transformer.util.VersionMinter;
 import java.io.File;
 import java.io.IOException;
@@ -59,12 +62,12 @@ public class TransformCycle {
             transformTheData();
             writeTheBlobFiles();
             submitToPublishWorkflow();
-            endCycleSuccessfully();
         } catch (Throwable th) {
             ctx.getLogger().error(TransformCycleFailed, "Transformer failed cycle -- rolling back", th);
             outputStateEngine.resetToLastPrepareForNextCycle();
             throw th;
         }
+        endCycleSuccessfully();
     }
 
     private void beginCycle() {
@@ -73,7 +76,7 @@ public class TransformCycle {
 
         if(ctx.getFastlaneIds() != null)
             ctx.getLogger().info(CycleFastlaneIds, ctx.getFastlaneIds());
-        ctx.getLogger().info(TransformCycleBegin, "Beginning cycle " + currentCycleNumber);
+        ctx.getLogger().info(TransformCycleBegin, "Beginning cycle=" + currentCycleNumber + " jarVersion=" + BlobMetaDataUtil.getJarVersion());
     }
     
     private void updateTheInput() {
@@ -182,6 +185,7 @@ public class TransformCycle {
     }
 
     private void endCycleSuccessfully() {
+        ctx.getMetricRecorder().incrementCounter(Metric.CycleSuccessCounter, 1);
         previousCycleNumber = currentCycleNumber;
     }
 

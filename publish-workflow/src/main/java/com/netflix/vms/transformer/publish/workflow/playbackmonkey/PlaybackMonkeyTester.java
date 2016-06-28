@@ -9,7 +9,6 @@ import com.netflix.niws.client.NFMultivaluedMap;
 import com.netflix.niws.client.NIWSClientException;
 import com.netflix.niws.client.RestClient;
 import com.netflix.niws.client.RestClient.Verb;
-import com.netflix.niws.client.RestClientFactory;
 import com.netflix.niws.client.RestClientManager;
 import com.netflix.playback.monkey.model.ParseUtil;
 import com.netflix.playback.monkey.model.PlaybackMonkeyTestResults;
@@ -202,7 +201,7 @@ public class PlaybackMonkeyTester {
         RestClient pbmRestClient = RestClientManager.getInstance().getClient(PBM_REST_CLIENT_NAME);
         if (pbmRestClient == null) {
             try {
-                pbmRestClient = RestClientFactory.registerRestClientUsingProperties(PBM_REST_CLIENT_NAME);
+                pbmRestClient = com.netflix.niws.client.RestClientFactory.registerRestClientUsingProperties(PBM_REST_CLIENT_NAME);
             } catch (NIWSClientException e) {
                 e.printStackTrace();
             }

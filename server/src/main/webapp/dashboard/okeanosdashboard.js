@@ -22,12 +22,10 @@ function Dashboard() {
                 var nflxEnv = new String(data);
                 if (nflxEnv == "test" || nflxEnv == "int" || nflxEnv == "prod") {
                     dashboard.nflxEnvironment = nflxEnv;
-                    var text = "<b>" + nflxEnv.toUpperCase() + "</b>";
-                    if (nflxEnv == "prod") text = "<font color=red>" + text + "</font>";
-                    $("#id-env-txt").html(text);
-
-                    var header = document.getElementById("header");
-                    header.className = "header_" + nflxEnv.toLowerCase(); 
+                    $("#id-env-txt").text(nflxEnv.toUpperCase());
+                    if (nflxEnv == "prod") {
+                        $("#id-env-txt").addClass("spinnaker-banner-prod");
+                    }
                 }
             }
         });
@@ -212,7 +210,7 @@ function Dashboard() {
     };
 
     this.createDataIOTab = function() {
-        var iotab = new IFrameWidget("#io-inset","id-io-iframe","","/dashboard/dataio/index.jsp");
+        var iotab = new IFrameWidget("#io-inset","id-io-iframe","","/REST/vms/followvipsameversion?format=html");
         $("#okeanos-tabs").on("tabsbeforeactivate", function(e, ui) {
             var id = ui.newPanel.attr('id');
             if (id == "io-dashboard-tab") {

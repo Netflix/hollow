@@ -31,6 +31,97 @@
 	   border-bottom-right-radius: 6px;	
 }
 
+.image-spinner-160 {
+    background-image: url('spinner160.gif');
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+.vms-info {
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 115%;
+    background: #f8f8f8;
+    text-align: left;
+    font-weight: bold; 
+    color: #333333;
+    padding-left: 10px;
+    padding-top: 0px; /*jq uery .ui-tabs .uitabs-nav*/
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+}
+
+.hr-line {
+    margin-top: 1px;
+    border: 0;
+    height: 1px;
+    background-color: #aaaaaa;
+}
+
+.ui-group {
+    border: 1px solid #c4c4c4;
+}
+
+.ui-vtag {
+    width:16px;
+    height:60px;
+    -webkit-border-radius: 0px 6px 6px 0px;
+    -moz-border-radius: 0px 6px 6px 0px;
+    border-radius: 0px 6px 6px 0px;
+    background-color:#f8f8f8;
+    border: 1px solid #c4c4c4;
+    padding-left: 0px;
+    margin-left: -1px;
+    background-position: left center;
+    background-repeat: no-repeat;
+    float: left;
+    cursor: pointer;
+}
+
+.vtag-right {
+    background-image: url('arrow-right.png');
+}
+
+.vtag-left {
+    background-image: url('arrow-left.png');
+}
+
+.ui-inner {
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 15px;
+}
+
+.spinnaker-banner {
+    background: #3a5469;
+    margin-bottom: 0px;
+    margin-top:0px;
+}
+
+.spinnaker-banner-prod {
+    background: #b82525;
+}
+
+.spinnaker-banner-text {
+    display: inline-block;
+    font-size:larger;
+    color: #cccccc;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: center;
+    padding-right: 50px;
+    padding-left: 50px;
+}
+
+.html-reset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    /*font-size: 100%;*/
+    vertical-align: baseline;
+    background: transparent;
+}
+
 .qe-select { 
         border: 1px solid #bbbbbb;
         background-color: #ffffff;
@@ -174,6 +265,13 @@ label.aligned {
     text-shadow: 1px 1px 0 #fff;
 }
 
+.progress-label-rel {
+    position: absolute;
+    margin: 4px 4px;
+    font-weight: bold;
+    /* text-shadow: 1px 1px 0 #fff; */
+}
+
 .progress-bar {
     float: left;
     margin: 10px 10px 10px 10px;
@@ -183,7 +281,7 @@ label.aligned {
 .innerframesmall {
     width:400px;
     height:270px;
-}                           
+}
 
 
 .splunkfont {
@@ -210,8 +308,11 @@ label.aligned {
   /* border-bottom-style: double;*/
 }
 
-.highlightrow {
-   outline-style:double;
+tr.highlightrow td {
+   /* outline-style:double;*/
+   /* border-color: #a6a6a6;*/
+   border-bottom: 2px solid #229cb3;
+   border-top: 2px solid #229cb3;
 }
 
 .vms-group {
@@ -349,25 +450,28 @@ table.prettytable thead tr .headerSortDown {
     color: #000000;
     max-width:100%;
     min-width:100%;
-    border: 1px silver solid;
-    frame: border;
+    border: 0px silver solid;
 }
 
 .clickabletable th {
     text-align: center;
-    border: 1px silver solid;
+    /* border: 1px silver solid;*/
     padding: 5px;
-    font-size: 11px;
+    color: #333333;
+    background: #f8f8f8;
+    letter-spacing: 0px;
+    font-weight: bold;
 }
 
 .clickabletable td {
     text-align: left;
-    border: 1px silver solid;
+    /* border: 1px silver solid; */
     padding: 5px;
 }
 
 .clickabletable tr {
     background: #FFFFFF;
+    border-bottom: 1px silver solid;
 }
 
 .clickablecell {

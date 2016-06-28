@@ -5,6 +5,7 @@ import com.netflix.hollow.read.customapi.HollowMapTypeAPI;
 import com.netflix.hollow.read.dataaccess.HollowMapTypeDataAccess;
 import com.netflix.hollow.objects.delegate.HollowMapLookupDelegate;
 
+@SuppressWarnings("all")
 public class MultiValuePassthroughMapTypeAPI extends HollowMapTypeAPI {
 
     private final HollowMapLookupDelegate delegateLookupImpl;

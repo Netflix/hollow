@@ -147,7 +147,7 @@ function ReplayCycleView(dashboard) {
         replayCycleTab.autoUpdateDAO.push(this.getSearchCountDao(graphWidget, "Error", "logLevel:error"));
     };
 
-     this.createProgressBar = function() {
+    this.createProgressBar = function() {
         var graphWidget = new ProgressBarWidget("#id-transformations-progress", "#id-transformations-progress-label");
         replayCycleTab.autoUpdateWidgets.push(graphWidget);
 

@@ -152,9 +152,12 @@ function ClickableTableWidget(divId, tableId, fields, titles, clickableColumn, c
     this.clickableColumn = clickableColumn;
     this.html = "";
     this.clearPrevious = false;
+    this.showHeader = true;
     this.clickEventFunc = !clickEventFunction ? null : clickEventFunction;
     this.rowIndicatorFunc = !rowIndicatorFunction ? null : rowIndicatorFunction;
     this.onRowClick = null;
+    this.endBuildTableFunc = null;
+    var refFn = this;
 
     this.getType = function() {
         return "ClickableTableWidget";
@@ -170,6 +173,9 @@ function ClickableTableWidget(divId, tableId, fields, titles, clickableColumn, c
             this.clear();
         }
         this.buildTable(model);
+        if(this.endBuildTableFunc != null) {
+            this.endBuildTableFunc();
+        }
     };
 
     this.clearHighlight = function() {
@@ -181,7 +187,6 @@ function ClickableTableWidget(divId, tableId, fields, titles, clickableColumn, c
 
     // find text in clickable column and highlight it
     this.updateHighlight = function(val) {
-        var refFn = this;
         refFn.clearHighlight();
         var tableRowId = "#" + this.tableId + " tr";
         $(tableRowId).each(function() {
@@ -198,12 +203,16 @@ function ClickableTableWidget(divId, tableId, fields, titles, clickableColumn, c
             numRows = tableDataModel.length;
         }
 
-        this.html = "<table id='" + this.tableId + "' class='clickabletable'><thead><tr>";
-        for ( var i in this.titleNames) {
-            this.html += "<th class='ui-state-default'>" + this.titleNames[i] + "</th>";
+        this.html = "<table id='" + this.tableId + "' class='clickabletable'>";
+        if(refFn.showHeader) {
+            this.html += "<thead><tr>";
+            for ( var i in this.titleNames) {
+                this.html += "<th>" + this.titleNames[i] + "</th>";
+            }
+            this.html += "</tr></thead>";
         }
 
-        this.html += "</tr></thead><tbody>\n";
+        this.html += "<tbody>\n";
 
         for (var row = 0; row < numRows; row++) {
             tableRow = tableDataModel[row];
@@ -212,7 +221,7 @@ function ClickableTableWidget(divId, tableId, fields, titles, clickableColumn, c
             if (!this.rowIndicatorFunc) {
                 this.html += "<tr>";
             } else {
-                customAdditions = this.rowIndicatorFunc(tableRow);
+                customAdditions = this.rowIndicatorFunc(tableRow, row, numRows);
                 this.html += customAdditions.trow;
             }
 
@@ -449,8 +458,32 @@ function EventChainingWidget(functionToInvoke) {
     this.refresh = function() {
         this.functionToInvoke();
     };
+}
+
+
+// --------------------------------------------------------------------
+// CallbackWidget is not a widget, but the "refresh" is a proxy for
+// invoking a function
+// --------------------------------------------------------------------
+function CallbackWidget(functionToInvoke) {
+    this.functionToInvoke = functionToInvoke;
+    this.modelData = null;
+    var refFn = this;
+
+    this.clear = function() {
+    };
+
+    this.applyParserData = function(model) {
+        refFn.modelData = model;
+    };
+
+    this.refresh = function() {
+        this.functionToInvoke(refFn.modelData);
+    };
 
 }
+
+
 
 // --------------------------------------------------------------------
 // SelectOptionsWidget

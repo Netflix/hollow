@@ -6,6 +6,7 @@ function VmsServerInfoTab(dashboard) {
     var serverInfoView = this;
     var expandedTabs = true;
     this.cycleSummaryView = null;
+    this.cycleStatusView = null;
     this.cycleReplayView = null;
     this.cyclePublishView = null;
     this.cycleValidationView = null;
@@ -161,6 +162,7 @@ function VmsServerInfoTab(dashboard) {
         // get the live timer going (once and only once)
         this.cycleReplayView.setupLiveControl();
         this.cycleReplayView.startRealTimeStatsTimer();
+        this.cycleStatusView = new ServerCycleStatusTab(serverInfoView);
         this.cyclePublishView = new ServerPublishTab(serverInfoView);
         this.cycleInputSearchView = new ServerInputSearchTab(serverInfoView);
         this.propertiesTabView = new CyclePropertiesTab(serverInfoView);
@@ -258,7 +260,7 @@ function VmsServerInfoTab(dashboard) {
         });
 
         // default view
-        this.cycleSummaryView.refresh();
+        this.cycleStatusView.refresh();
     };
 
     this.cycleIdToDate = function() {
@@ -319,6 +321,15 @@ function VmsServerInfoTab(dashboard) {
             if (!this.cycleReplayView.pauseRealTimeRefresh) {
                 $("#id-startlive-btn").click();
             }
+        }
+
+        if(id == "cycle-status-tab") {
+            if(!this.cycleStatusView.autoUpdateFlag) {
+                this.cycleStatusView.autoUpdateFlag = true;
+                this.cycleStatusView.autoUpdate();
+            }
+        } else {
+            this.cycleStatusView.autoUpdateFlag = false;
         }
 
         if (id == "cycle-circuitbreaker-tab") {
@@ -460,7 +471,7 @@ function CycleErrorTab(serverInfoView) {
     refFn.refresh();
 
     $("#id-search-error-btn").button().click(function() {
-        var fields = ["timestamp","message", "instanceId"]
+        var fields = ["timestamp","message"]
         var tableWidget = new DataTableWidget("#id-cycle-error-locations", "id-table-error-results", fields);
         tableWidget.reformatCellDataFunc = new JavaExceptionFormatter("com.netflix.videometadata.").format;
         var searchQuery = new SearchQuery();
