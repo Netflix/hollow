@@ -157,6 +157,7 @@ function ClickableTableWidget(divId, tableId, fields, titles, clickableColumn, c
     this.rowIndicatorFunc = !rowIndicatorFunction ? null : rowIndicatorFunction;
     this.onRowClick = null;
     this.endBuildTableFunc = null;
+    this.textAlign = null;
     var refFn = this;
 
     this.getType = function() {
@@ -237,6 +238,10 @@ function ClickableTableWidget(divId, tableId, fields, titles, clickableColumn, c
 
                 if (col == this.clickableColumn) {
                     this.html += "style='cursor: pointer'";
+                } else {
+                    if(refFn.textAlign) {
+                        this.html += refFn.textAlign;
+                    }
                 }
                 this.html += ">" + cellValue + "</td>";
             }

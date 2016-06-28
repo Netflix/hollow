@@ -35,7 +35,6 @@ function VmsServerInfoTab(dashboard) {
     // Set params from vms REST queries and create tabs
     // --------------------------------------------------------------------
     this.initialize = function() {
-
         serverInfoView.elasticSearchHost = $("#id-elasticsearchhost-box").val();
 
         $.ajax({
@@ -84,7 +83,7 @@ function VmsServerInfoTab(dashboard) {
     // --------------------------------------------------------------------
     this.createServerInfoTab = function() {
         if (this.vipAddress == null) {
-            this.vipAddress = this.nflxEnvironment == "test" ? "newpipeline" : "berlin";
+            this.vipAddress = this.nflxEnvironment == "test" ? "berlin" : "berlin";
         }
 
         $("#id-cycle-prev-btn").button({
@@ -143,9 +142,6 @@ function VmsServerInfoTab(dashboard) {
             $("#id-cycle-timestamp-div").show();
 
             var cycSelectWidget = new SelectOptionsWidget("#id-vms-cycle-select", null, null, true);
-            //var fieldRegex = new Object();
-            //fieldRegex["name"] = [ /(.*)/, 1 ];
-            //var cycleWidgetExecutor = new RegexSearchWidgetExecutor(cycSelectWidget, fieldRegex);
             var cycleWidgetExecutor = new KeyValueWidgetExecutor(cycSelectWidget, 'currentCycle', true);
             cycleWidgetExecutor.searchQuery.indexName = $("#id-vms-index-select").val();
             cycleWidgetExecutor.searchQuery.indexType = "vmsserver";
@@ -227,7 +223,8 @@ function VmsServerInfoTab(dashboard) {
     });
 
     $("#id-cycle-refresh-btn").click(function() {
-        serverInfoView.refresh();
+        $("#id-vms-vip-select").change(); 
+        // serverInfoView.refresh();
     });
 
     function initializeInputValidationTab(serverInfoView) {
