@@ -51,7 +51,7 @@
                 $("#okeanos-tabs").tabs();
             });
 
-            $(document).ready(function() {new Dashboard().initialize()});
+            $(document).ready(function() {new Dashboard().initialize(); $(document).tooltip();});
         </script>
         
     </head>
@@ -92,7 +92,6 @@
                     <div id="id-cycle-date-txt" style="display:inline-block; margin-left: 25px; margin-right: 25px"></div> 
                     <button id="id-cycle-prev-btn" style="display:inline-block;">Prev</button>
                     <button id="id-cycle-next-btn" style="display:inline-block;">Next</button>
-                    <button id="id-cycle-refresh-btn" class='hidden'>Apply</button>
                 </div>
                 <!-- class="ui-widget-content ui-helper-clearfix" -->
                 <div id="id-cycle-timestamp-div" class="ui-group" style="width:30%; float:left;margin-right:0px; overflow-y: auto;"> </div>
@@ -115,7 +114,9 @@
                         <div style="padding-top: 8px"></div>
                         
                         <div id="id-vms-server-rightpane" class="ui-group ui-helper-clearfix" style="width:40%; float:left">
-                                <div class='vms-info'>TRANSFORM PROGRESS</div>
+                                <div class='vms-info'>TRANSFORM PROGRESS
+                                <div id="id-cycle-refresh-btn" class="ui-refresh-button hidden" title="Refresh for latest cycle"></div>
+                                </div>
                                 <div class='ui-inner' id="id-cycle-transform-progress">
                                     <div id="id-cycle-transform-progress-label" class="progress-label-rel"></div>
                                 </div>

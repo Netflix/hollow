@@ -62,7 +62,7 @@
 }
 
 .ui-vtag {
-    width:16px;
+    width:11px;
     height:60px;
     -webkit-border-radius: 0px 6px 6px 0px;
     -moz-border-radius: 0px 6px 6px 0px;
@@ -71,7 +71,7 @@
     border: 1px solid #c4c4c4;
     padding-left: 0px;
     margin-left: -1px;
-    background-position: left center;
+    background-position: center center;
     background-repeat: no-repeat;
     float: left;
     cursor: pointer;
@@ -83,6 +83,16 @@
 
 .vtag-left {
     background-image: url('arrow-left.png');
+}
+
+div.ui-refresh-button {
+    content: url('refresh.png');
+    background-position: center center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    float: right;
+    margin-left: 25px;
+    margin-left: 25px;
 }
 
 .ui-inner {

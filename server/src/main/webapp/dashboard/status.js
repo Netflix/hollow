@@ -82,6 +82,7 @@ function ServerCycleStatusTab(dashboard) {
                 // return;
                 cycleSummaryTab.updateProgressBar();
             }
+            $("#id-cycle-refresh-btn").addClass("hidden");
             // cycleSummaryTab.updateProgressBar();
             cycleSummaryTab.createCycleWarnTable();
             cycleSummaryTab.checkForNewCycle();
@@ -95,6 +96,7 @@ function ServerCycleStatusTab(dashboard) {
             var latestCycleId = obj["eventInfo.currentCycle"];
             if(latestCycleId != dashboard.vmsCycleId) {
                cycleSummaryTab.autoUpdateFlag = false;
+               $("#id-cycle-refresh-btn").removeClass("hidden");
                // cycleSummaryTab.initialize();
             }
         }
@@ -104,6 +106,7 @@ function ServerCycleStatusTab(dashboard) {
         var tableFields = ["instanceId", "JarVersion"];
         var tableHeader = ["Instance", "Jar version"];
         var tableWidget = new ClickableTableWidget("#id-cycle-system-info", "id-cycle-system-info-table", tableFields, tableHeader);
+        tableWidget.textAlign = "style='text-align: center'";
         var widgetExecutor = new RegexSearchWidgetExecutor(tableWidget, RegexParserMapper.prototype.getJarVersionRegexInfo());
         var query = widgetExecutor.searchQuery;
         query.indexName = dashboard.vmsIndex;
