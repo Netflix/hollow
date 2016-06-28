@@ -88,7 +88,7 @@ public class ContractRestrictionModule {
             assetTypeIdx.addDownloadableId(new ContractAssetType(assetType, language), stream._getDownloadableId());
         }
 
-        // iterate over the VideoRights of every country
+        // iterate over the VideoStatus of every country
         HollowHashIndexResult statusResult = videoStatusIdx.findMatches(packages._getMovieId());
         if (statusResult != null) {
             HollowOrdinalIterator iter = statusResult.iterator();
