@@ -210,7 +210,7 @@ function Dashboard() {
     };
 
     this.createDataIOTab = function() {
-        var iotab = new IFrameWidget("#io-inset","id-io-iframe","","/dashboard/dataio/index.jsp");
+        var iotab = new IFrameWidget("#io-inset","id-io-iframe","","/REST/vms/followvipsameversion?format=html");
         $("#okeanos-tabs").on("tabsbeforeactivate", function(e, ui) {
             var id = ui.newPanel.attr('id');
             if (id == "io-dashboard-tab") {

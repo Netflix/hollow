@@ -1,22 +1,16 @@
 package com.netflix.vms.transformer.apiutil.generate;
 
+import com.netflix.hollow.HollowSchema;
+import com.netflix.hollow.codegen.HollowAPIGenerator;
+import com.netflix.hollow.util.HollowSchemaParser;
+import com.netflix.hollow.util.HollowWriteStateCreator;
+import com.netflix.hollow.write.HollowWriteStateEngine;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collection;
-
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-
-import com.netflix.hollow.HollowSchema;
-import com.netflix.hollow.codegen.HollowAPIGenerator;
-import com.netflix.hollow.codegen.HollowPOJOGenerator;
-import com.netflix.hollow.util.HollowSchemaParser;
-import com.netflix.hollow.util.HollowWriteStateCreator;
-import com.netflix.hollow.write.HollowWriteStateEngine;
-import com.netflix.hollow.zenoadapter.HollowSerializationFramework;
-import com.netflix.videometadata.serializer.framework.VMSSerializerFactory;
-import com.netflix.vms.transformer.util.VMSTransformerHashCodeFinder;
 
 public class GenerateAPIs {
 
@@ -38,7 +32,7 @@ public class GenerateAPIs {
     }
 
 
-    @Test
+    /*@Test
     public void bootstrapOutputPOJOs() throws IOException {
         HollowSerializationFramework hollowFramework = new HollowSerializationFramework(VMSSerializerFactory.getInstance(), new VMSTransformerHashCodeFinder());
         HollowWriteStateEngine stateEngine = hollowFramework.getStateEngine();
@@ -48,7 +42,7 @@ public class GenerateAPIs {
         String outputFolder = TRANSFORMER_PROJECT_BASE_DIR + "/src/main/java/com/netflix/vms/transformer/hollowoutput";
         cleanupFolder(outputFolder);
         generator.generateFiles(outputFolder);
-    }
+    }*/
 
     private void cleanupFolder(String folder) {
         System.out.println("Cleaning up folder: " + folder);
