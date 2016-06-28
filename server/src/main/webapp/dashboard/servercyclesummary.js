@@ -53,7 +53,7 @@ function ServerCycleSummaryTab(dashboard) {
         this.stateEngineSize = null;
         this.topNodeCounts = null;
         this.statsMbps = null;
-        $("#id-cycle-timestamp-div").html("");
+        $("#id-cycle-timestamp-div").html('<div style="text-align: center;"><img src="images/spinner160.gif" align="middle"/></div>');
 
         this.getIndexSearchQuery = function(purpose, commaSeparatedFieldNames) {
             var query = new SearchQuery();

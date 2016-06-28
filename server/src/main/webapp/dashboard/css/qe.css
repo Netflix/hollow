@@ -31,6 +31,12 @@
 	   border-bottom-right-radius: 6px;	
 }
 
+.image-spinner-160 {
+    background-image: url('spinner160.gif');
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
 .vms-info {
     font-family: 'Source Sans Pro', sans-serif;
     font-size: 115%;
@@ -61,9 +67,10 @@
     -webkit-border-radius: 0px 6px 6px 0px;
     -moz-border-radius: 0px 6px 6px 0px;
     border-radius: 0px 6px 6px 0px;
-    background-color:#c4c4c4;
+    background-color:#f8f8f8;
+    border: 1px solid #c4c4c4;
     padding-left: 0px;
-    margin-left: 0px;
+    margin-left: -1px;
     background-position: left center;
     background-repeat: no-repeat;
     float: left;
