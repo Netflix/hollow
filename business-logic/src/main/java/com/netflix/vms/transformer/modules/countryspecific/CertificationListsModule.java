@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import java.util.Collections;
+
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.hollowinput.ConsolidatedCertSystemRatingHollow;
 import com.netflix.vms.transformer.hollowinput.ConsolidatedCertificationSystemsHollow;
@@ -17,12 +19,10 @@ import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.MovieCertification;
 import com.netflix.vms.transformer.hollowoutput.MovieRatingReason;
-import com.netflix.vms.transformer.hollowoutput.SortedMapOfDateWindowToListOfInteger;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,9 +53,8 @@ public class CertificationListsModule {
             perCountryCertificationLists.put(videoId, perCountryCertLists);
         }
 
-        data.certificationList = perCountryCertLists.get(countryCode);
-
-        data.dateWindowWiseSeasonSequenceNumberMap = new SortedMapOfDateWindowToListOfInteger();
+        List<Certification> certList = perCountryCertLists.get(countryCode);
+        data.certificationList = certList == null ? Collections.emptyList() : certList;
     }
     
     private Map<String, List<Certification>> buildCertificationListsByCountry(Integer videoId) {
