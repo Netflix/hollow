@@ -96,6 +96,7 @@
                 </div>
                 <!-- class="ui-widget-content ui-helper-clearfix" -->
                 <div id="id-cycle-timestamp-div" class="ui-group" style="width:30%; float:left;margin-right:0px; overflow-y: auto;"> </div>
+                <button id="id-summary-toggle-btn">toggle</button>
                 <div id="cycle-stats-tabs" style="width:67%;float:right;">
                     <ul>
                         <li><a href="#cycle-status-tab">Cycles</a></li>
@@ -114,19 +115,19 @@
                         <div style="padding-top: 8px"></div>
                         
                         <div id="id-vms-server-rightpane" class="ui-group ui-helper-clearfix" style="width:40%; float:left">
-                                <div class='vms-info'>Transform Progress</div>
+                                <div class='vms-info'>TRANSFORM PROGRESS</div>
                                 <div class='ui-inner' id="id-cycle-transform-progress">
                                     <div id="id-cycle-transform-progress-label" class="progress-label-rel"></div>
                                 </div>
                                 <div class='hr-line'></div>
-                                <div class='vms-info'>Warnings and Errors</div>
+                                <div class='vms-info'>WARNINGS/ERRORS</div>
                                 <div class='ui-inner' id="id-cycle-warn-aggregate"></div>
                                 <div class='hr-line'></div>
-                                <div class='vms-info'>System Information</div>
+                                <div class='vms-info'>SYSTEM INFORMATION</div>
                                 <div class='ui-inner' id="id-cycle-system-info"></div>
                         </div>
-                        <div class="ui-group ui-helper-clearfix" style="width:56%; float:right">
-                                <div class='vms-info'>Component Durations</div>
+                        <div id ="id-atlas-durations" class="ui-group ui-helper-clearfix" style="width:56%; float:right">
+                                <div class='vms-info'>COMPONENT DURATION</div>
                                 <div class='ui-inner' id="id-vms-server-dashboard"></div>
                         </div>
                     </div>

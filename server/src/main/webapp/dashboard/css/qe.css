@@ -32,13 +32,14 @@
 }
 
 .vms-info {
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 115%;
     background: #f8f8f8;
     text-align: left;
     font-weight: bold; 
     color: #333333;
-    font-size: larger;
     padding-left: 10px;
-    padding-top: 8px;
+    padding-top: 0px; /*jq uery .ui-tabs .uitabs-nav*/
     padding-bottom: 8px;
     margin-bottom: 15px;
 }
@@ -54,10 +55,14 @@
     border: 1px solid #c4c4c4;
 }
 
+.dark-background {
+    background-color: red;
+}
+
 .ui-inner {
     margin-left: 10px;
     margin-right: 10px;
-     margin-bottom: 15px;
+    margin-bottom: 15px;
 }
 
 .spinnaker-banner {

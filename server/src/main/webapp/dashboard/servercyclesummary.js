@@ -2,21 +2,45 @@ function ServerCycleSummaryTab(dashboard) {
     var cycleSummaryTab = this;
     this.cycleSummarytableWidget = null;
     this.graphWidth = 0;
-    var hidableColumns = [3, 5, 6, 7];
-    
+    this.expandedView = false;
+    this.fullData = false;
+    this.hidableColumns =  [3, 5, 6, 7];
+
+    $("#id-summary-toggle-btn").button().click(function() {
+        cycleSummaryTab.toggleHidableColumns();
+    });
+
     this.hideColumns = function() {
-        for(var i=0; i < hidableColumns.length; i++) {
-            $("table[id='id-cycle-timestamp-table']").hideColumn(hidableColumns[i]);
+        for(var i=0; i < cycleSummaryTab.hidableColumns.length; i++) {
+            $("table[id='id-cycle-timestamp-table']").hideColumn(cycleSummaryTab.hidableColumns[i]);
         }
     }
-    
-    this.unhideColumns = function() {
-        for(var i=0; i < hidableColumns.length; i++) {
-            $("table[id='id-cycle-timestamp-table']").showColumn(hidableColumns[i]);
+
+    this.toggleHidableColumns = function() {
+        cycleSummaryTab.expandedView = !cycleSummaryTab.expandedView;
+        if(cycleSummaryTab.expandedView && !cycleSummaryTab.fullData) {
+            cycleSummaryTab.initialize();
+        }
+
+        if(cycleSummaryTab.expandedView) {
+            $("#id-cycle-timestamp-div").animate({width:"56%"});
+            $("#cycle-stats-tabs").width("40%");
+
+            $("#id-atlas-durations").width("36%");
+            $("#id-vms-server-rightpane").width("60%");
+            for(var i=0; i < cycleSummaryTab.hidableColumns.length; i++) {
+                $("table[id='id-cycle-timestamp-table']").showColumn(cycleSummaryTab.hidableColumns[i]);
+            }
+            //$("#id-cycle-timestamp-div").addClass("shadow");
+        } else {
+            //$("#id-cycle-timestamp-div").removeClass("shadow");
+            $("#id-cycle-timestamp-div").width("30%");
+            cycleSummaryTab.hideColumns();
+            // $("#cycle-stats-tabs").show(400, "linear");
         }
     }
-    
-   this.initialize = function() {
+
+    this.initialize = function() {
         var refFn = this;
         this.workerPublishMbps = null;
         this.stateEngineSize = null;
@@ -95,7 +119,7 @@ function ServerCycleSummaryTab(dashboard) {
                 publishErrors = true;
             }
 
-            if (this.s3FailModel.rowFieldEquals("eventInfo.currentCycle", currCycle)) {
+            if (this.s3FailModel != null && this.s3FailModel.rowFieldEquals("eventInfo.currentCycle", currCycle)) {
                 publishErrors = true;
             }
 
@@ -175,7 +199,7 @@ function ServerCycleSummaryTab(dashboard) {
 
             var publishDataSizes = refFn.stateEngineSize;
 
-            if (!publishDataSizes[currCycle]) {
+            if (publishDataSizes == null || !publishDataSizes[currCycle]) {
                 html += "<td style='text-align:right'><img src='images/incomplete.png'></td>";
             } else {
                 var val = publishDataSizes[currCycle].toFixed(4);
@@ -195,9 +219,9 @@ function ServerCycleSummaryTab(dashboard) {
 
             var topNodeCountDelta = refFn.topNodeCounts;
             var currCycleNum = Number(currCycle);
-            var topNodeForCycle = topNodeCountDelta[currCycle];
+            var topNodeForCycle =topNodeCountDelta == null ? null : topNodeCountDelta[currCycle];
 
-            if (!topNodeCountDelta[currCycle]) {
+            if (topNodeCountDelta == null || !topNodeCountDelta[currCycle]) {
                 if(topNodeForCycle == 0) {
                     html += "<td style='text-align:right'> </td>";
                 } else {
@@ -218,15 +242,21 @@ function ServerCycleSummaryTab(dashboard) {
         };
 
         this.populateCycleTimeStampsTable = function() {
-            refFn.computeStateEngineSize();
-            refFn.computeTopNodeCounts();
+            if(cycleSummaryTab.expandedView) {
+                refFn.computeStateEngineSize();
+                refFn.computeTopNodeCounts();
+                cycleSummaryTab.fullData = true;
+            }
             cycleSummaryTab.cycleSummarytableWidget = new ClickableTableWidget("#id-cycle-timestamp-div", "id-cycle-timestamp-table", [ "currentCycle",
                     "timestamp", "custom", "custom", "custom", "custom", "custom", "custom", "custom"], [ "Cycle id", "Time", "Success", "S3 access", 
                     "Regions lagging", "S3 upload Mbps",
                     "Snapshot change", "Topnodes change"], 0, dashboard.cycleIdSelector, refFn.styleRowBackground);
             var searchFieldModelDAO = new FieldModelSearchDAO(cycleSummaryTab.cycleSummarytableWidget, refFn.getIndexSearchQuery("CycleInfo"), [
                     "timestamp", "message", "currentCycle" ], true);
-            cycleSummaryTab.cycleSummarytableWidget.endBuildTableFunc = cycleSummaryTab.hideColumns;
+            
+            if(!cycleSummaryTab.expandedView) {
+                cycleSummaryTab.cycleSummarytableWidget.endBuildTableFunc = cycleSummaryTab.hideColumns;
+            }
             searchFieldModelDAO.updateJsonFromSearch();
         };
 
@@ -256,10 +286,12 @@ function ServerCycleSummaryTab(dashboard) {
 
         this.fillParallelModelCaches = function() {
             var daoExecutor = new ParallelDAOExecutor(refFn.populateCycleTimeStampsTable);
-            daoExecutor.add(refFn.stateEnginePublishDAO);
-            daoExecutor.add(refFn.topNodeCountDAO);
+            if(cycleSummaryTab.expandedView) {
+                daoExecutor.add(refFn.stateEnginePublishDAO);
+                daoExecutor.add(refFn.topNodeCountDAO);
+                daoExecutor.add(refFn.s3FailDAO);
+            }
             daoExecutor.add(refFn.cacheFailDAO);
-            daoExecutor.add(refFn.s3FailDAO);
             daoExecutor.add(refFn.cacheSuccessDAO);
             daoExecutor.add(refFn.hollowPublishRegionDAO);
             daoExecutor.run();
