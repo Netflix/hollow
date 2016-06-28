@@ -141,10 +141,10 @@ public class ValuableVideoHolder {
 
 	private Map<Integer, Float> getVideoViewHours1DayFromHollow(MapOfIntegerToFloatHollow videoViewHrs1DayHollow) {
 		
-		Map<Integer, Float> result = new HashMap<>(videoViewHrs1DayHollow.size());	
-		
 		if(nullOrEmpty(videoViewHrs1DayHollow))
-			return result;
+			return Collections.emptyMap();
+		
+		Map<Integer, Float> result = new HashMap<>(videoViewHrs1DayHollow.size());
 		
 		for(Entry<IntegerHollow, FloatHollow> entryH: videoViewHrs1DayHollow.entrySet()){
 			int videoId = entryH.getKey()._getVal();
@@ -192,33 +192,44 @@ public class ValuableVideoHolder {
 			return result;
 
 		final Map<String, TopNVideoDataHollow> topnByCountry = hollowBlobDataProvider.getTopNData();
+		
+		final Map<String, Map<Integer, Float>> viewViewShare1DayByCountry = new HashMap<>(topnByCountry.size());
+		
+		for(Entry<String, TopNVideoDataHollow> topnEntry: topnByCountry.entrySet()){
+			String countryId = topnEntry.getKey();
+			
+			Map<Integer, Float> videoViewHrs1Day = getVideoViewHours1DayFromHollow(topnEntry.getValue()._getVideoViewHrs1Day());
+			
+			viewViewShare1DayByCountry.put(countryId, videoViewHrs1Day);
+		}
 
 		for (VideoCountryKey videoCountry : videoCountryKeys) {
 			
-			String country = videoCountry.getCountry();
+			String countryId = videoCountry.getCountry();
 			
-			TopNVideoDataHollow topNForCountry = topnByCountry.get(country);
+			TopNVideoDataHollow topNForCountry = topnByCountry.get(countryId);
 
 			if (isInvalidTopNData(topNForCountry)) {
-				if (result.get(country) == null) {
-					//LOGGER.logf(ErrorCode.PlayBackMonkeyWarn, "Missing topN data for country %s when calculating view share.", country);
-					result.put(country, 0f);
+				if (result.get(countryId) == null) {
+					result.put(countryId, 0f);
 				}
 				continue;
 			}
+			Map<Integer, Float> videoViewHrs1Day = viewViewShare1DayByCountry.get(countryId);
 			
-			Map<Integer, Float> videoViewHrs1Day = getVideoViewHours1DayFromHollow(topNForCountry._getVideoViewHrs1Day());
 			Float videoViewHrs = videoViewHrs1Day.get(videoCountry.getVideoId());
+			
 			Float countryViewHrs1Day = topNForCountry._getCountryViewHrs1Day();
+			
 			float videoViewShareAsPercent = 0f;
 
 			if(videoViewHrs != null && countryViewHrs1Day != null && Float.compare(0f, countryViewHrs1Day)!=0)
 				videoViewShareAsPercent = (videoViewHrs / countryViewHrs1Day) * 100;
 			
-			Float viewShare = result.get(country);
+			Float viewShare = result.get(countryId);
 			if (viewShare == null)  viewShare = 0f;
 			viewShare = videoViewShareAsPercent + viewShare;
-			result.put(country, viewShare);
+			result.put(countryId, viewShare);
 		}// end for
 		return result;
 	}
