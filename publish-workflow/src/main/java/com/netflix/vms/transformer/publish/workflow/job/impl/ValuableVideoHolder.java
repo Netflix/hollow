@@ -7,12 +7,15 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ComparisonChain;
 import com.netflix.type.ISOCountry;
 import com.netflix.type.NFCountry;
+import com.netflix.vms.generated.notemplate.FloatHollow;
+import com.netflix.vms.generated.notemplate.IntegerHollow;
+import com.netflix.vms.generated.notemplate.MapOfIntegerToFloatHollow;
+import com.netflix.vms.generated.notemplate.TopNVideoDataHollow;
 import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TopNVideoViewHoursData;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -21,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 public class ValuableVideoHolder {
@@ -64,7 +68,7 @@ public class ValuableVideoHolder {
 
 		Set<VideoCountryKey> mostValueableVideosToTest = new HashSet<HollowBlobDataProvider.VideoCountryKey>(maxVideos);
 
-		final Map<String, TopNVideoViewHoursData> topnByCountry = hollowBlobDataProvider.getTopNData();
+		final Map<String, TopNVideoDataHollow> topnByCountry = hollowBlobDataProvider.getTopNData();
 
 		final Map<String, Set<Integer>> videosBasedOnPackageChanges = hollowBlobDataProvider.changedVideoCountryKeysBasedOnPackages();
 
@@ -87,7 +91,7 @@ public class ValuableVideoHolder {
 			
 			if(videosWithCompVideoChange == null) videosWithCompVideoChange = Collections.emptySet();
 			
-			TopNVideoViewHoursData topNForCountry = topnByCountry.get(countryId);
+			TopNVideoDataHollow topNForCountry = topnByCountry.get(countryId);
 			
 			Set<Integer> excludedVideosForCountry = excludedVideosByCountry.get(countryId);
 			
@@ -96,8 +100,10 @@ public class ValuableVideoHolder {
 			if(pastFailedIDsForCountry == null) pastFailedIDsForCountry = Collections.emptySet();
 			
 			if (topNForCountry != null) {
-				List<Integer> sortedTopNVideos = getSortedTopNVideos(topNForCountry.getVideoViewHrs1Day(),
-						videosWithPckgDataChange, videosWithCompVideoChange);
+				
+				Map<Integer, Float> videoViewHours1Day = getVideoViewHours1DayFromHollow(topNForCountry._getVideoViewHrs1Day());
+				
+				List<Integer> sortedTopNVideos = getSortedTopNVideos(videoViewHours1Day, videosWithPckgDataChange, videosWithCompVideoChange);
 
 				int size = (videosPerCountry > sortedTopNVideos.size()) ? sortedTopNVideos.size() : videosPerCountry;
 				for (int i = 0; i < size; i++) {
@@ -131,6 +137,21 @@ public class ValuableVideoHolder {
 		ctx.getLogger().info(PlaybackMonkey, "Returning " + mostValueableVideosToTest.size() + " TopN Videos.  Took " + timeTaken + "ms.");
 		
 		return Collections.unmodifiableSet(mostValueableVideosToTest);
+	}
+
+	private Map<Integer, Float> getVideoViewHours1DayFromHollow(MapOfIntegerToFloatHollow videoViewHrs1DayHollow) {
+		
+		Map<Integer, Float> result = new HashMap<>(videoViewHrs1DayHollow.size());	
+		
+		if(nullOrEmpty(videoViewHrs1DayHollow))
+			return result;
+		
+		for(Entry<IntegerHollow, FloatHollow> entryH: videoViewHrs1DayHollow.entrySet()){
+			int videoId = entryH.getKey()._getVal();
+			float viewHrs1Day = entryH.getValue()._getVal();
+			result.put(videoId, viewHrs1Day);
+		}
+		return result;
 	}
 
 	private boolean isExcluded(Set<Integer> excludedVideosForCountry, Integer videoId) {
@@ -170,21 +191,25 @@ public class ValuableVideoHolder {
 		if (videoCountryKeys == null || videoCountryKeys.isEmpty())
 			return result;
 
-		final Map<String, TopNVideoViewHoursData> topnByCountry = hollowBlobDataProvider.getTopNData();
+		final Map<String, TopNVideoDataHollow> topnByCountry = hollowBlobDataProvider.getTopNData();
 
 		for (VideoCountryKey videoCountry : videoCountryKeys) {
+			
 			String country = videoCountry.getCountry();
-			TopNVideoViewHoursData videoViewHoursForCountry = topnByCountry.get(country);
+			
+			TopNVideoDataHollow topNForCountry = topnByCountry.get(country);
 
-			if (isInvalidTopNData(videoViewHoursForCountry)) {
+			if (isInvalidTopNData(topNForCountry)) {
 				if (result.get(country) == null) {
 					//LOGGER.logf(ErrorCode.PlayBackMonkeyWarn, "Missing topN data for country %s when calculating view share.", country);
 					result.put(country, 0f);
 				}
 				continue;
 			}
-			Float videoViewHrs = videoViewHoursForCountry.getVideoViewHrs1Day().get(videoCountry.getVideoId());
-			Float countryViewHrs1Day = videoViewHoursForCountry.getCountryViewHrs1Day();
+			
+			Map<Integer, Float> videoViewHrs1Day = getVideoViewHours1DayFromHollow(topNForCountry._getVideoViewHrs1Day());
+			Float videoViewHrs = videoViewHrs1Day.get(videoCountry.getVideoId());
+			Float countryViewHrs1Day = topNForCountry._getCountryViewHrs1Day();
 			float videoViewShareAsPercent = 0f;
 
 			if(videoViewHrs != null && countryViewHrs1Day != null && Float.compare(0f, countryViewHrs1Day)!=0)
@@ -198,11 +223,11 @@ public class ValuableVideoHolder {
 		return result;
 	}
 	
-	private boolean isInvalidTopNData( TopNVideoViewHoursData videoViewHoursForCountry) {
+	private boolean isInvalidTopNData( TopNVideoDataHollow videoViewHoursForCountry) {
 		return (videoViewHoursForCountry == null
-				|| videoViewHoursForCountry.getVideoViewHrs1Day() == null
-				|| videoViewHoursForCountry.getVideoViewHrs1Day().isEmpty() || Float
-					.compare(videoViewHoursForCountry.getCountryViewHrs1Day(),
+				|| videoViewHoursForCountry._getVideoViewHrs1Day() == null
+				|| videoViewHoursForCountry._getVideoViewHrs1Day().isEmpty() || Float
+					.compare(videoViewHoursForCountry._getCountryViewHrs1Day(),
 							0f) == 0);
 	}
 	
