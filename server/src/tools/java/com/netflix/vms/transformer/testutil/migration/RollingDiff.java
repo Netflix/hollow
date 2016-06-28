@@ -70,6 +70,7 @@ public class RollingDiff {
 
     private void downloadOldPipelineOutput() throws IOException {
         String latestControlVipVersion = HttpHelper.getStringResponse(PROD_PROXY_URL + "/" + "filestore-version?keybase=" + new HollowBlobKeybaseBuilder(CONTROL_PIPELINE_VIP).getSnapshotKeybase());
+        System.out.println("Download: ControlVip=" + CONTROL_PIPELINE_VIP + "\t latestControlVipVersion=" + latestControlVipVersion);
 
         File dir = new File(WORKING_DIR, "rolling-diff");
         dir.mkdir();
@@ -89,6 +90,9 @@ public class RollingDiff {
         File dir = new File(WORKING_DIR, "rolling-diff");
 
         HollowBlobHeader header = reader.readHeader(new LZ4VMSInputStream(new FileInputStream(new File(dir, "oldpipeline-snapshot"))));
+        System.out.println("===========================");
+        System.out.println("oldpipelien-snapshot header = " + header.getHeaderTags());
+        System.out.println("===========================\n");
 
         for(Map.Entry<String, String> headerEntry : header.getHeaderTags().entrySet()) {
             if(headerEntry.getKey().endsWith("_ColdStartManager")) {
