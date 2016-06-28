@@ -356,7 +356,7 @@ public class ValuableVideoHolder {
     public static final String GLOBAL_SCOPE = "GLOBAL";
     protected Collection<String> fetchCountriesForNameSpace(final String namespace, PublishWorkflowContext ctx){
         if (namespace == null || namespace.trim().isEmpty()) 
-        	ctx.getLogger().warn(LogTag.PlaybackMonkeyWarn, "namespace can not be null or empty");
+        	ctx.getLogger().warn(LogTag.PlaybackMonkeyWarn, "PBM esxclude video namespace can not be null or empty");
 
         if (GLOBAL_SCOPE.equalsIgnoreCase(namespace)) {
             return ctx.getOctoberSkyData().getSupportedCountries();
