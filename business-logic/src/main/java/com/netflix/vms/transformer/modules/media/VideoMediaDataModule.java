@@ -5,6 +5,8 @@ import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_RIGHTS;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 
+import java.util.Collections;
+
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
@@ -125,7 +127,7 @@ public class VideoMediaDataModule {
         return (rightsOrdinal != -1);
     }
 
-    private boolean populateGeneral(Integer videoId, VideoMediaData vmd) {
+    private void populateGeneral(Integer videoId, VideoMediaData vmd) {
         int ordinal = videoGeneralIdx.getMatchingOrdinal((long) videoId);
         if (ordinal != -1) {
             VideoGeneralHollow general = api.getVideoGeneralHollow(ordinal);
@@ -139,7 +141,8 @@ public class VideoMediaDataModule {
                 vmd.regulatoryAdvisories = outputRegAdv;
             }
         }
-        return (ordinal != -1);
+
+        if(vmd.regulatoryAdvisories == null)  vmd.regulatoryAdvisories = Collections.emptySet();
     }
 
     private boolean populateDate(Integer videoId, String countryCode, VideoMediaData vmd) {
