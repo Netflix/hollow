@@ -1,0 +1,67 @@
+
+.ui-tabs .ui-tabs-nav li.ui-tabs-active {
+	margin-bottom: -1px;
+	padding-bottom: 1px;
+}
+
+.ui-widget-tab-header {
+    /* border: 1px solid silver;*/
+    /* background: #b4e1f8 url("images/ui-bg_gloss-wave_100_b4e1f8_500x100.png") 50% 50% repeat-x; */
+    font-weight: bold;
+    font-size: 1.1em;
+    font-family: Verdana,Arial,sans-serif;
+    border-bottom: 1px silver solid;
+    /* border-bottom: 2px #428BCA solid; */
+    /* this effects the bottom line of tabs*/
+}
+
+.ui-tabs {
+	position: relative;/* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
+	padding: 0;
+}
+
+.ui-tabs .ui-tabs-nav {
+	margin: 0;
+	padding: .2em .2em 0;
+}
+.ui-tabs .ui-tabs-nav li {
+	list-style: none;
+	float: left;
+	position: relative;
+	top: 0;
+	margin: 1px .2em 0 0;
+	border-bottom-width: 0;
+	padding: 0;
+	white-space: nowrap;
+    border: none;
+}
+.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
+	float: left;
+	padding: .5em 1em;
+	text-decoration: none;
+    color: #229cb3;
+
+}
+.ui-tabs .ui-tabs-nav li.ui-tabs-active {
+	margin-bottom: -1px;
+	padding-bottom: 1px;
+    background: url("images/ui-bg_glass_80_4E98EC_1x400.png") left bottom repeat-x;
+}
+.ui-tabs .ui-tabs-nav li.ui-tabs-active .ui-tabs-anchor,
+.ui-tabs .ui-tabs-nav li.ui-state-disabled .ui-tabs-anchor,
+.ui-tabs .ui-tabs-nav li.ui-tabs-loading .ui-tabs-anchor {
+	cursor: text;
+}
+.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-active .ui-tabs-anchor {
+	cursor: pointer;
+}
+.ui-tabs .ui-tabs-panel {
+	display: block;
+	border-width: 0;
+	padding-top: 0px;
+    padding-right: 0px;
+    padding-bottom: 1px;
+    padding-left: 2px;
+	background: none;
+}
+
