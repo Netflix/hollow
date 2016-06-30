@@ -34,4 +34,7 @@ public class SimpleOctoberSkyData implements OctoberSkyData {
 		return countrySet;
 	}
 
+    @Override
+    public void refresh() { }
+
 }
