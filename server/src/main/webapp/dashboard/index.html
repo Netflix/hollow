@@ -87,26 +87,43 @@
                     </div>
                     <div class="hr-line"></div>
                 </div>
-                <!-- ui-widget-tooolbar -->
-                <div id="stats-tab-toolbar" class="vms-info" style="margin-top:10px">
-                    VIP
-                    
-                    Day (UTC)
-                    <select id = "id-vms-index-select" style="display:inline-block;">
-                        <option></option>
-                    </select> 
-                    Cycle
-                    <select id = "id-vms-cycle-select" style="display:inline-block;">
-                        <option></option>
-                    </select> 
-                    <div id="id-cycle-date-txt" style="display:inline-block; margin-left: 25px; margin-right: 25px"></div> 
-                    <button id="id-cycle-prev-btn" style="display:inline-block;">Prev</button>
-                    <button id="id-cycle-next-btn" style="display:inline-block;">Next</button>
-                </div>
                 <!-- class="ui-widget-content ui-helper-clearfix" -->
-                <div id="id-cycle-timestamp-div" class="ui-group" style="width:30%; float:left;margin-right:0px; overflow-y: auto;"> </div>
+                <div id="id-cycles-container" style="width:30%; float:left;margin-right:0px;">
+                    <div>
+                        <table class="view-font-h2">
+                            <tr>
+                                <td>Date (UTC)</td>
+                                <td>
+                                    <select id="id-vms-index-select"><option></option></select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Cycle ID</td>
+                                <td>
+                                    <select id="id-vms-cycle-select"><option></option></select> 
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div id="id-cycle-timestamp-div" class="ui-group" style="overflow-y: auto; clear:both;"> </div>
+                </div>
                 <div id="id-summary-toggle-btn" class="ui-vtag"></div>
                 <div id="cycle-stats-tabs" style="width:67%;float:right;">
+                <!-- ui-widget-tooolbar -->
+                <div id="stats-tab-toolbar" class="vms-info" style="margin-top:10px">
+                    <div style="display:inline-block; width:50% float:left">
+                        <div id="id-cycle-id-txt" style="display:inline-block;"></div>
+                        <div id="id-cycle-date-txt" style="display:inline-block; margin-left: 25px;"></div>
+                    </div>
+                    <div style="display:inline-block; width:47%; float:right">
+                        <div style="position:absolute; right:0px">
+                            <button id="id-cycle-prev-btn" style="display:inline-block;">Prev</button>
+                            <button id="id-cycle-next-btn" style="display:inline-block;">Next</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
                     <ul>
                         <li><a href="#cycle-status-tab">SUMMARY</a></li>
                         <li><a href="#cycle-properties-tab">PROPERTIES</a></li>
@@ -296,6 +313,9 @@
                     <div id="expander-tab"></div>
             </div>
             </div>
+            </div>
+
+
             <div id="client-dashboard-tab">
                 <ul>
                     <li><a href="#vms-sps">SPS and VMS Announcements</a></li>
