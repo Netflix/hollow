@@ -78,6 +78,7 @@ public class TransformCycle {
     private void beginCycle() {
         currentCycleNumber = versionMinter.mintANewVersion();
         ctx.setCurrentCycleId(currentCycleNumber);
+        ctx.getOctoberSkyData().refresh();
 
         if(ctx.getFastlaneIds() != null)
             ctx.getLogger().info(CycleFastlaneIds, ctx.getFastlaneIds());
@@ -194,6 +195,5 @@ public class TransformCycle {
     private void incrementSuccessCounter() {
         ctx.getMetricRecorder().incrementCounter(Metric.CycleSuccessCounter, 1);
     }
-
 
 }

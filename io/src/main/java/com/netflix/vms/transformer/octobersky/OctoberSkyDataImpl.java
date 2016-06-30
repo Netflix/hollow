@@ -16,16 +16,23 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
     private static final String BEEHIVE_NAMESPACE = "beehive";
     private static final String IS_MIN_METADATA_PRESENT = "isMinMetadataPresent";
 
-    private final Set<String> supportedCountries;
+    private final LaunchConfiguration octoberSky;
+    private Set<String> supportedCountries;
 
     @Inject
     public OctoberSkyDataImpl(LaunchConfiguration octoberSky) {
-        this.supportedCountries = findCountriesWithMinMetadata(octoberSky);
+        this.octoberSky = octoberSky;
+        refresh();
     }
 
     @Override
     public Set<String> getSupportedCountries() {
         return supportedCountries;
+    }
+    
+    @Override
+    public void refresh() {
+        this.supportedCountries = findCountriesWithMinMetadata(octoberSky);
     }
 
     private static Set<String> findCountriesWithMinMetadata(LaunchConfiguration octoberSky) {
