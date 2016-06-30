@@ -83,13 +83,18 @@
 /* Interaction states
 ----------------------------------*/
 /*
- * style="background: #3a5469; padding-left:20px; padding-top:20px; margin-top:0px; width:100%; clear:both;"
+ * 
  * */
-tabs-min { 
+.tabs-min { 
     border: none; 
 }
 
-tabs-min .ui-widget-header { 
+.tabs-min .ui-tabs-nav {
+	margin: 0;
+	padding-left: 100;
+}
+
+.tabs-min .ui-widget-header { 
     border: none; 
     border-bottom: 1px solid #c0c0c0; 
     -moz-border-radius: 0px; 
@@ -97,21 +102,51 @@ tabs-min .ui-widget-header {
     border-radius: 0px; 
 }
 
-tabs-min .ui-tabs-nav .ui-state-default { 
+.tabs-min .ui-tabs-nav .ui-state-default { 
     background: transparent; 
     border: none; 
 }
 
-tabs-min .ui-tabs-nav .ui-state-active { 
-    background: transparent url("images/ui-bg_glass_80_4E98EC_1x400.png") 50% 50% repeat-x;
+.tabs-min .ui-tabs-nav .ui-state-active { 
+    background: transparent url("images/ui-bg_glass_80_4E98EC_1x400.png") left top repeat-x;
     border: none; 
 }
 
-tabs-min .ui-tabs-nav .ui-state-default a { 
-    color: #c0c0c0; 
+.tabs-min .ui-tabs-nav .ui-state-default a { 
+    color: #c0c0c0;
+    padding-top: 20;
 }
 
-tabs-min .ui-tabs-nav .ui-state-active a { 
+.tabs-min .ui-tabs-nav .ui-state-active a { 
     color: #459e00; 
+    padding-top: 20;
 }
 
+/* Misc visuals
+----------------------------------*/
+
+/* Corner radius */
+.ui-corner-all,
+.ui-corner-top,
+.ui-corner-left,
+.ui-corner-tl {
+	border-top-left-radius: 0px;
+}
+.ui-corner-all,
+.ui-corner-top,
+.ui-corner-right,
+.ui-corner-tr {
+	border-top-right-radius: 0px;
+}
+.ui-corner-all,
+.ui-corner-bottom,
+.ui-corner-left,
+.ui-corner-bl {
+	border-bottom-left-radius: 0px;
+}
+.ui-corner-all,
+.ui-corner-bottom,
+.ui-corner-right,
+.ui-corner-br {
+	border-bottom-right-radius: 0px;
+}
