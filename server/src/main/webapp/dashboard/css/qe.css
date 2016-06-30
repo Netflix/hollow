@@ -54,12 +54,13 @@
 }
 
 .iframe-refresh-button {
-    margin: 2;
-/*     float: left; */
+    margin-top: 0;
     position: absolute;
-    right: 100px;
+    left: 0px;
     top: 0px;
     z-index: 1234;
+    transform: translate(-100%,0%) rotate(-90deg); 
+    transform-origin: 100% 0%;
 }
 
 .iframe-toolbar {

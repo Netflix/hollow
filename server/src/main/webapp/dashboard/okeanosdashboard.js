@@ -165,14 +165,14 @@ function Dashboard() {
         $("#okeanos-tabs").on("tabsbeforeactivate", function(e, ui) {
             var id = ui.newPanel.attr('id');
             if (id == "data-dashboard-tab") {
-                wave2frame.initialize();
+                 mutationsFrame.initialize();
             }
         });
 
         $("#data-dashboard-tab").on("tabsbeforeactivate", function(e, ui) {
             var id = ui.newPanel.attr('id');
-            if (id == "stats-events") {
-                mutationsFrame.initialize();
+            if (id == "stats-titles") {
+                wave2frame.initialize();
             }
         });
         $("#data-dashboard-tab").on("tabsbeforeactivate", function(e, ui) {
