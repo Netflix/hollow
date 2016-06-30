@@ -60,19 +60,25 @@ public class TransformCycle {
             outputStateEngine.prepareForNextCycle();
             updateTheInput();
             transformTheData();
-            writeTheBlobFiles();
-            submitToPublishWorkflow();
+            if(isUnchangedFastlaneState()) {
+                rollbackFastlaneStateEngine();
+                incrementSuccessCounter();
+            } else {
+                writeTheBlobFiles();
+                submitToPublishWorkflow();
+                endCycleSuccessfully();
+            }
         } catch (Throwable th) {
             ctx.getLogger().error(TransformCycleFailed, "Transformer failed cycle -- rolling back", th);
             outputStateEngine.resetToLastPrepareForNextCycle();
             throw th;
         }
-        endCycleSuccessfully();
     }
 
     private void beginCycle() {
         currentCycleNumber = versionMinter.mintANewVersion();
         ctx.setCurrentCycleId(currentCycleNumber);
+        ctx.getOctoberSkyData().refresh();
 
         if(ctx.getFastlaneIds() != null)
             ctx.getLogger().info(CycleFastlaneIds, ctx.getFastlaneIds());
@@ -129,9 +135,6 @@ public class TransformCycle {
     }
 
     private void writeTheBlobFiles() throws IOException {
-    	if(rollbackFastlaneStateEngineIfUnchanged())
-    		return;
-
     	headerPopulator.addHeaders(previousCycleNumber, currentCycleNumber);
     	
         long startTime = System.currentTimeMillis();
@@ -170,23 +173,27 @@ public class TransformCycle {
         ctx.getMetricRecorder().recordMetric(WriteOutputDataDuration, endTime - startTime);
     }
 
-    private boolean rollbackFastlaneStateEngineIfUnchanged() {
-		if(ctx.getFastlaneIds() != null && previousCycleNumber != Long.MIN_VALUE && !outputStateEngine.hasChangedSinceLastCycle()) {
-    		outputStateEngine.resetToLastPrepareForNextCycle();
-    		ctx.getMetricRecorder().recordMetric(WriteOutputDataDuration, 0);
-    		return true;
-    	}
-		return false;
-	}
+    private boolean isUnchangedFastlaneState() {
+        return ctx.getFastlaneIds() != null && previousCycleNumber != Long.MIN_VALUE && !outputStateEngine.hasChangedSinceLastCycle();
+    }
 
+    private boolean rollbackFastlaneStateEngine() {
+		outputStateEngine.resetToLastPrepareForNextCycle();
+		ctx.getMetricRecorder().recordMetric(WriteOutputDataDuration, 0);
+		return true;
+	}
 
     public void submitToPublishWorkflow() {
         publishWorkflowStager.triggerPublish(inputClient.getCurrentVersionId(), previousCycleNumber, currentCycleNumber);
     }
 
     private void endCycleSuccessfully() {
-        ctx.getMetricRecorder().incrementCounter(Metric.CycleSuccessCounter, 1);
+        incrementSuccessCounter();
         previousCycleNumber = currentCycleNumber;
+    }
+    
+    private void incrementSuccessCounter() {
+        ctx.getMetricRecorder().incrementCounter(Metric.CycleSuccessCounter, 1);
     }
 
 }

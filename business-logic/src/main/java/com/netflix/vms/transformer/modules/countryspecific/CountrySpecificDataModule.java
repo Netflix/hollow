@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import java.util.Collections;
+
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
@@ -142,8 +144,11 @@ public class CountrySpecificDataModule {
 
         // Use Status Data to populate MetaDataAvailabilityDate
         populateMetaDataAvailabilityDate(videoId, countryCode, firstDisplayDate, availabilityWindowList, data);
-    }
 
+        if(data.firstDisplayDateByLocale == null) data.firstDisplayDateByLocale = Collections.emptyMap();
+        if(data.imagesAvailabilityWindows == null) data.imagesAvailabilityWindows = Collections.emptyList();
+        if(data.mediaAvailabilityWindows == null) data.mediaAvailabilityWindows = Collections.emptyList();
+    }
 
     // Return firstDisplayDate as long
     private Long populateFirstDisplayDateData(CompleteVideoCountrySpecificData data, StatusHollow status, List<VMSAvailabilityWindow> availabilityWindowList) {

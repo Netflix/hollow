@@ -36,6 +36,9 @@ public interface TransformerConfig {
 
     String getFollowVip();
     
+    @DefaultValue("15")
+    int getMinCycleCadenceMinutes();
+    
     @DefaultValue("0")
     int getMaxTolerableFailedTransformerHierarchies();
     

@@ -31,32 +31,74 @@
 	   border-bottom-right-radius: 6px;	
 }
 
+.image-spinner-160 {
+    background-image: url('spinner160.gif');
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
 .vms-info {
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 115%;
     background: #f8f8f8;
     text-align: left;
     font-weight: bold; 
     color: #333333;
-    font-size: larger;
     padding-left: 10px;
-    padding-top: 8px;
+    padding-top: 0px; /*jq uery .ui-tabs .uitabs-nav*/
     padding-bottom: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .hr-line {
-    margin-top: 10px;
+    margin-top: 1px;
     border: 0;
     height: 1px;
     background-color: #aaaaaa;
 }
 
 .ui-group {
-    border: 1px solid #aaaaaa;
+    border: 1px solid #c4c4c4;
+}
+
+.ui-vtag {
+    width:11px;
+    height:60px;
+    -webkit-border-radius: 0px 6px 6px 0px;
+    -moz-border-radius: 0px 6px 6px 0px;
+    border-radius: 0px 6px 6px 0px;
+    background-color:#f8f8f8;
+    border: 1px solid #c4c4c4;
+    padding-left: 0px;
+    margin-left: -1px;
+    background-position: center center;
+    background-repeat: no-repeat;
+    float: left;
+    cursor: pointer;
+}
+
+.vtag-right {
+    background-image: url('arrow-right.png');
+}
+
+.vtag-left {
+    background-image: url('arrow-left.png');
+}
+
+div.ui-refresh-button {
+    content: url('refresh.png');
+    background-position: center center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    float: right;
+    margin-left: 25px;
+    margin-left: 25px;
 }
 
 .ui-inner {
     margin-left: 10px;
     margin-right: 10px;
+    margin-bottom: 15px;
 }
 
 .spinnaker-banner {
@@ -276,9 +318,11 @@ label.aligned {
   /* border-bottom-style: double;*/
 }
 
-.highlightrow {
-   outline-style:double;
-   color:#333333;
+tr.highlightrow td {
+   /* outline-style:double;*/
+   /* border-color: #a6a6a6;*/
+   border-bottom: 2px solid #229cb3;
+   border-top: 2px solid #229cb3;
 }
 
 .vms-group {

@@ -34,8 +34,6 @@ import netflix.admin.videometadata.uploadstat.VMSServerUploadStatus;
 
 public class TransformerCycleKickoff {
 
-    private static final long MIN_CYCLE_TIME = 10 * 60 * 1000;
-
     @Inject
     public TransformerCycleKickoff(
             ElasticSearchClient esClient,
@@ -86,8 +84,9 @@ public class TransformerCycleKickoff {
             	if(isFastlane(ctx.getConfig()))
             		return;
             	
+            	long minCycleTime = (long)transformerConfig.getMinCycleCadenceMinutes() * 60 * 1000; 
                 long timeSinceLastCycle = System.currentTimeMillis() - previousCycleStartTime;
-                long msUntilNextCycle = MIN_CYCLE_TIME - timeSinceLastCycle;
+                long msUntilNextCycle = minCycleTime - timeSinceLastCycle;
 
                 if(msUntilNextCycle > 0) {
                     ctx.getLogger().info(WaitForNextCycle, "Waiting " + msUntilNextCycle + "ms until beginning next cycle");
@@ -100,7 +99,7 @@ public class TransformerCycleKickoff {
                     } catch (InterruptedException ignore) { }
 
                     timeSinceLastCycle = System.currentTimeMillis() - previousCycleStartTime;
-                    msUntilNextCycle = MIN_CYCLE_TIME - timeSinceLastCycle;
+                    msUntilNextCycle = minCycleTime - timeSinceLastCycle;
                 }
 
                 previousCycleStartTime = System.currentTimeMillis();

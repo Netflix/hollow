@@ -111,7 +111,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.103",
+            "locked": "0.104",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -550,7 +550,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.103",
+            "locked": "0.104",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -989,7 +989,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.103",
+            "locked": "0.104",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -1428,7 +1428,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.103",
+            "locked": "0.104",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -1966,7 +1966,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.103",
+            "locked": "0.104",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -2405,7 +2405,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.103",
+            "locked": "0.104",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -2855,7 +2855,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.103",
+            "locked": "0.104",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -3305,7 +3305,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.103",
+            "locked": "0.104",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -3755,7 +3755,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.103",
+            "locked": "0.104",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {

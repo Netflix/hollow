@@ -6,6 +6,7 @@ function VmsServerInfoTab(dashboard) {
     var serverInfoView = this;
     var expandedTabs = true;
     this.cycleSummaryView = null;
+    this.cycleStatusView = null;
     this.cycleReplayView = null;
     this.cyclePublishView = null;
     this.cycleValidationView = null;
@@ -34,7 +35,6 @@ function VmsServerInfoTab(dashboard) {
     // Set params from vms REST queries and create tabs
     // --------------------------------------------------------------------
     this.initialize = function() {
-
         serverInfoView.elasticSearchHost = $("#id-elasticsearchhost-box").val();
 
         $.ajax({
@@ -83,7 +83,7 @@ function VmsServerInfoTab(dashboard) {
     // --------------------------------------------------------------------
     this.createServerInfoTab = function() {
         if (this.vipAddress == null) {
-            this.vipAddress = this.nflxEnvironment == "test" ? "newpipeline" : "berlin";
+            this.vipAddress = this.nflxEnvironment == "test" ? "berlin" : "berlin";
         }
 
         $("#id-cycle-prev-btn").button({
@@ -142,9 +142,6 @@ function VmsServerInfoTab(dashboard) {
             $("#id-cycle-timestamp-div").show();
 
             var cycSelectWidget = new SelectOptionsWidget("#id-vms-cycle-select", null, null, true);
-            //var fieldRegex = new Object();
-            //fieldRegex["name"] = [ /(.*)/, 1 ];
-            //var cycleWidgetExecutor = new RegexSearchWidgetExecutor(cycSelectWidget, fieldRegex);
             var cycleWidgetExecutor = new KeyValueWidgetExecutor(cycSelectWidget, 'currentCycle', true);
             cycleWidgetExecutor.searchQuery.indexName = $("#id-vms-index-select").val();
             cycleWidgetExecutor.searchQuery.indexType = "vmsserver";
@@ -161,6 +158,7 @@ function VmsServerInfoTab(dashboard) {
         // get the live timer going (once and only once)
         this.cycleReplayView.setupLiveControl();
         this.cycleReplayView.startRealTimeStatsTimer();
+        this.cycleStatusView = new ServerCycleStatusTab(serverInfoView);
         this.cyclePublishView = new ServerPublishTab(serverInfoView);
         this.cycleInputSearchView = new ServerInputSearchTab(serverInfoView);
         this.propertiesTabView = new CyclePropertiesTab(serverInfoView);
@@ -225,7 +223,8 @@ function VmsServerInfoTab(dashboard) {
     });
 
     $("#id-cycle-refresh-btn").click(function() {
-        serverInfoView.refresh();
+        $("#id-vms-vip-select").change(); 
+        // serverInfoView.refresh();
     });
 
     function initializeInputValidationTab(serverInfoView) {
@@ -258,7 +257,7 @@ function VmsServerInfoTab(dashboard) {
         });
 
         // default view
-        this.cycleSummaryView.refresh();
+        this.cycleStatusView.refresh();
     };
 
     this.cycleIdToDate = function() {
@@ -322,12 +321,12 @@ function VmsServerInfoTab(dashboard) {
         }
 
         if(id == "cycle-status-tab") {
-            if(!this.cycleSummaryView.autoUpdateFlag) {
-                this.cycleSummaryView.autoUpdateFlag = true;
-                this.cycleSummaryView.autoUpdate();
+            if(!this.cycleStatusView.autoUpdateFlag) {
+                this.cycleStatusView.autoUpdateFlag = true;
+                this.cycleStatusView.autoUpdate();
             }
         } else {
-            this.cycleSummaryView.autoUpdateFlag = false;
+            this.cycleStatusView.autoUpdateFlag = false;
         }
 
         if (id == "cycle-circuitbreaker-tab") {
@@ -469,7 +468,7 @@ function CycleErrorTab(serverInfoView) {
     refFn.refresh();
 
     $("#id-search-error-btn").button().click(function() {
-        var fields = ["timestamp","message", "instanceId"]
+        var fields = ["timestamp","message"]
         var tableWidget = new DataTableWidget("#id-cycle-error-locations", "id-table-error-results", fields);
         tableWidget.reformatCellDataFunc = new JavaExceptionFormatter("com.netflix.videometadata.").format;
         var searchQuery = new SearchQuery();

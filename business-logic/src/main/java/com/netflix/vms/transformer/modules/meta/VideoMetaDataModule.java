@@ -471,6 +471,8 @@ public class VideoMetaDataModule {
             }
 
             vmd.hooks = hooks;
+        } else {
+            vmd.hooks = Collections.emptyList();
         }
     }
 

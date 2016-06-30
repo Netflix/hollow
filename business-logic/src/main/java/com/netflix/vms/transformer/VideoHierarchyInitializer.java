@@ -229,8 +229,6 @@ public class VideoHierarchyInitializer {
         if (!windows.isEmpty())
             return true;
 
-        videoStatus._getRights()._getContracts();
-
         return false;
     }
 

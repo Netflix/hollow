@@ -154,7 +154,7 @@ public class PlaybackMonkeyTester {
 										break;
                                     }
                                 } catch(Exception e) {
-                                	logger.info(PlaybackMonkey, ": Exception running PBM tests."+ e.getStackTrace());
+                                	logger.error(PlaybackMonkey, ": Exception running PBM tests.", e);
                                 }
                             }
                         }
@@ -177,8 +177,6 @@ public class PlaybackMonkeyTester {
 
     public String getInstanceInPlayBackMonkeyStack() throws Exception {
         String json = getResponseJson(pbmRestClient, new URI(INSTANCE_LIST_URL), null);
-        // LOGGER.logf(ErrorCode.PlayBackMonkeyInfo,
-        // "getInstanceInPlayBackMonkeyStack response: %s.",json);
         return json.substring(json.indexOf('[') + 1, json.lastIndexOf(']')).trim().replaceAll("\"", "");
     }
 

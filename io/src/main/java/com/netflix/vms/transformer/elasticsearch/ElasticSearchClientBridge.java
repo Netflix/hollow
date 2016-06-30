@@ -1,11 +1,10 @@
 package com.netflix.vms.transformer.elasticsearch;
 
-import com.netflix.hollow.util.SimultaneousExecutor;
-
 import com.google.common.collect.Sets;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import com.netflix.discovery.shared.Application;
+import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import java.util.Collections;
 import java.util.HashSet;
@@ -89,22 +88,24 @@ public class ElasticSearchClientBridge {
             //LOGGER.infof("UP Instances clusterName={}, app={}, num={} :{}", clusterName, app.getName(), newServerSet.size(), getHostNames(newServerSet));
 
             for (final InstanceInfo removed : Sets.difference(esServerSet, newServerSet)) {
-                client.removeTransportAddress(new InetSocketTransportAddress(removed.getHostName(), port));
+                client.removeTransportAddress(new InetSocketTransportAddress(removed.getIPAddr(), port));
                 esServerSet.remove(removed);
-                LOGGER.info("Instance removed id={}, host={}", removed.getId(), removed.getHostName());
+                LOGGER.info("Instance removed id={}, ip-address={}", removed.getId(), removed.getIPAddr());
             }
 
             SimultaneousExecutor executor = new SimultaneousExecutor(50);
 
             for (final InstanceInfo added : Sets.difference(newServerSet, esServerSet)) {
                 executor.execute(() -> {
-                    if (healthy(added.getHostName(), clusterName, port)) {
-                        client.addTransportAddress(new InetSocketTransportAddress(added.getHostName(), port));
-                        synchronized(esServerSet) {
-                            esServerSet.add(added);
-                        }
-                        LOGGER.info("Instance added id={}, host={}", added.getId(), added.getHostName());
+                    // TODO: ip-addre:7104/, parse status (200 is green)
+                    long t0 = System.currentTimeMillis();
+                    InetSocketTransportAddress transportAddress = new InetSocketTransportAddress(added.getIPAddr(), port);
+                    LOGGER.info("Instance added id={}, ip={}, dt={}ms", added.getId(), added.getIPAddr(), (System.currentTimeMillis() - t0));
+                    client.addTransportAddress(transportAddress);
+                    synchronized (esServerSet) {
+                        esServerSet.add(added);
                     }
+                    LOGGER.info("Instance added id={}, ip={}", added.getId(), added.getIPAddr());
                 });
             }
 

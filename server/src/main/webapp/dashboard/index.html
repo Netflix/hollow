@@ -7,6 +7,7 @@
         <script src="jquery/js/jquery-ui-1.10.3.vms.js"></script>
         <script src="jquery/js/jquery.flot.js"></script>
         <script src="jquery/js/jquery.jsonview.js"></script>
+        <script src="jquery/js/ash.js"></script>
 
         <!-- Codemirror -->
         <link rel="stylesheet" href="codemirror/lib/codemirror.css">
@@ -28,6 +29,7 @@
         <script type="text/javascript"  src="okeanosdashboard.js"></script>
         <script type="text/javascript"  src="vmsserverinfotab.js"></script>
         <script type="text/javascript"  src="servercyclesummary.js"></script>
+        <script type="text/javascript"  src="status.js"></script>
         <script type="text/javascript"  src="inputvalidation.js"></script>
         <script type="text/javascript"  src="serverpublishtab.js"></script>
         <script type="text/javascript"  src="cyclereplaytab.js"></script>
@@ -49,7 +51,7 @@
                 $("#okeanos-tabs").tabs();
             });
 
-            $(document).ready(function() {new Dashboard().initialize()});
+            $(document).ready(function() {new Dashboard().initialize(); $(document).tooltip();});
         </script>
         
     </head>
@@ -90,12 +92,13 @@
                     <div id="id-cycle-date-txt" style="display:inline-block; margin-left: 25px; margin-right: 25px"></div> 
                     <button id="id-cycle-prev-btn" style="display:inline-block;">Prev</button>
                     <button id="id-cycle-next-btn" style="display:inline-block;">Next</button>
-                    <button id="id-cycle-refresh-btn" class='hidden'>Apply</button>
                 </div>
                 <!-- class="ui-widget-content ui-helper-clearfix" -->
-                <div id="cycle-stats-tabs">
+                <div id="id-cycle-timestamp-div" class="ui-group" style="width:30%; float:left;margin-right:0px; overflow-y: auto;"> </div>
+                <div id="id-summary-toggle-btn" class="ui-vtag"></div>
+                <div id="cycle-stats-tabs" style="width:67%;float:right;">
                     <ul>
-                        <li><a href="#cycle-status-tab">Cycles</a></li>
+                        <li><a href="#cycle-status-tab">Cycle</a></li>
                         <li><a href="#cycle-properties-tab">Properties</a></li>
                         <li><a href="#cycle-publish-tab">Publish</a></li>
                         <li><a href="#cycle-error-logs-tab">Logs</a></li>
@@ -109,18 +112,23 @@
                     <!-- NOTE: the divs below should be in the same order as listed in <ul> section -->
                     <div id="cycle-status-tab">
                         <div style="padding-top: 8px"></div>
-                        <div id="id-cycle-timestamp-div" style="display: none; width:63%; height:825px; float:left;margin-right:0px; overflow-y: auto;">
-                        </div>
-                        <div id="id-vms-server-rightpane" class="ui-group" style="width:35%; float:right;">
-                                <div class='vms-info'>Transform Progress</div>
+                        
+                        <div id="id-vms-server-rightpane" class="ui-group ui-helper-clearfix" style="width:40%; float:left">
+                                <div class='vms-info'>TRANSFORM PROGRESS
+                                <div id="id-cycle-refresh-btn" class="ui-refresh-button hidden" title="Refresh for latest cycle"></div>
+                                </div>
                                 <div class='ui-inner' id="id-cycle-transform-progress">
                                     <div id="id-cycle-transform-progress-label" class="progress-label-rel"></div>
                                 </div>
                                 <div class='hr-line'></div>
-                                <div class='vms-info'>Warnings and Errors</div>
+                                <div class='vms-info'>WARNINGS/ERRORS</div>
                                 <div class='ui-inner' id="id-cycle-warn-aggregate"></div>
                                 <div class='hr-line'></div>
-                                <div class='vms-info'>Component Durations</div>
+                                <div class='vms-info'>SYSTEM INFORMATION</div>
+                                <div class='ui-inner' id="id-cycle-system-info"></div>
+                        </div>
+                        <div id ="id-atlas-durations" class="ui-group ui-helper-clearfix" style="width:56%; float:right">
+                                <div class='vms-info'>COMPONENT DURATION</div>
                                 <div class='ui-inner' id="id-vms-server-dashboard"></div>
                         </div>
                     </div>
