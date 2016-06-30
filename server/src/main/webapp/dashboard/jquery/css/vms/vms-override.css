@@ -22,7 +22,7 @@
 
 .ui-tabs .ui-tabs-nav {
 	margin: 0;
-	padding: .2em .2em 0;
+	padding: 0;
 }
 .ui-tabs .ui-tabs-nav li {
 	list-style: none;
@@ -39,13 +39,6 @@
 	float: left;
 	padding: .5em 1em;
 	text-decoration: none;
-    color: #229cb3;
-
-}
-.ui-tabs .ui-tabs-nav li.ui-tabs-active {
-	margin-bottom: -1px;
-	padding-bottom: 1px;
-    background: url("images/ui-bg_glass_80_4E98EC_1x400.png") left bottom repeat-x;
 }
 .ui-tabs .ui-tabs-nav li.ui-tabs-active .ui-tabs-anchor,
 .ui-tabs .ui-tabs-nav li.ui-state-disabled .ui-tabs-anchor,
@@ -63,5 +56,62 @@
     padding-bottom: 1px;
     padding-left: 2px;
 	background: none;
+}
+
+
+/* Interaction states
+----------------------------------*/
+.vms-tabs .ui-tabs-nav .ui-state-default {
+    background: transparent; 
+    border: none; 
+} 
+
+.vms-tabs .ui-tabs-nav .ui-state-default a { 
+    color: #62c6d8; 
+} 
+
+.vms-tabs .ui-tabs-nav .ui-state-active a { 
+    color: #229cb3; 
+}
+
+.vms-tabs .ui-tabs-nav li.ui-tabs-active {
+	margin-bottom: -1px;
+	padding-bottom: 1px;
+    background: transparent url("images/ui-bg_glass_80_4E98EC_1x400.png") left bottom repeat-x;
+}
+
+/* Interaction states
+----------------------------------*/
+/*
+ * style="background: #3a5469; padding-left:20px; padding-top:20px; margin-top:0px; width:100%; clear:both;"
+ * */
+tabs-min { 
+    border: none; 
+}
+
+tabs-min .ui-widget-header { 
+    border: none; 
+    border-bottom: 1px solid #c0c0c0; 
+    -moz-border-radius: 0px; 
+    -webkit-border-radius: 0px; 
+    border-radius: 0px; 
+}
+
+tabs-min .ui-tabs-nav .ui-state-default { 
+    background: transparent; 
+    border: none; 
+}
+
+tabs-min .ui-tabs-nav .ui-state-active { 
+    background: transparent url("images/ui-bg_glass_80_4E98EC_1x400.png") 50% 50% repeat-x;
+    border: none; 
+}
+
+tabs-min .ui-tabs-nav .ui-state-default a { 
+    color: #c0c0c0; 
+}
+
+tabs-min .ui-tabs-nav .ui-state-active a { 
+    color: #459e00; 
 }
 
