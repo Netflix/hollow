@@ -635,18 +635,18 @@ function IFrameWidget(parentDivId, iframeId, hostname, link) {
         var toolbarId = iframeWidget.iframeId + "-toolbar";
         $('<div/>', {
             id : toolbarId,
-            class : "ui-widget-content"
+            class : "ui-button iframe-toolbar"
         }).appendTo(parentDivId);
 
         // add reload button to toolbar
         var reloadBtnId = iframeWidget.iframeId + "-reload-btn";
         $('<button/>', {
             id : reloadBtnId,
+            class : "iframe-refresh-button"
         }).appendTo("#" + toolbarId);
 
         $("#" + reloadBtnId).button({
-            label : "Reload",
-            class : "ui-widget ui-button",
+            label : "Refresh iframe",
             icons : {
                 primary : "ui-icon-refresh"
             }
@@ -657,12 +657,13 @@ function IFrameWidget(parentDivId, iframeId, hostname, link) {
         // create iframe
         $('<iframe/>', {
             src : link,
+            // id : iframeWidget.iframeId,
             id : iframeWidget.iframeId,
             frameborder : 0,
             width : width,
             height : height,
             scrolling : "auto"
-        }).appendTo(parentDivId);
+        }).appendTo("#" + toolbarId);
 
         // reload
         iframeWidget.refresh();

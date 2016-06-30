@@ -48,6 +48,8 @@ function Dashboard() {
                 $("#id-vip-txt").html(dashboard.vipAddress);
             }
         });
+    
+        // $("#id-spinnaker-banner").height($("#vms-header-banner").height());
 
         this.createServerInfoTab();
         this.createClientHistoryTab();

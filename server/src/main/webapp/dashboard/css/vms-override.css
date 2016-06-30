@@ -21,7 +21,7 @@
 }
 
 .ui-tabs .ui-tabs-nav {
-	margin: 0;
+	margin: 0 0 10 10; /* top flushed */
 	padding: 0;
 }
 .ui-tabs .ui-tabs-nav li {
@@ -100,6 +100,8 @@
 #okeanos-tabs > .ui-tabs-nav {
 	margin: 0;
 	padding-left: 100;
+    background: #3a5469;
+    height:60
 }
 
 #okeanos-tabs > .ui-widget-header { 

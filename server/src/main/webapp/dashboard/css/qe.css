@@ -53,6 +53,22 @@
     margin-bottom: 15px;
 }
 
+.iframe-refresh-button {
+    margin: 2;
+/*     float: left; */
+    position: absolute;
+    right: 100px;
+    top: 0px;
+    z-index: 1234;
+}
+
+.iframe-toolbar {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    background-color: #5B5B5B;
+    width:100%;
+}
+
 .vms-header {
     background: #3a5469; 
     padding-left:50px; 
@@ -60,6 +76,7 @@
     padding-top:0px;
     width:100%; 
     clear:both;
+    height:60;
 }
 
 .hr-line {
@@ -118,7 +135,7 @@ div.ui-refresh-button {
     margin-bottom: 0px;
     margin-top:0px;
     position: absolute;
-    right: 0px;
+    left: 0px;
     top: 0px;
     z-index: 1234;
 }
@@ -131,11 +148,12 @@ div.ui-refresh-button {
     display: inline-block;
     font-size:larger;
     color: #cccccc;
-    padding-top: 8px;
-    padding-bottom: 8px;
+    padding-top: 20px;
+    padding-bottom: 0px;
     text-align: center;
     padding-right: 10px;
     padding-left: 10px;
+    height:40;
 }
 
 .html-reset {

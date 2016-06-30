@@ -60,13 +60,13 @@
         HTML body section
     -->
     <body class="html-reset" style="font-size:12px; background-color: #FFF;">
-        <div class='spinnaker-banner'>
+        <div id="id-spinnaker-banner"  class='spinnaker-banner'>
             <div class='spinnaker-banner-text spinnaker-banner-prod' id='id-env-txt'>TEST</div>
-            <div class='spinnaker-banner-text' id='id-vip-txt'>local-vip</div>
+            <!-- div class='spinnaker-banner-text' id='id-vip-txt'>local-vip</div -->
         </div>
 
         <div id="okeanos-tabs">
-            <ul class="vms-header"> <!-- style="background: #3a5469; padding-left:20px; padding-top:20px; margin-top:0px; width:100%; clear:both;" -->
+            <ul>
                 <li><a href="#cycle-view">Transformer</a></li>
                 <li><a href="#client-dashboard-tab">Client</a></li>
                 <li><a href="#data-dashboard-tab">Data Metric</a></li>
@@ -294,14 +294,14 @@
                     <li><a href="#stats-client-blobinfo">Blob info</a></li>
                     <li><a href="#stats-client-usage">Client Usage</a></li>
                 </ul>
+                <div id="vms-sps">
+                    <div id = "id-vms-sps-content" class='ui-widget-content'></div>
+                </div>
                 <div id="stats-client-historic">
                     <div id = "id-vms-client-dashboard" class='ui-widget-content'></div>
                 </div>
                 <div id="stats-client-jarversions">
                     <div id = "id-vms-client-jarversions-atlas" class='ui-widget-content'></div>
-                </div>
-                <div id="vms-sps">
-                    <div id = "id-vms-sps-content" class='ui-widget-content'></div>
                 </div>
                 <div id="stats-client-blobinfo">
                     <div id = "id-vms-blob-info" class='ui-widget-content'></div>
@@ -312,18 +312,18 @@
             </div>
             <div id="data-dashboard-tab">
                 <ul>
-                	<li><a href="#stats-dataval">Data Validation</a></li>
-                    <li><a href="#stats-titles">Content Metrics</a></li>
                     <li><a href="#stats-events">Mutation Events</a></li>
+                    <li><a href="#stats-dataval">Data Validation</a></li>
+                    <li><a href="#stats-titles">Content Metrics</a></li>
                 </ul>
+                <div id="stats-events">
+                    <div id = "id-mutation-events-dashboard" class='ui-widget-content'></div>
+                </div>
                 <div id="stats-dataval">
                     <div id = "id-dataval-dashboard" class='ui-widget-content'></div>
                 </div>
                 <div id="stats-titles">
                     <div id = "id-title-stats-dashboard" class='ui-widget-content'></div>
-                </div>
-                <div id="stats-events">
-                    <div id = "id-mutation-events-dashboard" class='ui-widget-content'></div>
                 </div>
             </div>
             <div id="debug-dashboard-tab">
