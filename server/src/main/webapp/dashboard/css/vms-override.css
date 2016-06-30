@@ -61,23 +61,23 @@
 
 /* Interaction states
 ----------------------------------*/
-.vms-tabs .ui-tabs-nav .ui-state-default {
+#cycle-stats-tabs .ui-tabs-nav .ui-state-default {
     background: transparent; 
     border: none; 
 } 
 
-.vms-tabs .ui-tabs-nav .ui-state-default a { 
+#cycle-stats-tabs .ui-tabs-nav .ui-state-default a { 
     color: #62c6d8; 
 } 
 
-.vms-tabs .ui-tabs-nav .ui-state-active a { 
+#cycle-stats-tabs .ui-tabs-nav .ui-state-active a { 
     color: #229cb3; 
 }
 
-.vms-tabs .ui-tabs-nav li.ui-tabs-active {
+#cycle-stats-tabs .ui-tabs-nav li.ui-tabs-active {
 	margin-bottom: -1px;
 	padding-bottom: 1px;
-    background: transparent url("images/ui-bg_glass_80_4E98EC_1x400.png") left bottom repeat-x;
+    background: transparent url("ui-bg_glass_80_4E98EC_1x400.png") left bottom repeat-x;
 }
 
 /* Interaction states
@@ -85,16 +85,16 @@
 /*
  * 
  * */
-.tabs-min { 
+#okeanos-tabs { 
     border: none; 
 }
 
-.tabs-min .ui-tabs-nav {
+#okeanos-tabs > .ui-tabs-nav {
 	margin: 0;
 	padding-left: 100;
 }
 
-.tabs-min .ui-widget-header { 
+#okeanos-tabs > .ui-widget-header { 
     border: none; 
     border-bottom: 1px solid #c0c0c0; 
     -moz-border-radius: 0px; 
@@ -102,22 +102,22 @@
     border-radius: 0px; 
 }
 
-.tabs-min .ui-tabs-nav .ui-state-default { 
+#okeanos-tabs > .ui-tabs-nav .ui-state-default { 
     background: transparent; 
     border: none; 
 }
 
-.tabs-min .ui-tabs-nav .ui-state-active { 
-    background: transparent url("images/ui-bg_glass_80_4E98EC_1x400.png") left top repeat-x;
+#okeanos-tabs > .ui-tabs-nav .ui-state-active { 
+    background: transparent url("ui-bg_glass_80_4E98EC_1x400.png") left top repeat-x;
     border: none; 
 }
 
-.tabs-min .ui-tabs-nav .ui-state-default a { 
+#okeanos-tabs > .ui-tabs-nav .ui-state-default a { 
     color: #c0c0c0;
     padding-top: 20;
 }
 
-.tabs-min .ui-tabs-nav .ui-state-active a { 
+#okeanos-tabs > .ui-tabs-nav .ui-state-active a { 
     color: #459e00; 
     padding-top: 20;
 }
