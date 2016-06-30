@@ -74,13 +74,23 @@
                 <li><a href="#debug-dashboard-tab">Diagnostics</a></li>
                 <li><a href="#cb-dashboard-tab">Circuit Breaker</a></li>
             </ul>
-            <div id="cycle-view">
+            <div id="cycle-view" style="padding: 0 25 0 25">
+                <div class="view-header">
+                    <div class="view-font-h1" style="width:60%; float:left">Server Cycles </div>
+                    <div style="width:37%; float:right">
+                        <div style="float:right">
+                            <div class="view-font-h2" style="display:inline-block;">VMS VIP</div>
+                            <select id="id-vms-vip-select" style="display:inline-block;">
+                                <option></option>
+                            </select> 
+                        </div>
+                    </div>
+                    <div class="hr-line"></div>
+                </div>
                 <!-- ui-widget-tooolbar -->
                 <div id="stats-tab-toolbar" class="vms-info" style="margin-top:10px">
                     VIP
-                    <select id = "id-vms-vip-select" style="display:inline-block;">
-                        <option></option>
-                    </select> 
+                    
                     Day (UTC)
                     <select id = "id-vms-index-select" style="display:inline-block;">
                         <option></option>

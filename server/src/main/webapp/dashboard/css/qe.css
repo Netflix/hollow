@@ -48,7 +48,7 @@
     font-weight: bold; 
     color: #333333;
     padding-left: 10px;
-    padding-top: 0px; /*jq uery .ui-tabs .uitabs-nav*/
+    padding-top: 2px; /*jq uery .ui-tabs .uitabs-nav*/
     padding-bottom: 8px;
     margin-bottom: 15px;
 }
@@ -80,11 +80,33 @@
     height:60;
 }
 
+.view-header {
+    margin: 20 0 20 0;
+    overflow: hidden;
+    display: block;
+    position: relative;
+}
+
+.view-font-h1 {
+    font-weight: bold;
+    font-family: Trebuchet MS,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Tahoma,sans-serif;
+    font-size: 20px;
+    padding-bottom:10px;
+}
+
+.view-font-h2 {
+    font-family: Trebuchet MS,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Tahoma,sans-serif;
+    font-size: 14px;
+    padding-right:10px;
+    font-weight: bold;
+}
+
 .hr-line {
     margin-top: 1px;
     border: 0;
     height: 1px;
     background-color: #aaaaaa;
+    clear: both;
 }
 
 .ui-group {
