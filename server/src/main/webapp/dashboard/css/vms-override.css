@@ -53,7 +53,7 @@
 	border-width: 0;
 	padding-top: 0px;
     padding-right: 0px;
-    padding-bottom: 1px;
+    padding-bottom: 1px; /* 1 */
     padding-left: 2px;
 	background: none;
 }
@@ -61,23 +61,31 @@
 
 /* Interaction states
 ----------------------------------*/
-#cycle-stats-tabs .ui-tabs-nav .ui-state-default {
+.ui-tabs .ui-tabs-nav .ui-state-default {
     background: transparent; 
     border: none; 
 } 
 
-#cycle-stats-tabs .ui-tabs-nav .ui-state-default a { 
-    color: #62c6d8; 
+.ui-tabs .ui-tabs-nav .ui-state-default a { 
+    color:#229cb3;
+    padding-top: 10;
+    padding-bottom:10;
 } 
 
-#cycle-stats-tabs .ui-tabs-nav .ui-state-active a { 
-    color: #229cb3; 
+.ui-tabs .ui-tabs-nav .ui-state-active a { 
+    color:#1d8499;
+    padding-top: 10;
+    padding-bottom:10;
 }
 
-#cycle-stats-tabs .ui-tabs-nav li.ui-tabs-active {
+.ui-tabs .ui-tabs-nav li.ui-tabs-active {
 	margin-bottom: -1px;
 	padding-bottom: 1px;
     background: transparent url("ui-bg_glass_80_4E98EC_1x400.png") left bottom repeat-x;
+}
+
+.ui-tabs .ui-tabs-nav li.ui-state-hover {
+    background-color: #eeeeee;
 }
 
 /* Interaction states
@@ -109,17 +117,26 @@
 
 #okeanos-tabs > .ui-tabs-nav .ui-state-active { 
     background: transparent url("ui-bg_glass_80_4E98EC_1x400.png") left top repeat-x;
-    border: none; 
+    border: none;
+    margin-top:0px;
 }
 
 #okeanos-tabs > .ui-tabs-nav .ui-state-default a { 
-    color: #c0c0c0;
-    padding-top: 20;
+    color: #dddddd;
+    padding-top: 15;
+    padding-bottom:15;
+    font-size: larger;
 }
 
 #okeanos-tabs > .ui-tabs-nav .ui-state-active a { 
-    color: #459e00; 
-    padding-top: 20;
+    color: #eeeeee; 
+    padding-top: 15;
+    padding-bottom:15;
+    font-size:larger;
+}
+
+#okeanos-tabs > .ui-tabs-nav li.ui-state-hover {
+    background-color: #45657E;
 }
 
 /* Misc visuals

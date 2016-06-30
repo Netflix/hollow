@@ -10,8 +10,8 @@
         <script src="jquery/js/ash.js"></script>
 
         <!-- Codemirror -->
-        <link rel="stylesheet" href="codemirror/lib/codemirror.css">
-        <link rel="stylesheet" href="codemirror/addon/dialog/dialog.css">
+        <!-- link rel="stylesheet" href="codemirror/lib/codemirror.css">
+        <link rel="stylesheet" href="codemirror/addon/dialog/dialog.css" -->
         <script src="codemirror/lib/codemirror.js"></script>
         <script src="codemirror/mode/groovy/groovy.js"></script>
         <script src="codemirror/addon/dialog/dialog.js"></script>
@@ -19,10 +19,10 @@
         <script src="codemirror/addon/search/search.js"></script>
         <style type="text/css">.CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black;}</style>
 
-        <link rel="stylesheet" type="text/css" href="jquery/css/smoothness/jquery-ui.min.css"/>
         <link rel="stylesheet" type="text/css" href="css/jquery.jsonview.css"/>
         <link rel="stylesheet" type="text/css" href="css/jquery.dataTables_themeroller.css"/>
         <link rel="stylesheet" type="text/css" href="jquery/css/vms/jquery-ui.css"/>
+        <link rel="stylesheet" type="text/css" href="css/vms-override.css"/>
         <link rel="stylesheet" type="text/css" href="css/qe.css"/>
 
         <!-- this is where the widgets are created -->
@@ -59,15 +59,15 @@
     <!--
         HTML body section
     -->
-    <body class="html-reset" style="font-size:12px; background-color: #FFF">
+    <body class="html-reset" style="font-size:12px; background-color: #FFF;">
         <div class='spinnaker-banner'>
-            <div class='spinnaker-banner-text' id='id-env-txt'>TEST</div>
-            <div class='spinnaker-banner-text' id='id-vip-txt'>local</div>
+            <div class='spinnaker-banner-text spinnaker-banner-prod' id='id-env-txt'>TEST</div>
+            <div class='spinnaker-banner-text' id='id-vip-txt'>local-vip</div>
         </div>
 
-        <div id="okeanos-tabs" >
-            <ul>
-                <li><a href="#cycle-view">Server</a></li>
+        <div id="okeanos-tabs">
+            <ul class="vms-header"> <!-- style="background: #3a5469; padding-left:20px; padding-top:20px; margin-top:0px; width:100%; clear:both;" -->
+                <li><a href="#cycle-view">Transformer</a></li>
                 <li><a href="#client-dashboard-tab">Client</a></li>
                 <li><a href="#data-dashboard-tab">Data Metric</a></li>
                 <li><a href="#io-dashboard-tab">Data IO</a></li>
@@ -76,7 +76,7 @@
             </ul>
             <div id="cycle-view">
                 <!-- ui-widget-tooolbar -->
-                <div id="stats-tab-toolbar" class="vms-info">
+                <div id="stats-tab-toolbar" class="vms-info" style="margin-top:10px">
                     VIP
                     <select id = "id-vms-vip-select" style="display:inline-block;">
                         <option></option>
@@ -98,16 +98,16 @@
                 <div id="id-summary-toggle-btn" class="ui-vtag"></div>
                 <div id="cycle-stats-tabs" style="width:67%;float:right;">
                     <ul>
-                        <li><a href="#cycle-status-tab">Cycle</a></li>
-                        <li><a href="#cycle-properties-tab">Properties</a></li>
-                        <li><a href="#cycle-publish-tab">Publish</a></li>
-                        <li><a href="#cycle-error-logs-tab">Logs</a></li>
-                        <li><a href="#cycle-circuitbreaker-tab">Circuit Breaker</a></li>
-                        <li><a href="#cycle-input-validation-tab">Input Validation</a></li>
-                        <li><a href="#cycle-inputdata-tab">Coldstarts and Events</a></li>
-                        <li><a href="#cycle-replay-tab">Replay Cycle</a></li>
-                        <li><a href="#cycle-input-search-tab">Search</a></li>
-                        <li><a href="#expander-tab">+</a></li>
+                        <li><a href="#cycle-status-tab">SUMMARY</a></li>
+                        <li><a href="#cycle-properties-tab">PROPERTIES</a></li>
+                        <li><a href="#cycle-publish-tab">PUBLISH</a></li>
+                        <li><a href="#cycle-error-logs-tab">LOGS</a></li>
+                        <li><a href="#cycle-circuitbreaker-tab">CIRCUIT BREAKER</a></li>
+                        <li><a href="#cycle-input-validation-tab">APOLLO</a></li>
+                        <li><a href="#cycle-inputdata-tab">INPUTS</a></li>
+                        <li><a href="#cycle-replay-tab">REPLAY CYCLE</a></li>
+                        <li><a href="#cycle-input-search-tab">SEARCH</a></li>
+                        <li><a href="#expander-tab">OTHER+</a></li>
                     </ul>
                     <!-- NOTE: the divs below should be in the same order as listed in <ul> section -->
                     <div id="cycle-status-tab">

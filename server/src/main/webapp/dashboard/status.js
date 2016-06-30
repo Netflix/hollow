@@ -86,7 +86,7 @@ function ServerCycleStatusTab(dashboard) {
             // cycleSummaryTab.updateProgressBar();
             cycleSummaryTab.createCycleWarnTable();
             cycleSummaryTab.checkForNewCycle();
-            setTimeout(cycleSummaryTab.autoUpdate, 5000);
+            //!! setTimeout(cycleSummaryTab.autoUpdate, 5000);
         }
     }
 
