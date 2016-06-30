@@ -124,7 +124,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
 
             // NOTE: recipeDescriptor does not seem unique enough - likely because Beehieve is passing a different format(width/height) that was used to compute recipeDescriptor
             String recipeDescriptor = derivativeHollow._getRecipeDescriptor()._getValue();
-            String derivativeKey = recipeDescriptor + "_" + new String(formatEntry.nameStr);
+            String derivativeKey = recipeDescriptor + "_" + new String(formatEntry.nameStr) + "_" + new String(typeEntry.nameStr);
 
             ArtworkDerivative derivative = derivativeCache.get(derivativeKey);
             if(derivative == null) {
@@ -177,7 +177,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
 
     private static String createFilenameWithoutExtension(String sourceId, String recipeDescriptor) {
         String filename_work_in_progress = sourceId + "_" + recipeDescriptor;
-        String filename_without_extension = DigestUtils.sha1Hex(filename_work_in_progress);
+        String filename_without_extension = DigestUtils.shaHex(filename_work_in_progress);
         return filename_without_extension;
     }
 
