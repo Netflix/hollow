@@ -25,7 +25,7 @@ function ServerCycleSummaryTab(dashboard) {
         }
 
         if(cycleSummaryTab.expandedView) {
-            $("#id-cycle-timestamp-div").animate({width:"56%"});
+            $("#id-cycles-container").animate({width:"56%"});
             $("#cycle-stats-tabs").width("40%");
 
             $("#id-atlas-durations").width("36%");
@@ -37,7 +37,7 @@ function ServerCycleSummaryTab(dashboard) {
             $("#id-summary-toggle-btn").addClass("vtag-left");
         } else {
             cycleSummaryTab.hideColumns();
-            $("#id-cycle-timestamp-div").width("30%");
+            $("#id-cycles-container").width("30%");
             $("#id-atlas-durations").width("56%");
             $("#id-vms-server-rightpane").width("40%");
             $("#cycle-stats-tabs").animate({width:"67%"});

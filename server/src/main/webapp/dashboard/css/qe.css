@@ -101,6 +101,13 @@
     font-weight: bold;
 }
 
+.view-font-h3 {
+    font-family: Trebuchet MS,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Tahoma,sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 2
+}
+
 .hr-line {
     margin-top: 1px;
     border: 0;

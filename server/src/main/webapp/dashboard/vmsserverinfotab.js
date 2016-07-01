@@ -234,6 +234,7 @@ function VmsServerInfoTab(dashboard) {
     this.refresh = function() {
         serverInfoView.clearLazyLoadElements();
         serverInfoView.vmsCycleId = new String($("#id-vms-cycle-select").val());
+        $("#id-cycle-id-txt").text("Cycle: " + serverInfoView.vmsCycleId);
         serverInfoView.cycleIdToDate();
         $("#id-cycle-date-txt").html(serverInfoView.vmsCycleDate.toLocaleString());
 

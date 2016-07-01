@@ -104,7 +104,7 @@ function DataTableWidget(divId, tableId, fields) {
             return;
         }
 
-        this.html = "<table id='" + this.tableId + "' class='prettytable' style='width:100%'><thead><tr>";
+        this.html = "<table id='" + this.tableId + "' class='prettytable'><thead><tr>";
         for ( var i in this.fieldNames) {
             this.html += "<th>" + this.fieldNames[i] + "</th>";
         }
@@ -136,8 +136,8 @@ function DataTableWidget(divId, tableId, fields) {
                 "bJQueryUI" : true,
                 "iDisplayLength" : 25,
                 "aLengthMenu" : [ 10, 25, 50, 100, 500 ],
-                // "sDom" : '<"H"lfrp>t<"F"ip>',
                 "sDom" : '<"H"lifp><t>',
+                "scrollX": true,
                 "sPaginationType" : "full_numbers"
             });
         }

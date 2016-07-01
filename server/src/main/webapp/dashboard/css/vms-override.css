@@ -88,6 +88,14 @@
     background-color: #eeeeee;
 }
 
+/************ table ****************/
+.ui-widget-table-header {
+    border: 1px solid silver;
+    background: #F2F2F2;
+    color: #222222;
+    font-weight: bold;
+}
+
 /* Interaction states
 ----------------------------------*/
 /*
