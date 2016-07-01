@@ -4,8 +4,6 @@ import static com.netflix.vms.transformer.index.IndexSpec.CSM_REVIEW;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_AWARD;
 import static com.netflix.vms.transformer.index.IndexSpec.VMS_AWARD;
 
-import java.util.Set;
-
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.hollowinput.CSMReviewHollow;
@@ -26,10 +24,13 @@ import com.netflix.vms.transformer.hollowoutput.VideoMiscData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.util.OutputUtil;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class VideoMiscDataModule {
     private final VMSHollowInputAPI api;
@@ -135,7 +136,7 @@ public class VideoMiscDataModule {
     private Strings getStrings(StringHollow stringHollow) {
         return (stringHollow != null && stringHollow._getValue() != null) ? new Strings(stringHollow._getValue().toCharArray()) : null;
     }
-
+    
     private List<VideoAward> getAwards(int videoId) {
         List<VideoAward> videoAwards = new ArrayList<>();
         int videoAwardsOrdinal = videoAwardIdx.getMatchingOrdinal((long)videoId);
@@ -170,7 +171,16 @@ public class VideoMiscDataModule {
                 }
             }
         }
+        
+        Collections.sort(videoAwards, VIDEO_AWARD_COMPARATOR);
+        
         return videoAwards;
     }
+    
+    private static final Comparator<VideoAward> VIDEO_AWARD_COMPARATOR = new Comparator<VideoAward>() {
+        public int compare(VideoAward o1, VideoAward o2) {
+            return Integer.compare(o1.sequenceNumber, o2.sequenceNumber);
+        }
+    };
 
 }
