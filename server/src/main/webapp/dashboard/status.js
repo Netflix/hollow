@@ -11,7 +11,7 @@ function ServerCycleStatusTab(dashboard) {
     this.refresh = function() {
         cycleSummaryTab.createCycleDurationAtlasIFrame();
         cycleSummaryTab.createCycleWarnTable();
-        cycleSummaryTab.updateProgressBar();
+        cycleSummaryTab.progressWidget.value = 0;
         cycleSummaryTab.createSystemInfoTable();
     }
 
