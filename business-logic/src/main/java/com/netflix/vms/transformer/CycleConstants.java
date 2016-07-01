@@ -1,5 +1,9 @@
 package com.netflix.vms.transformer;
 
+import com.netflix.vms.transformer.hollowoutput.SortedMapOfIntegerToListOfVideoEpisode;
+import com.netflix.vms.transformer.hollowoutput.VideoEpisode;
+import java.util.List;
+
 import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.SortedMapOfDateWindowToListOfInteger;
 import com.netflix.vms.transformer.hollowoutput.Strings;
@@ -35,6 +39,7 @@ public class CycleConstants {
     
     public final VideoImages EMPTY_VIDEO_IMAGES = emptyVideoImages();
     public final SortedMapOfDateWindowToListOfInteger EMPTY_DATE_WINDOW_SEASON_SEQ_MAP = new SortedMapOfDateWindowToListOfInteger(Collections.emptyMap()); 
+    public final SortedMapOfIntegerToListOfVideoEpisode EMPTY_EPISODE_SEQUENCE_NUMBER_MAP = new SortedMapOfIntegerToListOfVideoEpisode(Collections.<com.netflix.vms.transformer.hollowoutput.Integer, List<VideoEpisode>>emptyMap());
     
     
     private static VideoFormatDescriptor videoFormatDescriptor(int id, String name, String description) {
