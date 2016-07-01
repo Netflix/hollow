@@ -130,7 +130,7 @@ public class VideoCollectionsDataHierarchy {
         episode.supplementalVideos = supplementalVideos;
         episode.topNode = topNode;
         episode.episodesForSeasonSequenceNumberMap = constants.EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
-        
+
         addSupplementalVideoCollectionsData(supplementalVideos, v);
     }
 
@@ -147,12 +147,12 @@ public class VideoCollectionsDataHierarchy {
                 supplementalVideoCollectionsData.supplementalVideoParents = currentSeasonVideo == null ? Collections.singletonList(topNode) : Arrays.asList(topNode, currentSeasonVideo);
             else
                 supplementalVideoCollectionsData.supplementalVideoParents = Collections.singletonList(supplementalVideoParent);
-                    
+
             supplementalVideoCollectionsData.topNode = topNode;
 
             if(supplementalVideoCollectionsData.topNodeType == constants.SHOW)
                 supplementalVideoCollectionsData.showParent = topNode;
-            
+
             supplementalVideoCollectionsData.episodesForSeasonSequenceNumberMap = constants.EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
 
             supplementalVideosCollectionsData.put(suppVideo.id.value, supplementalVideoCollectionsData);
@@ -181,5 +181,25 @@ public class VideoCollectionsDataHierarchy {
 
     public Map<Integer, VideoCollectionsData> getSupplementalVideosCollectionsData() {
         return supplementalVideosCollectionsData;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("topNodeId=").append(topNode.value);
+        int i = 0;
+        for (int seasonId : orderedSeasons.keySet()) {
+            sb.append("\n\tseasonId=").append(seasonId);
+            for (int episodeId : orderedSeasonEpisodes.get(i++).keySet()) {
+                sb.append("\n\t\tepisodeIds=").append(episodeId);
+            }
+        }
+
+        sb.append("\nsupplementalIds=");
+        for (int supId : supplementalVideosCollectionsData.keySet()) {
+            sb.append(supId).append(" ");
+        }
+
+        return sb.toString();
     }
 }
