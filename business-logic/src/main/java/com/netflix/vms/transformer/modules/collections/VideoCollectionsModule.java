@@ -1,10 +1,7 @@
 package com.netflix.vms.transformer.modules.collections;
 
-import java.util.HashSet;
-
-import java.util.Set;
-import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
+import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
@@ -19,9 +16,13 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class VideoCollectionsModule {
 
@@ -81,7 +82,7 @@ public class VideoCollectionsModule {
 
         return countryHierarchies;
     }
-
+    
     private List<SupplementalVideo> getSupplementalVideos(VideoHierarchy hierarchy, long videoId) {
         int supplementalsOrdinal = supplementalIndex.getMatchingOrdinal(videoId);
 
@@ -129,7 +130,14 @@ public class VideoCollectionsModule {
             }
         }
 
+        Collections.sort(supplementalVideos, SUPPLEMENTAL_VIDEO_COMPARATOR);
+
         return supplementalVideos;
     }
-
+    
+    private static final Comparator<SupplementalVideo> SUPPLEMENTAL_VIDEO_COMPARATOR = new Comparator<SupplementalVideo>() {
+        public int compare(SupplementalVideo o1, SupplementalVideo o2) {
+            return Integer.compare(o1.sequenceNumber, o2.sequenceNumber);
+        }
+    };
 }
