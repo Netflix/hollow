@@ -16,8 +16,6 @@ import java.util.Map;
 
 public class VideoCollectionsDataHierarchy {
 
-    public static final SortedMapOfIntegerToListOfVideoEpisode EMPTY_EPISODE_SEQUENCE_NUMBER_MAP = new SortedMapOfIntegerToListOfVideoEpisode(Collections.<com.netflix.vms.transformer.hollowoutput.Integer, List<VideoEpisode>>emptyMap());
-
     private VideoCollectionsData topNodeVideoCollectionsData;
     private final Video topNode;
     private final LinkedHashMap<Integer, VideoCollectionsData> orderedSeasons;
@@ -48,7 +46,7 @@ public class VideoCollectionsDataHierarchy {
             topNodeVideoCollectionsData.seasonChildren = Collections.emptyList();
             topNodeVideoCollectionsData.supplementalVideoParents = Collections.emptyList();
             topNodeVideoCollectionsData.topNode = topNode;
-            topNodeVideoCollectionsData.episodesForSeasonSequenceNumberMap = EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
+            topNodeVideoCollectionsData.episodesForSeasonSequenceNumberMap = constants.EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
             topNodeVideoCollectionsData.supplementalVideos = supplementalVideos;
         } else {
             topNodeVideoCollectionsData.nodeType = constants.SHOW;
@@ -87,7 +85,7 @@ public class VideoCollectionsDataHierarchy {
         currentSeason.topNode = topNode;
         currentSeason.showParent = topNode;
         currentSeason.supplementalVideos = supplementalVideos;
-        currentSeason.episodesForSeasonSequenceNumberMap = EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
+        currentSeason.episodesForSeasonSequenceNumberMap = constants.EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
 
         addSupplementalVideoCollectionsData(supplementalVideos, null);
     }
@@ -131,8 +129,8 @@ public class VideoCollectionsDataHierarchy {
         episode.seasonParent = currentSeasonVideo;
         episode.supplementalVideos = supplementalVideos;
         episode.topNode = topNode;
-        episode.episodesForSeasonSequenceNumberMap = EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
-        
+        episode.episodesForSeasonSequenceNumberMap = constants.EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
+
         addSupplementalVideoCollectionsData(supplementalVideos, v);
     }
 
@@ -149,13 +147,13 @@ public class VideoCollectionsDataHierarchy {
                 supplementalVideoCollectionsData.supplementalVideoParents = currentSeasonVideo == null ? Collections.singletonList(topNode) : Arrays.asList(topNode, currentSeasonVideo);
             else
                 supplementalVideoCollectionsData.supplementalVideoParents = Collections.singletonList(supplementalVideoParent);
-                    
+
             supplementalVideoCollectionsData.topNode = topNode;
 
             if(supplementalVideoCollectionsData.topNodeType == constants.SHOW)
                 supplementalVideoCollectionsData.showParent = topNode;
-            
-            supplementalVideoCollectionsData.episodesForSeasonSequenceNumberMap = EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
+
+            supplementalVideoCollectionsData.episodesForSeasonSequenceNumberMap = constants.EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
 
             supplementalVideosCollectionsData.put(suppVideo.id.value, supplementalVideoCollectionsData);
         }
@@ -183,5 +181,25 @@ public class VideoCollectionsDataHierarchy {
 
     public Map<Integer, VideoCollectionsData> getSupplementalVideosCollectionsData() {
         return supplementalVideosCollectionsData;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("topNodeId=").append(topNode.value);
+        int i = 0;
+        for (int seasonId : orderedSeasons.keySet()) {
+            sb.append("\n\tseasonId=").append(seasonId);
+            for (int episodeId : orderedSeasonEpisodes.get(i++).keySet()) {
+                sb.append("\n\t\tepisodeIds=").append(episodeId);
+            }
+        }
+
+        sb.append("\nsupplementalIds=");
+        for (int supId : supplementalVideosCollectionsData.keySet()) {
+            sb.append(supId).append(" ");
+        }
+
+        return sb.toString();
     }
 }

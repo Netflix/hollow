@@ -73,7 +73,16 @@ public class HollowBlobAfterCanaryAnnounceJob extends AfterCanaryAnnounceJob {
         ctx.getLogger().info(PlaybackMonkey, getJobName() + ": Waiting for pbm instances to get to version " + desiredVersion);
         while(System.currentTimeMillis() < stopCheckingTime) {
 			try {
-				instancesNotInDesiredVersion = parseStringToListExcludeEmptyValues(dataTester.getInstanceInPlayBackMonkeyStack(), ",");
+				String instanceInPlayBackMonkeyStack = dataTester.getInstanceInPlayBackMonkeyStack();
+				ctx.getLogger().info(PlaybackMonkey, getJobName()+": "+desiredVersion+" Got these PBM instances: "+instanceInPlayBackMonkeyStack);
+				instancesNotInDesiredVersion = parseStringToListExcludeEmptyValues(instanceInPlayBackMonkeyStack, ",");
+				
+				if(instancesNotInDesiredVersion == null || instancesNotInDesiredVersion.isEmpty()){
+					// No PBM instance to get to desired version, so try again and get a list of PBM PBCS instances
+					ctx.getLogger().info(PlaybackMonkey, getJobName()+": "+desiredVersion+" Got empty PBM instance list. So trying again.");
+					continue;
+				}
+				
 				final Map<String, String> columns = ctx.getCanaryResultsCassandraHelper().getColumns(ctx.getCanaryResultsCassandraHelper().vipSpecificKey(vip, desiredVersion));
 				for(final String instance: columns.keySet()){
 					instancesNotInDesiredVersion.remove(instance.trim());

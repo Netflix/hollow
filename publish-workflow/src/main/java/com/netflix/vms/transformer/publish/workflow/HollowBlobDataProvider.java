@@ -2,6 +2,19 @@ package com.netflix.vms.transformer.publish.workflow;
 
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.CircuitBreaker;
 
+import com.netflix.hollow.read.engine.HollowBlobReader;
+import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
+import com.netflix.hollow.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.util.HashCodes;
+import com.netflix.hollow.util.HollowChecksum;
+import com.netflix.vms.generated.notemplate.ISOCountryHollow;
+import com.netflix.vms.generated.notemplate.PackageDataHollow;
+import com.netflix.vms.generated.notemplate.TopNVideoDataHollow;
+import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
+import com.netflix.vms.generated.notemplate.VideoHollow;
+import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import java.io.File;
 import java.io.IOException;
 import java.util.BitSet;
@@ -11,20 +24,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
-import com.netflix.hollow.read.engine.HollowBlobReader;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
-import com.netflix.hollow.read.engine.object.HollowObjectTypeReadState;
-import com.netflix.hollow.util.HashCodes;
-import com.netflix.hollow.util.HollowChecksum;
-import com.netflix.vms.generated.notemplate.ISOCountryHollow;
-import com.netflix.vms.generated.notemplate.PackageDataHollow;
-import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
-import com.netflix.vms.generated.notemplate.VideoHollow;
-import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
-import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TopNVideoViewHoursData;
 
 public class HollowBlobDataProvider {
     /* dependencies */
@@ -227,9 +226,20 @@ public class HollowBlobDataProvider {
 	    }
 	}
 
-    public Map<String, TopNVideoViewHoursData> getTopNData() {
-        // TODO Auto-generated method stub
-        return null;
+    public Map<String, TopNVideoDataHollow> getTopNData() {
+		// Read from blob
+	    Map <String, TopNVideoDataHollow> result = new HashMap<>();
+	    
+		VMSRawHollowAPI api = new VMSRawHollowAPI(hollowReadStateEngine);
+		
+		for(TopNVideoDataHollow topn: api.getAllTopNVideoDataHollow()){
+			
+			String countryId = topn._getCountryId();
+			
+			result.put(countryId, topn);
+			
+		}
+		return result;
     }
 
 }

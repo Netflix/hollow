@@ -38,6 +38,9 @@ public abstract class HollowPerCountryTopNVideoScoringCircuitBreaker extends Hol
 			
 			String countryId = topn._getCountryId();
 			
+			if(!isEnabled(countryId))
+				continue;
+			
 			if(videoViewHrsHollow != null && Float.compare(0, countryViewHrs1Day)!=0){
 			
 				float missingViewShare = 0f;

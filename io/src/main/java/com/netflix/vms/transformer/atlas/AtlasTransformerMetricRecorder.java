@@ -1,5 +1,8 @@
 package com.netflix.vms.transformer.atlas;
 
+import org.slf4j.LoggerFactory;
+
+import org.slf4j.Logger;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.netflix.servo.monitor.Counter;
@@ -16,6 +19,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Singleton
 public class AtlasTransformerMetricRecorder implements TransformerMetricRecorder {
 
+    private static final Logger logger = LoggerFactory.getLogger(AtlasTransformerMetricRecorder.class);
+    
     private final ConcurrentHashMap<Metric, Counter> counters;
 
     @Inject
@@ -25,33 +30,45 @@ public class AtlasTransformerMetricRecorder implements TransformerMetricRecorder
 
     @Override
     public void recordMetric(Metric metric, double value) {
-    	DoubleGauge gauge = Servo.getDoubleGauge(MonitorConfig.builder(metric.toString()).build());
-        gauge.set(value);
+        try {
+        	DoubleGauge gauge = Servo.getDoubleGauge(MonitorConfig.builder(metric.toString()).build());
+            gauge.set(value);
+        } catch(Throwable th) {
+            logger.error("Failed to record metric: " + metric + "(value " + value + ")", th);
+        }
     }
     
     @Override
     public void recordMetric(Metric metric, double value, String... keyValues) {
-    	ArrayList<Tag> listOfTags = getAsTagList(keyValues);
-    	DoubleGauge gauge  = Servo.getDoubleGauge(MonitorConfig.builder(metric.toString()).build().withAdditionalTags(new BasicTagList(listOfTags)));
-        gauge.set(value);
+        try {
+        	ArrayList<Tag> listOfTags = getAsTagList(keyValues);
+        	DoubleGauge gauge  = Servo.getDoubleGauge(MonitorConfig.builder(metric.toString()).build().withAdditionalTags(new BasicTagList(listOfTags)));
+            gauge.set(value);
+        } catch(Throwable th) {
+            logger.error("Failed to record metric: " + metric + "(value " + value + ")", th);
+        }
     }
-
-	private ArrayList<Tag> getAsTagList(String... keyValues) {
-		ArrayList<Tag> listOfTags = new ArrayList<>();
-    	for(int i = 0; i < keyValues.length; i=i+2){
-    		listOfTags.add(new BasicTag(keyValues[i], keyValues[i+1]));
-    	}
-		return listOfTags;
-	}
 
     @Override
     public void incrementCounter(Metric metric, long incrementBy) {
-        Counter counter = counters.get(metric);
-        if(counter == null) {
-            counter = Servo.getCounter(metric.toString());
-            counters.put(metric, counter);
+        try {
+            Counter counter = counters.get(metric);
+            if(counter == null) {
+                counter = Servo.getCounter(metric.toString());
+                counters.put(metric, counter);
+            }
+            counter.increment(incrementBy);
+        } catch(Throwable th) {
+            logger.error("Failed to increment metric: " + metric + "(incrementBy " + incrementBy + ")", th);
         }
-        counter.increment(incrementBy);
+    }
+    
+    private ArrayList<Tag> getAsTagList(String... keyValues) {
+        ArrayList<Tag> listOfTags = new ArrayList<>();
+        for(int i = 0; i < keyValues.length; i=i+2){
+            listOfTags.add(new BasicTag(keyValues[i], keyValues[i+1]));
+        }
+        return listOfTags;
     }
 
 }

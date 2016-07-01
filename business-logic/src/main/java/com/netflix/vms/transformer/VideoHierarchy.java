@@ -224,4 +224,24 @@ public class VideoHierarchy {
         return hashCode;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("topNodeId=").append(topNodeId);
+        sb.append("\nisStandalone=").append(isStandalone);
+        for (int i = 0; i < seasonIds.length; i++) {
+            sb.append("\n\tseasonId=").append(seasonIds[i]).append("(").append(seasonSequenceNumbers[i]).append(")");
+            for (int j = 0; j < episodeIds[i].length; j++) {
+                sb.append("\n\t\tepisodeIds=").append(episodeIds[i][j]).append("(").append(episodeSequenceNumbers[i][j]).append(")");
+            }
+        }
+
+        sb.append("\nsupplementalIds=");
+        for (int supId : supplementalIds) {
+            sb.append(supId).append(" ");
+        }
+        sb.append("\ndroppedIds=").append(droppedIds);
+
+        return sb.toString();
+    }
 }
