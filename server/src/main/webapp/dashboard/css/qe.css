@@ -56,17 +56,18 @@
 .iframe-refresh-button {
     margin-top: 0;
     position: absolute;
-    left: 0px;
+    right: 20px;
     top: 0px;
     z-index: 1234;
-    transform: translate(-100%,0%) rotate(-90deg); 
-    transform-origin: 100% 0%;
+    color: #1d8499;
+/*     transform: translate(-100%,0%) rotate(-90deg);  */
+/*     transform-origin: 100% 0%; */
 }
 
 .iframe-toolbar {
     padding-top: 2px;
     padding-bottom: 2px;
-    background-color: #5B5B5B;
+/*     background-color: #5B5B5B; */
     width:100%;
 }
 
@@ -175,6 +176,7 @@ div.ui-refresh-button {
 }
 
 .spinnaker-banner-text {
+    font-family: Trebuchet MS,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Tahoma,sans-serif;
     display: inline-block;
     font-size:larger;
     color: #cccccc;

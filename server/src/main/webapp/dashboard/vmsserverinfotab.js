@@ -166,6 +166,7 @@ function VmsServerInfoTab(dashboard) {
         this.cycleInputDataView = new CycleInputDataInformation(serverInfoView);
         this.cycleCircuitBreakerView = new CircuitBreakerTab(serverInfoView);
         this.dataInjectionTabView = new DataInjectionTab(serverInfoView);
+        this.cycleErrorsView = new CycleErrorTab(serverInfoView);
 
         // ------------------------------------------------------------
         // update lazy tabs when activated
@@ -232,6 +233,8 @@ function VmsServerInfoTab(dashboard) {
     }
 
     this.refresh = function() {
+        var h = $(window).height();
+        $("#id-cycle-timestamp-div").height(h - 175);
         serverInfoView.clearLazyLoadElements();
         serverInfoView.vmsCycleId = new String($("#id-vms-cycle-select").val());
         $("#id-cycle-id-txt").text("Cycle: " + serverInfoView.vmsCycleId);
@@ -240,12 +243,12 @@ function VmsServerInfoTab(dashboard) {
 
         // ------------------------------------------------------------
         // recreate tabs
-        this.cycleErrorsView = new CycleErrorTab(serverInfoView);
-        this.cycleDataInjectionView = new DataInjectionTab(serverInfoView);
-        this.cycleErrorCodesView = new CycleErrorCodesTab(serverInfoView);
+        // this.cycleDataInjectionView = new DataInjectionTab(serverInfoView);
+        // this.cycleErrorCodesView = new CycleErrorCodesTab(serverInfoView);
 
         // ------------------------------------------------------------
         // refresh live tab
+        this.cycleErrorsView.refresh();
         this.cycleReplayView.refresh();
 
         // ------------------------------------------------------------
@@ -466,8 +469,6 @@ function CycleErrorTab(serverInfoView) {
         searchDao.updateJsonFromSearch();
     }
 
-    refFn.refresh();
-
     $("#id-search-error-btn").button().click(function() {
         var fields = ["timestamp","message"]
         var tableWidget = new DataTableWidget("#id-cycle-error-locations", "id-table-error-results", fields);
@@ -482,6 +483,8 @@ function CycleErrorTab(serverInfoView) {
         var searchdao = new FieldModelSearchDAO(tableWidget, searchQuery, fields, true);
         searchdao.updateJsonFromSearch();
     });
+
+    refFn.refresh();
 }
 
 // --------------------------------------------------------------------
