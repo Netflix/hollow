@@ -143,7 +143,7 @@ function ServerCycleStatusTab(dashboard) {
             });
         var oldestColdstart = sortedData[0];
         var date = new Date(Number(oldestColdstart["coldstartVersionId"]));
-        var dateString = date.toLocaleTimeString();
+        var dateString = (date.getMonth()+1) + '/' + date.getDate() + " " + date.toLocaleTimeString();
         // alert(oldestColdstart["mutationGroup"] + " -> " + dateString);
 
         // "id-cycle-oldest-coldstart"
