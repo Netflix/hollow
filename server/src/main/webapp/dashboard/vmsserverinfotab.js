@@ -472,6 +472,9 @@ function CycleErrorTab(serverInfoView) {
 
     $("#id-search-error-btn").button().click(function() {
         var fields = ["timestamp","message"]
+        var availWidth = $("#id-cycle-error-container").width();
+        var usedWidth = $("#id-cycle-error-table").width();
+        $("#id-cycle-error-locations").width(availWidth - usedWidth - 10);
         var tableWidget = new DataTableWidget("#id-cycle-error-locations", "id-table-error-results", fields);
         tableWidget.reformatCellDataFunc = new JavaExceptionFormatter("com.netflix.videometadata.").format;
         var searchQuery = new SearchQuery();
