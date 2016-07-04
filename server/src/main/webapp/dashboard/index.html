@@ -96,8 +96,13 @@
                                     <select id="id-vms-index-select"><option></option></select>
                                 </td>
                             </tr>
+                            <tr class="hidden">
+                                <td>Cycle ID</td>
+                                <td style="padding-left:50px">
+                                    <select id="id-vms-cycle-select"><option></option></select> 
+                                </td>
+                            </t>
                         </table>
-                        <select id="id-vms-cycle-select" class="hidden"><option></option></select> 
                     </div>
                     <div id="id-cycle-timestamp-div" class="ui-group" style="overflow-y: auto; clear:both;"> </div>
                 </div>
@@ -358,17 +363,17 @@
             </div>
             <div id="debug-dashboard-tab" style="padding: 0 25 0 25">
                  <ul>
-                    <li><a href="#stats-client-vmsdebug">TEJA</a></li>
                     <li><a href="#stats-vmsiopsys">VMS IOPS</a></li>
+                    <li><a href="#stats-client-vmsdebug">TEJA</a></li>
                     <li><a href="#stats-vmsinputhistory">INPUT HISTORY</a></li>
                     <li><a href="#stats-vmsoutputhistory">OUTPUT HISTORY</a></li>
-                    <li><a href="#io-dashboard-tab">VIP DIFF</a></li>
+                    <li><a href="#io-dashboard-tab">PRIMARY VIP DIFF</a></li>
                 </ul>
-                <div id="stats-client-vmsdebug">
-                    <div id = "id-vmsdebug-tab" class='ui-widget-content'></div>
-                </div>
                 <div id="stats-vmsiopsys">
                     <div id = "id-vmsiopsys-dashboard" class='ui-widget-content'></div>
+                </div>
+                <div id="stats-client-vmsdebug">
+                    <div id = "id-vmsdebug-tab" class='ui-widget-content'></div>
                 </div>
                 <div id="stats-vmsinputhistory">
                     <div id = "id-vmsinputhistory-dashboard" class='ui-widget-content'></div>
@@ -376,12 +381,12 @@
                 <div id="stats-vmsoutputhistory">
                     <div id = "id-vmsoutputhistory-dashboard" class='ui-widget-content'></div>
                 </div>
-                <div id="cb-dashboard-tab">
-                    <div id="cb-inset" class="ui-widget-content"></div>
+                <div id="io-dashboard-tab" style="padding: 0 25 0 25">
+                    <div id="io-inset" class="ui-widget-content"> </div>
                 </div>
             </div>
-            <div id="io-dashboard-tab" style="padding: 0 25 0 25">
-                <div id="io-inset" class="ui-widget-content">  
+            <div id="cb-dashboard-tab" style="padding: 0 25 0 25">
+                <div id="cb-inset" class="ui-widget-content">  
                 </div>
             </div>
         </div>

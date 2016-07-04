@@ -82,10 +82,11 @@
 }
 
 .view-header {
-    margin: 20 0 20 0;
+    margin: 15 0 15 0;
     overflow: hidden;
     display: block;
     position: relative;
+    border:none;
 }
 
 .view-font-h1 {
@@ -100,6 +101,7 @@
     font-size: 14px;
     padding-right:10px;
     font-weight: bold;
+    border:none;
 }
 
 .view-font-h3 {
