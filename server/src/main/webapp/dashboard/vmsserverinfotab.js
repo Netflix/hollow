@@ -233,7 +233,7 @@ function VmsServerInfoTab(dashboard) {
     }
 
     this.refresh = function() {
-        var h = $(document).height();
+        var h = window.innerHeight;
         // alert("h=" +h + ", d=" + $(document).height());
         $("#id-cycle-timestamp-div").height(h - 175);
         serverInfoView.clearLazyLoadElements();
