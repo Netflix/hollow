@@ -3,6 +3,8 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.AnnouncementFailure;
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.AnnouncementSuccess;
 
+import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
+
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.AnnounceJob;
@@ -30,9 +32,11 @@ public class HermesAnnounceJob extends AnnounceJob {
     }
 
     private void logResult(boolean success) {
-        if(success)
+        if(success) {
             ctx.getLogger().info(AnnouncementSuccess, "Hollow data announce success: for version " + getCycleVersion() + " for vip "+vip+" region " + region);
-        else
+            ctx.getMetricRecorder().incrementCounter(Metric.AnnounceSuccess, 1, "destination.region", region.toString());
+        } else {
             ctx.getLogger().error(AnnouncementFailure, "Hollow data announce failure: for version " + getCycleVersion() + " for vip "+vip+" region "+region);
+        }
     }
 }
