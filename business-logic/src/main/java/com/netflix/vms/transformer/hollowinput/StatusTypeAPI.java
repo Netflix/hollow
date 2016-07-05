@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.hollowinput;
 import com.netflix.hollow.read.customapi.HollowObjectTypeAPI;
 import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
 
-@SuppressWarnings("all")
 public class StatusTypeAPI extends HollowObjectTypeAPI {
 
     private final StatusDelegateLookupImpl delegateLookupImpl;
@@ -45,8 +44,8 @@ public class StatusTypeAPI extends HollowObjectTypeAPI {
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[1]);
     }
 
-    public ISOCountryTypeAPI getCountryCodeTypeAPI() {
-        return getAPI().getISOCountryTypeAPI();
+    public StringTypeAPI getCountryCodeTypeAPI() {
+        return getAPI().getStringTypeAPI();
     }
 
     public int getRightsOrdinal(int ordinal) {

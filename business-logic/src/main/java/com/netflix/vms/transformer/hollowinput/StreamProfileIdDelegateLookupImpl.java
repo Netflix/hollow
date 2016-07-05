@@ -4,7 +4,6 @@ import com.netflix.hollow.objects.delegate.HollowObjectAbstractDelegate;
 import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.HollowObjectSchema;
 
-@SuppressWarnings("all")
 public class StreamProfileIdDelegateLookupImpl extends HollowObjectAbstractDelegate implements StreamProfileIdDelegate {
 
     private final StreamProfileIdTypeAPI typeAPI;

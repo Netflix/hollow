@@ -6,7 +6,6 @@ import com.netflix.hollow.HollowObjectSchema;
 import com.netflix.hollow.read.customapi.HollowTypeAPI;
 import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 
-@SuppressWarnings("all")
 public class StreamDrmInfoDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, StreamDrmInfoDelegate {
 
     private final int keyIdOrdinal;

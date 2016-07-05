@@ -5,7 +5,6 @@ import com.netflix.hollow.HollowListSchema;
 import com.netflix.hollow.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
-@SuppressWarnings("all")
 public class TopNAttributesListHollow extends HollowList<TopNAttributeHollow> {
 
     public TopNAttributesListHollow(HollowListDelegate delegate, int ordinal) {
@@ -13,6 +12,7 @@ public class TopNAttributesListHollow extends HollowList<TopNAttributeHollow> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public TopNAttributeHollow instantiateElement(int ordinal) {
         return (TopNAttributeHollow) api().getTopNAttributeHollow(ordinal);
     }

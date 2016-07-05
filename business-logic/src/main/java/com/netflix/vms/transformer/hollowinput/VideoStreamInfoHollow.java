@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.hollowinput;
 import com.netflix.hollow.objects.HollowObject;
 import com.netflix.hollow.HollowObjectSchema;
 
-@SuppressWarnings("all")
 public class VideoStreamInfoHollow extends HollowObject {
 
     public VideoStreamInfoHollow(VideoStreamInfoDelegate delegate, int ordinal) {

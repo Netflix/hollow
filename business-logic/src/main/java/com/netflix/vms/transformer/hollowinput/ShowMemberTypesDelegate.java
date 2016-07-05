@@ -2,8 +2,6 @@ package com.netflix.vms.transformer.hollowinput;
 
 import com.netflix.hollow.objects.delegate.HollowObjectDelegate;
 
-
-@SuppressWarnings("all")
 public interface ShowMemberTypesDelegate extends HollowObjectDelegate {
 
     public long getShowMemberTypeId(int ordinal);

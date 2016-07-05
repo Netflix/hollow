@@ -5,7 +5,6 @@ import com.netflix.hollow.HollowListSchema;
 import com.netflix.hollow.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
-@SuppressWarnings("all")
 public class ListOfRightsWindowHollow extends HollowList<RightsWindowHollow> {
 
     public ListOfRightsWindowHollow(HollowListDelegate delegate, int ordinal) {
@@ -13,6 +12,7 @@ public class ListOfRightsWindowHollow extends HollowList<RightsWindowHollow> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public RightsWindowHollow instantiateElement(int ordinal) {
         return (RightsWindowHollow) api().getRightsWindowHollow(ordinal);
     }

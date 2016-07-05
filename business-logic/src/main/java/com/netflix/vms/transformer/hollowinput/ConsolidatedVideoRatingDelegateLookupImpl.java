@@ -4,7 +4,6 @@ import com.netflix.hollow.objects.delegate.HollowObjectAbstractDelegate;
 import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.HollowObjectSchema;
 
-@SuppressWarnings("all")
 public class ConsolidatedVideoRatingDelegateLookupImpl extends HollowObjectAbstractDelegate implements ConsolidatedVideoRatingDelegate {
 
     private final ConsolidatedVideoRatingTypeAPI typeAPI;

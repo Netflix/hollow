@@ -6,7 +6,6 @@ import com.netflix.hollow.HollowObjectSchema;
 import com.netflix.hollow.read.customapi.HollowTypeAPI;
 import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 
-@SuppressWarnings("all")
 public class VideoRightsContractAssetDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, VideoRightsContractAssetDelegate {
 
     private final int bcp47CodeOrdinal;

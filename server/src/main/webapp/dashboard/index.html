@@ -67,12 +67,11 @@
 
         <div id="okeanos-tabs">
             <ul>
-                <li><a href="#cycle-view">Transformer</a></li>
+                <li><a href="#cycle-view">Server</a></li>
                 <li><a href="#client-dashboard-tab">Client</a></li>
-                <li><a href="#data-dashboard-tab">Data Metric</a></li>
+                <li><a href="#data-dashboard-tab">Data</a></li>
                 <li><a href="#debug-dashboard-tab">Diagnostics</a></li>
                 <li><a href="#cb-dashboard-tab">Circuit Breaker</a></li>
-                <li><a href="#io-dashboard-tab">Data IO</a></li>
             </ul>
             <div id="cycle-view" style="padding: 0 25 0 25">
                 <div class="view-header">
@@ -97,12 +96,12 @@
                                     <select id="id-vms-index-select"><option></option></select>
                                 </td>
                             </tr>
-                            <tr class="view-font-h3">
+                            <tr class="hidden">
                                 <td>Cycle ID</td>
                                 <td style="padding-left:50px">
                                     <select id="id-vms-cycle-select"><option></option></select> 
                                 </td>
-                            </tr>
+                            </t>
                         </table>
                     </div>
                     <div id="id-cycle-timestamp-div" class="ui-group" style="overflow-y: auto; clear:both;"> </div>
@@ -153,6 +152,9 @@
                                 <div class='hr-line'></div>
                                 <div class='vms-info'>SYSTEM INFORMATION</div>
                                 <div class='ui-inner' id="id-cycle-system-info"></div>
+                                <div class='hr-line'></div>
+                                <div class='vms-info'>OLDEST COLDSTART</div>
+                                <div class='ui-inner' id="id-cycle-oldest-coldstart"></div>
                         </div>
                         <div id ="id-atlas-durations" class="ui-group ui-helper-clearfix" style="width:56%; float:right">
                                 <div class='vms-info'>COMPONENT DURATION</div>
@@ -187,12 +189,11 @@
                             <button id="id-search-error-btn" class='ui-widget-content'>search</button>
                         </div>
                         <br>
-                        <div style="margin-top: 5px">
+                        <div id="id-cycle-error-container" style="margin-top: 5px; width=100%">
                             <div id="id-cycle-error-list" style="width:25%; float:left;">
                                 <table id="id-cycle-error-table" class="clickabletable"></table>
                             </div>
-                            <div style="width:65%; float:right;">
-                                <div id="id-cycle-error-locations" style="overflow-x: auto;"></div>
+                            <div id="id-cycle-error-locations" style="float:right;">
                             </div>
                         </div>
                     </div>
@@ -362,7 +363,10 @@
             <div id="debug-dashboard-tab" style="padding: 0 25 0 25">
                  <ul>
                     <li><a href="#stats-vmsiopsys">VMS IOPS</a></li>
-                    <li><a href="#stats-client-vmsdebug">VMS Debug</a></li>
+                    <li><a href="#stats-client-vmsdebug">TEJA</a></li>
+                    <li><a href="#stats-vmsinputhistory">INPUT HISTORY</a></li>
+                    <li><a href="#stats-vmsoutputhistory">OUTPUT HISTORY</a></li>
+                    <li><a href="#io-dashboard-tab">PRIMARY VIP DIFF</a></li>
                 </ul>
                 <div id="stats-vmsiopsys">
                     <div id = "id-vmsiopsys-dashboard" class='ui-widget-content'></div>
@@ -370,13 +374,18 @@
                 <div id="stats-client-vmsdebug">
                     <div id = "id-vmsdebug-tab" class='ui-widget-content'></div>
                 </div>
-             </div>
-            <div id="cb-dashboard-tab" style="padding: 0 25 0 25">
-                <div id="cb-inset" class="ui-widget-content">  
+                <div id="stats-vmsinputhistory">
+                    <div id = "id-vmsinputhistory-dashboard" class='ui-widget-content'></div>
+                </div>
+                <div id="stats-vmsoutputhistory">
+                    <div id = "id-vmsoutputhistory-dashboard" class='ui-widget-content'></div>
+                </div>
+                <div id="io-dashboard-tab" style="padding: 0 25 0 25">
+                    <div id="io-inset" class="ui-widget-content"> </div>
                 </div>
             </div>
-            <div id="io-dashboard-tab" style="padding: 0 25 0 25">
-                <div id="io-inset" class="ui-widget-content">  
+            <div id="cb-dashboard-tab" style="padding: 0 25 0 25">
+                <div id="cb-inset" class="ui-widget-content">  
                 </div>
             </div>
         </div>

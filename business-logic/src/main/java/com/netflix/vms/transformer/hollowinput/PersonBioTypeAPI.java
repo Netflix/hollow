@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.hollowinput;
 import com.netflix.hollow.read.customapi.HollowObjectTypeAPI;
 import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
 
-@SuppressWarnings("all")
 public class PersonBioTypeAPI extends HollowObjectTypeAPI {
 
     private final PersonBioDelegateLookupImpl delegateLookupImpl;
@@ -12,6 +11,7 @@ public class PersonBioTypeAPI extends HollowObjectTypeAPI {
         super(api, typeDataAccess, new String[] {
             "spouses",
             "partners",
+            "currentRelationship",
             "personId",
             "birthDate",
             "movieIds"
@@ -39,19 +39,29 @@ public class PersonBioTypeAPI extends HollowObjectTypeAPI {
         return getAPI().getListOfStringTypeAPI();
     }
 
-    public long getPersonId(int ordinal) {
+    public int getCurrentRelationshipOrdinal(int ordinal) {
         if(fieldIndex[2] == -1)
+            return missingDataHandler().handleReferencedOrdinal("PersonBio", ordinal, "currentRelationship");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[2]);
+    }
+
+    public StringTypeAPI getCurrentRelationshipTypeAPI() {
+        return getAPI().getStringTypeAPI();
+    }
+
+    public long getPersonId(int ordinal) {
+        if(fieldIndex[3] == -1)
             return missingDataHandler().handleLong("PersonBio", ordinal, "personId");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[2]);
+        return getTypeDataAccess().readLong(ordinal, fieldIndex[3]);
     }
 
     public Long getPersonIdBoxed(int ordinal) {
         long l;
-        if(fieldIndex[2] == -1) {
+        if(fieldIndex[3] == -1) {
             l = missingDataHandler().handleLong("PersonBio", ordinal, "personId");
         } else {
-            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[2]);
-            l = getTypeDataAccess().readLong(ordinal, fieldIndex[2]);
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[3]);
+            l = getTypeDataAccess().readLong(ordinal, fieldIndex[3]);
         }
         if(l == Long.MIN_VALUE)
             return null;
@@ -61,9 +71,9 @@ public class PersonBioTypeAPI extends HollowObjectTypeAPI {
 
 
     public int getBirthDateOrdinal(int ordinal) {
-        if(fieldIndex[3] == -1)
+        if(fieldIndex[4] == -1)
             return missingDataHandler().handleReferencedOrdinal("PersonBio", ordinal, "birthDate");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[3]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[4]);
     }
 
     public ExplicitDateTypeAPI getBirthDateTypeAPI() {
@@ -71,9 +81,9 @@ public class PersonBioTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getMovieIdsOrdinal(int ordinal) {
-        if(fieldIndex[4] == -1)
+        if(fieldIndex[5] == -1)
             return missingDataHandler().handleReferencedOrdinal("PersonBio", ordinal, "movieIds");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[4]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[5]);
     }
 
     public ListOfVideoIdsTypeAPI getMovieIdsTypeAPI() {

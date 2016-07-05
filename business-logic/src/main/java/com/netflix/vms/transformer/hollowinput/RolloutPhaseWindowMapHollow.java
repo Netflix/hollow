@@ -5,7 +5,6 @@ import com.netflix.hollow.HollowMapSchema;
 import com.netflix.hollow.objects.delegate.HollowMapDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
-@SuppressWarnings("all")
 public class RolloutPhaseWindowMapHollow extends HollowMap<ISOCountryHollow, RolloutPhaseWindowHollow> {
 
     public RolloutPhaseWindowMapHollow(HollowMapDelegate delegate, int ordinal) {
@@ -13,11 +12,13 @@ public class RolloutPhaseWindowMapHollow extends HollowMap<ISOCountryHollow, Rol
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public ISOCountryHollow instantiateKey(int ordinal) {
         return (ISOCountryHollow) api().getISOCountryHollow(ordinal);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public RolloutPhaseWindowHollow instantiateValue(int ordinal) {
         return (RolloutPhaseWindowHollow) api().getRolloutPhaseWindowHollow(ordinal);
     }

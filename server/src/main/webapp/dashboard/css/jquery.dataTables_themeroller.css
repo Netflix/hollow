@@ -16,10 +16,12 @@ table.dataTable thead th {
 	padding: 3px 0px 3px 10px;
 	cursor: pointer;
 	*cursor: hand;
+    background: #f8f8f8;
 }
 
 table.dataTable tfoot th {
 	padding: 3px 10px;
+    background: #f8f8f8;
 }
 
 table.dataTable td {

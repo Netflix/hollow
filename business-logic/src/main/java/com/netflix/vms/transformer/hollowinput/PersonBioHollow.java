@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.hollowinput;
 import com.netflix.hollow.objects.HollowObject;
 import com.netflix.hollow.HollowObjectSchema;
 
-@SuppressWarnings("all")
 public class PersonBioHollow extends HollowObject {
 
     public PersonBioHollow(PersonBioDelegate delegate, int ordinal) {
@@ -22,6 +21,13 @@ public class PersonBioHollow extends HollowObject {
         if(refOrdinal == -1)
             return null;
         return  api().getListOfStringHollow(refOrdinal);
+    }
+
+    public StringHollow _getCurrentRelationship() {
+        int refOrdinal = delegate().getCurrentRelationshipOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getStringHollow(refOrdinal);
     }
 
     public long _getPersonId() {
