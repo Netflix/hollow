@@ -4,8 +4,12 @@ package com.netflix.vms.transformer.common;
 public interface TransformerMetricRecorder {
 
     void recordMetric(Metric name, double value);
+    
+    void recordMetric(Metric metric, double value, String... tagKeyValues);
 
     void incrementCounter(Metric name, long incrementBy);
+    
+    void incrementCounter(Metric name, long incrementBy, String... tagKeyValues);
 
     public static enum Metric {
         WaitForNextCycleDuration,
@@ -21,6 +25,8 @@ public interface TransformerMetricRecorder {
         SnapShotSize,
         ViewShareCoveredByPBM,
         PBMFailuresMissingViewShare,
+        
+        AnnounceSuccess,
 
         CycleSuccessCounter;
 
@@ -36,7 +42,5 @@ public interface TransformerMetricRecorder {
         }
 
     }
-
-	void recordMetric(Metric metric, double value, String... keyValues);
 
 }
