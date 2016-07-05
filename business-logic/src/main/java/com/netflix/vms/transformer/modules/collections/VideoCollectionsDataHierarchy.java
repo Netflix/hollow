@@ -6,7 +6,6 @@ import com.netflix.vms.transformer.hollowoutput.SupplementalVideo;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
 import com.netflix.vms.transformer.hollowoutput.VideoEpisode;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,8 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 public class VideoCollectionsDataHierarchy {
-
-    public static final SortedMapOfIntegerToListOfVideoEpisode EMPTY_EPISODE_SEQUENCE_NUMBER_MAP = new SortedMapOfIntegerToListOfVideoEpisode(Collections.<com.netflix.vms.transformer.hollowoutput.Integer, List<VideoEpisode>>emptyMap());
 
     private VideoCollectionsData topNodeVideoCollectionsData;
     private final Video topNode;
@@ -49,7 +46,7 @@ public class VideoCollectionsDataHierarchy {
             topNodeVideoCollectionsData.seasonChildren = Collections.emptyList();
             topNodeVideoCollectionsData.supplementalVideoParents = Collections.emptyList();
             topNodeVideoCollectionsData.topNode = topNode;
-            topNodeVideoCollectionsData.episodesForSeasonSequenceNumberMap = EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
+            topNodeVideoCollectionsData.episodesForSeasonSequenceNumberMap = constants.EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
             topNodeVideoCollectionsData.supplementalVideos = supplementalVideos;
         } else {
             topNodeVideoCollectionsData.nodeType = constants.SHOW;
@@ -88,7 +85,7 @@ public class VideoCollectionsDataHierarchy {
         currentSeason.topNode = topNode;
         currentSeason.showParent = topNode;
         currentSeason.supplementalVideos = supplementalVideos;
-        currentSeason.episodesForSeasonSequenceNumberMap = EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
+        currentSeason.episodesForSeasonSequenceNumberMap = constants.EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
 
         addSupplementalVideoCollectionsData(supplementalVideos, null);
     }
@@ -132,7 +129,7 @@ public class VideoCollectionsDataHierarchy {
         episode.seasonParent = currentSeasonVideo;
         episode.supplementalVideos = supplementalVideos;
         episode.topNode = topNode;
-        episode.episodesForSeasonSequenceNumberMap = EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
+        episode.episodesForSeasonSequenceNumberMap = constants.EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
 
         addSupplementalVideoCollectionsData(supplementalVideos, v);
     }
@@ -148,15 +145,15 @@ public class VideoCollectionsDataHierarchy {
             supplementalVideoCollectionsData.supplementalVideos = Collections.emptyList();
             if(supplementalVideoParent == null)
                 supplementalVideoCollectionsData.supplementalVideoParents = currentSeasonVideo == null ? Collections.singletonList(topNode) : Arrays.asList(topNode, currentSeasonVideo);
-                else
-                    supplementalVideoCollectionsData.supplementalVideoParents = Collections.singletonList(supplementalVideoParent);
+            else
+                supplementalVideoCollectionsData.supplementalVideoParents = Collections.singletonList(supplementalVideoParent);
 
             supplementalVideoCollectionsData.topNode = topNode;
 
             if(supplementalVideoCollectionsData.topNodeType == constants.SHOW)
                 supplementalVideoCollectionsData.showParent = topNode;
 
-            supplementalVideoCollectionsData.episodesForSeasonSequenceNumberMap = EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
+            supplementalVideoCollectionsData.episodesForSeasonSequenceNumberMap = constants.EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
 
             supplementalVideosCollectionsData.put(suppVideo.id.value, supplementalVideoCollectionsData);
         }

@@ -23,6 +23,7 @@ public class VMSInputDataClient extends HollowClient {
               new VMSInputDataAPIFactory(),
               new DefaultHashCodeFinder(),
               HollowClientMemoryConfig.DEFAULT_CONFIG);
+        setMaxDeltas(40);
     }
 
     public VMSInputDataClient(String baseProxyURL, String localDataDir, String converterVip) {
@@ -32,6 +33,7 @@ public class VMSInputDataClient extends HollowClient {
               new VMSInputDataAPIFactory(),
               new DefaultHashCodeFinder(),
               HollowClientMemoryConfig.DEFAULT_CONFIG);
+        setMaxDeltas(40);
     }
 
     @Override

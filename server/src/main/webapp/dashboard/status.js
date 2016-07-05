@@ -1,18 +1,28 @@
 function ServerCycleStatusTab(dashboard) {
     var cycleSummaryTab = this;
-    this.cycleSummarytableWidget = null;
     this.graphWidth = 0;
     this.autoUpdateFlag = false;
     this.progressWidget = new ProgressBarWidget("#id-cycle-transform-progress", "#id-cycle-transform-progress-label");
     $("#id-cycle-transform-progress > div").css({ 'background': '#a6bf82' });
     $('#id-cycle-transform-progress').height(18);
+    var csTableFields = [ "group", "date" ];
+    this.csTable = new ClickableTableWidget("#id-cycle-oldest-coldstart", "iid-cycle-oldest-coldstart-table", csTableFields, csTableFields, -1);
+    this.csTable.textAlign = "style='text-align: center'";
 
+    var tableFields = ["instanceId", "JarVersion"];
+    var tableHeader = ["Instance", "Jar version"];
+    this.systemInfoTable = new ClickableTableWidget("#id-cycle-system-info", "id-cycle-system-info-table", tableFields, tableHeader);
+    // this.systemInfoTable.clearPrevious = true;
+    this.systemInfoTable.textAlign = "style='text-align: center'";
+
+    this.warnCodesWidget = new ClickableTableWidget("#id-cycle-warn-aggregate", "id-cycle-warn-agg-table", [ "key", "doc_count" ], [ "tag", "Count"], -1);
 
     this.refresh = function() {
         cycleSummaryTab.createCycleDurationAtlasIFrame();
         cycleSummaryTab.createCycleWarnTable();
-        cycleSummaryTab.updateProgressBar();
+        cycleSummaryTab.progressWidget.value = 0;
         cycleSummaryTab.createSystemInfoTable();
+        cycleSummaryTab.findOldestColdstart();
     }
 
 
@@ -47,15 +57,13 @@ function ServerCycleStatusTab(dashboard) {
     };
 
     this.createCycleWarnTable = function() {
-            var fieldKeys = [ "key", "doc_count" ];
-            var warnCodesWidget = new ClickableTableWidget("#id-cycle-warn-aggregate", "id-cycle-warn-agg-table", fieldKeys, [ "tag", "Count"], -1);
-            warnCodesWidget.showHeader = false;
+            cycleSummaryTab.warnCodesWidget.showHeader = false;
             var query = new SearchQuery();
             query.indexName = dashboard.vmsIndex;
             query.add("eventInfo.currentCycle:" + dashboard.vmsCycleId);
             query.add("(logLevel:warn OR logLevel:error)");
             query.aggregate = "tag";
-            var searchDao = new SearchAggregationDAO(warnCodesWidget, query, true);
+            var searchDao = new SearchAggregationDAO(cycleSummaryTab.warnCodesWidget, query, true);
             searchDao.updateJsonFromSearch();
     }
 
@@ -103,11 +111,7 @@ function ServerCycleStatusTab(dashboard) {
     }
 
     this.createSystemInfoTable = function() {
-        var tableFields = ["instanceId", "JarVersion"];
-        var tableHeader = ["Instance", "Jar version"];
-        var tableWidget = new ClickableTableWidget("#id-cycle-system-info", "id-cycle-system-info-table", tableFields, tableHeader);
-        tableWidget.textAlign = "style='text-align: center'";
-        var widgetExecutor = new RegexSearchWidgetExecutor(tableWidget, RegexParserMapper.prototype.getJarVersionRegexInfo());
+        var widgetExecutor = new RegexSearchWidgetExecutor(cycleSummaryTab.systemInfoTable, RegexParserMapper.prototype.getJarVersionRegexInfo());
         var query = widgetExecutor.searchQuery;
         query.indexName = dashboard.vmsIndex;
         query.indexType = "vmsserver";
@@ -127,6 +131,43 @@ function ServerCycleStatusTab(dashboard) {
         searchDao.searchQuery.add("tag:TransformCycleBegin");
         searchDao.searchQuery.sort = "eventInfo.timestamp:desc";
         searchDao.updateJsonFromSearch();
+    }
+
+    this.populateOldestColdstartTable = function(data) {
+        if(!data || data.length == 0) {
+            return;
+        }
+        var dataOp = new DataOperator(data);
+        var sortedData = dataOp.sort("coldstartVersionId", function(a, b) {
+                return Number(a["coldstartVersionId"]) - Number(b["coldstartVersionId"]);
+            });
+        var oldestColdstart = sortedData[0];
+        var date = new Date(Number(oldestColdstart["coldstartVersionId"]));
+        var dateString = (date.getMonth()+1) + '/' + date.getDate() + " " + date.toLocaleTimeString();
+        // alert(oldestColdstart["mutationGroup"] + " -> " + dateString);
+
+        // "id-cycle-oldest-coldstart"
+        cycleSummaryTab.csTable.showHeader = false;
+        var data = new Array();
+        var val = {
+            "group" : oldestColdstart["mutationGroup"],
+            "date" : dateString
+        }
+        data.push(val);
+        cycleSummaryTab.csTable.applyParserData(data);
+    }
+
+    this.findOldestColdstart = function() {
+        // mutationGroup=PERSON_BIO latestEventId=1125975801 coldstartVersionId=1463012034071 coldstartKeybase=dummyValue coldstartS3Filename=anotherDummyValue
+        var callbackFn = new CallbackWidget(cycleSummaryTab.populateOldestColdstartTable);
+        var widgetExecutor = new RegexSearchWidgetExecutor(callbackFn, RegexParserMapper.prototype.getInputDataRegexInfo());
+        
+        var query = widgetExecutor.searchQuery;
+        query.indexName = dashboard.vmsIndex;
+        query.indexType = "vmsserver";
+        query.size = 50;
+        query.add(dashboard.vmsCycleId).add("tag:InputDataVersionIds");
+        widgetExecutor.updateJsonFromSearch();
     }
 
 }//status.js

@@ -1,19 +1,17 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
-import com.netflix.vms.transformer.CycleConstants;
-
-import java.util.Arrays;
-import com.netflix.vms.transformer.hollowinput.StringHollow;
-import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
+import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.hollowinput.CdnDeploymentHollow;
 import com.netflix.vms.transformer.hollowinput.DownloadableIdHollow;
+import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.PackageMomentHollow;
 import com.netflix.vms.transformer.hollowinput.PackageMomentListHollow;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
 import com.netflix.vms.transformer.hollowinput.StreamDimensionsHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
+import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.BaseDownloadable;
 import com.netflix.vms.transformer.hollowoutput.ImageDownloadable;
@@ -33,6 +31,9 @@ import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.VideoFormatDescriptorIdentifier;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -247,10 +248,18 @@ public class PackageMomentDataModule {
             image.videoId = packageData.video;
             image.videoMoment = moment;
             image.downloadableList = entry.getValue();
+            
+            Collections.sort(image.downloadableList, IMAGE_DOWNLOADABLE_COMPARATOR);
 
             list.add(image);
         }
     }
+    
+    private static final Comparator<ImageDownloadable> IMAGE_DOWNLOADABLE_COMPARATOR = new Comparator<ImageDownloadable>() {
+        public int compare(ImageDownloadable o1, ImageDownloadable o2) {
+            return Long.compare(o1.downloadableId, o2.downloadableId);
+        }
+    };
 
     private Map<Integer, TrickPlayType> getTrickPlayTypeMap() {
         Map<Integer, TrickPlayType> map = new HashMap<Integer, TrickPlayType>();

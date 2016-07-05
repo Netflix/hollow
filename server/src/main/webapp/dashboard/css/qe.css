@@ -1,4 +1,7 @@
 #toolbar { padding: 10px 5px; }
+:focus {
+    outline: 0;
+}
 
 .align-right { float:right; vertical-align:middle; padding-right:5px;}
 
@@ -45,9 +48,67 @@
     font-weight: bold; 
     color: #333333;
     padding-left: 10px;
-    padding-top: 0px; /*jq uery .ui-tabs .uitabs-nav*/
+    padding-top: 2px; /*jq uery .ui-tabs .uitabs-nav*/
     padding-bottom: 8px;
     margin-bottom: 15px;
+}
+
+.iframe-refresh-button {
+    margin-top: 0;
+    position: absolute;
+    right: 20px;
+    top: 0px;
+    z-index: 1234;
+    color: #1d8499;
+/*     transform: translate(-100%,0%) rotate(-90deg);  */
+/*     transform-origin: 100% 0%; */
+}
+
+.iframe-toolbar {
+    padding-top: 2px;
+    padding-bottom: 2px;
+/*     background-color: #5B5B5B; */
+    width:100%;
+}
+
+.vms-header {
+    background: #3a5469; 
+    padding-left:50px; 
+    margin-top:0px; 
+    padding-top:0px;
+    width:100%; 
+    clear:both;
+    height:60;
+}
+
+.view-header {
+    margin: 15 0 15 0;
+    overflow: hidden;
+    display: block;
+    position: relative;
+    border:none;
+}
+
+.view-font-h1 {
+    font-weight: bold;
+    font-family: Trebuchet MS,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Tahoma,sans-serif;
+    font-size: 20px;
+    padding-bottom:10px;
+}
+
+.view-font-h2 {
+    font-family: Trebuchet MS,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Tahoma,sans-serif;
+    font-size: 14px;
+    padding-right:10px;
+    font-weight: bold;
+    border:none;
+}
+
+.view-font-h3 {
+    font-family: Trebuchet MS,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Tahoma,sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 2
 }
 
 .hr-line {
@@ -55,6 +116,7 @@
     border: 0;
     height: 1px;
     background-color: #aaaaaa;
+    clear: both;
 }
 
 .ui-group {
@@ -105,6 +167,10 @@ div.ui-refresh-button {
     background: #3a5469;
     margin-bottom: 0px;
     margin-top:0px;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: 1234;
 }
 
 .spinnaker-banner-prod {
@@ -112,14 +178,16 @@ div.ui-refresh-button {
 }
 
 .spinnaker-banner-text {
+    font-family: Trebuchet MS,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Tahoma,sans-serif;
     display: inline-block;
     font-size:larger;
     color: #cccccc;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding-top: 20px;
+    padding-bottom: 0px;
     text-align: center;
-    padding-right: 50px;
-    padding-left: 50px;
+    padding-right: 10px;
+    padding-left: 10px;
+    height:40;
 }
 
 .html-reset {
@@ -313,18 +381,6 @@ label.aligned {
 }
 
 
-.highlightcell {
-    font-weight: bold;
-  /* border-bottom-style: double;*/
-}
-
-tr.highlightrow td {
-   /* outline-style:double;*/
-   /* border-color: #a6a6a6;*/
-   border-bottom: 2px solid #229cb3;
-   border-top: 2px solid #229cb3;
-}
-
 .vms-group {
    outline-style:solid;
    outline-color:silver;
@@ -450,6 +506,19 @@ table.prettytable thead tr .headerSortDown {
     -webkit-transform-origin: 0 0;
 }
 
+.highlightcell {
+/*     font-weight: bold; */
+  /* border-bottom-style: double;*/
+  color: black;
+}
+
+tr.highlightrow td {
+   /* outline-style:double;*/
+   /* border-color: #a6a6a6;*/
+   border-bottom: 2px solid #229cb3;
+   border-top: 2px solid #229cb3;
+}
+
 .clickabletable {
     /* margin: 1em 1em 1em 2em;*/
     margin: 30px
@@ -457,7 +526,6 @@ table.prettytable thead tr .headerSortDown {
     border-collapse: collapse;
     font-size: 12px;
     font-family: sans-serif;
-    color: #000000;
     max-width:100%;
     min-width:100%;
     border: 0px silver solid;
@@ -476,7 +544,7 @@ table.prettytable thead tr .headerSortDown {
 .clickabletable td {
     text-align: left;
     /* border: 1px silver solid; */
-    padding: 5px;
+    padding: 5 1 5 5;
 }
 
 .clickabletable tr {

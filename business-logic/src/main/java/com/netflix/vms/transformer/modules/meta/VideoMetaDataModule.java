@@ -402,7 +402,7 @@ public class VideoMetaDataModule {
     }
 
     private void populateRoleLists(Integer videoId, VideoMetaData vmd) {
-        Map<VRole, List<VPerson>> roles = new HashMap<>();
+        Map<VRole, List<SequencedVPerson>> roles = new HashMap<>();
         HollowHashIndexResult personMatches = personVideoIdx.findMatches((long) videoId);
         if(personMatches != null) {
             HollowOrdinalIterator iter = personMatches.iterator();
@@ -421,13 +421,13 @@ public class VideoMetaDataModule {
                     PersonVideoRoleHollow role = api.getPersonVideoRoleHollow(roleOrdinal);
 
                     VRole vRole = new VRole(role._getRoleTypeId());
-                    List<VPerson> list = roles.get(vRole);
+                    List<SequencedVPerson> list = roles.get(vRole);
                     if (list == null) {
                         list = new ArrayList<>();
                         roles.put(vRole, list);
                     }
                     VPerson vPerson = new VPerson((int) personId);
-                    list.add(vPerson);
+                    list.add(new SequencedVPerson(vPerson, role._getSequenceNumber()));
 
                     roleOrdinal = roleIter.next();
                 }
@@ -436,10 +436,44 @@ public class VideoMetaDataModule {
             }
         }
 
-        vmd.roles = roles;
-        vmd.actorList = getRoles(ACTOR_ROLE_ID, roles);
-        vmd.directorList = getRoles(DIRECTOR_ROLE_ID, roles);
-        vmd.creatorList = getRoles(CREATOR_ROLE_ID, roles);
+        vmd.roles = getSortedRoleMap(roles);
+        vmd.actorList = getRoles(ACTOR_ROLE_ID, vmd.roles);
+        vmd.directorList = getRoles(DIRECTOR_ROLE_ID, vmd.roles);
+        vmd.creatorList = getRoles(CREATOR_ROLE_ID, vmd.roles);
+    }
+    
+    private static class SequencedVPerson implements Comparable<SequencedVPerson> {
+        private final VPerson person;
+        private final int sequenceNumber;
+        
+        public SequencedVPerson(VPerson person, int sequenceNumber) {
+            this.person = person;
+            this.sequenceNumber = sequenceNumber;
+        }
+        
+        public VPerson getPerson() {
+            return person;
+        }
+        
+        @Override
+        public int compareTo(SequencedVPerson other) {
+            return Integer.compare(sequenceNumber, other.sequenceNumber);
+        }
+    }
+    
+    private Map<VRole, List<VPerson>> getSortedRoleMap(Map<VRole, List<SequencedVPerson>> sequencedMap) {
+        Map<VRole, List<VPerson>> map = new HashMap<>();
+        
+        for(Map.Entry<VRole, List<SequencedVPerson>>entry : sequencedMap.entrySet()) {
+            Collections.sort(entry.getValue());
+            List<VPerson> personList = new ArrayList<>();
+            for(SequencedVPerson person : entry.getValue()) {
+                personList.add(person.getPerson());
+            }
+            map.put(entry.getKey(), personList);
+        }
+        
+        return map;
     }
 
     private List<VPerson> getRoles(int roleId, Map<VRole, List<VPerson>> roles) {

@@ -166,6 +166,7 @@ function VmsServerInfoTab(dashboard) {
         this.cycleInputDataView = new CycleInputDataInformation(serverInfoView);
         this.cycleCircuitBreakerView = new CircuitBreakerTab(serverInfoView);
         this.dataInjectionTabView = new DataInjectionTab(serverInfoView);
+        this.cycleErrorsView = new CycleErrorTab(serverInfoView);
 
         // ------------------------------------------------------------
         // update lazy tabs when activated
@@ -232,19 +233,23 @@ function VmsServerInfoTab(dashboard) {
     }
 
     this.refresh = function() {
+        var h = window.innerHeight;
+        // alert("h=" +h + ", d=" + $(document).height());
+        $("#id-cycle-timestamp-div").height(h - 100);
         serverInfoView.clearLazyLoadElements();
         serverInfoView.vmsCycleId = new String($("#id-vms-cycle-select").val());
+        $("#id-cycle-id-txt").text("Cycle: " + serverInfoView.vmsCycleId);
         serverInfoView.cycleIdToDate();
         $("#id-cycle-date-txt").html(serverInfoView.vmsCycleDate.toLocaleString());
 
         // ------------------------------------------------------------
         // recreate tabs
-        this.cycleErrorsView = new CycleErrorTab(serverInfoView);
-        this.cycleDataInjectionView = new DataInjectionTab(serverInfoView);
-        this.cycleErrorCodesView = new CycleErrorCodesTab(serverInfoView);
+        // this.cycleDataInjectionView = new DataInjectionTab(serverInfoView);
+        // this.cycleErrorCodesView = new CycleErrorCodesTab(serverInfoView);
 
         // ------------------------------------------------------------
         // refresh live tab
+        this.cycleErrorsView.refresh();
         this.cycleReplayView.refresh();
 
         // ------------------------------------------------------------
@@ -442,14 +447,18 @@ function CircuitBreakerTab(serverInfoView) {
 // --------------------------------------------------------------------
 function CycleErrorTab(serverInfoView) {
     var refFn = this;
-
+    var reqWidth = 0;
+    var fields = ["timestamp","message"]
+    this.tableWidget = new DataTableWidget("#id-cycle-error-locations", "id-table-error-results", fields);
+    this.tableWidget.reformatCellDataFunc = new JavaExceptionFormatter("com.netflix.videometadata.").forma
+    
     $("#id-loglevel-select").change(function() {
         refFn.refresh();
     });
 
     this.refresh = function() {
         var fieldKeys = [ "key", "doc_count" ];
-        var errCodesWidget = new ClickableTableWidget("#id-cycle-error-list", "id-cycle-error-table", fieldKeys, [ "tag", "Count"], 0,
+        var errCodesWidget = new ClickableTableWidget("#id-cycle-error-list", "id-cycle-error-table", fieldKeys, [ "Tag", "Num"], 0,
                 function(fieldValue) {
                     $("#id-search-error-box").val(fieldValue);
                     $("#id-search-error-btn").button().click();
@@ -465,12 +474,13 @@ function CycleErrorTab(serverInfoView) {
         searchDao.updateJsonFromSearch();
     }
 
-    refFn.refresh();
-
     $("#id-search-error-btn").button().click(function() {
-        var fields = ["timestamp","message"]
-        var tableWidget = new DataTableWidget("#id-cycle-error-locations", "id-table-error-results", fields);
-        tableWidget.reformatCellDataFunc = new JavaExceptionFormatter("com.netflix.videometadata.").format;
+        var availWidth = $("#id-cycle-error-container").width();
+        var usedWidth = $("#id-cycle-error-table").width();
+        refFn.reqWidth = availWidth - usedWidth - 10;
+        // alert('a=' + availWidth + ', u=' + usedWidth + ', r=' + refFn.reqWidth);
+        $("#id-cycle-error-locations").width(refFn.reqWidth);
+
         var searchQuery = new SearchQuery();
         searchQuery.indexName = $("#id-vms-index-select").val();
         searchQuery.size = "200";
@@ -478,9 +488,11 @@ function CycleErrorTab(serverInfoView) {
         searchQuery.add( $("#id-search-error-box").val());
         searchQuery.add($("#id-loglevel-select").val());
         searchQuery.sort = "eventInfo.timestamp:desc";
-        var searchdao = new FieldModelSearchDAO(tableWidget, searchQuery, fields, true);
+        var searchdao = new FieldModelSearchDAO(refFn.tableWidget, searchQuery, fields, true);
         searchdao.updateJsonFromSearch();
     });
+
+    refFn.refresh();
 }
 
 // --------------------------------------------------------------------

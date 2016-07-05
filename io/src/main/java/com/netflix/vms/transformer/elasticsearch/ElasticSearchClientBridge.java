@@ -102,6 +102,7 @@ public class ElasticSearchClientBridge {
                     InetSocketTransportAddress transportAddress = new InetSocketTransportAddress(added.getIPAddr(), port);
                     LOGGER.info("Instance added id={}, ip={}, dt={}ms", added.getId(), added.getIPAddr(), (System.currentTimeMillis() - t0));
                     client.addTransportAddress(transportAddress);
+                    LOGGER.info("addTransportAddress id={}, ip={}, dt={}ms", added.getId(), added.getIPAddr(), (System.currentTimeMillis() - t0));
                     synchronized (esServerSet) {
                         esServerSet.add(added);
                     }

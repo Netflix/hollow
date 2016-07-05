@@ -104,7 +104,7 @@ function DataTableWidget(divId, tableId, fields) {
             return;
         }
 
-        this.html = "<table id='" + this.tableId + "' class='prettytable' style='width:100%'><thead><tr>";
+        this.html = "<table id='" + this.tableId + "' class='prettytable'><thead><tr>";
         for ( var i in this.fieldNames) {
             this.html += "<th>" + this.fieldNames[i] + "</th>";
         }
@@ -136,8 +136,8 @@ function DataTableWidget(divId, tableId, fields) {
                 "bJQueryUI" : true,
                 "iDisplayLength" : 25,
                 "aLengthMenu" : [ 10, 25, 50, 100, 500 ],
-                // "sDom" : '<"H"lfrp>t<"F"ip>',
                 "sDom" : '<"H"lifp><t>',
+                "scrollX": true,
                 "sPaginationType" : "full_numbers"
             });
         }
@@ -165,14 +165,14 @@ function ClickableTableWidget(divId, tableId, fields, titles, clickableColumn, c
     };
 
     this.clear = function() {
-        $(this.divId).html("");
-        this.html = "";
+        if (this.clearPrevious) {
+            $(this.divId).html("");
+            this.html = "";
+        }
     };
 
     this.applyParserData = function(model) {
-        if (this.clearPrevious) {
-            this.clear();
-        }
+        this.clear();
         this.buildTable(model);
         if(this.endBuildTableFunc != null) {
             this.endBuildTableFunc();
@@ -635,18 +635,18 @@ function IFrameWidget(parentDivId, iframeId, hostname, link) {
         var toolbarId = iframeWidget.iframeId + "-toolbar";
         $('<div/>', {
             id : toolbarId,
-            class : "ui-widget-content"
+            class : "ui-button iframe-toolbar"
         }).appendTo(parentDivId);
 
         // add reload button to toolbar
         var reloadBtnId = iframeWidget.iframeId + "-reload-btn";
         $('<button/>', {
             id : reloadBtnId,
+            class : "iframe-refresh-button"
         }).appendTo("#" + toolbarId);
 
         $("#" + reloadBtnId).button({
-            label : "Reload",
-            class : "ui-widget ui-button",
+            label : "iframe",
             icons : {
                 primary : "ui-icon-refresh"
             }
@@ -657,12 +657,13 @@ function IFrameWidget(parentDivId, iframeId, hostname, link) {
         // create iframe
         $('<iframe/>', {
             src : link,
+            // id : iframeWidget.iframeId,
             id : iframeWidget.iframeId,
             frameborder : 0,
             width : width,
             height : height,
             scrolling : "auto"
-        }).appendTo(parentDivId);
+        }).appendTo("#" + toolbarId);
 
         // reload
         iframeWidget.refresh();

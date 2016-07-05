@@ -10,8 +10,8 @@
         <script src="jquery/js/ash.js"></script>
 
         <!-- Codemirror -->
-        <link rel="stylesheet" href="codemirror/lib/codemirror.css">
-        <link rel="stylesheet" href="codemirror/addon/dialog/dialog.css">
+        <!-- link rel="stylesheet" href="codemirror/lib/codemirror.css">
+        <link rel="stylesheet" href="codemirror/addon/dialog/dialog.css" -->
         <script src="codemirror/lib/codemirror.js"></script>
         <script src="codemirror/mode/groovy/groovy.js"></script>
         <script src="codemirror/addon/dialog/dialog.js"></script>
@@ -19,10 +19,10 @@
         <script src="codemirror/addon/search/search.js"></script>
         <style type="text/css">.CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black;}</style>
 
-        <link rel="stylesheet" type="text/css" href="jquery/css/smoothness/jquery-ui.min.css"/>
         <link rel="stylesheet" type="text/css" href="css/jquery.jsonview.css"/>
         <link rel="stylesheet" type="text/css" href="css/jquery.dataTables_themeroller.css"/>
         <link rel="stylesheet" type="text/css" href="jquery/css/vms/jquery-ui.css"/>
+        <link rel="stylesheet" type="text/css" href="css/vms-override.css"/>
         <link rel="stylesheet" type="text/css" href="css/qe.css"/>
 
         <!-- this is where the widgets are created -->
@@ -59,55 +59,81 @@
     <!--
         HTML body section
     -->
-    <body class="html-reset" style="font-size:12px; background-color: #FFF">
-        <div class='spinnaker-banner'>
+    <body class="html-reset" style="font-size:12px; background-color: #FFF;">
+        <div id="id-spinnaker-banner"  class='spinnaker-banner'>
             <div class='spinnaker-banner-text' id='id-env-txt'>TEST</div>
-            <div class='spinnaker-banner-text' id='id-vip-txt'>local</div>
+            <!-- div class='spinnaker-banner-text' id='id-vip-txt'>local-vip</div -->
         </div>
 
-        <div id="okeanos-tabs" >
+        <div id="okeanos-tabs">
             <ul>
                 <li><a href="#cycle-view">Server</a></li>
                 <li><a href="#client-dashboard-tab">Client</a></li>
-                <li><a href="#data-dashboard-tab">Data Metric</a></li>
-                <li><a href="#io-dashboard-tab">Data IO</a></li>
+                <li><a href="#data-dashboard-tab">Data</a></li>
                 <li><a href="#debug-dashboard-tab">Diagnostics</a></li>
                 <li><a href="#cb-dashboard-tab">Circuit Breaker</a></li>
             </ul>
-            <div id="cycle-view">
-                <!-- ui-widget-tooolbar -->
-                <div id="stats-tab-toolbar" class="vms-info">
-                    VIP
-                    <select id = "id-vms-vip-select" style="display:inline-block;">
-                        <option></option>
-                    </select> 
-                    Day (UTC)
-                    <select id = "id-vms-index-select" style="display:inline-block;">
-                        <option></option>
-                    </select> 
-                    Cycle
-                    <select id = "id-vms-cycle-select" style="display:inline-block;">
-                        <option></option>
-                    </select> 
-                    <div id="id-cycle-date-txt" style="display:inline-block; margin-left: 25px; margin-right: 25px"></div> 
-                    <button id="id-cycle-prev-btn" style="display:inline-block;">Prev</button>
-                    <button id="id-cycle-next-btn" style="display:inline-block;">Next</button>
+            <div id="cycle-view" style="padding: 0 25 0 25">
+                <div class="view-header">
+                    <div class="view-font-h1" style="width:60%; float:left">Server Cycles </div>
+                    <div style="width:37%; float:right">
+                        <div style="float:right">
+                            <div class="view-font-h2" style="display:inline-block;">VMS VIP</div>
+                            <select id="id-vms-vip-select" style="display:inline-block;">
+                                <option></option>
+                            </select> 
+                        </div>
+                    </div>
+                    <div class="hr-line"></div>
                 </div>
                 <!-- class="ui-widget-content ui-helper-clearfix" -->
-                <div id="id-cycle-timestamp-div" class="ui-group" style="width:30%; float:left;margin-right:0px; overflow-y: auto;"> </div>
+                <div id="id-cycles-container" style="width:30%; float:left;margin-right:0px;">
+                    <div>
+                        <table>
+                            <tr class="view-font-h3" >
+                                <td>Date (UTC)</td>
+                                <td style="padding-left:50px">
+                                    <select id="id-vms-index-select"><option></option></select>
+                                </td>
+                            </tr>
+                            <tr class="hidden">
+                                <td>Cycle ID</td>
+                                <td style="padding-left:50px">
+                                    <select id="id-vms-cycle-select"><option></option></select> 
+                                </td>
+                            </t>
+                        </table>
+                    </div>
+                    <div id="id-cycle-timestamp-div" class="ui-group" style="overflow-y: auto; clear:both;"> </div>
+                </div>
                 <div id="id-summary-toggle-btn" class="ui-vtag"></div>
                 <div id="cycle-stats-tabs" style="width:67%;float:right;">
+                <!-- ui-widget-tooolbar -->
+                <div id="stats-tab-toolbar" class="view-font-h3" style="margin-bottom:10px; display:inline-block;">
+                    <div style="display:inline-block; float:left">
+                        <div id="id-cycle-id-txt" style="display:inline-block;"></div>
+                        <div id="id-cycle-date-txt" style="display:inline-block; margin-left: 15px;"></div>
+                    </div>
+                    <div style="display:inline-block; float:right">
+                        <div style="position:absolute; right:0px; display:inline-block;">
+                            <button id="id-cycle-prev-btn" style="display:inline-block;">Prev</button>
+                            <button id="id-cycle-next-btn" style="display:inline-block;">Next</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
                     <ul>
-                        <li><a href="#cycle-status-tab">Cycle</a></li>
-                        <li><a href="#cycle-properties-tab">Properties</a></li>
-                        <li><a href="#cycle-publish-tab">Publish</a></li>
-                        <li><a href="#cycle-error-logs-tab">Logs</a></li>
-                        <li><a href="#cycle-circuitbreaker-tab">Circuit Breaker</a></li>
-                        <li><a href="#cycle-input-validation-tab">Input Validation</a></li>
-                        <li><a href="#cycle-inputdata-tab">Coldstarts and Events</a></li>
-                        <li><a href="#cycle-replay-tab">Replay Cycle</a></li>
-                        <li><a href="#cycle-input-search-tab">Search</a></li>
-                        <li><a href="#expander-tab">+</a></li>
+                        <li><a href="#cycle-status-tab">SUMMARY</a></li>
+                        <li><a href="#cycle-properties-tab">PROPERTIES</a></li>
+                        <li><a href="#cycle-publish-tab">PUBLISH</a></li>
+                        <li><a href="#cycle-error-logs-tab">LOGS</a></li>
+                        <li><a href="#cycle-circuitbreaker-tab">CIRCUIT BREAKER</a></li>
+                        <li><a href="#cycle-input-validation-tab">APOLLO</a></li>
+                        <li><a href="#cycle-inputdata-tab">INPUTS</a></li>
+                        <li><a href="#cycle-replay-tab">REPLAY CYCLE</a></li>
+                        <li><a href="#cycle-input-search-tab">SEARCH</a></li>
+                        <li><a href="#expander-tab">OTHER+</a></li>
                     </ul>
                     <!-- NOTE: the divs below should be in the same order as listed in <ul> section -->
                     <div id="cycle-status-tab">
@@ -115,7 +141,7 @@
                         
                         <div id="id-vms-server-rightpane" class="ui-group ui-helper-clearfix" style="width:40%; float:left">
                                 <div class='vms-info'>TRANSFORM PROGRESS
-                                <div id="id-cycle-refresh-btn" class="ui-refresh-button hidden" title="Refresh for latest cycle"></div>
+                                    <div id="id-cycle-refresh-btn" class="ui-refresh-button" title="Refresh for latest cycle"></div>
                                 </div>
                                 <div class='ui-inner' id="id-cycle-transform-progress">
                                     <div id="id-cycle-transform-progress-label" class="progress-label-rel"></div>
@@ -126,6 +152,9 @@
                                 <div class='hr-line'></div>
                                 <div class='vms-info'>SYSTEM INFORMATION</div>
                                 <div class='ui-inner' id="id-cycle-system-info"></div>
+                                <div class='hr-line'></div>
+                                <div class='vms-info'>OLDEST COLDSTART</div>
+                                <div class='ui-inner' id="id-cycle-oldest-coldstart"></div>
                         </div>
                         <div id ="id-atlas-durations" class="ui-group ui-helper-clearfix" style="width:56%; float:right">
                                 <div class='vms-info'>COMPONENT DURATION</div>
@@ -146,8 +175,7 @@
                         <br>
                     </div>
                     <div id="cycle-error-logs-tab">
-                        <div style="padding-top: 8px"></div>
-                        <div id="id-error-toolbar" class="ui-widget-header ui-corner-all" style="display:inline-block; padding: 4px">
+                        <div id="id-error-toolbar" style="font-size: 12px; display:inline-block; padding: 4px; width:100%">
                             Search for Tag (AND optionally id):
                             <input  type="textbox" id="id-search-error-box" size="25" value=""></input>
                             Log-level:
@@ -161,9 +189,12 @@
                             <button id="id-search-error-btn" class='ui-widget-content'>search</button>
                         </div>
                         <br>
-                        <div style="margin-top: 5px">
-                            <div id="id-cycle-error-list" style="width:25%; float:left;"></div>
-                            <div id="id-cycle-error-locations" style="width:73%; float:right;"></div>
+                        <div id="id-cycle-error-container" style="margin-top: 5px; width=100%">
+                            <div id="id-cycle-error-list" style="width:25%; float:left;">
+                                <table id="id-cycle-error-table" class="clickabletable"></table>
+                            </div>
+                            <div id="id-cycle-error-locations" style="float:right;">
+                            </div>
                         </div>
                     </div>
                     <div id="cycle-circuitbreaker-tab">
@@ -286,7 +317,10 @@
                     <div id="expander-tab"></div>
             </div>
             </div>
-            <div id="client-dashboard-tab">
+            </div>
+
+
+            <div id="client-dashboard-tab" style="padding: 0 25 0 25">
                 <ul>
                     <li><a href="#vms-sps">SPS and VMS Announcements</a></li>
                     <li><a href="#stats-client-historic">Refresh Duration</a></li>
@@ -294,14 +328,14 @@
                     <li><a href="#stats-client-blobinfo">Blob info</a></li>
                     <li><a href="#stats-client-usage">Client Usage</a></li>
                 </ul>
+                <div id="vms-sps">
+                    <div id = "id-vms-sps-content" class='ui-widget-content'></div>
+                </div>
                 <div id="stats-client-historic">
                     <div id = "id-vms-client-dashboard" class='ui-widget-content'></div>
                 </div>
                 <div id="stats-client-jarversions">
                     <div id = "id-vms-client-jarversions-atlas" class='ui-widget-content'></div>
-                </div>
-                <div id="vms-sps">
-                    <div id = "id-vms-sps-content" class='ui-widget-content'></div>
                 </div>
                 <div id="stats-client-blobinfo">
                     <div id = "id-vms-blob-info" class='ui-widget-content'></div>
@@ -310,26 +344,29 @@
                     <div id = "id-vms-usage-info" class='ui-widget-content'></div>
                 </div>
             </div>
-            <div id="data-dashboard-tab">
+            <div id="data-dashboard-tab" style="padding: 0 25 0 25">
                 <ul>
-                	<li><a href="#stats-dataval">Data Validation</a></li>
-                    <li><a href="#stats-titles">Content Metrics</a></li>
                     <li><a href="#stats-events">Mutation Events</a></li>
+                    <li><a href="#stats-dataval">Data Validation</a></li>
+                    <li><a href="#stats-titles">Content Metrics</a></li>
                 </ul>
+                <div id="stats-events">
+                    <div id = "id-mutation-events-dashboard" class='ui-widget-content'></div>
+                </div>
                 <div id="stats-dataval">
                     <div id = "id-dataval-dashboard" class='ui-widget-content'></div>
                 </div>
                 <div id="stats-titles">
                     <div id = "id-title-stats-dashboard" class='ui-widget-content'></div>
                 </div>
-                <div id="stats-events">
-                    <div id = "id-mutation-events-dashboard" class='ui-widget-content'></div>
-                </div>
             </div>
-            <div id="debug-dashboard-tab">
+            <div id="debug-dashboard-tab" style="padding: 0 25 0 25">
                  <ul>
                     <li><a href="#stats-vmsiopsys">VMS IOPS</a></li>
-                    <li><a href="#stats-client-vmsdebug">VMS Debug</a></li>
+                    <li><a href="#stats-client-vmsdebug">TEJA</a></li>
+                    <li><a href="#stats-vmsinputhistory">INPUT HISTORY</a></li>
+                    <li><a href="#stats-vmsoutputhistory">OUTPUT HISTORY</a></li>
+                    <li><a href="#io-dashboard-tab">PRIMARY VIP DIFF</a></li>
                 </ul>
                 <div id="stats-vmsiopsys">
                     <div id = "id-vmsiopsys-dashboard" class='ui-widget-content'></div>
@@ -337,13 +374,18 @@
                 <div id="stats-client-vmsdebug">
                     <div id = "id-vmsdebug-tab" class='ui-widget-content'></div>
                 </div>
-             </div>
-            <div id="cb-dashboard-tab">
-                <div id="cb-inset" class="ui-widget-content">  
+                <div id="stats-vmsinputhistory">
+                    <div id = "id-vmsinputhistory-dashboard" class='ui-widget-content'></div>
+                </div>
+                <div id="stats-vmsoutputhistory">
+                    <div id = "id-vmsoutputhistory-dashboard" class='ui-widget-content'></div>
+                </div>
+                <div id="io-dashboard-tab" style="padding: 0 25 0 25">
+                    <div id="io-inset" class="ui-widget-content"> </div>
                 </div>
             </div>
-            <div id="io-dashboard-tab">
-                <div id="io-inset" class="ui-widget-content">  
+            <div id="cb-dashboard-tab" style="padding: 0 25 0 25">
+                <div id="cb-inset" class="ui-widget-content">  
                 </div>
             </div>
         </div>
