@@ -2,8 +2,6 @@ package com.netflix.vms.transformer.hollowinput;
 
 import com.netflix.hollow.objects.delegate.HollowObjectDelegate;
 
-
-@SuppressWarnings("all")
 public interface RolloutPhaseElementsDelegate extends HollowObjectDelegate {
 
     public int getLocalized_metadataOrdinal(int ordinal);

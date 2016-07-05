@@ -6,7 +6,6 @@ import com.netflix.hollow.HollowObjectSchema;
 import com.netflix.hollow.read.customapi.HollowTypeAPI;
 import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 
-@SuppressWarnings("all")
 public class SupplementalsDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, SupplementalsDelegate {
 
     private final Long movieId;

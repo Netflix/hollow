@@ -2,8 +2,6 @@ package com.netflix.vms.transformer.hollowinput;
 
 import com.netflix.hollow.objects.delegate.HollowObjectDelegate;
 
-
-@SuppressWarnings("all")
 public interface VideoAwardMappingDelegate extends HollowObjectDelegate {
 
     public long getAwardId(int ordinal);

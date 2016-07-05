@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.hollowinput;
 import com.netflix.hollow.objects.HollowObject;
 import com.netflix.hollow.HollowObjectSchema;
 
-@SuppressWarnings("all")
 public class LanguagesHollow extends HollowObject {
 
     public LanguagesHollow(LanguagesDelegate delegate, int ordinal) {

@@ -4,7 +4,6 @@ import com.netflix.hollow.objects.delegate.HollowObjectAbstractDelegate;
 import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.HollowObjectSchema;
 
-@SuppressWarnings("all")
 public class PersonBioDelegateLookupImpl extends HollowObjectAbstractDelegate implements PersonBioDelegate {
 
     private final PersonBioTypeAPI typeAPI;
@@ -19,6 +18,10 @@ public class PersonBioDelegateLookupImpl extends HollowObjectAbstractDelegate im
 
     public int getPartnersOrdinal(int ordinal) {
         return typeAPI.getPartnersOrdinal(ordinal);
+    }
+
+    public int getCurrentRelationshipOrdinal(int ordinal) {
+        return typeAPI.getCurrentRelationshipOrdinal(ordinal);
     }
 
     public long getPersonId(int ordinal) {

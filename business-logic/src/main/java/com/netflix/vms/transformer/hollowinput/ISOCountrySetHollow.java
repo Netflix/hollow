@@ -5,7 +5,6 @@ import com.netflix.hollow.HollowSetSchema;
 import com.netflix.hollow.objects.delegate.HollowSetDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
-@SuppressWarnings("all")
 public class ISOCountrySetHollow extends HollowSet<ISOCountryHollow> {
 
     public ISOCountrySetHollow(HollowSetDelegate delegate, int ordinal) {
@@ -13,6 +12,7 @@ public class ISOCountrySetHollow extends HollowSet<ISOCountryHollow> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public ISOCountryHollow instantiateElement(int ordinal) {
         return (ISOCountryHollow) api().getISOCountryHollow(ordinal);
     }

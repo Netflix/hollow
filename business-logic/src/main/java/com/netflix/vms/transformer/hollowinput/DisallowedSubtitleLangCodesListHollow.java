@@ -5,7 +5,6 @@ import com.netflix.hollow.HollowListSchema;
 import com.netflix.hollow.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
-@SuppressWarnings("all")
 public class DisallowedSubtitleLangCodesListHollow extends HollowList<DisallowedSubtitleLangCodeHollow> {
 
     public DisallowedSubtitleLangCodesListHollow(HollowListDelegate delegate, int ordinal) {
@@ -13,6 +12,7 @@ public class DisallowedSubtitleLangCodesListHollow extends HollowList<Disallowed
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public DisallowedSubtitleLangCodeHollow instantiateElement(int ordinal) {
         return (DisallowedSubtitleLangCodeHollow) api().getDisallowedSubtitleLangCodeHollow(ordinal);
     }
