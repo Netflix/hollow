@@ -210,7 +210,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.8",
+            "locked": "1.4.9",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
@@ -1083,7 +1083,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.8",
+            "locked": "1.4.9",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
@@ -1956,7 +1956,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.8",
+            "locked": "1.4.9",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
@@ -2829,7 +2829,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.8",
+            "locked": "1.4.9",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
@@ -3801,7 +3801,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.8",
+            "locked": "1.4.9",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
@@ -4674,7 +4674,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.8",
+            "locked": "1.4.9",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
@@ -5558,7 +5558,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.8",
+            "locked": "1.4.9",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
@@ -6442,7 +6442,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.8",
+            "locked": "1.4.9",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
@@ -7326,7 +7326,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.8",
+            "locked": "1.4.9",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
