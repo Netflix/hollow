@@ -187,9 +187,15 @@ function Dashboard() {
     // Diagnostics Tab
     // --------------------------------------------------------------------
     this.createDiagnosticsTab = function() {
-        var vmsdebug = new IFrameWidget("#id-vmsdebug-tab", "id-vmsdebug-iframe", "http://go/", "vmsdebug");
+        var teja = dashboard.nflxEnvironment == "prod" ? "teja" : "tejaqa";
+        var vmsdebug = new IFrameWidget("#id-vmsdebug-tab", "id-vmsdebug-iframe", "http://go/", teja);
         var vmsiops = dashboard.nflxEnvironment == "prod" ? "vmsiops" : "vmsiopstest";
         var vmsiopsysframe = new IFrameWidget("#id-vmsiopsys-dashboard", "id-vmsiopsys-iframe", "http://go/", vmsiops);
+        var inputHistory = dashboard.nflxEnvironment == "prod" ? "vmsinputhistory" : "vmsinputhistory-test";
+        var inputHistoryFrame = new IFrameWidget("#id-vmsinputhistory-dashboard", "id-vmsinputhistory-iframe", "http://go/", inputHistory);
+        var outputHistory = dashboard.nflxEnvironment == "prod" ? "vmshistory" : "vmshistory-test";
+        var outputHistoryFrame = new IFrameWidget("#id-vmsoutputhistory-dashboard", "id-vmsoutputhistory-iframe", "http://go/", outputHistory);
+
         // $("#id-vmsiopsys-dashboard").load("miner.html");
 
         $("#okeanos-tabs").on("tabsbeforeactivate", function(e, ui) {
@@ -197,6 +203,8 @@ function Dashboard() {
             if (id == "debug-dashboard-tab") {
                 vmsiopsysframe.initialize();
                 vmsdebug.initialize();
+                inputHistoryFrame.initialize();
+                outputHistoryFrame.initialize();
             }
         });
     };

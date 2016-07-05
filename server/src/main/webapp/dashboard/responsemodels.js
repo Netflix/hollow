@@ -479,6 +479,18 @@ function DataOperator(dataModel) {
         return new DataOperator(this.outDataModel);
     };
 
+    // assumes inp is an array (e.g. output of RegexSourceModel),
+    // out is an array of objects
+    this.sort = function(fieldName, comparatorFn) {
+        if(!comparatorFn) {
+            comparatorFn = function(a, b) {
+                return a[fieldName] - b[fieldName];
+            }
+        }
+        this.inpDataModel.sort(comparatorFn);
+        return this.inpDataModel;
+    }
+    
     // assumes input is map from id ->array, with a number field, e.g, output of groupBy
     // output is key-value
     this.min = function(fieldName) {

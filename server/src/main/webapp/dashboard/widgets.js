@@ -165,14 +165,14 @@ function ClickableTableWidget(divId, tableId, fields, titles, clickableColumn, c
     };
 
     this.clear = function() {
-        $(this.divId).html("");
-        this.html = "";
+        if (this.clearPrevious) {
+            $(this.divId).html("");
+            this.html = "";
+        }
     };
 
     this.applyParserData = function(model) {
-        if (this.clearPrevious) {
-            this.clear();
-        }
+        this.clear();
         this.buildTable(model);
         if(this.endBuildTableFunc != null) {
             this.endBuildTableFunc();
@@ -646,7 +646,7 @@ function IFrameWidget(parentDivId, iframeId, hostname, link) {
         }).appendTo("#" + toolbarId);
 
         $("#" + reloadBtnId).button({
-            label : "Refresh iframe",
+            label : "iframe",
             icons : {
                 primary : "ui-icon-refresh"
             }
