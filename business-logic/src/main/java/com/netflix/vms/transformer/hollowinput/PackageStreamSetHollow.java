@@ -5,7 +5,6 @@ import com.netflix.hollow.HollowSetSchema;
 import com.netflix.hollow.objects.delegate.HollowSetDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
-@SuppressWarnings("all")
 public class PackageStreamSetHollow extends HollowSet<PackageStreamHollow> {
 
     public PackageStreamSetHollow(HollowSetDelegate delegate, int ordinal) {
@@ -13,6 +12,7 @@ public class PackageStreamSetHollow extends HollowSet<PackageStreamHollow> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public PackageStreamHollow instantiateElement(int ordinal) {
         return (PackageStreamHollow) api().getPackageStreamHollow(ordinal);
     }

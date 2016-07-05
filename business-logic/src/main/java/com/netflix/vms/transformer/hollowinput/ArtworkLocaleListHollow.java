@@ -5,7 +5,6 @@ import com.netflix.hollow.HollowListSchema;
 import com.netflix.hollow.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
-@SuppressWarnings("all")
 public class ArtworkLocaleListHollow extends HollowList<ArtworkLocaleHollow> {
 
     public ArtworkLocaleListHollow(HollowListDelegate delegate, int ordinal) {
@@ -13,6 +12,7 @@ public class ArtworkLocaleListHollow extends HollowList<ArtworkLocaleHollow> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public ArtworkLocaleHollow instantiateElement(int ordinal) {
         return (ArtworkLocaleHollow) api().getArtworkLocaleHollow(ordinal);
     }

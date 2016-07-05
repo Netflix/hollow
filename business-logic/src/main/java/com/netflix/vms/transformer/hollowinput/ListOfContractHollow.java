@@ -5,7 +5,6 @@ import com.netflix.hollow.HollowListSchema;
 import com.netflix.hollow.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
-@SuppressWarnings("all")
 public class ListOfContractHollow extends HollowList<ContractHollow> {
 
     public ListOfContractHollow(HollowListDelegate delegate, int ordinal) {
@@ -13,6 +12,7 @@ public class ListOfContractHollow extends HollowList<ContractHollow> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public ContractHollow instantiateElement(int ordinal) {
         return (ContractHollow) api().getContractHollow(ordinal);
     }

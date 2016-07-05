@@ -5,7 +5,6 @@ import com.netflix.hollow.read.customapi.HollowListTypeAPI;
 import com.netflix.hollow.read.dataaccess.HollowListTypeDataAccess;
 import com.netflix.hollow.objects.delegate.HollowListLookupDelegate;
 
-@SuppressWarnings("all")
 public class StoriesSynopsesHookListTypeAPI extends HollowListTypeAPI {
 
     private final HollowListLookupDelegate delegateLookupImpl;

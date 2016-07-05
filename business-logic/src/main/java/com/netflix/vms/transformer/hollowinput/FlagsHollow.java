@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.hollowinput;
 import com.netflix.hollow.objects.HollowObject;
 import com.netflix.hollow.HollowObjectSchema;
 
-@SuppressWarnings("all")
 public class FlagsHollow extends HollowObject {
 
     public FlagsHollow(FlagsDelegate delegate, int ordinal) {
@@ -42,13 +41,6 @@ public class FlagsHollow extends HollowObject {
         return delegate().getLocalAudioBoxed(ordinal);
     }
 
-    public MapOfFlagsFirstDisplayDatesHollow _getFirstDisplayDates() {
-        int refOrdinal = delegate().getFirstDisplayDatesOrdinal(ordinal);
-        if(refOrdinal == -1)
-            return null;
-        return  api().getMapOfFlagsFirstDisplayDatesHollow(refOrdinal);
-    }
-
     public boolean _getGoLive() {
         return delegate().getGoLive(ordinal);
     }
@@ -78,6 +70,13 @@ public class FlagsHollow extends HollowObject {
         if(refOrdinal == -1)
             return null;
         return  api().getDateHollow(refOrdinal);
+    }
+
+    public MapOfFlagsFirstDisplayDatesHollow _getFirstDisplayDates() {
+        int refOrdinal = delegate().getFirstDisplayDatesOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getMapOfFlagsFirstDisplayDatesHollow(refOrdinal);
     }
 
     public VMSHollowInputAPI api() {

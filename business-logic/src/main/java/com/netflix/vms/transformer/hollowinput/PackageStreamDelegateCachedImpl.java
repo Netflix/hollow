@@ -6,7 +6,6 @@ import com.netflix.hollow.HollowObjectSchema;
 import com.netflix.hollow.read.customapi.HollowTypeAPI;
 import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 
-@SuppressWarnings("all")
 public class PackageStreamDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, PackageStreamDelegate {
 
     private final Long downloadableId;

@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.hollowinput;
 import com.netflix.hollow.read.customapi.HollowObjectTypeAPI;
 import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
 
-@SuppressWarnings("all")
 public class FlagsTypeAPI extends HollowObjectTypeAPI {
 
     private final FlagsDelegateLookupImpl delegateLookupImpl;
@@ -14,11 +13,11 @@ public class FlagsTypeAPI extends HollowObjectTypeAPI {
             "localText",
             "languageOverride",
             "localAudio",
-            "firstDisplayDates",
             "goLive",
             "contentApproved",
             "autoPlay",
-            "firstDisplayDate"
+            "firstDisplayDate",
+            "firstDisplayDates"
         });
         this.delegateLookupImpl = new FlagsDelegateLookupImpl(this);
     }
@@ -79,66 +78,66 @@ public class FlagsTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public int getFirstDisplayDatesOrdinal(int ordinal) {
-        if(fieldIndex[4] == -1)
-            return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "firstDisplayDates");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[4]);
-    }
-
-    public MapOfFlagsFirstDisplayDatesTypeAPI getFirstDisplayDatesTypeAPI() {
-        return getAPI().getMapOfFlagsFirstDisplayDatesTypeAPI();
-    }
-
     public boolean getGoLive(int ordinal) {
-        if(fieldIndex[5] == -1)
+        if(fieldIndex[4] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "goLive") == Boolean.TRUE;
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[5]) == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[4]) == Boolean.TRUE;
     }
 
     public Boolean getGoLiveBoxed(int ordinal) {
-        if(fieldIndex[5] == -1)
+        if(fieldIndex[4] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "goLive");
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[5]);
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[4]);
     }
 
 
 
     public boolean getContentApproved(int ordinal) {
-        if(fieldIndex[6] == -1)
+        if(fieldIndex[5] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "contentApproved") == Boolean.TRUE;
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[6]) == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[5]) == Boolean.TRUE;
     }
 
     public Boolean getContentApprovedBoxed(int ordinal) {
-        if(fieldIndex[6] == -1)
+        if(fieldIndex[5] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "contentApproved");
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[6]);
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[5]);
     }
 
 
 
     public boolean getAutoPlay(int ordinal) {
-        if(fieldIndex[7] == -1)
+        if(fieldIndex[6] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "autoPlay") == Boolean.TRUE;
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[7]) == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[6]) == Boolean.TRUE;
     }
 
     public Boolean getAutoPlayBoxed(int ordinal) {
-        if(fieldIndex[7] == -1)
+        if(fieldIndex[6] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "autoPlay");
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[7]);
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[6]);
     }
 
 
 
     public int getFirstDisplayDateOrdinal(int ordinal) {
-        if(fieldIndex[8] == -1)
+        if(fieldIndex[7] == -1)
             return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "firstDisplayDate");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[8]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[7]);
     }
 
     public DateTypeAPI getFirstDisplayDateTypeAPI() {
         return getAPI().getDateTypeAPI();
+    }
+
+    public int getFirstDisplayDatesOrdinal(int ordinal) {
+        if(fieldIndex[8] == -1)
+            return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "firstDisplayDates");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[8]);
+    }
+
+    public MapOfFlagsFirstDisplayDatesTypeAPI getFirstDisplayDatesTypeAPI() {
+        return getAPI().getMapOfFlagsFirstDisplayDatesTypeAPI();
     }
 
     public FlagsDelegateLookupImpl getDelegateLookupImpl() {

@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.hollowinput;
 import com.netflix.hollow.read.customapi.HollowObjectTypeAPI;
 import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
 
-@SuppressWarnings("all")
 public class StreamProfileIdTypeAPI extends HollowObjectTypeAPI {
 
     private final StreamProfileIdDelegateLookupImpl delegateLookupImpl;

@@ -6,18 +6,17 @@ import com.netflix.hollow.HollowObjectSchema;
 import com.netflix.hollow.read.customapi.HollowTypeAPI;
 import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 
-@SuppressWarnings("all")
 public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, FlagsDelegate {
 
     private final Boolean searchOnly;
     private final Boolean localText;
     private final Boolean languageOverride;
     private final Boolean localAudio;
-    private final int firstDisplayDatesOrdinal;
     private final Boolean goLive;
     private final Boolean contentApproved;
     private final Boolean autoPlay;
     private final int firstDisplayDateOrdinal;
+    private final int firstDisplayDatesOrdinal;
    private FlagsTypeAPI typeAPI;
 
     public FlagsDelegateCachedImpl(FlagsTypeAPI typeAPI, int ordinal) {
@@ -25,11 +24,11 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
         this.localText = typeAPI.getLocalTextBoxed(ordinal);
         this.languageOverride = typeAPI.getLanguageOverrideBoxed(ordinal);
         this.localAudio = typeAPI.getLocalAudioBoxed(ordinal);
-        this.firstDisplayDatesOrdinal = typeAPI.getFirstDisplayDatesOrdinal(ordinal);
         this.goLive = typeAPI.getGoLiveBoxed(ordinal);
         this.contentApproved = typeAPI.getContentApprovedBoxed(ordinal);
         this.autoPlay = typeAPI.getAutoPlayBoxed(ordinal);
         this.firstDisplayDateOrdinal = typeAPI.getFirstDisplayDateOrdinal(ordinal);
+        this.firstDisplayDatesOrdinal = typeAPI.getFirstDisplayDatesOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -65,10 +64,6 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
         return localAudio;
     }
 
-    public int getFirstDisplayDatesOrdinal(int ordinal) {
-        return firstDisplayDatesOrdinal;
-    }
-
     public boolean getGoLive(int ordinal) {
         return goLive.booleanValue();
     }
@@ -95,6 +90,10 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
 
     public int getFirstDisplayDateOrdinal(int ordinal) {
         return firstDisplayDateOrdinal;
+    }
+
+    public int getFirstDisplayDatesOrdinal(int ordinal) {
+        return firstDisplayDatesOrdinal;
     }
 
     @Override

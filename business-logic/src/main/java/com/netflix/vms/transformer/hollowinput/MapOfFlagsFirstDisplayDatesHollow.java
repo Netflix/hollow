@@ -5,7 +5,6 @@ import com.netflix.hollow.HollowMapSchema;
 import com.netflix.hollow.objects.delegate.HollowMapDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
-@SuppressWarnings("all")
 public class MapOfFlagsFirstDisplayDatesHollow extends HollowMap<MapKeyHollow, DateHollow> {
 
     public MapOfFlagsFirstDisplayDatesHollow(HollowMapDelegate delegate, int ordinal) {
@@ -13,11 +12,13 @@ public class MapOfFlagsFirstDisplayDatesHollow extends HollowMap<MapKeyHollow, D
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public MapKeyHollow instantiateKey(int ordinal) {
         return (MapKeyHollow) api().getMapKeyHollow(ordinal);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public DateHollow instantiateValue(int ordinal) {
         return (DateHollow) api().getDateHollow(ordinal);
     }

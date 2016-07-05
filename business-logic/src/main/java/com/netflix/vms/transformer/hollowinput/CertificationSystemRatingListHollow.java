@@ -5,7 +5,6 @@ import com.netflix.hollow.HollowListSchema;
 import com.netflix.hollow.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
-@SuppressWarnings("all")
 public class CertificationSystemRatingListHollow extends HollowList<CertificationSystemRatingHollow> {
 
     public CertificationSystemRatingListHollow(HollowListDelegate delegate, int ordinal) {
@@ -13,6 +12,7 @@ public class CertificationSystemRatingListHollow extends HollowList<Certificatio
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public CertificationSystemRatingHollow instantiateElement(int ordinal) {
         return (CertificationSystemRatingHollow) api().getCertificationSystemRatingHollow(ordinal);
     }
