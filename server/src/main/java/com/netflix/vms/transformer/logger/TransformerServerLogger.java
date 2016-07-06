@@ -76,7 +76,7 @@ public class TransformerServerLogger implements TaggingLogger {
         if (args.length > 0) {
             tagToMessage = t -> arrayFormat(t.with(message), args).getMessage();
             Object o = args[args.length-1];
-            cause = Throwable.class.isAssignableFrom(o.getClass()) ? (Throwable)o : null;
+            cause = o != null && Throwable.class.isAssignableFrom(o.getClass()) ? (Throwable)o : null;
         } else {
             tagToMessage = t -> t.with(message);
             cause = null;
