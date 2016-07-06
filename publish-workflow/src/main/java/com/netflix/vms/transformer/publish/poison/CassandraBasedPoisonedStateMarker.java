@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.publish.poison;
 
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.ObservedPoisonState;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.ObservedPoisonState;
 
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.astyanax.connectionpool.exceptions.NotFoundException;
@@ -39,13 +39,13 @@ public class CassandraBasedPoisonedStateMarker implements PoisonedStateMarker {
         try {
             String poisonStatus = ctx.getPoisonStatesHelper().getVipKeyValuePair(vip, String.valueOf(version));
             if("true".equals(poisonStatus)) {
-                ctx.getLogger().info(ObservedPoisonState, "VMS Poisoned state discovered -- " + version);
+                ctx.getLogger().info(ObservedPoisonState, "VMS Poisoned state discovered -- {}", version);
                 return true;
             }
         } catch(NotFoundException nfe) {
             return false;
         } catch(Throwable th) {
-            ctx.getLogger().error(ObservedPoisonState, "VMS Poisoned state discovery failed -- assuming poisoned -- " + version, th);
+            ctx.getLogger().error(ObservedPoisonState, "VMS Poisoned state discovery failed -- assuming poisoned -- {}", version, th);
         }
 
         return true;

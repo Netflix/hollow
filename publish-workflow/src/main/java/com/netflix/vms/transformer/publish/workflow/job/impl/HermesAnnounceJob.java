@@ -1,11 +1,10 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.AnnouncementFailure;
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.AnnouncementSuccess;
-
-import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.AnnouncementFailure;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.AnnouncementSuccess;
 
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.AnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryValidationJob;

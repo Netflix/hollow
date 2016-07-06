@@ -1,10 +1,13 @@
 package com.netflix.vms.transformer.context;
 
+import java.util.Set;
+import java.util.function.Consumer;
+
 import com.netflix.archaius.api.Config;
+import com.netflix.vms.io.TaggingLogger;
 import com.netflix.vms.transformer.SysoutTransformerLogger;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerFiles;
-import com.netflix.vms.transformer.common.TransformerLogger;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
@@ -13,8 +16,6 @@ import com.netflix.vms.transformer.common.publish.workflow.PublicationHistoryCon
 import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
 import com.netflix.vms.transformer.config.FrozenTransformerConfigFactory;
 import com.netflix.vms.transformer.logger.TransformerServerLogger;
-import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * Properties go here.
@@ -97,7 +98,7 @@ public class TransformerServerContext implements TransformerContext {
 	}
 
 	@Override
-    public TransformerLogger getLogger() {
+    public TaggingLogger getLogger() {
         return logger;
     }
 	

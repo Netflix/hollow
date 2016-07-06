@@ -1,13 +1,13 @@
 package com.netflix.vms.transformer.input;
 
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.InputDataVersionIds;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.InputDataVersionIds;
 
-import com.netflix.vms.transformer.common.TransformerLogger;
 import java.util.Map;
 
-public class VMSInputDataVersionLogger {
+import com.netflix.vms.io.TaggingLogger;
 
-    public static void logInputVersions(Map<String, String> inputBlobHeaders, TransformerLogger logger) {
+public class VMSInputDataVersionLogger {
+    public static void logInputVersions(Map<String, String> inputBlobHeaders, TaggingLogger logger) {
         for(Map.Entry<String, String> entry : inputBlobHeaders.entrySet()) {
             if(entry.getKey().endsWith("_coldstart")) {
                 String mutationGroup = entry.getKey().substring(0, entry.getKey().indexOf("_coldstart"));
@@ -24,6 +24,5 @@ public class VMSInputDataVersionLogger {
                         " isColdstartPinned=false");
             }
         }
-
     }
 }

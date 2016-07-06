@@ -2,6 +2,7 @@ dependencies {
     compile 'com.netflix.hollow:netflix-hollow:latest.release'
     compile 'com.netflix.archaius:archaius2-api:latest.release'
     compile 'com.netflix.astyanax:astyanax-cassandra:latest.release'
+    compile 'com.netflix.vms.io:vmsio-api:latest.candidate'
     compile 'netflix:netflix-config:latest.release'
 
     testCompile 'junit:junit:4.11'

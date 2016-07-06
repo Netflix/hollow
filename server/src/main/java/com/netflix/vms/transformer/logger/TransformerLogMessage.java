@@ -1,11 +1,9 @@
 package com.netflix.vms.transformer.logger;
 
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
-
-import com.netflix.vms.transformer.common.TransformerLogger.Severity;
+import com.netflix.vms.io.TaggingLogger.LogTag;
+import com.netflix.vms.io.TaggingLogger.Severity;
 
 class TransformerLogMessage {
-
     private final EventInfo eventInfo;
     private final String message;
 
@@ -23,7 +21,6 @@ class TransformerLogMessage {
     }
 
     static class EventInfo {
-
         private final Severity logLevel;
         private final LogTag tag;
         private final String currentCycle;
@@ -58,7 +55,4 @@ class TransformerLogMessage {
             return instanceId;
         }
     }
-
-
-
 }

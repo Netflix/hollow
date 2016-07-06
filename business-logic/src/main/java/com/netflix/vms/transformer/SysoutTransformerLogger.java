@@ -1,18 +1,21 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.vms.transformer.common.TransformerLogger;
 import java.util.Collection;
 
-public class SysoutTransformerLogger implements TransformerLogger {
+import com.netflix.vms.io.TaggingLogger;
 
+public class SysoutTransformerLogger implements TaggingLogger {
     @Override
-    public void log(Severity severity, Collection<LogTag> tags, String message, Throwable th) {
+    public void log(Severity severity, Collection<LogTag> tags, String message, Object... args) {
+        Throwable cause = null;
+        if (args.length > 0) {
+            Object o = args[args.length-1];
+            if (Throwable.class.isAssignableFrom(o.getClass())) cause = (Throwable)o;
+        }
         for(LogTag tag : tags) {
-            System.out.format("%s: %s: %s\n", severity.toString(), tag.toString(), message);
+            System.out.format("%s\t%s: %s\n", severity.toString(), tag.toString(), message);
         }
 
-        if(th != null)
-            th.printStackTrace();
+        if(cause != null) cause.printStackTrace();
     }
-
 }

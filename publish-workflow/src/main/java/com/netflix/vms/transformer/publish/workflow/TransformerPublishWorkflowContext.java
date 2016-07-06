@@ -1,18 +1,19 @@
 package com.netflix.vms.transformer.publish.workflow;
 
-import com.netflix.vms.transformer.publish.status.PublishWorkflowStatusIndicator;
+import java.util.function.Supplier;
 
-import com.netflix.vms.transformer.publish.poison.CassandraBasedPoisonedStateMarker;
-import com.netflix.vms.transformer.publish.poison.PoisonedStateMarker;
 import com.netflix.aws.file.FileStore;
+import com.netflix.vms.io.TaggingLogger;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.TransformerLogger;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.publish.workflow.VipAnnouncer;
-import java.util.function.Supplier;
+import com.netflix.vms.transformer.publish.poison.CassandraBasedPoisonedStateMarker;
+import com.netflix.vms.transformer.publish.poison.PoisonedStateMarker;
+import com.netflix.vms.transformer.publish.status.PublishWorkflowStatusIndicator;
+
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 
 public class TransformerPublishWorkflowContext implements PublishWorkflowContext {
@@ -22,7 +23,7 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
     private final TransformerConfig config;
     private final PoisonedStateMarker poisonStateMarker;
     private final VipAnnouncer vipAnnouncer;
-    private final TransformerLogger logger;
+    private final TaggingLogger logger;
     private final Supplier<ServerUploadStatus> uploadStatus;
     private final FileStore fileStore;
     private final PublishWorkflowStatusIndicator statusIndicator;
@@ -58,7 +59,7 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
     }
 
     @Override
-    public TransformerLogger getLogger() {
+    public TaggingLogger getLogger() {
         return logger;
     }
 

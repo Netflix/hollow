@@ -1,12 +1,8 @@
 package com.netflix.vms.transformer.config;
 
-import com.netflix.archaius.ConfigProxyFactory;
-import com.netflix.archaius.api.Config;
-import com.netflix.archaius.api.annotations.Configuration;
-import com.netflix.archaius.config.MapConfig;
-import com.netflix.vms.transformer.common.TransformerLogger;
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
-import com.netflix.vms.transformer.common.config.TransformerConfig;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.ConfigurationFailure;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.PropertyValue;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Method;
@@ -15,27 +11,32 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
 
+import com.netflix.archaius.ConfigProxyFactory;
+import com.netflix.archaius.api.Config;
+import com.netflix.archaius.api.annotations.Configuration;
+import com.netflix.archaius.config.MapConfig;
+import com.netflix.vms.io.TaggingLogger;
+import com.netflix.vms.transformer.common.config.TransformerConfig;
+
 public class FrozenTransformerConfigFactory {
-    
     private final Config config;
     private final String propertyPrefix;
-    
+
     public FrozenTransformerConfigFactory(Config config) {
         this.config = config;
         this.propertyPrefix = TransformerConfig.class.getAnnotation(Configuration.class).prefix() + ".";
     }
-    
-    
-    public TransformerConfig createStaticConfig(TransformerLogger logger) {
+
+    public TransformerConfig createStaticConfig(TaggingLogger logger) {
         String propertiesString = getPropertiesString();
-        
+
         Properties props = new Properties();
         try {
             props.load(new StringReader(propertiesString));
         } catch (IOException e) {
-            logger.error(LogTag.ConfigurationFailure, "Failed to parse properties String: " + propertiesString);
+            logger.error(ConfigurationFailure, "Failed to parse properties String: {}", propertiesString);
         }
-        
+
         TransformerConfig transformerConfig = new ConfigProxyFactory(new MapConfig(props)).newProxy(TransformerConfig.class);
         logProperties(transformerConfig, logger);
         return transformerConfig;
@@ -52,10 +53,10 @@ public class FrozenTransformerConfigFactory {
 
         return builder.toString();
     }    
-    
-    private void logProperties(TransformerConfig transformerConfig, TransformerLogger logger) {
+
+    private void logProperties(TransformerConfig transformerConfig, TaggingLogger logger) {
         Set<String> loggedKeys = new HashSet<>();
-        
+
         try {
             for(Method m : TransformerConfig.class.getDeclaredMethods()) {
                 String methodName = m.getName();
@@ -63,23 +64,23 @@ public class FrozenTransformerConfigFactory {
                 
                 if(m.getParameterCount() == 0) {
                     Object value = m.invoke(transformerConfig);
-                    logger.info(LogTag.PropertyValue, "key=" + propertyName + " value=" + value);
+                    logger.info(PropertyValue, "key={} value={}", propertyName, value);
                 } else {
                     Iterator<String> keyIter = config.getKeys(propertyName);
                     while(keyIter.hasNext()) {
                         String key = keyIter.next();
                         if(loggedKeys.add(key)) {
                             String value = config.getString(key);
-                            logger.info(LogTag.PropertyValue, "key=" + key + " value=" + value);
+                            logger.info(PropertyValue, "key={} value={}", key, value);
                         }
                     }
                 }
             }
         } catch(Exception e) {
-            logger.error(LogTag.ConfigurationFailure, "Unable to log property values", e);
+            logger.error(ConfigurationFailure, "Unable to log property values", e);
         }
     }
-    
+
     private String getPropertyName(String methodName) {
         if(methodName.startsWith("get"))
             return propertyPrefix + methodName.substring(3, 4).toLowerCase() + methodName.substring(4);
@@ -87,5 +88,4 @@ public class FrozenTransformerConfigFactory {
             return propertyPrefix + methodName.substring(2, 3).toLowerCase() + methodName.substring(3);
         return propertyPrefix + methodName;
     }
-
 }

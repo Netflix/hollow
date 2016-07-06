@@ -1,21 +1,22 @@
 package com.netflix.vms.transformer;
 
+import java.util.Set;
+import java.util.function.Consumer;
+
 import com.netflix.archaius.ConfigProxyFactory;
 import com.netflix.archaius.config.EmptyConfig;
+import com.netflix.vms.io.TaggingLogger;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerFiles;
-import com.netflix.vms.transformer.common.TransformerLogger;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
 import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
-import java.util.Set;
-import java.util.function.Consumer;
 
 public class SimpleTransformerContext implements TransformerContext {
 
-    private final TransformerLogger logger;
+    private final TaggingLogger logger;
     private final TransformerConfig config;
     private final TransformerMetricRecorder recorder;
     private final TransformerFiles files;
@@ -24,7 +25,7 @@ public class SimpleTransformerContext implements TransformerContext {
         this(new SysoutTransformerLogger(), new NoOpMetricRecorder(), null);
     }
 
-    SimpleTransformerContext(TransformerLogger logger, TransformerMetricRecorder recorder, TransformerFiles files) {
+    SimpleTransformerContext(TaggingLogger logger, TransformerMetricRecorder recorder, TransformerFiles files) {
         this.logger = logger;
         this.config = new ConfigProxyFactory(EmptyConfig.INSTANCE).newProxy(TransformerConfig.class);
         this.files = files;
@@ -67,7 +68,7 @@ public class SimpleTransformerContext implements TransformerContext {
     }
 
     @Override
-    public TransformerLogger getLogger() {
+    public TaggingLogger getLogger() {
         return logger;
     }
     

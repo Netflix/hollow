@@ -65,6 +65,7 @@ dependencies {
     compile project(':vmstransformer-io')
     compile project(':vmstransformer-business-logic')
     compile project(':vmstransformer-publish-workflow')
+    compile 'com.netflix.vms.io:vmsio-api:latest.candidate'
     compile 'netflix:vms-hollow-generated-notemplate:latest.release'
 
     testCompile 'junit:junit:latest.release'
