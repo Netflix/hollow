@@ -18,7 +18,7 @@ import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.elasticsearch.ElasticSearchClient;
 
 public class TransformerServerLogger implements TaggingLogger {
-    private static final String FQCN = TransformerServerLogger.class.getName();
+    private static final String FQCN = TaggingLogger.class.getName();
 
     private final ElasticSearchClient esClient;
     private final TransformerConfig config;
