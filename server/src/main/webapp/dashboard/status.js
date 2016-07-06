@@ -16,6 +16,7 @@ function ServerCycleStatusTab(dashboard) {
     this.systemInfoTable.textAlign = "style='text-align: center'";
 
     this.warnCodesWidget = new ClickableTableWidget("#id-cycle-warn-aggregate", "id-cycle-warn-agg-table", [ "key", "doc_count" ], [ "tag", "Count"], -1);
+    this.warnCodesWidget.clearPrevious = true;
 
     this.refresh = function() {
         cycleSummaryTab.createCycleDurationAtlasIFrame();
