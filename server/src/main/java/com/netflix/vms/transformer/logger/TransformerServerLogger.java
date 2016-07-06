@@ -70,46 +70,23 @@ public class TransformerServerLogger implements TaggingLogger {
     @Override
     public void log(Severity severity, Collection<LogTag> tags, String message, Object... args) {
         // TODO: timt: partially duplicated from TaggingLoggerFactory
-        Function<LogTag, String> tagToMessage;
-        Function<LogTag, String> tagToJson;
-        Throwable cause;
+        String formattedMessage = message;
+        Throwable cause = null;
         if (args.length > 0) {
-            tagToMessage = t -> arrayFormat(t.with(message), args).getMessage();
+            formattedMessage = arrayFormat(message, args).getMessage();
             Object o = args[args.length-1];
             cause = o != null && Throwable.class.isAssignableFrom(o.getClass()) ? (Throwable)o : null;
-        } else {
-            tagToMessage = t -> t.with(message);
-            cause = null;
         }
-        if(config.isElasticSearchLoggingEnabled()) {
-            tagToJson = tag -> {
+
+        for (LogTag tag : tags) {
+            consoleLogger.log(null, FQCN, severity.intValue, tag.with(formattedMessage), null, cause);
+            if(config.isElasticSearchLoggingEnabled()) {
                 try {
-                    return toJsonString(severity, tag, message, cause);
+                    esClient.addData(elasticSearchIndexName, "vmsserver", toJsonString(severity, tag, formattedMessage, cause));
                 } catch (JsonProcessingException e) {
                     consoleLogger.log(null, FQCN, Severity.ERROR.intValue, "Unable to create json for ES log message", null, e);
                 }
-                return null;
-            };
-        } else {
-            tagToJson = tag -> null;
-        }
-        Function<LogTag, Tuple2<String, String>> tagToMessageAndJson = t -> new Tuple2<>(tagToMessage.apply(t), tagToJson.apply(t));
-
-        tags.parallelStream()
-        .map(tagToMessageAndJson)
-        .forEach(tuple -> {
-            consoleLogger.log(null, FQCN, severity.intValue, tuple.first, null, cause);
-            if (tuple.second != null) esClient.addData(elasticSearchIndexName, "vmsserver", tuple.second);
-        });
-    }
-
-    private static final class Tuple2<First, Second> {
-        final First first;
-        final Second second;
-
-        Tuple2(First first, Second second) {
-            this.first = first;
-            this.second = second;
+            }
         }
     }
 }
