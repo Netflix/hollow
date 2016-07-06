@@ -6,11 +6,11 @@ import com.netflix.hollow.HollowObjectSchema;
 import com.netflix.hollow.read.customapi.HollowTypeAPI;
 import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 
-@SuppressWarnings("all")
 public class PersonBioDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, PersonBioDelegate {
 
     private final int spousesOrdinal;
     private final int partnersOrdinal;
+    private final int currentRelationshipOrdinal;
     private final Long personId;
     private final int birthDateOrdinal;
     private final int movieIdsOrdinal;
@@ -19,6 +19,7 @@ public class PersonBioDelegateCachedImpl extends HollowObjectAbstractDelegate im
     public PersonBioDelegateCachedImpl(PersonBioTypeAPI typeAPI, int ordinal) {
         this.spousesOrdinal = typeAPI.getSpousesOrdinal(ordinal);
         this.partnersOrdinal = typeAPI.getPartnersOrdinal(ordinal);
+        this.currentRelationshipOrdinal = typeAPI.getCurrentRelationshipOrdinal(ordinal);
         this.personId = typeAPI.getPersonIdBoxed(ordinal);
         this.birthDateOrdinal = typeAPI.getBirthDateOrdinal(ordinal);
         this.movieIdsOrdinal = typeAPI.getMovieIdsOrdinal(ordinal);
@@ -31,6 +32,10 @@ public class PersonBioDelegateCachedImpl extends HollowObjectAbstractDelegate im
 
     public int getPartnersOrdinal(int ordinal) {
         return partnersOrdinal;
+    }
+
+    public int getCurrentRelationshipOrdinal(int ordinal) {
+        return currentRelationshipOrdinal;
     }
 
     public long getPersonId(int ordinal) {

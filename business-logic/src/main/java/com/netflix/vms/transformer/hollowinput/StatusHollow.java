@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.hollowinput;
 import com.netflix.hollow.objects.HollowObject;
 import com.netflix.hollow.HollowObjectSchema;
 
-@SuppressWarnings("all")
 public class StatusHollow extends HollowObject {
 
     public StatusHollow(StatusDelegate delegate, int ordinal) {
@@ -18,11 +17,11 @@ public class StatusHollow extends HollowObject {
         return delegate().getMovieIdBoxed(ordinal);
     }
 
-    public ISOCountryHollow _getCountryCode() {
+    public StringHollow _getCountryCode() {
         int refOrdinal = delegate().getCountryCodeOrdinal(ordinal);
         if(refOrdinal == -1)
             return null;
-        return  api().getISOCountryHollow(refOrdinal);
+        return  api().getStringHollow(refOrdinal);
     }
 
     public RightsHollow _getRights() {

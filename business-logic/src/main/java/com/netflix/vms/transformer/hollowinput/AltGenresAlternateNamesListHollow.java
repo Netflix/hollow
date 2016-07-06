@@ -5,7 +5,6 @@ import com.netflix.hollow.HollowListSchema;
 import com.netflix.hollow.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
-@SuppressWarnings("all")
 public class AltGenresAlternateNamesListHollow extends HollowList<AltGenresAlternateNamesHollow> {
 
     public AltGenresAlternateNamesListHollow(HollowListDelegate delegate, int ordinal) {
@@ -13,6 +12,7 @@ public class AltGenresAlternateNamesListHollow extends HollowList<AltGenresAlter
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public AltGenresAlternateNamesHollow instantiateElement(int ordinal) {
         return (AltGenresAlternateNamesHollow) api().getAltGenresAlternateNamesHollow(ordinal);
     }

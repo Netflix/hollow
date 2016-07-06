@@ -1,8 +1,5 @@
 package com.netflix.vms.transformer.atlas;
 
-import org.slf4j.LoggerFactory;
-
-import org.slf4j.Logger;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.netflix.servo.monitor.Counter;
@@ -14,19 +11,16 @@ import com.netflix.servo.tag.Tag;
 import com.netflix.suro.servo.Servo;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
 public class AtlasTransformerMetricRecorder implements TransformerMetricRecorder {
 
     private static final Logger logger = LoggerFactory.getLogger(AtlasTransformerMetricRecorder.class);
     
-    private final ConcurrentHashMap<Metric, Counter> counters;
-
     @Inject
-    public AtlasTransformerMetricRecorder() {
-        this.counters = new ConcurrentHashMap<>();
-    }
+    public AtlasTransformerMetricRecorder() { }
 
     @Override
     public void recordMetric(Metric metric, double value) {
@@ -39,9 +33,9 @@ public class AtlasTransformerMetricRecorder implements TransformerMetricRecorder
     }
     
     @Override
-    public void recordMetric(Metric metric, double value, String... keyValues) {
+    public void recordMetric(Metric metric, double value, String... tagKeyValues) {
         try {
-        	ArrayList<Tag> listOfTags = getAsTagList(keyValues);
+        	ArrayList<Tag> listOfTags = getAsTagList(tagKeyValues);
         	DoubleGauge gauge  = Servo.getDoubleGauge(MonitorConfig.builder(metric.toString()).build().withAdditionalTags(new BasicTagList(listOfTags)));
             gauge.set(value);
         } catch(Throwable th) {
@@ -52,11 +46,17 @@ public class AtlasTransformerMetricRecorder implements TransformerMetricRecorder
     @Override
     public void incrementCounter(Metric metric, long incrementBy) {
         try {
-            Counter counter = counters.get(metric);
-            if(counter == null) {
-                counter = Servo.getCounter(metric.toString());
-                counters.put(metric, counter);
-            }
+            Counter counter = Servo.getCounter(metric.toString());
+            counter.increment(incrementBy);
+        } catch(Throwable th) {
+            logger.error("Failed to increment metric: " + metric + "(incrementBy " + incrementBy + ")", th);
+        }
+    }
+    
+    @Override
+    public void incrementCounter(Metric metric, long incrementBy, String... tagKeyValues) {
+        try {
+            Counter counter = Servo.getCounter(metric.toString(), tagKeyValues);
             counter.increment(incrementBy);
         } catch(Throwable th) {
             logger.error("Failed to increment metric: " + metric + "(incrementBy " + incrementBy + ")", th);

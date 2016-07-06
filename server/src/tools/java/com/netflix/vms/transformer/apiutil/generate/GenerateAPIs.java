@@ -5,16 +5,18 @@ import com.netflix.hollow.codegen.HollowAPIGenerator;
 import com.netflix.hollow.util.HollowSchemaParser;
 import com.netflix.hollow.util.HollowWriteStateCreator;
 import com.netflix.hollow.write.HollowWriteStateEngine;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collection;
+
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 public class GenerateAPIs {
 
-    private static final String TRANSFORMER_PROJECT_BASE_DIR = "/common/git/vmstransformer/business-logic";
+    private static final String TRANSFORMER_PROJECT_BASE_DIR = "/common/git/vmstransformer";
     private static final String CONVERTER_PROJECT_BASE_DIR = "/common/git/vmsconverter";
 
     @Test

@@ -4,7 +4,6 @@ import com.netflix.hollow.objects.delegate.HollowObjectAbstractDelegate;
 import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.HollowObjectSchema;
 
-@SuppressWarnings("all")
 public class FlagsDelegateLookupImpl extends HollowObjectAbstractDelegate implements FlagsDelegate {
 
     private final FlagsTypeAPI typeAPI;
@@ -45,10 +44,6 @@ public class FlagsDelegateLookupImpl extends HollowObjectAbstractDelegate implem
         return typeAPI.getLocalAudioBoxed(ordinal);
     }
 
-    public int getFirstDisplayDatesOrdinal(int ordinal) {
-        return typeAPI.getFirstDisplayDatesOrdinal(ordinal);
-    }
-
     public boolean getGoLive(int ordinal) {
         return typeAPI.getGoLive(ordinal);
     }
@@ -73,12 +68,12 @@ public class FlagsDelegateLookupImpl extends HollowObjectAbstractDelegate implem
         return typeAPI.getAutoPlayBoxed(ordinal);
     }
 
-    public long getFirstDisplayDate(int ordinal) {
-        return typeAPI.getFirstDisplayDate(ordinal);
+    public int getFirstDisplayDateOrdinal(int ordinal) {
+        return typeAPI.getFirstDisplayDateOrdinal(ordinal);
     }
 
-    public Long getFirstDisplayDateBoxed(int ordinal) {
-        return typeAPI.getFirstDisplayDateBoxed(ordinal);
+    public int getFirstDisplayDatesOrdinal(int ordinal) {
+        return typeAPI.getFirstDisplayDatesOrdinal(ordinal);
     }
 
     public FlagsTypeAPI getTypeAPI() {

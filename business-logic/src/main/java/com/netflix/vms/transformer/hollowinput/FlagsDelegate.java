@@ -2,8 +2,6 @@ package com.netflix.vms.transformer.hollowinput;
 
 import com.netflix.hollow.objects.delegate.HollowObjectDelegate;
 
-
-@SuppressWarnings("all")
 public interface FlagsDelegate extends HollowObjectDelegate {
 
     public boolean getSearchOnly(int ordinal);
@@ -22,8 +20,6 @@ public interface FlagsDelegate extends HollowObjectDelegate {
 
     public Boolean getLocalAudioBoxed(int ordinal);
 
-    public int getFirstDisplayDatesOrdinal(int ordinal);
-
     public boolean getGoLive(int ordinal);
 
     public Boolean getGoLiveBoxed(int ordinal);
@@ -36,9 +32,9 @@ public interface FlagsDelegate extends HollowObjectDelegate {
 
     public Boolean getAutoPlayBoxed(int ordinal);
 
-    public long getFirstDisplayDate(int ordinal);
+    public int getFirstDisplayDateOrdinal(int ordinal);
 
-    public Long getFirstDisplayDateBoxed(int ordinal);
+    public int getFirstDisplayDatesOrdinal(int ordinal);
 
     public FlagsTypeAPI getTypeAPI();
 

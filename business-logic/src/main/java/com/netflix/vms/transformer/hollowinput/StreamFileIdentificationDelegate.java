@@ -2,8 +2,6 @@ package com.netflix.vms.transformer.hollowinput;
 
 import com.netflix.hollow.objects.delegate.HollowObjectDelegate;
 
-
-@SuppressWarnings("all")
 public interface StreamFileIdentificationDelegate extends HollowObjectDelegate {
 
     public String getFilename(int ordinal);

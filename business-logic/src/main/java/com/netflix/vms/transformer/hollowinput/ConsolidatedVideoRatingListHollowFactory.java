@@ -5,15 +5,16 @@ import com.netflix.hollow.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.read.customapi.HollowTypeAPI;
 import com.netflix.hollow.objects.delegate.HollowListCachedDelegate;
 
-@SuppressWarnings("all")
 public class ConsolidatedVideoRatingListHollowFactory<T extends ConsolidatedVideoRatingListHollow> extends HollowFactory<T> {
 
     @Override
+    @SuppressWarnings("unchecked")
     public T newHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
         return (T)new ConsolidatedVideoRatingListHollow(((ConsolidatedVideoRatingListTypeAPI)typeAPI).getDelegateLookupImpl(), ordinal);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public T newCachedHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
         return (T)new ConsolidatedVideoRatingListHollow(new HollowListCachedDelegate((ConsolidatedVideoRatingListTypeAPI)typeAPI, ordinal), ordinal);
     }

@@ -2,13 +2,13 @@ package com.netflix.vms.transformer.hollowinput;
 
 import com.netflix.hollow.objects.delegate.HollowObjectDelegate;
 
-
-@SuppressWarnings("all")
 public interface PersonBioDelegate extends HollowObjectDelegate {
 
     public int getSpousesOrdinal(int ordinal);
 
     public int getPartnersOrdinal(int ordinal);
+
+    public int getCurrentRelationshipOrdinal(int ordinal);
 
     public long getPersonId(int ordinal);
 

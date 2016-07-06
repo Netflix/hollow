@@ -74,6 +74,8 @@ public class TransformerScenario {
         
         HollowWriteStateEngine slicedStateEngine = slicer.sliceInputBlob(client.getStateEngine());
         
+        slicedStateEngine.addHeaderTag("publishCycleDataTS", String.valueOf(processTimestamp));
+        
         writeStateEngineSlice(slicedStateEngine, scenarioInputFile);
 
         return readStateEngineSlice(scenarioInputFile);
@@ -108,6 +110,9 @@ public class TransformerScenario {
         try(LZ4BlockInputStream is = new LZ4BlockInputStream(new FileInputStream(sliceFile))) {
             reader.readSnapshot(is);
         }
+        
+        this.processTimestamp = Long.parseLong(stateEngine.getHeaderTag("publishCycleDataTS"));
+        
         return stateEngine;
     }
     

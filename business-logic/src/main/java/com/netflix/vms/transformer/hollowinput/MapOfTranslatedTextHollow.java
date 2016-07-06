@@ -5,7 +5,6 @@ import com.netflix.hollow.HollowMapSchema;
 import com.netflix.hollow.objects.delegate.HollowMapDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
-@SuppressWarnings("all")
 public class MapOfTranslatedTextHollow extends HollowMap<MapKeyHollow, TranslatedTextValueHollow> {
 
     public MapOfTranslatedTextHollow(HollowMapDelegate delegate, int ordinal) {
@@ -13,11 +12,13 @@ public class MapOfTranslatedTextHollow extends HollowMap<MapKeyHollow, Translate
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public MapKeyHollow instantiateKey(int ordinal) {
         return (MapKeyHollow) api().getMapKeyHollow(ordinal);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public TranslatedTextValueHollow instantiateValue(int ordinal) {
         return (TranslatedTextValueHollow) api().getTranslatedTextValueHollow(ordinal);
     }
