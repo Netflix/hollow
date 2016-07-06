@@ -69,6 +69,10 @@ public class GlobalPersonModule extends AbstractTransformModule {
                 output.partners = stringsList(personBioInput._getPartners());
                 output.birthDate = birthDate(personBioInput._getBirthDate());
                 output.topVideos = videoList(personBioInput._getMovieIds());
+                StringHollow currentRelationship = personBioInput._getCurrentRelationship();
+                if(currentRelationship != null) {
+                    output.currentRelationship = currentRelationship._getValue();
+                }
             }
 
             mapper.addObject(output);
