@@ -90,8 +90,9 @@
 
 /************ table ****************/
 .ui-widget-table-header {
-    border: 1px solid silver;
-    background: #F2F2F2;
+/*     border: 1px solid silver; */
+    border: none;
+    background: #F8F8F8;
     color: #222222;
     font-weight: bold;
 }
