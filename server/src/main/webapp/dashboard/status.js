@@ -8,15 +8,16 @@ function ServerCycleStatusTab(dashboard) {
     var csTableFields = [ "group", "date" ];
     this.csTable = new ClickableTableWidget("#id-cycle-oldest-coldstart", "iid-cycle-oldest-coldstart-table", csTableFields, csTableFields, -1);
     this.csTable.textAlign = "style='text-align: center'";
+    this.csTable.clearPrevious = false;
 
     var tableFields = ["instanceId", "JarVersion"];
     var tableHeader = ["Instance", "Jar version"];
     this.systemInfoTable = new ClickableTableWidget("#id-cycle-system-info", "id-cycle-system-info-table", tableFields, tableHeader);
     // this.systemInfoTable.clearPrevious = true;
     this.systemInfoTable.textAlign = "style='text-align: center'";
+    this.systemInfoTable.clearPrevious = false;
 
     this.warnCodesWidget = new ClickableTableWidget("#id-cycle-warn-aggregate", "id-cycle-warn-agg-table", [ "key", "doc_count" ], [ "tag", "Count"], -1);
-    this.warnCodesWidget.clearPrevious = true;
 
     this.refresh = function() {
         cycleSummaryTab.createCycleDurationAtlasIFrame();
