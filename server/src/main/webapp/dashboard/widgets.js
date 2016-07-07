@@ -151,7 +151,7 @@ function ClickableTableWidget(divId, tableId, fields, titles, clickableColumn, c
     this.titleNames = titles;
     this.clickableColumn = clickableColumn;
     this.html = "";
-    this.clearPrevious = false;
+    this.clearPrevious = true;
     this.showHeader = true;
     this.clickEventFunc = !clickEventFunction ? null : clickEventFunction;
     this.rowIndicatorFunc = !rowIndicatorFunction ? null : rowIndicatorFunction;
