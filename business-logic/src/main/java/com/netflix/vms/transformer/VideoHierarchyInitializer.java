@@ -119,7 +119,7 @@ public class VideoHierarchyInitializer {
             // Add standalones for countries that are not defined in hierarchy feed (Show,Movie,Supplemental)
             int videoTypeOrdinal = videoTypeIndex.getMatchingOrdinal(topParentId);
             VideoTypeHollow videoType = api.getVideoTypeHollow(videoTypeOrdinal);
-            if (videoType == null || videoType._getCountryInfos().isEmpty()) {
+            if (videoTypeOrdinal == -1 || videoType._getCountryInfos().isEmpty()) {
                 addVideoAndAssociatedSupplementals(topParentId, droppedIds);
             } else {
                 for (VideoTypeDescriptorHollow countryType : videoType._getCountryInfos()) {
