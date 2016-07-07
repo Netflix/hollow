@@ -41,7 +41,6 @@ public class ShowMeTheProgressDiffTool {
         addTypeDiff(diff, "CharacterImages", "id");
         addTypeDiff(diff, "FileEncodingData", "downloadableId");
         addTypeDiff(diff, "RolloutVideo", "video.value");
-        addTypeDiff(diff, "RolloutCharacter", "id");
         addTypeDiff(diff, "TopNVideoData", "countryId");
         diff.calculateDiffs();
 
