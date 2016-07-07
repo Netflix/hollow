@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.context;
 
 import com.netflix.archaius.api.Config;
+import com.netflix.vms.transformer.SysoutTransformerLogger;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerFiles;
 import com.netflix.vms.transformer.common.TransformerLogger;
@@ -60,7 +61,7 @@ public class TransformerServerContext implements TransformerContext {
         this.publicationHistoryConsumer = publicationHistoryConsumer;
         
         this.configFactory = new FrozenTransformerConfigFactory(config);
-        this.staticConfig = configFactory.createStaticConfig(logger);
+        this.staticConfig = configFactory.createStaticConfig(new SysoutTransformerLogger());
     }
 
     @Override
