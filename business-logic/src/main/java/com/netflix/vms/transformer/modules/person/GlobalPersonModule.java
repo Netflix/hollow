@@ -71,7 +71,7 @@ public class GlobalPersonModule extends AbstractTransformModule {
                 output.topVideos = videoList(personBioInput._getMovieIds());
                 StringHollow currentRelationship = personBioInput._getCurrentRelationship();
                 if(currentRelationship != null) {
-                    output.currentRelationship = currentRelationship._getValue();
+                    output.currentRelationship = new Strings(currentRelationship._getValue());
                 }
             }
 

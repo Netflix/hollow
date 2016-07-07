@@ -11,7 +11,7 @@ public class GlobalPerson implements Cloneable {
     public List<Strings> spouses = null;
     public List<Strings> partners = null;
     public List<Video> topVideos = null;
-    public String currentRelationship = null;
+    public Strings currentRelationship = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
