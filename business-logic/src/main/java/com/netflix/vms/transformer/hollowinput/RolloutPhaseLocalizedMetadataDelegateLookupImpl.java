@@ -4,6 +4,7 @@ import com.netflix.hollow.objects.delegate.HollowObjectAbstractDelegate;
 import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.HollowObjectSchema;
 
+@SuppressWarnings("all")
 public class RolloutPhaseLocalizedMetadataDelegateLookupImpl extends HollowObjectAbstractDelegate implements RolloutPhaseLocalizedMetadataDelegate {
 
     private final RolloutPhaseLocalizedMetadataTypeAPI typeAPI;
@@ -14,6 +15,18 @@ public class RolloutPhaseLocalizedMetadataDelegateLookupImpl extends HollowObjec
 
     public int getSUPPLEMENTAL_MESSAGEOrdinal(int ordinal) {
         return typeAPI.getSUPPLEMENTAL_MESSAGEOrdinal(ordinal);
+    }
+
+    public int getMERCH_OVERRIDE_MESSAGEOrdinal(int ordinal) {
+        return typeAPI.getMERCH_OVERRIDE_MESSAGEOrdinal(ordinal);
+    }
+
+    public int getPOSTPLAY_OVERRIDE_MESSAGEOrdinal(int ordinal) {
+        return typeAPI.getPOSTPLAY_OVERRIDE_MESSAGEOrdinal(ordinal);
+    }
+
+    public int getODP_OVERRIDE_MESSAGEOrdinal(int ordinal) {
+        return typeAPI.getODP_OVERRIDE_MESSAGEOrdinal(ordinal);
     }
 
     public int getTAGLINEOrdinal(int ordinal) {

@@ -2,6 +2,8 @@ package com.netflix.vms.transformer.hollowinput;
 
 import com.netflix.hollow.objects.delegate.HollowObjectDelegate;
 
+
+@SuppressWarnings("all")
 public interface ConsolidatedVideoCountryRatingDelegate extends HollowObjectDelegate {
 
     public int getAdvisoriesOrdinal(int ordinal);
