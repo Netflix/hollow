@@ -15,7 +15,7 @@ import com.netflix.archaius.ConfigProxyFactory;
 import com.netflix.archaius.api.Config;
 import com.netflix.archaius.api.annotations.Configuration;
 import com.netflix.archaius.config.MapConfig;
-import com.netflix.vms.io.TaggingLogger;
+import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 
 public class FrozenTransformerConfigFactory {

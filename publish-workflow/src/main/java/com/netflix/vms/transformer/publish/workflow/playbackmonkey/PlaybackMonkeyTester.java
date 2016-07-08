@@ -26,7 +26,7 @@ import com.netflix.playback.monkey.model.PlaybackMonkeyTestResults;
 import com.netflix.playback.monkey.model.PlaybackMonkeyTestResults.Status;
 import com.netflix.playback.monkey.model.VideoTestDetails;
 import com.netflix.servo.monitor.DynamicCounter;
-import com.netflix.vms.io.TaggingLogger;
+import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
 
 public class PlaybackMonkeyTester {

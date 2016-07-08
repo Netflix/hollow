@@ -1066,6 +1066,15 @@
                 "netflix:platform-chukwaClient"
             ]
         },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.1",
+            "requested": "latest.release",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
             "project": true
         },
@@ -2731,6 +2740,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.logging:vmslogging-api",
                 "com.thinkaurelius.thrift:thrift-server",
                 "com.yammer.metrics:metrics-core",
                 "io.dropwizard.metrics:metrics-core",
@@ -3887,6 +3897,15 @@
                 "netflix:platform-chukwaClient"
             ]
         },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.1",
+            "requested": "latest.release",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
             "project": true
         },
@@ -5552,6 +5571,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.logging:vmslogging-api",
                 "com.thinkaurelius.thrift:thrift-server",
                 "com.yammer.metrics:metrics-core",
                 "io.dropwizard.metrics:metrics-core",
@@ -6708,6 +6728,15 @@
                 "netflix:platform-chukwaClient"
             ]
         },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.1",
+            "requested": "latest.release",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
             "project": true
         },
@@ -8373,6 +8402,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.logging:vmslogging-api",
                 "com.thinkaurelius.thrift:thrift-server",
                 "com.yammer.metrics:metrics-core",
                 "io.dropwizard.metrics:metrics-core",
@@ -9527,6 +9557,15 @@
             "locked": "0.2.50-platform",
             "transitive": [
                 "netflix:platform-chukwaClient"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.1",
+            "requested": "latest.release",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
@@ -11165,6 +11204,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.logging:vmslogging-api",
                 "com.thinkaurelius.thrift:thrift-server",
                 "com.yammer.metrics:metrics-core",
                 "io.dropwizard.metrics:metrics-core",
@@ -12372,6 +12412,15 @@
             "locked": "0.2.50-platform",
             "transitive": [
                 "netflix:platform-chukwaClient"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.1",
+            "requested": "latest.release",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
@@ -14039,6 +14088,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.logging:vmslogging-api",
                 "com.thinkaurelius.thrift:thrift-server",
                 "com.yammer.metrics:metrics-core",
                 "io.dropwizard.metrics:metrics-core",
@@ -16287,6 +16337,15 @@
                 "netflix:platform-chukwaClient"
             ]
         },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.1",
+            "requested": "latest.release",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
             "project": true
         },
@@ -17952,6 +18011,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.logging:vmslogging-api",
                 "com.thinkaurelius.thrift:thrift-server",
                 "com.yammer.metrics:metrics-core",
                 "io.dropwizard.metrics:metrics-core",
@@ -19106,6 +19166,15 @@
             "locked": "0.2.50-platform",
             "transitive": [
                 "netflix:platform-chukwaClient"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.1",
+            "requested": "latest.release",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
@@ -20741,6 +20810,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.logging:vmslogging-api",
                 "com.thinkaurelius.thrift:thrift-server",
                 "com.yammer.metrics:metrics-core",
                 "io.dropwizard.metrics:metrics-core",
@@ -21941,6 +22011,15 @@
             "locked": "0.2.50-platform",
             "transitive": [
                 "netflix:platform-chukwaClient"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.1",
+            "requested": "latest.release",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
@@ -23679,6 +23758,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.logging:vmslogging-api",
                 "com.thinkaurelius.thrift:thrift-server",
                 "com.yammer.metrics:metrics-core",
                 "io.dropwizard.metrics:metrics-core",
@@ -24885,6 +24965,15 @@
                 "netflix:platform-chukwaClient"
             ]
         },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.1",
+            "requested": "latest.release",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
             "project": true
         },
@@ -26621,6 +26710,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.logging:vmslogging-api",
                 "com.thinkaurelius.thrift:thrift-server",
                 "com.yammer.metrics:metrics-core",
                 "io.dropwizard.metrics:metrics-core",
@@ -27827,6 +27917,15 @@
                 "netflix:platform-chukwaClient"
             ]
         },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.1",
+            "requested": "latest.release",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
             "project": true
         },
@@ -29563,6 +29662,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.logging:vmslogging-api",
                 "com.thinkaurelius.thrift:thrift-server",
                 "com.yammer.metrics:metrics-core",
                 "io.dropwizard.metrics:metrics-core",
@@ -30769,6 +30869,15 @@
                 "netflix:platform-chukwaClient"
             ]
         },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.1",
+            "requested": "latest.release",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
             "project": true
         },
@@ -32505,6 +32614,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.logging:vmslogging-api",
                 "com.thinkaurelius.thrift:thrift-server",
                 "com.yammer.metrics:metrics-core",
                 "io.dropwizard.metrics:metrics-core",

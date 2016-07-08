@@ -4,7 +4,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.InputDataV
 
 import java.util.Map;
 
-import com.netflix.vms.io.TaggingLogger;
+import com.netflix.vms.logging.TaggingLogger;
 
 public class VMSInputDataVersionLogger {
     public static void logInputVersions(Map<String, String> inputBlobHeaders, TaggingLogger logger) {

@@ -9,7 +9,7 @@ import java.util.Map;
 
 import com.netflix.config.FastProperty;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.vms.io.TaggingLogger;
+import com.netflix.vms.logging.TaggingLogger;
 
 public class PublishRegionProvider {
 

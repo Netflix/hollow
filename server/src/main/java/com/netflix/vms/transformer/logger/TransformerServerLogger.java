@@ -13,7 +13,7 @@ import org.slf4j.spi.LocationAwareLogger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.netflix.vms.io.TaggingLogger;
+import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.elasticsearch.ElasticSearchClient;
 
@@ -69,7 +69,7 @@ public class TransformerServerLogger implements TaggingLogger {
 
     @Override
     public void log(Severity severity, Collection<LogTag> tags, String message, Object... args) {
-        // TODO: timt: partially duplicated from TaggingLoggerFactory
+        // TODO: timt: partially duplicated from TaggingLoggers
         String formattedMessage = message;
         Throwable cause = null;
         if (args.length > 0) {

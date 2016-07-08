@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.common.io;
 
-import com.netflix.vms.io.TaggingLogger.LogTag;
+import com.netflix.vms.logging.TaggingLogger.LogTag;
 
 public enum TransformerLogTag implements LogTag {
     WaitForNextCycle,

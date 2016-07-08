@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.publish.workflow;
 import java.util.function.Supplier;
 
 import com.netflix.aws.file.FileStore;
-import com.netflix.vms.io.TaggingLogger;
+import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;

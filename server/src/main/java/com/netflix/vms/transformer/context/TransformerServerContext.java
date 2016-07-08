@@ -4,8 +4,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import com.netflix.archaius.api.Config;
-import com.netflix.vms.io.TaggingLogger;
-import com.netflix.vms.transformer.SysoutTransformerLogger;
+import com.netflix.vms.logging.TaggingLogger;
+import com.netflix.vms.logging.TaggingLoggers;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerFiles;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
@@ -62,7 +62,7 @@ public class TransformerServerContext implements TransformerContext {
         this.publicationHistoryConsumer = publicationHistoryConsumer;
         
         this.configFactory = new FrozenTransformerConfigFactory(config);
-        this.staticConfig = configFactory.createStaticConfig(new SysoutTransformerLogger());
+        this.staticConfig = configFactory.createStaticConfig(TaggingLoggers.sysoutLogger());
     }
 
     @Override

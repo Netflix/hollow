@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.logger;
 
-import com.netflix.vms.io.TaggingLogger.LogTag;
-import com.netflix.vms.io.TaggingLogger.Severity;
+import com.netflix.vms.logging.TaggingLogger.LogTag;
+import com.netflix.vms.logging.TaggingLogger.Severity;
 
 class TransformerLogMessage {
     private final EventInfo eventInfo;

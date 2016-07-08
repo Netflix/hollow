@@ -5,7 +5,8 @@ import java.util.function.Consumer;
 
 import com.netflix.archaius.ConfigProxyFactory;
 import com.netflix.archaius.config.EmptyConfig;
-import com.netflix.vms.io.TaggingLogger;
+import com.netflix.vms.logging.TaggingLogger;
+import com.netflix.vms.logging.TaggingLoggers;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerFiles;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
@@ -22,7 +23,7 @@ public class SimpleTransformerContext implements TransformerContext {
     private final TransformerFiles files;
 
     public SimpleTransformerContext() {
-        this(new SysoutTransformerLogger(), new NoOpMetricRecorder(), null);
+        this(TaggingLoggers.sysoutLogger(), new NoOpMetricRecorder(), null);
     }
 
     SimpleTransformerContext(TaggingLogger logger, TransformerMetricRecorder recorder, TransformerFiles files) {
