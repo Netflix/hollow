@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.input;
 
+import com.netflix.vms.transformer.common.KeybaseBuilder;
+
 import com.netflix.aws.file.FileAccessItem;
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.client.HollowTransitionCreator;
@@ -10,16 +12,20 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class VMSInputDataTransitionCreator implements HollowTransitionCreator {
+public class VMSDataTransitionCreator implements HollowTransitionCreator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(VMSInputDataTransitionCreator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VMSDataTransitionCreator.class);
 
     private final FileStore fileStore;
-    private final VMSInputDataKeybaseBuilder keybaseBuilder;
+    private final KeybaseBuilder keybaseBuilder;
 
-    public VMSInputDataTransitionCreator(FileStore fileStore, String converterVip) {
+    public VMSDataTransitionCreator(FileStore fileStore, String converterVip) {
+        this(fileStore, new VMSInputDataKeybaseBuilder(converterVip));
+    }
+    
+    public VMSDataTransitionCreator(FileStore fileStore, KeybaseBuilder keybaseBuilder) {
         this.fileStore = fileStore;
-        this.keybaseBuilder = new VMSInputDataKeybaseBuilder(converterVip);
+        this.keybaseBuilder = keybaseBuilder;
     }
 
     @Override

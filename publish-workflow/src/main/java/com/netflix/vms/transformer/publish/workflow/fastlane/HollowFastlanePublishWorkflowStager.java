@@ -1,15 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow.fastlane;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.hermes.publisher.FastPropertyPublisher;
 import com.netflix.hermes.subscriber.SubscriptionManager;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
@@ -26,7 +18,12 @@ import com.netflix.vms.transformer.publish.workflow.job.impl.FastlaneHermesAnnou
 import com.netflix.vms.transformer.publish.workflow.job.impl.FileStoreHollowBlobPublishJob;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HermesBlobAnnouncer;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HermesVipAnnouncer;
-
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 
 public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStager {
@@ -37,10 +34,10 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
     
     private PublishWorkflowContext ctx;
     
-    public HollowFastlanePublishWorkflowStager(TransformerContext ctx, SubscriptionManager hermesSubscriber, FastPropertyPublisher hermesPublisher, FileStore fileStore, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+    public HollowFastlanePublishWorkflowStager(TransformerContext ctx, SubscriptionManager hermesSubscriber, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
         this.ctx = new TransformerPublishWorkflowContext(ctx,
                 new HermesVipAnnouncer(
-                        new HermesBlobAnnouncer(hermesPublisher),
+                        hermesBlobAnnouncer,
                         hermesSubscriber, null),
                 uploadStatus,
                 fileStore,

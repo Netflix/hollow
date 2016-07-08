@@ -1,7 +1,8 @@
 package com.netflix.vms.transformer.util;
 
+import com.netflix.vms.transformer.common.KeybaseBuilder;
 
-public class HollowBlobKeybaseBuilder {
+public class HollowBlobKeybaseBuilder implements KeybaseBuilder {
 
     private final String vip;
 

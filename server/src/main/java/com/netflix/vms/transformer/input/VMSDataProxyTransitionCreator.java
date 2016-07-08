@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.input;
 
+import com.netflix.vms.transformer.common.KeybaseBuilder;
+
 import com.netflix.hollow.client.HollowTransitionCreator;
 import com.netflix.hollow.client.HollowUpdateTransition;
 import com.netflix.vms.transformer.http.HttpHelper;
@@ -11,18 +13,22 @@ import java.util.TimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class VMSInputDataProxyTransitionCreator implements HollowTransitionCreator {
+public class VMSDataProxyTransitionCreator implements HollowTransitionCreator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(VMSInputDataProxyTransitionCreator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VMSDataProxyTransitionCreator.class);
 
     private final String baseProxyURL;
     private final String localDataDir;
-    private final VMSInputDataKeybaseBuilder keybaseBuilder;
+    private final KeybaseBuilder keybaseBuilder;
 
-    public VMSInputDataProxyTransitionCreator(String baseProxyURL, String localDataDir, String converterVip) {
+    public VMSDataProxyTransitionCreator(String baseProxyURL, String localDataDir, String converterVip) {
+        this(baseProxyURL, localDataDir, new VMSInputDataKeybaseBuilder(converterVip));
+    }
+    
+    public VMSDataProxyTransitionCreator(String baseProxyURL, String localDataDir, KeybaseBuilder keybaseBuilder) {
         this.baseProxyURL = baseProxyURL;
         this.localDataDir = localDataDir;
-        this.keybaseBuilder = new VMSInputDataKeybaseBuilder(converterVip);
+        this.keybaseBuilder = keybaseBuilder;
     }
 
     @Override

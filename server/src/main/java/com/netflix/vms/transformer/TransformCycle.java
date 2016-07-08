@@ -9,18 +9,18 @@ import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metri
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ReadInputDataDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WriteOutputDataDuration;
 
-import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
-
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.client.HollowClient;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
+import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.FollowVipPin;
 import com.netflix.vms.transformer.input.FollowVipPinExtractor;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
 import com.netflix.vms.transformer.input.VMSInputDataVersionLogger;
+import com.netflix.vms.transformer.input.VMSOutputDataClient;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.job.impl.BlobMetaDataUtil;
@@ -53,7 +53,12 @@ public class TransformCycle {
         this.versionMinter = new VersionMinter();
         this.followVipPinExtractor = new FollowVipPinExtractor(fileStore);
     }
-
+    
+    public void restore(VMSOutputDataClient restoreFrom) {
+        outputStateEngine.restoreFrom(restoreFrom.getStateEngine());
+        previousCycleNumber = restoreFrom.getCurrentVersionId();
+    }
+    
     public void cycle() throws Throwable {
         try {
             beginCycle();
@@ -195,5 +200,5 @@ public class TransformCycle {
     private void incrementSuccessCounter() {
         ctx.getMetricRecorder().incrementCounter(Metric.CycleSuccessCounter, 1);
     }
-
+    
 }

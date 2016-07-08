@@ -5,12 +5,11 @@ import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.Transf
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.WaitForNextCycle;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ConsecutiveCycleFailures;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WaitForNextCycleDuration;
-
+import com.netflix.vms.transformer.input.VMSOutputDataClient;
 import com.google.inject.Inject;
 import com.netflix.archaius.api.Config;
 import com.netflix.aws.file.FileStore;
 import com.netflix.cassandra.NFAstyanaxManager;
-import com.netflix.hermes.publisher.FastPropertyPublisher;
 import com.netflix.hermes.subscriber.SubscriptionManager;
 import com.netflix.vms.transformer.TransformCycle;
 import com.netflix.vms.transformer.atlas.AtlasTransformerMetricRecorder;
@@ -26,8 +25,9 @@ import com.netflix.vms.transformer.logger.TransformerServerLogger;
 import com.netflix.vms.transformer.publish.workflow.HollowPublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.fastlane.HollowFastlanePublishWorkflowStager;
+import com.netflix.vms.transformer.publish.workflow.job.impl.HermesBlobAnnouncer;
+import com.netflix.vms.transformer.publish.workflow.util.TransformerServerCassandraHelper;
 import com.netflix.vms.transformer.rest.VMSPublishWorkflowHistoryAdmin;
-import com.netflix.vms.transformer.util.TransformerServerCassandraHelper;
 import java.util.function.Supplier;
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 import netflix.admin.videometadata.uploadstat.VMSServerUploadStatus;
@@ -39,8 +39,8 @@ public class TransformerCycleKickoff {
             ElasticSearchClient esClient,
             NFAstyanaxManager astyanax,
             SubscriptionManager hermesSubscriber,
-            FastPropertyPublisher hermesPublisher,
             FileStore fileStore,
+            HermesBlobAnnouncer hermesBlobAnnouncer,
             TransformerConfig transformerConfig,
             Config config,
             OctoberSkyData octoberSkyData,
@@ -50,7 +50,7 @@ public class TransformerCycleKickoff {
         FileStore.useMultipartUploadWhenApplicable(true);
 
         TransformerContext ctx = ctx(astyanax, esClient, transformerConfig, config, octoberSkyData, healthIndicator);
-        PublishWorkflowStager publishStager = publishStager(ctx, hermesSubscriber, hermesPublisher, fileStore);
+        PublishWorkflowStager publishStager = publishStager(ctx, hermesSubscriber, fileStore, hermesBlobAnnouncer);
 
         TransformCycle cycle = new TransformCycle(
                                             ctx,
@@ -58,6 +58,9 @@ public class TransformerCycleKickoff {
                                             publishStager,
                                             transformerConfig.getConverterVip(),
                                             transformerConfig.getTransformerVip());
+        
+        if(!isFastlane(ctx.getConfig()))
+            restore(cycle, ctx.getConfig(), fileStore, hermesBlobAnnouncer);
 
         Thread t = new Thread(new Runnable() {
             private long previousCycleStartTime;
@@ -144,14 +147,29 @@ public class TransformerCycleKickoff {
     }
 
     private final PublishWorkflowStager publishStager(TransformerContext ctx, SubscriptionManager hermesSubscriber,
-            FastPropertyPublisher hermesPublisher, FileStore fileStore) {
+            FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer) {
         Supplier<ServerUploadStatus> uploadStatus = () -> VMSServerUploadStatus.get();
         if(isFastlane(ctx.getConfig()))
-            return new HollowFastlanePublishWorkflowStager(ctx, hermesSubscriber, hermesPublisher, fileStore, uploadStatus, ctx.getConfig().getTransformerVip());
+            return new HollowFastlanePublishWorkflowStager(ctx, hermesSubscriber, fileStore, hermesBlobAnnouncer, uploadStatus, ctx.getConfig().getTransformerVip());
 
-        return new HollowPublishWorkflowStager(ctx, hermesSubscriber, hermesPublisher, fileStore, uploadStatus, ctx.getConfig().getTransformerVip());
+        return new HollowPublishWorkflowStager(ctx, hermesSubscriber, fileStore, hermesBlobAnnouncer, uploadStatus, ctx.getConfig().getTransformerVip());
     }
     
+    private void restore(TransformCycle cycle, TransformerConfig cfg, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer) {
+        if(cfg.isRestoreFromPreviousStateEngine() && !isFastlane(cfg)) {
+            long latestVersion = hermesBlobAnnouncer.getLatestAnnouncedVersionFromCassandra(cfg.getTransformerVip());
+            
+            if(latestVersion != Long.MIN_VALUE) {
+                VMSOutputDataClient outputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip());
+                outputClient.triggerRefreshTo(latestVersion);
+                
+                cycle.restore(outputClient);
+            } else {
+                throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.restoreFromPreviousStateEngine=false.");
+            }
+        }
+    }
+
     private boolean isFastlane(TransformerConfig cfg) {
     	return cfg.getTransformerVip().endsWith("_override");
     }

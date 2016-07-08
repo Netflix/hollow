@@ -1,26 +1,34 @@
 package com.netflix.vms.transformer.publish.workflow;
 
+import com.netflix.aws.file.FileStore;
+import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.hermes.subscriber.SubscriptionManager;
+import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
+import com.netflix.vms.transformer.publish.workflow.job.AfterCanaryAnnounceJob;
+import com.netflix.vms.transformer.publish.workflow.job.AnnounceJob;
+import com.netflix.vms.transformer.publish.workflow.job.AutoPinbackJob;
+import com.netflix.vms.transformer.publish.workflow.job.BeforeCanaryAnnounceJob;
+import com.netflix.vms.transformer.publish.workflow.job.CanaryAnnounceJob;
+import com.netflix.vms.transformer.publish.workflow.job.CanaryRollbackJob;
+import com.netflix.vms.transformer.publish.workflow.job.CanaryValidationJob;
+import com.netflix.vms.transformer.publish.workflow.job.CircuitBreakerJob;
+import com.netflix.vms.transformer.publish.workflow.job.DelayJob;
+import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
+import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob.PublishType;
+import com.netflix.vms.transformer.publish.workflow.job.PoisonStateMarkerJob;
+import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJobScheduler;
+import com.netflix.vms.transformer.publish.workflow.job.impl.DefaultHollowPublishJobCreator;
+import com.netflix.vms.transformer.publish.workflow.job.impl.HermesBlobAnnouncer;
+import com.netflix.vms.transformer.publish.workflow.job.impl.HollowPublishJobCreator;
+import com.netflix.vms.transformer.publish.workflow.job.impl.ValuableVideoHolder;
+import com.netflix.vms.transformer.publish.workflow.playbackmonkey.PlaybackMonkeyTester;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
-
-import com.netflix.aws.file.FileStore;
-import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.hermes.publisher.FastPropertyPublisher;
-import com.netflix.hermes.subscriber.SubscriptionManager;
-import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
-import com.netflix.vms.transformer.publish.workflow.job.*;
-import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob.PublishType;
-import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJobScheduler;
-import com.netflix.vms.transformer.publish.workflow.job.impl.DefaultHollowPublishJobCreator;
-import com.netflix.vms.transformer.publish.workflow.job.impl.HollowPublishJobCreator;
-import com.netflix.vms.transformer.publish.workflow.job.impl.ValuableVideoHolder;
-import com.netflix.vms.transformer.publish.workflow.playbackmonkey.PlaybackMonkeyTester;
-
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 
 public class HollowPublishWorkflowStager implements PublishWorkflowStager {
@@ -38,12 +46,12 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     private CanaryValidationJob priorCycleCanaryValidationJob;
     private CanaryRollbackJob priorCycleCanaryRollbackJob;
 
-    public HollowPublishWorkflowStager(TransformerContext ctx, SubscriptionManager hermesSubscriber, FastPropertyPublisher hermesPublisher, FileStore fileStore, Supplier<ServerUploadStatus> uploadStatus, String vip) {
-        this(ctx, hermesSubscriber, hermesPublisher, fileStore, new HollowBlobDataProvider(ctx), uploadStatus, vip);
+    public HollowPublishWorkflowStager(TransformerContext ctx, SubscriptionManager hermesSubscriber, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+        this(ctx, hermesSubscriber, fileStore, hermesBlobAnnouncer, new HollowBlobDataProvider(ctx), uploadStatus, vip);
     }
 
-    private HollowPublishWorkflowStager(TransformerContext ctx, SubscriptionManager hermesSubscriber, FastPropertyPublisher hermesPublisher, FileStore fileStore, HollowBlobDataProvider hollowBlobDataProvider, Supplier<ServerUploadStatus> uploadStatus, String vip) {
-        this(ctx, new DefaultHollowPublishJobCreator(ctx, hermesSubscriber, hermesPublisher, fileStore, hollowBlobDataProvider, new PlaybackMonkeyTester(), new ValuableVideoHolder(hollowBlobDataProvider), uploadStatus, vip), vip);
+    private HollowPublishWorkflowStager(TransformerContext ctx, SubscriptionManager hermesSubscriber, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, HollowBlobDataProvider hollowBlobDataProvider, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+        this(ctx, new DefaultHollowPublishJobCreator(ctx, hermesSubscriber, fileStore, hermesBlobAnnouncer, hollowBlobDataProvider, new PlaybackMonkeyTester(), new ValuableVideoHolder(hollowBlobDataProvider), uploadStatus, vip), vip);
     }
 
     public HollowPublishWorkflowStager(TransformerContext ctx, HollowPublishJobCreator jobCreator, String vip) {

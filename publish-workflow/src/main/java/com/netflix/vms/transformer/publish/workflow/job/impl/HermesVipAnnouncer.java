@@ -36,11 +36,9 @@ public class HermesVipAnnouncer implements VipAnnouncer {
 
     @Override
     public boolean announce(String vip, RegionEnum region, boolean canary, long announceVersion, long priorVersion) {
-        String hermesTopic = canary ? HermesTopicProvider.getDataCanaryTopic(vip) : HermesTopicProvider.getHollowBlobTopic(vip);
-
         boolean success = false;
         try {
-            success = hermesAnnouncer.publish(region, hermesTopic, getAttributes(announceVersion, priorVersion));
+            success = hermesAnnouncer.publish(region, vip, canary, getAttributes(announceVersion, priorVersion));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
