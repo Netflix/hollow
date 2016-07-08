@@ -2,6 +2,8 @@ package com.netflix.vms.transformer.hollowinput;
 
 import com.netflix.hollow.objects.delegate.HollowObjectDelegate;
 
+
+@SuppressWarnings("all")
 public interface CertificationSystemDelegate extends HollowObjectDelegate {
 
     public long getCertificationSystemId(int ordinal);

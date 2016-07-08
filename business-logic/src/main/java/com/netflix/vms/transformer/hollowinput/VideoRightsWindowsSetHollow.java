@@ -5,6 +5,7 @@ import com.netflix.hollow.HollowSetSchema;
 import com.netflix.hollow.objects.delegate.HollowSetDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
+@SuppressWarnings("all")
 public class VideoRightsWindowsSetHollow extends HollowSet<VideoRightsWindowHollow> {
 
     public VideoRightsWindowsSetHollow(HollowSetDelegate delegate, int ordinal) {
@@ -12,7 +13,6 @@ public class VideoRightsWindowsSetHollow extends HollowSet<VideoRightsWindowHoll
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public VideoRightsWindowHollow instantiateElement(int ordinal) {
         return (VideoRightsWindowHollow) api().getVideoRightsWindowHollow(ordinal);
     }

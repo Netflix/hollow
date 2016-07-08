@@ -4,6 +4,7 @@ import com.netflix.hollow.objects.delegate.HollowObjectAbstractDelegate;
 import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.HollowObjectSchema;
 
+@SuppressWarnings("all")
 public class RolloutPhaseArtworkSourceFileIdDelegateLookupImpl extends HollowObjectAbstractDelegate implements RolloutPhaseArtworkSourceFileIdDelegate {
 
     private final RolloutPhaseArtworkSourceFileIdTypeAPI typeAPI;
