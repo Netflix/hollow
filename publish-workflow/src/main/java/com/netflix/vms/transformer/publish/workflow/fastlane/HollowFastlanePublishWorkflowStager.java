@@ -2,7 +2,6 @@ package com.netflix.vms.transformer.publish.workflow.fastlane;
 
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.hermes.subscriber.SubscriptionManager;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
@@ -34,11 +33,9 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
     
     private PublishWorkflowContext ctx;
     
-    public HollowFastlanePublishWorkflowStager(TransformerContext ctx, SubscriptionManager hermesSubscriber, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+    public HollowFastlanePublishWorkflowStager(TransformerContext ctx, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
         this.ctx = new TransformerPublishWorkflowContext(ctx,
-                new HermesVipAnnouncer(
-                        hermesBlobAnnouncer,
-                        hermesSubscriber, null),
+                new HermesVipAnnouncer(hermesBlobAnnouncer),
                 uploadStatus,
                 fileStore,
                 vip);

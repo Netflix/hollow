@@ -2,7 +2,6 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.hermes.subscriber.SubscriptionManager;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
@@ -39,7 +38,6 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
     private PublishWorkflowContext ctx;
 
     public DefaultHollowPublishJobCreator(TransformerContext transformerContext,
-            SubscriptionManager hermesSubscriber,
             FileStore fileStore,
             HermesBlobAnnouncer hermesBlobAnnouncer,
             HollowBlobDataProvider hollowBlobDataProvider, PlaybackMonkeyTester playbackMonkeyTester,
@@ -48,10 +46,7 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
         this.playbackMonkeyTester = playbackMonkeyTester;
         this.videoRanker = videoRanker;
         this.ctx = new TransformerPublishWorkflowContext(transformerContext,
-                new HermesVipAnnouncer(
-                        hermesBlobAnnouncer,
-                        hermesSubscriber, 
-                        transformerContext.getConfig().getTransformerVip()),
+                new HermesVipAnnouncer(hermesBlobAnnouncer),
                 serverUploadStatus,
                 fileStore,
                 vip);

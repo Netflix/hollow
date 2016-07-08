@@ -2,7 +2,6 @@ package com.netflix.vms.transformer.publish.workflow;
 
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.hermes.subscriber.SubscriptionManager;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.job.AfterCanaryAnnounceJob;
@@ -46,12 +45,12 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     private CanaryValidationJob priorCycleCanaryValidationJob;
     private CanaryRollbackJob priorCycleCanaryRollbackJob;
 
-    public HollowPublishWorkflowStager(TransformerContext ctx, SubscriptionManager hermesSubscriber, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
-        this(ctx, hermesSubscriber, fileStore, hermesBlobAnnouncer, new HollowBlobDataProvider(ctx), uploadStatus, vip);
+    public HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+        this(ctx, fileStore, hermesBlobAnnouncer, new HollowBlobDataProvider(ctx), uploadStatus, vip);
     }
 
-    private HollowPublishWorkflowStager(TransformerContext ctx, SubscriptionManager hermesSubscriber, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, HollowBlobDataProvider hollowBlobDataProvider, Supplier<ServerUploadStatus> uploadStatus, String vip) {
-        this(ctx, new DefaultHollowPublishJobCreator(ctx, hermesSubscriber, fileStore, hermesBlobAnnouncer, hollowBlobDataProvider, new PlaybackMonkeyTester(), new ValuableVideoHolder(hollowBlobDataProvider), uploadStatus, vip), vip);
+    private HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, HollowBlobDataProvider hollowBlobDataProvider, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+        this(ctx, new DefaultHollowPublishJobCreator(ctx, fileStore, hermesBlobAnnouncer, hollowBlobDataProvider, new PlaybackMonkeyTester(), new ValuableVideoHolder(hollowBlobDataProvider), uploadStatus, vip), vip);
     }
 
     public HollowPublishWorkflowStager(TransformerContext ctx, HollowPublishJobCreator jobCreator, String vip) {

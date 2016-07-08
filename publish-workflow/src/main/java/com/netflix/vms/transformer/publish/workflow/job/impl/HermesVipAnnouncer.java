@@ -1,32 +1,22 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.hermes.data.DirectDataPointer;
-import com.netflix.hermes.exception.DataConsumeException;
-import com.netflix.hermes.subscriber.Subscription;
-import com.netflix.hermes.subscriber.SubscriptionManager;
 import com.netflix.vms.transformer.common.publish.workflow.VipAnnouncer;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 public class HermesVipAnnouncer implements VipAnnouncer {
 
     /* dependencies */
     private final HermesBlobAnnouncer hermesAnnouncer;
-    private final SubscriptionManager subscriptionManager;
-    private final String vip;
 
     /* fields */
     private long previouslyAnnouncedCanaryVersion = Long.MAX_VALUE;
     private long currentlyAnnouncedCanaryVersion = Long.MAX_VALUE;
 
-    public HermesVipAnnouncer(HermesBlobAnnouncer hermesAnnouncer, SubscriptionManager hermesSubscriber, String vip) {
+    public HermesVipAnnouncer(HermesBlobAnnouncer hermesAnnouncer) {
         this.hermesAnnouncer = hermesAnnouncer;
-        this.subscriptionManager = hermesSubscriber;
-        this.vip = vip;
     }
 
     @Override
@@ -38,7 +28,7 @@ public class HermesVipAnnouncer implements VipAnnouncer {
     public boolean announce(String vip, RegionEnum region, boolean canary, long announceVersion, long priorVersion) {
         boolean success = false;
         try {
-            success = hermesAnnouncer.publish(region, vip, canary, getAttributes(announceVersion, priorVersion));
+            success = hermesAnnouncer.publish(region, vip, canary, getAttributes(vip, announceVersion, priorVersion));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -56,7 +46,7 @@ public class HermesVipAnnouncer implements VipAnnouncer {
         return success;
     }
 
-    private Map<String, String> getAttributes(long cycleVersionId, long priorVersion) {
+    private Map<String, String> getAttributes(String vip, long cycleVersionId, long priorVersion) {
         String currentVersionStr = String.valueOf(cycleVersionId);
         String priorVersionStr = (priorVersion != Long.MIN_VALUE || priorVersion != cycleVersionId)? String.valueOf(priorVersion) : "";
         return BlobMetaDataUtil.getPublisherProps(vip, System.currentTimeMillis(), currentVersionStr, priorVersionStr);
@@ -70,28 +60,8 @@ public class HermesVipAnnouncer implements VipAnnouncer {
         return previouslyAnnouncedCanaryVersion;
     }
 
-    private boolean initializePreviouslyAnnouncedCanaryVersion(String vip) {
-        Subscription subscription = subscriptionManager.subscribe(HermesTopicProvider.getDataCanaryTopic(vip), (entry) -> {
-            DirectDataPointer directDataPointer = (DirectDataPointer)(entry.getDataPointer());
-            String dataString = directDataPointer.getDataString();
-            String latestVersion = null;
-            try {
-                HermesAnnounceEvent event = new ObjectMapper().readValue(dataString, HermesAnnounceEvent.class);
-                latestVersion = event.getVersion();
-
-                previouslyAnnouncedCanaryVersion = Long.parseLong(latestVersion);
-            } catch (Throwable t) {
-                throw new DataConsumeException("Exception occurred receiving Hermes VMS announcement.  Version: " + latestVersion, true, t);
-            }
-        });
-
-        try {
-            subscription.waitInitUpdate(60000L);
-            return true;
-        } catch(TimeoutException te) {
-            te.printStackTrace();
-            return false;
-        }
+    private void initializePreviouslyAnnouncedCanaryVersion(String vip) {
+        previouslyAnnouncedCanaryVersion = hermesAnnouncer.getLatestAnnouncedVersionFromCassandra(vip);
     }
 
     @JsonDeserialize(builder=HermesAnnounceEvent.Builder.class)

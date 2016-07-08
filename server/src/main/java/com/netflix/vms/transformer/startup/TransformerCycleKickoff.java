@@ -5,12 +5,11 @@ import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.Transf
 import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.WaitForNextCycle;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ConsecutiveCycleFailures;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WaitForNextCycleDuration;
-import com.netflix.vms.transformer.input.VMSOutputDataClient;
+
 import com.google.inject.Inject;
 import com.netflix.archaius.api.Config;
 import com.netflix.aws.file.FileStore;
 import com.netflix.cassandra.NFAstyanaxManager;
-import com.netflix.hermes.subscriber.SubscriptionManager;
 import com.netflix.vms.transformer.TransformCycle;
 import com.netflix.vms.transformer.atlas.AtlasTransformerMetricRecorder;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -20,6 +19,7 @@ import com.netflix.vms.transformer.context.TransformerServerContext;
 import com.netflix.vms.transformer.elasticsearch.ElasticSearchClient;
 import com.netflix.vms.transformer.fastlane.FastlaneIdRetriever;
 import com.netflix.vms.transformer.health.TransformerServerHealthIndicator;
+import com.netflix.vms.transformer.input.VMSOutputDataClient;
 import com.netflix.vms.transformer.io.LZ4VMSTransformerFiles;
 import com.netflix.vms.transformer.logger.TransformerServerLogger;
 import com.netflix.vms.transformer.publish.workflow.HollowPublishWorkflowStager;
@@ -38,7 +38,6 @@ public class TransformerCycleKickoff {
     public TransformerCycleKickoff(
             ElasticSearchClient esClient,
             NFAstyanaxManager astyanax,
-            SubscriptionManager hermesSubscriber,
             FileStore fileStore,
             HermesBlobAnnouncer hermesBlobAnnouncer,
             TransformerConfig transformerConfig,
@@ -50,7 +49,7 @@ public class TransformerCycleKickoff {
         FileStore.useMultipartUploadWhenApplicable(true);
 
         TransformerContext ctx = ctx(astyanax, esClient, transformerConfig, config, octoberSkyData, healthIndicator);
-        PublishWorkflowStager publishStager = publishStager(ctx, hermesSubscriber, fileStore, hermesBlobAnnouncer);
+        PublishWorkflowStager publishStager = publishStager(ctx, fileStore, hermesBlobAnnouncer);
 
         TransformCycle cycle = new TransformCycle(
                                             ctx,
@@ -146,13 +145,12 @@ public class TransformerCycleKickoff {
                 });
     }
 
-    private final PublishWorkflowStager publishStager(TransformerContext ctx, SubscriptionManager hermesSubscriber,
-            FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer) {
+    private final PublishWorkflowStager publishStager(TransformerContext ctx, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer) {
         Supplier<ServerUploadStatus> uploadStatus = () -> VMSServerUploadStatus.get();
         if(isFastlane(ctx.getConfig()))
-            return new HollowFastlanePublishWorkflowStager(ctx, hermesSubscriber, fileStore, hermesBlobAnnouncer, uploadStatus, ctx.getConfig().getTransformerVip());
+            return new HollowFastlanePublishWorkflowStager(ctx, fileStore, hermesBlobAnnouncer, uploadStatus, ctx.getConfig().getTransformerVip());
 
-        return new HollowPublishWorkflowStager(ctx, hermesSubscriber, fileStore, hermesBlobAnnouncer, uploadStatus, ctx.getConfig().getTransformerVip());
+        return new HollowPublishWorkflowStager(ctx, fileStore, hermesBlobAnnouncer, uploadStatus, ctx.getConfig().getTransformerVip());
     }
     
     private void restore(TransformCycle cycle, TransformerConfig cfg, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer) {
