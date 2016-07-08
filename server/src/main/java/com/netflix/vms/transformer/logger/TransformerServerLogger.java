@@ -1,9 +1,9 @@
 package com.netflix.vms.transformer.logger;
 
+import static com.netflix.vms.logging.Slf4jTaggingLogger.severityToInt;
 import static org.slf4j.helpers.MessageFormatter.arrayFormat;
 
 import java.util.Collection;
-import java.util.function.Function;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -17,6 +17,7 @@ import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.elasticsearch.ElasticSearchClient;
 
+// TODO: timt: partially duplicated from TaggingLoggers; could extend/compose Slf4jTaggingLogger
 public class TransformerServerLogger implements TaggingLogger {
     private static final String FQCN = TaggingLogger.class.getName();
 
@@ -69,7 +70,6 @@ public class TransformerServerLogger implements TaggingLogger {
 
     @Override
     public void log(Severity severity, Collection<LogTag> tags, String message, Object... args) {
-        // TODO: timt: partially duplicated from TaggingLoggers
         String formattedMessage = message;
         Throwable cause = null;
         if (args.length > 0) {
@@ -79,12 +79,12 @@ public class TransformerServerLogger implements TaggingLogger {
         }
 
         for (LogTag tag : tags) {
-            consoleLogger.log(null, FQCN, severity.intValue, tag.with(formattedMessage), null, cause);
+            consoleLogger.log(null, FQCN, severityToInt(severity), tag.with(formattedMessage), null, cause);
             if(config.isElasticSearchLoggingEnabled()) {
                 try {
                     esClient.addData(elasticSearchIndexName, "vmsserver", toJsonString(severity, tag, formattedMessage, cause));
                 } catch (JsonProcessingException e) {
-                    consoleLogger.log(null, FQCN, Severity.ERROR.intValue, "Unable to create json for ES log message", null, e);
+                    consoleLogger.log(null, FQCN, severityToInt(Severity.ERROR), "Unable to create json for ES log message", null, e);
                 }
             }
         }
