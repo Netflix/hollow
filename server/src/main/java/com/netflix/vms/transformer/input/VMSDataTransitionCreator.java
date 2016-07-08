@@ -18,14 +18,16 @@ public class VMSDataTransitionCreator implements HollowTransitionCreator {
 
     private final FileStore fileStore;
     private final KeybaseBuilder keybaseBuilder;
+    private final boolean useVMSLZ4;
 
     public VMSDataTransitionCreator(FileStore fileStore, String converterVip) {
-        this(fileStore, new VMSInputDataKeybaseBuilder(converterVip));
+        this(fileStore, new VMSInputDataKeybaseBuilder(converterVip), false);
     }
     
-    public VMSDataTransitionCreator(FileStore fileStore, KeybaseBuilder keybaseBuilder) {
+    public VMSDataTransitionCreator(FileStore fileStore, KeybaseBuilder keybaseBuilder, boolean useVMSLZ4) {
         this.fileStore = fileStore;
         this.keybaseBuilder = keybaseBuilder;
+        this.useVMSLZ4 = useVMSLZ4;
     }
 
     @Override
@@ -115,7 +117,7 @@ public class VMSDataTransitionCreator implements HollowTransitionCreator {
     }
 
     private FileStoreHollowUpdateTransition createTransition(FileAccessItem latestItem) {
-        FileStoreHollowUpdateTransition transition = new FileStoreHollowUpdateTransition(latestItem, fileStore);
+        FileStoreHollowUpdateTransition transition = new FileStoreHollowUpdateTransition(latestItem, fileStore, useVMSLZ4);
         return transition;
     }
 
