@@ -437,7 +437,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.20",
+            "locked": "1.22",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -1067,13 +1067,23 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.1",
-            "requested": "latest.release",
+            "locked": "1.5",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-core": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-slf4j": {
+            "locked": "1.3",
+            "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
             "project": true
@@ -1512,6 +1522,8 @@
                 "com.netflix.governator:governator-core",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
             ]
@@ -2740,7 +2752,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "com.netflix.vms.logging:vmslogging-api",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.thinkaurelius.thrift:thrift-server",
                 "com.yammer.metrics:metrics-core",
                 "io.dropwizard.metrics:metrics-core",
@@ -3268,7 +3280,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.20",
+            "locked": "1.22",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -3898,13 +3910,23 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.1",
-            "requested": "latest.release",
+            "locked": "1.5",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-core": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-slf4j": {
+            "locked": "1.3",
+            "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
             "project": true
@@ -4343,6 +4365,8 @@
                 "com.netflix.governator:governator-core",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
             ]
@@ -5571,7 +5595,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "com.netflix.vms.logging:vmslogging-api",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.thinkaurelius.thrift:thrift-server",
                 "com.yammer.metrics:metrics-core",
                 "io.dropwizard.metrics:metrics-core",
@@ -6099,7 +6123,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.20",
+            "locked": "1.22",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -6729,13 +6753,23 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.1",
-            "requested": "latest.release",
+            "locked": "1.5",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-core": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-slf4j": {
+            "locked": "1.3",
+            "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
             "project": true
@@ -7174,6 +7208,8 @@
                 "com.netflix.governator:governator-core",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
             ]
@@ -8402,7 +8438,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "com.netflix.vms.logging:vmslogging-api",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.thinkaurelius.thrift:thrift-server",
                 "com.yammer.metrics:metrics-core",
                 "io.dropwizard.metrics:metrics-core",
@@ -8930,7 +8966,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.20",
+            "locked": "1.22",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -9560,13 +9596,23 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.1",
-            "requested": "latest.release",
+            "locked": "1.5",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-core": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-slf4j": {
+            "locked": "1.3",
+            "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
             "project": true
@@ -10005,6 +10051,8 @@
                 "com.netflix.governator:governator-core",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
             ]
@@ -11204,7 +11252,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "com.netflix.vms.logging:vmslogging-api",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.thinkaurelius.thrift:thrift-server",
                 "com.yammer.metrics:metrics-core",
                 "io.dropwizard.metrics:metrics-core",
@@ -11785,7 +11833,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.20",
+            "locked": "1.22",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -12415,13 +12463,23 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.1",
-            "requested": "latest.release",
+            "locked": "1.5",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-core": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-slf4j": {
+            "locked": "1.3",
+            "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
             "project": true
@@ -12860,6 +12918,8 @@
                 "com.netflix.governator:governator-core",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
             ]
@@ -14088,7 +14148,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "com.netflix.vms.logging:vmslogging-api",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.thinkaurelius.thrift:thrift-server",
                 "com.yammer.metrics:metrics-core",
                 "io.dropwizard.metrics:metrics-core",
@@ -15708,7 +15768,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.20",
+            "locked": "1.22",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -16338,13 +16398,23 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.1",
-            "requested": "latest.release",
+            "locked": "1.5",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-core": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-slf4j": {
+            "locked": "1.3",
+            "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
             "project": true
@@ -16783,6 +16853,8 @@
                 "com.netflix.governator:governator-core",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
             ]
@@ -18011,7 +18083,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "com.netflix.vms.logging:vmslogging-api",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.thinkaurelius.thrift:thrift-server",
                 "com.yammer.metrics:metrics-core",
                 "io.dropwizard.metrics:metrics-core",
@@ -18539,7 +18611,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.20",
+            "locked": "1.22",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -19169,13 +19241,23 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.1",
-            "requested": "latest.release",
+            "locked": "1.5",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-core": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-slf4j": {
+            "locked": "1.3",
+            "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
             "project": true
@@ -19614,6 +19696,8 @@
                 "com.netflix.governator:governator-core",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
             ]
@@ -20810,7 +20894,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "com.netflix.vms.logging:vmslogging-api",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.thinkaurelius.thrift:thrift-server",
                 "com.yammer.metrics:metrics-core",
                 "io.dropwizard.metrics:metrics-core",
@@ -21361,7 +21445,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.20",
+            "locked": "1.22",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -21369,13 +21453,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.9",
+            "locked": "1.11",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.20",
+            "locked": "1.22",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -22014,13 +22098,23 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.1",
-            "requested": "latest.release",
+            "locked": "1.5",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-core": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-slf4j": {
+            "locked": "1.3",
+            "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
             "project": true
@@ -22476,6 +22570,8 @@
                 "com.netflix.governator:governator-core",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
             ]
@@ -23758,7 +23854,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "com.netflix.vms.logging:vmslogging-api",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.thinkaurelius.thrift:thrift-server",
                 "com.yammer.metrics:metrics-core",
                 "io.dropwizard.metrics:metrics-core",
@@ -24313,7 +24409,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.20",
+            "locked": "1.22",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -24321,13 +24417,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.9",
+            "locked": "1.11",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.20",
+            "locked": "1.22",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -24966,13 +25062,23 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.1",
-            "requested": "latest.release",
+            "locked": "1.5",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-core": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-slf4j": {
+            "locked": "1.3",
+            "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
             "project": true
@@ -25428,6 +25534,8 @@
                 "com.netflix.governator:governator-core",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
             ]
@@ -26710,7 +26818,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "com.netflix.vms.logging:vmslogging-api",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.thinkaurelius.thrift:thrift-server",
                 "com.yammer.metrics:metrics-core",
                 "io.dropwizard.metrics:metrics-core",
@@ -27265,7 +27373,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.20",
+            "locked": "1.22",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -27273,13 +27381,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.9",
+            "locked": "1.11",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.20",
+            "locked": "1.22",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -27918,13 +28026,23 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.1",
-            "requested": "latest.release",
+            "locked": "1.5",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-core": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-slf4j": {
+            "locked": "1.3",
+            "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
             "project": true
@@ -28380,6 +28498,8 @@
                 "com.netflix.governator:governator-core",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
             ]
@@ -29662,7 +29782,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "com.netflix.vms.logging:vmslogging-api",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.thinkaurelius.thrift:thrift-server",
                 "com.yammer.metrics:metrics-core",
                 "io.dropwizard.metrics:metrics-core",
@@ -30217,7 +30337,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.20",
+            "locked": "1.22",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -30225,13 +30345,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.9",
+            "locked": "1.11",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.20",
+            "locked": "1.22",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -30870,13 +30990,23 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.1",
-            "requested": "latest.release",
+            "locked": "1.5",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-core": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-slf4j": {
+            "locked": "1.3",
+            "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
             "project": true
@@ -31332,6 +31462,8 @@
                 "com.netflix.governator:governator-core",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
             ]
@@ -32614,7 +32746,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "com.netflix.vms.logging:vmslogging-api",
+                "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.thinkaurelius.thrift:thrift-server",
                 "com.yammer.metrics:metrics-core",
                 "io.dropwizard.metrics:metrics-core",
