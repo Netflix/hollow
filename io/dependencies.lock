@@ -313,6 +313,12 @@
             "locked": "0.2.51-platform",
             "requested": "latest.release"
         },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
+        },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
@@ -1185,6 +1191,12 @@
         "com.netflix.suro:suro-core": {
             "locked": "0.2.51-platform",
             "requested": "latest.release"
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
@@ -2059,6 +2071,12 @@
             "locked": "0.2.51-platform",
             "requested": "latest.release"
         },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
+        },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
@@ -2931,6 +2949,12 @@
         "com.netflix.suro:suro-core": {
             "locked": "0.2.51-platform",
             "requested": "latest.release"
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
@@ -3904,6 +3928,12 @@
             "locked": "0.2.51-platform",
             "requested": "latest.release"
         },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
+        },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
@@ -4776,6 +4806,12 @@
         "com.netflix.suro:suro-core": {
             "locked": "0.2.51-platform",
             "requested": "latest.release"
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
@@ -5661,6 +5697,12 @@
             "locked": "0.2.51-platform",
             "requested": "latest.release"
         },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
+        },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
@@ -6545,6 +6587,12 @@
             "locked": "0.2.51-platform",
             "requested": "latest.release"
         },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
+        },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
         },
@@ -7428,6 +7476,12 @@
         "com.netflix.suro:suro-core": {
             "locked": "0.2.51-platform",
             "requested": "latest.release"
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true

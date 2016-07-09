@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.modules.artwork;
 
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.*;
 
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -35,7 +35,7 @@ public class PersonImagesModule extends ArtWorkModule{
             int entityId = (int) artworkHollowInput._getPersonId();
             Set<ArtworkLocaleHollow> localeSet = getLocalTerritories(locales);
             if(localeSet.isEmpty()) {
-                ctx.getLogger().error(LogTag.MissingLocaleForArtwork, String.format("Missing artwork locale for %s with id=%d; data will be dropped.", entityType, entityId));
+                ctx.getLogger().error(MissingLocaleForArtwork, "Missing artwork locale for {} with id={}; data will be dropped.", entityType, entityId);
                 continue;
             }
 

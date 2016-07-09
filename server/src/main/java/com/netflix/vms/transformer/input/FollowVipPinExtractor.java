@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.input;
 
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.FollowVip;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.FollowVip;
 
 import com.netflix.aws.file.FileAccessItem;
 import com.netflix.aws.file.FileStore;
