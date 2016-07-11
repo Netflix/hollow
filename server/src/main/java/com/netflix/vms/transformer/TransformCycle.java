@@ -1,19 +1,20 @@
 package com.netflix.vms.transformer;
 
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.CycleFastlaneIds;
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleBegin;
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleFailed;
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.WritingBlobsFailed;
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.WroteBlob;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ProcessDataDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ReadInputDataDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WriteOutputDataDuration;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleFastlaneIds;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.InputDataConverterVersionId;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.ProcessNowMillis;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleBegin;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.WritingBlobsFailed;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.WroteBlob;
 
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.client.HollowClient;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.FollowVipPin;
@@ -87,7 +88,7 @@ public class TransformCycle {
 
         if(ctx.getFastlaneIds() != null)
             ctx.getLogger().info(CycleFastlaneIds, ctx.getFastlaneIds());
-        ctx.getLogger().info(TransformCycleBegin, "Beginning cycle=" + currentCycleNumber + " jarVersion=" + BlobMetaDataUtil.getJarVersion());
+        ctx.getLogger().info(TransformCycleBegin, "Beginning cycle={} jarVersion={}", currentCycleNumber, BlobMetaDataUtil.getJarVersion());
     }
     
     private void updateTheInput() {
@@ -116,8 +117,8 @@ public class TransformCycle {
         long endTime = System.currentTimeMillis();
 
         ctx.getMetricRecorder().recordMetric(ReadInputDataDuration, endTime - startTime);
-        ctx.getLogger().info(LogTag.InputDataConverterVersionId, inputClient.getCurrentVersionId());
-        ctx.getLogger().info(LogTag.ProcessNowMillis, "Using transform timestamp of " + nowMillis + " (" + new Date(nowMillis).toString() + ")");
+        ctx.getLogger().info(InputDataConverterVersionId, inputClient.getCurrentVersionId());
+        ctx.getLogger().info(ProcessNowMillis, "Using transform timestamp of {} ({})", nowMillis, new Date(nowMillis));
 
         VMSInputDataVersionLogger.logInputVersions(inputClient.getStateEngine().getHeaderTags(), ctx.getLogger());
     }
@@ -152,20 +153,20 @@ public class TransformCycle {
             String snapshotFileName = fileNamer.getSnapshotFileName(currentCycleNumber);
             try (OutputStream snapshotOutputStream = ctx.files().newBlobOutputStream(new File(snapshotFileName))) {
                 writer.writeSnapshot(snapshotOutputStream);
-                ctx.getLogger().info(WroteBlob, "Wrote Snapshot to local file " + snapshotFileName);
+                ctx.getLogger().info(WroteBlob, "Wrote Snapshot to local file {}", snapshotFileName);
             }
 
             if(previousCycleNumber != Long.MIN_VALUE) {
                 String deltaFileName = fileNamer.getDeltaFileName(previousCycleNumber, currentCycleNumber);
                 try (OutputStream deltaOutputStream = ctx.files().newBlobOutputStream(new File(deltaFileName))) {
                     writer.writeDelta(deltaOutputStream);
-                    ctx.getLogger().info(WroteBlob, "Wrote Delta to local file " + deltaFileName);
+                    ctx.getLogger().info(WroteBlob, "Wrote Delta to local file {}", deltaFileName);
                 }
 
                 String reverseDeltaFileName = fileNamer.getReverseDeltaFileName(currentCycleNumber, previousCycleNumber);
                 try (OutputStream reverseDeltaOutputStream = ctx.files().newBlobOutputStream(new File(reverseDeltaFileName))){
                     writer.writeReverseDelta(reverseDeltaOutputStream);
-                    ctx.getLogger().info(WroteBlob, "Wrote Reverse Delta to local file " + reverseDeltaFileName);
+                    ctx.getLogger().info(WroteBlob, "Wrote Reverse Delta to local file {}", reverseDeltaFileName);
                 }
             }
         } catch(IOException e) {

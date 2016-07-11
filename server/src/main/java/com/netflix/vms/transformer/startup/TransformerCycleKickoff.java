@@ -1,8 +1,6 @@
 package com.netflix.vms.transformer.startup;
 
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleFailed;
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleSuccess;
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.WaitForNextCycle;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.*;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ConsecutiveCycleFailures;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WaitForNextCycleDuration;
 

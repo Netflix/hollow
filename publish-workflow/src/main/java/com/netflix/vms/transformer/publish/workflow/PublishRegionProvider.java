@@ -1,14 +1,15 @@
 package com.netflix.vms.transformer.publish.workflow;
 
-import com.netflix.vms.transformer.common.TransformerLogger;
-import java.util.List;
-import java.util.Arrays;
-import com.netflix.config.FastProperty;
-import com.netflix.config.NetflixConfiguration.RegionEnum;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import com.netflix.config.FastProperty;
+import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.vms.logging.TaggingLogger;
 
 public class PublishRegionProvider {
 
@@ -25,11 +26,11 @@ public class PublishRegionProvider {
     private final Collection<RegionEnum> nonPrimaryRegions = new ArrayList<>();
     private final Map<RegionEnum, Long> publishRegionDelays = new HashMap<>();
 
-    public PublishRegionProvider(TransformerLogger logger) {
+    public PublishRegionProvider(TaggingLogger logger) {
         this(PUBLISH_REGION_DELAYS.get(), RegionEnum.valueOf(PUBLISH_PRIMARY_REGION.get()), logger);
     }
 
-    public PublishRegionProvider(String regionPublishDelays, RegionEnum primaryRegion, TransformerLogger logger) {
+    public PublishRegionProvider(String regionPublishDelays, RegionEnum primaryRegion, TaggingLogger logger) {
         if(!ALL_REGIONS.contains(primaryRegion)) throw new IllegalArgumentException("Invalid primary region");
         this.primaryRegion = primaryRegion;
         for(RegionEnum region : ALL_REGIONS) {

@@ -1,8 +1,9 @@
 package com.netflix.vms.transformer.modules.l10n;
 
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.*;
+
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
@@ -45,15 +46,14 @@ public class L10NMiscResourcesModule extends AbstractTransformModule {
         processorList.add(new PersonsProcessor(api, ctx, mapper));
         processorList.add(new ShowMemberTypesProcessor(api, ctx, mapper));
         processorList.add(new TurboCollectionsProcessor(api, ctx, mapper));
-
     }
 
     @Override
     public void transform() {
-    	/// short-circuit Fastlane
-    	if(ctx.getFastlaneIds() != null)
-    		return;
-    	
+        /// short-circuit Fastlane
+        if(ctx.getFastlaneIds() != null)
+            return;
+
         for (L10NMiscProcessor<?> processor : processorList) {
             long start = System.currentTimeMillis();
 
@@ -62,7 +62,7 @@ public class L10NMiscResourcesModule extends AbstractTransformModule {
             int itemsAdded = processor.getItemsAdded();
 
             long duration = System.currentTimeMillis() - start;
-            ctx.getLogger().info(LogTag.L10NProcessing, String.format("processorName=%s, itemsProcessed=%s, itemsAdded=%s, duraction=%s", processorName, itemsProcessed, itemsAdded, duration));
+            ctx.getLogger().info(L10NProcessing, "processorName={}, itemsProcessed={}, itemsAdded={}, duration={}", processorName, itemsProcessed, itemsAdded, duration);
         }
     }
 }

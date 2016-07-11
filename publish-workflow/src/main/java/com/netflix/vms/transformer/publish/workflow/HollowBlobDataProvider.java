@@ -1,6 +1,17 @@
 package com.netflix.vms.transformer.publish.workflow;
 
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.CircuitBreaker;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.BlobChecksum;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.CircuitBreaker;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
@@ -14,16 +25,6 @@ import com.netflix.vms.generated.notemplate.TopNVideoDataHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
 import com.netflix.vms.generated.notemplate.VideoHollow;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
-import java.io.File;
-import java.io.IOException;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
 public class HollowBlobDataProvider {
     /* dependencies */
@@ -40,14 +41,14 @@ public class HollowBlobDataProvider {
     }
 
     public void readSnapshot(File snapshotFile) throws IOException {
-        ctx.getLogger().info(CircuitBreaker, "Reading Snapshot blob " + snapshotFile.getName());
+        ctx.getLogger().info(CircuitBreaker, "Reading Snapshot blob {}", snapshotFile.getName());
         hollowReadStateEngine = new HollowReadStateEngine(true);
         hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
         hollowBlobReader.readSnapshot(ctx.files().newBlobInputStream(snapshotFile));
     }
 
     public void readDelta(File deltaFile) throws IOException {
-        ctx.getLogger().info(CircuitBreaker, "Reading Delta blob " + deltaFile.getName());
+        ctx.getLogger().info(CircuitBreaker, "Reading Delta blob {}", deltaFile.getName());
         hollowBlobReader.applyDelta(ctx.files().newBlobInputStream(deltaFile));
     }
 
@@ -86,8 +87,8 @@ public class HollowBlobDataProvider {
         HollowChecksum deltaChecksum = HollowChecksum.forStateEngine(hollowReadStateEngine);
         HollowChecksum snapshotChecksum = HollowChecksum.forStateEngine(anotherStateEngine);
 
-        ctx.getLogger().info(LogTag.BlobChecksum, "DELTA STATE CHECKSUM: " + deltaChecksum.toString());
-        ctx.getLogger().info(LogTag.BlobChecksum, "SNAPSHOT STATE CHECKSUM: " + snapshotChecksum.toString());
+        ctx.getLogger().info(BlobChecksum, "DELTA STATE CHECKSUM: {}", deltaChecksum);
+        ctx.getLogger().info(BlobChecksum, "SNAPSHOT STATE CHECKSUM: {}", snapshotChecksum);
 
         if(!deltaChecksum.equals(snapshotChecksum))
             throw new RuntimeException("DELTA CHECKSUM VALIDATION FAILURE!");
@@ -96,8 +97,8 @@ public class HollowBlobDataProvider {
             anotherReader.applyDelta(ctx.files().newBlobInputStream(reverseDeltaFile));
             HollowChecksum reverseDeltaChecksum = HollowChecksum.forStateEngine(anotherStateEngine);
 
-            ctx.getLogger().info(LogTag.BlobChecksum, "INITIAL STATE CHECKSUM: " + initialChecksumBeforeDelta.toString());
-            ctx.getLogger().info(LogTag.BlobChecksum, "REVERSE DELTA STATE CHECKSUM: " + reverseDeltaChecksum.toString());
+            ctx.getLogger().info(BlobChecksum, "INITIAL STATE CHECKSUM: {}", initialChecksumBeforeDelta);
+            ctx.getLogger().info(BlobChecksum, "REVERSE DELTA STATE CHECKSUM: {}", reverseDeltaChecksum);
 
             if(!initialChecksumBeforeDelta.equals(reverseDeltaChecksum))
                 throw new RuntimeException("REVERSE DELTA CHECKSUM VALIDATION FAILURE!");

@@ -57,7 +57,7 @@
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.2.0",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
@@ -238,7 +238,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.104",
+            "locked": "1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -312,6 +312,12 @@
         "com.netflix.suro:suro-core": {
             "locked": "0.2.51-platform",
             "requested": "latest.release"
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
@@ -930,7 +936,7 @@
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.2.0",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
@@ -1111,7 +1117,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.104",
+            "locked": "1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -1185,6 +1191,12 @@
         "com.netflix.suro:suro-core": {
             "locked": "0.2.51-platform",
             "requested": "latest.release"
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
@@ -1803,7 +1815,7 @@
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.2.0",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
@@ -1984,7 +1996,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.104",
+            "locked": "1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -2058,6 +2070,12 @@
         "com.netflix.suro:suro-core": {
             "locked": "0.2.51-platform",
             "requested": "latest.release"
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
@@ -2676,7 +2694,7 @@
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.2.0",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
@@ -2857,7 +2875,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.104",
+            "locked": "1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -2931,6 +2949,12 @@
         "com.netflix.suro:suro-core": {
             "locked": "0.2.51-platform",
             "requested": "latest.release"
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
@@ -3582,11 +3606,11 @@
     },
     "resolutionRules": {
         "com.netflix.nebula:gradle-resolution-rules": {
-            "locked": "0.23.0",
+            "locked": "0.27.0",
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
-            "locked": "0.7.0",
+            "locked": "0.8.1",
             "requested": "latest.release"
         }
     },
@@ -3648,7 +3672,7 @@
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.2.0",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
@@ -3829,7 +3853,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.104",
+            "locked": "1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -3903,6 +3927,12 @@
         "com.netflix.suro:suro-core": {
             "locked": "0.2.51-platform",
             "requested": "latest.release"
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
@@ -4521,7 +4551,7 @@
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.2.0",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
@@ -4702,7 +4732,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.104",
+            "locked": "1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -4776,6 +4806,12 @@
         "com.netflix.suro:suro-core": {
             "locked": "0.2.51-platform",
             "requested": "latest.release"
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
@@ -5405,7 +5441,7 @@
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.2.0",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
@@ -5586,7 +5622,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.104",
+            "locked": "1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -5660,6 +5696,12 @@
         "com.netflix.suro:suro-core": {
             "locked": "0.2.51-platform",
             "requested": "latest.release"
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
@@ -6289,7 +6331,7 @@
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.2.0",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
@@ -6470,7 +6512,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.104",
+            "locked": "1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -6544,6 +6586,12 @@
         "com.netflix.suro:suro-core": {
             "locked": "0.2.51-platform",
             "requested": "latest.release"
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
@@ -7173,7 +7221,7 @@
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.2.0",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.suro:suro-core"
             ]
@@ -7354,7 +7402,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.104",
+            "locked": "1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -7428,6 +7476,12 @@
         "com.netflix.suro:suro-core": {
             "locked": "0.2.51-platform",
             "requested": "latest.release"
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true

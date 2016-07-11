@@ -74,7 +74,7 @@ function ServerCycleSummaryTab(dashboard) {
                 query.add("tag:TransformCycleSuccess");
             } else if (purpose == "CycleInfo") {
                 query.indexType = "vmsserver";
-                query.add("tag:TransformCycleBegin");
+                query.add("tag:TransformCycleBegin").add("jarVersion");
             } else if (purpose == "TopNodes") {
                 query.indexType = "vmsserver";
                 query.add("tag:TransformInfo").add("topNodes");
@@ -139,24 +139,27 @@ function ServerCycleSummaryTab(dashboard) {
             hollowDisplayString = "";
             showNonAvailability = false;
 
+             // fast-lane does not publish every cycle, and announces without delay
+            if(dashboard.vipAddress.indexOf("_override") == -1) {
             // returns filtered array
             var announceResult = this.hollowPublishRegionModel.filter("eventInfo.currentCycle", currCycle);
-            if(announceResult.length > 0) {
-                for(i=0;i<regions.length;i++) {
-                    for(var ires = 0; ires < announceResult.length; ires++) {
-                        if(announceResult[ires].message.indexOf(regions[i]) > 0) {
-                            hollowAnnounced[i] = true;
-                            break;
+                if(announceResult.length > 0) {
+                    for(i=0;i<regions.length;i++) {
+                        for(var ires = 0; ires < announceResult.length; ires++) {
+                            if(announceResult[ires].message.indexOf(regions[i]) > 0) {
+                                hollowAnnounced[i] = true;
+                                break;
+                            }
+                        }
+                        if(!hollowAnnounced[i]) {
+                            hollowDisplayString += regions[i] + " ";
+                            showNonAvailability = true;
                         }
                     }
-                    if(!hollowAnnounced[i]) {
-                        hollowDisplayString += regions[i] + " ";
-                        showNonAvailability = true;
-                    }
+                } else {
+                    // Even if no hollow publish events for a cycle are found, it means that this cycle was not announced to any regions.
+                    showNonAvailability = true;
                 }
-            } else {
-            	// Even if no hollow publish events for a cycle are found, it means that this cycle was not announced to any regions.
-            	showNonAvailability = true;
             }
 
             if (cycleFail) {

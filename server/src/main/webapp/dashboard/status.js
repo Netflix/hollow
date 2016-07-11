@@ -8,12 +8,14 @@ function ServerCycleStatusTab(dashboard) {
     var csTableFields = [ "group", "date" ];
     this.csTable = new ClickableTableWidget("#id-cycle-oldest-coldstart", "iid-cycle-oldest-coldstart-table", csTableFields, csTableFields, -1);
     this.csTable.textAlign = "style='text-align: center'";
+    this.csTable.clearPrevious = false;
 
     var tableFields = ["instanceId", "JarVersion"];
     var tableHeader = ["Instance", "Jar version"];
     this.systemInfoTable = new ClickableTableWidget("#id-cycle-system-info", "id-cycle-system-info-table", tableFields, tableHeader);
     // this.systemInfoTable.clearPrevious = true;
     this.systemInfoTable.textAlign = "style='text-align: center'";
+    this.systemInfoTable.clearPrevious = false;
 
     this.warnCodesWidget = new ClickableTableWidget("#id-cycle-warn-aggregate", "id-cycle-warn-agg-table", [ "key", "doc_count" ], [ "tag", "Count"], -1);
 
@@ -121,9 +123,9 @@ function ServerCycleStatusTab(dashboard) {
     }
 
     this.checkForNewCycle = function() {
-        var callbackFn = new CallbackWidget(cycleSummaryTab.refreshOnLatestCycle);
-        var fieldList = ["eventInfo.currentCycle" ];
-        var searchDao = new FieldModelSearchDAO(callbackFn, new SearchQuery(), fieldList, true);
+        const callbackFn = new CallbackWidget(cycleSummaryTab.refreshOnLatestCycle);
+        const fieldList = ["eventInfo.currentCycle" ];
+        const searchDao = new FieldModelSearchDAO(callbackFn, new SearchQuery(), fieldList, true);
         searchDao.searchQuery.size = "1";
         searchDao.searchQuery.indexType = "vmsserver";
         searchDao.searchQuery.indexName = dashboard.vmsIndex;
@@ -141,20 +143,25 @@ function ServerCycleStatusTab(dashboard) {
         var sortedData = dataOp.sort("coldstartVersionId", function(a, b) {
                 return Number(a["coldstartVersionId"]) - Number(b["coldstartVersionId"]);
             });
-        var oldestColdstart = sortedData[0];
-        var date = new Date(Number(oldestColdstart["coldstartVersionId"]));
-        var dateString = (date.getMonth()+1) + '/' + date.getDate() + " " + date.toLocaleTimeString();
-        // alert(oldestColdstart["mutationGroup"] + " -> " + dateString);
 
-        // "id-cycle-oldest-coldstart"
-        cycleSummaryTab.csTable.showHeader = false;
-        var data = new Array();
-        var val = {
-            "group" : oldestColdstart["mutationGroup"],
-            "date" : dateString
+        const tableData = new Array();
+        for( var i = 0; i < data.length; i++) {
+            const csObj = sortedData[i];
+            const date = new Date(Number(csObj["coldstartVersionId"]));
+            const diffMillis = dashboard.vmsCycleDate - date;
+
+            if(diffMillis > 3600*3*1000) {
+                const dateString = (date.getMonth()+1) + '/' + date.getDate() + " " + date.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'});
+                // "id-cycle-oldest-coldstart"
+                cycleSummaryTab.csTable.showHeader = false;
+                const val = {
+                    "group" : csObj["mutationGroup"],
+                    "date" : dateString
+                }
+                tableData.push(val);
+            }
         }
-        data.push(val);
-        cycleSummaryTab.csTable.applyParserData(data);
+        cycleSummaryTab.csTable.applyParserData(tableData);
     }
 
     this.findOldestColdstart = function() {

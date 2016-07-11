@@ -1,9 +1,11 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.AnnouncementFailure;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.AnnouncementSuccess;
+
 import java.util.List;
 
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
@@ -53,9 +55,9 @@ public class FastlaneHermesAnnounceJob extends PublishWorkflowPublicationJob {
         // TODO: need to figure out a way to expose this message in Errors tab.
         String format = "Hollow data announce %s: for version %s for vip %s region %s";
         if(success){
-            ctx.getLogger().info(LogTag.AnnouncementSuccess, String.format(format, "success", getCycleVersion(), vip, region));
+            ctx.getLogger().info(AnnouncementSuccess, format, "success", getCycleVersion(), vip, region);
         } else {
-            ctx.getLogger().error(LogTag.AnnouncementFailure, String.format(format, "failure", getCycleVersion(), vip, region));
+            ctx.getLogger().error(AnnouncementFailure, format, "failure", getCycleVersion(), vip, region);
         }
     }
 

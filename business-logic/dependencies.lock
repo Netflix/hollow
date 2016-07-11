@@ -227,7 +227,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.104",
+            "locked": "1.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -283,6 +283,17 @@
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "netflix:netflix-config"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-core": {
+            "locked": "1.5",
+            "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
@@ -467,6 +478,7 @@
                 "com.netflix.archaius:archaius2-api",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.vms.logging:vmslogging-core",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
             ]
@@ -1075,7 +1087,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.104",
+            "locked": "1.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -1131,6 +1143,17 @@
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "netflix:netflix-config"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-core": {
+            "locked": "1.5",
+            "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
@@ -1315,6 +1338,7 @@
                 "com.netflix.archaius:archaius2-api",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.vms.logging:vmslogging-core",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
             ]
@@ -1923,7 +1947,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.104",
+            "locked": "1.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -1979,6 +2003,17 @@
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "netflix:netflix-config"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-core": {
+            "locked": "1.5",
+            "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
@@ -2163,6 +2198,7 @@
                 "com.netflix.archaius:archaius2-api",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.vms.logging:vmslogging-core",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
             ]
@@ -2771,7 +2807,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.104",
+            "locked": "1.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -2827,6 +2863,17 @@
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "netflix:netflix-config"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-core": {
+            "locked": "1.5",
+            "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
@@ -3011,6 +3058,7 @@
                 "com.netflix.archaius:archaius2-api",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.vms.logging:vmslogging-core",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
             ]
@@ -3482,11 +3530,11 @@
     },
     "resolutionRules": {
         "com.netflix.nebula:gradle-resolution-rules": {
-            "locked": "0.23.0",
+            "locked": "0.27.0",
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
-            "locked": "0.7.0",
+            "locked": "0.8.1",
             "requested": "latest.release"
         }
     },
@@ -3718,7 +3766,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.104",
+            "locked": "1.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -3774,6 +3822,17 @@
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "netflix:netflix-config"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-core": {
+            "locked": "1.5",
+            "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
@@ -3958,6 +4017,7 @@
                 "com.netflix.archaius:archaius2-api",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.vms.logging:vmslogging-core",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
             ]
@@ -4566,7 +4626,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.104",
+            "locked": "1.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -4622,6 +4682,17 @@
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "netflix:netflix-config"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-core": {
+            "locked": "1.5",
+            "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
@@ -4806,6 +4877,7 @@
                 "com.netflix.archaius:archaius2-api",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.vms.logging:vmslogging-core",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
             ]
@@ -5425,7 +5497,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.104",
+            "locked": "1.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -5481,6 +5553,17 @@
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "netflix:netflix-config"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-core": {
+            "locked": "1.5",
+            "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
@@ -5665,6 +5748,7 @@
                 "com.netflix.archaius:archaius2-api",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.vms.logging:vmslogging-core",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
             ]
@@ -6284,7 +6368,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.104",
+            "locked": "1.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -6340,6 +6424,17 @@
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "netflix:netflix-config"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-core": {
+            "locked": "1.5",
+            "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
@@ -6524,6 +6619,7 @@
                 "com.netflix.archaius:archaius2-api",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.vms.logging:vmslogging-core",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
             ]
@@ -7143,7 +7239,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "0.104",
+            "locked": "1.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -7199,6 +7295,17 @@
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "netflix:netflix-config"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "transitive": [
+                "com.netflix.vms.logging:vmslogging-core",
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces"
+            ]
+        },
+        "com.netflix.vms.logging:vmslogging-core": {
+            "locked": "1.5",
+            "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
             "project": true
@@ -7383,6 +7490,7 @@
                 "com.netflix.archaius:archaius2-api",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.vms.logging:vmslogging-core",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:nf-eventbus-core"
             ]

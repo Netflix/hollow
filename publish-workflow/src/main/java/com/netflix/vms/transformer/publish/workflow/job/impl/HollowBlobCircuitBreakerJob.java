@@ -1,7 +1,17 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.CircuitBreaker;
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.TransformCycleFailed;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.CircuitBreaker;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+
+import org.apache.commons.lang.StringUtils;
 
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
@@ -17,14 +27,6 @@ import com.netflix.vms.transformer.publish.workflow.circuitbreaker.SnapshotSizeC
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TopNViewShareAvailabilityCircuitBreaker;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TypeCardinalityCircuitBreaker;
 import com.netflix.vms.transformer.publish.workflow.job.CircuitBreakerJob;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
-import org.apache.commons.lang.StringUtils;
 
 public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
 
@@ -146,9 +148,9 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
         String logMessage = "Hollow data validation completed for version " + cycleVersion + " vip: " + ctx.getVip();
 
         if (!isAllDataValid) {
-            ctx.getLogger().error(Arrays.asList(TransformCycleFailed, CircuitBreaker), "Circuit Breakers Failed: " + logMessage);
+            ctx.getLogger().error(Arrays.asList(TransformCycleFailed, CircuitBreaker), "Circuit Breakers Failed: {}", logMessage);
         } else {
-            ctx.getLogger().info(CircuitBreaker, "Circuit Breakers Successful: " + logMessage);
+            ctx.getLogger().info(CircuitBreaker, "Circuit Breakers Successful: {}", logMessage);
         }
     }
 

@@ -1,7 +1,11 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.PlaybackMonkey;
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.PlaybackMonkeyTestVideo;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.PlaybackMonkey;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.PlaybackMonkeyTestVideo;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.PlaybackMonkeyWarn;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ComparisonChain;
@@ -11,21 +15,10 @@ import com.netflix.vms.generated.notemplate.FloatHollow;
 import com.netflix.vms.generated.notemplate.IntegerHollow;
 import com.netflix.vms.generated.notemplate.MapOfIntegerToFloatHollow;
 import com.netflix.vms.generated.notemplate.TopNVideoDataHollow;
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 public class ValuableVideoHolder {
 	private final HollowBlobDataProvider hollowBlobDataProvider;
@@ -114,8 +107,8 @@ public class ValuableVideoHolder {
 				
 				// Add failed IDs from past cycle if they are not in exclusion list
 				if(pastFailedIDsForCountry != null && !pastFailedIDsForCountry.isEmpty()){
-					ctx.getLogger().info(PlaybackMonkeyTestVideo,"Adding "+ pastFailedIDsForCountry.size()+" failed IDs for country "+countryId+
-							" if not in exclude list: ["+getVideoIDsForVideoCountryKeys(pastFailedIDsForCountry)+"]");
+					ctx.getLogger().info(PlaybackMonkeyTestVideo, "Adding {} failed IDs for country {} if not in exclude list: [{}]",
+					        pastFailedIDsForCountry.size(), countryId, getVideoIDsForVideoCountryKeys(pastFailedIDsForCountry));
 					for(VideoCountryKey v: pastFailedIDsForCountry){
 						if(!isExcluded(excludedVideosForCountry, v.getVideoId()))
 							valuedVideosForCountry.add(v);
@@ -123,18 +116,20 @@ public class ValuableVideoHolder {
 				}
 				
 				ctx.getLogger().info(PlaybackMonkeyTestVideo,
-						"Picked "+valuedVideosForCountry.size()+" valuable videos to test for country (including failed IDs and excluding excluded videos)"+
-						 countryId+" : ["+getVideoIDsForVideoCountryKeys(valuedVideosForCountry)+"]");
+						"Picked {} valuable videos to test for country (including failed IDs and excluding excluded videos) {}: [{}]",
+						 valuedVideosForCountry.size(),
+						 countryId,
+						 getVideoIDsForVideoCountryKeys(valuedVideosForCountry));
 				ctx.getMetricRecorder().recordMetric(Metric.ViewShareCoveredByPBM, getViewShareOfVideos(valuedVideosForCountry).get(countryId), "country", countryId);
 			} else {
-				ctx.getLogger().warn(LogTag.PlaybackMonkeyWarn, "For country "+countryId+" topN videos are empty and so no videos were "
-						+ "added for the country even though the country is in playbackmonkeyTestForCountries property.");
+				ctx.getLogger().warn(PlaybackMonkeyWarn, "For country {} topN videos are empty and so no videos were "
+						+ "added for the country even though the country is in playbackmonkeyTestForCountries property.", countryId);
 			}
 			mostValueableVideosToTest.addAll(valuedVideosForCountry);
 		}
 
 		long timeTaken = System.currentTimeMillis() - start;
-		ctx.getLogger().info(PlaybackMonkey, "Returning " + mostValueableVideosToTest.size() + " TopN Videos.  Took " + timeTaken + "ms.");
+		ctx.getLogger().info(PlaybackMonkey, "Returning {} TopN Videos.  Took {}ms.", mostValueableVideosToTest.size(), timeTaken);
 		
 		return Collections.unmodifiableSet(mostValueableVideosToTest);
 	}
@@ -351,7 +346,7 @@ public class ValuableVideoHolder {
         final Map<String, Set<Integer>> tmpMap = new HashMap<>();
         
         String stringToParse = ctx.getConfig().getPlaybackMonkeyVideoCountryToExclude();
-        ctx.getLogger().info(PlaybackMonkeyTestVideo, "Exclude video property value: "+ stringToParse);
+        ctx.getLogger().info(PlaybackMonkeyTestVideo, "Exclude video property value: {}", stringToParse);
         
 		if(stringToParse == null || stringToParse.length() < 1)
         	return tmpMap;
@@ -392,7 +387,7 @@ public class ValuableVideoHolder {
     public static final String GLOBAL_SCOPE = "GLOBAL";
     protected Collection<String> fetchCountriesForNameSpace(final String namespace, PublishWorkflowContext ctx){
         if (namespace == null || namespace.trim().isEmpty()) 
-        	ctx.getLogger().warn(LogTag.PlaybackMonkeyWarn, "PBM esxclude video namespace can not be null or empty");
+            ctx.getLogger().warn(PlaybackMonkeyWarn, "PBM exclude video namespace can not be null or empty");
 
         if (GLOBAL_SCOPE.equalsIgnoreCase(namespace)) {
             return ctx.getOctoberSkyData().getSupportedCountries();
@@ -403,8 +398,8 @@ public class ValuableVideoHolder {
             if(country != null)
             	return Collections.singleton(namespace);
         } catch (final Exception ex) {
-        	ctx.getLogger().warn(LogTag.PlaybackMonkeyWarn, "Unable to convert namespace= "+namespace+" to country List.  "
-        			+ "Supported value are GLOBAL or COUNTRY_CODE."+ex.getStackTrace());
+            ctx.getLogger().warn(PlaybackMonkeyWarn, "Unable to convert namespace={} to country List.  "
+                    + "Supported value are GLOBAL or COUNTRY_CODE.", namespace, ex);
         }
 		return Collections.emptySet();
     }
