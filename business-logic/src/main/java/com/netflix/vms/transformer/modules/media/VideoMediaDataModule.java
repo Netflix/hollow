@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.modules.media;
 
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_DATE;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
-import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_RIGHTS;
+import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_STATUS;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 
 import java.util.Collections;
@@ -13,16 +13,17 @@ import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.hollowinput.ReleaseDateHollow;
 import com.netflix.vms.transformer.hollowinput.SetOfStringHollow;
+import com.netflix.vms.transformer.hollowinput.StatusHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoDateWindowHollow;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
-import com.netflix.vms.transformer.hollowinput.VideoRightsHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoMediaData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.util.VideoDateUtil;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -31,7 +32,7 @@ import java.util.Set;
 public class VideoMediaDataModule {
 
     private final VMSHollowInputAPI api;
-    private final HollowPrimaryKeyIndex videoRightsIdx;
+    private final HollowPrimaryKeyIndex videoStatusIdx;
     private final HollowHashIndex videoTypeCountryIdx;
     private final HollowPrimaryKeyIndex videoGeneralIdx;
     private final HollowHashIndex videoDateIdx;
@@ -45,7 +46,7 @@ public class VideoMediaDataModule {
 
     public VideoMediaDataModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer) {
         this.api = api;
-        this.videoRightsIdx = indexer.getPrimaryKeyIndex(VIDEO_RIGHTS);
+        this.videoStatusIdx = indexer.getPrimaryKeyIndex(VIDEO_STATUS);
         this.videoTypeCountryIdx = indexer.getHashIndex(VIDEO_TYPE_COUNTRY);
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(VIDEO_GENERAL);
         this.videoDateIdx = indexer.getHashIndex(VIDEO_DATE);
@@ -61,17 +62,17 @@ public class VideoMediaDataModule {
 
             for(VideoHierarchy hierarchy: entry.getValue()) {
                 addToResult(hierarchy.getTopNodeId(), countryCode, hierarchy, HierarchyLeveL.SHOW, countryMap);
-    
+
                 for (int iSeason = 0; iSeason < hierarchy.getSeasonIds().length; iSeason++) {
                     int seasonId = hierarchy.getSeasonIds()[iSeason];
                     addToResult(seasonId, countryCode, hierarchy, HierarchyLeveL.SEASON, countryMap);
-    
+
                     for (int j = 0; j < hierarchy.getEpisodeIds()[iSeason].length; j++) {
                         Integer episodeId = hierarchy.getEpisodeIds()[iSeason][j];
                         addToResult(episodeId, countryCode, hierarchy, HierarchyLeveL.EPISODE, countryMap);
                     }
                 }
-    
+
                 for (int i = 0; i < hierarchy.getSupplementalIds().length; i++) {
                     addToResult(hierarchy.getSupplementalIds()[i], countryCode, hierarchy, HierarchyLeveL.SUPPLEMENTAL, countryMap);
                 }
@@ -105,17 +106,17 @@ public class VideoMediaDataModule {
     }
 
     private boolean populateRights(Integer videoId, String countryCode, VideoMediaData vmd) {
-        int rightsOrdinal = videoRightsIdx.getMatchingOrdinal(videoId.longValue(), countryCode);
-        VideoRightsHollow rights = null;
+        int statusOrdinal = videoStatusIdx.getMatchingOrdinal(videoId.longValue(), countryCode);
+        StatusHollow status = null;
 
-        if (rightsOrdinal != -1) {
-            rights = api.getVideoRightsHollow(rightsOrdinal);
-            vmd.isGoLive = rights._getFlags()._getGoLive();
-            vmd.hasLocalText = rights._getFlags()._getLocalText();
-            vmd.isAutoPlayEnabled = rights._getFlags()._getAutoPlay();
-            vmd.isLanguageOverride = rights._getFlags()._getLanguageOverride();
-            vmd.hasLocalText = rights._getFlags()._getLocalText();
-            vmd.hasLocalAudio = rights._getFlags()._getLocalAudio();
+        if (statusOrdinal != -1) {
+            status = api.getStatusHollow(statusOrdinal);
+            vmd.isGoLive = status._getFlags()._getGoLive();
+            vmd.hasLocalText = status._getFlags()._getLocalText();
+            vmd.isAutoPlayEnabled = status._getFlags()._getAutoPlay();
+            vmd.isLanguageOverride = status._getFlags()._getLanguageOverride();
+            vmd.hasLocalText = status._getFlags()._getLocalText();
+            vmd.hasLocalAudio = status._getFlags()._getLocalAudio();
 
             HollowHashIndexResult videoTypeMatches = videoTypeCountryIdx.findMatches(videoId.longValue(), countryCode);
             VideoTypeDescriptorHollow typeDescriptor = null;
@@ -124,7 +125,7 @@ public class VideoMediaDataModule {
                 vmd.isOriginal = typeDescriptor._getOriginal();
             }
         }
-        return (rightsOrdinal != -1);
+        return (statusOrdinal != -1);
     }
 
     private void populateGeneral(Integer videoId, VideoMediaData vmd) {
@@ -136,7 +137,7 @@ public class VideoMediaDataModule {
             if(inputRegAdvisories != null) {
                 Set<Strings> outputRegAdv = new HashSet<>();
                 for(StringHollow regAdv : inputRegAdvisories) {
-                	outputRegAdv.add(new Strings(regAdv._getValue()));
+                    outputRegAdv.add(new Strings(regAdv._getValue()));
                 }
                 vmd.regulatoryAdvisories = outputRegAdv;
             }

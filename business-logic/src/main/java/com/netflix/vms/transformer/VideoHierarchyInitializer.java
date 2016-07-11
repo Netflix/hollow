@@ -10,16 +10,16 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.EpisodeHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
+import com.netflix.vms.transformer.hollowinput.ListOfRightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowHollow;
 import com.netflix.vms.transformer.hollowinput.SeasonHollow;
 import com.netflix.vms.transformer.hollowinput.ShowSeasonEpisodeHollow;
+import com.netflix.vms.transformer.hollowinput.StatusHollow;
 import com.netflix.vms.transformer.hollowinput.SupplementalsHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
-import com.netflix.vms.transformer.hollowinput.VideoRightsHollow;
-import com.netflix.vms.transformer.hollowinput.VideoRightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeMediaHollow;
@@ -40,7 +40,7 @@ public class VideoHierarchyInitializer {
     private final HollowPrimaryKeyIndex videoGeneralIndex;
     private final HollowHashIndex showSeasonEpisodeIndex;
     private final HollowHashIndex videoTypeCountryIndex;
-    private final HollowPrimaryKeyIndex videoRightsIndex;
+    private final HollowPrimaryKeyIndex videoStatusIndex;
     private final HollowHashIndex rolloutVideoTypeIndex;
     private final TransformerContext ctx;
 
@@ -51,7 +51,7 @@ public class VideoHierarchyInitializer {
         this.videoGeneralIndex = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
         this.showSeasonEpisodeIndex = indexer.getHashIndex(IndexSpec.SHOW_SEASON_EPISODE);
         this.videoTypeCountryIndex = indexer.getHashIndex(IndexSpec.VIDEO_TYPE_COUNTRY);
-        this.videoRightsIndex = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_RIGHTS);
+        this.videoStatusIndex = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_STATUS);
         this.rolloutVideoTypeIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
         this.ctx = ctx;
     }
@@ -214,20 +214,19 @@ public class VideoHierarchyInitializer {
     }
 
     boolean isGoLiveOrHasFirstDisplayDate(long videoId, String countryCode) {
-        int rightsOrdinal = videoRightsIndex.getMatchingOrdinal(videoId, countryCode);
-        if(rightsOrdinal == -1)
+        int statusOrdinal = videoStatusIndex.getMatchingOrdinal(videoId, countryCode);
+        if (statusOrdinal == -1)
             return false;
 
-        VideoRightsHollow videoRights = api.getVideoRightsHollow(rightsOrdinal);
-        if(videoRights._getFlags()._getGoLive())
+        StatusHollow videoStatus = api.getStatusHollow(statusOrdinal);
+        if (videoStatus._getFlags()._getGoLive())
             return true;
 
-        if(videoRights._getFlags()._getFirstDisplayDate() != null)
+        if (videoStatus._getFlags()._getFirstDisplayDate() != null)
             return true;
 
-        Set<VideoRightsWindowHollow> windowSet = videoRights._getRights()._getWindows();
-
-        if(!windowSet.isEmpty())
+        ListOfRightsWindowHollow windows = videoStatus._getRights()._getWindows();
+        if (!windows.isEmpty())
             return true;
 
         return false;
