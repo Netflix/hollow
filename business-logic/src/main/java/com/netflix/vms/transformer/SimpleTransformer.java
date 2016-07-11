@@ -1,7 +1,21 @@
 package com.netflix.vms.transformer;
 
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.IndividualTransformFailed;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.FailedProcessingIndividualHierarchies;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.IndividualTransformFailed;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.NonVideoSpecificTransformDuration;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformInfo;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformProgress;
+
+import java.lang.Integer;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
@@ -9,24 +23,8 @@ import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.VideoHierarchyGrouper.VideoHierarchyGroup;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
-import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
-import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
-import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
-import com.netflix.vms.transformer.hollowoutput.FallbackUSArtwork;
-import com.netflix.vms.transformer.hollowoutput.GlobalPerson;
-import com.netflix.vms.transformer.hollowoutput.GlobalVideo;
-import com.netflix.vms.transformer.hollowoutput.ISOCountry;
-import com.netflix.vms.transformer.hollowoutput.Strings;
-import com.netflix.vms.transformer.hollowoutput.Video;
-import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
-import com.netflix.vms.transformer.hollowoutput.VideoImages;
-import com.netflix.vms.transformer.hollowoutput.VideoMediaData;
-import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
-import com.netflix.vms.transformer.hollowoutput.VideoMiscData;
-import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
-import com.netflix.vms.transformer.hollowoutput.VideoSetType;
+import com.netflix.vms.transformer.hollowoutput.*;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.logmessage.ProgressMessage;
 import com.netflix.vms.transformer.misc.TopNVideoDataModule;
@@ -60,15 +58,6 @@ import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
 import com.netflix.vms.transformer.namedlist.NamedListCompletionModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule.VideoNamedListPopulator;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class SimpleTransformer {
 
@@ -116,7 +105,7 @@ public class SimpleTransformer {
         VideoHierarchyGrouper showGrouper = new VideoHierarchyGrouper(api, ctx);
 
         final List<Set<VideoHierarchyGroup>> processGroups = showGrouper.getProcessGroups();
-        ctx.getLogger().info(LogTag.TransformInfo, "topNodes=" + processGroups.size());
+        ctx.getLogger().info(TransformInfo, "topNodes={}", processGroups.size());
 
         AtomicInteger processedCount = new AtomicInteger();
         int progressDivisor = getProgressDivisor(processGroups.size());
@@ -166,7 +155,7 @@ public class SimpleTransformer {
                     }
 
                     if (idx % progressDivisor == 0) {
-                        ctx.getLogger().info(LogTag.TransformProgress, new ProgressMessage(idx, progressDivisor));
+                        ctx.getLogger().info(TransformProgress, new ProgressMessage(idx, progressDivisor));
                     }
 
                     idx = processedCount.getAndIncrement();
@@ -203,7 +192,7 @@ public class SimpleTransformer {
             long tStart = System.currentTimeMillis();
             m.transform();
             long tDuration = System.currentTimeMillis() - tStart;
-            ctx.getLogger().info(LogTag.NonVideoSpecificTransformDuration, String.format("Finished Trasform for module=%s, duration=%s", m.getName(), tDuration));
+            ctx.getLogger().info(NonVideoSpecificTransformDuration, "Finished Transform for module={}, duration={}", m.getName(), tDuration);
         }
 
         /// GlobalPersonModule is pulled out separately here because we will use the result in the NamedListCompletionModule
@@ -211,7 +200,7 @@ public class SimpleTransformer {
         long tStart = System.currentTimeMillis();
         List<GlobalPerson> allGlobalPersonRecords = globalPersonModule.transformPersons();
         long tDuration = System.currentTimeMillis() - tStart;
-        ctx.getLogger().info(LogTag.NonVideoSpecificTransformDuration, String.format("Finished Trasform for module=%s, duration=%s", globalPersonModule.getName(), tDuration));
+        ctx.getLogger().info(NonVideoSpecificTransformDuration, "Finished Transform for module={}, duration={}", globalPersonModule.getName(), tDuration);
 
         executor.awaitSuccessfulCompletion();
 
@@ -221,9 +210,9 @@ public class SimpleTransformer {
         NamedListCompletionModule namedListCompleter = new NamedListCompletionModule(videoNamedListModule, allGlobalPersonRecords, objectMapper);
         namedListCompleter.transform();
         tDuration = System.currentTimeMillis() - tStart;
-        ctx.getLogger().info(LogTag.NonVideoSpecificTransformDuration, String.format("Finished Trasform for module=%s, duration=%s", namedListCompleter.getName(), tDuration));
+        ctx.getLogger().info(NonVideoSpecificTransformDuration, "Finished Transform for module={}, duration={}", namedListCompleter.getName(), tDuration);
 
-        ctx.getLogger().info(LogTag.TransformProgress, new ProgressMessage(processedCount.get()));
+        ctx.getLogger().info(TransformProgress, new ProgressMessage(processedCount.get()));
         ctx.getMetricRecorder().recordMetric(FailedProcessingIndividualHierarchies, failedIndividualTransforms.get());
         
         if(failedIndividualTransforms.get() > ctx.getConfig().getMaxTolerableFailedTransformerHierarchies())

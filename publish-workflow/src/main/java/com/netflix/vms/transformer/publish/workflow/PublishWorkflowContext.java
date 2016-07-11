@@ -1,16 +1,17 @@
 package com.netflix.vms.transformer.publish.workflow;
 
-import com.netflix.vms.transformer.publish.status.PublishWorkflowStatusIndicator;
+import java.util.function.Supplier;
 
-import com.netflix.vms.transformer.publish.poison.PoisonedStateMarker;
 import com.netflix.aws.file.FileStore;
-import com.netflix.vms.transformer.common.TransformerLogger;
+import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.publish.workflow.VipAnnouncer;
-import java.util.function.Supplier;
+import com.netflix.vms.transformer.publish.poison.PoisonedStateMarker;
+import com.netflix.vms.transformer.publish.status.PublishWorkflowStatusIndicator;
+
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 
 public interface PublishWorkflowContext {
@@ -19,7 +20,7 @@ public interface PublishWorkflowContext {
     
     String getVip();
 
-    TransformerLogger getLogger();
+    TaggingLogger getLogger();
 
     TransformerConfig getConfig();
 

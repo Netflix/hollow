@@ -1,22 +1,29 @@
 package com.netflix.vms.transformer.logger;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static com.netflix.vms.logging.Slf4jTaggingLogger.severityToInt;
+import static org.slf4j.helpers.MessageFormatter.arrayFormat;
 
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netflix.vms.transformer.common.TransformerLogger;
-import com.netflix.vms.transformer.common.config.TransformerConfig;
-import com.netflix.vms.transformer.elasticsearch.ElasticSearchClient;
 import java.util.Collection;
+
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.spi.LocationAwareLogger;
 
-public class TransformerServerLogger implements TransformerLogger {
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.netflix.vms.logging.TaggingLogger;
+import com.netflix.vms.transformer.common.config.TransformerConfig;
+import com.netflix.vms.transformer.elasticsearch.ElasticSearchClient;
+
+// TODO: timt: partially duplicated from TaggingLoggers; could extend/compose Slf4jTaggingLogger
+public class TransformerServerLogger implements TaggingLogger {
+    private static final String FQCN = TaggingLogger.class.getName();
 
     private final ElasticSearchClient esClient;
     private final TransformerConfig config;
-    private final Logger consoleLogger;
+    private final LocationAwareLogger consoleLogger;
     private final long currentCycleId;
 
     private final String elasticSearchIndexName;
@@ -32,7 +39,7 @@ public class TransformerServerLogger implements TransformerLogger {
     }
 
     private TransformerServerLogger(TransformerConfig config, ElasticSearchClient esClient, Logger consoleLogger, long cycleId) {
-        this.consoleLogger = consoleLogger;
+        this.consoleLogger = (LocationAwareLogger) consoleLogger;
         this.esClient = esClient;
         this.config = config;
         this.currentCycleId = cycleId;
@@ -42,32 +49,6 @@ public class TransformerServerLogger implements TransformerLogger {
 
     public TransformerServerLogger withCurrentCycleId(long cycleId) {
         return new TransformerServerLogger(config, esClient, consoleLogger, cycleId);
-    }
-
-    @Override
-    public void log(Severity severity, Collection<LogTag> tags, String message, Throwable th) {
-        for(LogTag tag : tags) {
-            String taggedMessage = tag.toString() + ": " + message;
-            switch(severity) {
-            case ERROR:
-                consoleLogger.error(taggedMessage, th);
-                break;
-            case WARN:
-                consoleLogger.warn(taggedMessage, th);
-                break;
-            case INFO:
-                consoleLogger.info(taggedMessage, th);
-                break;
-            }
-
-            if(config.isElasticSearchLoggingEnabled()) {
-                try {
-                    esClient.addData(elasticSearchIndexName, "vmsserver", toJsonString(severity, tag, message, th));
-                } catch (JsonProcessingException e) {
-                    consoleLogger.error("Unable to create json for ES log message", e);
-                }
-            }
-        }
     }
 
     private String toJsonString(Severity severity, LogTag logTag, String message, Throwable th) throws JsonProcessingException {
@@ -87,4 +68,25 @@ public class TransformerServerLogger implements TransformerLogger {
         return builder.toString().toLowerCase();
     }
 
+    @Override
+    public void log(Severity severity, Collection<LogTag> tags, String message, Object... args) {
+        String formattedMessage = message;
+        Throwable cause = null;
+        if (args.length > 0) {
+            formattedMessage = arrayFormat(message, args).getMessage();
+            Object o = args[args.length-1];
+            cause = o != null && Throwable.class.isAssignableFrom(o.getClass()) ? (Throwable)o : null;
+        }
+
+        for (LogTag tag : tags) {
+            consoleLogger.log(null, FQCN, severityToInt(severity), tag.with(formattedMessage), null, cause);
+            if(config.isElasticSearchLoggingEnabled()) {
+                try {
+                    esClient.addData(elasticSearchIndexName, "vmsserver", toJsonString(severity, tag, formattedMessage, cause));
+                } catch (JsonProcessingException e) {
+                    consoleLogger.log(null, FQCN, severityToInt(Severity.ERROR), "Unable to create json for ES log message", null, e);
+                }
+            }
+        }
+    }
 }

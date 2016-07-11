@@ -1,8 +1,14 @@
 package com.netflix.vms.transformer.modules.artwork;
 
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.UnknownArtworkImageType;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_IMAGE_FORMAT;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_RECIPE;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_TERRITORY_COUNTRIES;
+
+import java.util.*;
+import java.util.Map.Entry;
+
+import org.apache.commons.codec.digest.DigestUtils;
 
 import com.google.common.collect.ComparisonChain;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
@@ -10,53 +16,12 @@ import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.write.objectmapper.NullablePrimitiveBoolean;
 import com.netflix.vms.transformer.ConversionUtils;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
-import com.netflix.vms.transformer.hollowinput.ArtWorkImageTypeHollow;
-import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
-import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeHollow;
-import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeListHollow;
-import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
-import com.netflix.vms.transformer.hollowinput.ArtworkLocaleListHollow;
-import com.netflix.vms.transformer.hollowinput.ArtworkRecipeHollow;
-import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
-import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
-import com.netflix.vms.transformer.hollowinput.MultiValuePassthroughMapHollow;
-import com.netflix.vms.transformer.hollowinput.SingleValuePassthroughMapHollow;
-import com.netflix.vms.transformer.hollowinput.StringHollow;
-import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
-import com.netflix.vms.transformer.hollowoutput.ArtWorkImageFormatEntry;
-import com.netflix.vms.transformer.hollowoutput.ArtWorkImageRecipe;
-import com.netflix.vms.transformer.hollowoutput.ArtWorkImageTypeEntry;
-import com.netflix.vms.transformer.hollowoutput.Artwork;
-import com.netflix.vms.transformer.hollowoutput.ArtworkBasicPassthrough;
-import com.netflix.vms.transformer.hollowoutput.ArtworkCdn;
-import com.netflix.vms.transformer.hollowoutput.ArtworkDerivative;
-import com.netflix.vms.transformer.hollowoutput.ArtworkDerivatives;
-import com.netflix.vms.transformer.hollowoutput.ArtworkSourcePassthrough;
-import com.netflix.vms.transformer.hollowoutput.ArtworkSourceString;
+import com.netflix.vms.transformer.hollowinput.*;
+import com.netflix.vms.transformer.hollowoutput.*;
 import com.netflix.vms.transformer.hollowoutput.Integer;
-import com.netflix.vms.transformer.hollowoutput.NFLocale;
-import com.netflix.vms.transformer.hollowoutput.PassthroughString;
-import com.netflix.vms.transformer.hollowoutput.PassthroughVideo;
-import com.netflix.vms.transformer.hollowoutput.Strings;
-import com.netflix.vms.transformer.hollowoutput.__passthrough_string;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
 import com.netflix.vms.transformer.util.NFLocaleUtil;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import org.apache.commons.codec.digest.DigestUtils;
 
 public abstract class ArtWorkModule extends AbstractTransformModule{
     protected final String entityType;
@@ -116,7 +81,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             if (typeEntry == null) {
                 String imageType = derivativeHollow._getImageType()._getValue();
                 if(!unknownArtworkImageTypes.contains(imageType)) {
-                    ctx.getLogger().warn(LogTag.UnknownArtworkImageType, String.format("Unknown Image Type for entity=%s, id=%s, type=%s; data will be dropped.", entityType, entityId, imageType));
+                    ctx.getLogger().warn(UnknownArtworkImageType, "Unknown Image Type for entity={}, id={}, type={}; data will be dropped.", entityType, entityId, imageType);
                     unknownArtworkImageTypes.add(imageType);
                 }
                 continue;

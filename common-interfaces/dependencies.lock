@@ -120,6 +120,10 @@
                 "netflix:netflix-config"
             ]
         },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "requested": "latest.release"
+        },
         "com.ning:compress-lzf": {
             "locked": "0.8.4",
             "transitive": [
@@ -558,6 +562,10 @@
             "transitive": [
                 "netflix:netflix-config"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
             "locked": "0.8.4",
@@ -998,6 +1006,10 @@
                 "netflix:netflix-config"
             ]
         },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "requested": "latest.release"
+        },
         "com.ning:compress-lzf": {
             "locked": "0.8.4",
             "transitive": [
@@ -1437,6 +1449,10 @@
                 "netflix:netflix-config"
             ]
         },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "requested": "latest.release"
+        },
         "com.ning:compress-lzf": {
             "locked": "0.8.4",
             "transitive": [
@@ -1846,7 +1862,7 @@
     },
     "resolutionRules": {
         "com.netflix.nebula:gradle-resolution-rules": {
-            "locked": "0.26.0",
+            "locked": "0.27.0",
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
@@ -1974,6 +1990,10 @@
             "transitive": [
                 "netflix:netflix-config"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
             "locked": "0.8.4",
@@ -2413,6 +2433,10 @@
             "transitive": [
                 "netflix:netflix-config"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
             "locked": "0.8.4",
@@ -2864,6 +2888,10 @@
                 "netflix:netflix-config"
             ]
         },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "requested": "latest.release"
+        },
         "com.ning:compress-lzf": {
             "locked": "0.8.4",
             "transitive": [
@@ -3314,6 +3342,10 @@
                 "netflix:netflix-config"
             ]
         },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "requested": "latest.release"
+        },
         "com.ning:compress-lzf": {
             "locked": "0.8.4",
             "transitive": [
@@ -3763,6 +3795,10 @@
             "transitive": [
                 "netflix:netflix-config"
             ]
+        },
+        "com.netflix.vms.logging:vmslogging-api": {
+            "locked": "1.5",
+            "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
             "locked": "0.8.4",

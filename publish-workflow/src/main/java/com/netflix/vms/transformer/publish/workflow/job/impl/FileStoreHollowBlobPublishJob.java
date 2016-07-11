@@ -1,15 +1,18 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import com.netflix.aws.file.FileStore;
-import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.videometadata.s3.HollowBlobKeybaseBuilder;
-import com.netflix.vms.transformer.common.TransformerLogger.LogTag;
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
-import com.netflix.vms.transformer.publish.workflow.logmessage.PublishBlobMessage;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.PublishedBlob;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.netflix.aws.file.FileStore;
+import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.videometadata.s3.HollowBlobKeybaseBuilder;
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
+import com.netflix.vms.transformer.publish.workflow.logmessage.PublishBlobMessage;
+
 import netflix.admin.videometadata.uploadstat.FileUploadStatus.FileRegionUploadStatus;
 import netflix.admin.videometadata.uploadstat.FileUploadStatus.UploadStatus;
 
@@ -70,7 +73,7 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
         long duration = System.currentTimeMillis() - startTime;
         if(success) {
             status.setStatus(UploadStatus.SUCCESS);
-            ctx.getLogger().info(LogTag.PublishedBlob,  new PublishBlobMessage(keybase, status.getRegion(), getCycleVersion(), getCycleVersion(), fileToUpload.length(), duration));
+            ctx.getLogger().info(PublishedBlob, new PublishBlobMessage(keybase, status.getRegion(), getCycleVersion(), getCycleVersion(), fileToUpload.length(), duration));
         } else {
             status.setStatus(UploadStatus.FAILED);
         }

@@ -1,6 +1,17 @@
 package com.netflix.vms.transformer.publish.workflow.playbackmonkey;
 
-import static com.netflix.vms.transformer.common.TransformerLogger.LogTag.PlaybackMonkey;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.PlaybackMonkey;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import org.codehaus.jackson.JsonProcessingException;
 
 import com.netflix.hermes.exception.EntityNotFoundException;
 import com.netflix.hollow.util.SimultaneousExecutor;
@@ -15,17 +26,8 @@ import com.netflix.playback.monkey.model.PlaybackMonkeyTestResults;
 import com.netflix.playback.monkey.model.PlaybackMonkeyTestResults.Status;
 import com.netflix.playback.monkey.model.VideoTestDetails;
 import com.netflix.servo.monitor.DynamicCounter;
-import com.netflix.vms.transformer.common.TransformerLogger;
+import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
-import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import org.codehaus.jackson.JsonProcessingException;
 
 public class PlaybackMonkeyTester {
 
@@ -41,7 +43,7 @@ public class PlaybackMonkeyTester {
         this.pbmRestClient = createClient();
     }
 
-    public Map<VideoCountryKey, Boolean> testVideoCountryKeysWithRetry(TransformerLogger logger, Set<VideoCountryKey> mostValuableChangedVideos, int numOfTries) throws Exception {
+    public Map<VideoCountryKey, Boolean> testVideoCountryKeysWithRetry(TaggingLogger logger, Set<VideoCountryKey> mostValuableChangedVideos, int numOfTries) throws Exception {
         Map<VideoCountryKey, Boolean> playBackMonkeyResult = new HashMap<>(mostValuableChangedVideos.size());
         for (VideoCountryKey key : mostValuableChangedVideos) {
             playBackMonkeyResult.put(key, false);
@@ -60,7 +62,7 @@ public class PlaybackMonkeyTester {
                     failedVideos.add(entry.getKey());
                 }
             }
-            logger.info(PlaybackMonkey, "PBM run number: " + currentTry + ". Video sent: " + videosToTest.size() + ". Failed videos: " + failedVideos.size() + ".");
+            logger.info(PlaybackMonkey, "PBM run number: {}. Video sent: {}. Failed videos: {}.", currentTry, videosToTest.size(), failedVideos.size());
             if (failedVideos.size() == 0)
                 break;
             videosToTest = failedVideos;
@@ -75,7 +77,7 @@ public class PlaybackMonkeyTester {
      * com.netflix.videometadata.hollow.publish.workflow.playbackmonkey.DataTester
      * #testVideoCountryKeys(java.util.List)
      */
-    public Map<VideoCountryKey, Boolean> testVideoCountryKeys(TransformerLogger logger, List<VideoCountryKey> keys) throws Exception {
+    public Map<VideoCountryKey, Boolean> testVideoCountryKeys(TaggingLogger logger, List<VideoCountryKey> keys) throws Exception {
         final String[] testIds = new String[keys.size()];
         final boolean testCompleted[] = new boolean[keys.size()];
         final boolean testSuccess[] = new boolean[keys.size()];
@@ -83,7 +85,7 @@ public class PlaybackMonkeyTester {
         SimultaneousExecutor executor = new SimultaneousExecutor();
         final int numThreads = executor.getCorePoolSize();
 
-        logger.info(PlaybackMonkey, "keys.size(): " + keys.size() + " ; testIds.length: " + testIds.length);
+        logger.info(PlaybackMonkey, "keys.size(): {} ; testIds.length: {}", keys.size(), testIds.length);
         for (int i = 0; i < numThreads; i++) {
             final int threadNumber = i;
             executor.execute(new Runnable() {
@@ -106,7 +108,7 @@ public class PlaybackMonkeyTester {
 
         executor.awaitSuccessfulCompletion();
 
-        logger.info(PlaybackMonkey, "Initiated " + keys.size() + " number of video country tests.");
+        logger.info(PlaybackMonkey, "Initiated {} number of video country tests.", keys.size());
 
         executor = new SimultaneousExecutor();
         
@@ -154,7 +156,7 @@ public class PlaybackMonkeyTester {
 										break;
                                     }
                                 } catch(Exception e) {
-                                	logger.error(PlaybackMonkey, ": Exception running PBM tests.", e);
+                                    logger.error(PlaybackMonkey, "Exception running PBM tests.", e);
                                 }
                             }
                         }
@@ -171,7 +173,7 @@ public class PlaybackMonkeyTester {
             testResults.put(keys.get(i), testSuccess[i] ? Boolean.TRUE : Boolean.FALSE);
 
         // System.out.println("Completed PlaybackMonkeyTester with testResults size "+testResults.size());
-        logger.info(PlaybackMonkey, "Completed PlaybackMonkeyTester with testResults size " + testResults.size());
+        logger.info(PlaybackMonkey, "Completed PlaybackMonkeyTester with testResults size {}", testResults.size());
         return testResults;
     }
 
