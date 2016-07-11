@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.publish.workflow;
 
+import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -38,6 +39,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     private final HollowBlobFileNamer fileNamer;
     private PublishRegionProvider regionProvider;
     private final HollowPublishJobCreator jobCreator;
+    private HollowBlobDataProvider circuitBreakerDataProvider;
 
     /* fields */
     private final String vip;
@@ -49,8 +51,9 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         this(ctx, fileStore, hermesBlobAnnouncer, new HollowBlobDataProvider(ctx), uploadStatus, vip);
     }
 
-    private HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, HollowBlobDataProvider hollowBlobDataProvider, Supplier<ServerUploadStatus> uploadStatus, String vip) {
-        this(ctx, new DefaultHollowPublishJobCreator(ctx, fileStore, hermesBlobAnnouncer, hollowBlobDataProvider, new PlaybackMonkeyTester(), new ValuableVideoHolder(hollowBlobDataProvider), uploadStatus, vip), vip);
+    private HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, HollowBlobDataProvider circuitBreakerDataProvider, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+        this(ctx, new DefaultHollowPublishJobCreator(ctx, fileStore, hermesBlobAnnouncer, circuitBreakerDataProvider, new PlaybackMonkeyTester(), new ValuableVideoHolder(circuitBreakerDataProvider), uploadStatus, vip), vip);
+        this.circuitBreakerDataProvider = circuitBreakerDataProvider;
     }
 
     public HollowPublishWorkflowStager(TransformerContext ctx, HollowPublishJobCreator jobCreator, String vip) {
@@ -65,6 +68,12 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         exposePublicationHistory();
     }
 
+    @Override
+    public void notifyRestoredStateEngine(HollowReadStateEngine restoredState) {
+        if(circuitBreakerDataProvider != null)
+            circuitBreakerDataProvider.notifyRestoredStateEngine(restoredState);
+    }
+    
     @Override
     public void triggerPublish(long inputDataVersion, long previousVersion, long newVersion) {
         jobCreator.beginStagingNewCycle();
@@ -211,4 +220,5 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     private void exposePublicationHistory() {
         ctx.getPublicationHistoryConsumer().accept(scheduler.getHistory());
     }
+
 }

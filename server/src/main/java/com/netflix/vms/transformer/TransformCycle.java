@@ -57,6 +57,7 @@ public class TransformCycle {
     
     public void restore(VMSOutputDataClient restoreFrom) {
         outputStateEngine.restoreFrom(restoreFrom.getStateEngine());
+        publishWorkflowStager.notifyRestoredStateEngine(restoreFrom.getStateEngine());
         previousCycleNumber = restoreFrom.getCurrentVersionId();
     }
     
