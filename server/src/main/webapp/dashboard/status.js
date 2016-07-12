@@ -48,7 +48,7 @@ function ServerCycleStatusTab(dashboard) {
         }
         var hostName = "http://atlas-global." + dashboard.nflxEnvironment + ".netflix.net/";
         var path = "api/v1/graph?q=name,(,"
-        path += "vms.transformer.ReadInputDataDuration,vms.transformer.ProcessDataDuration,vms.transformer.WriteOutputDataDuration,vms.transformer.PublishWorkflowDuration,vms.transformer.WaitForNextCycleDuration";
+        path += "vms.transformer.ReadInputDataDuration,vms.transformer.ProcessDataDuration,vms.transformer.WriteOutputDataDuration,vms.transformer.WaitForPublishWorkflowDuration,vms.transformer.WaitForNextCycleDuration";
         path += ",),:in,nf.cluster," + cluster + ",:eq,:and,:sum,(,name,),:by,60000,:div,:stack";
         path += "&e=now-" + cycleSummaryTab.getAtlasEndMinusNowTimeMinutes() + "m&s=e-2h";
         path += "&w=" + cycleSummaryTab.graphWidth + "&h=270&ylabel=Duration(mins)&plot=area"; //w = 460
