@@ -4,6 +4,8 @@ import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
+import com.netflix.videometadata.client.HermesHollowClientUpdateDirector;
+import com.netflix.videometadata.client.VMSHollowClient;
 import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
 import com.netflix.vms.generated.notemplate.GlobalPersonHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
@@ -55,7 +57,7 @@ public class TitleLevelPinningPOC {
      * @return the file pointing to the processed data
      */
     public File process(Long inputDataVersion, int topNode) throws Throwable {
-        File slicedOutputFile = getSlicedFile("ouput", inputDataVersion, topNode);
+        File slicedOutputFile = createSlicedFile("ouput", inputDataVersion, topNode);
         if (slicedOutputFile.exists()) {
             System.out.println(String.format("Skipping vip=%s, version=%s, videoIds=%s [output file exists=%s]", converterVip, inputDataVersion, topNode, slicedOutputFile));
             return slicedOutputFile;
@@ -63,8 +65,8 @@ public class TitleLevelPinningPOC {
 
         long start = System.currentTimeMillis();
         System.out.println(String.format("Processing vip=%s, version=%s, videoIds=%s", converterVip, inputDataVersion, topNode));
-        File slicedInputFile = getSlicedFile("input", inputDataVersion, topNode);
-        HollowReadStateEngine inputStateEngineSlice = readStateEngineSlice(slicedInputFile, inputDataVersion, topNode);
+        File slicedInputFile = createSlicedFile("input", inputDataVersion, topNode);
+        HollowReadStateEngine inputStateEngineSlice = fetchStateEngineSlice(slicedInputFile, inputDataVersion, topNode);
 
         VMSHollowInputAPI api = new VMSHollowInputAPI(inputStateEngineSlice);
         new SimpleTransformer(api, outputStateEngine, ctx).transform();
@@ -146,6 +148,10 @@ public class TitleLevelPinningPOC {
 
     @Test
     public static void test() throws IOException, ParseException {
+        ((HermesHollowClientUpdateDirector) VMSHollowClient.getDefault().getUpdateDirector()).setIgnoreRefreshEvents(true);
+        VMSHollowClient.getDefault().triggerRefresh();
+        VMSHollowClient.getDefault().getCurrentVersionId();
+
         VMSInputDataProxyTransitionCreator creator = new VMSInputDataProxyTransitionCreator(BASE_PROXY, LOCAL_BLOB_STORE, VIP);
         creator.getLatestLocalSnapshotVersion();
         //creator.createSnapshotTransition(20160708205643826L).getInputStream();
@@ -172,27 +178,28 @@ public class TitleLevelPinningPOC {
     }
 
     // ------
-    private File getSlicedFile(String type, Long inputDataVersion, int topNode) {
+    private File createSlicedFile(String type, Long inputDataVersion, int topNode) {
         long version = inputDataVersion != null ? inputDataVersion : System.currentTimeMillis();
         return new File(localBlobStore, "vms.hollow" + type + ".blob." + converterVip + ".slice_" + version + "_" + topNode);
     }
 
-    private HollowReadStateEngine readStateEngineSlice(File slicedFile, Long inputDataVersion, int topNode) throws IOException {
+    private HollowReadStateEngine fetchStateEngineSlice(File slicedFile, Long inputDataVersion, int topNode) throws IOException {
         if (!slicedFile.exists()) {
             HollowReadStateEngine inputStateEngine = readInputData(inputDataVersion);
 
+            long start = System.currentTimeMillis();
             DataSlicer slicer = new DataSlicer(0, topNode);
             HollowWriteStateEngine slicedStateEngine = slicer.sliceInputBlob(inputStateEngine);
 
             writeStateEngine(slicedStateEngine, slicedFile);
-            System.out.println(String.format("Sliced videoId=%s from vip=%s, version=%s", topNode, converterVip, inputDataVersion));
+            System.out.println(String.format("Sliced videoId=%s from vip=%s, version=%s, duration=", topNode, converterVip, inputDataVersion, (System.currentTimeMillis() - start)));
         }
 
         return readStateEngine(slicedFile);
     }
 
     private HollowReadStateEngine readInputData(Long inputDataVersion) throws IOException {
-        System.out.println(String.format("Fetching vip=%s, version=%s", converterVip, inputDataVersion));
+        long start = System.currentTimeMillis();
 
         // Load Input File
         VMSInputDataClient client = new VMSInputDataClient(proxyURL, localBlobStore, converterVip);
@@ -201,6 +208,8 @@ public class TitleLevelPinningPOC {
         } else {
             client.triggerRefreshTo(inputDataVersion);
         }
+
+        System.out.println(String.format("readInputData vip=%s, version=%s, duration=%s", converterVip, inputDataVersion, (System.currentTimeMillis() - start)));
         return client.getStateEngine();
     }
 
