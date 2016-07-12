@@ -52,8 +52,9 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
                 vip);
     }
 
-    public void beginStagingNewCycle() {
+    public PublishWorkflowContext beginStagingNewCycle() {
         ctx = ctx.withCurrentLoggerAndConfig();
+        return ctx;
     }
 
     @Override

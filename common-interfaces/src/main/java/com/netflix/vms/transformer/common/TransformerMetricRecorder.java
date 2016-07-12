@@ -16,6 +16,7 @@ public interface TransformerMetricRecorder {
         ReadInputDataDuration,
         ProcessDataDuration,
         WriteOutputDataDuration,
+        PublishWorkflowDuration,
 
         ConsecutiveCycleFailures,
         ConsecutivePublishFailures,

@@ -67,7 +67,7 @@ public class HermesBlobAnnouncer{
 
         int retryCount = 0;
 
-        while(retryCount < 5) {
+        while(retryCount < 10) {
             try {
                 publisher.publish(pointer, entry, purgePolicy, prop);
                 writePublishedVersionToCassandra(topic, version);
@@ -75,8 +75,13 @@ public class HermesBlobAnnouncer{
             } catch(Throwable th) {
                 th.printStackTrace();
             }
-
+            
             retryCount++;
+
+            try {
+                Thread.sleep(retryCount * 1000L);
+            } catch(InterruptedException ignore) { }
+
         }
 
         return false;

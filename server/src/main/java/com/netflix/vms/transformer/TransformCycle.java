@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer;
 
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ProcessDataDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.PublishWorkflowDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ReadInputDataDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WriteOutputDataDuration;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleFastlaneIds;
@@ -10,7 +11,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformC
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WritingBlobsFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WroteBlob;
-
+import com.netflix.vms.transformer.publish.status.CycleStatusFuture;
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.client.HollowClient;
 import com.netflix.hollow.write.HollowBlobWriter;
@@ -64,7 +65,6 @@ public class TransformCycle {
     public void cycle() throws Throwable {
         try {
             beginCycle();
-            outputStateEngine.prepareForNextCycle();
             updateTheInput();
             transformTheData();
             if(isUnchangedFastlaneState()) {
@@ -89,7 +89,10 @@ public class TransformCycle {
 
         if(ctx.getFastlaneIds() != null)
             ctx.getLogger().info(CycleFastlaneIds, ctx.getFastlaneIds());
+        
         ctx.getLogger().info(TransformCycleBegin, "Beginning cycle={} jarVersion={}", currentCycleNumber, BlobMetaDataUtil.getJarVersion());
+
+        outputStateEngine.prepareForNextCycle();
     }
     
     private void updateTheInput() {
@@ -191,7 +194,17 @@ public class TransformCycle {
 	}
 
     public void submitToPublishWorkflow() {
-        publishWorkflowStager.triggerPublish(inputClient.getCurrentVersionId(), previousCycleNumber, currentCycleNumber);
+        long startTime = System.currentTimeMillis();
+        
+        try {
+            CycleStatusFuture future = publishWorkflowStager.triggerPublish(inputClient.getCurrentVersionId(), previousCycleNumber, currentCycleNumber);
+            if(!future.awaitStatus())
+                throw new RuntimeException("Publish Workflow Failed!");
+        } finally {
+            long endTime = System.currentTimeMillis();
+            ctx.getMetricRecorder().recordMetric(PublishWorkflowDuration, endTime - startTime);
+        }
+                
     }
 
     private void endCycleSuccessfully() {

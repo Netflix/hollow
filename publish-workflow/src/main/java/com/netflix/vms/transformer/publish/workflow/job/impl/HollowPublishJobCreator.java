@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.job.AfterCanaryAnnounceJob;
@@ -21,7 +23,7 @@ import java.util.Map;
 
 public interface HollowPublishJobCreator {
 
-    void                        beginStagingNewCycle();
+    PublishWorkflowContext          beginStagingNewCycle();
 
     CircuitBreakerJob               createCircuitBreakerJob (String vip,
                                                              long newVersion,

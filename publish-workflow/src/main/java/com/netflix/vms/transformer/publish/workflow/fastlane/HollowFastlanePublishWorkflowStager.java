@@ -1,7 +1,8 @@
 package com.netflix.vms.transformer.publish.workflow.fastlane;
 
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.vms.transformer.publish.status.CycleStatusFuture;
 
+import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -48,8 +49,7 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
     }
 
     @Override
-    public void triggerPublish(long inputDataVersion, long previousVersion, long newVersion) {
-    	
+    public CycleStatusFuture triggerPublish(long inputDataVersion, long previousVersion, long newVersion) {
     	ctx = ctx.withCurrentLoggerAndConfig();
 
         // Add publish jobs
@@ -64,7 +64,8 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
             allPublishJobs.addAll(list);
         }
         addDeleteJob(previousVersion, newVersion, allPublishJobs);
-
+        
+        return CycleStatusFuture.UNCHECKED_STATUS;
     }
 
     private Map<RegionEnum, List<PublicationJob>> addPublishJobsAllRegions(long inputDataVersion, long previousVersion, long newVersion){

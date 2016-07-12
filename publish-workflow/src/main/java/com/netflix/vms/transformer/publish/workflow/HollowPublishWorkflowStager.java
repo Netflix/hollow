@@ -1,5 +1,8 @@
 package com.netflix.vms.transformer.publish.workflow;
 
+import com.netflix.vms.transformer.publish.status.WorkflowCycleStatusFuture;
+
+import com.netflix.vms.transformer.publish.status.CycleStatusFuture;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
@@ -75,8 +78,8 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     }
     
     @Override
-    public void triggerPublish(long inputDataVersion, long previousVersion, long newVersion) {
-        jobCreator.beginStagingNewCycle();
+    public CycleStatusFuture triggerPublish(long inputDataVersion, long previousVersion, long newVersion) {
+        PublishWorkflowContext ctx = jobCreator.beginStagingNewCycle();
 
         // Add validation job
         final CircuitBreakerJob circuitBreakerJob = addCircuitBreakerJob(previousVersion, newVersion);
@@ -101,6 +104,8 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         addDeleteJob(previousVersion, newVersion, allPublishJobs);
 
         priorCycleCanaryValidationJob = canaryValidationJob;
+        
+        return new WorkflowCycleStatusFuture(ctx.getStatusIndicator(), newVersion);
     }
 
     private AnnounceJob createAnnounceJobForRegion(RegionEnum region, long previousVerion, long newVersion, CanaryValidationJob validationJob, AnnounceJob primaryRegionAnnounceJob) {
