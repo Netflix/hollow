@@ -12,6 +12,8 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformC
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WritingBlobsFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WroteBlob;
 
+import com.netflix.vms.transformer.common.VersionMinter;
+
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.client.HollowClient;
 import com.netflix.hollow.write.HollowBlobWriter;
@@ -27,7 +29,7 @@ import com.netflix.vms.transformer.publish.status.CycleStatusFuture;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.job.impl.BlobMetaDataUtil;
-import com.netflix.vms.transformer.util.VersionMinter;
+import com.netflix.vms.transformer.util.SequenceVersionMinter;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -53,7 +55,7 @@ public class TransformCycle {
         this.ctx = ctx;
         this.headerPopulator = new TransformerOutputBlobHeaderPopulator(inputClient, outputStateEngine, ctx);
         this.publishWorkflowStager = publishStager;
-        this.versionMinter = new VersionMinter();
+        this.versionMinter = new SequenceVersionMinter();
         this.followVipPinExtractor = new FollowVipPinExtractor(fileStore);
     }
     

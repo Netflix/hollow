@@ -1,7 +1,5 @@
 package com.netflix.vms.transformer.startup;
 
-import javax.inject.Singleton;
-
 import com.google.inject.AbstractModule;
 // Common module dependencies
 import com.google.inject.Provides;
@@ -9,10 +7,13 @@ import com.netflix.archaius.ConfigProxyFactory;
 // Server dependencies
 import com.netflix.runtime.health.guice.HealthModule;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
+import com.netflix.vms.transformer.common.VersionMinter;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.health.TransformerServerHealthIndicator;
 import com.netflix.vms.transformer.octobersky.OctoberSkyDataImpl;
+import com.netflix.vms.transformer.util.SequenceVersionMinter;
+import javax.inject.Singleton;
 
 
 /**
@@ -36,6 +37,7 @@ public final class TransformerModule extends AbstractModule {
 
         bind(OctoberSkyData.class).to(OctoberSkyDataImpl.class);
         bind(TransformerCycleKickoff.class).asEagerSingleton();
+        bind(VersionMinter.class).to(SequenceVersionMinter.class);
     }
 
     @Provides

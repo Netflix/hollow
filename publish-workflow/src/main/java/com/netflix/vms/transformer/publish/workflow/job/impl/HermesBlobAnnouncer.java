@@ -1,16 +1,11 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
-
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.ConcurrentHashMap;
-import com.netflix.vms.transformer.publish.workflow.util.TransformerServerCassandraHelper;
-import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
-import com.netflix.cassandra.NFAstyanaxManager;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
+import com.netflix.cassandra.NFAstyanaxManager;
 import com.netflix.config.NetflixConfiguration;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.hermes.Constants;
@@ -20,21 +15,28 @@ import com.netflix.hermes.data.NoContentDataEntry;
 import com.netflix.hermes.platformserviceclient.Property;
 import com.netflix.hermes.publisher.FastPropertyPublisher;
 import com.netflix.hermes.publisher.PurgePolicy;
+import com.netflix.vms.transformer.common.VersionMinter;
+import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
+import com.netflix.vms.transformer.publish.workflow.util.TransformerServerCassandraHelper;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Singleton
 public class HermesBlobAnnouncer{
     
     private final FastPropertyPublisher publisher;
     private final TransformerCassandraHelper announcedVersionCassandraHelper;
+    private final VersionMinter hermesVersionMinter;
     
     private final ConcurrentHashMap<String, AtomicLong> latestAnnouncedVersionsPerTopic;
 
     @Inject
-    public HermesBlobAnnouncer(FastPropertyPublisher publisher, NFAstyanaxManager astyanaxManager) {
+    public HermesBlobAnnouncer(FastPropertyPublisher publisher, NFAstyanaxManager astyanaxManager, VersionMinter hermesVersionMinter) {
         this.publisher = publisher;
         this.announcedVersionCassandraHelper = new TransformerServerCassandraHelper(astyanaxManager, "CASS_DPT", "vms_announced_versions", "vms_announced_versions");
         this.latestAnnouncedVersionsPerTopic = new ConcurrentHashMap<>();
+        this.hermesVersionMinter = hermesVersionMinter;
     }
     
     /*
@@ -55,7 +57,7 @@ public class HermesBlobAnnouncer{
         String eventString = new ObjectMapper().writeValueAsString(event);
         final DirectDataPointer pointer = new DirectDataPointer.Builder()
                                             .topic(topic)
-                                            .version(String.valueOf(version))
+                                            .version(String.valueOf(hermesVersionMinter.mintANewVersion()))
                                             .dataString(eventString)
                                             .build();
         final Property prop = new Property();
