@@ -1,7 +1,9 @@
 package com.netflix.vms.transformer.testutil.slice;
 
+import com.netflix.hollow.combine.HollowCombiner;
 import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.util.StateEngineRoundTripper;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
@@ -64,12 +66,13 @@ public class TitleLevelPinningPOC {
         HollowReadStateEngine inputStateEngineSlice = fetchStateEngineSlice(slicedInputFile, inputDataVersion, topNode);
 
         VMSHollowInputAPI api = new VMSHollowInputAPI(inputStateEngineSlice);
+        VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
         new SimpleTransformer(api, outputStateEngine, ctx).transform();
         writeStateEngine(outputStateEngine, slicedOutputFile);
 
         // Get output StateEngine ready for next procesing
-        outputStateEngine.prepareForNextCycle();
-        outputStateEngine.addAllObjectsFromPreviousCycle();
+        //        outputStateEngine.prepareForNextCycle();
+        //        outputStateEngine.addAllObjectsFromPreviousCycle();
 
         System.out.println(String.format("***** \t Processed in=%s, out=%s, duration=%s", slicedInputFile, slicedOutputFile, (System.currentTimeMillis() - start)));
         return slicedOutputFile;
@@ -129,8 +132,14 @@ public class TitleLevelPinningPOC {
             @Override
             public void run() {
                 try {
-                    output(actual);
-                    ShowMeTheProgressDiffTool.startTheDiff(expected, actual);
+                    HollowCombiner combiner = expected.getSchemas().isEmpty() ? new HollowCombiner(actual) : new HollowCombiner(expected, actual);
+                    combiner.combine();
+                    HollowWriteStateEngine combinedStateEngine = combiner.getCombinedStateEngine();
+                    combinedStateEngine.addHeaderTags(actual.getHeaderTags());
+                    HollowReadStateEngine combinedReadStateEngine = StateEngineRoundTripper.roundTripSnapshot(combinedStateEngine);
+
+                    output(combinedReadStateEngine);
+                    ShowMeTheProgressDiffTool.startTheDiff(expected, combinedReadStateEngine);
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
