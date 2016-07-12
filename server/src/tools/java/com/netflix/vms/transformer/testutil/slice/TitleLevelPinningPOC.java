@@ -4,8 +4,6 @@ import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
-import com.netflix.videometadata.client.HermesHollowClientUpdateDirector;
-import com.netflix.videometadata.client.VMSHollowClient;
 import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
 import com.netflix.vms.generated.notemplate.GlobalPersonHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
@@ -14,19 +12,15 @@ import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
-import com.netflix.vms.transformer.input.VMSInputDataProxyTransitionCreator;
 import com.netflix.vms.transformer.testutil.migration.ShowMeTheProgressDiffTool;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.testng.annotations.Test;
 
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
@@ -46,6 +40,7 @@ public class TitleLevelPinningPOC {
         this.converterVip = converterVip;
         this.proxyURL = proxyURL;
         this.localBlobStore = localBlobStore;
+        mkdir(this.localBlobStore);
 
         outputStateEngine = new VMSTransformerWriteStateEngine();
         ctx = new SimpleTransformerContext();
@@ -146,16 +141,11 @@ public class TitleLevelPinningPOC {
         return thread;
     }
 
-    @Test
-    public static void test() throws IOException, ParseException {
-        ((HermesHollowClientUpdateDirector) VMSHollowClient.getDefault().getUpdateDirector()).setIgnoreRefreshEvents(true);
-        VMSHollowClient.getDefault().triggerRefresh();
-        VMSHollowClient.getDefault().getCurrentVersionId();
-
-        VMSInputDataProxyTransitionCreator creator = new VMSInputDataProxyTransitionCreator(BASE_PROXY, LOCAL_BLOB_STORE, VIP);
-        creator.getLatestLocalSnapshotVersion();
-        //creator.createSnapshotTransition(20160708205643826L).getInputStream();
-    }
+    //    public static void test() throws IOException, ParseException {
+    //        VMSInputDataProxyTransitionCreator creator = new VMSInputDataProxyTransitionCreator(BASE_PROXY, LOCAL_BLOB_STORE, VIP);
+    //        creator.getLatestLocalSnapshotVersion();
+    //        //creator.createSnapshotTransition(20160708205643826L).getInputStream();
+    //    }
 
     public static void output(HollowReadStateEngine readStateEngine) throws IOException {
         VMSRawHollowAPI api = new VMSRawHollowAPI(readStateEngine);
@@ -229,6 +219,13 @@ public class TitleLevelPinningPOC {
         HollowBlobWriter writer = new HollowBlobWriter(stateEngine);
         try (LZ4BlockOutputStream os = new LZ4BlockOutputStream(new FileOutputStream(outputFile))) {
             writer.writeSnapshot(os);
+        }
+    }
+
+    private static void mkdir(String dirName) {
+        File dir = new File(dirName);
+        if (!dir.exists()) {
+            dir.mkdirs();
         }
     }
 }
