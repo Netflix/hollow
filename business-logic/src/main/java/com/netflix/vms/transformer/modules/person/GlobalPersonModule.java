@@ -73,6 +73,10 @@ public class GlobalPersonModule extends AbstractTransformModule {
                 if(currentRelationship != null) {
                     output.currentRelationship = new Strings(currentRelationship._getValue());
                 }
+                ListOfStringHollow relationships = personBioInput._getRelationships();
+                if(relationships != null) {
+                    output.relationships = stringsList(relationships);
+                }
             }
 
             mapper.addObject(output);

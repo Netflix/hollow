@@ -24,6 +24,13 @@ public class PersonBioHollow extends HollowObject {
         return  api().getListOfStringHollow(refOrdinal);
     }
 
+    public ListOfStringHollow _getRelationships() {
+        int refOrdinal = delegate().getRelationshipsOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getListOfStringHollow(refOrdinal);
+    }
+
     public StringHollow _getCurrentRelationship() {
         int refOrdinal = delegate().getCurrentRelationshipOrdinal(ordinal);
         if(refOrdinal == -1)
