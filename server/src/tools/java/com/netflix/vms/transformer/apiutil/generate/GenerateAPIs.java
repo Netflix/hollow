@@ -16,8 +16,8 @@ import org.junit.Test;
 
 public class GenerateAPIs {
 
-    private static final String TRANSFORMER_PROJECT_BASE_DIR = "/common/git/vmstransformer";
-    private static final String CONVERTER_PROJECT_BASE_DIR = "/common/git/vmsconverter";
+    private static final String TRANSFORMER_PROJECT_BASE_DIR = "/home/djayaraman/work/stash/vmstransformer";
+    private static final String CONVERTER_PROJECT_BASE_DIR = "/home/djayaraman/work/stash/vmsconverter";
 
     @Test
     public void generateInputAPI() throws IOException {
