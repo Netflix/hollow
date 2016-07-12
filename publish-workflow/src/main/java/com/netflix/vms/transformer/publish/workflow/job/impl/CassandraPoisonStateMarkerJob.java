@@ -20,8 +20,8 @@ public class CassandraPoisonStateMarkerJob extends PoisonStateMarkerJob {
     @Override
     protected boolean executeJob() {
         try {
-            ctx.getPoisonStateMarker().markStatePoisoned(getCycleVersion(), true);
             ctx.getStatusIndicator().markFailure(getCycleVersion());
+            ctx.getPoisonStateMarker().markStatePoisoned(getCycleVersion(), true);
             ctx.getLogger().error(
                     Arrays.asList(MarkedPoisonState, TransformCycleFailed),
                     "Marked version {} poison.", getCycleVersion());

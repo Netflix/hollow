@@ -1,7 +1,8 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import java.util.concurrent.atomic.AtomicLong;
+import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.ConcurrentHashMap;
 import com.netflix.vms.transformer.publish.workflow.util.TransformerServerCassandraHelper;
 import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
@@ -69,8 +70,8 @@ public class HermesBlobAnnouncer{
 
         while(retryCount < 10) {
             try {
-                publisher.publish(pointer, entry, purgePolicy, prop);
                 writePublishedVersionToCassandra(topic, version);
+                publisher.publish(pointer, entry, purgePolicy, prop);
                 return true;
             } catch(Throwable th) {
                 th.printStackTrace();
@@ -87,7 +88,7 @@ public class HermesBlobAnnouncer{
         return false;
     }
     
-    private void writePublishedVersionToCassandra(String topic, long version) {
+    private void writePublishedVersionToCassandra(String topic, long version) throws ConnectionException {
         AtomicLong latest = latestAnnouncedVersionsPerTopic.get(topic);
         if(latest == null) {
             latest = new AtomicLong(Long.MIN_VALUE);
@@ -99,17 +100,7 @@ public class HermesBlobAnnouncer{
         long latestVal = latest.get();
         while(latestVal < version) {
             if(latest.compareAndSet(latestVal, version)) {
-                int retryCount = 0;
-                while(retryCount < 5) {
-                    try {
-                        announcedVersionCassandraHelper.addKeyValuePair(topic, String.valueOf(version));
-                        return;
-                    } catch(Throwable th) {
-                        th.printStackTrace();
-                    }
-                    
-                    retryCount++;
-                }
+                announcedVersionCassandraHelper.addKeyValuePair(topic, String.valueOf(version));
                 return;
             }
             latestVal = latest.get();
