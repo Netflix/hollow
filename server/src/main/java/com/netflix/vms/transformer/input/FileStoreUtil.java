@@ -4,6 +4,7 @@ import com.netflix.aws.db.ItemAttribute;
 import com.netflix.aws.file.FileAccessItem;
 import com.netflix.logging.ILog;
 import com.netflix.logging.LogManager;
+
 import java.util.List;
 
 @SuppressWarnings("deprecation")
@@ -13,6 +14,7 @@ public class FileStoreUtil {
 
     public static long getToVersion(FileAccessItem fileItem) {
         String toVersionStr = getAttribute(fileItem, "toVersion");
+        if (toVersionStr == null) return Long.MIN_VALUE;
 
         try {
             return Long.parseLong(toVersionStr);
@@ -24,19 +26,23 @@ public class FileStoreUtil {
 
     public static long getFromVersion(FileAccessItem fileItem) {
         String fromVersionStr = getAttribute(fileItem, "fromVersion");
+        if (fromVersionStr == null) return Long.MIN_VALUE;
 
-        if(fromVersionStr == null)
+        try {
+            return Long.parseLong(fromVersionStr);
+        } catch (Throwable th) {
+            LOGGER.error(th);
             return Long.MIN_VALUE;
-
-        return Long.parseLong(fromVersionStr);
+        }
     }
-    
+
     public static String getConverterVip(FileAccessItem fileItem) {
         return getAttribute(fileItem, "converterVip");
     }
-    
+
     public static long getInputDataVersion(FileAccessItem fileItem) {
         String inputVersionStr = getAttribute(fileItem, "inputVersion");
+        if (inputVersionStr == null) return Long.MIN_VALUE;
 
         try {
             return Long.parseLong(inputVersionStr);
@@ -45,10 +51,11 @@ public class FileStoreUtil {
             return Long.MIN_VALUE;
         }
     }
-    
+
 
     public static long getPublishCycleDataTS(FileAccessItem fileItem) {
         String publishCycleDataTS = getAttribute(fileItem, "publishCycleDataTS");
+        if (publishCycleDataTS == null) return Long.MIN_VALUE;
 
         try {
             return Long.parseLong(publishCycleDataTS);
@@ -66,5 +73,4 @@ public class FileStoreUtil {
         }
         return null;
     }
-
 }

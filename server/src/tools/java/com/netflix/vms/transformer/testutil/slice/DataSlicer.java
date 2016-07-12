@@ -28,6 +28,7 @@ import com.netflix.vms.transformer.hollowoutput.NamedCollectionHolder;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VPerson;
 import com.netflix.vms.transformer.hollowoutput.Video;
+
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
@@ -102,6 +103,13 @@ public class DataSlicer {
             }
         });
 
+        findIncludedOrdinals(stateEngine, "LanguageRights", videoIdsToInclude, new VideoIdDeriver() {
+            @Override
+            public Integer deriveId(int ordinal) {
+                return outputAPI.getLanguageRightsHollow(ordinal)._getVideoId()._getValueBoxed();
+            }
+        });
+
         includeAll(stateEngine, "EncodingProfile");
         includeAll(stateEngine, "OriginServer");
         includeAll(stateEngine, "DeploymentIntent");
@@ -116,7 +124,6 @@ public class DataSlicer {
         includeAll(stateEngine, "PersonImages");
         includeAll(stateEngine, "TopNVideoData");
         includeAll(stateEngine, "GlobalPerson");
-        includeAll(stateEngine, "LanguageRights");
 
         ordinalsToInclude.put("L10NResources", findIncludedL10NOrdinals(stateEngine, videoIdsToInclude));
 
@@ -239,6 +246,18 @@ public class DataSlicer {
             @Override
             public Integer deriveId(int ordinal) {
                 return Integer.valueOf((int)inputAPI.getVideoRightsHollow(ordinal)._getMovieId());
+            }
+        });
+        findIncludedOrdinals(stateEngine, "Status", videoIdsToInclude, new VideoIdDeriver() {
+            @Override
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int) inputAPI.getStatusHollow(ordinal)._getMovieId());
+            }
+        });
+        findIncludedOrdinals(stateEngine, "Contracts", videoIdsToInclude, new VideoIdDeriver() {
+            @Override
+            public Integer deriveId(int ordinal) {
+                return Integer.valueOf((int) inputAPI.getContractsHollow(ordinal)._getMovieId());
             }
         });
         findIncludedOrdinals(stateEngine, "CSMReview", videoIdsToInclude, new VideoIdDeriver() {

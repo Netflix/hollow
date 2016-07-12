@@ -1,9 +1,5 @@
 package com.netflix.vms.transformer.testutil.migration;
 
-import com.netflix.vms.transformer.SimpleTransformer;
-import com.netflix.vms.transformer.SimpleTransformerContext;
-import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
-
 import com.netflix.hollow.HollowBlobHeader;
 import com.netflix.hollow.HollowSchema;
 import com.netflix.hollow.filter.HollowFilterConfig;
@@ -13,8 +9,12 @@ import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.memory.WastefulRecycler;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
+import com.netflix.vms.transformer.SimpleTransformer;
+import com.netflix.vms.transformer.SimpleTransformerContext;
+import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.io.LZ4VMSInputStream;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -26,8 +26,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
-import net.jpountz.lz4.LZ4BlockInputStream;
+
 import org.junit.Test;
+
+import net.jpountz.lz4.LZ4BlockInputStream;
 
 public class ShowMeTheProgress {
 
@@ -109,7 +111,6 @@ public class ShowMeTheProgress {
         filter.addTypeRecursive("VideoEpisode_CountryList", outputSchemas);
         filter.addTypeRecursive("DrmInfoData", outputSchemas);
         filter.addTypeRecursive("FileEncodingData", outputSchemas);
-        filter.addTypeRecursive("LanguageRights", outputSchemas);
         return filter;
     }
 
