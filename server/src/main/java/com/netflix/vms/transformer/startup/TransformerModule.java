@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.startup;
 
+import org.elasticsearch.common.inject.name.Names;
+
 import com.google.inject.AbstractModule;
 // Common module dependencies
 import com.google.inject.Provides;
@@ -37,7 +39,7 @@ public final class TransformerModule extends AbstractModule {
 
         bind(OctoberSkyData.class).to(OctoberSkyDataImpl.class);
         bind(TransformerCycleKickoff.class).asEagerSingleton();
-        bind(VersionMinter.class).to(SequenceVersionMinter.class);
+        bind(VersionMinter.class).annotatedWith(Names.named("vipAnnounceID")).toInstance(new SequenceVersionMinter());
     }
 
     @Provides

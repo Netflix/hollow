@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
+import com.google.inject.name.Named;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
@@ -32,7 +34,9 @@ public class HermesBlobAnnouncer{
     private final ConcurrentHashMap<String, AtomicLong> latestAnnouncedVersionsPerTopic;
 
     @Inject
-    public HermesBlobAnnouncer(FastPropertyPublisher publisher, NFAstyanaxManager astyanaxManager, VersionMinter hermesVersionMinter) {
+    public HermesBlobAnnouncer(FastPropertyPublisher publisher, 
+                               NFAstyanaxManager astyanaxManager, 
+                               @Named("vipAnnounceID") VersionMinter hermesVersionMinter) {
         this.publisher = publisher;
         this.announcedVersionCassandraHelper = new TransformerServerCassandraHelper(astyanaxManager, "CASS_DPT", "vms_announced_versions", "vms_announced_versions");
         this.latestAnnouncedVersionsPerTopic = new ConcurrentHashMap<>();
