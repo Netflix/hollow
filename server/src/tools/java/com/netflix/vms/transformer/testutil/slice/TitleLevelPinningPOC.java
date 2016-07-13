@@ -54,7 +54,7 @@ public class TitleLevelPinningPOC {
      * @return the file pointing to the processed data
      */
     public File process(Long inputDataVersion, int topNode) throws Throwable {
-        File slicedOutputFile = createSlicedFile("ouput", inputDataVersion, topNode);
+        File slicedOutputFile = createSlicedFile("output", inputDataVersion, topNode);
         if (slicedOutputFile.exists()) {
             System.out.println(String.format("Skipping vip=%s, version=%s, videoIds=%s [output file exists=%s]", converterVip, inputDataVersion, topNode, slicedOutputFile));
             return slicedOutputFile;
