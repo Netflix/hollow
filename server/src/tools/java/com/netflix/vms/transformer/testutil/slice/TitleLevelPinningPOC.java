@@ -70,10 +70,6 @@ public class TitleLevelPinningPOC {
         new SimpleTransformer(api, outputStateEngine, ctx).transform();
         writeStateEngine(outputStateEngine, slicedOutputFile);
 
-        // Get output StateEngine ready for next procesing
-        //        outputStateEngine.prepareForNextCycle();
-        //        outputStateEngine.addAllObjectsFromPreviousCycle();
-
         System.out.println(String.format("***** \t Processed in=%s, out=%s, duration=%s", slicedInputFile, slicedOutputFile, (System.currentTimeMillis() - start)));
         return slicedOutputFile;
     }
@@ -94,8 +90,6 @@ public class TitleLevelPinningPOC {
         // Chelsea
         File out3 = pinner.process(20160711162231381L, 80049872);
 
-        // Chelsea already processed
-        File out4 = pinner.process(20160711162231381L, 80049872);
         System.out.println("ALL PROCESSING DONE, duration=" + (System.currentTimeMillis() - start));
 
 
@@ -118,28 +112,31 @@ public class TitleLevelPinningPOC {
             state3.setHeaderTags(Collections.singletonMap("vip", "Chelsea"));
             startTheDiff(state2, state3);
 
-            HollowReadStateEngine state4 = readStateEngine(out4);
-            state4.setHeaderTags(Collections.singletonMap("vip", "x 2"));
-            startTheDiff(state3, state4);
             System.out.println("ALL DIFFING DONE, duration=" + (System.currentTimeMillis() - start));
         }
 
         System.out.flush();
     }
 
-    public static Thread startTheDiff(final HollowReadStateEngine expected, final HollowReadStateEngine actual) throws Exception {
+    public static Thread startTheDiff(final HollowReadStateEngine fromState, final HollowReadStateEngine actual) throws Exception {
         Thread thread = new Thread() {
             @Override
             public void run() {
                 try {
-                    HollowCombiner combiner = expected.getSchemas().isEmpty() ? new HollowCombiner(actual) : new HollowCombiner(expected, actual);
-                    combiner.combine();
-                    HollowWriteStateEngine combinedStateEngine = combiner.getCombinedStateEngine();
-                    combinedStateEngine.addHeaderTags(actual.getHeaderTags());
-                    HollowReadStateEngine combinedReadStateEngine = StateEngineRoundTripper.roundTripSnapshot(combinedStateEngine);
+                    HollowReadStateEngine toState = actual;
 
-                    output(combinedReadStateEngine);
-                    ShowMeTheProgressDiffTool.startTheDiff(expected, combinedReadStateEngine);
+                    if (!fromState.getSchemas().isEmpty()) {
+                        HollowCombiner combiner = new HollowCombiner(fromState, actual);
+                        combiner.addIgnoredTypes(HollowCombinerWithNamedList.NAMEDLIST_TYPE_STATE_NAME);
+                        combiner.combine();
+                        new HollowCombinerWithNamedList(combiner.getCombinedStateEngine(), fromState, actual).combine();
+                        HollowWriteStateEngine combinedStateEngine = combiner.getCombinedStateEngine();
+                        combinedStateEngine.addHeaderTags(actual.getHeaderTags());
+                        toState = StateEngineRoundTripper.roundTripSnapshot(combinedStateEngine);
+                    }
+
+                    output(toState);
+                    ShowMeTheProgressDiffTool.startTheDiff(fromState, toState);
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -149,12 +146,6 @@ public class TitleLevelPinningPOC {
         thread.start();
         return thread;
     }
-
-    //    public static void test() throws IOException, ParseException {
-    //        VMSInputDataProxyTransitionCreator creator = new VMSInputDataProxyTransitionCreator(BASE_PROXY, LOCAL_BLOB_STORE, VIP);
-    //        creator.getLatestLocalSnapshotVersion();
-    //        //creator.createSnapshotTransition(20160708205643826L).getInputStream();
-    //    }
 
     public static void output(HollowReadStateEngine readStateEngine) throws IOException {
         VMSRawHollowAPI api = new VMSRawHollowAPI(readStateEngine);
