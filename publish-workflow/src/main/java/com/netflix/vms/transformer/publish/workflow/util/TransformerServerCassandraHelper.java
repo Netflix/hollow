@@ -1,4 +1,4 @@
-package com.netflix.vms.transformer.util;
+package com.netflix.vms.transformer.publish.workflow.util;
 
 import java.util.HashMap;
 import java.util.Map;

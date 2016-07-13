@@ -2,8 +2,6 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.hermes.publisher.FastPropertyPublisher;
-import com.netflix.hermes.subscriber.SubscriptionManager;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
@@ -40,26 +38,23 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
     private PublishWorkflowContext ctx;
 
     public DefaultHollowPublishJobCreator(TransformerContext transformerContext,
-            SubscriptionManager hermesSubscriber,
-            FastPropertyPublisher hermesPublisher,
             FileStore fileStore,
+            HermesBlobAnnouncer hermesBlobAnnouncer,
             HollowBlobDataProvider hollowBlobDataProvider, PlaybackMonkeyTester playbackMonkeyTester,
             ValuableVideoHolder videoRanker, Supplier<ServerUploadStatus> serverUploadStatus, String vip) {
         this.hollowBlobDataProvider = hollowBlobDataProvider;
         this.playbackMonkeyTester = playbackMonkeyTester;
         this.videoRanker = videoRanker;
         this.ctx = new TransformerPublishWorkflowContext(transformerContext,
-                new HermesVipAnnouncer(
-                        new HermesBlobAnnouncer(hermesPublisher),
-                        hermesSubscriber, 
-                        transformerContext.getConfig().getTransformerVip()),
+                new HermesVipAnnouncer(hermesBlobAnnouncer),
                 serverUploadStatus,
                 fileStore,
                 vip);
     }
 
-    public void beginStagingNewCycle() {
+    public PublishWorkflowContext beginStagingNewCycle() {
         ctx = ctx.withCurrentLoggerAndConfig();
+        return ctx;
     }
 
     @Override

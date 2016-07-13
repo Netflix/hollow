@@ -1,16 +1,17 @@
 package com.netflix.vms.transformer.util;
-import com.netflix.vms.transformer.util.VersionMinter;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.netflix.vms.transformer.common.VersionMinter;
 import org.junit.Before;
 import org.junit.Test;
-import static org.assertj.core.api.Assertions.*;
 
 public class VersionMinterTest {
     private VersionMinter subject;
 
     @Before
     public void setup() {
-        this.subject = new VersionMinter();
+        this.subject = new SequenceVersionMinter();
     }
 
     @Test

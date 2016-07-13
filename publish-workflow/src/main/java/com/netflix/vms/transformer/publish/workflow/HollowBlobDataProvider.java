@@ -39,6 +39,11 @@ public class HollowBlobDataProvider {
         this.hollowReadStateEngine = new HollowReadStateEngine(true);
         this.hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
     }
+    
+    public void notifyRestoredStateEngine(HollowReadStateEngine restoredState) {
+        this.hollowReadStateEngine = restoredState;
+        this.hollowBlobReader = new HollowBlobReader(restoredState);
+    }
 
     public void readSnapshot(File snapshotFile) throws IOException {
         ctx.getLogger().info(CircuitBreaker, "Reading Snapshot blob {}", snapshotFile.getName());
@@ -61,17 +66,8 @@ public class HollowBlobDataProvider {
     }
 
 	public void updateData(File snapshotFile, File deltaFile, File reverseDeltaFile) throws IOException {
-		if (deltaFile.exists()) {
-		    HollowChecksum initialChecksum = null;
-
-		    if(reverseDeltaFile.exists())
-		        initialChecksum = HollowChecksum.forStateEngine(hollowReadStateEngine);
-
-			readDelta(deltaFile);
-
-            if(snapshotFile.exists())
-                validateChecksums(snapshotFile, reverseDeltaFile, initialChecksum);
-
+		if (deltaFile.exists() && snapshotFile.exists()) {
+		    validateChecksums(snapshotFile, deltaFile, reverseDeltaFile);
         } else if (snapshotFile.exists()) {
             readSnapshot(snapshotFile);
         } else {
@@ -79,13 +75,19 @@ public class HollowBlobDataProvider {
         }
     }
 
-    private void validateChecksums(File snapshotFile, File reverseDeltaFile, HollowChecksum initialChecksumBeforeDelta) throws IOException {
+    private void validateChecksums(File snapshotFile, File deltaFile, File reverseDeltaFile) throws IOException {
         HollowReadStateEngine anotherStateEngine = new HollowReadStateEngine();
         HollowBlobReader anotherReader = new HollowBlobReader(anotherStateEngine);
         anotherReader.readSnapshot(ctx.files().newBlobInputStream(snapshotFile));
+        
+        HollowChecksum initialChecksumBeforeDelta = null;
+        if(reverseDeltaFile.exists())
+            initialChecksumBeforeDelta = HollowChecksum.forStateEngineWithCommonSchemas(hollowReadStateEngine, anotherStateEngine);
+        
+        readDelta(deltaFile);
 
-        HollowChecksum deltaChecksum = HollowChecksum.forStateEngine(hollowReadStateEngine);
-        HollowChecksum snapshotChecksum = HollowChecksum.forStateEngine(anotherStateEngine);
+        HollowChecksum deltaChecksum = HollowChecksum.forStateEngineWithCommonSchemas(hollowReadStateEngine, anotherStateEngine);
+        HollowChecksum snapshotChecksum = HollowChecksum.forStateEngineWithCommonSchemas(anotherStateEngine, hollowReadStateEngine);
 
         ctx.getLogger().info(BlobChecksum, "DELTA STATE CHECKSUM: {}", deltaChecksum);
         ctx.getLogger().info(BlobChecksum, "SNAPSHOT STATE CHECKSUM: {}", snapshotChecksum);
@@ -95,7 +97,7 @@ public class HollowBlobDataProvider {
 
         if(reverseDeltaFile.exists()) {
             anotherReader.applyDelta(ctx.files().newBlobInputStream(reverseDeltaFile));
-            HollowChecksum reverseDeltaChecksum = HollowChecksum.forStateEngine(anotherStateEngine);
+            HollowChecksum reverseDeltaChecksum = HollowChecksum.forStateEngineWithCommonSchemas(anotherStateEngine, hollowReadStateEngine);
 
             ctx.getLogger().info(BlobChecksum, "INITIAL STATE CHECKSUM: {}", initialChecksumBeforeDelta);
             ctx.getLogger().info(BlobChecksum, "REVERSE DELTA STATE CHECKSUM: {}", reverseDeltaChecksum);
