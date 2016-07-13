@@ -35,16 +35,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class HollowCombinerWithNamedList {
     public static final String NAMEDLIST_TYPE_STATE_NAME = "NamedCollectionHolder";
 
-    private final HollowReadStateEngine inputs[];
     private final HollowCombiner combiner;
+    private final HollowReadStateEngine inputs[];
 
     protected final ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> combinedVideoLists;
     protected final ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> combinedPersonLists;
     protected final ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> combinedEpisodeLists;
 
-    protected HollowCombinerWithNamedList(HollowReadStateEngine... inputs) {
+    protected HollowCombinerWithNamedList(HollowWriteStateEngine output, HollowReadStateEngine... inputs) {
         this.inputs = inputs;
-        this.combiner = new HollowCombiner(inputs);
+        this.combiner = new HollowCombiner(output, inputs);
         combiner.addIgnoredTypes(HollowCombinerWithNamedList.NAMEDLIST_TYPE_STATE_NAME);
 
         this.combinedVideoLists = new ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String,Set<Integer>>>();
@@ -52,13 +52,16 @@ public class HollowCombinerWithNamedList {
         this.combinedEpisodeLists = new ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String,Set<Integer>>>();
     }
 
-    public HollowWriteStateEngine combine() throws Exception {
+    public void combine() throws Exception {
         combiner.combine();
-        HollowWriteStateEngine output = combiner.getCombinedStateEngine();
         buildPOJOLists();
-        writePOJOListsToOutput(output);
-        return output;
+        writePOJOListsToOutput(combiner.getCombinedStateEngine());
     }
+
+    public HollowWriteStateEngine getCombinedStateEngine() {
+        return combiner.getCombinedStateEngine();
+    }
+
 
     protected void buildPOJOLists() throws Exception {
         SimultaneousExecutor executor = new SimultaneousExecutor();

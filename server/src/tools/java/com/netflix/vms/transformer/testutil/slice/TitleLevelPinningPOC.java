@@ -2,7 +2,6 @@ package com.netflix.vms.transformer.testutil.slice;
 
 import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.util.StateEngineRoundTripper;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
@@ -15,10 +14,13 @@ import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
 import com.netflix.vms.transformer.testutil.migration.ShowMeTheProgressDiffTool;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -34,7 +36,7 @@ public class TitleLevelPinningPOC {
     private final String converterVip;
     private final String proxyURL;
     private final String localBlobStore;
-    private final VMSTransformerWriteStateEngine outputStateEngine;
+    private static final VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
     private final SimpleTransformerContext ctx;
 
     public TitleLevelPinningPOC(String converterVip, String proxyURL, String localBlobStore) {
@@ -43,7 +45,6 @@ public class TitleLevelPinningPOC {
         this.localBlobStore = localBlobStore;
         mkdir(this.localBlobStore);
 
-        outputStateEngine = new VMSTransformerWriteStateEngine();
         ctx = new SimpleTransformerContext();
     }
 
@@ -99,15 +100,15 @@ public class TitleLevelPinningPOC {
             HollowReadStateEngine baseState = new HollowReadStateEngine();
             baseState.setHeaderTags(Collections.singletonMap("vip", "baseline"));
 
-            HollowReadStateEngine state1 = readStateEngine(out1);
+            HollowReadStateEngine state1 = combine(outputStateEngine, out1);
             state1.setHeaderTags(Collections.singletonMap("vip", "Wonder Man"));
             startTheDiff(baseState, state1);
 
-            HollowReadStateEngine state2 = readStateEngine(out2);
+            HollowReadStateEngine state2 = combine(outputStateEngine, out2);
             state2.setHeaderTags(Collections.singletonMap("vip", "HoC"));
             startTheDiff(state1, state2);
 
-            HollowReadStateEngine state3 = readStateEngine(out3);
+            HollowReadStateEngine state3 = combine(outputStateEngine, out3);
             state3.setHeaderTags(Collections.singletonMap("vip", "Chelsea"));
             startTheDiff(state2, state3);
 
@@ -117,30 +118,45 @@ public class TitleLevelPinningPOC {
         System.out.flush();
     }
 
-    public static Thread startTheDiff(final HollowReadStateEngine fromState, final HollowReadStateEngine actual) throws Exception {
+    public static HollowReadStateEngine combine(HollowWriteStateEngine output, File inputFile) throws Exception {
+        HollowReadStateEngine input = readStateEngine(inputFile);
+        HollowCombinerWithNamedList combiner = new HollowCombinerWithNamedList(output, input);
+
+        combiner.combine();
+        output.addHeaderTags(input.getHeaderTags());
+        HollowReadStateEngine state = roundTripSnapshot(output);
+        output.prepareForNextCycle();
+        output.addAllObjectsFromPreviousCycle();
+
+        return state;
+    }
+
+    public static HollowReadStateEngine roundTripSnapshot(HollowWriteStateEngine writeEngine) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
+        writer.writeSnapshot(baos);
+
+        HollowReadStateEngine readEngine = new HollowReadStateEngine();
+        HollowBlobReader reader = new HollowBlobReader(readEngine);
+        InputStream is = new ByteArrayInputStream(baos.toByteArray());
+        reader.readSnapshot(is);
+
+        return readEngine;
+    }
+
+    public static void startTheDiff(final HollowReadStateEngine fromState, final HollowReadStateEngine toState) throws Exception {
         Thread thread = new Thread() {
             @Override
             public void run() {
                 try {
-                    HollowReadStateEngine toState = actual;
-
-                    if (!fromState.getSchemas().isEmpty()) {
-                        HollowCombinerWithNamedList combiner = new HollowCombinerWithNamedList(fromState, actual);
-                        HollowWriteStateEngine combinedStateEngine = combiner.combine();
-                        combinedStateEngine.addHeaderTags(actual.getHeaderTags());
-                        toState = StateEngineRoundTripper.roundTripSnapshot(combinedStateEngine);
-                    }
-
                     output(toState);
                     ShowMeTheProgressDiffTool.startTheDiff(fromState, toState);
                 } catch (Exception e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
         };
         thread.start();
-        return thread;
     }
 
     public static void output(HollowReadStateEngine readStateEngine) throws IOException {
