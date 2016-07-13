@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.testutil.slice;
 
 import com.netflix.hollow.HollowObjectSchema;
+import com.netflix.hollow.combine.HollowCombiner;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.read.engine.object.HollowObjectTypeReadState;
@@ -35,24 +36,28 @@ public class HollowCombinerWithNamedList {
     public static final String NAMEDLIST_TYPE_STATE_NAME = "NamedCollectionHolder";
 
     private final HollowReadStateEngine inputs[];
-    private final HollowWriteStateEngine output;
+    private final HollowCombiner combiner;
 
     protected final ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> combinedVideoLists;
     protected final ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> combinedPersonLists;
     protected final ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> combinedEpisodeLists;
 
-    protected HollowCombinerWithNamedList(HollowWriteStateEngine output, HollowReadStateEngine... inputs) {
-        this.output = output;
+    protected HollowCombinerWithNamedList(HollowReadStateEngine... inputs) {
         this.inputs = inputs;
+        this.combiner = new HollowCombiner(inputs);
+        combiner.addIgnoredTypes(HollowCombinerWithNamedList.NAMEDLIST_TYPE_STATE_NAME);
 
         this.combinedVideoLists = new ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String,Set<Integer>>>();
         this.combinedPersonLists = new ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String,Set<Integer>>>();
         this.combinedEpisodeLists = new ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String,Set<Integer>>>();
     }
 
-    public void combine() throws Exception {
+    public HollowWriteStateEngine combine() throws Exception {
+        combiner.combine();
+        HollowWriteStateEngine output = combiner.getCombinedStateEngine();
         buildPOJOLists();
-        writePOJOListsToOutput();
+        writePOJOListsToOutput(output);
+        return output;
     }
 
     protected void buildPOJOLists() throws Exception {
@@ -157,10 +162,10 @@ public class HollowCombinerWithNamedList {
         return set;
     }
 
-    private void writePOJOListsToOutput() throws Exception {
+    private void writePOJOListsToOutput(HollowWriteStateEngine output) throws Exception {
         SimultaneousExecutor executor = new SimultaneousExecutor();
 
-        final int emptyResourceIdMapOrdinal = writeEmptyResourceIdMapToOutput();
+        final int emptyResourceIdMapOrdinal = writeEmptyResourceIdMapToOutput(output);
 
         for(final Entry<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> entry : combinedVideoLists.entrySet()) {
             final ISOCountry country = entry.getKey();
@@ -180,9 +185,9 @@ public class HollowCombinerWithNamedList {
                     HollowObjectWriteRecord personRec = new HollowObjectWriteRecord((HollowObjectSchema)output.getSchema("VPerson"));
                     HollowObjectWriteRecord episodeRec = new HollowObjectWriteRecord((HollowObjectSchema)output.getSchema("Episode"));
 
-                    int videoMapOrdinal = writeToOutput(videoLists, videoRec, "Video", "value");
-                    int episodeMapOrdinal = writeToOutput(episodeLists, episodeRec, "Episode", "id");
-                    int personMapOrdinal = writeToOutput(personLists, personRec, "VPerson", "id");
+                    int videoMapOrdinal = writeToOutput(videoLists, videoRec, "Video", "value", output);
+                    int episodeMapOrdinal = writeToOutput(episodeLists, episodeRec, "Episode", "id", output);
+                    int personMapOrdinal = writeToOutput(personLists, personRec, "VPerson", "id", output);
                     int countryOrdinal = output.add("ISOCountry", countryRec);
 
                     holderRec.setReference("videoListMap", videoMapOrdinal);
@@ -199,12 +204,13 @@ public class HollowCombinerWithNamedList {
         executor.awaitSuccessfulCompletion();
     }
 
-    private int writeEmptyResourceIdMapToOutput() {
+    // @TODO: Needs to be removed once client code is cleaned up
+    private int writeEmptyResourceIdMapToOutput(HollowWriteStateEngine output) {
         return output.add("MapOfStringsToSetOfNFResourceID", new HollowMapWriteRecord());
     }
 
 
-    private int writeToOutput(Map<String, Set<Integer>> itemLists, HollowObjectWriteRecord itemRec, String typeName, String itemIdFieldName) {
+    private int writeToOutput(Map<String, Set<Integer>> itemLists, HollowObjectWriteRecord itemRec, String typeName, String itemIdFieldName, HollowWriteStateEngine output) {
         String setName = "SetOf" + typeName;
         HollowMapWriteRecord mapRec = new HollowMapWriteRecord();
         HollowSetWriteRecord setRec = new HollowSetWriteRecord();

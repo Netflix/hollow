@@ -1,6 +1,5 @@
 package com.netflix.vms.transformer.testutil.slice;
 
-import com.netflix.hollow.combine.HollowCombiner;
 import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.StateEngineRoundTripper;
@@ -126,11 +125,8 @@ public class TitleLevelPinningPOC {
                     HollowReadStateEngine toState = actual;
 
                     if (!fromState.getSchemas().isEmpty()) {
-                        HollowCombiner combiner = new HollowCombiner(fromState, actual);
-                        combiner.addIgnoredTypes(HollowCombinerWithNamedList.NAMEDLIST_TYPE_STATE_NAME);
-                        combiner.combine();
-                        new HollowCombinerWithNamedList(combiner.getCombinedStateEngine(), fromState, actual).combine();
-                        HollowWriteStateEngine combinedStateEngine = combiner.getCombinedStateEngine();
+                        HollowCombinerWithNamedList combiner = new HollowCombinerWithNamedList(fromState, actual);
+                        HollowWriteStateEngine combinedStateEngine = combiner.combine();
                         combinedStateEngine.addHeaderTags(actual.getHeaderTags());
                         toState = StateEngineRoundTripper.roundTripSnapshot(combinedStateEngine);
                     }
