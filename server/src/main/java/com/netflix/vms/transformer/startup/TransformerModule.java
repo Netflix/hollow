@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.startup;
 
-import org.elasticsearch.common.inject.name.Names;
+import com.google.inject.name.Names;
 
 import com.google.inject.AbstractModule;
 // Common module dependencies
