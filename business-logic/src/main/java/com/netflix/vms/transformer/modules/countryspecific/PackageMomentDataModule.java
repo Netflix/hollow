@@ -253,6 +253,10 @@ public class PackageMomentDataModule {
 
             list.add(image);
         }
+        
+        for(Map.Entry<Strings, List<VideoImage>> entry : packageMomentData.stillImagesMap.entrySet()) {
+            Collections.sort(entry.getValue(), VIDEO_IMAGE_COMPARATOR);
+        }
     }
     
     private static final Comparator<ImageDownloadable> IMAGE_DOWNLOADABLE_COMPARATOR = new Comparator<ImageDownloadable>() {
@@ -261,6 +265,12 @@ public class PackageMomentDataModule {
         }
     };
 
+    private static final Comparator<VideoImage> VIDEO_IMAGE_COMPARATOR = new Comparator<VideoImage>() {
+        public int compare(VideoImage o1, VideoImage o2) {
+            return Integer.compare(o1.videoMoment.sequenceNumber, o2.videoMoment.sequenceNumber);
+        }
+    };
+    
     private Map<Integer, TrickPlayType> getTrickPlayTypeMap() {
         Map<Integer, TrickPlayType> map = new HashMap<Integer, TrickPlayType>();
 
