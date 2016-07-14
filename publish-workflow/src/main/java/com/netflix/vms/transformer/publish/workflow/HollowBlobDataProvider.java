@@ -33,6 +33,8 @@ public class HollowBlobDataProvider {
     /* fields */
     private HollowReadStateEngine hollowReadStateEngine;
     private HollowBlobReader hollowBlobReader;
+    
+    private HollowReadStateEngine revertableStateEngine;
 
     public HollowBlobDataProvider(TransformerContext ctx) {
         this.ctx = ctx;
@@ -55,6 +57,12 @@ public class HollowBlobDataProvider {
     public void readDelta(File deltaFile) throws IOException {
         ctx.getLogger().info(CircuitBreaker, "Reading Delta blob {}", deltaFile.getName());
         hollowBlobReader.applyDelta(ctx.files().newBlobInputStream(deltaFile));
+    }
+    
+    public synchronized void revertToPriorVersion() {
+        if(revertableStateEngine != null)
+            hollowReadStateEngine = revertableStateEngine;
+        revertableStateEngine = null;
     }
 
     public HollowReadStateEngine getStateEngine() {
@@ -84,6 +92,8 @@ public class HollowBlobDataProvider {
         if(reverseDeltaFile.exists())
             initialChecksumBeforeDelta = HollowChecksum.forStateEngineWithCommonSchemas(hollowReadStateEngine, anotherStateEngine);
         
+        revertableStateEngine = null;
+        
         readDelta(deltaFile);
 
         HollowChecksum deltaChecksum = HollowChecksum.forStateEngineWithCommonSchemas(hollowReadStateEngine, anotherStateEngine);
@@ -104,6 +114,8 @@ public class HollowBlobDataProvider {
 
             if(!initialChecksumBeforeDelta.equals(reverseDeltaChecksum))
                 throw new RuntimeException("REVERSE DELTA CHECKSUM VALIDATION FAILURE!");
+            
+            revertableStateEngine = anotherStateEngine;
         }
     }
 

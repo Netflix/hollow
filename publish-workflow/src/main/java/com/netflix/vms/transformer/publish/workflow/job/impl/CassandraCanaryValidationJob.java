@@ -82,20 +82,22 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
             beforeCanaryAnnounceJob.clearResults();
             afterCanaryAnnounceJob.clearResults();
             validationVideoHolder.onCycleComplete(getCycleVersion(), failedIDs);
-            
-			if(!failedIDs.isEmpty()){
-			    float missingViewShareThreshold = ctx.getConfig().getPlaybackmonkeyMissingViewShareThreshold();
-			    Map<String, Float> viewShareOfFailedVideos = validationVideoHolder.getViewShareOfVideos(failedIDs);
-			    for(String countryId: viewShareOfFailedVideos.keySet()){
-			        Float missingViewShareForCountry = viewShareOfFailedVideos.get(countryId);
-                                if(missingViewShareForCountry != null && 
-			                Float.compare(missingViewShareForCountry, missingViewShareThreshold) > 0){
-                                	pbmSuccess = false;
-                                }
-			        ctx.getMetricRecorder().recordMetric(Metric.PBMFailuresMissingViewShare, missingViewShareForCountry, "country",countryId);
-			    }
-			}
-            
+
+            if(!failedIDs.isEmpty()){
+                ctx.getLogger().info(PlaybackMonkey, "failedIDs={}", failedIDs);
+                float missingViewShareThreshold = ctx.getConfig().getPlaybackmonkeyMissingViewShareThreshold();
+                Map<String, Float> viewShareOfFailedVideos = validationVideoHolder.getViewShareOfVideos(failedIDs);
+                for(String countryId: viewShareOfFailedVideos.keySet()){
+                    Float missingViewShareForCountry = viewShareOfFailedVideos.get(countryId);
+                    if(missingViewShareForCountry != null && 
+                            Float.compare(missingViewShareForCountry, missingViewShareThreshold) > 0){
+                        pbmSuccess = false;
+                    }
+                    ctx.getLogger().info(PlaybackMonkey, "country={} missingViewShare={} threshold={}", countryId, missingViewShareForCountry, missingViewShareThreshold);
+                    ctx.getMetricRecorder().recordMetric(Metric.PBMFailuresMissingViewShare, missingViewShareForCountry, "country",countryId);
+                }
+            }
+
             if (!pbmSuccess) {
                 // Log which results failed
                 ctx.getLogger().error(PlaybackMonkey, "PBM validation: for region {} failed. {}",
