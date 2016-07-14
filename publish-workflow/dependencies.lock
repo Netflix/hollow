@@ -1939,7 +1939,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.7",
+            "locked": "2.8",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -1990,11 +1990,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -4397,7 +4397,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.7",
+            "locked": "2.8",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -4448,11 +4448,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -6855,7 +6855,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.7",
+            "locked": "2.8",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -6906,11 +6906,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -9313,7 +9313,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.7",
+            "locked": "2.8",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -9364,11 +9364,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -11870,7 +11870,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.7",
+            "locked": "2.8",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -11921,11 +11921,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -14329,7 +14329,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.7",
+            "locked": "2.8",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -14380,11 +14380,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -16793,7 +16793,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.7",
+            "locked": "2.8",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -16844,11 +16844,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -19257,7 +19257,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.7",
+            "locked": "2.8",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -19308,11 +19308,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -21721,7 +21721,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.7",
+            "locked": "2.8",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -21772,11 +21772,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
