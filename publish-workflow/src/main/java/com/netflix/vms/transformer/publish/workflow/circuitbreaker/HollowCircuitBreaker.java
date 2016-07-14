@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.publish.workflow.circuitbreaker;
 
+import static com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper.TransformerColumnFamily.CIRCUITBREAKER_STATS;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CircuitBreaker;
 
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
@@ -165,7 +166,7 @@ public abstract class HollowCircuitBreaker {
     }
 
     private TransformerCassandraColumnFamilyHelper getCassandraHelper() {
-        return ctx.getCassandraHelper().getColumnFamilyHelper("hollow_publish_workflow", "hollow_validation_stats");
+        return ctx.getCassandraHelper().getColumnFamilyHelper(CIRCUITBREAKER_STATS);
     }
 
 }

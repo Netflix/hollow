@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
+import static com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper.TransformerColumnFamily.ANNOUNCED_VERSIONS;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
@@ -36,7 +38,7 @@ public class HermesBlobAnnouncer{
                                TransformerCassandraHelper cassandraHelper, 
                                @Named("vipAnnounceID") VersionMinter hermesVersionMinter) {
         this.publisher = publisher;
-        this.announcedVersionCassandraHelper = cassandraHelper.getColumnFamilyHelper("vms_announced_versions", "vms_announced_versions");
+        this.announcedVersionCassandraHelper = cassandraHelper.getColumnFamilyHelper(ANNOUNCED_VERSIONS);
         this.latestAnnouncedVersionsPerTopic = new ConcurrentHashMap<>();
         this.hermesVersionMinter = hermesVersionMinter;
     }

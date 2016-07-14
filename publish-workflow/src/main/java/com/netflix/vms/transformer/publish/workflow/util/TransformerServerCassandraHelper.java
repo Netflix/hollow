@@ -1,12 +1,11 @@
 package com.netflix.vms.transformer.publish.workflow.util;
 
-import com.netflix.cassandra.NFAstyanaxManager;
-
 import com.google.inject.Inject;
-import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
-import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
-import java.util.concurrent.ConcurrentHashMap;
 import com.google.inject.Singleton;
+import com.netflix.cassandra.NFAstyanaxManager;
+import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
+import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 public class TransformerServerCassandraHelper implements TransformerCassandraHelper {
@@ -15,7 +14,7 @@ public class TransformerServerCassandraHelper implements TransformerCassandraHel
     
     private final NFAstyanaxManager astyanax;
     
-    private final ConcurrentHashMap<String, TransformerCassandraColumnFamilyHelper> map;
+    private final ConcurrentHashMap<TransformerColumnFamily, TransformerCassandraColumnFamilyHelper> map;
     
     @Inject
     public TransformerServerCassandraHelper(NFAstyanaxManager astyanax) {
@@ -24,12 +23,11 @@ public class TransformerServerCassandraHelper implements TransformerCassandraHel
     }
 
     @Override
-    public TransformerCassandraColumnFamilyHelper getColumnFamilyHelper(String keyspace, String columnFamily) {
-        String cfKey = keyspace + "_" + columnFamily;
-        TransformerCassandraColumnFamilyHelper helper = map.get(cfKey);
+    public TransformerCassandraColumnFamilyHelper getColumnFamilyHelper(TransformerColumnFamily cf) {
+        TransformerCassandraColumnFamilyHelper helper = map.get(cf);
         if(helper == null) {
-            helper = new TransformerServerCassandraColumnFamilyHelper(astyanax, CLUSTER_NAME, keyspace, columnFamily);
-            TransformerCassandraColumnFamilyHelper existingHelper = map.putIfAbsent(cfKey, helper);
+            helper = new TransformerServerCassandraColumnFamilyHelper(astyanax, CLUSTER_NAME, cf.getKeyspace(), cf.getColumnFamily());
+            TransformerCassandraColumnFamilyHelper existingHelper = map.putIfAbsent(cf, helper);
             if(existingHelper != null)
                 helper = existingHelper;
         }

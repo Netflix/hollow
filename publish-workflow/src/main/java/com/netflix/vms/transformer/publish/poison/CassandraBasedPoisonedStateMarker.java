@@ -1,13 +1,13 @@
 package com.netflix.vms.transformer.publish.poison;
 
+import static com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper.TransformerColumnFamily.POISON_STATES;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.ObservedPoisonState;
-
-import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
 
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.astyanax.connectionpool.exceptions.NotFoundException;
 import com.netflix.config.FastProperty;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
 
 public class CassandraBasedPoisonedStateMarker implements PoisonedStateMarker {
 
@@ -23,7 +23,7 @@ public class CassandraBasedPoisonedStateMarker implements PoisonedStateMarker {
     public CassandraBasedPoisonedStateMarker(TransformerContext ctx, String vip) {
         this.ctx = ctx;
         this.vip = vip;
-        this.cassandraHelper = ctx.getCassandraHelper().getColumnFamilyHelper("vms_poison_states", "poison_states");
+        this.cassandraHelper = ctx.getCassandraHelper().getColumnFamilyHelper(POISON_STATES);
     }
 
     public String getVip() {

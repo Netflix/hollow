@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.rest;
 
+import static com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper.TransformerColumnFamily.CIRCUITBREAKER_STATS;
+
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -47,7 +49,7 @@ public class VMSCircuitBreakerAdmin {
     public VMSCircuitBreakerAdmin(TransformerConfig transformerConfig, Config config, OctoberSkyData ocData, TransformerCassandraHelper cassandraHelper) {
         this.transformerConfig = transformerConfig;
         this.config = config;
-        this.cassandraHelper = cassandraHelper.getColumnFamilyHelper("hollow_publish_workflow", "hollow_validation_stats");
+        this.cassandraHelper = cassandraHelper.getColumnFamilyHelper(CIRCUITBREAKER_STATS);
         this.vip = transformerConfig.getTransformerVip();
         this.ocData = ocData;
     }
