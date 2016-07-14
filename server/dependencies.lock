@@ -929,13 +929,15 @@
         "com.netflix.runtime:health-guice": {
             "locked": "1.0.7",
             "transitive": [
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
             "locked": "1.0.7",
             "transitive": [
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
@@ -1671,7 +1673,7 @@
             ]
         },
         "net.spy:spymemcached": {
-            "locked": "2.11.4+4",
+            "locked": "2.11.4+5",
             "transitive": [
                 "netflix:awsutils"
             ]
@@ -1706,7 +1708,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.68.0",
+            "locked": "1.70.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -1720,7 +1722,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "1.1650.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent"
@@ -2158,7 +2160,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.6",
+            "locked": "2.8",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -2212,14 +2214,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.106",
+            "locked": "59.110",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -3770,13 +3772,15 @@
         "com.netflix.runtime:health-guice": {
             "locked": "1.0.7",
             "transitive": [
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
             "locked": "1.0.7",
             "transitive": [
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
@@ -4512,7 +4516,7 @@
             ]
         },
         "net.spy:spymemcached": {
-            "locked": "2.11.4+4",
+            "locked": "2.11.4+5",
             "transitive": [
                 "netflix:awsutils"
             ]
@@ -4547,7 +4551,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.68.0",
+            "locked": "1.70.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -4561,7 +4565,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "1.1650.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent"
@@ -4999,7 +5003,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.6",
+            "locked": "2.8",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -5053,14 +5057,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.106",
+            "locked": "59.110",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -6611,13 +6615,15 @@
         "com.netflix.runtime:health-guice": {
             "locked": "1.0.7",
             "transitive": [
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
             "locked": "1.0.7",
             "transitive": [
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
@@ -7353,7 +7359,7 @@
             ]
         },
         "net.spy:spymemcached": {
-            "locked": "2.11.4+4",
+            "locked": "2.11.4+5",
             "transitive": [
                 "netflix:awsutils"
             ]
@@ -7388,7 +7394,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.68.0",
+            "locked": "1.70.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -7402,7 +7408,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "1.1650.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent"
@@ -7840,7 +7846,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.6",
+            "locked": "2.8",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -7894,14 +7900,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.106",
+            "locked": "59.110",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -9452,13 +9458,15 @@
         "com.netflix.runtime:health-guice": {
             "locked": "1.0.7",
             "transitive": [
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
             "locked": "1.0.7",
             "transitive": [
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
@@ -10195,7 +10203,7 @@
             ]
         },
         "net.spy:spymemcached": {
-            "locked": "2.11.4+4",
+            "locked": "2.11.4+5",
             "transitive": [
                 "netflix:awsutils"
             ]
@@ -10230,7 +10238,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.68.0",
+            "locked": "1.70.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -10244,7 +10252,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "1.1650.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent"
@@ -10682,7 +10690,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.6",
+            "locked": "2.8",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -10736,14 +10744,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.106",
+            "locked": "59.110",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -12316,13 +12324,15 @@
         "com.netflix.runtime:health-guice": {
             "locked": "1.0.7",
             "transitive": [
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
             "locked": "1.0.7",
             "transitive": [
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
@@ -13058,7 +13068,7 @@
             ]
         },
         "net.spy:spymemcached": {
-            "locked": "2.11.4+4",
+            "locked": "2.11.4+5",
             "transitive": [
                 "netflix:awsutils"
             ]
@@ -13093,7 +13103,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.68.0",
+            "locked": "1.70.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -13107,7 +13117,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "1.1650.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent"
@@ -13545,7 +13555,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.6",
+            "locked": "2.8",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -13599,14 +13609,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.106",
+            "locked": "59.110",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -16249,13 +16259,15 @@
         "com.netflix.runtime:health-guice": {
             "locked": "1.0.7",
             "transitive": [
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
             "locked": "1.0.7",
             "transitive": [
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
@@ -16991,7 +17003,7 @@
             ]
         },
         "net.spy:spymemcached": {
-            "locked": "2.11.4+4",
+            "locked": "2.11.4+5",
             "transitive": [
                 "netflix:awsutils"
             ]
@@ -17026,7 +17038,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.68.0",
+            "locked": "1.70.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -17040,7 +17052,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "1.1650.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent"
@@ -17478,7 +17490,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.6",
+            "locked": "2.8",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -17532,14 +17544,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.106",
+            "locked": "59.110",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -19090,13 +19102,15 @@
         "com.netflix.runtime:health-guice": {
             "locked": "1.0.7",
             "transitive": [
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
             "locked": "1.0.7",
             "transitive": [
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
@@ -19831,7 +19845,7 @@
             ]
         },
         "net.spy:spymemcached": {
-            "locked": "2.11.4+4",
+            "locked": "2.11.4+5",
             "transitive": [
                 "netflix:awsutils"
             ]
@@ -19866,7 +19880,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.68.0",
+            "locked": "1.70.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -19880,7 +19894,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "1.1650.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent"
@@ -20318,7 +20332,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.6",
+            "locked": "2.8",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -20372,14 +20386,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.106",
+            "locked": "59.110",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -21942,13 +21956,15 @@
         "com.netflix.runtime:health-guice": {
             "locked": "1.0.7",
             "transitive": [
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
             "locked": "1.0.7",
             "transitive": [
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
@@ -22716,7 +22732,7 @@
             ]
         },
         "net.spy:spymemcached": {
-            "locked": "2.11.4+4",
+            "locked": "2.11.4+5",
             "transitive": [
                 "netflix:awsutils"
             ]
@@ -22751,7 +22767,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.68.0",
+            "locked": "1.70.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -22765,7 +22781,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "1.1650.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent"
@@ -23206,7 +23222,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.6",
+            "locked": "2.8",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -23260,14 +23276,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.106",
+            "locked": "59.110",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -24904,13 +24920,15 @@
         "com.netflix.runtime:health-guice": {
             "locked": "1.0.7",
             "transitive": [
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
             "locked": "1.0.7",
             "transitive": [
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
@@ -25678,7 +25696,7 @@
             ]
         },
         "net.spy:spymemcached": {
-            "locked": "2.11.4+4",
+            "locked": "2.11.4+5",
             "transitive": [
                 "netflix:awsutils"
             ]
@@ -25713,7 +25731,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.68.0",
+            "locked": "1.70.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -25727,7 +25745,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "1.1650.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent"
@@ -26168,7 +26186,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.6",
+            "locked": "2.8",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -26222,14 +26240,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.106",
+            "locked": "59.110",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -27866,13 +27884,15 @@
         "com.netflix.runtime:health-guice": {
             "locked": "1.0.7",
             "transitive": [
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
             "locked": "1.0.7",
             "transitive": [
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
@@ -28640,7 +28660,7 @@
             ]
         },
         "net.spy:spymemcached": {
-            "locked": "2.11.4+4",
+            "locked": "2.11.4+5",
             "transitive": [
                 "netflix:awsutils"
             ]
@@ -28675,7 +28695,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.68.0",
+            "locked": "1.70.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -28689,7 +28709,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "1.1650.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent"
@@ -29130,7 +29150,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.6",
+            "locked": "2.8",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -29184,14 +29204,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.106",
+            "locked": "59.110",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -30828,13 +30848,15 @@
         "com.netflix.runtime:health-guice": {
             "locked": "1.0.7",
             "transitive": [
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
             "locked": "1.0.7",
             "transitive": [
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
@@ -31602,7 +31624,7 @@
             ]
         },
         "net.spy:spymemcached": {
-            "locked": "2.11.4+4",
+            "locked": "2.11.4+5",
             "transitive": [
                 "netflix:awsutils"
             ]
@@ -31637,7 +31659,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.68.0",
+            "locked": "1.70.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -31651,7 +31673,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "1.1650.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent"
@@ -32092,7 +32114,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.6",
+            "locked": "2.8",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -32146,14 +32168,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.106",
+            "locked": "59.110",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.106",
+            "locked": "59.110",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]

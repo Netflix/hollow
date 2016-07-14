@@ -2,16 +2,7 @@ package com.netflix.vms.transformer.publish.workflow;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.BlobChecksum;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CircuitBreaker;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.RollbackStateEngine;
 
 import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
@@ -25,6 +16,15 @@ import com.netflix.vms.generated.notemplate.TopNVideoDataHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
 import com.netflix.vms.generated.notemplate.VideoHollow;
 import com.netflix.vms.transformer.common.TransformerContext;
+import java.io.File;
+import java.io.IOException;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 public class HollowBlobDataProvider {
     /* dependencies */
@@ -32,36 +32,36 @@ public class HollowBlobDataProvider {
 
     /* fields */
     private HollowReadStateEngine hollowReadStateEngine;
-    private HollowBlobReader hollowBlobReader;
     
     private HollowReadStateEngine revertableStateEngine;
 
     public HollowBlobDataProvider(TransformerContext ctx) {
         this.ctx = ctx;
         this.hollowReadStateEngine = new HollowReadStateEngine(true);
-        this.hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
     }
     
     public void notifyRestoredStateEngine(HollowReadStateEngine restoredState) {
         this.hollowReadStateEngine = restoredState;
-        this.hollowBlobReader = new HollowBlobReader(restoredState);
     }
 
     public void readSnapshot(File snapshotFile) throws IOException {
         ctx.getLogger().info(CircuitBreaker, "Reading Snapshot blob {}", snapshotFile.getName());
         hollowReadStateEngine = new HollowReadStateEngine(true);
-        hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
+        HollowBlobReader hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
         hollowBlobReader.readSnapshot(ctx.files().newBlobInputStream(snapshotFile));
     }
 
     public void readDelta(File deltaFile) throws IOException {
         ctx.getLogger().info(CircuitBreaker, "Reading Delta blob {}", deltaFile.getName());
+        HollowBlobReader hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
         hollowBlobReader.applyDelta(ctx.files().newBlobInputStream(deltaFile));
     }
     
     public synchronized void revertToPriorVersion() {
-        if(revertableStateEngine != null)
+        if(revertableStateEngine != null) {
+            ctx.getLogger().info(RollbackStateEngine, "Rolling back state engine in circuit breaker data provider");
             hollowReadStateEngine = revertableStateEngine;
+        }
         revertableStateEngine = null;
     }
 
