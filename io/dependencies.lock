@@ -540,7 +540,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "14.133",
+            "locked": "15.15",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -1419,7 +1419,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "14.133",
+            "locked": "15.15",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -2298,7 +2298,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "14.133",
+            "locked": "15.15",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -3177,7 +3177,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "14.133",
+            "locked": "15.15",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -4155,7 +4155,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "14.133",
+            "locked": "15.15",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -5035,7 +5035,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "14.133",
+            "locked": "15.15",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -5925,7 +5925,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "14.133",
+            "locked": "15.15",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -6815,7 +6815,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "14.133",
+            "locked": "15.15",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -7705,7 +7705,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "14.133",
+            "locked": "15.15",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
