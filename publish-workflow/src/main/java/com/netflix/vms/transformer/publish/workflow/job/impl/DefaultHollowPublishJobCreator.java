@@ -84,7 +84,7 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
 
     @Override
     public PoisonStateMarkerJob createPoisonStateMarkerJob(PublicationJob validationJob, long newVersion) {
-        return new CassandraPoisonStateMarkerJob(ctx, validationJob, newVersion);
+        return new CassandraPoisonStateMarkerJob(ctx, validationJob, hollowBlobDataProvider, newVersion);
     }
 
     @Override
