@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.common.slice;
 
+import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 
 public interface DataSlicer {
@@ -8,9 +9,9 @@ public interface DataSlicer {
     
     public interface SliceTask {
         
-        public HollowWriteStateEngine sliceOutputBlob(HollowWriteStateEngine outputStateEngine);
+        public HollowWriteStateEngine sliceOutputBlob(HollowReadStateEngine outputStateEngine);
         
-        public HollowWriteStateEngine sliceInputBlob(HollowWriteStateEngine inputStateEngine);
+        public HollowWriteStateEngine sliceInputBlob(HollowReadStateEngine inputStateEngine);
         
     }
 
