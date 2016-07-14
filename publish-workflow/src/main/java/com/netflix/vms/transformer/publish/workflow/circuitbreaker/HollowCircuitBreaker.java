@@ -2,19 +2,18 @@ package com.netflix.vms.transformer.publish.workflow.circuitbreaker;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CircuitBreaker;
 
+import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
+import com.netflix.astyanax.connectionpool.exceptions.NotFoundException;
+import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
-import com.netflix.astyanax.connectionpool.exceptions.NotFoundException;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-
 public abstract class HollowCircuitBreaker {
-
 
     public static final CircuitBreakerResults PASSED = new CircuitBreakerResults(true, "");
 
@@ -95,7 +94,7 @@ public abstract class HollowCircuitBreaker {
 
     protected boolean metricExists(String metricName) {
         try {
-            ctx.getValidationStatsCassandraHelper().getVipKeyValuePair(ctx.getVip(), metricName);
+            getCassandraHelper().getVipKeyValuePair(ctx.getVip(), metricName);
             return true;
         } catch(Exception e) {
             return false;
@@ -105,7 +104,7 @@ public abstract class HollowCircuitBreaker {
     public void saveSuccessSizesForCycle(long cycleVersion) {
         for(String key: successCountsForCycle.keySet()){
             try {
-                ctx.getValidationStatsCassandraHelper().addVipKeyValuePair(ctx.getVip(), key, String.valueOf(successCountsForCycle.get(key)));
+                getCassandraHelper().addVipKeyValuePair(ctx.getVip(), key, String.valueOf(successCountsForCycle.get(key)));
             } catch (ConnectionException e) {
                 e.printStackTrace();
                 ctx.getLogger().warn(CircuitBreaker, "Hollow validation infrastructure error:  Could not write data to C*: vip={} key={}", ctx.getVip(), key);
@@ -114,7 +113,7 @@ public abstract class HollowCircuitBreaker {
     }
 
     protected double getBaseLine(String objectName) throws NumberFormatException, ConnectionException {
-        return Double.parseDouble(ctx.getValidationStatsCassandraHelper().getVipKeyValuePair(ctx.getVip(), objectName));
+        return Double.parseDouble(getCassandraHelper().getVipKeyValuePair(ctx.getVip(), objectName));
     }
 
     private boolean failedBecauseDataNotYetPopulated(Exception e) {
@@ -146,8 +145,7 @@ public abstract class HollowCircuitBreaker {
             return results.iterator();
         }
     }
-
-
+    
     public static class CircuitBreakerResult {
         private final boolean passed;
         private final String message;
@@ -164,7 +162,10 @@ public abstract class HollowCircuitBreaker {
         public String getMessage() {
             return message;
         }
+    }
 
+    private TransformerCassandraColumnFamilyHelper getCassandraHelper() {
+        return ctx.getCassandraHelper().getColumnFamilyHelper("hollow_publish_workflow", "hollow_validation_stats");
     }
 
 }

@@ -5,15 +5,15 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.netflix.archaius.api.Config;
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
-import com.netflix.cassandra.NFAstyanaxManager;
 import com.netflix.config.NetflixConfiguration.EnvironmentEnum;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
+import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.fastproperties.PersistedPropertiesUtil;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuitBreaker;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HollowBlobCircuitBreakerJob;
-import com.netflix.vms.transformer.publish.workflow.util.TransformerServerCassandraHelper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,16 +38,16 @@ public class VMSCircuitBreakerAdmin {
 
     private final TransformerConfig transformerConfig;
     private final Config config;
-    private final TransformerServerCassandraHelper cassandraHelper;
+    private final TransformerCassandraColumnFamilyHelper cassandraHelper;
     private final OctoberSkyData ocData;
 
     private final String vip;
 
     @Inject
-    public VMSCircuitBreakerAdmin(TransformerConfig transformerConfig, Config config, OctoberSkyData ocData, NFAstyanaxManager astyanamaxManager) {
+    public VMSCircuitBreakerAdmin(TransformerConfig transformerConfig, Config config, OctoberSkyData ocData, TransformerCassandraHelper cassandraHelper) {
         this.transformerConfig = transformerConfig;
         this.config = config;
-        this.cassandraHelper = new TransformerServerCassandraHelper(astyanamaxManager, "cass_dpt", "hollow_publish_workflow", "hollow_validation_stats");
+        this.cassandraHelper = cassandraHelper.getColumnFamilyHelper("hollow_publish_workflow", "hollow_validation_stats");
         this.vip = transformerConfig.getTransformerVip();
         this.ocData = ocData;
     }

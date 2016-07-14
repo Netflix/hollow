@@ -1,13 +1,12 @@
-package com.netflix.vms.transformer.common.publish.workflow;
-
-import java.util.Map;
+package com.netflix.vms.transformer.common.cassandra;
 
 import com.netflix.astyanax.MutationBatch;
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.astyanax.model.ColumnFamily;
 import com.netflix.astyanax.query.ColumnFamilyQuery;
+import java.util.Map;
 
-public interface TransformerCassandraHelper {
+public interface TransformerCassandraColumnFamilyHelper {
     void addVipKeyValuePair(String vip, String key, String value) throws ConnectionException;
 
     void addKeyValuePair(String key, String value) throws ConnectionException;

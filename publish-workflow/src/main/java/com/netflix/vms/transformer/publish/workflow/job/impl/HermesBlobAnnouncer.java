@@ -1,13 +1,11 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import com.google.inject.name.Named;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
-import com.netflix.cassandra.NFAstyanaxManager;
 import com.netflix.config.NetflixConfiguration;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.hermes.Constants;
@@ -18,8 +16,8 @@ import com.netflix.hermes.platformserviceclient.Property;
 import com.netflix.hermes.publisher.FastPropertyPublisher;
 import com.netflix.hermes.publisher.PurgePolicy;
 import com.netflix.vms.transformer.common.VersionMinter;
-import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
-import com.netflix.vms.transformer.publish.workflow.util.TransformerServerCassandraHelper;
+import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
+import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -28,17 +26,17 @@ import java.util.concurrent.atomic.AtomicLong;
 public class HermesBlobAnnouncer{
     
     private final FastPropertyPublisher publisher;
-    private final TransformerCassandraHelper announcedVersionCassandraHelper;
+    private final TransformerCassandraColumnFamilyHelper announcedVersionCassandraHelper;
     private final VersionMinter hermesVersionMinter;
     
     private final ConcurrentHashMap<String, AtomicLong> latestAnnouncedVersionsPerTopic;
 
     @Inject
     public HermesBlobAnnouncer(FastPropertyPublisher publisher, 
-                               NFAstyanaxManager astyanaxManager, 
+                               TransformerCassandraHelper cassandraHelper, 
                                @Named("vipAnnounceID") VersionMinter hermesVersionMinter) {
         this.publisher = publisher;
-        this.announcedVersionCassandraHelper = new TransformerServerCassandraHelper(astyanaxManager, "CASS_DPT", "vms_announced_versions", "vms_announced_versions");
+        this.announcedVersionCassandraHelper = cassandraHelper.getColumnFamilyHelper("vms_announced_versions", "vms_announced_versions");
         this.latestAnnouncedVersionsPerTopic = new ConcurrentHashMap<>();
         this.hermesVersionMinter = hermesVersionMinter;
     }
