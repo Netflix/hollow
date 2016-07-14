@@ -20,6 +20,8 @@ public enum TransformerLogTag implements LogTag {
     NonVideoSpecificTransformDuration,
     ConfigurationFailure,
     UnexpectedError,
+    RollbackStateEngine,
+
 
     //// TRANSFORMATION ERRORS ////
 
@@ -46,5 +48,6 @@ public enum TransformerLogTag implements LogTag {
     ObservedPoisonState,
     AnnouncementSuccess,
     AnnouncementFailure,
-    BlobChecksum
+    BlobChecksum,
+    CreateDevSlice,
 }
