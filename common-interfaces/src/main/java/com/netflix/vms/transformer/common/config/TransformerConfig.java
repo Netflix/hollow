@@ -104,6 +104,9 @@ public interface TransformerConfig {
 
     @DefaultValue("false")
     public boolean isBigGreenButton();
+    
+    @DefaultValue("false")
+    public boolean createDevSlicedBlob();
 
 
     /////////////// VMS IOPS (ElasticSearch) ///////////////

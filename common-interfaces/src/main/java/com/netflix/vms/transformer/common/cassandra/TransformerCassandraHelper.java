@@ -8,7 +8,8 @@ public interface TransformerCassandraHelper {
         CANARY_VALIDATION("canary_validation", "canary_results"),
         CIRCUITBREAKER_STATS("hollow_publish_workflow", "hollow_validation_stats"),
         POISON_STATES("vms_poison_states", "poison_states"),
-        ANNOUNCED_VERSIONS("vms_announced_versions", "vms_announced_versions");
+        ANNOUNCED_VERSIONS("vms_announced_versions", "vms_announced_versions"),
+        DEV_SLICED_BLOB_IDS("vms_devslice_ids", "vms_devslice_ids");
         
         private final String keyspace;
         private final String columnFamily;
