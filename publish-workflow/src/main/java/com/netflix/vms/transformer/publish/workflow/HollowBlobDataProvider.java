@@ -32,30 +32,28 @@ public class HollowBlobDataProvider {
 
     /* fields */
     private HollowReadStateEngine hollowReadStateEngine;
-    private HollowBlobReader hollowBlobReader;
     
     private HollowReadStateEngine revertableStateEngine;
 
     public HollowBlobDataProvider(TransformerContext ctx) {
         this.ctx = ctx;
         this.hollowReadStateEngine = new HollowReadStateEngine(true);
-        this.hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
     }
     
     public void notifyRestoredStateEngine(HollowReadStateEngine restoredState) {
         this.hollowReadStateEngine = restoredState;
-        this.hollowBlobReader = new HollowBlobReader(restoredState);
     }
 
     public void readSnapshot(File snapshotFile) throws IOException {
         ctx.getLogger().info(CircuitBreaker, "Reading Snapshot blob {}", snapshotFile.getName());
         hollowReadStateEngine = new HollowReadStateEngine(true);
-        hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
+        HollowBlobReader hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
         hollowBlobReader.readSnapshot(ctx.files().newBlobInputStream(snapshotFile));
     }
 
     public void readDelta(File deltaFile) throws IOException {
         ctx.getLogger().info(CircuitBreaker, "Reading Delta blob {}", deltaFile.getName());
+        HollowBlobReader hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
         hollowBlobReader.applyDelta(ctx.files().newBlobInputStream(deltaFile));
     }
     
