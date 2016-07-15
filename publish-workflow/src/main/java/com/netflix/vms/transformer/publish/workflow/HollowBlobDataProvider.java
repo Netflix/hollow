@@ -197,10 +197,6 @@ public class HollowBlobDataProvider {
 		return modifiedPackageVideoIds;
     }
 
-    public long getLoadedVersion(){
-        return Long.parseLong(hollowReadStateEngine.getHeaderTag("dataVersion"));
-    }
-
 	public static class VideoCountryKey {
 		private final String country;
 	    private final int videoId;

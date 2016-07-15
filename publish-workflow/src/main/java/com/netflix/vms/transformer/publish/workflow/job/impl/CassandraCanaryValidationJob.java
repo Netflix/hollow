@@ -1,24 +1,25 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.PlaybackMonkey;
+import static com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper.TransformerColumnFamily.CANARY_VALIDATION;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.DataCanary;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.PlaybackMonkey;
 
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.astyanax.connectionpool.exceptions.NotFoundException;
 import com.netflix.config.FastProperty;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
+import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.AfterCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.BeforeCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryValidationJob;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.VMSDataCanaryResult;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class CassandraCanaryValidationJob extends CanaryValidationJob {
 
@@ -30,10 +31,12 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
     private final Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs;
     private final Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs;
 	private final ValuableVideoHolder validationVideoHolder;
+	private final TransformerCassandraColumnFamilyHelper cassandraHelper;
 
     public CassandraCanaryValidationJob(PublishWorkflowContext ctx, long cycleVersion, Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs,
             Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs, ValuableVideoHolder videoRanker) {
         super(ctx, ctx.getVip(), cycleVersion, beforeCanaryAnnounceJobs, afterCanaryAnnounceJobs);
+        this.cassandraHelper = ctx.getCassandraHelper().getColumnFamilyHelper(CANARY_VALIDATION);
 		this.validationVideoHolder = videoRanker;
         this.beforeCanaryAnnounceJobs = beforeCanaryAnnounceJobs;
         this.afterCanaryAnnounceJobs = afterCanaryAnnounceJobs;
@@ -150,7 +153,7 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
         List<String> remainingCanaryAppList = null;
         while(System.currentTimeMillis() < stopCheckingTime) {
             try {
-                final Map<String, String> columns = ctx.getCanaryResultsCassandraHelper().getColumns(ctx.getCanaryResultsCassandraHelper().vipSpecificKey(vip, String.valueOf(getCycleVersion())));
+                final Map<String, String> columns = cassandraHelper.getColumns(cassandraHelper.vipSpecificKey(vip, String.valueOf(getCycleVersion())));
 				remainingCanaryAppList = parseStringToListExcludeEmptyValues(requiredCanaryAppsStr, ",");
 
                 for(final Map.Entry<String, String> column : columns.entrySet()) {

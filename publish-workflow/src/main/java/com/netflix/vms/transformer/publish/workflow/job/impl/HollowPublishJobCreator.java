@@ -1,7 +1,8 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import com.netflix.vms.transformer.publish.workflow.job.CreateDevSliceJob;
 
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.job.AfterCanaryAnnounceJob;
@@ -92,4 +93,8 @@ public interface HollowPublishJobCreator {
                                                              BeforeCanaryAnnounceJob beforeCanaryAnnounceJob,
                                                              CanaryAnnounceJob canaryAnnounceJob);
     
+    CreateDevSliceJob             createDevSliceJob         (PublishWorkflowContext ctx,
+                                                             AnnounceJob dependency,
+                                                             long inputVersion,
+                                                             long cycleVersion);
 }

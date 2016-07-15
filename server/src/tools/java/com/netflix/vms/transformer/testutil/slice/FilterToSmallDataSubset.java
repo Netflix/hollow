@@ -1,10 +1,13 @@
 package com.netflix.vms.transformer.testutil.slice;
 
 
+import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
+
 import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
+import com.netflix.vms.transformer.common.slice.DataSlicer;
 import com.netflix.vms.transformer.io.LZ4VMSInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
@@ -31,12 +34,12 @@ public class FilterToSmallDataSubset {
     
     private static final int TARGET_NUMBER_OF_TOPNODES = 1000;
 
-    private DataSlicer slicer;
+    private DataSlicer.SliceTask slicer;
     
     @Before
     public void setUp() {
-        slicer = new DataSlicer(TARGET_NUMBER_OF_TOPNODES, 
-        		80097047);
+        slicer = new DataSlicerImpl().getSliceTask(TARGET_NUMBER_OF_TOPNODES, 
+        		                                    80097047);
     }
     
     @Test

@@ -1,7 +1,9 @@
 package com.netflix.vms.transformer.startup;
 
-import com.google.inject.name.Names;
+import com.netflix.vms.transformer.publish.workflow.util.TransformerServerCassandraHelper;
 
+import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
+import com.google.inject.name.Names;
 import com.google.inject.AbstractModule;
 // Common module dependencies
 import com.google.inject.Provides;
@@ -38,6 +40,7 @@ public final class TransformerModule extends AbstractModule {
         install(new JerseyModule());
 
         bind(OctoberSkyData.class).to(OctoberSkyDataImpl.class);
+        bind(TransformerCassandraHelper.class).to(TransformerServerCassandraHelper.class);
         bind(TransformerCycleKickoff.class).asEagerSingleton();
         bind(VersionMinter.class).annotatedWith(Names.named("vipAnnounceID")).toInstance(new SequenceVersionMinter());
     }
