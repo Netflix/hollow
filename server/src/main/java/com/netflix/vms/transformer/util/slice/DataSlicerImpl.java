@@ -1,8 +1,6 @@
 package com.netflix.vms.transformer.util.slice;
 
 import com.netflix.vms.transformer.common.slice.DataSlicer;
-
-import com.netflix.vms.transformer.testutil.slice.RandomShowMovieHierarchyBasedSelector;
 import com.netflix.hollow.combine.HollowCombiner;
 import com.netflix.hollow.combine.HollowCombinerIncludeOrdinalsCopyDirector;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;

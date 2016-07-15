@@ -1,7 +1,8 @@
 package com.netflix.vms.transformer.publish.workflow;
 
-import com.netflix.vms.transformer.publish.status.WorkflowCycleStatusFuture;
+import com.netflix.vms.transformer.common.slice.DataSlicer;
 
+import com.netflix.vms.transformer.publish.status.WorkflowCycleStatusFuture;
 import com.netflix.vms.transformer.publish.status.CycleStatusFuture;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.aws.file.FileStore;
@@ -50,12 +51,12 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     private CanaryValidationJob priorCycleCanaryValidationJob;
     private CanaryRollbackJob priorCycleCanaryRollbackJob;
 
-    public HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
-        this(ctx, fileStore, hermesBlobAnnouncer, new HollowBlobDataProvider(ctx), uploadStatus, vip);
+    public HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+        this(ctx, fileStore, hermesBlobAnnouncer, new HollowBlobDataProvider(ctx), dataSlicer, uploadStatus, vip);
     }
 
-    private HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, HollowBlobDataProvider circuitBreakerDataProvider, Supplier<ServerUploadStatus> uploadStatus, String vip) {
-        this(ctx, new DefaultHollowPublishJobCreator(ctx, fileStore, hermesBlobAnnouncer, circuitBreakerDataProvider, new PlaybackMonkeyTester(), new ValuableVideoHolder(circuitBreakerDataProvider), uploadStatus, vip), vip);
+    private HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, HollowBlobDataProvider circuitBreakerDataProvider, DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+        this(ctx, new DefaultHollowPublishJobCreator(ctx, fileStore, hermesBlobAnnouncer, circuitBreakerDataProvider, new PlaybackMonkeyTester(), new ValuableVideoHolder(circuitBreakerDataProvider), dataSlicer, uploadStatus, vip), vip);
         this.circuitBreakerDataProvider = circuitBreakerDataProvider;
     }
 
@@ -103,6 +104,9 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         }
         addDeleteJob(previousVersion, newVersion, allPublishJobs);
 
+        if(ctx.getConfig().isCreateDevSlicedBlob())
+            scheduler.submitJob(jobCreator.createDevSliceJob(ctx, primaryRegionAnnounceJob, newVersion));
+        
         priorCycleCanaryValidationJob = canaryValidationJob;
         
         return new WorkflowCycleStatusFuture(ctx.getStatusIndicator(), newVersion);

@@ -28,14 +28,12 @@ public class CreateHollowDevSliceJob extends CreateDevSliceJob {
 
     private final HollowBlobDataProvider dataProvider;
     private final DataSlicer dataSlicer;
-    private final HermesVipAnnouncer announcer;
     private final String sliceVip;
     
-    public CreateHollowDevSliceJob(PublishWorkflowContext ctx, AnnounceJob dependency, HollowBlobDataProvider dataProvider, DataSlicer dataSlicer, HermesVipAnnouncer announcer, long currentCycleId) {
+    public CreateHollowDevSliceJob(PublishWorkflowContext ctx, AnnounceJob dependency, HollowBlobDataProvider dataProvider, DataSlicer dataSlicer, long currentCycleId) {
         super(ctx, dependency, currentCycleId);
         this.dataProvider = dataProvider;
         this.dataSlicer = dataSlicer;
-        this.announcer = announcer;
         this.sliceVip = ctx.getVip() + "_devslice";
     }
 
@@ -82,7 +80,7 @@ public class CreateHollowDevSliceJob extends CreateDevSliceJob {
     private void publishSlice(File sliceSnapshotFile, RegionEnum region) throws Exception {
         HollowBlobKeybaseBuilder keybaseBuilder = new HollowBlobKeybaseBuilder(sliceVip);
         ctx.getFileStore().publish(sliceSnapshotFile, keybaseBuilder.getSnapshotKeybase(), String.valueOf(getCycleVersion()), RegionEnum.US_EAST_1);
-        announcer.announce(sliceVip, region, false, getCycleVersion());
+        ctx.getVipAnnouncer().announce(sliceVip, region, false, getCycleVersion());
     }
     
     private int[] getTopNodeIdsToInclude() throws ConnectionException {
