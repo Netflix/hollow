@@ -101,7 +101,4 @@ public class CreateHollowDevSliceJob extends CreateDevSliceJob {
         return list.arrayCopyOfRange(0, list.size());
     }
     
-    
-    
-    
 }
