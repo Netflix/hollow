@@ -7,26 +7,22 @@ import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
 import com.netflix.vms.generated.notemplate.GlobalPersonHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
-import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
-import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
+import com.netflix.vms.transformer.override.OverrideHollowCombiner;
+import com.netflix.vms.transformer.override.InputSliceTitleOverrideProcessor;
+import com.netflix.vms.transformer.override.OutputSliceTitleOverrideProcessor;
+import com.netflix.vms.transformer.override.TitleOverrideProcessor;
 import com.netflix.vms.transformer.testutil.migration.ShowMeTheProgressDiffTool;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-import net.jpountz.lz4.LZ4BlockInputStream;
-import net.jpountz.lz4.LZ4BlockOutputStream;
 
 public class TitleLevelPinningPOC {
     private static final String VIP = "boson";
@@ -38,12 +34,13 @@ public class TitleLevelPinningPOC {
     private final String localBlobStore;
     private static final VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
     private final SimpleTransformerContext ctx;
+    private final boolean isInputBased;
 
-    public TitleLevelPinningPOC(String converterVip, String proxyURL, String localBlobStore) {
+    public TitleLevelPinningPOC(String converterVip, String proxyURL, String localBlobStore, boolean isInputBased) {
         this.converterVip = converterVip;
-        this.proxyURL = proxyURL;
         this.localBlobStore = localBlobStore;
-        mkdir(this.localBlobStore);
+        this.proxyURL = proxyURL;
+        this.isInputBased = isInputBased;
 
         ctx = new SimpleTransformerContext();
     }
@@ -53,25 +50,12 @@ public class TitleLevelPinningPOC {
      *
      * @return the file pointing to the processed data
      */
-    public File process(Long inputDataVersion, int topNode) throws Throwable {
-        File slicedOutputFile = createSlicedFile("output", inputDataVersion, topNode);
-        if (slicedOutputFile.exists()) {
-            System.out.println(String.format("Skipping vip=%s, version=%s, videoIds=%s [output file exists=%s]", converterVip, inputDataVersion, topNode, slicedOutputFile));
-            return slicedOutputFile;
-        }
+    public HollowReadStateEngine process(Long dataVersion, int topNode) throws Throwable {
+        TitleOverrideProcessor processor = isInputBased
+                ? new InputSliceTitleOverrideProcessor("boson", proxyURL, localBlobStore, ctx)
+                        : new OutputSliceTitleOverrideProcessor("berlin", proxyURL, localBlobStore, ctx);
 
-        long start = System.currentTimeMillis();
-        System.out.println(String.format("Processing vip=%s, version=%s, videoIds=%s", converterVip, inputDataVersion, topNode));
-        File slicedInputFile = createSlicedFile("input", inputDataVersion, topNode);
-        HollowReadStateEngine inputStateEngineSlice = fetchStateEngineSlice(slicedInputFile, inputDataVersion, topNode);
-
-        VMSHollowInputAPI api = new VMSHollowInputAPI(inputStateEngineSlice);
-        VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
-        new SimpleTransformer(api, outputStateEngine, ctx).transform();
-        writeStateEngine(outputStateEngine, slicedOutputFile);
-
-        System.out.println(String.format("***** \t Processed in=%s, out=%s, duration=%s", slicedInputFile, slicedOutputFile, (System.currentTimeMillis() - start)));
-        return slicedOutputFile;
+                return processor.process(dataVersion, topNode);
     }
 
     // -- DEBUG API
@@ -79,16 +63,16 @@ public class TitleLevelPinningPOC {
         long start = System.currentTimeMillis();
 
         //// PROCESSING
-        TitleLevelPinningPOC pinner = new TitleLevelPinningPOC(VIP, BASE_PROXY, LOCAL_BLOB_STORE);
+        TitleLevelPinningPOC pinner = new TitleLevelPinningPOC(VIP, BASE_PROXY, LOCAL_BLOB_STORE, false);
 
         // Wonder Man
-        File out1 = pinner.process(20160711163815697L, 1133891);
+        HollowReadStateEngine out1 = pinner.process(20160715180125072L, 1133891);
 
         // HoC
-        File out2 = pinner.process(20160711163815697L, 70178217);
+        HollowReadStateEngine out2 = pinner.process(20160715180125072L, 70178217);
 
         // Chelsea
-        File out3 = pinner.process(20160711162231381L, 80049872);
+        HollowReadStateEngine out3 = pinner.process(20160715190125076L, 80049872);
 
         System.out.println("ALL PROCESSING DONE, duration=" + (System.currentTimeMillis() - start));
 
@@ -118,9 +102,8 @@ public class TitleLevelPinningPOC {
         System.out.flush();
     }
 
-    public static HollowReadStateEngine combine(HollowWriteStateEngine output, File inputFile) throws Exception {
-        HollowReadStateEngine input = readStateEngine(inputFile);
-        HollowCombinerWithNamedList combiner = new HollowCombinerWithNamedList(output, input);
+    public static HollowReadStateEngine combine(HollowWriteStateEngine output, HollowReadStateEngine input) throws Exception {
+        OverrideHollowCombiner combiner = new OverrideHollowCombiner(output, input);
 
         combiner.combine();
         output.addHeaderTags(input.getHeaderTags());
@@ -180,64 +163,4 @@ public class TitleLevelPinningPOC {
     }
 
     // ------
-    private File createSlicedFile(String type, Long inputDataVersion, int topNode) {
-        long version = inputDataVersion != null ? inputDataVersion : System.currentTimeMillis();
-        return new File(localBlobStore, "vms.hollow" + type + ".blob." + converterVip + ".slice_" + version + "_" + topNode);
-    }
-
-    private HollowReadStateEngine fetchStateEngineSlice(File slicedFile, Long inputDataVersion, int topNode) throws IOException {
-        if (!slicedFile.exists()) {
-            HollowReadStateEngine inputStateEngine = readInputData(inputDataVersion);
-
-            long start = System.currentTimeMillis();
-            DataSlicer slicer = new DataSlicer(0, topNode);
-            HollowWriteStateEngine slicedStateEngine = slicer.sliceInputBlob(inputStateEngine);
-
-            writeStateEngine(slicedStateEngine, slicedFile);
-            System.out.println(String.format("Sliced videoId=%s from vip=%s, version=%s, duration=", topNode, converterVip, inputDataVersion, (System.currentTimeMillis() - start)));
-        }
-
-        return readStateEngine(slicedFile);
-    }
-
-    private HollowReadStateEngine readInputData(Long inputDataVersion) throws IOException {
-        long start = System.currentTimeMillis();
-
-        // Load Input File
-        VMSInputDataClient client = new VMSInputDataClient(proxyURL, localBlobStore, converterVip);
-        if (inputDataVersion == null) {
-            client.triggerRefresh();
-        } else {
-            client.triggerRefreshTo(inputDataVersion);
-        }
-
-        System.out.println(String.format("readInputData vip=%s, version=%s, duration=%s", converterVip, inputDataVersion, (System.currentTimeMillis() - start)));
-        return client.getStateEngine();
-    }
-
-    private static HollowReadStateEngine readStateEngine(File inputFile) throws IOException {
-        System.out.println("Read StateEngine: " + inputFile);
-        HollowReadStateEngine stateEngine = new HollowReadStateEngine();
-        HollowBlobReader reader = new HollowBlobReader(stateEngine);
-        try (LZ4BlockInputStream is = new LZ4BlockInputStream(new FileInputStream(inputFile))) {
-            reader.readSnapshot(is);
-        }
-
-        return stateEngine;
-    }
-
-    private static void writeStateEngine(HollowWriteStateEngine stateEngine, File outputFile) throws IOException {
-        System.out.println("Write StateEngine: " + outputFile);
-        HollowBlobWriter writer = new HollowBlobWriter(stateEngine);
-        try (LZ4BlockOutputStream os = new LZ4BlockOutputStream(new FileOutputStream(outputFile))) {
-            writer.writeSnapshot(os);
-        }
-    }
-
-    private static void mkdir(String dirName) {
-        File dir = new File(dirName);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
-    }
 }

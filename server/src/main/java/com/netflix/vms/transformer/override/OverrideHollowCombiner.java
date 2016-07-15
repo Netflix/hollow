@@ -1,4 +1,4 @@
-package com.netflix.vms.transformer.testutil.slice;
+package com.netflix.vms.transformer.override;
 
 import com.netflix.hollow.HollowObjectSchema;
 import com.netflix.hollow.combine.HollowCombiner;
@@ -32,7 +32,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class HollowCombinerWithNamedList {
+public class OverrideHollowCombiner {
     public static final String NAMEDLIST_TYPE_STATE_NAME = "NamedCollectionHolder";
 
     private final HollowCombiner combiner;
@@ -42,10 +42,10 @@ public class HollowCombinerWithNamedList {
     protected final ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> combinedPersonLists;
     protected final ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> combinedEpisodeLists;
 
-    protected HollowCombinerWithNamedList(HollowWriteStateEngine output, HollowReadStateEngine... inputs) {
+    public OverrideHollowCombiner(HollowWriteStateEngine output, HollowReadStateEngine... inputs) {
         this.inputs = inputs;
         this.combiner = new HollowCombiner(output, inputs);
-        combiner.addIgnoredTypes(HollowCombinerWithNamedList.NAMEDLIST_TYPE_STATE_NAME);
+        combiner.addIgnoredTypes(OverrideHollowCombiner.NAMEDLIST_TYPE_STATE_NAME);
 
         this.combinedVideoLists = new ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String,Set<Integer>>>();
         this.combinedPersonLists = new ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String,Set<Integer>>>();
