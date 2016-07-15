@@ -1,16 +1,20 @@
 package com.netflix.vms.transformer.startup;
 
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.*;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ConsecutiveCycleFailures;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WaitForNextCycleDuration;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleSuccess;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.WaitForNextCycle;
+
+import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
 
 import com.google.inject.Inject;
 import com.netflix.archaius.api.Config;
 import com.netflix.aws.file.FileStore;
-import com.netflix.cassandra.NFAstyanaxManager;
 import com.netflix.vms.transformer.TransformCycle;
 import com.netflix.vms.transformer.atlas.AtlasTransformerMetricRecorder;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.context.TransformerServerContext;
@@ -24,7 +28,6 @@ import com.netflix.vms.transformer.publish.workflow.HollowPublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.fastlane.HollowFastlanePublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HermesBlobAnnouncer;
-import com.netflix.vms.transformer.publish.workflow.util.TransformerServerCassandraHelper;
 import com.netflix.vms.transformer.rest.VMSPublishWorkflowHistoryAdmin;
 import java.util.function.Supplier;
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
@@ -35,7 +38,7 @@ public class TransformerCycleKickoff {
     @Inject
     public TransformerCycleKickoff(
             ElasticSearchClient esClient,
-            NFAstyanaxManager astyanax,
+            TransformerCassandraHelper cassandraHelper,
             FileStore fileStore,
             HermesBlobAnnouncer hermesBlobAnnouncer,
             TransformerConfig transformerConfig,
@@ -46,7 +49,7 @@ public class TransformerCycleKickoff {
 
         FileStore.useMultipartUploadWhenApplicable(true);
 
-        TransformerContext ctx = ctx(astyanax, esClient, transformerConfig, config, octoberSkyData, healthIndicator);
+        TransformerContext ctx = ctx(esClient, transformerConfig, config, octoberSkyData, cassandraHelper, healthIndicator);
         PublishWorkflowStager publishStager = publishStager(ctx, fileStore, hermesBlobAnnouncer);
 
         TransformCycle cycle = new TransformCycle(
@@ -128,15 +131,13 @@ public class TransformerCycleKickoff {
         t.start();
     }
 
-    private final TransformerContext ctx(NFAstyanaxManager astyanax, ElasticSearchClient esClient, TransformerConfig transformerConfig, Config config, OctoberSkyData octoberSkyData, TransformerServerHealthIndicator healthIndicator) {
+    private final TransformerContext ctx(ElasticSearchClient esClient, TransformerConfig transformerConfig, Config config, OctoberSkyData octoberSkyData, TransformerCassandraHelper cassandraHelper, TransformerServerHealthIndicator healthIndicator) {
         return new TransformerServerContext(
                 new TransformerServerLogger(transformerConfig, esClient),
                 config,
                 octoberSkyData,
                 new AtlasTransformerMetricRecorder(),
-                new TransformerServerCassandraHelper(astyanax, "cass_dpt", "vms_poison_states", "poison_states"),
-                new TransformerServerCassandraHelper(astyanax, "cass_dpt", "hollow_publish_workflow", "hollow_validation_stats"),
-                new TransformerServerCassandraHelper(astyanax, "cass_dpt", "canary_validation", "canary_results"),
+                cassandraHelper,
                 new LZ4VMSTransformerFiles(),
                 (history) -> {
                     VMSPublishWorkflowHistoryAdmin.history = history;
@@ -148,7 +149,7 @@ public class TransformerCycleKickoff {
         if(isFastlane(ctx.getConfig()))
             return new HollowFastlanePublishWorkflowStager(ctx, fileStore, hermesBlobAnnouncer, uploadStatus, ctx.getConfig().getTransformerVip());
 
-        return new HollowPublishWorkflowStager(ctx, fileStore, hermesBlobAnnouncer, uploadStatus, ctx.getConfig().getTransformerVip());
+        return new HollowPublishWorkflowStager(ctx, fileStore, hermesBlobAnnouncer, new DataSlicerImpl(), uploadStatus, ctx.getConfig().getTransformerVip());
     }
     
     private void restore(TransformCycle cycle, TransformerConfig cfg, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer) {

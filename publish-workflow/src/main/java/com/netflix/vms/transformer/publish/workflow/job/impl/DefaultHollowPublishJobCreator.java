@@ -1,5 +1,8 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
+import com.netflix.vms.transformer.common.slice.DataSlicer;
+
+import com.netflix.vms.transformer.publish.workflow.job.CreateDevSliceJob;
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -36,15 +39,21 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
     /* fields */
     ///TODO: VIP changes for red/black?
     private PublishWorkflowContext ctx;
+    private final DataSlicer dataSlicer;
 
     public DefaultHollowPublishJobCreator(TransformerContext transformerContext,
             FileStore fileStore,
             HermesBlobAnnouncer hermesBlobAnnouncer,
-            HollowBlobDataProvider hollowBlobDataProvider, PlaybackMonkeyTester playbackMonkeyTester,
-            ValuableVideoHolder videoRanker, Supplier<ServerUploadStatus> serverUploadStatus, String vip) {
+            HollowBlobDataProvider hollowBlobDataProvider, 
+            PlaybackMonkeyTester playbackMonkeyTester,
+            ValuableVideoHolder videoRanker, 
+            DataSlicer dataSlicer,
+            Supplier<ServerUploadStatus> serverUploadStatus, 
+            String vip) {
         this.hollowBlobDataProvider = hollowBlobDataProvider;
         this.playbackMonkeyTester = playbackMonkeyTester;
         this.videoRanker = videoRanker;
+        this.dataSlicer = dataSlicer;
         this.ctx = new TransformerPublishWorkflowContext(transformerContext,
                 new HermesVipAnnouncer(hermesBlobAnnouncer),
                 serverUploadStatus,
@@ -131,5 +140,10 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
     @Override
     public AutoPinbackJob createAutoPinbackJob(AnnounceJob announcement, long waitMillis, long cycleVersion) {
         return new HermesAutoPinbackJob(ctx, announcement, waitMillis, cycleVersion);
+    }
+
+    @Override
+    public CreateDevSliceJob createDevSliceJob(PublishWorkflowContext ctx, AnnounceJob dependency, long inputVersion, long cycleVersion) {
+        return new CreateHollowDevSliceJob(ctx, dependency, hollowBlobDataProvider, dataSlicer, inputVersion, cycleVersion);
     }
 }

@@ -17,7 +17,6 @@ import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
 import com.netflix.vms.transformer.hollowinput.RightsContractAssetHollow;
 import com.netflix.vms.transformer.hollowinput.RightsContractHollow;
-import com.netflix.vms.transformer.hollowinput.RightsContractHollow;
 import com.netflix.vms.transformer.hollowinput.RightsContractPackageHollow;
 import com.netflix.vms.transformer.hollowinput.RightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.StatusHollow;
@@ -34,7 +33,6 @@ import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoContractUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
