@@ -7,9 +7,10 @@ import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
+import com.netflix.vms.transformer.common.slice.DataSlicer;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
-import com.netflix.vms.transformer.testutil.slice.DataSlicer;
+import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,7 +57,7 @@ public class InputSliceTitleOverrideProcessor extends AbstractTitleOverrideProce
             long start = System.currentTimeMillis();
             HollowReadStateEngine inputStateEngine = readInputData(inputDataVersion);
 
-            DataSlicer slicer = new DataSlicer(0, topNode);
+            DataSlicer.SliceTask slicer = new DataSlicerImpl().getSliceTask(0, topNode);
             HollowWriteStateEngine slicedStateEngine = slicer.sliceInputBlob(inputStateEngine);
 
             writeStateEngine(slicedStateEngine, slicedFile);
