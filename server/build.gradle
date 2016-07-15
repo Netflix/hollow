@@ -85,6 +85,8 @@ dependencies {
 
     toolsCompile configurations.compile
     toolsRuntime configurations.runtime
+
+    toolsCompile 'com.netflix.hollow:netflix-hollow-diff-ui:latest.release'
 }
 
 configurations {
