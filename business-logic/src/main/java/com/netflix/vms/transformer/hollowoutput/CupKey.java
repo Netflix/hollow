@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 
 public class CupKey implements Cloneable {
-    public static String DEFAULT = "default";
+    public static final String DEFAULT = "default";
 
     public Strings token = null;
 
