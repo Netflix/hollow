@@ -43,6 +43,9 @@ public interface TransformerConfig {
     int getMaxTolerableFailedTransformerHierarchies();
     
     String getOverrideFastlaneIds();
+    
+    @DefaultValue("false")
+    boolean isRestoreFromPreviousStateEngine();
 
     //////////////// PUBLISH WORKFLOW ///////////////////
 

@@ -12,6 +12,7 @@ public class GlobalPerson implements Cloneable {
     public List<Strings> partners = null;
     public List<Video> topVideos = null;
     public Strings currentRelationship = null;
+    public List<Strings> relationships = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
@@ -41,6 +42,9 @@ public class GlobalPerson implements Cloneable {
         if(currentRelationship == null) {
             if(currentRelationship == null) return false;
         } else if(!o.currentRelationship.equals(currentRelationship)) return false;
+        if(o.relationships == null) {
+            if(relationships != null) return false;
+        } else if(!o.relationships.equals(relationships)) return false;
         return true;
     }
 
@@ -54,6 +58,7 @@ public class GlobalPerson implements Cloneable {
         hashCode = hashCode * 31 + (partners == null ? 1237 : partners.hashCode());
         hashCode = hashCode * 31 + (topVideos == null ? 1237 : topVideos.hashCode());
         hashCode = hashCode * 31 + (currentRelationship == null ? 1237 : currentRelationship.hashCode());
+        hashCode = hashCode * 31 + (relationships == null ? 1237 : relationships.hashCode());
         return hashCode;
     }
 
@@ -67,6 +72,7 @@ public class GlobalPerson implements Cloneable {
         builder.append(",partners=").append(partners);
         builder.append(",topVideos=").append(topVideos);
         builder.append(",currentRelationship=").append(currentRelationship);
+        builder.append(",relationships=").append(relationships);        
         builder.append("}");
         return builder.toString();
     }

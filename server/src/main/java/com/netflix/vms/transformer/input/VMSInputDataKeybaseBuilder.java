@@ -1,6 +1,8 @@
 package com.netflix.vms.transformer.input;
 
-public class VMSInputDataKeybaseBuilder {
+import com.netflix.vms.transformer.common.KeybaseBuilder;
+
+public class VMSInputDataKeybaseBuilder implements KeybaseBuilder {
 
     private final String converterVip;
 

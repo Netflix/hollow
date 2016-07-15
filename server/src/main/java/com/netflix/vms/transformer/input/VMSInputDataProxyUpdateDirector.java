@@ -1,18 +1,24 @@
 package com.netflix.vms.transformer.input;
 
+import com.netflix.vms.transformer.common.KeybaseBuilder;
+
 import com.netflix.hollow.client.HollowClientUpdateDirector;
 import com.netflix.vms.transformer.http.HttpHelper;
 
 public class VMSInputDataProxyUpdateDirector extends HollowClientUpdateDirector {
 
     private final String proxyURL;
-    private final VMSInputDataKeybaseBuilder keybaseBuilder;
+    private final KeybaseBuilder keybaseBuilder;
     
     private long specifiedLatestVersion = Long.MAX_VALUE;
 
     public VMSInputDataProxyUpdateDirector(String proxyURL, String converterVip) {
+        this(proxyURL, new VMSInputDataKeybaseBuilder(converterVip));
+    }
+    
+    public VMSInputDataProxyUpdateDirector(String proxyURL, KeybaseBuilder keybaseBuilder) {
         this.proxyURL = proxyURL;
-        this.keybaseBuilder = new VMSInputDataKeybaseBuilder(converterVip);
+        this.keybaseBuilder = keybaseBuilder;
     }
 
     @Override

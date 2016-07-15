@@ -21,6 +21,10 @@ public class PersonBioDelegateLookupImpl extends HollowObjectAbstractDelegate im
         return typeAPI.getPartnersOrdinal(ordinal);
     }
 
+    public int getRelationshipsOrdinal(int ordinal) {
+        return typeAPI.getRelationshipsOrdinal(ordinal);
+    }
+
     public int getCurrentRelationshipOrdinal(int ordinal) {
         return typeAPI.getCurrentRelationshipOrdinal(ordinal);
     }

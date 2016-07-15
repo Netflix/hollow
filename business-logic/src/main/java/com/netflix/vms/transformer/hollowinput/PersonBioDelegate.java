@@ -10,6 +10,8 @@ public interface PersonBioDelegate extends HollowObjectDelegate {
 
     public int getPartnersOrdinal(int ordinal);
 
+    public int getRelationshipsOrdinal(int ordinal);
+
     public int getCurrentRelationshipOrdinal(int ordinal);
 
     public long getPersonId(int ordinal);

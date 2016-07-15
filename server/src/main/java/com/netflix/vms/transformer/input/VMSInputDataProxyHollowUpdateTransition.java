@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.input;
 
+import com.netflix.vms.transformer.io.LZ4VMSInputStream;
 import java.io.FileInputStream;
-
 import net.jpountz.lz4.LZ4BlockInputStream;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
@@ -17,27 +17,31 @@ public class VMSInputDataProxyHollowUpdateTransition extends HollowUpdateTransit
     private final String baseProxyURL;
     private final String keybase;
     private final String localDataDir;
+    private final boolean useVMSLZ4;
     
-    public VMSInputDataProxyHollowUpdateTransition(String baseProxyURL, String localDataDir, String keybase, long toVersion) {
+    public VMSInputDataProxyHollowUpdateTransition(String baseProxyURL, String localDataDir, String keybase, long toVersion, boolean useVMSLZ4) {
         super(toVersion);
         this.baseProxyURL = baseProxyURL;
         this.localDataDir = localDataDir;
         this.keybase = keybase;
+        this.useVMSLZ4 = useVMSLZ4;
     }
     
-    public VMSInputDataProxyHollowUpdateTransition(String baseProxyURL, String localDataDir, String keybase, long fromVersion, long toVersion) {
+    public VMSInputDataProxyHollowUpdateTransition(String baseProxyURL, String localDataDir, String keybase, long fromVersion, long toVersion, boolean useVMSLZ4) {
         super(fromVersion, toVersion);
         this.baseProxyURL = baseProxyURL;
         this.localDataDir = localDataDir;
         this.keybase = keybase;
+        this.useVMSLZ4 = useVMSLZ4;
     }
 
     @Override
+    @SuppressWarnings("resource")
     public InputStream getInputStream() throws IOException {
         String url = baseProxyURL + "/filestore-download?keybase=" + keybase + "&version=" + getFileStoreVersion();
         
         if(localDataDir == null)
-            return new LZ4BlockInputStream(HttpHelper.getInputStream(url));
+            return useVMSLZ4 ? new LZ4VMSInputStream(HttpHelper.getInputStream(url)) : new LZ4BlockInputStream(HttpHelper.getInputStream(url));
             
         
         File localFile = new File(localDataDir, keybase + "_" + getFileStoreVersion());
@@ -56,7 +60,7 @@ public class VMSInputDataProxyHollowUpdateTransition extends HollowUpdateTransit
             localIncompleteFile.renameTo(localFile);
         }
         
-        return new LZ4BlockInputStream(new FileInputStream(localFile));
+        return useVMSLZ4 ? new LZ4VMSInputStream(new FileInputStream(localFile)) : new LZ4BlockInputStream(new FileInputStream(localFile));
     }
     
     private long getFileStoreVersion() {

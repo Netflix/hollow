@@ -33,10 +33,10 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
 	private final long nowMillis;
 
     public TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer, Supplier<ServerUploadStatus> uploadStatus, FileStore fileStore, String vip) {
-        this(ctx, vipAnnouncer, uploadStatus, fileStore, vip, new CassandraBasedPoisonedStateMarker(ctx, vip));
+        this(ctx, vipAnnouncer, uploadStatus, new PublishWorkflowStatusIndicator(ctx.getMetricRecorder()), fileStore, vip, new CassandraBasedPoisonedStateMarker(ctx, vip));
     }
 
-    private TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer, Supplier<ServerUploadStatus> uploadStatus, FileStore fileStore, String vip, PoisonedStateMarker poisonStateMarker) {
+    private TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer, Supplier<ServerUploadStatus> uploadStatus, PublishWorkflowStatusIndicator statusIndicator, FileStore fileStore, String vip, PoisonedStateMarker poisonStateMarker) {
         this.transformerCtx = ctx;
         this.vip = vip;
         this.config = ctx.getConfig();
@@ -44,13 +44,13 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
         this.poisonStateMarker = poisonStateMarker;
         this.uploadStatus = uploadStatus;
         this.fileStore = fileStore;
-        this.statusIndicator = new PublishWorkflowStatusIndicator(ctx.getMetricRecorder());
+        this.statusIndicator = statusIndicator;
         this.logger = ctx.getLogger();
         this.nowMillis = ctx.getNowMillis();
     }
 
     public TransformerPublishWorkflowContext withCurrentLoggerAndConfig() {
-        return new TransformerPublishWorkflowContext(transformerCtx, vipAnnouncer, uploadStatus, fileStore, vip, poisonStateMarker);
+        return new TransformerPublishWorkflowContext(transformerCtx, vipAnnouncer, uploadStatus, statusIndicator, fileStore, vip, poisonStateMarker);
     }
 
     @Override

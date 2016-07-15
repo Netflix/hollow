@@ -210,7 +210,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.9",
+            "locked": "1.4.10",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
@@ -238,7 +238,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.2",
+            "locked": "1.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -459,8 +459,8 @@
                 "com.netflix.governator:governator-core"
             ]
         },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:server-context"
@@ -534,13 +534,13 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.51.0",
+            "locked": "1.52.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:country-launch": {
-            "locked": "14.133",
+            "locked": "15.15",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -566,13 +566,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1089,7 +1089,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.9",
+            "locked": "1.4.10",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
@@ -1117,7 +1117,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.2",
+            "locked": "1.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -1338,8 +1338,8 @@
                 "com.netflix.governator:governator-core"
             ]
         },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:server-context"
@@ -1413,13 +1413,13 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.51.0",
+            "locked": "1.52.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:country-launch": {
-            "locked": "14.133",
+            "locked": "15.15",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -1445,13 +1445,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1968,7 +1968,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.9",
+            "locked": "1.4.10",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
@@ -1996,7 +1996,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.2",
+            "locked": "1.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -2217,8 +2217,8 @@
                 "com.netflix.governator:governator-core"
             ]
         },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:server-context"
@@ -2292,13 +2292,13 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.51.0",
+            "locked": "1.52.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:country-launch": {
-            "locked": "14.133",
+            "locked": "15.15",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -2324,13 +2324,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -2847,7 +2847,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.9",
+            "locked": "1.4.10",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
@@ -2875,7 +2875,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.2",
+            "locked": "1.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -3096,8 +3096,8 @@
                 "com.netflix.governator:governator-core"
             ]
         },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:server-context"
@@ -3171,13 +3171,13 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.51.0",
+            "locked": "1.52.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:country-launch": {
-            "locked": "14.133",
+            "locked": "15.15",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -3203,13 +3203,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3825,7 +3825,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.9",
+            "locked": "1.4.10",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
@@ -3853,7 +3853,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.2",
+            "locked": "1.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -4074,8 +4074,8 @@
                 "com.netflix.governator:governator-core"
             ]
         },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:server-context"
@@ -4149,13 +4149,13 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.51.0",
+            "locked": "1.52.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:country-launch": {
-            "locked": "14.133",
+            "locked": "15.15",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -4181,13 +4181,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -4704,7 +4704,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.9",
+            "locked": "1.4.10",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
@@ -4732,7 +4732,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.2",
+            "locked": "1.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -4953,8 +4953,8 @@
                 "com.netflix.governator:governator-core"
             ]
         },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:server-context"
@@ -5029,13 +5029,13 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.51.0",
+            "locked": "1.52.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:country-launch": {
-            "locked": "14.133",
+            "locked": "15.15",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -5061,13 +5061,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -5594,7 +5594,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.9",
+            "locked": "1.4.10",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
@@ -5622,7 +5622,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.2",
+            "locked": "1.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -5843,8 +5843,8 @@
                 "com.netflix.governator:governator-core"
             ]
         },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:server-context"
@@ -5919,13 +5919,13 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.51.0",
+            "locked": "1.52.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:country-launch": {
-            "locked": "14.133",
+            "locked": "15.15",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -5951,13 +5951,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -6484,7 +6484,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.9",
+            "locked": "1.4.10",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
@@ -6512,7 +6512,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.2",
+            "locked": "1.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -6733,8 +6733,8 @@
                 "com.netflix.governator:governator-core"
             ]
         },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:server-context"
@@ -6809,13 +6809,13 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.51.0",
+            "locked": "1.52.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:country-launch": {
-            "locked": "14.133",
+            "locked": "15.15",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -6841,13 +6841,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -7374,7 +7374,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.9",
+            "locked": "1.4.10",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.ribbon:ribbon-eureka",
@@ -7402,7 +7402,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.2",
+            "locked": "1.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -7623,8 +7623,8 @@
                 "com.netflix.governator:governator-core"
             ]
         },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:server-context"
@@ -7699,13 +7699,13 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.51.0",
+            "locked": "1.52.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:country-launch": {
-            "locked": "14.133",
+            "locked": "15.15",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -7731,13 +7731,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:netflix-config"
             ]

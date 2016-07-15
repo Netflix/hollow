@@ -2,16 +2,7 @@ package com.netflix.vms.transformer.publish.workflow;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.BlobChecksum;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CircuitBreaker;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.RollbackStateEngine;
 
 import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
@@ -25,6 +16,15 @@ import com.netflix.vms.generated.notemplate.TopNVideoDataHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
 import com.netflix.vms.generated.notemplate.VideoHollow;
 import com.netflix.vms.transformer.common.TransformerContext;
+import java.io.File;
+import java.io.IOException;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 public class HollowBlobDataProvider {
     /* dependencies */
@@ -32,24 +32,37 @@ public class HollowBlobDataProvider {
 
     /* fields */
     private HollowReadStateEngine hollowReadStateEngine;
-    private HollowBlobReader hollowBlobReader;
+    
+    private HollowReadStateEngine revertableStateEngine;
 
     public HollowBlobDataProvider(TransformerContext ctx) {
         this.ctx = ctx;
         this.hollowReadStateEngine = new HollowReadStateEngine(true);
-        this.hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
+    }
+    
+    public void notifyRestoredStateEngine(HollowReadStateEngine restoredState) {
+        this.hollowReadStateEngine = restoredState;
     }
 
     public void readSnapshot(File snapshotFile) throws IOException {
         ctx.getLogger().info(CircuitBreaker, "Reading Snapshot blob {}", snapshotFile.getName());
         hollowReadStateEngine = new HollowReadStateEngine(true);
-        hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
+        HollowBlobReader hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
         hollowBlobReader.readSnapshot(ctx.files().newBlobInputStream(snapshotFile));
     }
 
     public void readDelta(File deltaFile) throws IOException {
         ctx.getLogger().info(CircuitBreaker, "Reading Delta blob {}", deltaFile.getName());
+        HollowBlobReader hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
         hollowBlobReader.applyDelta(ctx.files().newBlobInputStream(deltaFile));
+    }
+    
+    public synchronized void revertToPriorVersion() {
+        if(revertableStateEngine != null) {
+            ctx.getLogger().info(RollbackStateEngine, "Rolling back state engine in circuit breaker data provider");
+            hollowReadStateEngine = revertableStateEngine;
+        }
+        revertableStateEngine = null;
     }
 
     public HollowReadStateEngine getStateEngine() {
@@ -61,17 +74,8 @@ public class HollowBlobDataProvider {
     }
 
 	public void updateData(File snapshotFile, File deltaFile, File reverseDeltaFile) throws IOException {
-		if (deltaFile.exists()) {
-		    HollowChecksum initialChecksum = null;
-
-		    if(reverseDeltaFile.exists())
-		        initialChecksum = HollowChecksum.forStateEngine(hollowReadStateEngine);
-
-			readDelta(deltaFile);
-
-            if(snapshotFile.exists())
-                validateChecksums(snapshotFile, reverseDeltaFile, initialChecksum);
-
+		if (deltaFile.exists() && snapshotFile.exists()) {
+		    validateChecksums(snapshotFile, deltaFile, reverseDeltaFile);
         } else if (snapshotFile.exists()) {
             readSnapshot(snapshotFile);
         } else {
@@ -79,13 +83,21 @@ public class HollowBlobDataProvider {
         }
     }
 
-    private void validateChecksums(File snapshotFile, File reverseDeltaFile, HollowChecksum initialChecksumBeforeDelta) throws IOException {
+    private void validateChecksums(File snapshotFile, File deltaFile, File reverseDeltaFile) throws IOException {
         HollowReadStateEngine anotherStateEngine = new HollowReadStateEngine();
         HollowBlobReader anotherReader = new HollowBlobReader(anotherStateEngine);
         anotherReader.readSnapshot(ctx.files().newBlobInputStream(snapshotFile));
+        
+        HollowChecksum initialChecksumBeforeDelta = null;
+        if(reverseDeltaFile.exists())
+            initialChecksumBeforeDelta = HollowChecksum.forStateEngineWithCommonSchemas(hollowReadStateEngine, anotherStateEngine);
+        
+        revertableStateEngine = null;
+        
+        readDelta(deltaFile);
 
-        HollowChecksum deltaChecksum = HollowChecksum.forStateEngine(hollowReadStateEngine);
-        HollowChecksum snapshotChecksum = HollowChecksum.forStateEngine(anotherStateEngine);
+        HollowChecksum deltaChecksum = HollowChecksum.forStateEngineWithCommonSchemas(hollowReadStateEngine, anotherStateEngine);
+        HollowChecksum snapshotChecksum = HollowChecksum.forStateEngineWithCommonSchemas(anotherStateEngine, hollowReadStateEngine);
 
         ctx.getLogger().info(BlobChecksum, "DELTA STATE CHECKSUM: {}", deltaChecksum);
         ctx.getLogger().info(BlobChecksum, "SNAPSHOT STATE CHECKSUM: {}", snapshotChecksum);
@@ -95,13 +107,15 @@ public class HollowBlobDataProvider {
 
         if(reverseDeltaFile.exists()) {
             anotherReader.applyDelta(ctx.files().newBlobInputStream(reverseDeltaFile));
-            HollowChecksum reverseDeltaChecksum = HollowChecksum.forStateEngine(anotherStateEngine);
+            HollowChecksum reverseDeltaChecksum = HollowChecksum.forStateEngineWithCommonSchemas(anotherStateEngine, hollowReadStateEngine);
 
             ctx.getLogger().info(BlobChecksum, "INITIAL STATE CHECKSUM: {}", initialChecksumBeforeDelta);
             ctx.getLogger().info(BlobChecksum, "REVERSE DELTA STATE CHECKSUM: {}", reverseDeltaChecksum);
 
             if(!initialChecksumBeforeDelta.equals(reverseDeltaChecksum))
                 throw new RuntimeException("REVERSE DELTA CHECKSUM VALIDATION FAILURE!");
+            
+            revertableStateEngine = anotherStateEngine;
         }
     }
 

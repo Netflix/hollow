@@ -3,25 +3,30 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MarkedPoisonState;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
 
-import java.util.Arrays;
+import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 
+import java.util.Arrays;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.PoisonStateMarkerJob;
 
 public class CassandraPoisonStateMarkerJob extends PoisonStateMarkerJob {
-    private final PublishWorkflowContext ctx;
 
-    public CassandraPoisonStateMarkerJob(PublishWorkflowContext ctx, PublicationJob validationJob, long cycleVersion) {
+    private final PublishWorkflowContext ctx;
+    private final HollowBlobDataProvider hollowBlobDataProvider;
+
+    public CassandraPoisonStateMarkerJob(PublishWorkflowContext ctx, PublicationJob validationJob, HollowBlobDataProvider dataProvider, long cycleVersion) {
         super(ctx, validationJob, cycleVersion);
         this.ctx = ctx;
+        this.hollowBlobDataProvider = dataProvider;
     }
 
     @Override
     protected boolean executeJob() {
         try {
-            ctx.getPoisonStateMarker().markStatePoisoned(getCycleVersion(), true);
             ctx.getStatusIndicator().markFailure(getCycleVersion());
+            hollowBlobDataProvider.revertToPriorVersion();
+            ctx.getPoisonStateMarker().markStatePoisoned(getCycleVersion(), true);
             ctx.getLogger().error(
                     Arrays.asList(MarkedPoisonState, TransformCycleFailed),
                     "Marked version {} poison.", getCycleVersion());

@@ -227,7 +227,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.2",
+            "locked": "1.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -483,8 +483,8 @@
                 "netflix:nf-eventbus-core"
             ]
         },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
@@ -559,7 +559,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.51.0",
+            "locked": "1.54.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -572,7 +572,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -597,17 +597,17 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.41",
+            "locked": "2.43",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -1087,7 +1087,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.2",
+            "locked": "1.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -1343,8 +1343,8 @@
                 "netflix:nf-eventbus-core"
             ]
         },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
@@ -1419,7 +1419,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.51.0",
+            "locked": "1.54.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -1432,7 +1432,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -1457,17 +1457,17 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.41",
+            "locked": "2.43",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -1947,7 +1947,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.2",
+            "locked": "1.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -2203,8 +2203,8 @@
                 "netflix:nf-eventbus-core"
             ]
         },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
@@ -2279,7 +2279,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.51.0",
+            "locked": "1.54.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -2292,7 +2292,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -2317,17 +2317,17 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.41",
+            "locked": "2.43",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -2807,7 +2807,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.2",
+            "locked": "1.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -3063,8 +3063,8 @@
                 "netflix:nf-eventbus-core"
             ]
         },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
@@ -3139,7 +3139,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.51.0",
+            "locked": "1.54.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -3152,7 +3152,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -3177,17 +3177,17 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.41",
+            "locked": "2.43",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -3766,7 +3766,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.2",
+            "locked": "1.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -4022,8 +4022,8 @@
                 "netflix:nf-eventbus-core"
             ]
         },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
@@ -4098,7 +4098,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.51.0",
+            "locked": "1.54.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -4111,7 +4111,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -4136,17 +4136,17 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.41",
+            "locked": "2.43",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -4626,7 +4626,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.2",
+            "locked": "1.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -4882,8 +4882,8 @@
                 "netflix:nf-eventbus-core"
             ]
         },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
@@ -4959,7 +4959,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.51.0",
+            "locked": "1.54.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -4972,7 +4972,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -4997,17 +4997,17 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.41",
+            "locked": "2.43",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -5497,7 +5497,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.2",
+            "locked": "1.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -5753,8 +5753,8 @@
                 "netflix:nf-eventbus-core"
             ]
         },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
@@ -5830,7 +5830,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.51.0",
+            "locked": "1.54.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -5843,7 +5843,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -5868,17 +5868,17 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.41",
+            "locked": "2.43",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -6368,7 +6368,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.2",
+            "locked": "1.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -6624,8 +6624,8 @@
                 "netflix:nf-eventbus-core"
             ]
         },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
@@ -6701,7 +6701,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.51.0",
+            "locked": "1.54.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -6714,7 +6714,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -6739,17 +6739,17 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.41",
+            "locked": "2.43",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -7239,7 +7239,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.2",
+            "locked": "1.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -7495,8 +7495,8 @@
                 "netflix:nf-eventbus-core"
             ]
         },
-        "javax.servlet:servlet-api": {
-            "locked": "2.5",
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.netflix-commons:netflix-infix",
@@ -7572,7 +7572,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.51.0",
+            "locked": "1.54.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -7585,7 +7585,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -7610,17 +7610,17 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.41",
+            "locked": "2.43",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "2.1873.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"

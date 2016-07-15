@@ -242,12 +242,6 @@ public class DataSlicer {
                 return Integer.valueOf((int) inputAPI.getPackageHollow(ordinal)._getMovieId());
             }
         });
-        findIncludedOrdinals(stateEngine, "VideoRights", videoIdsToInclude, new VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int)inputAPI.getVideoRightsHollow(ordinal)._getMovieId());
-            }
-        });
         findIncludedOrdinals(stateEngine, "Status", videoIdsToInclude, new VideoIdDeriver() {
             @Override
             public Integer deriveId(int ordinal) {
