@@ -4,6 +4,7 @@ import static com.netflix.vms.transformer.common.cassandra.TransformerCassandraH
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CreateDevSlice;
 
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
+import com.netflix.aws.db.ItemAttribute;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.hollow.util.IntList;
 import com.netflix.hollow.write.HollowBlobWriter;
@@ -22,18 +23,23 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("deprecation")
 public class CreateHollowDevSliceJob extends CreateDevSliceJob {
 
     private final HollowBlobDataProvider dataProvider;
     private final DataSlicer dataSlicer;
     private final String sliceVip;
+    private final long inputVersion;
     
-    public CreateHollowDevSliceJob(PublishWorkflowContext ctx, AnnounceJob dependency, HollowBlobDataProvider dataProvider, DataSlicer dataSlicer, long currentCycleId) {
+    public CreateHollowDevSliceJob(PublishWorkflowContext ctx, AnnounceJob dependency, HollowBlobDataProvider dataProvider, DataSlicer dataSlicer, long inputVersion, long currentCycleId) {
         super(ctx, dependency, currentCycleId);
         this.dataProvider = dataProvider;
         this.dataSlicer = dataSlicer;
+        this.inputVersion = inputVersion;
         this.sliceVip = ctx.getVip() + "_devslice";
     }
 
@@ -79,8 +85,25 @@ public class CreateHollowDevSliceJob extends CreateDevSliceJob {
 
     private void publishSlice(File sliceSnapshotFile, RegionEnum region) throws Exception {
         HollowBlobKeybaseBuilder keybaseBuilder = new HollowBlobKeybaseBuilder(sliceVip);
-        ctx.getFileStore().publish(sliceSnapshotFile, keybaseBuilder.getSnapshotKeybase(), String.valueOf(getCycleVersion()), RegionEnum.US_EAST_1);
+        ctx.getFileStore().publish(sliceSnapshotFile, keybaseBuilder.getSnapshotKeybase(), String.valueOf(getCycleVersion()), region, getItemAttributes());
         ctx.getVipAnnouncer().announce(sliceVip, region, false, getCycleVersion());
+    }
+    
+    private List<ItemAttribute> getItemAttributes() {
+        List<ItemAttribute> att = new ArrayList<>(4);
+
+        String currentVersion =  String.valueOf(getCycleVersion());
+
+        long publishedTimestamp = System.currentTimeMillis();
+        BlobMetaDataUtil.addPublisherProps(sliceVip, att, publishedTimestamp, currentVersion, "");
+
+        BlobMetaDataUtil.addAttribute(att, "toVersion", String.valueOf(getCycleVersion()));
+        
+        BlobMetaDataUtil.addAttribute(att, "converterVip", ctx.getConfig().getConverterVip());
+        BlobMetaDataUtil.addAttribute(att, "inputVersion", String.valueOf(inputVersion));
+        BlobMetaDataUtil.addAttribute(att, "publishCycleDataTS", String.valueOf(ctx.getNowMillis()));
+
+        return att;
     }
     
     private int[] getTopNodeIdsToInclude() throws ConnectionException {

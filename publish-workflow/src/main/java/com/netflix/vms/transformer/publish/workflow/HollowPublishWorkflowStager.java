@@ -105,7 +105,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         addDeleteJob(previousVersion, newVersion, allPublishJobs);
 
         if(ctx.getConfig().isCreateDevSlicedBlob())
-            scheduler.submitJob(jobCreator.createDevSliceJob(ctx, primaryRegionAnnounceJob, newVersion));
+            scheduler.submitJob(jobCreator.createDevSliceJob(ctx, primaryRegionAnnounceJob, inputDataVersion, newVersion));
         
         priorCycleCanaryValidationJob = canaryValidationJob;
         

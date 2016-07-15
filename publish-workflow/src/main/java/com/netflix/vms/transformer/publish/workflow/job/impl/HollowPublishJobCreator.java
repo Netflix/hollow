@@ -95,5 +95,6 @@ public interface HollowPublishJobCreator {
     
     CreateDevSliceJob             createDevSliceJob         (PublishWorkflowContext ctx,
                                                              AnnounceJob dependency,
+                                                             long inputVersion,
                                                              long cycleVersion);
 }

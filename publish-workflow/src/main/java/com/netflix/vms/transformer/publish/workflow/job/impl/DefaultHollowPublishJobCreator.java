@@ -143,7 +143,7 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
     }
 
     @Override
-    public CreateDevSliceJob createDevSliceJob(PublishWorkflowContext ctx, AnnounceJob dependency, long cycleVersion) {
-        return new CreateHollowDevSliceJob(ctx, dependency, hollowBlobDataProvider, dataSlicer, cycleVersion);
+    public CreateDevSliceJob createDevSliceJob(PublishWorkflowContext ctx, AnnounceJob dependency, long inputVersion, long cycleVersion) {
+        return new CreateHollowDevSliceJob(ctx, dependency, hollowBlobDataProvider, dataSlicer, inputVersion, cycleVersion);
     }
 }
