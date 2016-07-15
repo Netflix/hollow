@@ -19,6 +19,7 @@ import com.netflix.vms.transformer.hollowinput.StatusHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
+import com.netflix.vms.transformer.hollowoutput.CupKey;
 import com.netflix.vms.transformer.hollowoutput.LinkedHashSetOfStrings;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
@@ -52,7 +53,7 @@ public class VMSAvailabilityWindowModule {
 
     private final com.netflix.vms.transformer.hollowoutput.Integer ZERO = new com.netflix.vms.transformer.hollowoutput.Integer(0);
 
-    private final Strings DEFAULT_CUP_TOKEN = new Strings("default");
+    private final Strings DEFAULT_CUP_TOKEN = new Strings(CupKey.DEFAULT);
     private final LinkedHashSetOfStrings EMPTY_CUP_TOKENS;
     private final LinkedHashSetOfStrings DEFAULT_CUP_TOKENS;
 
