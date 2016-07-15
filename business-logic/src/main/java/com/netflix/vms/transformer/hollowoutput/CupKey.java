@@ -2,6 +2,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 
 public class CupKey implements Cloneable {
+    public static final String DEFAULT = "default";
 
     public Strings token = null;
 
@@ -11,6 +12,7 @@ public class CupKey implements Cloneable {
         this.token = value;
     }
 
+    @Override
     public boolean equals(Object other) {
         if(other == this)  return true;
         if(!(other instanceof CupKey))
@@ -23,12 +25,14 @@ public class CupKey implements Cloneable {
         return true;
     }
 
+    @Override
     public int hashCode() {
         int hashCode = 1;
         hashCode = hashCode * 31 + (token == null ? 1237 : token.hashCode());
         return hashCode;
     }
 
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder("CupKey{");
         builder.append("token=").append(token);
@@ -36,6 +40,7 @@ public class CupKey implements Cloneable {
         return builder.toString();
     }
 
+    @Override
     public CupKey clone() {
         try {
             CupKey clone = (CupKey)super.clone();

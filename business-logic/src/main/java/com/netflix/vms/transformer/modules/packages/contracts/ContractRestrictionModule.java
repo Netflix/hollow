@@ -146,6 +146,9 @@ public class ContractRestrictionModule {
                             buildRestrictionBasedOnSingleApplicableContract(assetTypeIdx, restriction, applicableRightsContracts.get(0), videoId, countryCode);
                         else
                             buildRestrictionBasedOnMultipleApplicableContracts(assetTypeIdx, restriction, applicableRightsContracts, videoId, countryCode);
+                        if (restriction.cupKeys.isEmpty()) {
+                            restriction.cupKeys.add(getCupKey(CupKey.DEFAULT));
+                        }
                         contractRestrictions.add(restriction);
                     }
                 }
@@ -261,7 +264,7 @@ public class ContractRestrictionModule {
             	restriction.isDownloadable = true;
             
             StringHollow cupKey = contract == null ? null : contract._getCupToken();
-            orderedContractIdCupKeyMap.put((int) rightsContract.contract._getContractId(), cupKey == null ? "default" : cupKey._getValue());
+            orderedContractIdCupKeyMap.put((int) rightsContract.contract._getContractId(), cupKey == null ? CupKey.DEFAULT : cupKey._getValue());
         }
 
         // Step 2: if any audio languages have language bundle restrictions, then determine the merged set of disallowed text languages for each
