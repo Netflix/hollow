@@ -15,7 +15,7 @@ import com.netflix.archaius.api.annotations.PropertyName;
  */
 @Configuration(prefix = "vms")
 public interface TransformerConfig {
-
+	
     @DefaultValue("defaultConverterVip")
     String getConverterVip();
 
@@ -143,5 +143,11 @@ public interface TransformerConfig {
 
     @DefaultValue("true")
     boolean isElasticSearchNoWaitingEnabled();
+    
+    
+    ///////////// TEMPORARY FEATURE-BASED //////////////////
+    
+    @DefaultValue("false")
+    boolean isOfflineViewingEnabled();   //  TODO: Remove this once offline viewing is fully rolled out.
 
 }

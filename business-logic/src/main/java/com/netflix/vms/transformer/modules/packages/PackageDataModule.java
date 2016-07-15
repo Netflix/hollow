@@ -7,6 +7,7 @@ import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.ChunkDurationsStringHollow;
 import com.netflix.vms.transformer.hollowinput.CodecPrivateDataStringHollow;
 import com.netflix.vms.transformer.hollowinput.DeployablePackagesHollow;
@@ -61,7 +62,7 @@ public class PackageDataModule {
     private final ContractRestrictionModule contractRestrictionModule;
     private final EncodeSummaryDescriptorModule encodeSummaryModule;
 
-    public PackageDataModule(VMSHollowInputAPI api, HollowObjectMapper objectMapper, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
+    public PackageDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper objectMapper, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
         this.api = api;
         this.mapper = objectMapper;
         this.packagesByVideoIdx = indexer.getHashIndex(IndexSpec.PACKAGES_BY_VIDEO);
@@ -71,7 +72,7 @@ public class PackageDataModule {
         this.drmInfoByGroupId = new HashMap<Integer, DrmInfo>();
 
         this.streamDataModule = new StreamDataModule(api, cycleConstants, indexer, objectMapper, drmKeysByGroupId, drmInfoByGroupId);
-        this.contractRestrictionModule = new ContractRestrictionModule(api, indexer);
+        this.contractRestrictionModule = new ContractRestrictionModule(api, ctx, indexer);
         this.encodeSummaryModule = new EncodeSummaryDescriptorModule(api, indexer);
     }
 
