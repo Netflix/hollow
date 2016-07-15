@@ -46,6 +46,19 @@ public class VMSDevsliceAdmin {
         
         html.append("<head><title>VMS DevSlice Admin</title></head>");
         html.append("<body>");
+        
+        html.append("<p>");
+        html.append("<b>Instructions:</b><br/>");
+        html.append("Add the Video ID of a show or standalone movie here, and it will be available (along with all associated supplementals, seasons, and episodes) in the devslice data within 15 minutes.");
+        html.append("<br/>See the \"Dev Slice\" section under <a href=\"http://go/vmsconfig\">http://go/vmsconfig</a> for instructions on how to initialize VMS devslice mode.");
+        html.append("</p><p>");
+        html.append("<b>Devslice Etiquette:</b>");
+        html.append("<ul>");
+        html.append("<li>Please don't add a huge number of IDs.</li>");
+        html.append("<li>Please only remove IDs which you have added <i>recently</i>.  If IDs have been here for a long time, it's possible other VMS partners may be expecting their presence in the devslice data.</li>");
+        html.append("</ul>");
+        html.append("</p>");
+        
         html.append("<form>");
         html.append("<input type=\"text\" name=\"addVideoId\">");
         html.append("<input type=\"submit\" value=\"Add Video\">");
