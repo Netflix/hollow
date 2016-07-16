@@ -6,6 +6,7 @@ import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
+import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,11 +31,15 @@ public abstract class AbstractTitleOverrideProcessor implements TitleOverridePro
     }
 
     protected File getFile(String type, long version, int topNode) {
-        return new File(localBlobStore, "vms.hollow" + type + ".blob." + vip + ".slice_" + version + "_" + topNode);
+        if (localBlobStore != null) {
+            return new File(localBlobStore, "vms.hollow" + type + ".blob." + vip + ".slice_" + version + "_" + topNode);
+        } else {
+            return new File(new HollowBlobFileNamer(vip).getTitleOverrideFileName(version, topNode));
+        }
     }
 
     protected HollowReadStateEngine readStateEngine(File inputFile) throws IOException {
-        ctx.getLogger().info(TransformerLogTag.OverrideBlob, "Read StateEngine file:{}", inputFile);
+        ctx.getLogger().info(TransformerLogTag.OverrideTitle, "Read StateEngine file:{}", inputFile);
 
         HollowReadStateEngine stateEngine = new HollowReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(stateEngine);
@@ -46,7 +51,7 @@ public abstract class AbstractTitleOverrideProcessor implements TitleOverridePro
     }
 
     protected void writeStateEngine(HollowWriteStateEngine stateEngine, File outputFile) throws IOException {
-        ctx.getLogger().info(TransformerLogTag.OverrideBlob, "Write StateEngine file:{}", outputFile);
+        ctx.getLogger().info(TransformerLogTag.OverrideTitle, "Write StateEngine file:{}", outputFile);
 
         HollowBlobWriter writer = new HollowBlobWriter(stateEngine);
         try (LZ4BlockOutputStream os = new LZ4BlockOutputStream(new FileOutputStream(outputFile))) {

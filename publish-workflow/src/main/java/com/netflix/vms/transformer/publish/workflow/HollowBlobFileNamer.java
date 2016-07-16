@@ -20,4 +20,8 @@ public class HollowBlobFileNamer {
     public String getSnapshotFileName(long nextVersion) {
         return FILENAME_PREFIX + vip + "-snapshot-" + nextVersion;
     }
+
+    public String getTitleOverrideFileName(long version, int topNode) {
+        return FILENAME_PREFIX + vip + "-titleoverride-" + version + "-" + topNode;
+    }
 }

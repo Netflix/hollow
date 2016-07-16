@@ -11,9 +11,8 @@ import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
 import com.netflix.vms.transformer.override.OverrideHollowCombiner;
-import com.netflix.vms.transformer.override.InputSliceTitleOverrideProcessor;
-import com.netflix.vms.transformer.override.OutputSliceTitleOverrideProcessor;
-import com.netflix.vms.transformer.override.TitleOverrideProcessor;
+import com.netflix.vms.transformer.override.TitleOverrideJobSpec;
+import com.netflix.vms.transformer.override.TitleOverrideManager;
 import com.netflix.vms.transformer.testutil.migration.ShowMeTheProgressDiffTool;
 
 import java.io.ByteArrayInputStream;
@@ -22,57 +21,56 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+
 public class TitleLevelPinningPOC {
-    private static final String VIP = "boson";
     private static final String BASE_PROXY = VMSInputDataClient.TEST_PROXY_URL;
     private static final String LOCAL_BLOB_STORE = "/space/title-pinning";
 
-    private final String converterVip;
-    private final String proxyURL;
-    private final String localBlobStore;
     private static final VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
-    private final SimpleTransformerContext ctx;
-    private final boolean isInputBased;
 
-    public TitleLevelPinningPOC(String converterVip, String proxyURL, String localBlobStore, boolean isInputBased) {
-        this.converterVip = converterVip;
-        this.localBlobStore = localBlobStore;
-        this.proxyURL = proxyURL;
-        this.isInputBased = isInputBased;
-
-        ctx = new SimpleTransformerContext();
-    }
-
-    /**
-     * Process specified topNode for input data version
-     *
-     * @return the file pointing to the processed data
-     */
-    public HollowReadStateEngine process(Long dataVersion, int topNode) throws Throwable {
-        TitleOverrideProcessor processor = isInputBased
-                ? new InputSliceTitleOverrideProcessor("boson", proxyURL, localBlobStore, ctx)
-                        : new OutputSliceTitleOverrideProcessor("berlin", proxyURL, localBlobStore, ctx);
-
-                return processor.process(dataVersion, topNode);
-    }
 
     // -- DEBUG API
     public static void main(String[] args) throws Throwable {
         long start = System.currentTimeMillis();
 
-        //// PROCESSING
-        TitleLevelPinningPOC pinner = new TitleLevelPinningPOC(VIP, BASE_PROXY, LOCAL_BLOB_STORE, false);
+        TitleOverrideManager mgr = new TitleOverrideManager(BASE_PROXY, "boson", "berlin", LOCAL_BLOB_STORE, new SimpleTransformerContext());
+
+        boolean isInputBased = true;
+        long version1 = 20160715180125072L;
+        long version2 = 20160715190125076L;
+        int video1 = 1133891;
+        int video2 = 70178217;
+        int video3 = 80049872;
 
         // Wonder Man
-        HollowReadStateEngine out1 = pinner.process(20160715180125072L, 1133891);
+        List<HollowReadStateEngine> run1 = mgr.runJobs(
+                new TitleOverrideJobSpec(version1, video1, isInputBased));
+        HollowReadStateEngine out1 = run1.get(0);
 
         // HoC
-        HollowReadStateEngine out2 = pinner.process(20160715180125072L, 70178217);
+        List<HollowReadStateEngine> run2 = mgr.runJobs(
+                new TitleOverrideJobSpec(version1, video1, isInputBased),
+                new TitleOverrideJobSpec(version1, video2, isInputBased));
+        HollowReadStateEngine out2 = run2.get(1);
+        if (run1.get(0) != run2.get(0)) {
+            throw new Exception("They should be the same");
+        }
 
         // Chelsea
-        HollowReadStateEngine out3 = pinner.process(20160715190125076L, 80049872);
+        List<HollowReadStateEngine> run3 = mgr.runJobs(
+                new TitleOverrideJobSpec(version1, video1, isInputBased),
+                new TitleOverrideJobSpec(version1, video2, isInputBased),
+                new TitleOverrideJobSpec(version2, video3, isInputBased));
+        HollowReadStateEngine out3 = run3.get(2);
+        if (run2.get(0) != run3.get(0)) {
+            throw new Exception("They should be the same");
+        }
+        if (run2.get(1) != run3.get(1)) {
+            throw new Exception("They should be the same");
+        }
 
         System.out.println("ALL PROCESSING DONE, duration=" + (System.currentTimeMillis() - start));
 

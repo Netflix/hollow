@@ -45,7 +45,7 @@ public class OutputSliceTitleOverrideProcessor extends AbstractTitleOverrideProc
             HollowWriteStateEngine slicedStateEngine = slicer.sliceOutputBlob(outputDataClient.getStateEngine());
 
             writeStateEngine(slicedStateEngine, localFile);
-            ctx.getLogger().info(TransformerLogTag.OverrideBlob, "Sliced[OUTPUT] videoId={} from vip={}, version={}, duration={}", topNode, vip, version, (System.currentTimeMillis() - start));
+            ctx.getLogger().info(TransformerLogTag.OverrideTitle, "Sliced[OUTPUT] videoId={} from vip={}, version={}, duration={}", topNode, vip, version, (System.currentTimeMillis() - start));
         }
 
         return readStateEngine(localFile);

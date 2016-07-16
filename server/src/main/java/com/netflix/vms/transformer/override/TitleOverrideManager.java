@@ -3,39 +3,104 @@ package com.netflix.vms.transformer.override;
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
+import com.netflix.vms.transformer.SimpleTransformer;
+import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 
 public class TitleOverrideManager {
-    private final String proxyURL;
+    private String proxyURL;
+    private String inputDataVip;
+    private String outputDataVip;
+
     private final String localBlobStore;
     private final TransformerContext ctx;
     private final FileStore fileStore;
+    private final SimultaneousExecutor mainExecutor = new SimultaneousExecutor();
 
     private TreeMap<TitleOverrideJobSpec, TitleOverrideProcessorJob> lastJobs = new TreeMap<>();
 
-    public TitleOverrideManager(FileStore fileStore, String localBlobStore, TransformerContext ctx) {
+    public TitleOverrideManager(FileStore fileStore, TransformerContext ctx) {
         this.fileStore = fileStore;
-        this.proxyURL = null;
-        this.localBlobStore = localBlobStore;
+        this.localBlobStore = null;
         this.ctx = ctx;
     }
 
-    public TitleOverrideManager(String proxyURL, String localBlobStore, TransformerContext ctx) {
+    public TitleOverrideManager(String proxyURL, String inputDataVip, String outputDataVip, String localBlobStore, TransformerContext ctx) {
         this.fileStore = null;
-        this.proxyURL = proxyURL;
         this.localBlobStore = localBlobStore;
         this.ctx = ctx;
+
+        this.proxyURL = proxyURL;
+        this.inputDataVip = inputDataVip;
+        this.outputDataVip = outputDataVip;
     }
 
-    public synchronized List<HollowReadStateEngine> runJobs(TitleOverrideJobSpec... TitleOverrideJobSpecs) throws InterruptedException, ExecutionException {
+    public void process(SimpleTransformer transformer, Set<String> overrideTitleSpecs, VMSTransformerWriteStateEngine outputStateEngine) throws Exception {
+        final List<Throwable> errors = new ArrayList<>();
+        mainExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    transformer.transform();
+                } catch (Throwable th) {
+                    errors.add(th);
+                }
+            }
+        });
+
+        final List<HollowReadStateEngine> overrideTitleResults = new ArrayList<>();
+        mainExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    runJobs(overrideTitleResults, overrideTitleSpecs);
+                } catch (Throwable th) {
+                    errors.add(th);
+                }
+            }
+        });
+
+        // combine everything
+        mainExecutor.awaitSuccessfulCompletion();
+        OverrideHollowCombiner combiner = new OverrideHollowCombiner(outputStateEngine, overrideTitleResults.toArray(new HollowReadStateEngine[0]));
+        combiner.combine();
+    }
+
+    private void runJobs(List<HollowReadStateEngine> resultList, Set<String> overrideTitleSpecs) throws InterruptedException, ExecutionException {
+        if (overrideTitleSpecs == null || overrideTitleSpecs.isEmpty()) return;
+
+        int i = 0;
+        TitleOverrideJobSpec[] jobSpecs = new TitleOverrideJobSpec[overrideTitleSpecs.size()];
+        for (String spec : overrideTitleSpecs) {
+            String parts[] = spec.split(":");
+            long version = Long.parseLong(parts[0]);
+            int topNode = Integer.parseInt(parts[1]);
+            boolean isInputBased = false;
+            if (parts.length >= 3) {
+                isInputBased = "in".equals(parts[2]);
+            }
+            jobSpecs[i++] = new TitleOverrideJobSpec(version, topNode, isInputBased);
+        }
+
+        runJobs(resultList, jobSpecs);
+    }
+
+    public synchronized List<HollowReadStateEngine> runJobs(TitleOverrideJobSpec... jobSpecs) throws InterruptedException, ExecutionException {
+        List<HollowReadStateEngine> resultList = new ArrayList<>();
+        runJobs(resultList, jobSpecs);
+        return resultList;
+    }
+
+    private synchronized void runJobs(List<HollowReadStateEngine> resultList, TitleOverrideJobSpec... jobSpecs) throws InterruptedException, ExecutionException {
         // Determine whether it could use prior results
         TreeMap<TitleOverrideJobSpec, TitleOverrideProcessorJob> currJobs = new TreeMap<>();
-        for (TitleOverrideJobSpec p : TitleOverrideJobSpecs) {
+        for (TitleOverrideJobSpec p : jobSpecs) {
             TitleOverrideProcessorJob job = lastJobs.get(p);
             if (job==null) {
                 // prior result not found so create new job
@@ -52,7 +117,6 @@ public class TitleOverrideManager {
         executor.awaitSuccessfulCompletion();
 
         // Collect Results on sorted Order
-        List<HollowReadStateEngine> resultList = new ArrayList<>();
         for (TitleOverrideJobSpec p : currJobs.keySet()) {
             TitleOverrideProcessorJob job = currJobs.get(p);
             if (job.isSuccessfull()) {
@@ -63,8 +127,6 @@ public class TitleOverrideManager {
         }
 
         lastJobs = currJobs;
-
-        return resultList;
     }
 
     private TitleOverrideProcessorJob createNewProcessJob(TitleOverrideJobSpec jobSpec) {
@@ -79,7 +141,7 @@ public class TitleOverrideManager {
     }
 
     private TitleOverrideProcessor createInputBasedProcessor() {
-        String vip = ctx.getConfig().getConverterVip();
+        String vip = inputDataVip != null ? inputDataVip : ctx.getConfig().getConverterVip();
         if (fileStore != null) {
             return new InputSliceTitleOverrideProcessor(vip, fileStore, localBlobStore, ctx);
         } else {
@@ -88,7 +150,7 @@ public class TitleOverrideManager {
     }
 
     private TitleOverrideProcessor createOutputBasedProcessor() {
-        String vip = ctx.getConfig().getTransformerVip();
+        String vip = outputDataVip != null ? outputDataVip : ctx.getConfig().getTransformerVip();
         if (fileStore != null) {
             return new OutputSliceTitleOverrideProcessor(vip, fileStore, localBlobStore, ctx);
         } else {
@@ -113,7 +175,10 @@ public class TitleOverrideManager {
         @Override
         public void run() {
             // skip if result is already available
-            if (resultStateEngine != null) return;
+            if (resultStateEngine != null) {
+                System.out.println("**** REUSING RESULT for" + jobSpec);
+                return;
+            }
 
             try {
                 resultStateEngine = processor.process(jobSpec.version, jobSpec.topNode);

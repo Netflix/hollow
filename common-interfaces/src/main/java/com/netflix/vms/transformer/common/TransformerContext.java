@@ -18,13 +18,17 @@ public interface TransformerContext {
     void setNowMillis(long now);
 
     long getNowMillis();
-    
+
     void setFastlaneIds(Set<Integer> fastlaneIds);
-    
+
     Set<Integer> getFastlaneIds();
 
+    void setTitleOverrideSpecs(Set<String> titleOverrideSpecs);
+
+    Set<String> getTitleOverrideSpecs();
+
     TaggingLogger getLogger();
-    
+
     TransformerConfig getConfig();
 
     TransformerMetricRecorder getMetricRecorder();
@@ -32,7 +36,7 @@ public interface TransformerContext {
     TransformerCassandraHelper getCassandraHelper();
 
     TransformerFiles files();
-    
+
     OctoberSkyData getOctoberSkyData();
 
     Consumer<PublicationHistory> getPublicationHistoryConsumer();

@@ -35,15 +35,17 @@ public interface TransformerConfig {
     Long getNowMillis();
 
     String getFollowVip();
-    
+
     @DefaultValue("15")
     int getMinCycleCadenceMinutes();
-    
+
     @DefaultValue("0")
     int getMaxTolerableFailedTransformerHierarchies();
-    
+
     String getOverrideFastlaneIds();
-    
+
+    String getOverrideTitleSpecs();
+
     @DefaultValue("false")
     boolean isRestoreFromPreviousStateEngine();
 
@@ -94,17 +96,17 @@ public interface TransformerConfig {
     public int getPlaybackMonkeyMaxRetriesPerTest();
 
     @DefaultValue("")
-	String getPlaybackMonkeyVideoCountryToExclude();
-	
+    String getPlaybackMonkeyVideoCountryToExclude();
+
     @DefaultValue("10.0f")
     public float getPlaybackMonkeyNoiseTolerance();
-    
+
     @DefaultValue("0.1f")
     public float getPlaybackmonkeyMissingViewShareThreshold();
 
     @DefaultValue("false")
     public boolean isBigGreenButton();
-    
+
     @DefaultValue("false")
     public boolean isCreateDevSlicedBlob();
 
