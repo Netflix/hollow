@@ -344,13 +344,13 @@ public class VMSAvailabilityWindowModule {
         theRightsContractMap.clear();
         if (isOfflineViewingEnabled) {
             for (RightsWindowContractHollow rightsWindowContract : window._getContractIdsExt()) {
-                Long contractId = rightsWindowContract._getContractId();
+                long contractId = rightsWindowContract._getContractId();
                 RightsContractHollow contract = getRightContract(rights, contractId);
                 theRightsContractMap.put(contractId, new RightsWindowContract(contractId, contract, rightsWindowContract._getDownload()));
             }
         } else {
             for (ContractIdHollow contractIdHollow : window._getContractIds()) {
-                Long contractId = contractIdHollow._getValue();
+                long contractId = contractIdHollow._getValue();
                 RightsContractHollow contract = getRightContract(rights, contractId);
                 theRightsContractMap.put(contractId, new RightsWindowContract(contractId, contract, false));
             }
