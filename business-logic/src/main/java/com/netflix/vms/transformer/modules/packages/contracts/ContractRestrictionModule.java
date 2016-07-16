@@ -461,16 +461,17 @@ public class ContractRestrictionModule {
         return bcp47Code;
     }
     
+    // TODO: timt: unduplicate me
     private static class RightsWindowContract {
-    	private final int contractId;
-    	private final RightsContractHollow contract;
-    	private final boolean isDownloadable;
-    	
-		public RightsWindowContract(int contractId, RightsContractHollow contract, boolean isDownloadable) {
-			this.contractId = contractId;
-			this.contract = contract;
-			this.isDownloadable = isDownloadable;
-		}
+        private final int contractId;
+        private final RightsContractHollow contract;
+        private final boolean isDownloadable;
+
+        public RightsWindowContract(int contractId, RightsContractHollow contract, boolean isDownloadable) {
+            this.contractId = contractId;
+            this.contract = contract;
+            this.isDownloadable = isDownloadable;
+        }
     }
 
 }

@@ -14,6 +14,7 @@ import com.netflix.vms.transformer.hollowinput.RightsContractAssetHollow;
 import com.netflix.vms.transformer.hollowinput.RightsContractHollow;
 import com.netflix.vms.transformer.hollowinput.RightsContractPackageHollow;
 import com.netflix.vms.transformer.hollowinput.RightsHollow;
+import com.netflix.vms.transformer.hollowinput.RightsWindowContractHollow;
 import com.netflix.vms.transformer.hollowinput.RightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.StatusHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
@@ -60,6 +61,7 @@ public class VMSAvailabilityWindowModule {
     private Map<Integer, VideoPackageData> transformedPackageData;
 
     private final WindowPackageContractInfoModule windowPackageContractInfoModule;
+    private final boolean isOfflineViewingEnabled;
 
     public VMSAvailabilityWindowModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
         this.api = api;
@@ -68,6 +70,7 @@ public class VMSAvailabilityWindowModule {
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
 
         this.windowPackageContractInfoModule = new WindowPackageContractInfoModule(api, ctx, cycleConstants, indexer);
+        this.isOfflineViewingEnabled = ctx.getConfig().isOfflineViewingEnabled();
 
         EMPTY_CUP_TOKENS = new LinkedHashSetOfStrings();
         EMPTY_CUP_TOKENS.ordinals = Collections.emptyList();
@@ -131,13 +134,14 @@ public class VMSAvailabilityWindowModule {
                 rollup.newSeasonWindow(window._getStartDate(), window._getEndDate(), rollup.getSeasonSequenceNumber());
             }
 
-            LinkedHashMap<Long, RightsContractHollow> rightsContractMap = getRightsContractMap(rights, window);
+            LinkedHashMap<Long, RightsWindowContract> rightsContractMap = getRightsContractMap(rights, window);
             boolean shouldFilterOutWindowInfo = shouldFilterOutWindowInfo(videoId, country, isGoLive, rightsContractMap.keySet(), includedPackageDataCount, outputWindow.startDate.val, outputWindow.endDate.val);
 
-            for (Map.Entry<Long, RightsContractHollow> entry : rightsContractMap.entrySet()) {
+            for (Map.Entry<Long, RightsWindowContract> entry : rightsContractMap.entrySet()) {
                 long contractId = entry.getKey();
-                RightsContractHollow rightsContract = entry.getValue();
+                RightsContractHollow rightsContract = entry.getValue().contract;
                 ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, country, contractId);
+                boolean isDownloadable = entry.getValue().isDownloadable;
 
                 if(rightsContract != null) {
                     ListOfRightsContractPackageHollow packageIdList = rightsContract._getPackages();
@@ -187,6 +191,7 @@ public class VMSAvailabilityWindowModule {
                                     windowPackageContractInfo.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(cupTokens);
                                     windowPackageContractInfo.videoContractInfo.assetBcp47Codes = bcp47Codes;
                                     windowPackageContractInfo.videoContractInfo.contractId = Math.max(windowPackageContractInfo.videoContractInfo.contractId, (int)contractId);
+                                    windowPackageContractInfo.videoContractInfo.isDownloadable = windowPackageContractInfo.videoContractInfo.isDownloadable || isDownloadable;
                                     windowPackageContractInfo.videoContractInfo.primaryPackageId = (int) Math.max(windowPackageContractInfo.videoContractInfo.primaryPackageId, rightsContract._getPackageId());
 
                                     outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
@@ -216,7 +221,7 @@ public class VMSAvailabilityWindowModule {
                                     PackageData packageData = getPackageData(videoId, pkg._getPackageId());
                                     if(packageData != null) {
                                         /// package data is available
-                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(packageData, rightsContract, contract, country);
+                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(packageData, rightsContract, contract, country, isDownloadable);
                                         outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
 
                                         if(packageData.id > maxPackageId) {
@@ -334,13 +339,21 @@ public class VMSAvailabilityWindowModule {
         data.imagesAvailabilityWindows = availabilityWindows;
     }
 
-    private final LinkedHashMap<Long, RightsContractHollow> theRightsContractMap = new LinkedHashMap<>();
-    private LinkedHashMap<Long, RightsContractHollow> getRightsContractMap(RightsHollow rights, RightsWindowHollow window) {
+    private final LinkedHashMap<Long, RightsWindowContract> theRightsContractMap = new LinkedHashMap<>();
+    private LinkedHashMap<Long, RightsWindowContract> getRightsContractMap(RightsHollow rights, RightsWindowHollow window) {
         theRightsContractMap.clear();
-        for (ContractIdHollow id : window._getContractIds()) {
-            Long contractId = id._getValue();
-            RightsContractHollow contract = getRightContract(rights, contractId);
-            theRightsContractMap.put(contractId, contract);
+        if (isOfflineViewingEnabled) {
+            for (RightsWindowContractHollow rightsWindowContract : window._getContractIdsExt()) {
+                Long contractId = rightsWindowContract._getContractId();
+                RightsContractHollow contract = getRightContract(rights, contractId);
+                theRightsContractMap.put(contractId, new RightsWindowContract(contractId, contract, rightsWindowContract._getDownload()));
+            }
+        } else {
+            for (ContractIdHollow contractIdHollow : window._getContractIds()) {
+                Long contractId = contractIdHollow._getValue();
+                RightsContractHollow contract = getRightContract(rights, contractId);
+                theRightsContractMap.put(contractId, new RightsWindowContract(contractId, contract, false));
+            }
         }
 
         return theRightsContractMap;
@@ -504,4 +517,16 @@ public class VMSAvailabilityWindowModule {
         this.windowPackageContractInfoModule.reset();
     }
 
+    // TODO: timt: unduplicate me
+    private static class RightsWindowContract {
+        private final long contractId;
+        private final RightsContractHollow contract;
+        private final boolean isDownloadable;
+
+        public RightsWindowContract(long contractId, RightsContractHollow contract, boolean isDownloadable) {
+            this.contractId = contractId;
+            this.contract = contract;
+            this.isDownloadable = isDownloadable;
+        }
+    }
 }
