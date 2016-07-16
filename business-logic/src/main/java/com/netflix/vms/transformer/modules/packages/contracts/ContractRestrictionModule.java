@@ -33,6 +33,7 @@ import com.netflix.vms.transformer.hollowoutput.LanguageRestrictions;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.modules.RightsWindowContract;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoContractUtil;
 import java.util.ArrayList;
@@ -460,18 +461,4 @@ public class ContractRestrictionModule {
         }
         return bcp47Code;
     }
-    
-    // TODO: timt: unduplicate me
-    private static class RightsWindowContract {
-        private final int contractId;
-        private final RightsContractHollow contract;
-        private final boolean isDownloadable;
-
-        public RightsWindowContract(int contractId, RightsContractHollow contract, boolean isDownloadable) {
-            this.contractId = contractId;
-            this.contract = contract;
-            this.isDownloadable = isDownloadable;
-        }
-    }
-
 }

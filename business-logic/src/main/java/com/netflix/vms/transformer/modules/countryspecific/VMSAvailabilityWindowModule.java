@@ -32,6 +32,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.modules.RightsWindowContract;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoContractUtil;
 import java.util.ArrayList;
@@ -515,18 +516,5 @@ public class VMSAvailabilityWindowModule {
     public void reset() {
         this.transformedPackageData = null;
         this.windowPackageContractInfoModule.reset();
-    }
-
-    // TODO: timt: unduplicate me
-    private static class RightsWindowContract {
-        private final long contractId;
-        private final RightsContractHollow contract;
-        private final boolean isDownloadable;
-
-        public RightsWindowContract(long contractId, RightsContractHollow contract, boolean isDownloadable) {
-            this.contractId = contractId;
-            this.contract = contract;
-            this.isDownloadable = isDownloadable;
-        }
     }
 }
