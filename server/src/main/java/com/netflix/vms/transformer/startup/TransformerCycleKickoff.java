@@ -27,6 +27,7 @@ import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.fastlane.HollowFastlanePublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HermesBlobAnnouncer;
 import com.netflix.vms.transformer.rest.VMSPublishWorkflowHistoryAdmin;
+import com.netflix.vms.transformer.util.VipUtil;
 import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
 
 import java.util.function.Supplier;
@@ -170,7 +171,7 @@ public class TransformerCycleKickoff {
     }
 
     private boolean isFastlane(TransformerConfig cfg) {
-        return cfg.getTransformerVip().endsWith("_override");
+        return VipUtil.isOverrideVip(cfg);
     }
 
 }

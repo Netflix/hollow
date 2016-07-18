@@ -30,6 +30,11 @@ public abstract class AbstractTitleOverrideProcessor implements TitleOverridePro
         mkdir(localBlobStore);
     }
 
+    @Override
+    public String getVip() {
+        return vip;
+    }
+
     protected File getFile(String type, long version, int topNode) {
         if (localBlobStore != null) {
             return new File(localBlobStore, "vms.hollow" + type + ".blob." + vip + ".slice_" + version + "_" + topNode);
@@ -60,6 +65,8 @@ public abstract class AbstractTitleOverrideProcessor implements TitleOverridePro
     }
 
     protected static void mkdir(String dirName) {
+        if (dirName == null) return;
+
         File dir = new File(dirName);
         if (!dir.exists()) {
             dir.mkdirs();

@@ -16,6 +16,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.WroteBlob;
 
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.client.HollowClient;
+import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
@@ -26,6 +27,7 @@ import com.netflix.vms.transformer.input.FollowVipPinExtractor;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
 import com.netflix.vms.transformer.input.VMSInputDataVersionLogger;
 import com.netflix.vms.transformer.input.VMSOutputDataClient;
+import com.netflix.vms.transformer.override.OverrideHollowCombiner;
 import com.netflix.vms.transformer.override.TitleOverrideManager;
 import com.netflix.vms.transformer.publish.status.CycleStatusFuture;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
@@ -37,6 +39,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 public class TransformCycle {
@@ -144,13 +147,23 @@ public class TransformCycle {
         long startTime = System.currentTimeMillis();
 
         try {
-            SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI) inputClient.getAPI(), outputStateEngine, ctx);
             Set<String> overrideTitleSpecs = ctx.getTitleOverrideSpecs();
             if (overrideTitleSpecs == null || overrideTitleSpecs.isEmpty()) {
+                SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI) inputClient.getAPI(), outputStateEngine, ctx);
                 transformer.transform();
             } else {
                 TitleOverrideManager mgr = new TitleOverrideManager(fileStore, ctx);
-                mgr.process(transformer, overrideTitleSpecs, outputStateEngine);
+                mgr.processASync(overrideTitleSpecs);
+
+                VMSTransformerWriteStateEngine fastlaneOutput = new VMSTransformerWriteStateEngine();
+                SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI) inputClient.getAPI(), fastlaneOutput, ctx);
+                transformer.transform();
+
+                List<HollowReadStateEngine> overrideTitleOutputs = mgr.waitForResults();
+
+                OverrideHollowCombiner combiner = OverrideHollowCombiner.create(outputStateEngine, fastlaneOutput, overrideTitleOutputs);
+                combiner.combine();
+                ctx.getLogger().info(OverrideTitle, "Processed override titles={}", overrideTitleSpecs);
             }
         } catch(Throwable th) {
             ctx.getLogger().error(TransformCycleFailed, "transform failed", th);

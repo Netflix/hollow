@@ -2,10 +2,12 @@ package com.netflix.vms.transformer.override;
 
 import com.netflix.hollow.HollowObjectSchema;
 import com.netflix.hollow.combine.HollowCombiner;
+import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.util.SimultaneousExecutor;
+import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowMapWriteRecord;
 import com.netflix.hollow.write.HollowObjectWriteRecord;
 import com.netflix.hollow.write.HollowSetWriteRecord;
@@ -24,9 +26,15 @@ import com.netflix.vms.generated.notemplate.StringsHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
 import com.netflix.vms.generated.notemplate.VPersonHollow;
 import com.netflix.vms.generated.notemplate.VideoHollow;
+import com.netflix.vms.transformer.publish.workflow.IndexDuplicateChecker;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.BitSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -37,6 +45,7 @@ public class OverrideHollowCombiner {
 
     private final HollowCombiner combiner;
     private final HollowReadStateEngine inputs[];
+    private final HollowWriteStateEngine output;
 
     protected final ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> combinedVideoLists;
     protected final ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> combinedPersonLists;
@@ -44,6 +53,7 @@ public class OverrideHollowCombiner {
 
     public OverrideHollowCombiner(HollowWriteStateEngine output, HollowReadStateEngine... inputs) {
         this.inputs = inputs;
+        this.output = output;
         this.combiner = new HollowCombiner(output, inputs);
         combiner.addIgnoredTypes(OverrideHollowCombiner.NAMEDLIST_TYPE_STATE_NAME);
 
@@ -52,14 +62,54 @@ public class OverrideHollowCombiner {
         this.combinedEpisodeLists = new ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String,Set<Integer>>>();
     }
 
-    public void combine() throws Exception {
-        combiner.combine();
-        buildPOJOLists();
-        writePOJOListsToOutput(combiner.getCombinedStateEngine());
+    public static OverrideHollowCombiner create(HollowWriteStateEngine output, HollowWriteStateEngine fastlane, List<HollowReadStateEngine> overrideTitles) throws Exception {
+        HollowReadStateEngine[] stateEngines = createReadStateEngines(fastlane, overrideTitles);
+        return new OverrideHollowCombiner(output, stateEngines);
+    }
+
+    private static HollowReadStateEngine[] createReadStateEngines(HollowWriteStateEngine fastlane, List<HollowReadStateEngine> overrideTitles) throws Exception {
+        int size = overrideTitles.size() + 1;
+        HollowReadStateEngine[] outputs = new HollowReadStateEngine[size];
+
+        outputs[0] = roundTrip(fastlane);
+        for (int i = 1; i < size; i++) {
+            outputs[i] = overrideTitles.get(i - 1);
+        }
+
+        return outputs;
     }
 
     public HollowWriteStateEngine getCombinedStateEngine() {
-        return combiner.getCombinedStateEngine();
+        return output;
+    }
+
+    public void combine() throws Exception {
+        combiner.combine();
+        buildPOJOLists();
+        writePOJOListsToOutput(output);
+        validateCombinedData(output);
+    }
+
+    private void validateCombinedData(HollowWriteStateEngine outputStateEngine) throws Exception {
+        HollowReadStateEngine stateEngine = roundTrip(outputStateEngine);
+        IndexDuplicateChecker dupChecker = new IndexDuplicateChecker(stateEngine);
+        dupChecker.checkDuplicates();
+        if (dupChecker.wasDupKeysDetected()) {
+            throw new Exception("Duplicate Keys detected: " + dupChecker.getResults());
+        }
+    }
+
+    private static HollowReadStateEngine roundTrip(HollowWriteStateEngine writeEngine) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
+        writer.writeSnapshot(baos);
+
+        HollowReadStateEngine readEngine = new HollowReadStateEngine();
+        HollowBlobReader reader = new HollowBlobReader(readEngine);
+        InputStream is = new ByteArrayInputStream(baos.toByteArray());
+        reader.readSnapshot(is);
+
+        return readEngine;
     }
 
 

@@ -44,6 +44,7 @@ public interface TransformerConfig {
 
     String getOverrideFastlaneIds();
 
+    // FORMAT: topNodeId:version or topNodeId:version:[in|out] - in=input pinning; otherwise, output slicing
     String getOverrideTitleSpecs();
 
     @DefaultValue("false")
