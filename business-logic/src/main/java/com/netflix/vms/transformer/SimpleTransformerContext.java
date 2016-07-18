@@ -1,8 +1,9 @@
 package com.netflix.vms.transformer;
 
+import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
+
 import java.util.Set;
 import java.util.function.Consumer;
-
 import com.netflix.archaius.ConfigProxyFactory;
 import com.netflix.archaius.config.EmptyConfig;
 import com.netflix.vms.logging.TaggingLogger;
@@ -13,7 +14,6 @@ import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
-import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
 
 public class SimpleTransformerContext implements TransformerContext {
 
@@ -84,18 +84,8 @@ public class SimpleTransformerContext implements TransformerContext {
     }
 
     @Override
-    public TransformerCassandraHelper getCanaryResultsCassandraHelper() {
-        throw new UnsupportedOperationException("simple transformer doesn't publish");
-    }
-
-    @Override
-    public TransformerCassandraHelper getValidationStatsCassandraHelper() {
-        throw new UnsupportedOperationException("simple transformer doesn't publish");
-    }
-
-    @Override
-    public TransformerCassandraHelper getPoisonStatesHelper() {
-        throw new UnsupportedOperationException("simple transformer doesn't publish");
+    public TransformerCassandraHelper getCassandraHelper() {
+        throw new UnsupportedOperationException("simple transformer doesn't provide a CassandraHelper!");
     }
 
     @Override

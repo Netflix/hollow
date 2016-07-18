@@ -3,7 +3,6 @@
         "antlr:antlr": {
             "locked": "2.7.7",
             "transitive": [
-                "org.antlr:antlr-runtime",
                 "org.antlr:stringtemplate"
             ]
         },
@@ -123,7 +122,8 @@
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
@@ -141,7 +141,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -159,6 +160,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
         },
@@ -280,6 +282,8 @@
                 "netflix:common-data-format",
                 "netflix:epic-plugin",
                 "netflix:fit-impl",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
                 "netflix:nsac-common",
@@ -341,6 +345,7 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nsac-client",
@@ -410,6 +415,18 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
+            ]
+        },
+        "com.mchange:c3p0": {
+            "locked": "0.9.2",
+            "transitive": [
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.mchange:mchange-commons-java": {
+            "locked": "0.2.3.3",
+            "transitive": [
+                "com.mchange:c3p0"
             ]
         },
         "com.netflix.archaius:archaius-core": {
@@ -590,7 +607,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.8",
+            "locked": "1.4.10",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -601,6 +618,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-plugin",
                 "netflix:nf-eureka-client",
                 "netflix:platform-ipc"
@@ -921,6 +939,7 @@
                 "netflix:atlas-plugin",
                 "netflix:epic-plugin",
                 "netflix:eventbus",
+                "netflix:jarversions",
                 "netflix:netflix-config",
                 "netflix:nf-eventbus",
                 "netflix:nfsso",
@@ -995,7 +1014,8 @@
             "locked": "0.2.51-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "com.netflix.suro:suro-kafka-producer": {
@@ -1012,6 +1032,12 @@
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-io": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -1021,6 +1047,12 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "com.spatial4j:spatial4j": {
+            "locked": "0.4.1",
+            "transitive": [
+                "org.apache.lucene:lucene-spatial"
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client": {
@@ -1244,6 +1276,7 @@
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:hermes",
+                "netflix:mutation-stream-common",
                 "netflix:nfsso",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -1270,6 +1303,7 @@
                 "commons-configuration:commons-configuration",
                 "netflix:akmsclient",
                 "netflix:base-server-plugins",
+                "netflix:mutation-stream-common",
                 "netflix:nflibrary",
                 "netflix:platform-aws",
                 "netflix:platform-core",
@@ -1510,6 +1544,13 @@
                 "org.slf4j:slf4j-log4j12"
             ]
         },
+        "mysql:mysql-connector-java": {
+            "locked": "5.1.16",
+            "transitive": [
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common"
+            ]
+        },
         "net.java.dev.jets3t:jets3t": {
             "locked": "0.9.0",
             "transitive": [
@@ -1591,6 +1632,12 @@
                 "netflix:concurrent"
             ]
         },
+        "netflix:base-server-explorer": {
+            "locked": "2.1573.0",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
         "netflix:base-server-plugins": {
             "locked": "1.16.0",
             "transitive": [
@@ -1619,6 +1666,12 @@
             "locked": "1.17.0",
             "transitive": [
                 "netflix:awsutils"
+            ]
+        },
+        "netflix:country-launch": {
+            "locked": "15.15",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:epic-plugin": {
@@ -1689,6 +1742,18 @@
             "locked": "1.169.0",
             "requested": "latest.release"
         },
+        "netflix:jarversions": {
+            "locked": "1.6.0",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "netflix:json": {
+            "locked": "1.1.0",
+            "transitive": [
+                "netflix:mutation-stream-common"
+            ]
+        },
         "netflix:mapping-registry": {
             "locked": "1.19.0",
             "transitive": [
@@ -1706,6 +1771,18 @@
             "transitive": [
                 "netflix:nflibrary",
                 "netflix:platform-management"
+            ]
+        },
+        "netflix:mutation-stream-client": {
+            "locked": "1.89",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "netflix:mutation-stream-common": {
+            "locked": "1.89",
+            "transitive": [
+                "netflix:mutation-stream-client"
             ]
         },
         "netflix:netflix-config": {
@@ -1990,11 +2067,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.110",
+            "locked": "59.113",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.110",
+            "locked": "59.113",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -2011,12 +2088,13 @@
             ]
         },
         "org.antlr:antlr-runtime": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.suro:suro-core",
                 "netflix:nf-eventbus",
-                "org.antlr:antlr"
+                "org.antlr:antlr",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.antlr:stringtemplate": {
@@ -2120,6 +2198,99 @@
                 "com.netflix.suro:suro-kafka-producer"
             ]
         },
+        "org.apache.lucene:lucene-analyzers-common": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-core": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-analyzers-common",
+                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-highlighter",
+                "org.apache.lucene:lucene-join",
+                "org.apache.lucene:lucene-memory",
+                "org.apache.lucene:lucene-misc",
+                "org.apache.lucene:lucene-queries",
+                "org.apache.lucene:lucene-queryparser",
+                "org.apache.lucene:lucene-sandbox",
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-grouping": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-join",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-highlighter": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-join": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-memory": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-highlighter",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-misc": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-queries": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-highlighter",
+                "org.apache.lucene:lucene-queryparser",
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-queryparser": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-sandbox": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-queryparser",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-spatial": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-suggest": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "org.apache.servicemix.bundles:org.apache.servicemix.bundles.commons-csv": {
             "locked": "1.0-r706900_3",
             "transitive": [
@@ -2161,6 +2332,9 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
@@ -2188,6 +2362,9 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common",
                 "netflix:netflix-config",
                 "netflix:nfsso",
                 "netflix:platform-aws",
@@ -2226,6 +2403,12 @@
             "transitive": [
                 "netflix:nflibrary",
                 "org.apache.solr:solr-solrj"
+            ]
+        },
+        "org.elasticsearch:elasticsearch": {
+            "locked": "1.5.2",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "org.freemarker:freemarker": {
@@ -2302,7 +2485,14 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.netflix.governator:governator",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "4.1",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -2461,7 +2651,6 @@
         "antlr:antlr": {
             "locked": "2.7.7",
             "transitive": [
-                "org.antlr:antlr-runtime",
                 "org.antlr:stringtemplate"
             ]
         },
@@ -2581,7 +2770,8 @@
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
@@ -2599,7 +2789,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -2617,6 +2808,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
         },
@@ -2738,6 +2930,8 @@
                 "netflix:common-data-format",
                 "netflix:epic-plugin",
                 "netflix:fit-impl",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
                 "netflix:nsac-common",
@@ -2799,6 +2993,7 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nsac-client",
@@ -2868,6 +3063,18 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
+            ]
+        },
+        "com.mchange:c3p0": {
+            "locked": "0.9.2",
+            "transitive": [
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.mchange:mchange-commons-java": {
+            "locked": "0.2.3.3",
+            "transitive": [
+                "com.mchange:c3p0"
             ]
         },
         "com.netflix.archaius:archaius-core": {
@@ -3048,7 +3255,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.8",
+            "locked": "1.4.10",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -3059,6 +3266,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-plugin",
                 "netflix:nf-eureka-client",
                 "netflix:platform-ipc"
@@ -3379,6 +3587,7 @@
                 "netflix:atlas-plugin",
                 "netflix:epic-plugin",
                 "netflix:eventbus",
+                "netflix:jarversions",
                 "netflix:netflix-config",
                 "netflix:nf-eventbus",
                 "netflix:nfsso",
@@ -3453,7 +3662,8 @@
             "locked": "0.2.51-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "com.netflix.suro:suro-kafka-producer": {
@@ -3470,6 +3680,12 @@
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-io": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -3479,6 +3695,12 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "com.spatial4j:spatial4j": {
+            "locked": "0.4.1",
+            "transitive": [
+                "org.apache.lucene:lucene-spatial"
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client": {
@@ -3702,6 +3924,7 @@
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:hermes",
+                "netflix:mutation-stream-common",
                 "netflix:nfsso",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -3728,6 +3951,7 @@
                 "commons-configuration:commons-configuration",
                 "netflix:akmsclient",
                 "netflix:base-server-plugins",
+                "netflix:mutation-stream-common",
                 "netflix:nflibrary",
                 "netflix:platform-aws",
                 "netflix:platform-core",
@@ -3968,6 +4192,13 @@
                 "org.slf4j:slf4j-log4j12"
             ]
         },
+        "mysql:mysql-connector-java": {
+            "locked": "5.1.16",
+            "transitive": [
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common"
+            ]
+        },
         "net.java.dev.jets3t:jets3t": {
             "locked": "0.9.0",
             "transitive": [
@@ -4049,6 +4280,12 @@
                 "netflix:concurrent"
             ]
         },
+        "netflix:base-server-explorer": {
+            "locked": "2.1573.0",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
         "netflix:base-server-plugins": {
             "locked": "1.16.0",
             "transitive": [
@@ -4077,6 +4314,12 @@
             "locked": "1.17.0",
             "transitive": [
                 "netflix:awsutils"
+            ]
+        },
+        "netflix:country-launch": {
+            "locked": "15.15",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:epic-plugin": {
@@ -4147,6 +4390,18 @@
             "locked": "1.169.0",
             "requested": "latest.release"
         },
+        "netflix:jarversions": {
+            "locked": "1.6.0",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "netflix:json": {
+            "locked": "1.1.0",
+            "transitive": [
+                "netflix:mutation-stream-common"
+            ]
+        },
         "netflix:mapping-registry": {
             "locked": "1.19.0",
             "transitive": [
@@ -4164,6 +4419,18 @@
             "transitive": [
                 "netflix:nflibrary",
                 "netflix:platform-management"
+            ]
+        },
+        "netflix:mutation-stream-client": {
+            "locked": "1.89",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "netflix:mutation-stream-common": {
+            "locked": "1.89",
+            "transitive": [
+                "netflix:mutation-stream-client"
             ]
         },
         "netflix:netflix-config": {
@@ -4448,11 +4715,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.110",
+            "locked": "59.113",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.110",
+            "locked": "59.113",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -4469,12 +4736,13 @@
             ]
         },
         "org.antlr:antlr-runtime": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.suro:suro-core",
                 "netflix:nf-eventbus",
-                "org.antlr:antlr"
+                "org.antlr:antlr",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.antlr:stringtemplate": {
@@ -4578,6 +4846,99 @@
                 "com.netflix.suro:suro-kafka-producer"
             ]
         },
+        "org.apache.lucene:lucene-analyzers-common": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-core": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-analyzers-common",
+                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-highlighter",
+                "org.apache.lucene:lucene-join",
+                "org.apache.lucene:lucene-memory",
+                "org.apache.lucene:lucene-misc",
+                "org.apache.lucene:lucene-queries",
+                "org.apache.lucene:lucene-queryparser",
+                "org.apache.lucene:lucene-sandbox",
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-grouping": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-join",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-highlighter": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-join": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-memory": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-highlighter",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-misc": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-queries": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-highlighter",
+                "org.apache.lucene:lucene-queryparser",
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-queryparser": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-sandbox": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-queryparser",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-spatial": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-suggest": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "org.apache.servicemix.bundles:org.apache.servicemix.bundles.commons-csv": {
             "locked": "1.0-r706900_3",
             "transitive": [
@@ -4619,6 +4980,9 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
@@ -4646,6 +5010,9 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common",
                 "netflix:netflix-config",
                 "netflix:nfsso",
                 "netflix:platform-aws",
@@ -4684,6 +5051,12 @@
             "transitive": [
                 "netflix:nflibrary",
                 "org.apache.solr:solr-solrj"
+            ]
+        },
+        "org.elasticsearch:elasticsearch": {
+            "locked": "1.5.2",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "org.freemarker:freemarker": {
@@ -4760,7 +5133,14 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.netflix.governator:governator",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "4.1",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -4919,7 +5299,6 @@
         "antlr:antlr": {
             "locked": "2.7.7",
             "transitive": [
-                "org.antlr:antlr-runtime",
                 "org.antlr:stringtemplate"
             ]
         },
@@ -5039,7 +5418,8 @@
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
@@ -5057,7 +5437,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -5075,6 +5456,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
         },
@@ -5196,6 +5578,8 @@
                 "netflix:common-data-format",
                 "netflix:epic-plugin",
                 "netflix:fit-impl",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
                 "netflix:nsac-common",
@@ -5257,6 +5641,7 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nsac-client",
@@ -5326,6 +5711,18 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
+            ]
+        },
+        "com.mchange:c3p0": {
+            "locked": "0.9.2",
+            "transitive": [
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.mchange:mchange-commons-java": {
+            "locked": "0.2.3.3",
+            "transitive": [
+                "com.mchange:c3p0"
             ]
         },
         "com.netflix.archaius:archaius-core": {
@@ -5506,7 +5903,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.8",
+            "locked": "1.4.10",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -5517,6 +5914,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-plugin",
                 "netflix:nf-eureka-client",
                 "netflix:platform-ipc"
@@ -5837,6 +6235,7 @@
                 "netflix:atlas-plugin",
                 "netflix:epic-plugin",
                 "netflix:eventbus",
+                "netflix:jarversions",
                 "netflix:netflix-config",
                 "netflix:nf-eventbus",
                 "netflix:nfsso",
@@ -5911,7 +6310,8 @@
             "locked": "0.2.51-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "com.netflix.suro:suro-kafka-producer": {
@@ -5928,6 +6328,12 @@
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-io": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -5937,6 +6343,12 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "com.spatial4j:spatial4j": {
+            "locked": "0.4.1",
+            "transitive": [
+                "org.apache.lucene:lucene-spatial"
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client": {
@@ -6160,6 +6572,7 @@
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:hermes",
+                "netflix:mutation-stream-common",
                 "netflix:nfsso",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -6186,6 +6599,7 @@
                 "commons-configuration:commons-configuration",
                 "netflix:akmsclient",
                 "netflix:base-server-plugins",
+                "netflix:mutation-stream-common",
                 "netflix:nflibrary",
                 "netflix:platform-aws",
                 "netflix:platform-core",
@@ -6426,6 +6840,13 @@
                 "org.slf4j:slf4j-log4j12"
             ]
         },
+        "mysql:mysql-connector-java": {
+            "locked": "5.1.16",
+            "transitive": [
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common"
+            ]
+        },
         "net.java.dev.jets3t:jets3t": {
             "locked": "0.9.0",
             "transitive": [
@@ -6507,6 +6928,12 @@
                 "netflix:concurrent"
             ]
         },
+        "netflix:base-server-explorer": {
+            "locked": "2.1573.0",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
         "netflix:base-server-plugins": {
             "locked": "1.16.0",
             "transitive": [
@@ -6535,6 +6962,12 @@
             "locked": "1.17.0",
             "transitive": [
                 "netflix:awsutils"
+            ]
+        },
+        "netflix:country-launch": {
+            "locked": "15.15",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:epic-plugin": {
@@ -6605,6 +7038,18 @@
             "locked": "1.169.0",
             "requested": "latest.release"
         },
+        "netflix:jarversions": {
+            "locked": "1.6.0",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "netflix:json": {
+            "locked": "1.1.0",
+            "transitive": [
+                "netflix:mutation-stream-common"
+            ]
+        },
         "netflix:mapping-registry": {
             "locked": "1.19.0",
             "transitive": [
@@ -6622,6 +7067,18 @@
             "transitive": [
                 "netflix:nflibrary",
                 "netflix:platform-management"
+            ]
+        },
+        "netflix:mutation-stream-client": {
+            "locked": "1.89",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "netflix:mutation-stream-common": {
+            "locked": "1.89",
+            "transitive": [
+                "netflix:mutation-stream-client"
             ]
         },
         "netflix:netflix-config": {
@@ -6906,11 +7363,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.110",
+            "locked": "59.113",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.110",
+            "locked": "59.113",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -6927,12 +7384,13 @@
             ]
         },
         "org.antlr:antlr-runtime": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.suro:suro-core",
                 "netflix:nf-eventbus",
-                "org.antlr:antlr"
+                "org.antlr:antlr",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.antlr:stringtemplate": {
@@ -7036,6 +7494,99 @@
                 "com.netflix.suro:suro-kafka-producer"
             ]
         },
+        "org.apache.lucene:lucene-analyzers-common": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-core": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-analyzers-common",
+                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-highlighter",
+                "org.apache.lucene:lucene-join",
+                "org.apache.lucene:lucene-memory",
+                "org.apache.lucene:lucene-misc",
+                "org.apache.lucene:lucene-queries",
+                "org.apache.lucene:lucene-queryparser",
+                "org.apache.lucene:lucene-sandbox",
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-grouping": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-join",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-highlighter": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-join": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-memory": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-highlighter",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-misc": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-queries": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-highlighter",
+                "org.apache.lucene:lucene-queryparser",
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-queryparser": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-sandbox": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-queryparser",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-spatial": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-suggest": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "org.apache.servicemix.bundles:org.apache.servicemix.bundles.commons-csv": {
             "locked": "1.0-r706900_3",
             "transitive": [
@@ -7077,6 +7628,9 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
@@ -7104,6 +7658,9 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common",
                 "netflix:netflix-config",
                 "netflix:nfsso",
                 "netflix:platform-aws",
@@ -7142,6 +7699,12 @@
             "transitive": [
                 "netflix:nflibrary",
                 "org.apache.solr:solr-solrj"
+            ]
+        },
+        "org.elasticsearch:elasticsearch": {
+            "locked": "1.5.2",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "org.freemarker:freemarker": {
@@ -7218,7 +7781,14 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.netflix.governator:governator",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "4.1",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -7377,7 +7947,6 @@
         "antlr:antlr": {
             "locked": "2.7.7",
             "transitive": [
-                "org.antlr:antlr-runtime",
                 "org.antlr:stringtemplate"
             ]
         },
@@ -7497,7 +8066,8 @@
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
@@ -7515,7 +8085,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -7533,6 +8104,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
         },
@@ -7654,6 +8226,8 @@
                 "netflix:common-data-format",
                 "netflix:epic-plugin",
                 "netflix:fit-impl",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
                 "netflix:nsac-common",
@@ -7715,6 +8289,7 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nsac-client",
@@ -7784,6 +8359,18 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
+            ]
+        },
+        "com.mchange:c3p0": {
+            "locked": "0.9.2",
+            "transitive": [
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.mchange:mchange-commons-java": {
+            "locked": "0.2.3.3",
+            "transitive": [
+                "com.mchange:c3p0"
             ]
         },
         "com.netflix.archaius:archaius-core": {
@@ -7964,7 +8551,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.8",
+            "locked": "1.4.10",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -7975,6 +8562,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-plugin",
                 "netflix:nf-eureka-client",
                 "netflix:platform-ipc"
@@ -8295,6 +8883,7 @@
                 "netflix:atlas-plugin",
                 "netflix:epic-plugin",
                 "netflix:eventbus",
+                "netflix:jarversions",
                 "netflix:netflix-config",
                 "netflix:nf-eventbus",
                 "netflix:nfsso",
@@ -8369,7 +8958,8 @@
             "locked": "0.2.51-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "com.netflix.suro:suro-kafka-producer": {
@@ -8386,6 +8976,12 @@
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-io": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -8395,6 +8991,12 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "com.spatial4j:spatial4j": {
+            "locked": "0.4.1",
+            "transitive": [
+                "org.apache.lucene:lucene-spatial"
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client": {
@@ -8618,6 +9220,7 @@
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:hermes",
+                "netflix:mutation-stream-common",
                 "netflix:nfsso",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -8644,6 +9247,7 @@
                 "commons-configuration:commons-configuration",
                 "netflix:akmsclient",
                 "netflix:base-server-plugins",
+                "netflix:mutation-stream-common",
                 "netflix:nflibrary",
                 "netflix:platform-aws",
                 "netflix:platform-core",
@@ -8884,6 +9488,13 @@
                 "org.slf4j:slf4j-log4j12"
             ]
         },
+        "mysql:mysql-connector-java": {
+            "locked": "5.1.16",
+            "transitive": [
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common"
+            ]
+        },
         "net.java.dev.jets3t:jets3t": {
             "locked": "0.9.0",
             "transitive": [
@@ -8965,6 +9576,12 @@
                 "netflix:concurrent"
             ]
         },
+        "netflix:base-server-explorer": {
+            "locked": "2.1573.0",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
         "netflix:base-server-plugins": {
             "locked": "1.16.0",
             "transitive": [
@@ -8993,6 +9610,12 @@
             "locked": "1.17.0",
             "transitive": [
                 "netflix:awsutils"
+            ]
+        },
+        "netflix:country-launch": {
+            "locked": "15.15",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:epic-plugin": {
@@ -9063,6 +9686,18 @@
             "locked": "1.169.0",
             "requested": "latest.release"
         },
+        "netflix:jarversions": {
+            "locked": "1.6.0",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "netflix:json": {
+            "locked": "1.1.0",
+            "transitive": [
+                "netflix:mutation-stream-common"
+            ]
+        },
         "netflix:mapping-registry": {
             "locked": "1.19.0",
             "transitive": [
@@ -9080,6 +9715,18 @@
             "transitive": [
                 "netflix:nflibrary",
                 "netflix:platform-management"
+            ]
+        },
+        "netflix:mutation-stream-client": {
+            "locked": "1.89",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "netflix:mutation-stream-common": {
+            "locked": "1.89",
+            "transitive": [
+                "netflix:mutation-stream-client"
             ]
         },
         "netflix:netflix-config": {
@@ -9364,11 +10011,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.110",
+            "locked": "59.113",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.110",
+            "locked": "59.113",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -9385,12 +10032,13 @@
             ]
         },
         "org.antlr:antlr-runtime": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.suro:suro-core",
                 "netflix:nf-eventbus",
-                "org.antlr:antlr"
+                "org.antlr:antlr",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.antlr:stringtemplate": {
@@ -9494,6 +10142,99 @@
                 "com.netflix.suro:suro-kafka-producer"
             ]
         },
+        "org.apache.lucene:lucene-analyzers-common": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-core": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-analyzers-common",
+                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-highlighter",
+                "org.apache.lucene:lucene-join",
+                "org.apache.lucene:lucene-memory",
+                "org.apache.lucene:lucene-misc",
+                "org.apache.lucene:lucene-queries",
+                "org.apache.lucene:lucene-queryparser",
+                "org.apache.lucene:lucene-sandbox",
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-grouping": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-join",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-highlighter": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-join": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-memory": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-highlighter",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-misc": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-queries": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-highlighter",
+                "org.apache.lucene:lucene-queryparser",
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-queryparser": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-sandbox": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-queryparser",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-spatial": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-suggest": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "org.apache.servicemix.bundles:org.apache.servicemix.bundles.commons-csv": {
             "locked": "1.0-r706900_3",
             "transitive": [
@@ -9535,6 +10276,9 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
@@ -9562,6 +10306,9 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common",
                 "netflix:netflix-config",
                 "netflix:nfsso",
                 "netflix:platform-aws",
@@ -9600,6 +10347,12 @@
             "transitive": [
                 "netflix:nflibrary",
                 "org.apache.solr:solr-solrj"
+            ]
+        },
+        "org.elasticsearch:elasticsearch": {
+            "locked": "1.5.2",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "org.freemarker:freemarker": {
@@ -9676,7 +10429,14 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.netflix.governator:governator",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "4.1",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -9934,7 +10694,6 @@
         "antlr:antlr": {
             "locked": "2.7.7",
             "transitive": [
-                "org.antlr:antlr-runtime",
                 "org.antlr:stringtemplate"
             ]
         },
@@ -10054,7 +10813,8 @@
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
@@ -10072,7 +10832,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -10090,6 +10851,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
         },
@@ -10211,6 +10973,8 @@
                 "netflix:common-data-format",
                 "netflix:epic-plugin",
                 "netflix:fit-impl",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
                 "netflix:nsac-common",
@@ -10272,6 +11036,7 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nsac-client",
@@ -10341,6 +11106,18 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
+            ]
+        },
+        "com.mchange:c3p0": {
+            "locked": "0.9.2",
+            "transitive": [
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.mchange:mchange-commons-java": {
+            "locked": "0.2.3.3",
+            "transitive": [
+                "com.mchange:c3p0"
             ]
         },
         "com.netflix.archaius:archaius-core": {
@@ -10521,7 +11298,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.8",
+            "locked": "1.4.10",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -10532,6 +11309,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-plugin",
                 "netflix:nf-eureka-client",
                 "netflix:platform-ipc"
@@ -10852,6 +11630,7 @@
                 "netflix:atlas-plugin",
                 "netflix:epic-plugin",
                 "netflix:eventbus",
+                "netflix:jarversions",
                 "netflix:netflix-config",
                 "netflix:nf-eventbus",
                 "netflix:nfsso",
@@ -10926,7 +11705,8 @@
             "locked": "0.2.51-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "com.netflix.suro:suro-kafka-producer": {
@@ -10943,6 +11723,12 @@
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-io": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -10952,6 +11738,12 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "com.spatial4j:spatial4j": {
+            "locked": "0.4.1",
+            "transitive": [
+                "org.apache.lucene:lucene-spatial"
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client": {
@@ -11175,6 +11967,7 @@
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:hermes",
+                "netflix:mutation-stream-common",
                 "netflix:nfsso",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -11201,6 +11994,7 @@
                 "commons-configuration:commons-configuration",
                 "netflix:akmsclient",
                 "netflix:base-server-plugins",
+                "netflix:mutation-stream-common",
                 "netflix:nflibrary",
                 "netflix:platform-aws",
                 "netflix:platform-core",
@@ -11441,6 +12235,13 @@
                 "org.slf4j:slf4j-log4j12"
             ]
         },
+        "mysql:mysql-connector-java": {
+            "locked": "5.1.16",
+            "transitive": [
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common"
+            ]
+        },
         "net.java.dev.jets3t:jets3t": {
             "locked": "0.9.0",
             "transitive": [
@@ -11522,6 +12323,12 @@
                 "netflix:concurrent"
             ]
         },
+        "netflix:base-server-explorer": {
+            "locked": "2.1573.0",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
         "netflix:base-server-plugins": {
             "locked": "1.16.0",
             "transitive": [
@@ -11550,6 +12357,12 @@
             "locked": "1.17.0",
             "transitive": [
                 "netflix:awsutils"
+            ]
+        },
+        "netflix:country-launch": {
+            "locked": "15.15",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:epic-plugin": {
@@ -11620,6 +12433,18 @@
             "locked": "1.169.0",
             "requested": "latest.release"
         },
+        "netflix:jarversions": {
+            "locked": "1.6.0",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "netflix:json": {
+            "locked": "1.1.0",
+            "transitive": [
+                "netflix:mutation-stream-common"
+            ]
+        },
         "netflix:mapping-registry": {
             "locked": "1.19.0",
             "transitive": [
@@ -11637,6 +12462,18 @@
             "transitive": [
                 "netflix:nflibrary",
                 "netflix:platform-management"
+            ]
+        },
+        "netflix:mutation-stream-client": {
+            "locked": "1.89",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "netflix:mutation-stream-common": {
+            "locked": "1.89",
+            "transitive": [
+                "netflix:mutation-stream-client"
             ]
         },
         "netflix:netflix-config": {
@@ -11921,11 +12758,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.110",
+            "locked": "59.113",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.110",
+            "locked": "59.113",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -11942,12 +12779,13 @@
             ]
         },
         "org.antlr:antlr-runtime": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.suro:suro-core",
                 "netflix:nf-eventbus",
-                "org.antlr:antlr"
+                "org.antlr:antlr",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.antlr:stringtemplate": {
@@ -12051,6 +12889,99 @@
                 "com.netflix.suro:suro-kafka-producer"
             ]
         },
+        "org.apache.lucene:lucene-analyzers-common": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-core": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-analyzers-common",
+                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-highlighter",
+                "org.apache.lucene:lucene-join",
+                "org.apache.lucene:lucene-memory",
+                "org.apache.lucene:lucene-misc",
+                "org.apache.lucene:lucene-queries",
+                "org.apache.lucene:lucene-queryparser",
+                "org.apache.lucene:lucene-sandbox",
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-grouping": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-join",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-highlighter": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-join": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-memory": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-highlighter",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-misc": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-queries": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-highlighter",
+                "org.apache.lucene:lucene-queryparser",
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-queryparser": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-sandbox": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-queryparser",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-spatial": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-suggest": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "org.apache.servicemix.bundles:org.apache.servicemix.bundles.commons-csv": {
             "locked": "1.0-r706900_3",
             "transitive": [
@@ -12092,6 +13023,9 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
@@ -12119,6 +13053,9 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common",
                 "netflix:netflix-config",
                 "netflix:nfsso",
                 "netflix:platform-aws",
@@ -12157,6 +13094,12 @@
             "transitive": [
                 "netflix:nflibrary",
                 "org.apache.solr:solr-solrj"
+            ]
+        },
+        "org.elasticsearch:elasticsearch": {
+            "locked": "1.5.2",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "org.freemarker:freemarker": {
@@ -12233,7 +13176,14 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.netflix.governator:governator",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "4.1",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -12392,7 +13342,6 @@
         "antlr:antlr": {
             "locked": "2.7.7",
             "transitive": [
-                "org.antlr:antlr-runtime",
                 "org.antlr:stringtemplate"
             ]
         },
@@ -12512,7 +13461,8 @@
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
@@ -12530,7 +13480,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -12548,6 +13499,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
         },
@@ -12669,6 +13621,8 @@
                 "netflix:common-data-format",
                 "netflix:epic-plugin",
                 "netflix:fit-impl",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
                 "netflix:nsac-common",
@@ -12730,6 +13684,7 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nsac-client",
@@ -12799,6 +13754,18 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
+            ]
+        },
+        "com.mchange:c3p0": {
+            "locked": "0.9.2",
+            "transitive": [
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.mchange:mchange-commons-java": {
+            "locked": "0.2.3.3",
+            "transitive": [
+                "com.mchange:c3p0"
             ]
         },
         "com.netflix.archaius:archaius-core": {
@@ -12979,7 +13946,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.8",
+            "locked": "1.4.10",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -12990,6 +13957,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-plugin",
                 "netflix:nf-eureka-client",
                 "netflix:platform-ipc"
@@ -13310,6 +14278,7 @@
                 "netflix:atlas-plugin",
                 "netflix:epic-plugin",
                 "netflix:eventbus",
+                "netflix:jarversions",
                 "netflix:netflix-config",
                 "netflix:nf-eventbus",
                 "netflix:nfsso",
@@ -13384,7 +14353,8 @@
             "locked": "0.2.51-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "com.netflix.suro:suro-kafka-producer": {
@@ -13401,6 +14371,12 @@
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-io": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -13410,6 +14386,12 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "com.spatial4j:spatial4j": {
+            "locked": "0.4.1",
+            "transitive": [
+                "org.apache.lucene:lucene-spatial"
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client": {
@@ -13633,6 +14615,7 @@
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:hermes",
+                "netflix:mutation-stream-common",
                 "netflix:nfsso",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -13659,6 +14642,7 @@
                 "commons-configuration:commons-configuration",
                 "netflix:akmsclient",
                 "netflix:base-server-plugins",
+                "netflix:mutation-stream-common",
                 "netflix:nflibrary",
                 "netflix:platform-aws",
                 "netflix:platform-core",
@@ -13900,6 +14884,13 @@
                 "org.slf4j:slf4j-log4j12"
             ]
         },
+        "mysql:mysql-connector-java": {
+            "locked": "5.1.16",
+            "transitive": [
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common"
+            ]
+        },
         "net.java.dev.jets3t:jets3t": {
             "locked": "0.9.0",
             "transitive": [
@@ -13981,6 +14972,12 @@
                 "netflix:concurrent"
             ]
         },
+        "netflix:base-server-explorer": {
+            "locked": "2.1573.0",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
         "netflix:base-server-plugins": {
             "locked": "1.16.0",
             "transitive": [
@@ -14009,6 +15006,12 @@
             "locked": "1.17.0",
             "transitive": [
                 "netflix:awsutils"
+            ]
+        },
+        "netflix:country-launch": {
+            "locked": "15.15",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:epic-plugin": {
@@ -14079,6 +15082,18 @@
             "locked": "1.169.0",
             "requested": "latest.release"
         },
+        "netflix:jarversions": {
+            "locked": "1.6.0",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "netflix:json": {
+            "locked": "1.1.0",
+            "transitive": [
+                "netflix:mutation-stream-common"
+            ]
+        },
         "netflix:mapping-registry": {
             "locked": "1.19.0",
             "transitive": [
@@ -14096,6 +15111,18 @@
             "transitive": [
                 "netflix:nflibrary",
                 "netflix:platform-management"
+            ]
+        },
+        "netflix:mutation-stream-client": {
+            "locked": "1.89",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "netflix:mutation-stream-common": {
+            "locked": "1.89",
+            "transitive": [
+                "netflix:mutation-stream-client"
             ]
         },
         "netflix:netflix-config": {
@@ -14380,11 +15407,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.110",
+            "locked": "59.113",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.110",
+            "locked": "59.113",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -14401,12 +15428,13 @@
             ]
         },
         "org.antlr:antlr-runtime": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.suro:suro-core",
                 "netflix:nf-eventbus",
-                "org.antlr:antlr"
+                "org.antlr:antlr",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.antlr:stringtemplate": {
@@ -14510,6 +15538,99 @@
                 "com.netflix.suro:suro-kafka-producer"
             ]
         },
+        "org.apache.lucene:lucene-analyzers-common": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-core": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-analyzers-common",
+                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-highlighter",
+                "org.apache.lucene:lucene-join",
+                "org.apache.lucene:lucene-memory",
+                "org.apache.lucene:lucene-misc",
+                "org.apache.lucene:lucene-queries",
+                "org.apache.lucene:lucene-queryparser",
+                "org.apache.lucene:lucene-sandbox",
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-grouping": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-join",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-highlighter": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-join": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-memory": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-highlighter",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-misc": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-queries": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-highlighter",
+                "org.apache.lucene:lucene-queryparser",
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-queryparser": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-sandbox": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-queryparser",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-spatial": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-suggest": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "org.apache.servicemix.bundles:org.apache.servicemix.bundles.commons-csv": {
             "locked": "1.0-r706900_3",
             "transitive": [
@@ -14555,6 +15676,9 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
@@ -14582,6 +15706,9 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common",
                 "netflix:netflix-config",
                 "netflix:nfsso",
                 "netflix:platform-aws",
@@ -14620,6 +15747,12 @@
             "transitive": [
                 "netflix:nflibrary",
                 "org.apache.solr:solr-solrj"
+            ]
+        },
+        "org.elasticsearch:elasticsearch": {
+            "locked": "1.5.2",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "org.freemarker:freemarker": {
@@ -14697,7 +15830,14 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.netflix.governator:governator",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "4.1",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -14856,7 +15996,6 @@
         "antlr:antlr": {
             "locked": "2.7.7",
             "transitive": [
-                "org.antlr:antlr-runtime",
                 "org.antlr:stringtemplate"
             ]
         },
@@ -14976,7 +16115,8 @@
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
@@ -14994,7 +16134,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -15012,6 +16153,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
         },
@@ -15133,6 +16275,8 @@
                 "netflix:common-data-format",
                 "netflix:epic-plugin",
                 "netflix:fit-impl",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
                 "netflix:nsac-common",
@@ -15194,6 +16338,7 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nsac-client",
@@ -15263,6 +16408,18 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
+            ]
+        },
+        "com.mchange:c3p0": {
+            "locked": "0.9.2",
+            "transitive": [
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.mchange:mchange-commons-java": {
+            "locked": "0.2.3.3",
+            "transitive": [
+                "com.mchange:c3p0"
             ]
         },
         "com.netflix.archaius:archaius-core": {
@@ -15443,7 +16600,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.8",
+            "locked": "1.4.10",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -15454,6 +16611,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-plugin",
                 "netflix:nf-eureka-client",
                 "netflix:platform-ipc"
@@ -15774,6 +16932,7 @@
                 "netflix:atlas-plugin",
                 "netflix:epic-plugin",
                 "netflix:eventbus",
+                "netflix:jarversions",
                 "netflix:netflix-config",
                 "netflix:nf-eventbus",
                 "netflix:nfsso",
@@ -15848,7 +17007,8 @@
             "locked": "0.2.51-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "com.netflix.suro:suro-kafka-producer": {
@@ -15865,6 +17025,12 @@
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-io": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -15874,6 +17040,12 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "com.spatial4j:spatial4j": {
+            "locked": "0.4.1",
+            "transitive": [
+                "org.apache.lucene:lucene-spatial"
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client": {
@@ -16097,6 +17269,7 @@
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:hermes",
+                "netflix:mutation-stream-common",
                 "netflix:nfsso",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -16123,6 +17296,7 @@
                 "commons-configuration:commons-configuration",
                 "netflix:akmsclient",
                 "netflix:base-server-plugins",
+                "netflix:mutation-stream-common",
                 "netflix:nflibrary",
                 "netflix:platform-aws",
                 "netflix:platform-core",
@@ -16364,6 +17538,13 @@
                 "org.slf4j:slf4j-log4j12"
             ]
         },
+        "mysql:mysql-connector-java": {
+            "locked": "5.1.16",
+            "transitive": [
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common"
+            ]
+        },
         "net.java.dev.jets3t:jets3t": {
             "locked": "0.9.0",
             "transitive": [
@@ -16445,6 +17626,12 @@
                 "netflix:concurrent"
             ]
         },
+        "netflix:base-server-explorer": {
+            "locked": "2.1573.0",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
         "netflix:base-server-plugins": {
             "locked": "1.16.0",
             "transitive": [
@@ -16473,6 +17660,12 @@
             "locked": "1.17.0",
             "transitive": [
                 "netflix:awsutils"
+            ]
+        },
+        "netflix:country-launch": {
+            "locked": "15.15",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:epic-plugin": {
@@ -16543,6 +17736,18 @@
             "locked": "1.169.0",
             "requested": "latest.release"
         },
+        "netflix:jarversions": {
+            "locked": "1.6.0",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "netflix:json": {
+            "locked": "1.1.0",
+            "transitive": [
+                "netflix:mutation-stream-common"
+            ]
+        },
         "netflix:mapping-registry": {
             "locked": "1.19.0",
             "transitive": [
@@ -16560,6 +17765,18 @@
             "transitive": [
                 "netflix:nflibrary",
                 "netflix:platform-management"
+            ]
+        },
+        "netflix:mutation-stream-client": {
+            "locked": "1.89",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "netflix:mutation-stream-common": {
+            "locked": "1.89",
+            "transitive": [
+                "netflix:mutation-stream-client"
             ]
         },
         "netflix:netflix-config": {
@@ -16844,11 +18061,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.110",
+            "locked": "59.113",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.110",
+            "locked": "59.113",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -16865,12 +18082,13 @@
             ]
         },
         "org.antlr:antlr-runtime": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.suro:suro-core",
                 "netflix:nf-eventbus",
-                "org.antlr:antlr"
+                "org.antlr:antlr",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.antlr:stringtemplate": {
@@ -16974,6 +18192,99 @@
                 "com.netflix.suro:suro-kafka-producer"
             ]
         },
+        "org.apache.lucene:lucene-analyzers-common": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-core": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-analyzers-common",
+                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-highlighter",
+                "org.apache.lucene:lucene-join",
+                "org.apache.lucene:lucene-memory",
+                "org.apache.lucene:lucene-misc",
+                "org.apache.lucene:lucene-queries",
+                "org.apache.lucene:lucene-queryparser",
+                "org.apache.lucene:lucene-sandbox",
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-grouping": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-join",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-highlighter": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-join": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-memory": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-highlighter",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-misc": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-queries": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-highlighter",
+                "org.apache.lucene:lucene-queryparser",
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-queryparser": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-sandbox": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-queryparser",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-spatial": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-suggest": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "org.apache.servicemix.bundles:org.apache.servicemix.bundles.commons-csv": {
             "locked": "1.0-r706900_3",
             "transitive": [
@@ -17019,6 +18330,9 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
@@ -17046,6 +18360,9 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common",
                 "netflix:netflix-config",
                 "netflix:nfsso",
                 "netflix:platform-aws",
@@ -17084,6 +18401,12 @@
             "transitive": [
                 "netflix:nflibrary",
                 "org.apache.solr:solr-solrj"
+            ]
+        },
+        "org.elasticsearch:elasticsearch": {
+            "locked": "1.5.2",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "org.freemarker:freemarker": {
@@ -17161,7 +18484,14 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.netflix.governator:governator",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "4.1",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -17320,7 +18650,6 @@
         "antlr:antlr": {
             "locked": "2.7.7",
             "transitive": [
-                "org.antlr:antlr-runtime",
                 "org.antlr:stringtemplate"
             ]
         },
@@ -17440,7 +18769,8 @@
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
@@ -17458,7 +18788,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -17476,6 +18807,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
         },
@@ -17597,6 +18929,8 @@
                 "netflix:common-data-format",
                 "netflix:epic-plugin",
                 "netflix:fit-impl",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
                 "netflix:nsac-common",
@@ -17658,6 +18992,7 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nsac-client",
@@ -17727,6 +19062,18 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
+            ]
+        },
+        "com.mchange:c3p0": {
+            "locked": "0.9.2",
+            "transitive": [
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.mchange:mchange-commons-java": {
+            "locked": "0.2.3.3",
+            "transitive": [
+                "com.mchange:c3p0"
             ]
         },
         "com.netflix.archaius:archaius-core": {
@@ -17907,7 +19254,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.8",
+            "locked": "1.4.10",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -17918,6 +19265,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-plugin",
                 "netflix:nf-eureka-client",
                 "netflix:platform-ipc"
@@ -18238,6 +19586,7 @@
                 "netflix:atlas-plugin",
                 "netflix:epic-plugin",
                 "netflix:eventbus",
+                "netflix:jarversions",
                 "netflix:netflix-config",
                 "netflix:nf-eventbus",
                 "netflix:nfsso",
@@ -18312,7 +19661,8 @@
             "locked": "0.2.51-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "com.netflix.suro:suro-kafka-producer": {
@@ -18329,6 +19679,12 @@
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-io": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -18338,6 +19694,12 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "com.spatial4j:spatial4j": {
+            "locked": "0.4.1",
+            "transitive": [
+                "org.apache.lucene:lucene-spatial"
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client": {
@@ -18561,6 +19923,7 @@
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:hermes",
+                "netflix:mutation-stream-common",
                 "netflix:nfsso",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -18587,6 +19950,7 @@
                 "commons-configuration:commons-configuration",
                 "netflix:akmsclient",
                 "netflix:base-server-plugins",
+                "netflix:mutation-stream-common",
                 "netflix:nflibrary",
                 "netflix:platform-aws",
                 "netflix:platform-core",
@@ -18828,6 +20192,13 @@
                 "org.slf4j:slf4j-log4j12"
             ]
         },
+        "mysql:mysql-connector-java": {
+            "locked": "5.1.16",
+            "transitive": [
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common"
+            ]
+        },
         "net.java.dev.jets3t:jets3t": {
             "locked": "0.9.0",
             "transitive": [
@@ -18909,6 +20280,12 @@
                 "netflix:concurrent"
             ]
         },
+        "netflix:base-server-explorer": {
+            "locked": "2.1573.0",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
         "netflix:base-server-plugins": {
             "locked": "1.16.0",
             "transitive": [
@@ -18937,6 +20314,12 @@
             "locked": "1.17.0",
             "transitive": [
                 "netflix:awsutils"
+            ]
+        },
+        "netflix:country-launch": {
+            "locked": "15.15",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:epic-plugin": {
@@ -19007,6 +20390,18 @@
             "locked": "1.169.0",
             "requested": "latest.release"
         },
+        "netflix:jarversions": {
+            "locked": "1.6.0",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "netflix:json": {
+            "locked": "1.1.0",
+            "transitive": [
+                "netflix:mutation-stream-common"
+            ]
+        },
         "netflix:mapping-registry": {
             "locked": "1.19.0",
             "transitive": [
@@ -19024,6 +20419,18 @@
             "transitive": [
                 "netflix:nflibrary",
                 "netflix:platform-management"
+            ]
+        },
+        "netflix:mutation-stream-client": {
+            "locked": "1.89",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "netflix:mutation-stream-common": {
+            "locked": "1.89",
+            "transitive": [
+                "netflix:mutation-stream-client"
             ]
         },
         "netflix:netflix-config": {
@@ -19308,11 +20715,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.110",
+            "locked": "59.113",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.110",
+            "locked": "59.113",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -19329,12 +20736,13 @@
             ]
         },
         "org.antlr:antlr-runtime": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.suro:suro-core",
                 "netflix:nf-eventbus",
-                "org.antlr:antlr"
+                "org.antlr:antlr",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.antlr:stringtemplate": {
@@ -19438,6 +20846,99 @@
                 "com.netflix.suro:suro-kafka-producer"
             ]
         },
+        "org.apache.lucene:lucene-analyzers-common": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-core": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-analyzers-common",
+                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-highlighter",
+                "org.apache.lucene:lucene-join",
+                "org.apache.lucene:lucene-memory",
+                "org.apache.lucene:lucene-misc",
+                "org.apache.lucene:lucene-queries",
+                "org.apache.lucene:lucene-queryparser",
+                "org.apache.lucene:lucene-sandbox",
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-grouping": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-join",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-highlighter": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-join": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-memory": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-highlighter",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-misc": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-queries": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-highlighter",
+                "org.apache.lucene:lucene-queryparser",
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-queryparser": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-sandbox": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-queryparser",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-spatial": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-suggest": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "org.apache.servicemix.bundles:org.apache.servicemix.bundles.commons-csv": {
             "locked": "1.0-r706900_3",
             "transitive": [
@@ -19483,6 +20984,9 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
@@ -19510,6 +21014,9 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common",
                 "netflix:netflix-config",
                 "netflix:nfsso",
                 "netflix:platform-aws",
@@ -19548,6 +21055,12 @@
             "transitive": [
                 "netflix:nflibrary",
                 "org.apache.solr:solr-solrj"
+            ]
+        },
+        "org.elasticsearch:elasticsearch": {
+            "locked": "1.5.2",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "org.freemarker:freemarker": {
@@ -19625,7 +21138,14 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.netflix.governator:governator",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "4.1",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -19784,7 +21304,6 @@
         "antlr:antlr": {
             "locked": "2.7.7",
             "transitive": [
-                "org.antlr:antlr-runtime",
                 "org.antlr:stringtemplate"
             ]
         },
@@ -19904,7 +21423,8 @@
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
@@ -19922,7 +21442,8 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:country-launch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -19940,6 +21461,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
         },
@@ -20061,6 +21583,8 @@
                 "netflix:common-data-format",
                 "netflix:epic-plugin",
                 "netflix:fit-impl",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
                 "netflix:nsac-common",
@@ -20122,6 +21646,7 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nsac-client",
@@ -20191,6 +21716,18 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
+            ]
+        },
+        "com.mchange:c3p0": {
+            "locked": "0.9.2",
+            "transitive": [
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.mchange:mchange-commons-java": {
+            "locked": "0.2.3.3",
+            "transitive": [
+                "com.mchange:c3p0"
             ]
         },
         "com.netflix.archaius:archaius-core": {
@@ -20371,7 +21908,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.8",
+            "locked": "1.4.10",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -20382,6 +21919,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-plugin",
                 "netflix:nf-eureka-client",
                 "netflix:platform-ipc"
@@ -20702,6 +22240,7 @@
                 "netflix:atlas-plugin",
                 "netflix:epic-plugin",
                 "netflix:eventbus",
+                "netflix:jarversions",
                 "netflix:netflix-config",
                 "netflix:nf-eventbus",
                 "netflix:nfsso",
@@ -20776,7 +22315,8 @@
             "locked": "0.2.51-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "com.netflix.suro:suro-kafka-producer": {
@@ -20793,6 +22333,12 @@
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-io": {
             "project": true
         },
         "com.ning:compress-lzf": {
@@ -20802,6 +22348,12 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "com.spatial4j:spatial4j": {
+            "locked": "0.4.1",
+            "transitive": [
+                "org.apache.lucene:lucene-spatial"
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client": {
@@ -21025,6 +22577,7 @@
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:hermes",
+                "netflix:mutation-stream-common",
                 "netflix:nfsso",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -21051,6 +22604,7 @@
                 "commons-configuration:commons-configuration",
                 "netflix:akmsclient",
                 "netflix:base-server-plugins",
+                "netflix:mutation-stream-common",
                 "netflix:nflibrary",
                 "netflix:platform-aws",
                 "netflix:platform-core",
@@ -21292,6 +22846,13 @@
                 "org.slf4j:slf4j-log4j12"
             ]
         },
+        "mysql:mysql-connector-java": {
+            "locked": "5.1.16",
+            "transitive": [
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common"
+            ]
+        },
         "net.java.dev.jets3t:jets3t": {
             "locked": "0.9.0",
             "transitive": [
@@ -21373,6 +22934,12 @@
                 "netflix:concurrent"
             ]
         },
+        "netflix:base-server-explorer": {
+            "locked": "2.1573.0",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
         "netflix:base-server-plugins": {
             "locked": "1.16.0",
             "transitive": [
@@ -21401,6 +22968,12 @@
             "locked": "1.17.0",
             "transitive": [
                 "netflix:awsutils"
+            ]
+        },
+        "netflix:country-launch": {
+            "locked": "15.15",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:epic-plugin": {
@@ -21471,6 +23044,18 @@
             "locked": "1.169.0",
             "requested": "latest.release"
         },
+        "netflix:jarversions": {
+            "locked": "1.6.0",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "netflix:json": {
+            "locked": "1.1.0",
+            "transitive": [
+                "netflix:mutation-stream-common"
+            ]
+        },
         "netflix:mapping-registry": {
             "locked": "1.19.0",
             "transitive": [
@@ -21488,6 +23073,18 @@
             "transitive": [
                 "netflix:nflibrary",
                 "netflix:platform-management"
+            ]
+        },
+        "netflix:mutation-stream-client": {
+            "locked": "1.89",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "netflix:mutation-stream-common": {
+            "locked": "1.89",
+            "transitive": [
+                "netflix:mutation-stream-client"
             ]
         },
         "netflix:netflix-config": {
@@ -21772,11 +23369,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.110",
+            "locked": "59.113",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.110",
+            "locked": "59.113",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -21793,12 +23390,13 @@
             ]
         },
         "org.antlr:antlr-runtime": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.suro:suro-core",
                 "netflix:nf-eventbus",
-                "org.antlr:antlr"
+                "org.antlr:antlr",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.antlr:stringtemplate": {
@@ -21902,6 +23500,99 @@
                 "com.netflix.suro:suro-kafka-producer"
             ]
         },
+        "org.apache.lucene:lucene-analyzers-common": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-core": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-analyzers-common",
+                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-highlighter",
+                "org.apache.lucene:lucene-join",
+                "org.apache.lucene:lucene-memory",
+                "org.apache.lucene:lucene-misc",
+                "org.apache.lucene:lucene-queries",
+                "org.apache.lucene:lucene-queryparser",
+                "org.apache.lucene:lucene-sandbox",
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-grouping": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-join",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-highlighter": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-join": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-memory": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-highlighter",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-misc": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-queries": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-highlighter",
+                "org.apache.lucene:lucene-queryparser",
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-queryparser": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-sandbox": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.apache.lucene:lucene-queryparser",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-spatial": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.apache.lucene:lucene-suggest": {
+            "locked": "4.10.4",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "org.apache.servicemix.bundles:org.apache.servicemix.bundles.commons-csv": {
             "locked": "1.0-r706900_3",
             "transitive": [
@@ -21947,6 +23638,9 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
@@ -21974,6 +23668,9 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
+                "netflix:jarversions",
+                "netflix:mutation-stream-client",
+                "netflix:mutation-stream-common",
                 "netflix:netflix-config",
                 "netflix:nfsso",
                 "netflix:platform-aws",
@@ -22012,6 +23709,12 @@
             "transitive": [
                 "netflix:nflibrary",
                 "org.apache.solr:solr-solrj"
+            ]
+        },
+        "org.elasticsearch:elasticsearch": {
+            "locked": "1.5.2",
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "org.freemarker:freemarker": {
@@ -22089,7 +23792,14 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.netflix.governator:governator",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "4.1",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.picocontainer:picocontainer": {
