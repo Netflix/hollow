@@ -314,7 +314,7 @@
             "requested": "latest.release"
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.5",
+            "locked": "1.8",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -1193,7 +1193,7 @@
             "requested": "latest.release"
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.5",
+            "locked": "1.8",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -2072,7 +2072,7 @@
             "requested": "latest.release"
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.5",
+            "locked": "1.8",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -2951,7 +2951,7 @@
             "requested": "latest.release"
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.5",
+            "locked": "1.8",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -3929,7 +3929,7 @@
             "requested": "latest.release"
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.5",
+            "locked": "1.8",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -4808,7 +4808,7 @@
             "requested": "latest.release"
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.5",
+            "locked": "1.8",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -5698,7 +5698,7 @@
             "requested": "latest.release"
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.5",
+            "locked": "1.8",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -6588,7 +6588,7 @@
             "requested": "latest.release"
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.5",
+            "locked": "1.8",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -7478,7 +7478,7 @@
             "requested": "latest.release"
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.5",
+            "locked": "1.8",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
