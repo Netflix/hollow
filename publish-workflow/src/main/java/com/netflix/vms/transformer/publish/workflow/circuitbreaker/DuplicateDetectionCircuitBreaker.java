@@ -18,7 +18,7 @@ public class DuplicateDetectionCircuitBreaker extends HollowCircuitBreaker {
     @Override
     public CircuitBreakerResults runCircuitBreaker(HollowReadStateEngine stateEngine) {
         IndexDuplicateChecker dupChecker = new IndexDuplicateChecker(stateEngine);
-        dupChecker.checkDuplicates();
+        dupChecker.checkAllDuplicates();
 
         if (!dupChecker.wasDupKeysDetected())
             return PASSED;

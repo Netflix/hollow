@@ -14,6 +14,9 @@ public class VipUtil {
     }
 
     public static String getTitleOverrideTransformerVip(TransformerConfig cfg) {
+        String overrideTitleDataVip = cfg.getOverrideTitleDataVip();
+        if (overrideTitleDataVip != null) return overrideTitleDataVip;
+
         String vip = cfg.getTransformerVip();
         if (isOverrideVip(vip)) {
             int len = vip.length() - OVERRIDE_VIP_SUFFIX.length();

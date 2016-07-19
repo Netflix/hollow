@@ -2,6 +2,7 @@ package com.netflix.vms.transformer.publish.workflow;
 
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.vms.transformer.common.config.OutputTypeConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,32 +22,16 @@ public class IndexDuplicateChecker {
             dupKeyInTypeList.add(type);
     }
 
-    public void checkDuplicates() {
-        checkIndex("CompleteVideo", "id.value", "country");
-        checkIndex("VideoEpisode_CountryList", "country", "item.deliverableVideo.value");
-        checkIndex("PackageData", "id");
-        checkIndex("StreamData", "downloadableId");
-        checkIndex("NamedCollectionHolder", "country");
-        checkIndex("EncodingProfile", "id");
-        checkIndex("OriginServer", "nameStr");
-        checkIndex("LanguageRights", "contractId", "videoId.value");
-        checkIndex("DeploymentIntent", "profileId", "bitrate", "country.id");
-        checkIndex("GlobalPerson", "id");
-        checkIndex("GlobalVideo", "completeVideo.id.value");
-        checkIndex("PersonImages", "id");
-        checkIndex("ArtWorkImageFormatEntry", "nameStr");
-        checkIndex("ArtWorkImageTypeEntry", "nameStr");
-        checkIndex("ArtWorkImageRecipe", "recipeNameStr");
-        checkIndex("DefaultExtensionRecipe", "extensionStr");
-        checkIndex("DrmKey", "keyId");
-        checkIndex("WmDrmKey", "downloadableId");
-        checkIndex("DrmInfoData", "packageId");
-        checkIndex("DrmSystem", "id");
-        checkIndex("L10NResources", "resourceIdStr");
-        checkIndex("EncodingProfileGroup", "groupNameStr");
-        checkIndex("CharacterImages", "id");
-        checkIndex("FileEncodingData", "downloadableId");
-        checkIndex("RolloutVideo", "video.value");
+    public void checkCoreTypeDuplicates() {
+        for (OutputTypeConfig type : OutputTypeConfig.CORE_TYPES) {
+            checkIndex(type.getType(), type.getKeyFieldPaths());
+        }
+    }
+
+    public void checkAllDuplicates() {
+        for (OutputTypeConfig type : OutputTypeConfig.values()) {
+            checkIndex(type.getType(), type.getKeyFieldPaths());
+        }
     }
 
     public boolean wasDupKeysDetected() {

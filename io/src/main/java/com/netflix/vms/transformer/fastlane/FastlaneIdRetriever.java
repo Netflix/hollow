@@ -7,6 +7,7 @@ import com.netflix.mutationstream.fastlane.FastlaneCassandraHelper;
 import com.netflix.mutationstream.fastlane.FastlaneVideo;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,8 +31,11 @@ public class FastlaneIdRetriever {
     }
 
     public Set<String> getTitleOverrideSpecs() {
+        String specsConfig = config.getOverrideTitleSpecs();
+        if (specsConfig == null || specsConfig.trim().isEmpty()) return Collections.emptySet();
+
         Set<String> specs = new HashSet<>();
-        for (String spec : config.getOverrideTitleSpecs().split(",")) {
+        for (String spec : specsConfig.split(",")) {
             specs.add(spec);
         }
         return specs;

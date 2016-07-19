@@ -158,7 +158,6 @@ public class TitleOverrideManager {
         public void run() {
             // skip if result is already available
             if (resultStateEngine != null) {
-                System.out.println("**** REUSING RESULT for" + jobSpec);
                 return;
             }
 

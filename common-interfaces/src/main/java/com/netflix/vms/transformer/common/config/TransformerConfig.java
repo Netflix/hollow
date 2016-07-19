@@ -47,6 +47,8 @@ public interface TransformerConfig {
     // FORMAT: topNodeId:version or topNodeId:version:[in|out] - in=input pinning; otherwise, output slicing
     String getOverrideTitleSpecs();
 
+    String getOverrideTitleDataVip();
+
     @DefaultValue("false")
     boolean isRestoreFromPreviousStateEngine();
 

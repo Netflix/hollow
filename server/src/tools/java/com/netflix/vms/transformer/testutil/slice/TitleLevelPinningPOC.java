@@ -15,7 +15,7 @@ import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
-import com.netflix.vms.transformer.override.OverrideHollowCombiner;
+import com.netflix.vms.transformer.override.TitleOverrideHollowCombiner;
 import com.netflix.vms.transformer.override.TitleOverrideJobSpec;
 import com.netflix.vms.transformer.override.TitleOverrideManager;
 import com.netflix.vms.transformer.testutil.migration.ShowMeTheProgressDiffTool;
@@ -64,7 +64,7 @@ public class TitleLevelPinningPOC {
 
             List<HollowReadStateEngine> overrideTitleOutputs = mgr.waitForResults();
 
-            OverrideHollowCombiner combiner = OverrideHollowCombiner.create(outputStateEngine, fastlaneOutput, overrideTitleOutputs);
+            TitleOverrideHollowCombiner combiner = TitleOverrideHollowCombiner.create(outputStateEngine, fastlaneOutput, overrideTitleOutputs);
             combiner.combine();
             ctx.getLogger().info(OverrideTitle, "Processed override titles={}", overrideTitleSpecs);
         }
@@ -151,7 +151,7 @@ public class TitleLevelPinningPOC {
     }
 
     public static HollowReadStateEngine combine(HollowWriteStateEngine output, HollowReadStateEngine input) throws Exception {
-        OverrideHollowCombiner combiner = new OverrideHollowCombiner(output, input);
+        TitleOverrideHollowCombiner combiner = new TitleOverrideHollowCombiner(output, input);
 
         combiner.combine();
         output.addHeaderTags(input.getHeaderTags());
