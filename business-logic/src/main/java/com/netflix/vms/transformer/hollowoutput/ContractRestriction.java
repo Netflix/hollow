@@ -11,6 +11,7 @@ public class ContractRestriction implements Cloneable {
     public List<CupKey> cupKeys = null;
     public int prePromotionDays = java.lang.Integer.MIN_VALUE;
     public int postPromotionDays = java.lang.Integer.MIN_VALUE;
+    public boolean isDownloadable = false;
     public Map<Strings, LanguageRestrictions> languageBcp47RestrictionsMap = null;
 
     public boolean equals(Object other) {
@@ -30,6 +31,7 @@ public class ContractRestriction implements Cloneable {
         } else if(!o.cupKeys.equals(cupKeys)) return false;
         if(o.prePromotionDays != prePromotionDays) return false;
         if(o.postPromotionDays != postPromotionDays) return false;
+        if(o.isDownloadable != isDownloadable) return false;
         if(o.languageBcp47RestrictionsMap == null) {
             if(languageBcp47RestrictionsMap != null) return false;
         } else if(!o.languageBcp47RestrictionsMap.equals(languageBcp47RestrictionsMap)) return false;
@@ -43,6 +45,7 @@ public class ContractRestriction implements Cloneable {
         hashCode = hashCode * 31 + (cupKeys == null ? 1237 : cupKeys.hashCode());
         hashCode = hashCode * 31 + prePromotionDays;
         hashCode = hashCode * 31 + postPromotionDays;
+        hashCode = hashCode * 31 + (isDownloadable? 1231 : 1237);
         hashCode = hashCode * 31 + (languageBcp47RestrictionsMap == null ? 1237 : languageBcp47RestrictionsMap.hashCode());
         return hashCode;
     }
@@ -54,6 +57,7 @@ public class ContractRestriction implements Cloneable {
         builder.append(",cupKeys=").append(cupKeys);
         builder.append(",prePromotionDays=").append(prePromotionDays);
         builder.append(",postPromotionDays=").append(postPromotionDays);
+        builder.append(",isDownloadable=").append(isDownloadable);
         builder.append(",languageBcp47RestrictionsMap=").append(languageBcp47RestrictionsMap);
         builder.append("}");
         return builder.toString();

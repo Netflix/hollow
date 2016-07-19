@@ -80,6 +80,14 @@ public class DataSlicerImpl implements DataSlicer {
                     return outputAPI.getPackageDataHollow(ordinal)._getVideo()._getValueBoxed();
                 }
             });
+            
+            findIncludedOrdinals(stateEngine, "VideoPackageData", videoIdsToInclude, new VideoIdDeriver() {
+                @Override
+                public Integer deriveId(int ordinal) {
+                    return outputAPI.getVideoPackageDataHollow(ordinal)._getVideoId()._getValueBoxed();
+                }
+                
+            });
     
             findIncludedOrdinals(stateEngine, "RolloutVideo", videoIdsToInclude, new VideoIdDeriver() {
                 @Override

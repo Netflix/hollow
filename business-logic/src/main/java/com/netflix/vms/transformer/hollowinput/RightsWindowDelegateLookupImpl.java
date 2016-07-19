@@ -33,6 +33,10 @@ public class RightsWindowDelegateLookupImpl extends HollowObjectAbstractDelegate
         return typeAPI.getContractIdsOrdinal(ordinal);
     }
 
+    public int getContractIdsExtOrdinal(int ordinal) {
+        return typeAPI.getContractIdsExtOrdinal(ordinal);
+    }
+
     public RightsWindowTypeAPI getTypeAPI() {
         return typeAPI;
     }
