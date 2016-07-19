@@ -33,6 +33,13 @@ public class RightsWindowHollow extends HollowObject {
         return  api().getListOfContractIdHollow(refOrdinal);
     }
 
+    public ListOfRightsWindowContractHollow _getContractIdsExt() {
+        int refOrdinal = delegate().getContractIdsExtOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getListOfRightsWindowContractHollow(refOrdinal);
+    }
+
     public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
