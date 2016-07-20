@@ -44,7 +44,7 @@ public abstract class AbstractTitleOverrideProcessor implements TitleOverridePro
     }
 
     protected HollowReadStateEngine readStateEngine(File inputFile) throws IOException {
-        ctx.getLogger().info(TransformerLogTag.OverrideTitle, "Read StateEngine file:{}", inputFile);
+        ctx.getLogger().info(TransformerLogTag.TitleOverride, "Read StateEngine file:{}", inputFile);
 
         HollowReadStateEngine stateEngine = new HollowReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(stateEngine);
@@ -56,8 +56,9 @@ public abstract class AbstractTitleOverrideProcessor implements TitleOverridePro
     }
 
     protected void writeStateEngine(HollowWriteStateEngine stateEngine, File outputFile) throws IOException {
-        ctx.getLogger().info(TransformerLogTag.OverrideTitle, "Write StateEngine file:{}", outputFile);
+        ctx.getLogger().info(TransformerLogTag.TitleOverride, "Write StateEngine file:{}", outputFile);
 
+        TitleOverrideHelper.addBlobID(stateEngine, outputFile);
         HollowBlobWriter writer = new HollowBlobWriter(stateEngine);
         try (LZ4BlockOutputStream os = new LZ4BlockOutputStream(new FileOutputStream(outputFile))) {
             writer.writeSnapshot(os);

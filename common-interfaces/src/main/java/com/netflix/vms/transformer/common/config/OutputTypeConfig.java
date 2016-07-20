@@ -5,8 +5,8 @@ import java.util.EnumSet;
 import java.util.Set;
 
 public enum OutputTypeConfig {
-    CompleteVideo("CompleteVideo", "id.value", "country"),
-    VideoEpisode_CountryList("VideoEpisode_CountryList", "country", "item.deliverableVideo.value"),
+    CompleteVideo("CompleteVideo", "id.value", "country.id"),
+    VideoEpisode_CountryList("VideoEpisode_CountryList", "country.id", "item.deliverableVideo.value"),
     RolloutVideo("RolloutVideo", "video.value"),
     GlobalVideo("GlobalVideo", "completeVideo.id.value"),
     FallbackUSArtwork("FallbackUSArtwork", "id.value"),
@@ -36,17 +36,24 @@ public enum OutputTypeConfig {
 
     L10NResources("L10NResources", "resourceIdStr"),
     TopNVideoData("TopNVideoData", "countryId"),
-    NamedCollectionHolder("NamedCollectionHolder", "country");
+    NamedCollectionHolder("NamedCollectionHolder", "country.id");
 
     //---------------
-    public static Set<OutputTypeConfig> VIDEO_TYPES = Collections.unmodifiableSet(EnumSet.of(
-            CompleteVideo, VideoEpisode_CountryList, RolloutVideo, GlobalVideo, FallbackUSArtwork, LanguageRights, VideoPackageData));
+    public final static Set<OutputTypeConfig> VIDEO_RELATED_TYPES = Collections.unmodifiableSet(EnumSet.of(
+            CompleteVideo, VideoEpisode_CountryList, RolloutVideo, GlobalVideo, FallbackUSArtwork, LanguageRights, VideoPackageData, PackageData));
 
-    public static Set<OutputTypeConfig> PERSON_TYPES = Collections.unmodifiableSet(EnumSet.of(
+    public final static Set<OutputTypeConfig> PERSON_RELATED_TYPES = Collections.unmodifiableSet(EnumSet.of(
             GlobalPerson, PersonImages));
 
-    public static Set<OutputTypeConfig> CORE_TYPES = Collections.unmodifiableSet(EnumSet.of(
-            CompleteVideo, VideoEpisode_CountryList, RolloutVideo, GlobalVideo, FallbackUSArtwork, LanguageRights, VideoPackageData, PackageData, GlobalPerson));
+    public final static Set<OutputTypeConfig> TOP_LEVEL_NON_VIDEO_TYPES = Collections.unmodifiableSet(EnumSet.of(
+            L10NResources,
+            GlobalPerson,
+            PersonImages, CharacterImages,
+            DrmInfoData, DrmSystem, OriginServer, EncodingProfile, EncodingProfileGroup, FileEncodingData, DeploymentIntent));
+
+    public final static Set<OutputTypeConfig> REFERENCED_TYPES = Collections.unmodifiableSet(EnumSet.of(
+            ArtWorkImageFormatEntry, ArtWorkImageTypeEntry, ArtWorkImageRecipe, DefaultExtensionRecipe,
+            StreamData, DrmKey, WmDrmKey));
 
     //---------------
     private final String type;
@@ -63,9 +70,5 @@ public enum OutputTypeConfig {
 
     public String[] getKeyFieldPaths() {
         return keyFieldPaths;
-    }
-
-    public boolean isVideoType() {
-        return VIDEO_TYPES.contains(this);
     }
 }

@@ -22,13 +22,13 @@ public class IndexDuplicateChecker {
             dupKeyInTypeList.add(type);
     }
 
-    public void checkCoreTypeDuplicates() {
-        for (OutputTypeConfig type : OutputTypeConfig.CORE_TYPES) {
+    public void checkDuplicates(OutputTypeConfig... types) {
+        for (OutputTypeConfig type : types) {
             checkIndex(type.getType(), type.getKeyFieldPaths());
         }
     }
 
-    public void checkAllDuplicates() {
+    public void checkDuplicates() {
         for (OutputTypeConfig type : OutputTypeConfig.values()) {
             checkIndex(type.getType(), type.getKeyFieldPaths());
         }

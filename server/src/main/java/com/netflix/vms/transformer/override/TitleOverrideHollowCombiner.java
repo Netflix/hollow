@@ -1,11 +1,12 @@
 package com.netflix.vms.transformer.override;
 
-import static com.netflix.vms.transformer.common.config.OutputTypeConfig.CharacterImages;
 import static com.netflix.vms.transformer.common.config.OutputTypeConfig.NamedCollectionHolder;
 import static com.netflix.vms.transformer.common.config.OutputTypeConfig.TopNVideoData;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.TitleOverride;
 
 import com.netflix.hollow.HollowObjectSchema;
 import com.netflix.hollow.combine.HollowCombiner;
+import com.netflix.hollow.combine.HollowCombinerCopyDirector;
 import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
@@ -18,6 +19,7 @@ import com.netflix.hollow.write.HollowSetWriteRecord;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.type.ISOCountry;
 import com.netflix.type.NFCountry;
+import com.netflix.vms.generated.notemplate.ArtWorkImageRecipeHollow;
 import com.netflix.vms.generated.notemplate.EpisodeHollow;
 import com.netflix.vms.generated.notemplate.MapOfStringsToSetOfEpisodeHollow;
 import com.netflix.vms.generated.notemplate.MapOfStringsToSetOfVPersonHollow;
@@ -30,6 +32,7 @@ import com.netflix.vms.generated.notemplate.StringsHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
 import com.netflix.vms.generated.notemplate.VPersonHollow;
 import com.netflix.vms.generated.notemplate.VideoHollow;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.OutputTypeConfig;
 import com.netflix.vms.transformer.publish.workflow.IndexDuplicateChecker;
 
@@ -48,10 +51,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TitleOverrideHollowCombiner {
     private static Set<OutputTypeConfig> TITLEOVERRIDE_EXCLUDED_TYPES = EnumSet.of(
-            NamedCollectionHolder, CharacterImages, TopNVideoData);
+            NamedCollectionHolder, TopNVideoData);
 
     public static final String NAMEDLIST_TYPE_STATE_NAME = NamedCollectionHolder.getType();
 
+    private final TransformerContext ctx;
     private final HollowCombiner combiner;
     private final HollowReadStateEngine inputs[];
     private final HollowWriteStateEngine output;
@@ -60,30 +64,36 @@ public class TitleOverrideHollowCombiner {
     protected final ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> combinedPersonLists;
     protected final ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> combinedEpisodeLists;
 
-    public TitleOverrideHollowCombiner(HollowWriteStateEngine output, HollowReadStateEngine... inputs) {
-        this.inputs = inputs;
+    public TitleOverrideHollowCombiner(TransformerContext ctx, HollowWriteStateEngine output, HollowWriteStateEngine fastlaneOutput, List<HollowReadStateEngine> overrideTitles) throws Exception {
+        this.ctx = ctx;
+
+        HollowReadStateEngine fastlane = roundTrip(fastlaneOutput);
+        this.inputs = createReadStateEngines(fastlane, overrideTitles);
         this.output = output;
-        this.combiner = new HollowCombiner(output, inputs);
+
+        HollowCombinerCopyDirector copyDirector = new TitleOverrideHollowCombinerCopyDirector(ctx, fastlane, overrideTitles);
+        this.combiner = new HollowCombiner(copyDirector, output, inputs);
         for (OutputTypeConfig type : TITLEOVERRIDE_EXCLUDED_TYPES) {
             combiner.addIgnoredTypes(type.getType());
         }
+
+        //        debug("fastlane", fastlane);
+        //        for (HollowReadStateEngine e : overrideTitles) {
+        //            debug("override", e);
+        //        }
 
         this.combinedVideoLists = new ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String,Set<Integer>>>();
         this.combinedPersonLists = new ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String,Set<Integer>>>();
         this.combinedEpisodeLists = new ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String,Set<Integer>>>();
     }
 
-    public static TitleOverrideHollowCombiner create(HollowWriteStateEngine output, HollowWriteStateEngine fastlane, List<HollowReadStateEngine> overrideTitles) throws Exception {
-        HollowReadStateEngine[] stateEngines = createReadStateEngines(fastlane, overrideTitles);
-        return new TitleOverrideHollowCombiner(output, stateEngines);
-    }
 
-    private static HollowReadStateEngine[] createReadStateEngines(HollowWriteStateEngine fastlane, List<HollowReadStateEngine> overrideTitles) throws Exception {
+    private static HollowReadStateEngine[] createReadStateEngines(HollowReadStateEngine fastlane, List<HollowReadStateEngine> overrideTitles) {
         int size = overrideTitles.size() + 1;
         HollowReadStateEngine[] outputs = new HollowReadStateEngine[size];
 
         int i = 0;
-        outputs[i++] = roundTrip(fastlane);
+        outputs[i++] = fastlane;
         for (HollowReadStateEngine item : overrideTitles) {
             outputs[i++] = item;
         }
@@ -99,6 +109,8 @@ public class TitleOverrideHollowCombiner {
         combiner.combine();
         buildPOJOLists();
         writePOJOListsToOutput(output);
+        TitleOverrideHelper.addBlobID(output, inputs);
+
         validateCombinedData(output);
     }
 
@@ -106,9 +118,29 @@ public class TitleOverrideHollowCombiner {
         HollowReadStateEngine stateEngine = roundTrip(outputStateEngine);
 
         IndexDuplicateChecker dupChecker = new IndexDuplicateChecker(stateEngine);
-        dupChecker.checkCoreTypeDuplicates();
+        for (OutputTypeConfig type : OutputTypeConfig.values()) {
+            if (OutputTypeConfig.REFERENCED_TYPES.contains(type)) continue;
+            dupChecker.checkDuplicates(type);
+        }
+
         if (dupChecker.wasDupKeysDetected()) {
-            throw new Exception("Duplicate Keys detected in Type(s): " + dupChecker.getResults());
+            //            debug("combined", stateEngine);
+
+            ctx.getLogger().error(TitleOverride, "Duplicate Keys detected in Core Type(s): {}", dupChecker.getResults());
+            throw new Exception("Duplicate Keys detected in Core Type(s): " + dupChecker.getResults());
+        }
+    }
+
+    public static void debug(String label, HollowReadStateEngine stateEngine) {
+        Set<String> keys = new HashSet<>();
+
+        int i = 0;
+        VMSRawHollowAPI finalAPI = new VMSRawHollowAPI(stateEngine);
+        for (ArtWorkImageRecipeHollow item : finalAPI.getAllArtWorkImageRecipeHollow()) {
+            String key = item._getRecipeNameStr();
+            boolean isDup = keys.contains(key);
+            keys.add(key);
+            System.out.println(i++ + ") [" + label + "] " + key + (isDup ? "****" : ""));
         }
     }
 

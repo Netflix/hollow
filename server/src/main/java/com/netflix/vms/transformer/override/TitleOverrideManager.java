@@ -164,7 +164,7 @@ public class TitleOverrideManager {
             try {
                 resultStateEngine = processor.process(jobSpec.version, jobSpec.topNode);
             } catch (Throwable e) {
-                ctx.getLogger().error(TransformerLogTag.OverrideTitle, "Failed to process override title={} for version={} and vip={}", jobSpec.topNode, jobSpec.version, processor.getVip());
+                ctx.getLogger().error(TransformerLogTag.TitleOverride, "Failed to process override title={} for version={} and vip={}", jobSpec.topNode, jobSpec.version, processor.getVip());
                 failure = new Exception("Failed to process topNode=" + jobSpec.version + " for version=" + jobSpec.topNode + "\t on vip=" + processor.getVip(), e);
             }
         }

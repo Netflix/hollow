@@ -5,7 +5,6 @@ import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.vms.transformer.common.config.OutputTypeConfig;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -14,16 +13,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 public class VMSOutputTypeIndexer {
+    private final String name;
     private final HollowReadStateEngine stateEngine;
-    private final Map<OutputTypeConfig, Object> indexMap;
+    private final Map<String, Object> indexMap; // Type name to Index
 
-    public VMSOutputTypeIndexer(HollowReadStateEngine stateEngine) {
+    public VMSOutputTypeIndexer(String name, HollowReadStateEngine stateEngine) {
+        this.name = name;
         this.stateEngine = stateEngine;
 
         ExecutorService executor = new SimultaneousExecutor();
 
         try {
-            Map<OutputTypeConfig, Object> indexMap = new HashMap<OutputTypeConfig, Object>();
+            Map<String, Object> indexMap = new HashMap<String, Object>();
 
             submitIndexingJobs(stateEngine, executor, indexMap);
             gatherResultsFromIndexingJobs(indexMap);
@@ -36,23 +37,27 @@ public class VMSOutputTypeIndexer {
         }
     }
 
+    public String getName() {
+        return name;
+    }
+
     public HollowReadStateEngine getStateEngine() {
         return stateEngine;
     }
 
-    public HollowPrimaryKeyIndex getPrimaryKeyIndex(OutputTypeConfig spec) {
-        return (HollowPrimaryKeyIndex) indexMap.get(spec);
+    public HollowPrimaryKeyIndex getPrimaryKeyIndex(String type) {
+        return (HollowPrimaryKeyIndex) indexMap.get(type);
     }
 
-    private void submitIndexingJobs(HollowReadStateEngine stateEngine, ExecutorService executor, Map<OutputTypeConfig, Object> indexMap) {
+    private void submitIndexingJobs(HollowReadStateEngine stateEngine, ExecutorService executor, Map<String, Object> indexMap) {
         for (OutputTypeConfig spec : OutputTypeConfig.values()) {
-            indexMap.put(spec, primaryKeyIdx(executor, stateEngine, spec));
+            indexMap.put(spec.getType(), primaryKeyIdx(executor, stateEngine, spec));
         }
     }
 
     @SuppressWarnings("unchecked")
-    private void gatherResultsFromIndexingJobs(Map<OutputTypeConfig, Object> indexMap) throws InterruptedException, ExecutionException {
-        for (Map.Entry<OutputTypeConfig, Object> futureEntry : indexMap.entrySet()) {
+    private void gatherResultsFromIndexingJobs(Map<String, Object> indexMap) throws InterruptedException, ExecutionException {
+        for (Map.Entry<String, Object> futureEntry : indexMap.entrySet()) {
             Future<Object> future = (Future<Object>) futureEntry.getValue();
             futureEntry.setValue(future.get());
         }
@@ -63,8 +68,8 @@ public class VMSOutputTypeIndexer {
             @Override
             public HollowPrimaryKeyIndex call() {
                 return new HollowPrimaryKeyIndex(stateEngine,
-                        spec.getKeyFieldPaths()[0],
-                        Arrays.copyOfRange(spec.getKeyFieldPaths(), 1, spec.getKeyFieldPaths().length));
+                        spec.getType(),
+                        spec.getKeyFieldPaths());
             }
         });
     }
