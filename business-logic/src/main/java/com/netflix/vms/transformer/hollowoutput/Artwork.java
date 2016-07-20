@@ -15,6 +15,7 @@ public class Artwork implements Cloneable {
     public PassthroughVideo source_movie_id = null;
     public ArtworkSourcePassthrough source = null;
     public ArtworkBasicPassthrough basic_passthrough = null;
+    public ArtworkMerchStillPackageData merchstillsPackageData = null;
     public int file_seq = java.lang.Integer.MIN_VALUE;
 
     public boolean equals(Object other) {
@@ -51,6 +52,11 @@ public class Artwork implements Cloneable {
             if(basic_passthrough != null) return false;
         } else if(!o.basic_passthrough.equals(basic_passthrough)) return false;
         if(o.file_seq != file_seq) return false;
+        if (o.merchstillsPackageData == null) {
+            if (merchstillsPackageData != null)
+                return false;
+        } else if (!o.merchstillsPackageData.equals(merchstillsPackageData))
+            return false;
         return true;
     }
 
@@ -68,6 +74,7 @@ public class Artwork implements Cloneable {
         hashCode = hashCode * 31 + (source == null ? 1237 : source.hashCode());
         hashCode = hashCode * 31 + (basic_passthrough == null ? 1237 : basic_passthrough.hashCode());
         hashCode = hashCode * 31 + file_seq;
+        hashCode = hashCode * 31 + (merchstillsPackageData == null ? 1237 : merchstillsPackageData.hashCode());
         return hashCode;
     }
 
@@ -85,6 +92,7 @@ public class Artwork implements Cloneable {
         builder.append(",source=").append(source);
         builder.append(",basic_passthrough=").append(basic_passthrough);
         builder.append(",file_seq=").append(file_seq);
+        builder.append(",merchstillsPackage=").append(merchstillsPackageData);
         builder.append("}");
         return builder.toString();
     }

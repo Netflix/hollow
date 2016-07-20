@@ -25,6 +25,7 @@ public enum IndexSpec {
     CONSOLIDATED_CERT_SYSTEMS(PRIMARY_KEY, "ConsolidatedCertificationSystems", "certificationSystemId"),
     CERT_SYSTEM_RATING(PRIMARY_KEY, "ConsolidatedCertSystemRating", "ratingId"),
     PACKAGES(PRIMARY_KEY, "Package", "packageId"),
+    DAM_MERCHSTILLS(PRIMARY_KEY, "DamMerchStills", "assetId.value"),
     PERSON_BIO(PRIMARY_KEY, "PersonBio", "personId"),
 
     L10N_STORIES_SYNOPSES(PRIMARY_KEY, "StoriesSynopses", "movieId"),

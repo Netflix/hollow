@@ -5,29 +5,66 @@ import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_IMAGE_FORMAT;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_RECIPE;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_TERRITORY_COUNTRIES;
 
-import java.util.*;
-import java.util.Map.Entry;
-
-import org.apache.commons.codec.digest.DigestUtils;
-
 import com.google.common.collect.ComparisonChain;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.write.objectmapper.NullablePrimitiveBoolean;
 import com.netflix.vms.transformer.ConversionUtils;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.hollowinput.*;
-import com.netflix.vms.transformer.hollowoutput.*;
+import com.netflix.vms.transformer.hollowinput.ArtWorkImageTypeHollow;
+import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
+import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeHollow;
+import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeListHollow;
+import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
+import com.netflix.vms.transformer.hollowinput.ArtworkLocaleListHollow;
+import com.netflix.vms.transformer.hollowinput.ArtworkRecipeHollow;
+import com.netflix.vms.transformer.hollowinput.DamMerchStillsHollow;
+import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
+import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
+import com.netflix.vms.transformer.hollowinput.MultiValuePassthroughMapHollow;
+import com.netflix.vms.transformer.hollowinput.SingleValuePassthroughMapHollow;
+import com.netflix.vms.transformer.hollowinput.StringHollow;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+import com.netflix.vms.transformer.hollowoutput.ArtWorkImageFormatEntry;
+import com.netflix.vms.transformer.hollowoutput.ArtWorkImageRecipe;
+import com.netflix.vms.transformer.hollowoutput.ArtWorkImageTypeEntry;
+import com.netflix.vms.transformer.hollowoutput.Artwork;
+import com.netflix.vms.transformer.hollowoutput.ArtworkBasicPassthrough;
+import com.netflix.vms.transformer.hollowoutput.ArtworkCdn;
+import com.netflix.vms.transformer.hollowoutput.ArtworkDerivative;
+import com.netflix.vms.transformer.hollowoutput.ArtworkDerivatives;
+import com.netflix.vms.transformer.hollowoutput.ArtworkMerchStillPackageData;
+import com.netflix.vms.transformer.hollowoutput.ArtworkSourcePassthrough;
+import com.netflix.vms.transformer.hollowoutput.ArtworkSourceString;
 import com.netflix.vms.transformer.hollowoutput.Integer;
+import com.netflix.vms.transformer.hollowoutput.NFLocale;
+import com.netflix.vms.transformer.hollowoutput.PassthroughString;
+import com.netflix.vms.transformer.hollowoutput.PassthroughVideo;
+import com.netflix.vms.transformer.hollowoutput.Strings;
+import com.netflix.vms.transformer.hollowoutput.__passthrough_string;
+import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
 import com.netflix.vms.transformer.util.NFLocaleUtil;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import org.apache.commons.codec.digest.DigestUtils;
 
 public abstract class ArtWorkModule extends AbstractTransformModule{
     protected final String entityType;
     protected final HollowPrimaryKeyIndex imageTypeIdx;
     protected final HollowPrimaryKeyIndex recipeIdx;
     protected final HollowPrimaryKeyIndex territoryIdx;
+    protected final HollowPrimaryKeyIndex damMerchStillsIdx;
     private final ArtWorkComparator artworkComparator;
 
     private final Map<String, ArtWorkImageTypeEntry> imageTypeEntryCache;
@@ -47,6 +84,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         this.imageTypeIdx = indexer.getPrimaryKeyIndex(ARTWORK_IMAGE_FORMAT);
         this.recipeIdx = indexer.getPrimaryKeyIndex(ARTWORK_RECIPE);
         this.territoryIdx = indexer.getPrimaryKeyIndex(ARTWORK_TERRITORY_COUNTRIES);
+        this.damMerchStillsIdx = indexer.getPrimaryKeyIndex(IndexSpec.DAM_MERCHSTILLS);
         this.artworkComparator = new ArtWorkComparator(ctx);
         this.imageFormatEntryCache = new HashMap<String, ArtWorkImageFormatEntry>();
         this.imageTypeEntryCache = new HashMap<String, ArtWorkImageTypeEntry>();
@@ -157,6 +195,14 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         artwork.effectiveDate = localeHollow._getEffectiveDate()._getValue();
         artwork.derivatives = artworkDerivatives(derivativeList);
         artwork.cdns = cdnList;
+
+        int ordinal = damMerchStillsIdx.getMatchingOrdinal(sourceFileId);
+        if (ordinal != -1) {
+            DamMerchStillsHollow damMerchstill = api.getDamMerchStillsHollow(ordinal);
+            ArtworkMerchStillPackageData packageInfo = new ArtworkMerchStillPackageData();
+            packageInfo.packageId = java.lang.Integer.valueOf(damMerchstill._getMoment()._getPackageId()._getValue());
+            packageInfo.offsetMillis = java.lang.Long.valueOf(damMerchstill._getMoment()._getStillTS()._getValue());
+        }
         fillPassThroughData(artwork, attributes);
 
         artworkSet.add(artwork);
