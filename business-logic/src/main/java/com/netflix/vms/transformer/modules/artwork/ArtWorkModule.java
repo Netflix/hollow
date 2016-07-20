@@ -199,9 +199,10 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         int ordinal = damMerchStillsIdx.getMatchingOrdinal(sourceFileId);
         if (ordinal != -1) {
             DamMerchStillsHollow damMerchstill = api.getDamMerchStillsHollow(ordinal);
-            ArtworkMerchStillPackageData packageInfo = new ArtworkMerchStillPackageData();
-            packageInfo.packageId = java.lang.Integer.valueOf(damMerchstill._getMoment()._getPackageId()._getValue());
-            packageInfo.offsetMillis = java.lang.Long.valueOf(damMerchstill._getMoment()._getStillTS()._getValue());
+            ArtworkMerchStillPackageData packageData = new ArtworkMerchStillPackageData();
+            packageData.packageId = java.lang.Integer.valueOf(damMerchstill._getMoment()._getPackageId()._getValue());
+            packageData.offsetMillis = java.lang.Long.valueOf(damMerchstill._getMoment()._getStillTS()._getValue());
+            artwork.merchstillsPackageData = packageData;
         }
         fillPassThroughData(artwork, attributes);
 
