@@ -78,6 +78,8 @@ public class VideoMetaDataModule {
     private final HollowHashIndex showCountryLabelIdx;
     private final HollowPrimaryKeyIndex videoStatusIdx;
     private final HollowPrimaryKeyIndex storiesSynopsesIdx;
+    
+    private final int newContentFlagDuration;
 
     Map<Integer, VideoMetaData> countryAgnosticMap = new HashMap<Integer, VideoMetaData>();
     Map<Integer, Map<VideoMetaDataCountrySpecificDataKey, VideoMetaData>> countrySpecificMap = new HashMap<Integer, Map<VideoMetaDataCountrySpecificDataKey,VideoMetaData>>();
@@ -97,6 +99,8 @@ public class VideoMetaDataModule {
         this.videoStatusIdx = indexer.getPrimaryKeyIndex(VIDEO_STATUS);
         this.videoTypeCountryIdx = indexer.getHashIndex(VIDEO_TYPE_COUNTRY);
         this.storiesSynopsesIdx = indexer.getPrimaryKeyIndex(L10N_STORIES_SYNOPSES);
+        
+        this.newContentFlagDuration = ctx.getConfig().getNewContentFlagDuration();
 
         hookTypeMap.put("TV Ratings Hook", new HookType("TV_RATINGS"));
         hookTypeMap.put("Awards/Critical Praise Hook", new HookType("AWARDS_CRITICAL_PRAISE"));
@@ -510,13 +514,9 @@ public class VideoMetaDataModule {
         }
     }
 
-
-    private static final int NEW_CONTENT_MIN_DAYS_ON_SITE = 30;
-    private static final int NUM_DAYS_BEFORE_NOT_NEW_CONTENT = 30;
-
     public boolean hasNewContent(VideoMetaDataRollupValues rollup) {
         if(rollup.doShow()) {
-            if(daysAgo(rollup.getEarliestFirstDisplayDate()) > NEW_CONTENT_MIN_DAYS_ON_SITE && daysAgo(rollup.getLatestLiveFirstDisplayDate()) <= NUM_DAYS_BEFORE_NOT_NEW_CONTENT)
+            if(daysAgo(rollup.getEarliestFirstDisplayDate()) > newContentFlagDuration && daysAgo(rollup.getLatestLiveFirstDisplayDate()) <= newContentFlagDuration)
                 return true;
         }
 
