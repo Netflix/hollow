@@ -35,6 +35,7 @@ import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.job.impl.BlobMetaDataUtil;
 import com.netflix.vms.transformer.util.SequenceVersionMinter;
+import com.netflix.vms.transformer.util.VipUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -148,23 +149,33 @@ public class TransformCycle {
         long startTime = System.currentTimeMillis();
 
         try {
-            Set<String> overrideTitleSpecs = ctx.getTitleOverrideSpecs();
-            if (overrideTitleSpecs == null || overrideTitleSpecs.isEmpty()) {
+            boolean isOverrideMode = VipUtil.isOverrideVip(ctx.getConfig());
+            Set<String> titleOverrideSpecs = ctx.getTitleOverrideSpecs();
+            if (!isOverrideMode || (titleOverrideSpecs == null || titleOverrideSpecs.isEmpty())) {
+                // Regular MODE or (FASTLANE without Title Override)
                 SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI) inputClient.getAPI(), outputStateEngine, ctx);
                 transformer.transform();
-            } else {
-                TitleOverrideManager mgr = new TitleOverrideManager(fileStore, ctx);
-                mgr.processASync(overrideTitleSpecs);
 
+                if (isOverrideMode) {
+                    TitleOverrideHelper.addBlobID(outputStateEngine, "FastlaneIds:" + ctx.getFastlaneIds());
+                }
+            } else {
+                // Kick off processing of Title Override/Pinning
+                TitleOverrideManager mgr = new TitleOverrideManager(fileStore, ctx);
+                mgr.processASync(titleOverrideSpecs);
+
+                // Process Fastlane
                 VMSTransformerWriteStateEngine fastlaneOutput = new VMSTransformerWriteStateEngine();
                 SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI) inputClient.getAPI(), fastlaneOutput, ctx);
                 transformer.transform();
-                TitleOverrideHelper.addBlobID(fastlaneOutput, "FastlaneIds_" + ctx.getFastlaneIds());
+                TitleOverrideHelper.addBlobID(fastlaneOutput, "FastlaneIds:" + ctx.getFastlaneIds());
 
+                // Wait for everything to finish and combine them
                 List<HollowReadStateEngine> overrideTitleOutputs = mgr.waitForResults();
                 TitleOverrideHollowCombiner combiner = new TitleOverrideHollowCombiner(ctx, outputStateEngine, fastlaneOutput, overrideTitleOutputs);
-                combiner.combine();
-                ctx.getLogger().info(TitleOverride, "Processed override titles={}", overrideTitleSpecs);
+                String overrideBlobID = combiner.combine();
+
+                ctx.getLogger().info(TitleOverride, "Processed override config={} with blobId={}", titleOverrideSpecs, overrideBlobID);
             }
         } catch(Throwable th) {
             ctx.getLogger().error(TransformCycleFailed, "transform failed", th);

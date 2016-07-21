@@ -15,6 +15,7 @@ import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
+import com.netflix.vms.transformer.override.TitleOverrideHelper;
 import com.netflix.vms.transformer.override.TitleOverrideHollowCombiner;
 import com.netflix.vms.transformer.override.TitleOverrideManager;
 import com.netflix.vms.transformer.testutil.migration.ShowMeTheProgressDiffTool;
@@ -64,7 +65,8 @@ public class TitleLevelPinningPOC {
             TitleOverrideHollowCombiner combiner = new TitleOverrideHollowCombiner(ctx, outputStateEngine, fastlaneOutput, overrideTitleOutputs);
             combiner.combine();
 
-            ctx.getLogger().info(TitleOverride, "Processed override titles={}", overrideTitleSpecs);
+            String blobID = TitleOverrideHelper.getBlobID(roundTrip(outputStateEngine));
+            ctx.getLogger().info(TitleOverride, "Processed override titles={} blodId={}", overrideTitleSpecs, blobID);
         }
     }
 

@@ -105,13 +105,17 @@ public class TitleOverrideHollowCombiner {
         return output;
     }
 
-    public void combine() throws Exception {
+    /**
+     * Return override blob Id
+     */
+    public String combine() throws Exception {
         combiner.combine();
         buildPOJOLists();
         writePOJOListsToOutput(output);
-        TitleOverrideHelper.addBlobID(output, inputs);
+        String id = TitleOverrideHelper.addBlobID(output, inputs);
 
         validateCombinedData(output);
+        return id;
     }
 
     private void validateCombinedData(HollowWriteStateEngine outputStateEngine) throws Exception {
@@ -119,6 +123,7 @@ public class TitleOverrideHollowCombiner {
 
         IndexDuplicateChecker dupChecker = new IndexDuplicateChecker(stateEngine);
         for (OutputTypeConfig type : OutputTypeConfig.values()) {
+            // SKIP referenced types since there will be dups (combiner/copier copies referenced records hence likely resulting in dups)
             if (OutputTypeConfig.REFERENCED_TYPES.contains(type)) continue;
             dupChecker.checkDuplicates(type);
         }
