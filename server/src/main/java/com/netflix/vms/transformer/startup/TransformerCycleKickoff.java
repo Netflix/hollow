@@ -73,6 +73,7 @@ public class TransformerCycleKickoff {
                 while(true) {
                     try {
                         waitForMinCycleTimeToPass();
+                        ctx.setTitleOverrideSpecs(fastlaneIdRetriever.getTitleOverrideSpecs());
                         if (isFastlane(ctx.getConfig()))
                             setUpFastlaneContext();
                         cycle.cycle();
@@ -112,7 +113,6 @@ public class TransformerCycleKickoff {
 
             private void setUpFastlaneContext() {
                 ctx.setFastlaneIds(fastlaneIdRetriever.getFastlaneIds());
-                ctx.setTitleOverrideSpecs(fastlaneIdRetriever.getTitleOverrideSpecs());
             }
 
             private void markCycleFailed(Throwable th) {

@@ -6,10 +6,10 @@ import com.netflix.hollow.write.HollowWriteStateEngine;
 import java.io.File;
 
 public class TitleOverrideHelper {
-    public static final String OVERRIDEBLOB_ID = "OVERRIDEBLOB_ID";
+    public static final String BLOB_ID = "BLOB_ID";
 
     public static String addBlobID(HollowWriteStateEngine writeStateEngine, String blobID) {
-        writeStateEngine.addHeaderTag(OVERRIDEBLOB_ID, blobID);
+        writeStateEngine.addHeaderTag(BLOB_ID, blobID);
         return blobID;
     }
 
@@ -28,7 +28,7 @@ public class TitleOverrideHelper {
     }
 
     public static String getBlobID(HollowReadStateEngine readStateEngine) {
-        return readStateEngine.getHeaderTag(OVERRIDEBLOB_ID);
+        return readStateEngine.getHeaderTag(BLOB_ID);
     }
 
 

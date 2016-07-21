@@ -16,6 +16,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.WroteBlob;
 
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.client.HollowClient;
+import com.netflix.hollow.read.customapi.HollowAPI;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -35,7 +36,6 @@ import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.job.impl.BlobMetaDataUtil;
 import com.netflix.vms.transformer.util.SequenceVersionMinter;
-import com.netflix.vms.transformer.util.VipUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -149,30 +149,22 @@ public class TransformCycle {
         long startTime = System.currentTimeMillis();
 
         try {
-            boolean isOverrideMode = VipUtil.isOverrideVip(ctx.getConfig());
             Set<String> titleOverrideSpecs = ctx.getTitleOverrideSpecs();
-            if (!isOverrideMode || (titleOverrideSpecs == null || titleOverrideSpecs.isEmpty())) {
-                // Regular MODE or (FASTLANE without Title Override)
-                SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI) inputClient.getAPI(), outputStateEngine, ctx);
-                transformer.transform();
-
-                if (isOverrideMode) {
-                    TitleOverrideHelper.addBlobID(outputStateEngine, "FastlaneIds:" + ctx.getFastlaneIds());
-                }
+            if (titleOverrideSpecs == null || titleOverrideSpecs.isEmpty()) {
+                // Process normally
+                trasformInputData(inputClient.getAPI(), outputStateEngine, ctx);
             } else {
                 // Kick off processing of Title Override/Pinning
                 TitleOverrideManager mgr = new TitleOverrideManager(fileStore, ctx);
                 mgr.processASync(titleOverrideSpecs);
 
-                // Process Fastlane
-                VMSTransformerWriteStateEngine fastlaneOutput = new VMSTransformerWriteStateEngine();
-                SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI) inputClient.getAPI(), fastlaneOutput, ctx);
-                transformer.transform();
-                TitleOverrideHelper.addBlobID(fastlaneOutput, "FastlaneIds:" + ctx.getFastlaneIds());
+                // Process cycle data transformation
+                VMSTransformerWriteStateEngine cycleOutput = new VMSTransformerWriteStateEngine();
+                trasformInputData(inputClient.getAPI(), cycleOutput, ctx);
 
                 // Wait for everything to finish and combine them
                 List<HollowReadStateEngine> overrideTitleOutputs = mgr.waitForResults();
-                TitleOverrideHollowCombiner combiner = new TitleOverrideHollowCombiner(ctx, outputStateEngine, fastlaneOutput, overrideTitleOutputs);
+                TitleOverrideHollowCombiner combiner = new TitleOverrideHollowCombiner(ctx, outputStateEngine, cycleOutput, overrideTitleOutputs);
                 String overrideBlobID = combiner.combine();
 
                 ctx.getLogger().info(TitleOverride, "Processed override config={} with blobId={}", titleOverrideSpecs, overrideBlobID);
@@ -186,6 +178,14 @@ public class TransformCycle {
         }
 
         return true;
+    }
+
+    private static void trasformInputData(HollowAPI inputAPI, VMSTransformerWriteStateEngine outputStateEngine, TransformerContext ctx) throws Throwable {
+        SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI) inputAPI, outputStateEngine, ctx);
+        transformer.transform();
+
+        String BLOB_ID = ctx.getFastlaneIds().isEmpty() ? "BASEBLOB" : "FASTLANE";
+        TitleOverrideHelper.addBlobID(outputStateEngine, BLOB_ID);
     }
 
     private void writeTheBlobFiles() throws IOException {
