@@ -36,6 +36,7 @@ import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.job.impl.BlobMetaDataUtil;
 import com.netflix.vms.transformer.util.SequenceVersionMinter;
+import com.netflix.vms.transformer.util.VipUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -184,7 +185,7 @@ public class TransformCycle {
         SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI) inputAPI, outputStateEngine, ctx);
         transformer.transform();
 
-        String BLOB_ID = ctx.getFastlaneIds().isEmpty() ? "BASEBLOB" : "FASTLANE";
+        String BLOB_ID = VipUtil.isOverrideVip(ctx.getConfig()) ? "BASEBLOB" : "FASTLANE";
         TitleOverrideHelper.addBlobID(outputStateEngine, BLOB_ID);
     }
 

@@ -57,22 +57,22 @@ public class TitleOverrideHollowCombinerCopyDirector implements HollowCombinerCo
         { // Process VIDEO TYPES - Prefer Pinned Title over Fastlane : fastlaneLastList
             List<VMSOutputTypeIndexer> processedIndexers = new ArrayList<>();
             for (HollowReadStateEngine stateEngine : fastlaneLastList) {
+                VMSOutputTypeIndexer currIndexer = indexerMap.get(stateEngine);
                 for(OutputTypeConfig typeConfig : OutputTypeConfig.VIDEO_RELATED_TYPES) {
-                    VMSOutputTypeIndexer currIndexer = indexerMap.get(stateEngine);
                     process(currIndexer.getName(), typeConfig.getType(), currIndexer, processedIndexers);
-                    processedIndexers.add(currIndexer);
                 }
+                processedIndexers.add(currIndexer);
             }
         }
 
         { // Process COMMON TYPES - fastlane then the rest: fastlaneFirstList
             List<VMSOutputTypeIndexer> processedIndexers = new ArrayList<>();
             for (HollowReadStateEngine stateEngine : fastlaneFirstList) {
+                VMSOutputTypeIndexer currIndexer = indexerMap.get(stateEngine);
                 for (OutputTypeConfig typeConfig : OutputTypeConfig.TOP_LEVEL_NON_VIDEO_TYPES) {
-                    VMSOutputTypeIndexer currIndexer = indexerMap.get(stateEngine);
                     process(currIndexer.getName(), typeConfig.getType(), currIndexer, processedIndexers);
-                    processedIndexers.add(currIndexer);
                 }
+                processedIndexers.add(currIndexer);
             }
         }
 
@@ -101,7 +101,7 @@ public class TitleOverrideHollowCombinerCopyDirector implements HollowCombinerCo
             bitset = newBitSet(typeState, false);
             int maxOrdinal = typeState.maxOrdinal();
             HollowPrimaryKeyIndex primaryKeyIndex = currIndexer.getPrimaryKeyIndex(typeName);
-            for (int i = 0; i < maxOrdinal; i++) {
+            for (int i = 0; i <= maxOrdinal; i++) {
                 try {
                     Object[] recKey = primaryKeyIndex.getRecordKey(i);
                     boolean hasDupRecord = hasDupRecord(processedIndexers, typeName, recKey);
@@ -134,6 +134,7 @@ public class TitleOverrideHollowCombinerCopyDirector implements HollowCombinerCo
             throw new Exception("Unable to init CopyDirector.  Duplicate typeState found for blobID=" + blobID + " typeName=" + typeName);
         }
 
+        //System.out.println(String.format("blobId=%s typeName=%s bitSet=%s", blobID, typeName, bitset));
         bitsetMap.put(typeState, bitset);
     }
 
