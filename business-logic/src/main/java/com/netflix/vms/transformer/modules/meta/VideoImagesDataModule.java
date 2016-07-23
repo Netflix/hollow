@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.modules.meta;
 
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.*;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidImagesTerritoryCode;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
 
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
@@ -25,7 +26,6 @@ import com.netflix.vms.transformer.hollowoutput.VideoImages;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.artwork.ArtWorkModule;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,6 +42,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
         this.videoArtworkIndex = indexer.getHashIndex(IndexSpec.ARTWORK_BY_VIDEO_ID);
     }
 
+    public static boolean debug = false; // TODO do not merge to master
     public Map<String, Map<Integer, VideoImages>> buildVideoImagesByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
         Set<Integer> ids = new HashSet<>();
         for (Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
@@ -52,6 +53,10 @@ public class VideoImagesDataModule extends ArtWorkModule {
 
         Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap = new HashMap<>();
         for (Integer videoId : ids) {
+            if (videoId.intValue() == 204926) // TODO do not merge to master
+                debug = true;
+            else
+                debug = false;
             HollowHashIndexResult matches = videoArtworkIndex.findMatches((long) videoId);
             if (matches != null) {
                 HollowOrdinalIterator iter = matches.iterator();

@@ -11,6 +11,7 @@ import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.write.objectmapper.NullablePrimitiveBoolean;
 import com.netflix.vms.transformer.ConversionUtils;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.hollowinput.ArtWorkImageTypeHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeHollow;
@@ -45,6 +46,7 @@ import com.netflix.vms.transformer.hollowoutput.__passthrough_string;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
+import com.netflix.vms.transformer.modules.meta.VideoImagesDataModule;
 import com.netflix.vms.transformer.util.NFLocaleUtil;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -94,6 +96,9 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
 
         this.computedCdnFolderLen = ctx.getConfig().getComputedCdnFolderLength();
         this.isEnableCdnDirectoryOptimization = ctx.getConfig().isEnableCdnDirectoryOptimization();
+
+        Collection<DamMerchStillsHollow> dams = api.getAllDamMerchStillsHollow();
+        ctx.getLogger().warn(TransformerLogTag.UnexpectedError, "number of AllDamMerchStillsHollow=" + dams.size());
     }
 
     protected void transformArtworks(int entityId, String sourceFileId, int ordinalPriority, int seqNum, ArtworkAttributesHollow attributes, ArtworkDerivativeListHollow derivatives, Set<ArtworkLocaleHollow> localeSet, Set<Artwork> artworkSet) {
@@ -196,13 +201,26 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         artwork.derivatives = artworkDerivatives(derivativeList);
         artwork.cdns = cdnList;
 
+        boolean debug = VideoImagesDataModule.debug; // TODO do not merge to master
+        if (debug) {
+            ctx.getLogger().warn(TransformerLogTag.UnexpectedError,
+                    "DamAssetId=" + sourceFileId + ", ordinal=" + damMerchStillsIdx.getMatchingOrdinal(sourceFileId) + ", locale=" + locale.toString());
+        }
         int ordinal = damMerchStillsIdx.getMatchingOrdinal(sourceFileId);
         if (ordinal != -1) {
             DamMerchStillsHollow damMerchstill = api.getDamMerchStillsHollow(ordinal);
             ArtworkMerchStillPackageData packageData = new ArtworkMerchStillPackageData();
-            packageData.packageId = java.lang.Integer.valueOf(damMerchstill._getMoment()._getPackageId()._getValue());
-            packageData.offsetMillis = java.lang.Long.valueOf(damMerchstill._getMoment()._getStillTS()._getValue());
-            artwork.merchstillsPackageData = packageData;
+            if(damMerchstill._getMoment() != null) {
+                try {
+                    packageData.packageId = java.lang.Integer.valueOf(damMerchstill._getMoment()._getPackageId()._getValue());
+                    packageData.offsetMillis = java.lang.Long.valueOf(damMerchstill._getMoment()._getStillTS()._getValue());
+                    artwork.merchstillsPackageData = packageData;
+                    ctx.getLogger().warn(TransformerLogTag.UnexpectedError,
+                            "INFO: found sourceFileId=" + sourceFileId + ", for packageId=" + packageData.packageId);
+                } catch (Exception e) {
+                    ctx.getLogger().error(TransformerLogTag.UnexpectedError, "malformeddamfile=" + sourceFileId, e);
+                }
+            }
         }
         fillPassThroughData(artwork, attributes);
 
