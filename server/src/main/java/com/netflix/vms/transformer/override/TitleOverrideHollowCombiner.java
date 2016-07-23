@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer.override;
 
 import static com.netflix.vms.transformer.common.config.OutputTypeConfig.NamedCollectionHolder;
-import static com.netflix.vms.transformer.common.config.OutputTypeConfig.TopNVideoData;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TitleOverride;
 
 import com.netflix.hollow.HollowObjectSchema;
@@ -41,7 +40,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.BitSet;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -50,9 +48,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TitleOverrideHollowCombiner {
-    private static Set<OutputTypeConfig> TITLEOVERRIDE_EXCLUDED_TYPES = EnumSet.of(
-            NamedCollectionHolder, TopNVideoData);
-
     public static final String NAMEDLIST_TYPE_STATE_NAME = NamedCollectionHolder.getType();
 
     private final TransformerContext ctx;
@@ -73,14 +68,10 @@ public class TitleOverrideHollowCombiner {
 
         HollowCombinerCopyDirector copyDirector = new TitleOverrideHollowCombinerCopyDirector(ctx, fastlane, overrideTitles);
         this.combiner = new HollowCombiner(copyDirector, output, inputs);
-        for (OutputTypeConfig type : TITLEOVERRIDE_EXCLUDED_TYPES) {
+        for (OutputTypeConfig type : OutputTypeConfig.FASTLANE_SKIP_TYPES) {
             combiner.addIgnoredTypes(type.getType());
         }
-
-        //        debug("fastlane", fastlane);
-        //        for (HollowReadStateEngine e : overrideTitles) {
-        //            debug("override", e);
-        //        }
+        combiner.addIgnoredTypes(NamedCollectionHolder.getType());
 
         this.combinedVideoLists = new ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String,Set<Integer>>>();
         this.combinedPersonLists = new ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String,Set<Integer>>>();
@@ -129,8 +120,6 @@ public class TitleOverrideHollowCombiner {
         }
 
         if (dupChecker.wasDupKeysDetected()) {
-            //            debug("combined", stateEngine);
-
             ctx.getLogger().error(TitleOverride, "Duplicate Keys detected in Core Type(s): {}", dupChecker.getResults());
             throw new Exception("Duplicate Keys detected in Core Type(s): " + dupChecker.getResults());
         }

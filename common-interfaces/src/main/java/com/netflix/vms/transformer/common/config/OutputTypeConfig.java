@@ -55,6 +55,10 @@ public enum OutputTypeConfig {
             ArtWorkImageFormatEntry, ArtWorkImageTypeEntry, ArtWorkImageRecipe, DefaultExtensionRecipe,
             StreamData, DrmKey, WmDrmKey));
 
+    public final static Set<OutputTypeConfig> FASTLANE_SKIP_TYPES = Collections.unmodifiableSet(EnumSet.of(
+            GlobalPerson, PersonImages, CharacterImages,
+            LanguageRights, TopNVideoData));
+
     //---------------
     private final String type;
     private final String[] keyFieldPaths;

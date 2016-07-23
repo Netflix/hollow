@@ -36,10 +36,11 @@ public abstract class AbstractTitleOverrideProcessor implements TitleOverridePro
     }
 
     protected File getFile(String type, long version, int topNode) {
+        String fileVIP = vip + "_" + type;
         if (localBlobStore != null) {
-            return new File(localBlobStore, "vms.hollow" + type + ".blob." + vip + ".slice_" + version + "_" + topNode);
+            return new File(localBlobStore, "vms." + fileVIP + "-titleoverride-" + version + "_" + topNode);
         } else {
-            return new File(new HollowBlobFileNamer(vip).getTitleOverrideFileName(version, topNode));
+            return new File(new HollowBlobFileNamer(fileVIP).getTitleOverrideFileName(version, topNode));
         }
     }
 

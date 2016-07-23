@@ -41,7 +41,7 @@ public class OutputSliceTitleOverrideProcessor extends AbstractTitleOverrideProc
             long start = System.currentTimeMillis();
             outputDataClient.triggerRefreshTo(version);
 
-            DataSlicer.SliceTask slicer = new DataSlicerImpl().getSliceTask(0, topNode);
+            DataSlicer.SliceTask slicer = new DataSlicerImpl().getSliceTask(false, 0, topNode);
             HollowWriteStateEngine slicedStateEngine = slicer.sliceOutputBlob(outputDataClient.getStateEngine());
 
             writeStateEngine(slicedStateEngine, localFile);
