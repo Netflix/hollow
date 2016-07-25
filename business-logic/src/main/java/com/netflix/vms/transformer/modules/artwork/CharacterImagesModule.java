@@ -1,9 +1,10 @@
 package com.netflix.vms.transformer.modules.artwork;
 
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.*;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
 
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.config.OutputTypeConfig;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeListHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
@@ -13,6 +14,7 @@ import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.Artwork;
 import com.netflix.vms.transformer.hollowoutput.CharacterImages;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -25,10 +27,10 @@ public class CharacterImagesModule extends ArtWorkModule{
 
     @Override
     public void transform() {
-    	/// short-circuit Fastlane
-    	if(ctx.getFastlaneIds() != null)
-    		return;
-    	
+        /// short-circuit Fastlane
+        if (OutputTypeConfig.FASTLANE_SKIP_TYPES.contains(OutputTypeConfig.CharacterImages) && ctx.getFastlaneIds() != null)
+            return;
+
         Map<Integer, Set<Artwork>> descMap = new HashMap<>();
         for(CharacterArtworkHollow artworkHollowInput : api.getAllCharacterArtworkHollow()) {
             int entityId = (int) artworkHollowInput._getCharacterId();
