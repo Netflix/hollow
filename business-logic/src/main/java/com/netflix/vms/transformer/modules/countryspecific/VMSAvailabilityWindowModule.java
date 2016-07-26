@@ -142,7 +142,7 @@ public class VMSAvailabilityWindowModule {
                 long contractId = entry.getKey();
                 RightsContractHollow rightsContract = entry.getValue().contract;
                 ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, country, contractId);
-                boolean isDownloadable = entry.getValue().isDownloadable;
+                boolean isAvailableForDownload = entry.getValue().isAvailableForDownload;
 
                 if(rightsContract != null) {
                     ListOfRightsContractPackageHollow packageIdList = rightsContract._getPackages();
@@ -192,7 +192,7 @@ public class VMSAvailabilityWindowModule {
                                     windowPackageContractInfo.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(cupTokens);
                                     windowPackageContractInfo.videoContractInfo.assetBcp47Codes = bcp47Codes;
                                     windowPackageContractInfo.videoContractInfo.contractId = Math.max(windowPackageContractInfo.videoContractInfo.contractId, (int)contractId);
-                                    windowPackageContractInfo.videoContractInfo.isDownloadable = windowPackageContractInfo.videoContractInfo.isDownloadable || isDownloadable;
+                                    windowPackageContractInfo.videoContractInfo.isAvailableForDownload = windowPackageContractInfo.videoContractInfo.isAvailableForDownload || isAvailableForDownload;
                                     windowPackageContractInfo.videoContractInfo.primaryPackageId = (int) Math.max(windowPackageContractInfo.videoContractInfo.primaryPackageId, rightsContract._getPackageId());
 
                                     outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
@@ -222,7 +222,7 @@ public class VMSAvailabilityWindowModule {
                                     PackageData packageData = getPackageData(videoId, pkg._getPackageId());
                                     if(packageData != null) {
                                         /// package data is available
-                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(packageData, rightsContract, contract, country, isDownloadable);
+                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(packageData, rightsContract, contract, country, isAvailableForDownload);
                                         outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
 
                                         if(packageData.id > maxPackageId) {

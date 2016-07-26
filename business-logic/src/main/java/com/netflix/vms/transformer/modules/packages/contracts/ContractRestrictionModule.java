@@ -168,9 +168,9 @@ public class ContractRestrictionModule {
         List<RightsWindowContract> applicableContracts = new ArrayList<>(contracts.size());
         for (RightsContractHollow contract : contracts) {
         	Integer contractId = Integer.valueOf((int)contract._getContractId());
-			Boolean isDownloadable = contractIds.get(contractId);
-            if (isDownloadable != null && contractIsApplicableForPackage(contract, packages._getPackageId())) {
-                applicableContracts.add(new RightsWindowContract(contractId.intValue(), contract, isDownloadable));
+			Boolean isAvailableForDownload = contractIds.get(contractId);
+            if (isAvailableForDownload != null && contractIsApplicableForPackage(contract, packages._getPackageId())) {
+                applicableContracts.add(new RightsWindowContract(contractId.intValue(), contract, isAvailableForDownload));
             }
         }
         return applicableContracts;
@@ -225,7 +225,7 @@ public class ContractRestrictionModule {
             restriction.cupKeys.add(getCupKey(cupToken));
         }
 
-        restriction.isDownloadable = rightsContract.isDownloadable;
+        restriction.isAvailableForDownload = rightsContract.isAvailableForDownload;
         
         finalizeContractRestriction(assetTypeIdx, restriction, contract);
     }
@@ -261,8 +261,8 @@ public class ContractRestrictionModule {
             }
 
             /// if any rights contract is downloadable, then the package is downloadable.
-            if(rightsContract.isDownloadable)
-            	restriction.isDownloadable = true;
+            if(rightsContract.isAvailableForDownload)
+            	restriction.isAvailableForDownload = true;
             
             StringHollow cupKey = contract == null ? null : contract._getCupToken();
             orderedContractIdCupKeyMap.put((int) rightsContract.contract._getContractId(), cupKey == null ? CupKey.DEFAULT : cupKey._getValue());
