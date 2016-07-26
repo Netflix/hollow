@@ -294,6 +294,7 @@ public class VMSAvailabilityWindowModule {
             Set<VideoFormatDescriptor> videoFormatDescriptorsFromMaxPackageId = null;
             int prePromoDays = 0;
             boolean hasRollingEpisodes = false;
+            boolean isAvailableForDownload = false;
             LinkedHashSetOfStrings cupTokens = null;
             Map<Strings, List<VideoImage>> stillImagesByTypeMap = null;
             Map<Strings, List<VideoImage>> stillImagesByTypeMapForShowLevelExtraction = null;
@@ -305,6 +306,7 @@ public class VMSAvailabilityWindowModule {
                     videoFormatDescriptorsFromMaxPackageId = entry.getValue().videoPackageInfo.formats;
                     prePromoDays = minValueToZero(entry.getValue().videoContractInfo.prePromotionDays);
                     hasRollingEpisodes = entry.getValue().videoContractInfo.hasRollingEpisodes;
+                    isAvailableForDownload = entry.getValue().videoContractInfo.isAvailableForDownload;
                     cupTokens = entry.getValue().videoContractInfo.cupTokens;
                     if(isGoLive && isInWindow)
                         stillImagesByTypeMap = entry.getValue().videoPackageInfo.stillImagesMap;
@@ -318,6 +320,8 @@ public class VMSAvailabilityWindowModule {
 
             if(hasRollingEpisodes)
                 rollup.foundRollingEpisodes();
+            if(isAvailableForDownload)
+                rollup.foundAvailableForDownload();
 
             if(isGoLive && isInWindow) {
                 rollup.newVideoFormatDescriptors(videoFormatDescriptorsFromMaxPackageId);
@@ -419,10 +423,12 @@ public class VMSAvailabilityWindowModule {
             videoMediaAvailabilityWindow.windowInfosByPackageId.put(ZERO, videoMediaContractInfo);
 
             videoImagesContractInfo.videoContractInfo.cupTokens = EMPTY_CUP_TOKENS;
+            videoImagesContractInfo.videoContractInfo.isAvailableForDownload = rollup.isAvailableForDownload();
             videoMediaContractInfo.videoContractInfo.assetBcp47Codes = rollup.getAssetBcp47Codes();
             videoMediaContractInfo.videoContractInfo.prePromotionDays = rollup.getPrePromoDays();
             videoMediaContractInfo.videoContractInfo.isDayAfterBroadcast = rollup.hasRollingEpisodes();
             videoMediaContractInfo.videoContractInfo.hasRollingEpisodes = rollup.hasRollingEpisodes();
+            videoMediaContractInfo.videoContractInfo.isAvailableForDownload = rollup.isAvailableForDownload();
             videoMediaContractInfo.videoContractInfo.postPromotionDays = 0;
             videoMediaContractInfo.videoContractInfo.cupTokens = rollup.getCupTokens() != null ? rollup.getCupTokens() : DEFAULT_CUP_TOKENS;
             videoMediaContractInfo.videoPackageInfo.formats = rollup.getVideoFormatDescriptors();

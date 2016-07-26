@@ -43,10 +43,12 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
     private int seasonSequenceNumber = 0;
     private Map<DateWindow, BitSet> seasonSequenceNumberMap = new HashMap<>();
 
-    int showPrePromoDays = 0;
-    int seasonPrePromoDays = 0;
-    boolean showHasRollingEpisodes = false;;
-    boolean seasonHasRollingEpisodes = false;
+    private int showPrePromoDays = 0;
+    private int seasonPrePromoDays = 0;
+    private boolean showHasRollingEpisodes = false;;
+    private boolean seasonHasRollingEpisodes = false;
+    private boolean showIsAvailableForDownload = false;
+    private boolean seasonIsAvailableForDownload = false;
 
     public void setSeasonSequenceNumber(int seasonSequenceNumber) {
         this.seasonSequenceNumber = seasonSequenceNumber;
@@ -67,6 +69,7 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         seasonVideoFormatDescriptors = new HashSet<VideoFormatDescriptor>();
         seasonPrePromoDays = 0;
         seasonHasRollingEpisodes = false;
+        seasonIsAvailableForDownload = false;
         seasonCupTokensFromFirstStreamableEpisode = null;
         seasonFirstEpisodeVideoImagesMap = Collections.emptyMap();
         seasonLevelTaggedVideoImagesRollup = new HashMap<Strings, List<VideoImage>>();
@@ -80,6 +83,7 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         showVideoFormatDescriptors = new HashSet<VideoFormatDescriptor>();
         showPrePromoDays = 0;
         showHasRollingEpisodes = false;
+        showIsAvailableForDownload = false;
         showCupTokensFromFirstStreamableEpisode = null;
         showFirstEpisodeVideoImagesMap = Collections.emptyMap();
         showLevelTaggedVideoImagesRollup = new HashMap<Strings, List<VideoImage>>();
@@ -128,6 +132,11 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
     public void foundRollingEpisodes() {
         showHasRollingEpisodes = true;
         seasonHasRollingEpisodes = true;
+    }
+
+    public void foundAvailableForDownload() {
+        showIsAvailableForDownload = true;
+        seasonIsAvailableForDownload = true;
     }
     
     public void newPrePromoDays(int prePromoDays) {
@@ -233,6 +242,10 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         return showHasRollingEpisodes;
     }
 
+    public boolean isAvailableForDownload() {
+        return doSeason() ? seasonIsAvailableForDownload : showIsAvailableForDownload;
+    }
+
     public LinkedHashSetOfStrings getCupTokens() {
         if (doSeason())
             return seasonCupTokensFromFirstStreamableEpisode;
@@ -298,5 +311,4 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
 
         return mergedWindowSeqNumMap;
     }
-
 }
