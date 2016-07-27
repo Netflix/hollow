@@ -46,6 +46,8 @@ public interface TransformerConfig {
     
     @DefaultValue("false")
     boolean isRestoreFromPreviousStateEngine();
+    
+    Long getRestoreFromSpecificVersion();
 
     //////////////// PUBLISH WORKFLOW ///////////////////
 

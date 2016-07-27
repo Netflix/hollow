@@ -5,9 +5,7 @@ import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metri
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleSuccess;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WaitForNextCycle;
-
 import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
-
 import com.google.inject.Inject;
 import com.netflix.archaius.api.Config;
 import com.netflix.aws.file.FileStore;
@@ -156,9 +154,14 @@ public class TransformerCycleKickoff {
         if(cfg.isRestoreFromPreviousStateEngine() && !isFastlane(cfg)) {
             long latestVersion = hermesBlobAnnouncer.getLatestAnnouncedVersionFromCassandra(cfg.getTransformerVip());
             
-            if(latestVersion != Long.MIN_VALUE) {
+            long restoreVersion = cfg.getRestoreFromSpecificVersion() != null ? cfg.getRestoreFromSpecificVersion() : latestVersion;
+            
+            if(restoreVersion != Long.MIN_VALUE) {
                 VMSOutputDataClient outputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip());
-                outputClient.triggerRefreshTo(latestVersion);
+                outputClient.triggerRefreshTo(restoreVersion);
+                
+                if(outputClient.getCurrentVersionId() != restoreVersion)
+                    throw new IllegalStateException("Failed to restore from state: " + restoreVersion); 
                 
                 cycle.restore(outputClient);
             } else {
