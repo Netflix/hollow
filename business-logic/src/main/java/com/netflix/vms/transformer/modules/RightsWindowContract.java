@@ -5,11 +5,11 @@ import com.netflix.vms.transformer.hollowinput.RightsContractHollow;
 public class RightsWindowContract {
     public final long contractId;
     public final RightsContractHollow contract;
-    public final boolean isDownloadable;
+    public final boolean isAvailableForDownload;
 
-    public RightsWindowContract(long contractId, RightsContractHollow contract, boolean isDownloadable) {
+    public RightsWindowContract(long contractId, RightsContractHollow contract, boolean isAvailableForDownload) {
         this.contractId = contractId;
         this.contract = contract;
-        this.isDownloadable = isDownloadable;
+        this.isAvailableForDownload = isAvailableForDownload;
     }
 }

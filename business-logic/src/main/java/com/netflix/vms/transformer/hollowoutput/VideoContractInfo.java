@@ -5,7 +5,7 @@ import java.util.Set;
 public class VideoContractInfo implements Cloneable {
 
     public int contractId = java.lang.Integer.MIN_VALUE;
-    public boolean isDownloadable = false;
+    public boolean isAvailableForDownload = false;
     public int primaryPackageId = java.lang.Integer.MIN_VALUE;
     public int prePromotionDays = java.lang.Integer.MIN_VALUE;
     public int postPromotionDays = java.lang.Integer.MIN_VALUE;
@@ -21,7 +21,7 @@ public class VideoContractInfo implements Cloneable {
 
         VideoContractInfo o = (VideoContractInfo) other;
         if(o.contractId != contractId) return false;
-        if(o.isDownloadable != isDownloadable) return false;
+        if(o.isAvailableForDownload != isAvailableForDownload) return false;
         if(o.primaryPackageId != primaryPackageId) return false;
         if(o.prePromotionDays != prePromotionDays) return false;
         if(o.postPromotionDays != postPromotionDays) return false;
@@ -39,7 +39,7 @@ public class VideoContractInfo implements Cloneable {
     public int hashCode() {
         int hashCode = 1;
         hashCode = hashCode * 31 + contractId;
-        hashCode = hashCode * 31 + (isDownloadable ? 1231 : 1237);
+        hashCode = hashCode * 31 + (isAvailableForDownload ? 1231 : 1237);
         hashCode = hashCode * 31 + primaryPackageId;
         hashCode = hashCode * 31 + prePromotionDays;
         hashCode = hashCode * 31 + postPromotionDays;
@@ -53,7 +53,7 @@ public class VideoContractInfo implements Cloneable {
     public String toString() {
         StringBuilder builder = new StringBuilder("VideoContractInfo{");
         builder.append("contractId=").append(contractId);
-        builder.append(",isDownloadable=").append(isDownloadable);
+        builder.append(",isAvailableForDownload=").append(isAvailableForDownload);
         builder.append(",primaryPackageId=").append(primaryPackageId);
         builder.append(",prePromotionDays=").append(prePromotionDays);
         builder.append(",postPromotionDays=").append(postPromotionDays);
