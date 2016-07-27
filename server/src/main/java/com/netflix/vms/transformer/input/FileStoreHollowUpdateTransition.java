@@ -62,8 +62,11 @@ public class FileStoreHollowUpdateTransition extends HollowUpdateTransition {
                 break;
             } catch(Exception e) {
                 LOGGER.error("Retrieval of transition input stream failed", e);
-                if(retryCount == NUM_RETRIES)
+                if(retryCount == NUM_RETRIES) {
+                    if(localFile.exists())
+                        localFile.delete();
                     throw new IOException(e);
+                }
             }
         }
 
