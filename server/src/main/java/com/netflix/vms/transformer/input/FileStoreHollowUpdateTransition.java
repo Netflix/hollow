@@ -15,7 +15,9 @@ import org.slf4j.LoggerFactory;
 
 public class FileStoreHollowUpdateTransition extends HollowUpdateTransition {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileStoreHollowUpdateTransition.class);
-
+    
+    private static final int NUM_RETRIES = 3;
+    
     private final String fileStoreKeybase;
     private final String fileStoreVersion;
 
@@ -50,7 +52,7 @@ public class FileStoreHollowUpdateTransition extends HollowUpdateTransition {
 
         int retryCount = 0;
 
-        while(retryCount < 3) {
+        while(retryCount < NUM_RETRIES) {
             retryCount++;
 
             try {
@@ -60,7 +62,7 @@ public class FileStoreHollowUpdateTransition extends HollowUpdateTransition {
                 break;
             } catch(Exception e) {
                 LOGGER.error("Retrieval of transition input stream failed", e);
-                if(retryCount == 2)
+                if(retryCount == NUM_RETRIES)
                     throw new IOException(e);
             }
         }
