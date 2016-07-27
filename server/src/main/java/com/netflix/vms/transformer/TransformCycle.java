@@ -8,6 +8,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleFastl
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InputDataConverterVersionId;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.ProcessNowMillis;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.RollbackStateEngine;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.StateEngineCompaction;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleBegin;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WritingBlobsFailed;
@@ -15,6 +16,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.WroteBlob;
 
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.client.HollowClient;
+import com.netflix.hollow.compact.HollowCompactor;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
@@ -82,6 +84,27 @@ public class TransformCycle {
             ctx.getLogger().error(RollbackStateEngine, "Transformer failed cycle -- rolling back write state engine", th);
             outputStateEngine.resetToLastPrepareForNextCycle();
             throw th;
+        }
+    }
+    
+    public void tryCompaction() throws Throwable {
+        long compactionBytesThreshold = ctx.getConfig().getCompactionHoleByteThreshold();
+        int compactionPercentThreshold = ctx.getConfig().getCompactionHolePercentThreshold();
+        HollowCompactor compactor = new HollowCompactor(outputStateEngine, publishWorkflowStager.getCurrentReadStateEngine(), compactionBytesThreshold, compactionPercentThreshold);
+        
+        if(compactor.needsCompaction()) {
+            try {
+                ctx.getLogger().info(StateEngineCompaction, "Compacting State Engine");
+                beginCycle();
+                compactor.compact();
+                writeTheBlobFiles();
+                submitToPublishWorkflow();
+                endCycleSuccessfully();
+            } catch(Throwable th) {
+                ctx.getLogger().error(RollbackStateEngine, "Transformer failed compaction cycle -- rolling back write state engine", th);
+                outputStateEngine.resetToLastPrepareForNextCycle();
+                throw th;
+            }
         }
     }
 

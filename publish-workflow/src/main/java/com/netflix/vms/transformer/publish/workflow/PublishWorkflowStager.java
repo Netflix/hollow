@@ -9,5 +9,7 @@ public interface PublishWorkflowStager {
 	CycleStatusFuture triggerPublish(long inputDataVersion, long previousCycleId, long currentCycleId);
 	
 	void notifyRestoredStateEngine(HollowReadStateEngine stateEngine);
+	
+	HollowReadStateEngine getCurrentReadStateEngine();
 
 }

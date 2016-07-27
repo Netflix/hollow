@@ -73,6 +73,8 @@ public class TransformerCycleKickoff {
                             setUpFastlaneContext();
 	                    cycle.cycle();
                         markCycleSucessful();
+                        if(shouldTryCompaction(ctx.getConfig()))
+                            cycle.tryCompaction();
                     } catch(Throwable th) {
                         markCycleFailed(th);
                     } finally {
@@ -168,6 +170,10 @@ public class TransformerCycleKickoff {
                 throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.restoreFromPreviousStateEngine=false.");
             }
         }
+    }
+    
+    private boolean shouldTryCompaction(TransformerConfig cfg) {
+        return !isFastlane(cfg) && cfg.isCompactionEnabled();
     }
 
     private boolean isFastlane(TransformerConfig cfg) {

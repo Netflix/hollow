@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer.publish.workflow.fastlane;
 
 import com.netflix.vms.transformer.publish.status.CycleStatusFuture;
-
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
@@ -127,5 +126,10 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
     @Override
     public void notifyRestoredStateEngine(HollowReadStateEngine stateEngine) { 
         throw new UnsupportedOperationException("The FastTrack doesn't restore state");
+    }
+    
+    @Override
+    public HollowReadStateEngine getCurrentReadStateEngine() {
+        throw new UnsupportedOperationException("The FastTrack doesn't require a HollowReadStateEngine");
     }
 }
