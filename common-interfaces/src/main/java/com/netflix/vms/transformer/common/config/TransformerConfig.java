@@ -44,7 +44,7 @@ public interface TransformerConfig {
     
     String getOverrideFastlaneIds();
     
-    @DefaultValue("false")
+    @DefaultValue("true")
     boolean isRestoreFromPreviousStateEngine();
     
     Long getRestoreFromSpecificVersion();
