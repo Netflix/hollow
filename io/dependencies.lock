@@ -566,13 +566,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.1.0",
+            "locked": "3.1.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.1.0",
+            "locked": "3.1.1",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1445,13 +1445,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.1.0",
+            "locked": "3.1.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.1.0",
+            "locked": "3.1.1",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -2324,13 +2324,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.1.0",
+            "locked": "3.1.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.1.0",
+            "locked": "3.1.1",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3203,13 +3203,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.1.0",
+            "locked": "3.1.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.1.0",
+            "locked": "3.1.1",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -4181,13 +4181,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.1.0",
+            "locked": "3.1.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.1.0",
+            "locked": "3.1.1",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -5061,13 +5061,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.1.0",
+            "locked": "3.1.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.1.0",
+            "locked": "3.1.1",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -5951,13 +5951,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.1.0",
+            "locked": "3.1.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.1.0",
+            "locked": "3.1.1",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -6841,13 +6841,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.1.0",
+            "locked": "3.1.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.1.0",
+            "locked": "3.1.1",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -7731,13 +7731,13 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.1.0",
+            "locked": "3.1.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.1.0",
+            "locked": "3.1.1",
             "transitive": [
                 "netflix:netflix-config"
             ]
