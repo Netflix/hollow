@@ -73,8 +73,10 @@ public class TransformerCycleKickoff {
                             setUpFastlaneContext();
 	                    cycle.cycle();
                         markCycleSucessful();
-                        if(shouldTryCompaction(ctx.getConfig()))
+                        if(shouldTryCompaction(ctx.getConfig())) {
                             cycle.tryCompaction();
+                            markCycleSucessful();
+                        }
                     } catch(Throwable th) {
                         markCycleFailed(th);
                     } finally {
