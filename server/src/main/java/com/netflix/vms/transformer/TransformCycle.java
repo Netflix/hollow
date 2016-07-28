@@ -94,8 +94,8 @@ public class TransformCycle {
         
         if(compactor.needsCompaction()) {
             try {
-                ctx.getLogger().info(StateEngineCompaction, "Compacting State Engine");
                 beginCycle();
+                ctx.getLogger().info(StateEngineCompaction, "Compacting State Engine");
                 compactor.compact();
                 writeTheBlobFiles();
                 submitToPublishWorkflow();
