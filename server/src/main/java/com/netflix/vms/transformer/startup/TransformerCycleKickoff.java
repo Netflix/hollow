@@ -29,6 +29,7 @@ import com.netflix.vms.transformer.publish.workflow.job.impl.HermesBlobAnnouncer
 import com.netflix.vms.transformer.rest.VMSPublishWorkflowHistoryAdmin;
 import com.netflix.vms.transformer.util.VipUtil;
 import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
+import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
 
 import java.util.function.Supplier;
 
@@ -158,11 +159,14 @@ public class TransformerCycleKickoff {
     private void restore(TransformCycle cycle, TransformerConfig cfg, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer) {
         if(cfg.isRestoreFromPreviousStateEngine() && !isFastlane(cfg)) {
             long latestVersion = hermesBlobAnnouncer.getLatestAnnouncedVersionFromCassandra(cfg.getTransformerVip());
+            long restoreVersion = cfg.getRestoreFromSpecificVersion() != null ? cfg.getRestoreFromSpecificVersion() : latestVersion;
 
-            if(latestVersion != Long.MIN_VALUE) {
+            if(restoreVersion != Long.MIN_VALUE) {
                 VMSOutputDataClient outputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip());
-                outputClient.triggerRefreshTo(latestVersion);
+                outputClient.triggerRefreshTo(restoreVersion);
 
+                if(outputClient.getCurrentVersionId() != restoreVersion)
+                    throw new IllegalStateException("Failed to restore from state: " + restoreVersion);
                 cycle.restore(outputClient);
             } else {
                 throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.restoreFromPreviousStateEngine=false.");

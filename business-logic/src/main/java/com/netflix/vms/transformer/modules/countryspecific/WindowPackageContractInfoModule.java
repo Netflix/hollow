@@ -61,13 +61,13 @@ public class WindowPackageContractInfoModule {
         FILTERED_VIDEO_PACKAGE_INFO = newEmptyVideoPackageInfo();
     }
 
-    public WindowPackageContractInfo buildWindowPackageContractInfo(PackageData packageData, RightsContractHollow rightsContract, ContractHollow contract, String country, boolean isDownloadable) {
+    public WindowPackageContractInfo buildWindowPackageContractInfo(PackageData packageData, RightsContractHollow rightsContract, ContractHollow contract, String country, boolean isAvailableForDownload) {
         PackageHollow inputPackage = api.getPackageHollow(packageIdx.getMatchingOrdinal((long) packageData.id));
 
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
         info.videoContractInfo.contractId = (int) rightsContract._getContractId();
-        info.videoContractInfo.isDownloadable = isDownloadable;
+        info.videoContractInfo.isAvailableForDownload = isAvailableForDownload;
         info.videoContractInfo.primaryPackageId = (int) rightsContract._getPackageId();
         assignContracInfo(info, contract);
         info.videoContractInfo.assetBcp47Codes = new HashSet<Strings>();

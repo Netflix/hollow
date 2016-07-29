@@ -49,8 +49,10 @@ public interface TransformerConfig {
 
     String getOverrideTitleDataVip();
 
-    @DefaultValue("false")
+    @DefaultValue("true")
     boolean isRestoreFromPreviousStateEngine();
+    
+    Long getRestoreFromSpecificVersion();
 
     //////////////// PUBLISH WORKFLOW ///////////////////
 
