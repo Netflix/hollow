@@ -21,6 +21,7 @@ public enum TransformerLogTag implements LogTag {
     ConfigurationFailure,
     UnexpectedError,
     RollbackStateEngine,
+    StateEngineCompaction,
 
 
     //// TRANSFORMATION ERRORS ////
