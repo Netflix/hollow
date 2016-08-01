@@ -53,6 +53,15 @@ public interface TransformerConfig {
     boolean isRestoreFromPreviousStateEngine();
     
     Long getRestoreFromSpecificVersion();
+    
+    @DefaultValue("false")
+    boolean isCompactionEnabled();
+    
+    @DefaultValue("2000000")
+    long getCompactionHoleByteThreshold();
+    
+    @DefaultValue("10")
+    int getCompactionHolePercentThreshold();
 
     //////////////// PUBLISH WORKFLOW ///////////////////
 
