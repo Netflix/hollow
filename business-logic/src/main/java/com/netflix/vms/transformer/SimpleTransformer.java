@@ -6,17 +6,6 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.NonVideoSp
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformInfo;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformProgress;
 
-import java.lang.Integer;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
@@ -24,7 +13,22 @@ import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.VideoHierarchyGrouper.VideoHierarchyGroup;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
-import com.netflix.vms.transformer.hollowoutput.*;
+import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
+import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
+import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
+import com.netflix.vms.transformer.hollowoutput.FallbackUSArtwork;
+import com.netflix.vms.transformer.hollowoutput.GlobalPerson;
+import com.netflix.vms.transformer.hollowoutput.GlobalVideo;
+import com.netflix.vms.transformer.hollowoutput.ISOCountry;
+import com.netflix.vms.transformer.hollowoutput.Strings;
+import com.netflix.vms.transformer.hollowoutput.Video;
+import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
+import com.netflix.vms.transformer.hollowoutput.VideoImages;
+import com.netflix.vms.transformer.hollowoutput.VideoMediaData;
+import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
+import com.netflix.vms.transformer.hollowoutput.VideoMiscData;
+import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
+import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.logmessage.ProgressMessage;
 import com.netflix.vms.transformer.misc.TopNVideoDataModule;
@@ -47,7 +51,6 @@ import com.netflix.vms.transformer.modules.mpl.EncodingProfileModule;
 import com.netflix.vms.transformer.modules.mpl.OriginServerModule;
 import com.netflix.vms.transformer.modules.packages.PackageDataModule;
 import com.netflix.vms.transformer.modules.packages.contracts.LanguageRightsModule;
-import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkFormatModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkImageRecipeModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkTypeModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.DefaultExtensionRecipeModule;
@@ -58,6 +61,16 @@ import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
 import com.netflix.vms.transformer.namedlist.NamedListCompletionModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule.VideoNamedListPopulator;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SimpleTransformer {
 
@@ -170,7 +183,6 @@ public class SimpleTransformer {
                 new DrmSystemModule(api, ctx, objectMapper),
                 new OriginServerModule(api, ctx, objectMapper, indexer),
                 new EncodingProfileModule(api, ctx, objectMapper, indexer),
-                new ArtworkFormatModule(api, ctx, objectMapper),
                 new CacheDeploymentIntentModule(api, ctx, objectMapper),
                 new ArtworkTypeModule(api, ctx, objectMapper),
                 new ArtworkImageRecipeModule(api, ctx, objectMapper),
