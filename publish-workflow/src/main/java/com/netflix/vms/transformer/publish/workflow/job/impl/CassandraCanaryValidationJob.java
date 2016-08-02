@@ -66,7 +66,6 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
 
                     // If before passed and after failed, then fail the data version.
                     if (videoFailedWithNewDataButPassedWithOld(beforeTestSuccess, afterTestSuccess)) {
-                        pbmSuccess = false;
                         failedIDs.add(videoCountry);
                     }
                     // If before passed and after passed or if before failed and after passed, the data is good.
@@ -84,34 +83,44 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
             validationVideoHolder.onCycleComplete(getCycleVersion(), failedIDs);
 
             if(!failedIDs.isEmpty()){
-                ctx.getLogger().info(PlaybackMonkey, "failedIDs={}", failedIDs);
                 float missingViewShareThreshold = ctx.getConfig().getPlaybackmonkeyMissingViewShareThreshold();
                 Map<String, Float> viewShareOfFailedVideos = validationVideoHolder.getViewShareOfVideos(failedIDs);
                 for(String countryId: viewShareOfFailedVideos.keySet()){
+                	boolean pbmSuccessForThisCountry = true;
                     Float missingViewShareForCountry = viewShareOfFailedVideos.get(countryId);
-                    if(missingViewShareForCountry != null && 
-                            Float.compare(missingViewShareForCountry, missingViewShareThreshold) > 0){
+                    if(missingViewShareForCountry != null && Float.compare(missingViewShareForCountry, missingViewShareThreshold) > 0){
                         pbmSuccess = false;
+                        pbmSuccessForThisCountry = false;
                     }
-                    ctx.getLogger().info(PlaybackMonkey, "country={} missingViewShare={} threshold={}", countryId, missingViewShareForCountry, missingViewShareThreshold);
-                    ctx.getMetricRecorder().recordMetric(Metric.PBMFailuresMissingViewShare, missingViewShareForCountry, "country",countryId);
+                    logMissingViewShare(pbmSuccessForThisCountry, missingViewShareThreshold, countryId, missingViewShareForCountry);
                 }
             }
-
-            if (!pbmSuccess) {
-                // Log which results failed
-                ctx.getLogger().error(PlaybackMonkey, "PBM validation: for region {} failed. {}",
-                        region.name(), getFailureReason(befTestResults, failedIDs));
-            } else {
-                ctx.getLogger().info(PlaybackMonkey, "PBM validation {} region completed. Success validation: {}",
-                        region.name(), pbmSuccess);
-            }
+            logFailedIDs(pbmSuccess, befTestResults, failedIDs);
         } catch(Exception ex) {
             ctx.getLogger().error(PlaybackMonkey, "Error validating PBM results.", ex);
             pbmSuccess = false;
         }
         return PlaybackMonkeyUtil.getFinalResultAferPBMOverride(pbmSuccess, ctx.getConfig());
     }
+
+
+	private void logFailedIDs(boolean pbmSuccess, Map<VideoCountryKey, Boolean> befTestResults, List<VideoCountryKey> failedIDs) {
+		if(!failedIDs.isEmpty()){
+			if(!pbmSuccess)
+				ctx.getLogger().error(PlaybackMonkey, "PBM validation failed. {}", getFailureReason(befTestResults, failedIDs));
+			else
+				ctx.getLogger().warn(PlaybackMonkey, "PBM validation successful with failedIDs={}", failedIDs);
+		}
+	}
+
+	private void logMissingViewShare(boolean pbmSuccessForThisCountry, float missingViewShareThreshold, String countryId,
+			Float missingViewShareForCountry) {
+		if(pbmSuccessForThisCountry)
+			ctx.getLogger().error(PlaybackMonkey, "PBM: country={} missingViewShare={} threshold={}.",countryId, missingViewShareForCountry, missingViewShareThreshold);
+		else if(missingViewShareForCountry != null && Float.compare(missingViewShareForCountry, 0f) > 0)
+			ctx.getLogger().warn(PlaybackMonkey, "PBM: country={} missingViewShare={} threshold={}", countryId, missingViewShareForCountry, missingViewShareThreshold);
+		ctx.getMetricRecorder().recordMetric(Metric.PBMFailuresMissingViewShare, missingViewShareForCountry, "country",countryId);
+	}
 
 	private boolean videoFailedWithNewDataButPassedWithOld(
 			Boolean beforeTestSuccess, Boolean afterTestSuccess) {
