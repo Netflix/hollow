@@ -6,7 +6,6 @@ import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.AudioStreamInfoHollow;
 import com.netflix.vms.transformer.hollowinput.ContractHollow;
-import com.netflix.vms.transformer.hollowinput.ContractIdHollow;
 import com.netflix.vms.transformer.hollowinput.DisallowedAssetBundleHollow;
 import com.netflix.vms.transformer.hollowinput.DisallowedSubtitleLangCodeHollow;
 import com.netflix.vms.transformer.hollowinput.DisallowedSubtitleLangCodesListHollow;
@@ -60,8 +59,6 @@ public class ContractRestrictionModule {
 
     private final StreamContractAssetTypeDeterminer assetTypeDeterminer;
     
-    private final boolean isOfflineViewingEnabled;
-
     public ContractRestrictionModule(VMSHollowInputAPI api, TransformerContext ctx, VMSTransformerIndexer indexer) {
         this.api = api;
         this.indexer = indexer;
@@ -70,8 +67,6 @@ public class ContractRestrictionModule {
         this.cupKeysMap = new HashMap<String, CupKey>();
         this.bcp47Codes = new HashMap<String, Strings>();
         this.assetTypeDeterminer = new StreamContractAssetTypeDeterminer(api, indexer);
-        
-        this.isOfflineViewingEnabled = ctx.getConfig().isOfflineViewingEnabled();
     }
 
     public Map<ISOCountry, Set<ContractRestriction>> getContractRestrictions(PackageHollow packages) {
@@ -118,14 +113,8 @@ public class ContractRestrictionModule {
                 for (RightsWindowHollow window : windows) {
                     Map<Integer, Boolean> contractIds = new HashMap<>();
 
-                    if(isOfflineViewingEnabled) {
-                    	for(RightsWindowContractHollow contract : window._getContractIdsExt()) {
-                    		contractIds.put(Integer.valueOf((int)contract._getContractId()), Boolean.valueOf(contract._getDownload()));
-                    	}
-                    } else {
-	                    for (ContractIdHollow contractId : window._getContractIds()) {
-	                        contractIds.put(Integer.valueOf((int) contractId._getValue()), Boolean.FALSE);
-	                    }
+                    for(RightsWindowContractHollow contract : window._getContractIdsExt()) {
+                        contractIds.put(Integer.valueOf((int)contract._getContractId()), Boolean.valueOf(contract._getDownload()));
                     }
 
                     ContractRestriction restriction = new ContractRestriction();
