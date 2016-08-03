@@ -571,7 +571,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -600,13 +600,13 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -1430,7 +1430,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -1459,13 +1459,13 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -2289,7 +2289,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -2318,13 +2318,13 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -3148,7 +3148,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -3177,13 +3177,13 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -4106,7 +4106,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -4135,13 +4135,13 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -4966,7 +4966,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -4995,13 +4995,13 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -5836,7 +5836,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -5865,13 +5865,13 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -6706,7 +6706,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -6735,13 +6735,13 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -7576,7 +7576,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -7605,13 +7605,13 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
