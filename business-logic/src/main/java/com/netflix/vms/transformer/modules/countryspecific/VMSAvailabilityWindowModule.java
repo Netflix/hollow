@@ -61,7 +61,6 @@ public class VMSAvailabilityWindowModule {
     private Map<Integer, VideoPackageData> transformedPackageData;
 
     private final WindowPackageContractInfoModule windowPackageContractInfoModule;
-    private final boolean isOfflineViewingEnabled;
 
     public VMSAvailabilityWindowModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
         this.api = api;
@@ -70,7 +69,6 @@ public class VMSAvailabilityWindowModule {
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
 
         this.windowPackageContractInfoModule = new WindowPackageContractInfoModule(api, ctx, cycleConstants, indexer);
-        this.isOfflineViewingEnabled = ctx.getConfig().isOfflineViewingEnabled();
 
         EMPTY_CUP_TOKENS = new LinkedHashSetOfStrings();
         EMPTY_CUP_TOKENS.ordinals = Collections.emptyList();
@@ -346,18 +344,10 @@ public class VMSAvailabilityWindowModule {
     private final LinkedHashMap<Long, RightsWindowContract> theRightsContractMap = new LinkedHashMap<>();
     private LinkedHashMap<Long, RightsWindowContract> getRightsContractMap(RightsHollow rights, RightsWindowHollow window) {
         theRightsContractMap.clear();
-        if (isOfflineViewingEnabled) {
-            for (RightsWindowContractHollow rightsWindowContract : window._getContractIdsExt()) {
-                long contractId = rightsWindowContract._getContractId();
-                RightsContractHollow contract = getRightContract(rights, contractId);
-                theRightsContractMap.put(contractId, new RightsWindowContract(contractId, contract, rightsWindowContract._getDownload()));
-            }
-        } else {
-            for (ContractIdHollow contractIdHollow : window._getContractIds()) {
-                long contractId = contractIdHollow._getValue();
-                RightsContractHollow contract = getRightContract(rights, contractId);
-                theRightsContractMap.put(contractId, new RightsWindowContract(contractId, contract, false));
-            }
+        for (RightsWindowContractHollow rightsWindowContract : window._getContractIdsExt()) {
+            long contractId = rightsWindowContract._getContractId();
+            RightsContractHollow contract = getRightContract(rights, contractId);
+            theRightsContractMap.put(contractId, new RightsWindowContract(contractId, contract, rightsWindowContract._getDownload()));
         }
 
         return theRightsContractMap;
