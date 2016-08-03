@@ -6,7 +6,6 @@ import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.ContractHollow;
-import com.netflix.vms.transformer.hollowinput.ContractIdHollow;
 import com.netflix.vms.transformer.hollowinput.FlagsHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfRightsContractPackageHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfRightsWindowHollow;
@@ -398,9 +397,9 @@ public class VMSAvailabilityWindowModule {
                 if(startDate < ctx.getNowMillis() && endDate > ctx.getNowMillis())
                     isInWindow = true;
 
-                for (ContractIdHollow id : window._getContractIds()) {
-                    if((int)id._getValue() > maxContractId)
-                        maxContractId = (int)id._getValue();
+                for (RightsWindowContractHollow rightsWindowContract : window._getContractIdsExt()) {
+                    if((int)rightsWindowContract._getContractId() > maxContractId)
+                        maxContractId = (int)rightsWindowContract._getContractId();
                 }
             }
 
