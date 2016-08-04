@@ -7,24 +7,31 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformI
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformProgress;
 
 import java.lang.Integer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.VideoHierarchyGrouper.VideoHierarchyGroup;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.hollowinput.CharacterListHollow;
+import com.netflix.vms.transformer.hollowinput.MovieCharacterPersonHollow;
+import com.netflix.vms.transformer.hollowinput.PersonCharacterHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.*;
+import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.logmessage.ProgressMessage;
 import com.netflix.vms.transformer.misc.TopNVideoDataModule;
@@ -291,6 +298,7 @@ public class SimpleTransformer {
 
         // ----------------------
         // Process GlobalVideo
+        HollowPrimaryKeyIndex primaryKeyIndex = indexer.getPrimaryKeyIndex(IndexSpec.MOVIE_CHARACTER_PERSON);
         for (Map.Entry<Video, Map<ISOCountry, CompleteVideo>> globalEntry : globalVideoMap.entrySet()) {
             Set<ISOCountry> availableCountries = new HashSet<ISOCountry>();
             Set<Strings> aliases = new HashSet<>();
@@ -310,13 +318,15 @@ public class SimpleTransformer {
                 }
             }
             if (representativeVideo == null) return;
-
+            
             // create GlobalVideo
             GlobalVideo gVideo = new GlobalVideo();
             gVideo.completeVideo = representativeVideo;
             gVideo.aliases = aliases;
             gVideo.availableCountries = availableCountries;
             gVideo.isSupplementalVideo = (representativeVideo.facetData.videoCollectionsData.nodeType == cycleConstants.SUPPLEMENTAL);
+            gVideo.personCharacters = getPersonCharacters(primaryKeyIndex, representativeVideo);
+            
             objectMapper.addObject(gVideo);
         }
 
@@ -335,6 +345,26 @@ public class SimpleTransformer {
                 objectMapper.addObject(artwork);
             }
         }
+    }
+
+    private List<MoviePersonCharacter> getPersonCharacters(HollowPrimaryKeyIndex primaryKeyIndex, CompleteVideo completeVideo) {
+        List<MoviePersonCharacter> personCharacters = new ArrayList<>();
+        long movieId = completeVideo.id.value;
+        int matchingOrdinal = primaryKeyIndex.getMatchingOrdinal(movieId);
+        if(matchingOrdinal != -1) {
+            MovieCharacterPersonHollow movieCharacterPersonHollow = api.getMovieCharacterPersonHollow(matchingOrdinal);
+            CharacterListHollow characterList = movieCharacterPersonHollow._getCharacters();
+            Iterator<PersonCharacterHollow> iterator = characterList.iterator();
+            while(iterator.hasNext()) {
+                PersonCharacterHollow personCharacterHollow = iterator.next();
+                MoviePersonCharacter moviePersonCharacter = new MoviePersonCharacter();
+                moviePersonCharacter.movieId = movieId;
+                moviePersonCharacter.personId = personCharacterHollow._getPersonId();
+                moviePersonCharacter.characterId = personCharacterHollow._getCharacterId();
+                personCharacters.add(moviePersonCharacter);
+            }
+        }
+        return personCharacters;
     }
 
     private CompleteVideo preferredCompleteVideo(CompleteVideo current, CompleteVideo candidate) {

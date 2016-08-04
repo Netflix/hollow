@@ -50,6 +50,9 @@ public class VMSHollowInputAPI extends HollowAPI {
     private final MapKeyTypeAPI mapKeyTypeAPI;
     private final MapOfFlagsFirstDisplayDatesTypeAPI mapOfFlagsFirstDisplayDatesTypeAPI;
     private final FlagsTypeAPI flagsTypeAPI;
+    private final PersonCharacterTypeAPI personCharacterTypeAPI;
+    private final CharacterListTypeAPI characterListTypeAPI;
+    private final MovieCharacterPersonTypeAPI movieCharacterPersonTypeAPI;
     private final PersonVideoAliasIdTypeAPI personVideoAliasIdTypeAPI;
     private final PersonVideoAliasIdsListTypeAPI personVideoAliasIdsListTypeAPI;
     private final PersonVideoRoleTypeAPI personVideoRoleTypeAPI;
@@ -91,6 +94,8 @@ public class VMSHollowInputAPI extends HollowAPI {
     private final CertificationSystemTypeAPI certificationSystemTypeAPI;
     private final CharacterElementsTypeAPI characterElementsTypeAPI;
     private final CharacterTypeAPI characterTypeAPI;
+    private final DamMerchStillsMomentTypeAPI damMerchStillsMomentTypeAPI;
+    private final DamMerchStillsTypeAPI damMerchStillsTypeAPI;
     private final DefaultExtensionRecipeTypeAPI defaultExtensionRecipeTypeAPI;
     private final DisallowedSubtitleLangCodeTypeAPI disallowedSubtitleLangCodeTypeAPI;
     private final DisallowedSubtitleLangCodesListTypeAPI disallowedSubtitleLangCodesListTypeAPI;
@@ -247,6 +252,9 @@ public class VMSHollowInputAPI extends HollowAPI {
     private final HollowObjectProvider mapKeyProvider;
     private final HollowObjectProvider mapOfFlagsFirstDisplayDatesProvider;
     private final HollowObjectProvider flagsProvider;
+    private final HollowObjectProvider personCharacterProvider;
+    private final HollowObjectProvider characterListProvider;
+    private final HollowObjectProvider movieCharacterPersonProvider;
     private final HollowObjectProvider personVideoAliasIdProvider;
     private final HollowObjectProvider personVideoAliasIdsListProvider;
     private final HollowObjectProvider personVideoRoleProvider;
@@ -288,6 +296,8 @@ public class VMSHollowInputAPI extends HollowAPI {
     private final HollowObjectProvider certificationSystemProvider;
     private final HollowObjectProvider characterElementsProvider;
     private final HollowObjectProvider characterProvider;
+    private final HollowObjectProvider damMerchStillsMomentProvider;
+    private final HollowObjectProvider damMerchStillsProvider;
     private final HollowObjectProvider defaultExtensionRecipeProvider;
     private final HollowObjectProvider disallowedSubtitleLangCodeProvider;
     private final HollowObjectProvider disallowedSubtitleLangCodesListProvider;
@@ -441,7 +451,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         HollowTypeDataAccess typeDataAccess;
         HollowFactory factory;
 
-        objectCreationSampler = new HollowObjectCreationSampler("CharacterQuote","CharacterQuoteList","ChunkDurationsString","CodecPrivateDataString","ContractId","Date","DownloadableId","DownloadableIdList","DrmInfoString","Episode","EpisodeList","ExplicitDate","ISOCountry","ISOCountryList","ISOCountrySet","DeployablePackages","ListOfContractId","MapKey","MapOfFlagsFirstDisplayDates","Flags","PersonVideoAliasId","PersonVideoAliasIdsList","PersonVideoRole","PersonVideoRolesList","PersonVideo","RightsContractPackage","ListOfRightsContractPackage","RightsWindowContract","ListOfRightsWindowContract","RightsWindow","ListOfRightsWindow","RolloutPhaseWindow","RolloutPhaseWindowMap","Season","SeasonList","ShowMemberType","ShowMemberTypeList","ShowCountryLabel","ShowSeasonEpisode","StreamAssetMetadata","StreamDimensions","StreamFileIdentification","StreamProfileId","StreamProfileIdList","String","ArtWorkImageFormat","ArtWorkImageType","ArtworkDerivative","ArtworkDerivativeList","ArtworkRecipe","AudioStreamInfo","CSMReview","CacheDeploymentIntent","Cdn","CdnDeployment","CdnDeploymentSet","CertificationSystemRating","CertificationSystemRatingList","CertificationSystem","CharacterElements","Character","DefaultExtensionRecipe","DisallowedSubtitleLangCode","DisallowedSubtitleLangCodesList","DisallowedAssetBundle","DisallowedAssetBundlesList","Contract","DrmHeaderInfo","DrmHeaderInfoList","DrmSystemIdentifiers","ImageStreamInfo","ListOfContract","Contracts","ListOfString","LocaleTerritoryCode","LocaleTerritoryCodeList","ArtworkLocale","ArtworkLocaleList","MultiValuePassthroughMap","OriginServer","PackageDrmInfo","PackageDrmInfoList","PackageMoment","PackageMomentList","ProtectionTypes","ReleaseDate","ListOfReleaseDates","RightsContractAsset","ListOfRightsContractAsset","RightsContract","ListOfRightsContract","Rights","RolloutPhaseArtworkSourceFileId","RolloutPhaseArtworkSourceFileIdList","RolloutPhaseArtwork","RolloutPhaseLocalizedMetadata","RolloutPhaseElements","RolloutPhase","RolloutPhaseList","Rollout","SetOfString","SingleValuePassthroughMap","PassthroughData","ArtworkAttributes","CharacterArtwork","IndividualSupplemental","PersonArtwork","Status","StorageGroups","StreamAssetType","StreamDeploymentInfo","StreamDeploymentLabel","StreamDeploymentLabelSet","StreamDeployment","StreamDrmInfo","StreamProfileGroups","StreamProfiles","SupplementalsList","Supplementals","TerritoryCountries","TextStreamInfo","TopNAttribute","TopNAttributesList","TopN","TranslatedTextValue","MapOfTranslatedText","AltGenresAlternateNames","AltGenresAlternateNamesList","LocalizedCharacter","LocalizedMetadata","StoriesSynopsesHook","StoriesSynopsesHookList","TranslatedText","AltGenres","AssetMetaDatas","Awards","Categories","CategoryGroups","Certifications","Characters","ConsolidatedCertSystemRating","ConsolidatedCertSystemRatingList","ConsolidatedCertificationSystems","Episodes","Festivals","Languages","MovieRatings","Movies","PersonAliases","Persons","Ratings","ShowMemberTypes","StoriesSynopses","TurboCollections","VMSAward","VideoArtwork","VideoAwardMapping","VideoAwardList","VideoAward","VideoDateWindow","VideoDateWindowList","VideoDate","VideoGeneralAlias","VideoGeneralAliasList","VideoGeneralEpisodeType","VideoGeneralEpisodeTypeList","VideoGeneralTitleType","VideoGeneralTitleTypeList","VideoGeneral","VideoId","ListOfVideoIds","PersonBio","VideoRatingAdvisoryId","VideoRatingAdvisoryIdList","VideoRatingAdvisories","ConsolidatedVideoCountryRating","ConsolidatedVideoCountryRatingList","ConsolidatedVideoRating","ConsolidatedVideoRatingList","ConsolidatedVideoRatings","VideoRatingRatingReasonIds","VideoRatingRatingReasonArrayOfIds","VideoRatingRatingReason","VideoRatingRating","VideoRatingArrayOfRating","VideoRating","VideoStreamInfo","StreamNonImageInfo","PackageStream","PackageStreamSet","Package","VideoTypeMedia","VideoTypeMediaList","VideoTypeDescriptor","VideoTypeDescriptorList","VideoType");
+        objectCreationSampler = new HollowObjectCreationSampler("CharacterQuote","CharacterQuoteList","ChunkDurationsString","CodecPrivateDataString","ContractId","Date","DownloadableId","DownloadableIdList","DrmInfoString","Episode","EpisodeList","ExplicitDate","ISOCountry","ISOCountryList","ISOCountrySet","DeployablePackages","ListOfContractId","MapKey","MapOfFlagsFirstDisplayDates","Flags","PersonCharacter","CharacterList","MovieCharacterPerson","PersonVideoAliasId","PersonVideoAliasIdsList","PersonVideoRole","PersonVideoRolesList","PersonVideo","RightsContractPackage","ListOfRightsContractPackage","RightsWindowContract","ListOfRightsWindowContract","RightsWindow","ListOfRightsWindow","RolloutPhaseWindow","RolloutPhaseWindowMap","Season","SeasonList","ShowMemberType","ShowMemberTypeList","ShowCountryLabel","ShowSeasonEpisode","StreamAssetMetadata","StreamDimensions","StreamFileIdentification","StreamProfileId","StreamProfileIdList","String","ArtWorkImageFormat","ArtWorkImageType","ArtworkDerivative","ArtworkDerivativeList","ArtworkRecipe","AudioStreamInfo","CSMReview","CacheDeploymentIntent","Cdn","CdnDeployment","CdnDeploymentSet","CertificationSystemRating","CertificationSystemRatingList","CertificationSystem","CharacterElements","Character","DamMerchStillsMoment","DamMerchStills","DefaultExtensionRecipe","DisallowedSubtitleLangCode","DisallowedSubtitleLangCodesList","DisallowedAssetBundle","DisallowedAssetBundlesList","Contract","DrmHeaderInfo","DrmHeaderInfoList","DrmSystemIdentifiers","ImageStreamInfo","ListOfContract","Contracts","ListOfString","LocaleTerritoryCode","LocaleTerritoryCodeList","ArtworkLocale","ArtworkLocaleList","MultiValuePassthroughMap","OriginServer","PackageDrmInfo","PackageDrmInfoList","PackageMoment","PackageMomentList","ProtectionTypes","ReleaseDate","ListOfReleaseDates","RightsContractAsset","ListOfRightsContractAsset","RightsContract","ListOfRightsContract","Rights","RolloutPhaseArtworkSourceFileId","RolloutPhaseArtworkSourceFileIdList","RolloutPhaseArtwork","RolloutPhaseLocalizedMetadata","RolloutPhaseElements","RolloutPhase","RolloutPhaseList","Rollout","SetOfString","SingleValuePassthroughMap","PassthroughData","ArtworkAttributes","CharacterArtwork","IndividualSupplemental","PersonArtwork","Status","StorageGroups","StreamAssetType","StreamDeploymentInfo","StreamDeploymentLabel","StreamDeploymentLabelSet","StreamDeployment","StreamDrmInfo","StreamProfileGroups","StreamProfiles","SupplementalsList","Supplementals","TerritoryCountries","TextStreamInfo","TopNAttribute","TopNAttributesList","TopN","TranslatedTextValue","MapOfTranslatedText","AltGenresAlternateNames","AltGenresAlternateNamesList","LocalizedCharacter","LocalizedMetadata","StoriesSynopsesHook","StoriesSynopsesHookList","TranslatedText","AltGenres","AssetMetaDatas","Awards","Categories","CategoryGroups","Certifications","Characters","ConsolidatedCertSystemRating","ConsolidatedCertSystemRatingList","ConsolidatedCertificationSystems","Episodes","Festivals","Languages","MovieRatings","Movies","PersonAliases","Persons","Ratings","ShowMemberTypes","StoriesSynopses","TurboCollections","VMSAward","VideoArtwork","VideoAwardMapping","VideoAwardList","VideoAward","VideoDateWindow","VideoDateWindowList","VideoDate","VideoGeneralAlias","VideoGeneralAliasList","VideoGeneralEpisodeType","VideoGeneralEpisodeTypeList","VideoGeneralTitleType","VideoGeneralTitleTypeList","VideoGeneral","VideoId","ListOfVideoIds","PersonBio","VideoRatingAdvisoryId","VideoRatingAdvisoryIdList","VideoRatingAdvisories","ConsolidatedVideoCountryRating","ConsolidatedVideoCountryRatingList","ConsolidatedVideoRating","ConsolidatedVideoRatingList","ConsolidatedVideoRatings","VideoRatingRatingReasonIds","VideoRatingRatingReasonArrayOfIds","VideoRatingRatingReason","VideoRatingRating","VideoRatingArrayOfRating","VideoRating","VideoStreamInfo","StreamNonImageInfo","PackageStream","PackageStreamSet","Package","VideoTypeMedia","VideoTypeMediaList","VideoTypeDescriptor","VideoTypeDescriptorList","VideoType");
 
         typeDataAccess = dataAccess.getTypeDataAccess("CharacterQuote");
         if(typeDataAccess != null) {
@@ -821,6 +831,63 @@ public class VMSHollowInputAPI extends HollowAPI {
             flagsProvider = new HollowObjectCacheProvider(typeDataAccess, flagsTypeAPI, factory, previousCacheProvider);
         } else {
             flagsProvider = new HollowObjectFactoryProvider(typeDataAccess, flagsTypeAPI, factory);
+        }
+
+        typeDataAccess = dataAccess.getTypeDataAccess("PersonCharacter");
+        if(typeDataAccess != null) {
+            personCharacterTypeAPI = new PersonCharacterTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
+        } else {
+            personCharacterTypeAPI = new PersonCharacterTypeAPI(this, new HollowObjectMissingDataAccess(dataAccess, "PersonCharacter"));
+        }
+        addTypeAPI(personCharacterTypeAPI);
+        factory = factoryOverrides.get("PersonCharacter");
+        if(factory == null)
+            factory = new PersonCharacterHollowFactory();
+        if(cachedTypes.contains("PersonCharacter")) {
+            HollowObjectCacheProvider previousCacheProvider = null;
+            if(previousCycleAPI != null && (previousCycleAPI.personCharacterProvider instanceof HollowObjectCacheProvider))
+                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.personCharacterProvider;
+            personCharacterProvider = new HollowObjectCacheProvider(typeDataAccess, personCharacterTypeAPI, factory, previousCacheProvider);
+        } else {
+            personCharacterProvider = new HollowObjectFactoryProvider(typeDataAccess, personCharacterTypeAPI, factory);
+        }
+
+        typeDataAccess = dataAccess.getTypeDataAccess("CharacterList");
+        if(typeDataAccess != null) {
+            characterListTypeAPI = new CharacterListTypeAPI(this, (HollowListTypeDataAccess)typeDataAccess);
+        } else {
+            characterListTypeAPI = new CharacterListTypeAPI(this, new HollowListMissingDataAccess(dataAccess, "CharacterList"));
+        }
+        addTypeAPI(characterListTypeAPI);
+        factory = factoryOverrides.get("CharacterList");
+        if(factory == null)
+            factory = new CharacterListHollowFactory();
+        if(cachedTypes.contains("CharacterList")) {
+            HollowObjectCacheProvider previousCacheProvider = null;
+            if(previousCycleAPI != null && (previousCycleAPI.characterListProvider instanceof HollowObjectCacheProvider))
+                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.characterListProvider;
+            characterListProvider = new HollowObjectCacheProvider(typeDataAccess, characterListTypeAPI, factory, previousCacheProvider);
+        } else {
+            characterListProvider = new HollowObjectFactoryProvider(typeDataAccess, characterListTypeAPI, factory);
+        }
+
+        typeDataAccess = dataAccess.getTypeDataAccess("MovieCharacterPerson");
+        if(typeDataAccess != null) {
+            movieCharacterPersonTypeAPI = new MovieCharacterPersonTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
+        } else {
+            movieCharacterPersonTypeAPI = new MovieCharacterPersonTypeAPI(this, new HollowObjectMissingDataAccess(dataAccess, "MovieCharacterPerson"));
+        }
+        addTypeAPI(movieCharacterPersonTypeAPI);
+        factory = factoryOverrides.get("MovieCharacterPerson");
+        if(factory == null)
+            factory = new MovieCharacterPersonHollowFactory();
+        if(cachedTypes.contains("MovieCharacterPerson")) {
+            HollowObjectCacheProvider previousCacheProvider = null;
+            if(previousCycleAPI != null && (previousCycleAPI.movieCharacterPersonProvider instanceof HollowObjectCacheProvider))
+                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.movieCharacterPersonProvider;
+            movieCharacterPersonProvider = new HollowObjectCacheProvider(typeDataAccess, movieCharacterPersonTypeAPI, factory, previousCacheProvider);
+        } else {
+            movieCharacterPersonProvider = new HollowObjectFactoryProvider(typeDataAccess, movieCharacterPersonTypeAPI, factory);
         }
 
         typeDataAccess = dataAccess.getTypeDataAccess("PersonVideoAliasId");
@@ -1600,6 +1667,44 @@ public class VMSHollowInputAPI extends HollowAPI {
             characterProvider = new HollowObjectCacheProvider(typeDataAccess, characterTypeAPI, factory, previousCacheProvider);
         } else {
             characterProvider = new HollowObjectFactoryProvider(typeDataAccess, characterTypeAPI, factory);
+        }
+
+        typeDataAccess = dataAccess.getTypeDataAccess("DamMerchStillsMoment");
+        if(typeDataAccess != null) {
+            damMerchStillsMomentTypeAPI = new DamMerchStillsMomentTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
+        } else {
+            damMerchStillsMomentTypeAPI = new DamMerchStillsMomentTypeAPI(this, new HollowObjectMissingDataAccess(dataAccess, "DamMerchStillsMoment"));
+        }
+        addTypeAPI(damMerchStillsMomentTypeAPI);
+        factory = factoryOverrides.get("DamMerchStillsMoment");
+        if(factory == null)
+            factory = new DamMerchStillsMomentHollowFactory();
+        if(cachedTypes.contains("DamMerchStillsMoment")) {
+            HollowObjectCacheProvider previousCacheProvider = null;
+            if(previousCycleAPI != null && (previousCycleAPI.damMerchStillsMomentProvider instanceof HollowObjectCacheProvider))
+                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.damMerchStillsMomentProvider;
+            damMerchStillsMomentProvider = new HollowObjectCacheProvider(typeDataAccess, damMerchStillsMomentTypeAPI, factory, previousCacheProvider);
+        } else {
+            damMerchStillsMomentProvider = new HollowObjectFactoryProvider(typeDataAccess, damMerchStillsMomentTypeAPI, factory);
+        }
+
+        typeDataAccess = dataAccess.getTypeDataAccess("DamMerchStills");
+        if(typeDataAccess != null) {
+            damMerchStillsTypeAPI = new DamMerchStillsTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
+        } else {
+            damMerchStillsTypeAPI = new DamMerchStillsTypeAPI(this, new HollowObjectMissingDataAccess(dataAccess, "DamMerchStills"));
+        }
+        addTypeAPI(damMerchStillsTypeAPI);
+        factory = factoryOverrides.get("DamMerchStills");
+        if(factory == null)
+            factory = new DamMerchStillsHollowFactory();
+        if(cachedTypes.contains("DamMerchStills")) {
+            HollowObjectCacheProvider previousCacheProvider = null;
+            if(previousCycleAPI != null && (previousCycleAPI.damMerchStillsProvider instanceof HollowObjectCacheProvider))
+                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.damMerchStillsProvider;
+            damMerchStillsProvider = new HollowObjectCacheProvider(typeDataAccess, damMerchStillsTypeAPI, factory, previousCacheProvider);
+        } else {
+            damMerchStillsProvider = new HollowObjectFactoryProvider(typeDataAccess, damMerchStillsTypeAPI, factory);
         }
 
         typeDataAccess = dataAccess.getTypeDataAccess("DefaultExtensionRecipe");
@@ -4210,6 +4315,12 @@ public class VMSHollowInputAPI extends HollowAPI {
             ((HollowObjectCacheProvider)mapOfFlagsFirstDisplayDatesProvider).detach();
         if(flagsProvider instanceof HollowObjectCacheProvider)
             ((HollowObjectCacheProvider)flagsProvider).detach();
+        if(personCharacterProvider instanceof HollowObjectCacheProvider)
+            ((HollowObjectCacheProvider)personCharacterProvider).detach();
+        if(characterListProvider instanceof HollowObjectCacheProvider)
+            ((HollowObjectCacheProvider)characterListProvider).detach();
+        if(movieCharacterPersonProvider instanceof HollowObjectCacheProvider)
+            ((HollowObjectCacheProvider)movieCharacterPersonProvider).detach();
         if(personVideoAliasIdProvider instanceof HollowObjectCacheProvider)
             ((HollowObjectCacheProvider)personVideoAliasIdProvider).detach();
         if(personVideoAliasIdsListProvider instanceof HollowObjectCacheProvider)
@@ -4292,6 +4403,10 @@ public class VMSHollowInputAPI extends HollowAPI {
             ((HollowObjectCacheProvider)characterElementsProvider).detach();
         if(characterProvider instanceof HollowObjectCacheProvider)
             ((HollowObjectCacheProvider)characterProvider).detach();
+        if(damMerchStillsMomentProvider instanceof HollowObjectCacheProvider)
+            ((HollowObjectCacheProvider)damMerchStillsMomentProvider).detach();
+        if(damMerchStillsProvider instanceof HollowObjectCacheProvider)
+            ((HollowObjectCacheProvider)damMerchStillsProvider).detach();
         if(defaultExtensionRecipeProvider instanceof HollowObjectCacheProvider)
             ((HollowObjectCacheProvider)defaultExtensionRecipeProvider).detach();
         if(disallowedSubtitleLangCodeProvider instanceof HollowObjectCacheProvider)
@@ -4624,6 +4739,15 @@ public class VMSHollowInputAPI extends HollowAPI {
     public FlagsTypeAPI getFlagsTypeAPI() {
         return flagsTypeAPI;
     }
+    public PersonCharacterTypeAPI getPersonCharacterTypeAPI() {
+        return personCharacterTypeAPI;
+    }
+    public CharacterListTypeAPI getCharacterListTypeAPI() {
+        return characterListTypeAPI;
+    }
+    public MovieCharacterPersonTypeAPI getMovieCharacterPersonTypeAPI() {
+        return movieCharacterPersonTypeAPI;
+    }
     public PersonVideoAliasIdTypeAPI getPersonVideoAliasIdTypeAPI() {
         return personVideoAliasIdTypeAPI;
     }
@@ -4746,6 +4870,12 @@ public class VMSHollowInputAPI extends HollowAPI {
     }
     public CharacterTypeAPI getCharacterTypeAPI() {
         return characterTypeAPI;
+    }
+    public DamMerchStillsMomentTypeAPI getDamMerchStillsMomentTypeAPI() {
+        return damMerchStillsMomentTypeAPI;
+    }
+    public DamMerchStillsTypeAPI getDamMerchStillsTypeAPI() {
+        return damMerchStillsTypeAPI;
     }
     public DefaultExtensionRecipeTypeAPI getDefaultExtensionRecipeTypeAPI() {
         return defaultExtensionRecipeTypeAPI;
@@ -5372,6 +5502,39 @@ public class VMSHollowInputAPI extends HollowAPI {
         objectCreationSampler.recordCreation(19);
         return (FlagsHollow)flagsProvider.getHollowObject(ordinal);
     }
+    public Collection<PersonCharacterHollow> getAllPersonCharacterHollow() {
+        return new AllHollowRecordCollection<PersonCharacterHollow>(getDataAccess().getTypeDataAccess("PersonCharacter").getTypeState()) {
+            protected PersonCharacterHollow getForOrdinal(int ordinal) {
+                return getPersonCharacterHollow(ordinal);
+            }
+        };
+    }
+    public PersonCharacterHollow getPersonCharacterHollow(int ordinal) {
+        objectCreationSampler.recordCreation(20);
+        return (PersonCharacterHollow)personCharacterProvider.getHollowObject(ordinal);
+    }
+    public Collection<CharacterListHollow> getAllCharacterListHollow() {
+        return new AllHollowRecordCollection<CharacterListHollow>(getDataAccess().getTypeDataAccess("CharacterList").getTypeState()) {
+            protected CharacterListHollow getForOrdinal(int ordinal) {
+                return getCharacterListHollow(ordinal);
+            }
+        };
+    }
+    public CharacterListHollow getCharacterListHollow(int ordinal) {
+        objectCreationSampler.recordCreation(21);
+        return (CharacterListHollow)characterListProvider.getHollowObject(ordinal);
+    }
+    public Collection<MovieCharacterPersonHollow> getAllMovieCharacterPersonHollow() {
+        return new AllHollowRecordCollection<MovieCharacterPersonHollow>(getDataAccess().getTypeDataAccess("MovieCharacterPerson").getTypeState()) {
+            protected MovieCharacterPersonHollow getForOrdinal(int ordinal) {
+                return getMovieCharacterPersonHollow(ordinal);
+            }
+        };
+    }
+    public MovieCharacterPersonHollow getMovieCharacterPersonHollow(int ordinal) {
+        objectCreationSampler.recordCreation(22);
+        return (MovieCharacterPersonHollow)movieCharacterPersonProvider.getHollowObject(ordinal);
+    }
     public Collection<PersonVideoAliasIdHollow> getAllPersonVideoAliasIdHollow() {
         return new AllHollowRecordCollection<PersonVideoAliasIdHollow>(getDataAccess().getTypeDataAccess("PersonVideoAliasId").getTypeState()) {
             protected PersonVideoAliasIdHollow getForOrdinal(int ordinal) {
@@ -5380,7 +5543,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PersonVideoAliasIdHollow getPersonVideoAliasIdHollow(int ordinal) {
-        objectCreationSampler.recordCreation(20);
+        objectCreationSampler.recordCreation(23);
         return (PersonVideoAliasIdHollow)personVideoAliasIdProvider.getHollowObject(ordinal);
     }
     public Collection<PersonVideoAliasIdsListHollow> getAllPersonVideoAliasIdsListHollow() {
@@ -5391,7 +5554,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PersonVideoAliasIdsListHollow getPersonVideoAliasIdsListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(21);
+        objectCreationSampler.recordCreation(24);
         return (PersonVideoAliasIdsListHollow)personVideoAliasIdsListProvider.getHollowObject(ordinal);
     }
     public Collection<PersonVideoRoleHollow> getAllPersonVideoRoleHollow() {
@@ -5402,7 +5565,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PersonVideoRoleHollow getPersonVideoRoleHollow(int ordinal) {
-        objectCreationSampler.recordCreation(22);
+        objectCreationSampler.recordCreation(25);
         return (PersonVideoRoleHollow)personVideoRoleProvider.getHollowObject(ordinal);
     }
     public Collection<PersonVideoRolesListHollow> getAllPersonVideoRolesListHollow() {
@@ -5413,7 +5576,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PersonVideoRolesListHollow getPersonVideoRolesListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(23);
+        objectCreationSampler.recordCreation(26);
         return (PersonVideoRolesListHollow)personVideoRolesListProvider.getHollowObject(ordinal);
     }
     public Collection<PersonVideoHollow> getAllPersonVideoHollow() {
@@ -5424,7 +5587,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PersonVideoHollow getPersonVideoHollow(int ordinal) {
-        objectCreationSampler.recordCreation(24);
+        objectCreationSampler.recordCreation(27);
         return (PersonVideoHollow)personVideoProvider.getHollowObject(ordinal);
     }
     public Collection<RightsContractPackageHollow> getAllRightsContractPackageHollow() {
@@ -5435,7 +5598,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RightsContractPackageHollow getRightsContractPackageHollow(int ordinal) {
-        objectCreationSampler.recordCreation(25);
+        objectCreationSampler.recordCreation(28);
         return (RightsContractPackageHollow)rightsContractPackageProvider.getHollowObject(ordinal);
     }
     public Collection<ListOfRightsContractPackageHollow> getAllListOfRightsContractPackageHollow() {
@@ -5446,7 +5609,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ListOfRightsContractPackageHollow getListOfRightsContractPackageHollow(int ordinal) {
-        objectCreationSampler.recordCreation(26);
+        objectCreationSampler.recordCreation(29);
         return (ListOfRightsContractPackageHollow)listOfRightsContractPackageProvider.getHollowObject(ordinal);
     }
     public Collection<RightsWindowContractHollow> getAllRightsWindowContractHollow() {
@@ -5457,7 +5620,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RightsWindowContractHollow getRightsWindowContractHollow(int ordinal) {
-        objectCreationSampler.recordCreation(27);
+        objectCreationSampler.recordCreation(30);
         return (RightsWindowContractHollow)rightsWindowContractProvider.getHollowObject(ordinal);
     }
     public Collection<ListOfRightsWindowContractHollow> getAllListOfRightsWindowContractHollow() {
@@ -5468,7 +5631,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ListOfRightsWindowContractHollow getListOfRightsWindowContractHollow(int ordinal) {
-        objectCreationSampler.recordCreation(28);
+        objectCreationSampler.recordCreation(31);
         return (ListOfRightsWindowContractHollow)listOfRightsWindowContractProvider.getHollowObject(ordinal);
     }
     public Collection<RightsWindowHollow> getAllRightsWindowHollow() {
@@ -5479,7 +5642,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RightsWindowHollow getRightsWindowHollow(int ordinal) {
-        objectCreationSampler.recordCreation(29);
+        objectCreationSampler.recordCreation(32);
         return (RightsWindowHollow)rightsWindowProvider.getHollowObject(ordinal);
     }
     public Collection<ListOfRightsWindowHollow> getAllListOfRightsWindowHollow() {
@@ -5490,7 +5653,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ListOfRightsWindowHollow getListOfRightsWindowHollow(int ordinal) {
-        objectCreationSampler.recordCreation(30);
+        objectCreationSampler.recordCreation(33);
         return (ListOfRightsWindowHollow)listOfRightsWindowProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutPhaseWindowHollow> getAllRolloutPhaseWindowHollow() {
@@ -5501,7 +5664,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RolloutPhaseWindowHollow getRolloutPhaseWindowHollow(int ordinal) {
-        objectCreationSampler.recordCreation(31);
+        objectCreationSampler.recordCreation(34);
         return (RolloutPhaseWindowHollow)rolloutPhaseWindowProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutPhaseWindowMapHollow> getAllRolloutPhaseWindowMapHollow() {
@@ -5512,7 +5675,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RolloutPhaseWindowMapHollow getRolloutPhaseWindowMapHollow(int ordinal) {
-        objectCreationSampler.recordCreation(32);
+        objectCreationSampler.recordCreation(35);
         return (RolloutPhaseWindowMapHollow)rolloutPhaseWindowMapProvider.getHollowObject(ordinal);
     }
     public Collection<SeasonHollow> getAllSeasonHollow() {
@@ -5523,7 +5686,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public SeasonHollow getSeasonHollow(int ordinal) {
-        objectCreationSampler.recordCreation(33);
+        objectCreationSampler.recordCreation(36);
         return (SeasonHollow)seasonProvider.getHollowObject(ordinal);
     }
     public Collection<SeasonListHollow> getAllSeasonListHollow() {
@@ -5534,7 +5697,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public SeasonListHollow getSeasonListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(34);
+        objectCreationSampler.recordCreation(37);
         return (SeasonListHollow)seasonListProvider.getHollowObject(ordinal);
     }
     public Collection<ShowMemberTypeHollow> getAllShowMemberTypeHollow() {
@@ -5545,7 +5708,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ShowMemberTypeHollow getShowMemberTypeHollow(int ordinal) {
-        objectCreationSampler.recordCreation(35);
+        objectCreationSampler.recordCreation(38);
         return (ShowMemberTypeHollow)showMemberTypeProvider.getHollowObject(ordinal);
     }
     public Collection<ShowMemberTypeListHollow> getAllShowMemberTypeListHollow() {
@@ -5556,7 +5719,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ShowMemberTypeListHollow getShowMemberTypeListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(36);
+        objectCreationSampler.recordCreation(39);
         return (ShowMemberTypeListHollow)showMemberTypeListProvider.getHollowObject(ordinal);
     }
     public Collection<ShowCountryLabelHollow> getAllShowCountryLabelHollow() {
@@ -5567,7 +5730,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ShowCountryLabelHollow getShowCountryLabelHollow(int ordinal) {
-        objectCreationSampler.recordCreation(37);
+        objectCreationSampler.recordCreation(40);
         return (ShowCountryLabelHollow)showCountryLabelProvider.getHollowObject(ordinal);
     }
     public Collection<ShowSeasonEpisodeHollow> getAllShowSeasonEpisodeHollow() {
@@ -5578,7 +5741,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ShowSeasonEpisodeHollow getShowSeasonEpisodeHollow(int ordinal) {
-        objectCreationSampler.recordCreation(38);
+        objectCreationSampler.recordCreation(41);
         return (ShowSeasonEpisodeHollow)showSeasonEpisodeProvider.getHollowObject(ordinal);
     }
     public Collection<StreamAssetMetadataHollow> getAllStreamAssetMetadataHollow() {
@@ -5589,7 +5752,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public StreamAssetMetadataHollow getStreamAssetMetadataHollow(int ordinal) {
-        objectCreationSampler.recordCreation(39);
+        objectCreationSampler.recordCreation(42);
         return (StreamAssetMetadataHollow)streamAssetMetadataProvider.getHollowObject(ordinal);
     }
     public Collection<StreamDimensionsHollow> getAllStreamDimensionsHollow() {
@@ -5600,7 +5763,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public StreamDimensionsHollow getStreamDimensionsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(40);
+        objectCreationSampler.recordCreation(43);
         return (StreamDimensionsHollow)streamDimensionsProvider.getHollowObject(ordinal);
     }
     public Collection<StreamFileIdentificationHollow> getAllStreamFileIdentificationHollow() {
@@ -5611,7 +5774,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public StreamFileIdentificationHollow getStreamFileIdentificationHollow(int ordinal) {
-        objectCreationSampler.recordCreation(41);
+        objectCreationSampler.recordCreation(44);
         return (StreamFileIdentificationHollow)streamFileIdentificationProvider.getHollowObject(ordinal);
     }
     public Collection<StreamProfileIdHollow> getAllStreamProfileIdHollow() {
@@ -5622,7 +5785,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public StreamProfileIdHollow getStreamProfileIdHollow(int ordinal) {
-        objectCreationSampler.recordCreation(42);
+        objectCreationSampler.recordCreation(45);
         return (StreamProfileIdHollow)streamProfileIdProvider.getHollowObject(ordinal);
     }
     public Collection<StreamProfileIdListHollow> getAllStreamProfileIdListHollow() {
@@ -5633,7 +5796,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public StreamProfileIdListHollow getStreamProfileIdListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(43);
+        objectCreationSampler.recordCreation(46);
         return (StreamProfileIdListHollow)streamProfileIdListProvider.getHollowObject(ordinal);
     }
     public Collection<StringHollow> getAllStringHollow() {
@@ -5644,7 +5807,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public StringHollow getStringHollow(int ordinal) {
-        objectCreationSampler.recordCreation(44);
+        objectCreationSampler.recordCreation(47);
         return (StringHollow)stringProvider.getHollowObject(ordinal);
     }
     public Collection<ArtWorkImageFormatHollow> getAllArtWorkImageFormatHollow() {
@@ -5655,7 +5818,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ArtWorkImageFormatHollow getArtWorkImageFormatHollow(int ordinal) {
-        objectCreationSampler.recordCreation(45);
+        objectCreationSampler.recordCreation(48);
         return (ArtWorkImageFormatHollow)artWorkImageFormatProvider.getHollowObject(ordinal);
     }
     public Collection<ArtWorkImageTypeHollow> getAllArtWorkImageTypeHollow() {
@@ -5666,7 +5829,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ArtWorkImageTypeHollow getArtWorkImageTypeHollow(int ordinal) {
-        objectCreationSampler.recordCreation(46);
+        objectCreationSampler.recordCreation(49);
         return (ArtWorkImageTypeHollow)artWorkImageTypeProvider.getHollowObject(ordinal);
     }
     public Collection<ArtworkDerivativeHollow> getAllArtworkDerivativeHollow() {
@@ -5677,7 +5840,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ArtworkDerivativeHollow getArtworkDerivativeHollow(int ordinal) {
-        objectCreationSampler.recordCreation(47);
+        objectCreationSampler.recordCreation(50);
         return (ArtworkDerivativeHollow)artworkDerivativeProvider.getHollowObject(ordinal);
     }
     public Collection<ArtworkDerivativeListHollow> getAllArtworkDerivativeListHollow() {
@@ -5688,7 +5851,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ArtworkDerivativeListHollow getArtworkDerivativeListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(48);
+        objectCreationSampler.recordCreation(51);
         return (ArtworkDerivativeListHollow)artworkDerivativeListProvider.getHollowObject(ordinal);
     }
     public Collection<ArtworkRecipeHollow> getAllArtworkRecipeHollow() {
@@ -5699,7 +5862,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ArtworkRecipeHollow getArtworkRecipeHollow(int ordinal) {
-        objectCreationSampler.recordCreation(49);
+        objectCreationSampler.recordCreation(52);
         return (ArtworkRecipeHollow)artworkRecipeProvider.getHollowObject(ordinal);
     }
     public Collection<AudioStreamInfoHollow> getAllAudioStreamInfoHollow() {
@@ -5710,7 +5873,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public AudioStreamInfoHollow getAudioStreamInfoHollow(int ordinal) {
-        objectCreationSampler.recordCreation(50);
+        objectCreationSampler.recordCreation(53);
         return (AudioStreamInfoHollow)audioStreamInfoProvider.getHollowObject(ordinal);
     }
     public Collection<CSMReviewHollow> getAllCSMReviewHollow() {
@@ -5721,7 +5884,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public CSMReviewHollow getCSMReviewHollow(int ordinal) {
-        objectCreationSampler.recordCreation(51);
+        objectCreationSampler.recordCreation(54);
         return (CSMReviewHollow)cSMReviewProvider.getHollowObject(ordinal);
     }
     public Collection<CacheDeploymentIntentHollow> getAllCacheDeploymentIntentHollow() {
@@ -5732,7 +5895,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public CacheDeploymentIntentHollow getCacheDeploymentIntentHollow(int ordinal) {
-        objectCreationSampler.recordCreation(52);
+        objectCreationSampler.recordCreation(55);
         return (CacheDeploymentIntentHollow)cacheDeploymentIntentProvider.getHollowObject(ordinal);
     }
     public Collection<CdnHollow> getAllCdnHollow() {
@@ -5743,7 +5906,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public CdnHollow getCdnHollow(int ordinal) {
-        objectCreationSampler.recordCreation(53);
+        objectCreationSampler.recordCreation(56);
         return (CdnHollow)cdnProvider.getHollowObject(ordinal);
     }
     public Collection<CdnDeploymentHollow> getAllCdnDeploymentHollow() {
@@ -5754,7 +5917,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public CdnDeploymentHollow getCdnDeploymentHollow(int ordinal) {
-        objectCreationSampler.recordCreation(54);
+        objectCreationSampler.recordCreation(57);
         return (CdnDeploymentHollow)cdnDeploymentProvider.getHollowObject(ordinal);
     }
     public Collection<CdnDeploymentSetHollow> getAllCdnDeploymentSetHollow() {
@@ -5765,7 +5928,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public CdnDeploymentSetHollow getCdnDeploymentSetHollow(int ordinal) {
-        objectCreationSampler.recordCreation(55);
+        objectCreationSampler.recordCreation(58);
         return (CdnDeploymentSetHollow)cdnDeploymentSetProvider.getHollowObject(ordinal);
     }
     public Collection<CertificationSystemRatingHollow> getAllCertificationSystemRatingHollow() {
@@ -5776,7 +5939,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public CertificationSystemRatingHollow getCertificationSystemRatingHollow(int ordinal) {
-        objectCreationSampler.recordCreation(56);
+        objectCreationSampler.recordCreation(59);
         return (CertificationSystemRatingHollow)certificationSystemRatingProvider.getHollowObject(ordinal);
     }
     public Collection<CertificationSystemRatingListHollow> getAllCertificationSystemRatingListHollow() {
@@ -5787,7 +5950,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public CertificationSystemRatingListHollow getCertificationSystemRatingListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(57);
+        objectCreationSampler.recordCreation(60);
         return (CertificationSystemRatingListHollow)certificationSystemRatingListProvider.getHollowObject(ordinal);
     }
     public Collection<CertificationSystemHollow> getAllCertificationSystemHollow() {
@@ -5798,7 +5961,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public CertificationSystemHollow getCertificationSystemHollow(int ordinal) {
-        objectCreationSampler.recordCreation(58);
+        objectCreationSampler.recordCreation(61);
         return (CertificationSystemHollow)certificationSystemProvider.getHollowObject(ordinal);
     }
     public Collection<CharacterElementsHollow> getAllCharacterElementsHollow() {
@@ -5809,7 +5972,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public CharacterElementsHollow getCharacterElementsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(59);
+        objectCreationSampler.recordCreation(62);
         return (CharacterElementsHollow)characterElementsProvider.getHollowObject(ordinal);
     }
     public Collection<CharacterHollow> getAllCharacterHollow() {
@@ -5820,8 +5983,30 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public CharacterHollow getCharacterHollow(int ordinal) {
-        objectCreationSampler.recordCreation(60);
+        objectCreationSampler.recordCreation(63);
         return (CharacterHollow)characterProvider.getHollowObject(ordinal);
+    }
+    public Collection<DamMerchStillsMomentHollow> getAllDamMerchStillsMomentHollow() {
+        return new AllHollowRecordCollection<DamMerchStillsMomentHollow>(getDataAccess().getTypeDataAccess("DamMerchStillsMoment").getTypeState()) {
+            protected DamMerchStillsMomentHollow getForOrdinal(int ordinal) {
+                return getDamMerchStillsMomentHollow(ordinal);
+            }
+        };
+    }
+    public DamMerchStillsMomentHollow getDamMerchStillsMomentHollow(int ordinal) {
+        objectCreationSampler.recordCreation(64);
+        return (DamMerchStillsMomentHollow)damMerchStillsMomentProvider.getHollowObject(ordinal);
+    }
+    public Collection<DamMerchStillsHollow> getAllDamMerchStillsHollow() {
+        return new AllHollowRecordCollection<DamMerchStillsHollow>(getDataAccess().getTypeDataAccess("DamMerchStills").getTypeState()) {
+            protected DamMerchStillsHollow getForOrdinal(int ordinal) {
+                return getDamMerchStillsHollow(ordinal);
+            }
+        };
+    }
+    public DamMerchStillsHollow getDamMerchStillsHollow(int ordinal) {
+        objectCreationSampler.recordCreation(65);
+        return (DamMerchStillsHollow)damMerchStillsProvider.getHollowObject(ordinal);
     }
     public Collection<DefaultExtensionRecipeHollow> getAllDefaultExtensionRecipeHollow() {
         return new AllHollowRecordCollection<DefaultExtensionRecipeHollow>(getDataAccess().getTypeDataAccess("DefaultExtensionRecipe").getTypeState()) {
@@ -5831,7 +6016,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public DefaultExtensionRecipeHollow getDefaultExtensionRecipeHollow(int ordinal) {
-        objectCreationSampler.recordCreation(61);
+        objectCreationSampler.recordCreation(66);
         return (DefaultExtensionRecipeHollow)defaultExtensionRecipeProvider.getHollowObject(ordinal);
     }
     public Collection<DisallowedSubtitleLangCodeHollow> getAllDisallowedSubtitleLangCodeHollow() {
@@ -5842,7 +6027,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public DisallowedSubtitleLangCodeHollow getDisallowedSubtitleLangCodeHollow(int ordinal) {
-        objectCreationSampler.recordCreation(62);
+        objectCreationSampler.recordCreation(67);
         return (DisallowedSubtitleLangCodeHollow)disallowedSubtitleLangCodeProvider.getHollowObject(ordinal);
     }
     public Collection<DisallowedSubtitleLangCodesListHollow> getAllDisallowedSubtitleLangCodesListHollow() {
@@ -5853,7 +6038,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public DisallowedSubtitleLangCodesListHollow getDisallowedSubtitleLangCodesListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(63);
+        objectCreationSampler.recordCreation(68);
         return (DisallowedSubtitleLangCodesListHollow)disallowedSubtitleLangCodesListProvider.getHollowObject(ordinal);
     }
     public Collection<DisallowedAssetBundleHollow> getAllDisallowedAssetBundleHollow() {
@@ -5864,7 +6049,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public DisallowedAssetBundleHollow getDisallowedAssetBundleHollow(int ordinal) {
-        objectCreationSampler.recordCreation(64);
+        objectCreationSampler.recordCreation(69);
         return (DisallowedAssetBundleHollow)disallowedAssetBundleProvider.getHollowObject(ordinal);
     }
     public Collection<DisallowedAssetBundlesListHollow> getAllDisallowedAssetBundlesListHollow() {
@@ -5875,7 +6060,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public DisallowedAssetBundlesListHollow getDisallowedAssetBundlesListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(65);
+        objectCreationSampler.recordCreation(70);
         return (DisallowedAssetBundlesListHollow)disallowedAssetBundlesListProvider.getHollowObject(ordinal);
     }
     public Collection<ContractHollow> getAllContractHollow() {
@@ -5886,7 +6071,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ContractHollow getContractHollow(int ordinal) {
-        objectCreationSampler.recordCreation(66);
+        objectCreationSampler.recordCreation(71);
         return (ContractHollow)contractProvider.getHollowObject(ordinal);
     }
     public Collection<DrmHeaderInfoHollow> getAllDrmHeaderInfoHollow() {
@@ -5897,7 +6082,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public DrmHeaderInfoHollow getDrmHeaderInfoHollow(int ordinal) {
-        objectCreationSampler.recordCreation(67);
+        objectCreationSampler.recordCreation(72);
         return (DrmHeaderInfoHollow)drmHeaderInfoProvider.getHollowObject(ordinal);
     }
     public Collection<DrmHeaderInfoListHollow> getAllDrmHeaderInfoListHollow() {
@@ -5908,7 +6093,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public DrmHeaderInfoListHollow getDrmHeaderInfoListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(68);
+        objectCreationSampler.recordCreation(73);
         return (DrmHeaderInfoListHollow)drmHeaderInfoListProvider.getHollowObject(ordinal);
     }
     public Collection<DrmSystemIdentifiersHollow> getAllDrmSystemIdentifiersHollow() {
@@ -5919,7 +6104,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public DrmSystemIdentifiersHollow getDrmSystemIdentifiersHollow(int ordinal) {
-        objectCreationSampler.recordCreation(69);
+        objectCreationSampler.recordCreation(74);
         return (DrmSystemIdentifiersHollow)drmSystemIdentifiersProvider.getHollowObject(ordinal);
     }
     public Collection<ImageStreamInfoHollow> getAllImageStreamInfoHollow() {
@@ -5930,7 +6115,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ImageStreamInfoHollow getImageStreamInfoHollow(int ordinal) {
-        objectCreationSampler.recordCreation(70);
+        objectCreationSampler.recordCreation(75);
         return (ImageStreamInfoHollow)imageStreamInfoProvider.getHollowObject(ordinal);
     }
     public Collection<ListOfContractHollow> getAllListOfContractHollow() {
@@ -5941,7 +6126,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ListOfContractHollow getListOfContractHollow(int ordinal) {
-        objectCreationSampler.recordCreation(71);
+        objectCreationSampler.recordCreation(76);
         return (ListOfContractHollow)listOfContractProvider.getHollowObject(ordinal);
     }
     public Collection<ContractsHollow> getAllContractsHollow() {
@@ -5952,7 +6137,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ContractsHollow getContractsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(72);
+        objectCreationSampler.recordCreation(77);
         return (ContractsHollow)contractsProvider.getHollowObject(ordinal);
     }
     public Collection<ListOfStringHollow> getAllListOfStringHollow() {
@@ -5963,7 +6148,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ListOfStringHollow getListOfStringHollow(int ordinal) {
-        objectCreationSampler.recordCreation(73);
+        objectCreationSampler.recordCreation(78);
         return (ListOfStringHollow)listOfStringProvider.getHollowObject(ordinal);
     }
     public Collection<LocaleTerritoryCodeHollow> getAllLocaleTerritoryCodeHollow() {
@@ -5974,7 +6159,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public LocaleTerritoryCodeHollow getLocaleTerritoryCodeHollow(int ordinal) {
-        objectCreationSampler.recordCreation(74);
+        objectCreationSampler.recordCreation(79);
         return (LocaleTerritoryCodeHollow)localeTerritoryCodeProvider.getHollowObject(ordinal);
     }
     public Collection<LocaleTerritoryCodeListHollow> getAllLocaleTerritoryCodeListHollow() {
@@ -5985,7 +6170,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public LocaleTerritoryCodeListHollow getLocaleTerritoryCodeListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(75);
+        objectCreationSampler.recordCreation(80);
         return (LocaleTerritoryCodeListHollow)localeTerritoryCodeListProvider.getHollowObject(ordinal);
     }
     public Collection<ArtworkLocaleHollow> getAllArtworkLocaleHollow() {
@@ -5996,7 +6181,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ArtworkLocaleHollow getArtworkLocaleHollow(int ordinal) {
-        objectCreationSampler.recordCreation(76);
+        objectCreationSampler.recordCreation(81);
         return (ArtworkLocaleHollow)artworkLocaleProvider.getHollowObject(ordinal);
     }
     public Collection<ArtworkLocaleListHollow> getAllArtworkLocaleListHollow() {
@@ -6007,7 +6192,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ArtworkLocaleListHollow getArtworkLocaleListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(77);
+        objectCreationSampler.recordCreation(82);
         return (ArtworkLocaleListHollow)artworkLocaleListProvider.getHollowObject(ordinal);
     }
     public Collection<MultiValuePassthroughMapHollow> getAllMultiValuePassthroughMapHollow() {
@@ -6018,7 +6203,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public MultiValuePassthroughMapHollow getMultiValuePassthroughMapHollow(int ordinal) {
-        objectCreationSampler.recordCreation(78);
+        objectCreationSampler.recordCreation(83);
         return (MultiValuePassthroughMapHollow)multiValuePassthroughMapProvider.getHollowObject(ordinal);
     }
     public Collection<OriginServerHollow> getAllOriginServerHollow() {
@@ -6029,7 +6214,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public OriginServerHollow getOriginServerHollow(int ordinal) {
-        objectCreationSampler.recordCreation(79);
+        objectCreationSampler.recordCreation(84);
         return (OriginServerHollow)originServerProvider.getHollowObject(ordinal);
     }
     public Collection<PackageDrmInfoHollow> getAllPackageDrmInfoHollow() {
@@ -6040,7 +6225,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PackageDrmInfoHollow getPackageDrmInfoHollow(int ordinal) {
-        objectCreationSampler.recordCreation(80);
+        objectCreationSampler.recordCreation(85);
         return (PackageDrmInfoHollow)packageDrmInfoProvider.getHollowObject(ordinal);
     }
     public Collection<PackageDrmInfoListHollow> getAllPackageDrmInfoListHollow() {
@@ -6051,7 +6236,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PackageDrmInfoListHollow getPackageDrmInfoListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(81);
+        objectCreationSampler.recordCreation(86);
         return (PackageDrmInfoListHollow)packageDrmInfoListProvider.getHollowObject(ordinal);
     }
     public Collection<PackageMomentHollow> getAllPackageMomentHollow() {
@@ -6062,7 +6247,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PackageMomentHollow getPackageMomentHollow(int ordinal) {
-        objectCreationSampler.recordCreation(82);
+        objectCreationSampler.recordCreation(87);
         return (PackageMomentHollow)packageMomentProvider.getHollowObject(ordinal);
     }
     public Collection<PackageMomentListHollow> getAllPackageMomentListHollow() {
@@ -6073,7 +6258,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PackageMomentListHollow getPackageMomentListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(83);
+        objectCreationSampler.recordCreation(88);
         return (PackageMomentListHollow)packageMomentListProvider.getHollowObject(ordinal);
     }
     public Collection<ProtectionTypesHollow> getAllProtectionTypesHollow() {
@@ -6084,7 +6269,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ProtectionTypesHollow getProtectionTypesHollow(int ordinal) {
-        objectCreationSampler.recordCreation(84);
+        objectCreationSampler.recordCreation(89);
         return (ProtectionTypesHollow)protectionTypesProvider.getHollowObject(ordinal);
     }
     public Collection<ReleaseDateHollow> getAllReleaseDateHollow() {
@@ -6095,7 +6280,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ReleaseDateHollow getReleaseDateHollow(int ordinal) {
-        objectCreationSampler.recordCreation(85);
+        objectCreationSampler.recordCreation(90);
         return (ReleaseDateHollow)releaseDateProvider.getHollowObject(ordinal);
     }
     public Collection<ListOfReleaseDatesHollow> getAllListOfReleaseDatesHollow() {
@@ -6106,7 +6291,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ListOfReleaseDatesHollow getListOfReleaseDatesHollow(int ordinal) {
-        objectCreationSampler.recordCreation(86);
+        objectCreationSampler.recordCreation(91);
         return (ListOfReleaseDatesHollow)listOfReleaseDatesProvider.getHollowObject(ordinal);
     }
     public Collection<RightsContractAssetHollow> getAllRightsContractAssetHollow() {
@@ -6117,7 +6302,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RightsContractAssetHollow getRightsContractAssetHollow(int ordinal) {
-        objectCreationSampler.recordCreation(87);
+        objectCreationSampler.recordCreation(92);
         return (RightsContractAssetHollow)rightsContractAssetProvider.getHollowObject(ordinal);
     }
     public Collection<ListOfRightsContractAssetHollow> getAllListOfRightsContractAssetHollow() {
@@ -6128,7 +6313,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ListOfRightsContractAssetHollow getListOfRightsContractAssetHollow(int ordinal) {
-        objectCreationSampler.recordCreation(88);
+        objectCreationSampler.recordCreation(93);
         return (ListOfRightsContractAssetHollow)listOfRightsContractAssetProvider.getHollowObject(ordinal);
     }
     public Collection<RightsContractHollow> getAllRightsContractHollow() {
@@ -6139,7 +6324,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RightsContractHollow getRightsContractHollow(int ordinal) {
-        objectCreationSampler.recordCreation(89);
+        objectCreationSampler.recordCreation(94);
         return (RightsContractHollow)rightsContractProvider.getHollowObject(ordinal);
     }
     public Collection<ListOfRightsContractHollow> getAllListOfRightsContractHollow() {
@@ -6150,7 +6335,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ListOfRightsContractHollow getListOfRightsContractHollow(int ordinal) {
-        objectCreationSampler.recordCreation(90);
+        objectCreationSampler.recordCreation(95);
         return (ListOfRightsContractHollow)listOfRightsContractProvider.getHollowObject(ordinal);
     }
     public Collection<RightsHollow> getAllRightsHollow() {
@@ -6161,7 +6346,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RightsHollow getRightsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(91);
+        objectCreationSampler.recordCreation(96);
         return (RightsHollow)rightsProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutPhaseArtworkSourceFileIdHollow> getAllRolloutPhaseArtworkSourceFileIdHollow() {
@@ -6172,7 +6357,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RolloutPhaseArtworkSourceFileIdHollow getRolloutPhaseArtworkSourceFileIdHollow(int ordinal) {
-        objectCreationSampler.recordCreation(92);
+        objectCreationSampler.recordCreation(97);
         return (RolloutPhaseArtworkSourceFileIdHollow)rolloutPhaseArtworkSourceFileIdProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutPhaseArtworkSourceFileIdListHollow> getAllRolloutPhaseArtworkSourceFileIdListHollow() {
@@ -6183,7 +6368,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RolloutPhaseArtworkSourceFileIdListHollow getRolloutPhaseArtworkSourceFileIdListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(93);
+        objectCreationSampler.recordCreation(98);
         return (RolloutPhaseArtworkSourceFileIdListHollow)rolloutPhaseArtworkSourceFileIdListProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutPhaseArtworkHollow> getAllRolloutPhaseArtworkHollow() {
@@ -6194,7 +6379,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RolloutPhaseArtworkHollow getRolloutPhaseArtworkHollow(int ordinal) {
-        objectCreationSampler.recordCreation(94);
+        objectCreationSampler.recordCreation(99);
         return (RolloutPhaseArtworkHollow)rolloutPhaseArtworkProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutPhaseLocalizedMetadataHollow> getAllRolloutPhaseLocalizedMetadataHollow() {
@@ -6205,7 +6390,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RolloutPhaseLocalizedMetadataHollow getRolloutPhaseLocalizedMetadataHollow(int ordinal) {
-        objectCreationSampler.recordCreation(95);
+        objectCreationSampler.recordCreation(100);
         return (RolloutPhaseLocalizedMetadataHollow)rolloutPhaseLocalizedMetadataProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutPhaseElementsHollow> getAllRolloutPhaseElementsHollow() {
@@ -6216,7 +6401,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RolloutPhaseElementsHollow getRolloutPhaseElementsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(96);
+        objectCreationSampler.recordCreation(101);
         return (RolloutPhaseElementsHollow)rolloutPhaseElementsProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutPhaseHollow> getAllRolloutPhaseHollow() {
@@ -6227,7 +6412,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RolloutPhaseHollow getRolloutPhaseHollow(int ordinal) {
-        objectCreationSampler.recordCreation(97);
+        objectCreationSampler.recordCreation(102);
         return (RolloutPhaseHollow)rolloutPhaseProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutPhaseListHollow> getAllRolloutPhaseListHollow() {
@@ -6238,7 +6423,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RolloutPhaseListHollow getRolloutPhaseListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(98);
+        objectCreationSampler.recordCreation(103);
         return (RolloutPhaseListHollow)rolloutPhaseListProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutHollow> getAllRolloutHollow() {
@@ -6249,7 +6434,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RolloutHollow getRolloutHollow(int ordinal) {
-        objectCreationSampler.recordCreation(99);
+        objectCreationSampler.recordCreation(104);
         return (RolloutHollow)rolloutProvider.getHollowObject(ordinal);
     }
     public Collection<SetOfStringHollow> getAllSetOfStringHollow() {
@@ -6260,7 +6445,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public SetOfStringHollow getSetOfStringHollow(int ordinal) {
-        objectCreationSampler.recordCreation(100);
+        objectCreationSampler.recordCreation(105);
         return (SetOfStringHollow)setOfStringProvider.getHollowObject(ordinal);
     }
     public Collection<SingleValuePassthroughMapHollow> getAllSingleValuePassthroughMapHollow() {
@@ -6271,7 +6456,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public SingleValuePassthroughMapHollow getSingleValuePassthroughMapHollow(int ordinal) {
-        objectCreationSampler.recordCreation(101);
+        objectCreationSampler.recordCreation(106);
         return (SingleValuePassthroughMapHollow)singleValuePassthroughMapProvider.getHollowObject(ordinal);
     }
     public Collection<PassthroughDataHollow> getAllPassthroughDataHollow() {
@@ -6282,7 +6467,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PassthroughDataHollow getPassthroughDataHollow(int ordinal) {
-        objectCreationSampler.recordCreation(102);
+        objectCreationSampler.recordCreation(107);
         return (PassthroughDataHollow)passthroughDataProvider.getHollowObject(ordinal);
     }
     public Collection<ArtworkAttributesHollow> getAllArtworkAttributesHollow() {
@@ -6293,7 +6478,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ArtworkAttributesHollow getArtworkAttributesHollow(int ordinal) {
-        objectCreationSampler.recordCreation(103);
+        objectCreationSampler.recordCreation(108);
         return (ArtworkAttributesHollow)artworkAttributesProvider.getHollowObject(ordinal);
     }
     public Collection<CharacterArtworkHollow> getAllCharacterArtworkHollow() {
@@ -6304,7 +6489,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public CharacterArtworkHollow getCharacterArtworkHollow(int ordinal) {
-        objectCreationSampler.recordCreation(104);
+        objectCreationSampler.recordCreation(109);
         return (CharacterArtworkHollow)characterArtworkProvider.getHollowObject(ordinal);
     }
     public Collection<IndividualSupplementalHollow> getAllIndividualSupplementalHollow() {
@@ -6315,7 +6500,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public IndividualSupplementalHollow getIndividualSupplementalHollow(int ordinal) {
-        objectCreationSampler.recordCreation(105);
+        objectCreationSampler.recordCreation(110);
         return (IndividualSupplementalHollow)individualSupplementalProvider.getHollowObject(ordinal);
     }
     public Collection<PersonArtworkHollow> getAllPersonArtworkHollow() {
@@ -6326,7 +6511,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PersonArtworkHollow getPersonArtworkHollow(int ordinal) {
-        objectCreationSampler.recordCreation(106);
+        objectCreationSampler.recordCreation(111);
         return (PersonArtworkHollow)personArtworkProvider.getHollowObject(ordinal);
     }
     public Collection<StatusHollow> getAllStatusHollow() {
@@ -6337,7 +6522,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public StatusHollow getStatusHollow(int ordinal) {
-        objectCreationSampler.recordCreation(107);
+        objectCreationSampler.recordCreation(112);
         return (StatusHollow)statusProvider.getHollowObject(ordinal);
     }
     public Collection<StorageGroupsHollow> getAllStorageGroupsHollow() {
@@ -6348,7 +6533,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public StorageGroupsHollow getStorageGroupsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(108);
+        objectCreationSampler.recordCreation(113);
         return (StorageGroupsHollow)storageGroupsProvider.getHollowObject(ordinal);
     }
     public Collection<StreamAssetTypeHollow> getAllStreamAssetTypeHollow() {
@@ -6359,7 +6544,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public StreamAssetTypeHollow getStreamAssetTypeHollow(int ordinal) {
-        objectCreationSampler.recordCreation(109);
+        objectCreationSampler.recordCreation(114);
         return (StreamAssetTypeHollow)streamAssetTypeProvider.getHollowObject(ordinal);
     }
     public Collection<StreamDeploymentInfoHollow> getAllStreamDeploymentInfoHollow() {
@@ -6370,7 +6555,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public StreamDeploymentInfoHollow getStreamDeploymentInfoHollow(int ordinal) {
-        objectCreationSampler.recordCreation(110);
+        objectCreationSampler.recordCreation(115);
         return (StreamDeploymentInfoHollow)streamDeploymentInfoProvider.getHollowObject(ordinal);
     }
     public Collection<StreamDeploymentLabelHollow> getAllStreamDeploymentLabelHollow() {
@@ -6381,7 +6566,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public StreamDeploymentLabelHollow getStreamDeploymentLabelHollow(int ordinal) {
-        objectCreationSampler.recordCreation(111);
+        objectCreationSampler.recordCreation(116);
         return (StreamDeploymentLabelHollow)streamDeploymentLabelProvider.getHollowObject(ordinal);
     }
     public Collection<StreamDeploymentLabelSetHollow> getAllStreamDeploymentLabelSetHollow() {
@@ -6392,7 +6577,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public StreamDeploymentLabelSetHollow getStreamDeploymentLabelSetHollow(int ordinal) {
-        objectCreationSampler.recordCreation(112);
+        objectCreationSampler.recordCreation(117);
         return (StreamDeploymentLabelSetHollow)streamDeploymentLabelSetProvider.getHollowObject(ordinal);
     }
     public Collection<StreamDeploymentHollow> getAllStreamDeploymentHollow() {
@@ -6403,7 +6588,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public StreamDeploymentHollow getStreamDeploymentHollow(int ordinal) {
-        objectCreationSampler.recordCreation(113);
+        objectCreationSampler.recordCreation(118);
         return (StreamDeploymentHollow)streamDeploymentProvider.getHollowObject(ordinal);
     }
     public Collection<StreamDrmInfoHollow> getAllStreamDrmInfoHollow() {
@@ -6414,7 +6599,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public StreamDrmInfoHollow getStreamDrmInfoHollow(int ordinal) {
-        objectCreationSampler.recordCreation(114);
+        objectCreationSampler.recordCreation(119);
         return (StreamDrmInfoHollow)streamDrmInfoProvider.getHollowObject(ordinal);
     }
     public Collection<StreamProfileGroupsHollow> getAllStreamProfileGroupsHollow() {
@@ -6425,7 +6610,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public StreamProfileGroupsHollow getStreamProfileGroupsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(115);
+        objectCreationSampler.recordCreation(120);
         return (StreamProfileGroupsHollow)streamProfileGroupsProvider.getHollowObject(ordinal);
     }
     public Collection<StreamProfilesHollow> getAllStreamProfilesHollow() {
@@ -6436,7 +6621,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public StreamProfilesHollow getStreamProfilesHollow(int ordinal) {
-        objectCreationSampler.recordCreation(116);
+        objectCreationSampler.recordCreation(121);
         return (StreamProfilesHollow)streamProfilesProvider.getHollowObject(ordinal);
     }
     public Collection<SupplementalsListHollow> getAllSupplementalsListHollow() {
@@ -6447,7 +6632,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public SupplementalsListHollow getSupplementalsListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(117);
+        objectCreationSampler.recordCreation(122);
         return (SupplementalsListHollow)supplementalsListProvider.getHollowObject(ordinal);
     }
     public Collection<SupplementalsHollow> getAllSupplementalsHollow() {
@@ -6458,7 +6643,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public SupplementalsHollow getSupplementalsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(118);
+        objectCreationSampler.recordCreation(123);
         return (SupplementalsHollow)supplementalsProvider.getHollowObject(ordinal);
     }
     public Collection<TerritoryCountriesHollow> getAllTerritoryCountriesHollow() {
@@ -6469,7 +6654,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public TerritoryCountriesHollow getTerritoryCountriesHollow(int ordinal) {
-        objectCreationSampler.recordCreation(119);
+        objectCreationSampler.recordCreation(124);
         return (TerritoryCountriesHollow)territoryCountriesProvider.getHollowObject(ordinal);
     }
     public Collection<TextStreamInfoHollow> getAllTextStreamInfoHollow() {
@@ -6480,7 +6665,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public TextStreamInfoHollow getTextStreamInfoHollow(int ordinal) {
-        objectCreationSampler.recordCreation(120);
+        objectCreationSampler.recordCreation(125);
         return (TextStreamInfoHollow)textStreamInfoProvider.getHollowObject(ordinal);
     }
     public Collection<TopNAttributeHollow> getAllTopNAttributeHollow() {
@@ -6491,7 +6676,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public TopNAttributeHollow getTopNAttributeHollow(int ordinal) {
-        objectCreationSampler.recordCreation(121);
+        objectCreationSampler.recordCreation(126);
         return (TopNAttributeHollow)topNAttributeProvider.getHollowObject(ordinal);
     }
     public Collection<TopNAttributesListHollow> getAllTopNAttributesListHollow() {
@@ -6502,7 +6687,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public TopNAttributesListHollow getTopNAttributesListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(122);
+        objectCreationSampler.recordCreation(127);
         return (TopNAttributesListHollow)topNAttributesListProvider.getHollowObject(ordinal);
     }
     public Collection<TopNHollow> getAllTopNHollow() {
@@ -6513,7 +6698,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public TopNHollow getTopNHollow(int ordinal) {
-        objectCreationSampler.recordCreation(123);
+        objectCreationSampler.recordCreation(128);
         return (TopNHollow)topNProvider.getHollowObject(ordinal);
     }
     public Collection<TranslatedTextValueHollow> getAllTranslatedTextValueHollow() {
@@ -6524,7 +6709,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public TranslatedTextValueHollow getTranslatedTextValueHollow(int ordinal) {
-        objectCreationSampler.recordCreation(124);
+        objectCreationSampler.recordCreation(129);
         return (TranslatedTextValueHollow)translatedTextValueProvider.getHollowObject(ordinal);
     }
     public Collection<MapOfTranslatedTextHollow> getAllMapOfTranslatedTextHollow() {
@@ -6535,7 +6720,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public MapOfTranslatedTextHollow getMapOfTranslatedTextHollow(int ordinal) {
-        objectCreationSampler.recordCreation(125);
+        objectCreationSampler.recordCreation(130);
         return (MapOfTranslatedTextHollow)mapOfTranslatedTextProvider.getHollowObject(ordinal);
     }
     public Collection<AltGenresAlternateNamesHollow> getAllAltGenresAlternateNamesHollow() {
@@ -6546,7 +6731,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public AltGenresAlternateNamesHollow getAltGenresAlternateNamesHollow(int ordinal) {
-        objectCreationSampler.recordCreation(126);
+        objectCreationSampler.recordCreation(131);
         return (AltGenresAlternateNamesHollow)altGenresAlternateNamesProvider.getHollowObject(ordinal);
     }
     public Collection<AltGenresAlternateNamesListHollow> getAllAltGenresAlternateNamesListHollow() {
@@ -6557,7 +6742,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public AltGenresAlternateNamesListHollow getAltGenresAlternateNamesListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(127);
+        objectCreationSampler.recordCreation(132);
         return (AltGenresAlternateNamesListHollow)altGenresAlternateNamesListProvider.getHollowObject(ordinal);
     }
     public Collection<LocalizedCharacterHollow> getAllLocalizedCharacterHollow() {
@@ -6568,7 +6753,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public LocalizedCharacterHollow getLocalizedCharacterHollow(int ordinal) {
-        objectCreationSampler.recordCreation(128);
+        objectCreationSampler.recordCreation(133);
         return (LocalizedCharacterHollow)localizedCharacterProvider.getHollowObject(ordinal);
     }
     public Collection<LocalizedMetadataHollow> getAllLocalizedMetadataHollow() {
@@ -6579,7 +6764,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public LocalizedMetadataHollow getLocalizedMetadataHollow(int ordinal) {
-        objectCreationSampler.recordCreation(129);
+        objectCreationSampler.recordCreation(134);
         return (LocalizedMetadataHollow)localizedMetadataProvider.getHollowObject(ordinal);
     }
     public Collection<StoriesSynopsesHookHollow> getAllStoriesSynopsesHookHollow() {
@@ -6590,7 +6775,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public StoriesSynopsesHookHollow getStoriesSynopsesHookHollow(int ordinal) {
-        objectCreationSampler.recordCreation(130);
+        objectCreationSampler.recordCreation(135);
         return (StoriesSynopsesHookHollow)storiesSynopsesHookProvider.getHollowObject(ordinal);
     }
     public Collection<StoriesSynopsesHookListHollow> getAllStoriesSynopsesHookListHollow() {
@@ -6601,7 +6786,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public StoriesSynopsesHookListHollow getStoriesSynopsesHookListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(131);
+        objectCreationSampler.recordCreation(136);
         return (StoriesSynopsesHookListHollow)storiesSynopsesHookListProvider.getHollowObject(ordinal);
     }
     public Collection<TranslatedTextHollow> getAllTranslatedTextHollow() {
@@ -6612,7 +6797,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public TranslatedTextHollow getTranslatedTextHollow(int ordinal) {
-        objectCreationSampler.recordCreation(132);
+        objectCreationSampler.recordCreation(137);
         return (TranslatedTextHollow)translatedTextProvider.getHollowObject(ordinal);
     }
     public Collection<AltGenresHollow> getAllAltGenresHollow() {
@@ -6623,7 +6808,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public AltGenresHollow getAltGenresHollow(int ordinal) {
-        objectCreationSampler.recordCreation(133);
+        objectCreationSampler.recordCreation(138);
         return (AltGenresHollow)altGenresProvider.getHollowObject(ordinal);
     }
     public Collection<AssetMetaDatasHollow> getAllAssetMetaDatasHollow() {
@@ -6634,7 +6819,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public AssetMetaDatasHollow getAssetMetaDatasHollow(int ordinal) {
-        objectCreationSampler.recordCreation(134);
+        objectCreationSampler.recordCreation(139);
         return (AssetMetaDatasHollow)assetMetaDatasProvider.getHollowObject(ordinal);
     }
     public Collection<AwardsHollow> getAllAwardsHollow() {
@@ -6645,7 +6830,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public AwardsHollow getAwardsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(135);
+        objectCreationSampler.recordCreation(140);
         return (AwardsHollow)awardsProvider.getHollowObject(ordinal);
     }
     public Collection<CategoriesHollow> getAllCategoriesHollow() {
@@ -6656,7 +6841,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public CategoriesHollow getCategoriesHollow(int ordinal) {
-        objectCreationSampler.recordCreation(136);
+        objectCreationSampler.recordCreation(141);
         return (CategoriesHollow)categoriesProvider.getHollowObject(ordinal);
     }
     public Collection<CategoryGroupsHollow> getAllCategoryGroupsHollow() {
@@ -6667,7 +6852,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public CategoryGroupsHollow getCategoryGroupsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(137);
+        objectCreationSampler.recordCreation(142);
         return (CategoryGroupsHollow)categoryGroupsProvider.getHollowObject(ordinal);
     }
     public Collection<CertificationsHollow> getAllCertificationsHollow() {
@@ -6678,7 +6863,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public CertificationsHollow getCertificationsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(138);
+        objectCreationSampler.recordCreation(143);
         return (CertificationsHollow)certificationsProvider.getHollowObject(ordinal);
     }
     public Collection<CharactersHollow> getAllCharactersHollow() {
@@ -6689,7 +6874,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public CharactersHollow getCharactersHollow(int ordinal) {
-        objectCreationSampler.recordCreation(139);
+        objectCreationSampler.recordCreation(144);
         return (CharactersHollow)charactersProvider.getHollowObject(ordinal);
     }
     public Collection<ConsolidatedCertSystemRatingHollow> getAllConsolidatedCertSystemRatingHollow() {
@@ -6700,7 +6885,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ConsolidatedCertSystemRatingHollow getConsolidatedCertSystemRatingHollow(int ordinal) {
-        objectCreationSampler.recordCreation(140);
+        objectCreationSampler.recordCreation(145);
         return (ConsolidatedCertSystemRatingHollow)consolidatedCertSystemRatingProvider.getHollowObject(ordinal);
     }
     public Collection<ConsolidatedCertSystemRatingListHollow> getAllConsolidatedCertSystemRatingListHollow() {
@@ -6711,7 +6896,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ConsolidatedCertSystemRatingListHollow getConsolidatedCertSystemRatingListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(141);
+        objectCreationSampler.recordCreation(146);
         return (ConsolidatedCertSystemRatingListHollow)consolidatedCertSystemRatingListProvider.getHollowObject(ordinal);
     }
     public Collection<ConsolidatedCertificationSystemsHollow> getAllConsolidatedCertificationSystemsHollow() {
@@ -6722,7 +6907,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ConsolidatedCertificationSystemsHollow getConsolidatedCertificationSystemsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(142);
+        objectCreationSampler.recordCreation(147);
         return (ConsolidatedCertificationSystemsHollow)consolidatedCertificationSystemsProvider.getHollowObject(ordinal);
     }
     public Collection<EpisodesHollow> getAllEpisodesHollow() {
@@ -6733,7 +6918,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public EpisodesHollow getEpisodesHollow(int ordinal) {
-        objectCreationSampler.recordCreation(143);
+        objectCreationSampler.recordCreation(148);
         return (EpisodesHollow)episodesProvider.getHollowObject(ordinal);
     }
     public Collection<FestivalsHollow> getAllFestivalsHollow() {
@@ -6744,7 +6929,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public FestivalsHollow getFestivalsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(144);
+        objectCreationSampler.recordCreation(149);
         return (FestivalsHollow)festivalsProvider.getHollowObject(ordinal);
     }
     public Collection<LanguagesHollow> getAllLanguagesHollow() {
@@ -6755,7 +6940,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public LanguagesHollow getLanguagesHollow(int ordinal) {
-        objectCreationSampler.recordCreation(145);
+        objectCreationSampler.recordCreation(150);
         return (LanguagesHollow)languagesProvider.getHollowObject(ordinal);
     }
     public Collection<MovieRatingsHollow> getAllMovieRatingsHollow() {
@@ -6766,7 +6951,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public MovieRatingsHollow getMovieRatingsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(146);
+        objectCreationSampler.recordCreation(151);
         return (MovieRatingsHollow)movieRatingsProvider.getHollowObject(ordinal);
     }
     public Collection<MoviesHollow> getAllMoviesHollow() {
@@ -6777,7 +6962,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public MoviesHollow getMoviesHollow(int ordinal) {
-        objectCreationSampler.recordCreation(147);
+        objectCreationSampler.recordCreation(152);
         return (MoviesHollow)moviesProvider.getHollowObject(ordinal);
     }
     public Collection<PersonAliasesHollow> getAllPersonAliasesHollow() {
@@ -6788,7 +6973,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PersonAliasesHollow getPersonAliasesHollow(int ordinal) {
-        objectCreationSampler.recordCreation(148);
+        objectCreationSampler.recordCreation(153);
         return (PersonAliasesHollow)personAliasesProvider.getHollowObject(ordinal);
     }
     public Collection<PersonsHollow> getAllPersonsHollow() {
@@ -6799,7 +6984,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PersonsHollow getPersonsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(149);
+        objectCreationSampler.recordCreation(154);
         return (PersonsHollow)personsProvider.getHollowObject(ordinal);
     }
     public Collection<RatingsHollow> getAllRatingsHollow() {
@@ -6810,7 +6995,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RatingsHollow getRatingsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(150);
+        objectCreationSampler.recordCreation(155);
         return (RatingsHollow)ratingsProvider.getHollowObject(ordinal);
     }
     public Collection<ShowMemberTypesHollow> getAllShowMemberTypesHollow() {
@@ -6821,7 +7006,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ShowMemberTypesHollow getShowMemberTypesHollow(int ordinal) {
-        objectCreationSampler.recordCreation(151);
+        objectCreationSampler.recordCreation(156);
         return (ShowMemberTypesHollow)showMemberTypesProvider.getHollowObject(ordinal);
     }
     public Collection<StoriesSynopsesHollow> getAllStoriesSynopsesHollow() {
@@ -6832,7 +7017,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public StoriesSynopsesHollow getStoriesSynopsesHollow(int ordinal) {
-        objectCreationSampler.recordCreation(152);
+        objectCreationSampler.recordCreation(157);
         return (StoriesSynopsesHollow)storiesSynopsesProvider.getHollowObject(ordinal);
     }
     public Collection<TurboCollectionsHollow> getAllTurboCollectionsHollow() {
@@ -6843,7 +7028,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public TurboCollectionsHollow getTurboCollectionsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(153);
+        objectCreationSampler.recordCreation(158);
         return (TurboCollectionsHollow)turboCollectionsProvider.getHollowObject(ordinal);
     }
     public Collection<VMSAwardHollow> getAllVMSAwardHollow() {
@@ -6854,7 +7039,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VMSAwardHollow getVMSAwardHollow(int ordinal) {
-        objectCreationSampler.recordCreation(154);
+        objectCreationSampler.recordCreation(159);
         return (VMSAwardHollow)vMSAwardProvider.getHollowObject(ordinal);
     }
     public Collection<VideoArtworkHollow> getAllVideoArtworkHollow() {
@@ -6865,7 +7050,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoArtworkHollow getVideoArtworkHollow(int ordinal) {
-        objectCreationSampler.recordCreation(155);
+        objectCreationSampler.recordCreation(160);
         return (VideoArtworkHollow)videoArtworkProvider.getHollowObject(ordinal);
     }
     public Collection<VideoAwardMappingHollow> getAllVideoAwardMappingHollow() {
@@ -6876,7 +7061,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoAwardMappingHollow getVideoAwardMappingHollow(int ordinal) {
-        objectCreationSampler.recordCreation(156);
+        objectCreationSampler.recordCreation(161);
         return (VideoAwardMappingHollow)videoAwardMappingProvider.getHollowObject(ordinal);
     }
     public Collection<VideoAwardListHollow> getAllVideoAwardListHollow() {
@@ -6887,7 +7072,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoAwardListHollow getVideoAwardListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(157);
+        objectCreationSampler.recordCreation(162);
         return (VideoAwardListHollow)videoAwardListProvider.getHollowObject(ordinal);
     }
     public Collection<VideoAwardHollow> getAllVideoAwardHollow() {
@@ -6898,7 +7083,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoAwardHollow getVideoAwardHollow(int ordinal) {
-        objectCreationSampler.recordCreation(158);
+        objectCreationSampler.recordCreation(163);
         return (VideoAwardHollow)videoAwardProvider.getHollowObject(ordinal);
     }
     public Collection<VideoDateWindowHollow> getAllVideoDateWindowHollow() {
@@ -6909,7 +7094,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoDateWindowHollow getVideoDateWindowHollow(int ordinal) {
-        objectCreationSampler.recordCreation(159);
+        objectCreationSampler.recordCreation(164);
         return (VideoDateWindowHollow)videoDateWindowProvider.getHollowObject(ordinal);
     }
     public Collection<VideoDateWindowListHollow> getAllVideoDateWindowListHollow() {
@@ -6920,7 +7105,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoDateWindowListHollow getVideoDateWindowListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(160);
+        objectCreationSampler.recordCreation(165);
         return (VideoDateWindowListHollow)videoDateWindowListProvider.getHollowObject(ordinal);
     }
     public Collection<VideoDateHollow> getAllVideoDateHollow() {
@@ -6931,7 +7116,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoDateHollow getVideoDateHollow(int ordinal) {
-        objectCreationSampler.recordCreation(161);
+        objectCreationSampler.recordCreation(166);
         return (VideoDateHollow)videoDateProvider.getHollowObject(ordinal);
     }
     public Collection<VideoGeneralAliasHollow> getAllVideoGeneralAliasHollow() {
@@ -6942,7 +7127,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoGeneralAliasHollow getVideoGeneralAliasHollow(int ordinal) {
-        objectCreationSampler.recordCreation(162);
+        objectCreationSampler.recordCreation(167);
         return (VideoGeneralAliasHollow)videoGeneralAliasProvider.getHollowObject(ordinal);
     }
     public Collection<VideoGeneralAliasListHollow> getAllVideoGeneralAliasListHollow() {
@@ -6953,7 +7138,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoGeneralAliasListHollow getVideoGeneralAliasListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(163);
+        objectCreationSampler.recordCreation(168);
         return (VideoGeneralAliasListHollow)videoGeneralAliasListProvider.getHollowObject(ordinal);
     }
     public Collection<VideoGeneralEpisodeTypeHollow> getAllVideoGeneralEpisodeTypeHollow() {
@@ -6964,7 +7149,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoGeneralEpisodeTypeHollow getVideoGeneralEpisodeTypeHollow(int ordinal) {
-        objectCreationSampler.recordCreation(164);
+        objectCreationSampler.recordCreation(169);
         return (VideoGeneralEpisodeTypeHollow)videoGeneralEpisodeTypeProvider.getHollowObject(ordinal);
     }
     public Collection<VideoGeneralEpisodeTypeListHollow> getAllVideoGeneralEpisodeTypeListHollow() {
@@ -6975,7 +7160,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoGeneralEpisodeTypeListHollow getVideoGeneralEpisodeTypeListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(165);
+        objectCreationSampler.recordCreation(170);
         return (VideoGeneralEpisodeTypeListHollow)videoGeneralEpisodeTypeListProvider.getHollowObject(ordinal);
     }
     public Collection<VideoGeneralTitleTypeHollow> getAllVideoGeneralTitleTypeHollow() {
@@ -6986,7 +7171,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoGeneralTitleTypeHollow getVideoGeneralTitleTypeHollow(int ordinal) {
-        objectCreationSampler.recordCreation(166);
+        objectCreationSampler.recordCreation(171);
         return (VideoGeneralTitleTypeHollow)videoGeneralTitleTypeProvider.getHollowObject(ordinal);
     }
     public Collection<VideoGeneralTitleTypeListHollow> getAllVideoGeneralTitleTypeListHollow() {
@@ -6997,7 +7182,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoGeneralTitleTypeListHollow getVideoGeneralTitleTypeListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(167);
+        objectCreationSampler.recordCreation(172);
         return (VideoGeneralTitleTypeListHollow)videoGeneralTitleTypeListProvider.getHollowObject(ordinal);
     }
     public Collection<VideoGeneralHollow> getAllVideoGeneralHollow() {
@@ -7008,7 +7193,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoGeneralHollow getVideoGeneralHollow(int ordinal) {
-        objectCreationSampler.recordCreation(168);
+        objectCreationSampler.recordCreation(173);
         return (VideoGeneralHollow)videoGeneralProvider.getHollowObject(ordinal);
     }
     public Collection<VideoIdHollow> getAllVideoIdHollow() {
@@ -7019,7 +7204,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoIdHollow getVideoIdHollow(int ordinal) {
-        objectCreationSampler.recordCreation(169);
+        objectCreationSampler.recordCreation(174);
         return (VideoIdHollow)videoIdProvider.getHollowObject(ordinal);
     }
     public Collection<ListOfVideoIdsHollow> getAllListOfVideoIdsHollow() {
@@ -7030,7 +7215,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ListOfVideoIdsHollow getListOfVideoIdsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(170);
+        objectCreationSampler.recordCreation(175);
         return (ListOfVideoIdsHollow)listOfVideoIdsProvider.getHollowObject(ordinal);
     }
     public Collection<PersonBioHollow> getAllPersonBioHollow() {
@@ -7041,7 +7226,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PersonBioHollow getPersonBioHollow(int ordinal) {
-        objectCreationSampler.recordCreation(171);
+        objectCreationSampler.recordCreation(176);
         return (PersonBioHollow)personBioProvider.getHollowObject(ordinal);
     }
     public Collection<VideoRatingAdvisoryIdHollow> getAllVideoRatingAdvisoryIdHollow() {
@@ -7052,7 +7237,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoRatingAdvisoryIdHollow getVideoRatingAdvisoryIdHollow(int ordinal) {
-        objectCreationSampler.recordCreation(172);
+        objectCreationSampler.recordCreation(177);
         return (VideoRatingAdvisoryIdHollow)videoRatingAdvisoryIdProvider.getHollowObject(ordinal);
     }
     public Collection<VideoRatingAdvisoryIdListHollow> getAllVideoRatingAdvisoryIdListHollow() {
@@ -7063,7 +7248,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoRatingAdvisoryIdListHollow getVideoRatingAdvisoryIdListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(173);
+        objectCreationSampler.recordCreation(178);
         return (VideoRatingAdvisoryIdListHollow)videoRatingAdvisoryIdListProvider.getHollowObject(ordinal);
     }
     public Collection<VideoRatingAdvisoriesHollow> getAllVideoRatingAdvisoriesHollow() {
@@ -7074,7 +7259,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoRatingAdvisoriesHollow getVideoRatingAdvisoriesHollow(int ordinal) {
-        objectCreationSampler.recordCreation(174);
+        objectCreationSampler.recordCreation(179);
         return (VideoRatingAdvisoriesHollow)videoRatingAdvisoriesProvider.getHollowObject(ordinal);
     }
     public Collection<ConsolidatedVideoCountryRatingHollow> getAllConsolidatedVideoCountryRatingHollow() {
@@ -7085,7 +7270,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ConsolidatedVideoCountryRatingHollow getConsolidatedVideoCountryRatingHollow(int ordinal) {
-        objectCreationSampler.recordCreation(175);
+        objectCreationSampler.recordCreation(180);
         return (ConsolidatedVideoCountryRatingHollow)consolidatedVideoCountryRatingProvider.getHollowObject(ordinal);
     }
     public Collection<ConsolidatedVideoCountryRatingListHollow> getAllConsolidatedVideoCountryRatingListHollow() {
@@ -7096,7 +7281,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ConsolidatedVideoCountryRatingListHollow getConsolidatedVideoCountryRatingListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(176);
+        objectCreationSampler.recordCreation(181);
         return (ConsolidatedVideoCountryRatingListHollow)consolidatedVideoCountryRatingListProvider.getHollowObject(ordinal);
     }
     public Collection<ConsolidatedVideoRatingHollow> getAllConsolidatedVideoRatingHollow() {
@@ -7107,7 +7292,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ConsolidatedVideoRatingHollow getConsolidatedVideoRatingHollow(int ordinal) {
-        objectCreationSampler.recordCreation(177);
+        objectCreationSampler.recordCreation(182);
         return (ConsolidatedVideoRatingHollow)consolidatedVideoRatingProvider.getHollowObject(ordinal);
     }
     public Collection<ConsolidatedVideoRatingListHollow> getAllConsolidatedVideoRatingListHollow() {
@@ -7118,7 +7303,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ConsolidatedVideoRatingListHollow getConsolidatedVideoRatingListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(178);
+        objectCreationSampler.recordCreation(183);
         return (ConsolidatedVideoRatingListHollow)consolidatedVideoRatingListProvider.getHollowObject(ordinal);
     }
     public Collection<ConsolidatedVideoRatingsHollow> getAllConsolidatedVideoRatingsHollow() {
@@ -7129,7 +7314,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ConsolidatedVideoRatingsHollow getConsolidatedVideoRatingsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(179);
+        objectCreationSampler.recordCreation(184);
         return (ConsolidatedVideoRatingsHollow)consolidatedVideoRatingsProvider.getHollowObject(ordinal);
     }
     public Collection<VideoRatingRatingReasonIdsHollow> getAllVideoRatingRatingReasonIdsHollow() {
@@ -7140,7 +7325,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoRatingRatingReasonIdsHollow getVideoRatingRatingReasonIdsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(180);
+        objectCreationSampler.recordCreation(185);
         return (VideoRatingRatingReasonIdsHollow)videoRatingRatingReasonIdsProvider.getHollowObject(ordinal);
     }
     public Collection<VideoRatingRatingReasonArrayOfIdsHollow> getAllVideoRatingRatingReasonArrayOfIdsHollow() {
@@ -7151,7 +7336,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoRatingRatingReasonArrayOfIdsHollow getVideoRatingRatingReasonArrayOfIdsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(181);
+        objectCreationSampler.recordCreation(186);
         return (VideoRatingRatingReasonArrayOfIdsHollow)videoRatingRatingReasonArrayOfIdsProvider.getHollowObject(ordinal);
     }
     public Collection<VideoRatingRatingReasonHollow> getAllVideoRatingRatingReasonHollow() {
@@ -7162,7 +7347,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoRatingRatingReasonHollow getVideoRatingRatingReasonHollow(int ordinal) {
-        objectCreationSampler.recordCreation(182);
+        objectCreationSampler.recordCreation(187);
         return (VideoRatingRatingReasonHollow)videoRatingRatingReasonProvider.getHollowObject(ordinal);
     }
     public Collection<VideoRatingRatingHollow> getAllVideoRatingRatingHollow() {
@@ -7173,7 +7358,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoRatingRatingHollow getVideoRatingRatingHollow(int ordinal) {
-        objectCreationSampler.recordCreation(183);
+        objectCreationSampler.recordCreation(188);
         return (VideoRatingRatingHollow)videoRatingRatingProvider.getHollowObject(ordinal);
     }
     public Collection<VideoRatingArrayOfRatingHollow> getAllVideoRatingArrayOfRatingHollow() {
@@ -7184,7 +7369,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoRatingArrayOfRatingHollow getVideoRatingArrayOfRatingHollow(int ordinal) {
-        objectCreationSampler.recordCreation(184);
+        objectCreationSampler.recordCreation(189);
         return (VideoRatingArrayOfRatingHollow)videoRatingArrayOfRatingProvider.getHollowObject(ordinal);
     }
     public Collection<VideoRatingHollow> getAllVideoRatingHollow() {
@@ -7195,7 +7380,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoRatingHollow getVideoRatingHollow(int ordinal) {
-        objectCreationSampler.recordCreation(185);
+        objectCreationSampler.recordCreation(190);
         return (VideoRatingHollow)videoRatingProvider.getHollowObject(ordinal);
     }
     public Collection<VideoStreamInfoHollow> getAllVideoStreamInfoHollow() {
@@ -7206,7 +7391,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoStreamInfoHollow getVideoStreamInfoHollow(int ordinal) {
-        objectCreationSampler.recordCreation(186);
+        objectCreationSampler.recordCreation(191);
         return (VideoStreamInfoHollow)videoStreamInfoProvider.getHollowObject(ordinal);
     }
     public Collection<StreamNonImageInfoHollow> getAllStreamNonImageInfoHollow() {
@@ -7217,7 +7402,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public StreamNonImageInfoHollow getStreamNonImageInfoHollow(int ordinal) {
-        objectCreationSampler.recordCreation(187);
+        objectCreationSampler.recordCreation(192);
         return (StreamNonImageInfoHollow)streamNonImageInfoProvider.getHollowObject(ordinal);
     }
     public Collection<PackageStreamHollow> getAllPackageStreamHollow() {
@@ -7228,7 +7413,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PackageStreamHollow getPackageStreamHollow(int ordinal) {
-        objectCreationSampler.recordCreation(188);
+        objectCreationSampler.recordCreation(193);
         return (PackageStreamHollow)packageStreamProvider.getHollowObject(ordinal);
     }
     public Collection<PackageStreamSetHollow> getAllPackageStreamSetHollow() {
@@ -7239,7 +7424,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PackageStreamSetHollow getPackageStreamSetHollow(int ordinal) {
-        objectCreationSampler.recordCreation(189);
+        objectCreationSampler.recordCreation(194);
         return (PackageStreamSetHollow)packageStreamSetProvider.getHollowObject(ordinal);
     }
     public Collection<PackageHollow> getAllPackageHollow() {
@@ -7250,7 +7435,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PackageHollow getPackageHollow(int ordinal) {
-        objectCreationSampler.recordCreation(190);
+        objectCreationSampler.recordCreation(195);
         return (PackageHollow)packageProvider.getHollowObject(ordinal);
     }
     public Collection<VideoTypeMediaHollow> getAllVideoTypeMediaHollow() {
@@ -7261,7 +7446,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoTypeMediaHollow getVideoTypeMediaHollow(int ordinal) {
-        objectCreationSampler.recordCreation(191);
+        objectCreationSampler.recordCreation(196);
         return (VideoTypeMediaHollow)videoTypeMediaProvider.getHollowObject(ordinal);
     }
     public Collection<VideoTypeMediaListHollow> getAllVideoTypeMediaListHollow() {
@@ -7272,7 +7457,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoTypeMediaListHollow getVideoTypeMediaListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(192);
+        objectCreationSampler.recordCreation(197);
         return (VideoTypeMediaListHollow)videoTypeMediaListProvider.getHollowObject(ordinal);
     }
     public Collection<VideoTypeDescriptorHollow> getAllVideoTypeDescriptorHollow() {
@@ -7283,7 +7468,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoTypeDescriptorHollow getVideoTypeDescriptorHollow(int ordinal) {
-        objectCreationSampler.recordCreation(193);
+        objectCreationSampler.recordCreation(198);
         return (VideoTypeDescriptorHollow)videoTypeDescriptorProvider.getHollowObject(ordinal);
     }
     public Collection<VideoTypeDescriptorListHollow> getAllVideoTypeDescriptorListHollow() {
@@ -7294,7 +7479,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoTypeDescriptorListHollow getVideoTypeDescriptorListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(194);
+        objectCreationSampler.recordCreation(199);
         return (VideoTypeDescriptorListHollow)videoTypeDescriptorListProvider.getHollowObject(ordinal);
     }
     public Collection<VideoTypeHollow> getAllVideoTypeHollow() {
@@ -7305,7 +7490,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoTypeHollow getVideoTypeHollow(int ordinal) {
-        objectCreationSampler.recordCreation(195);
+        objectCreationSampler.recordCreation(200);
         return (VideoTypeHollow)videoTypeProvider.getHollowObject(ordinal);
     }
     public void setSamplingDirector(HollowSamplingDirector director) {
