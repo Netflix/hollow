@@ -3,13 +3,19 @@ package com.netflix.vms.transformer.rest.blobinfo;
 import com.google.inject.Singleton;
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
+import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
+import com.netflix.astyanax.model.ColumnFamily;
 import com.netflix.aws.db.Item;
 import com.netflix.aws.db.ItemAttribute;
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
+import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.fastproperties.ClientPinningUtil;
+import com.netflix.vms.transformer.publish.workflow.util.TransformerServerCassandraColumnFamilyHelper;
+import com.netflix.vms.transformer.publish.workflow.util.TransformerServerCassandraHelper;
 import com.netflix.vms.transformer.rest.blobinfo.BlobImageEntry.AttributeKeys;
 import com.netflix.vms.transformer.rest.blobinfo.BlobImageEntry.BlobType;
 
@@ -54,11 +60,15 @@ public class VMSBlobInfoAdmin {
     
     private final TransformerConfig transformerConfig;
     private final FileStore fileStore;
+    private final TransformerServerCassandraHelper cassandraHelper;
+    private final TransformerCassandraColumnFamilyHelper poisonedCassandraHelper;
     
     @Inject
-    public VMSBlobInfoAdmin(TransformerConfig config, FileStore fileStore) {
+    public VMSBlobInfoAdmin(TransformerConfig config, FileStore fileStore, TransformerServerCassandraHelper cassandra) {
         this.transformerConfig = config;
         this.fileStore = fileStore;
+        this.cassandraHelper = cassandra;
+		this.poisonedCassandraHelper = cassandraHelper.getColumnFamilyHelper(TransformerCassandraHelper.TransformerColumnFamily.POISON_STATES);
     }
 
     @GET
@@ -186,6 +196,10 @@ public class VMSBlobInfoAdmin {
 
     private String formatJson(final SortedMap<String, BlobImageEntry> map, String vip,
     		Map<RegionEnum, String> pinnedVersions, Map<RegionEnum, String> announcedVersions) {
+    	for(RegionEnum region : regions) {
+    		pinableVersionSets.put(region, new HashSet<String>());
+    	}
+    	
     	// Map which will be converted to JSON
     	Map<String, Object> output = new LinkedHashMap<String, Object>();
 
@@ -204,13 +218,35 @@ public class VMSBlobInfoAdmin {
     	for(RegionEnum region : announcedVersions.keySet()) {
     		announcements.put(region.toString(), announcedVersions.get(region));
     	}
+    	
 
     	List<Map<String, Object>> blobList = new ArrayList<Map<String,Object>>();
     	for(BlobImageEntry entry : map.values()) {
     		Map<String, Object> mapObj = new LinkedHashMap<String, Object>();
     		// Poisoned state placeholder
-    		mapObj.put("poisoned", false);
     		mapObj.put("version", entry.getVersion());
+    		mapObj.put("pinable", isPinableVersion(entry));
+    		
+    		if(isPinableVersion(entry)) {
+    			String isPoisoned = "false";
+				try {
+					String poisonedStateQueryKey = entry.getVersion() + "_" + vip;
+					Map<String, String> columns = poisonedCassandraHelper.getColumns(poisonedStateQueryKey);
+					// If there are no columns, it means that the blob is not poisoned
+					if(columns.size() == 0) 
+						isPoisoned = "false";
+					else {
+						// Get the value of the poisoned column
+						isPoisoned = poisonedCassandraHelper.getKeyColumnValue(poisonedStateQueryKey, "val");
+						// In case of an exception, the isPoisoned value remains false
+					}
+				} catch (ConnectionException e) {
+					e.printStackTrace();
+				} finally {
+					mapObj.put("poisoned", Boolean.parseBoolean(isPoisoned));
+				}
+    		}
+    		
     		Map<String, String> entryAttribs = entry.getAttribs();
     		Long ts = entry.getPublishedTimeStamp();
     		if(ts != null) {

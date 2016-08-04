@@ -96,7 +96,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "18.0",
+            "locked": "19.0",
             "transitive": [
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
@@ -114,26 +114,26 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -238,7 +238,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.8",
+            "locked": "1.12",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -409,7 +409,7 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.4",
+            "locked": "2.5",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "netflix:mutation-stream-common"
@@ -556,23 +556,23 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.89",
+            "locked": "1.90",
             "requested": "latest.release"
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.89",
+            "locked": "1.90",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.1.1",
+            "locked": "3.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.1.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -975,7 +975,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "18.0",
+            "locked": "19.0",
             "transitive": [
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
@@ -993,26 +993,26 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -1117,7 +1117,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.8",
+            "locked": "1.12",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -1288,7 +1288,7 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.4",
+            "locked": "2.5",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "netflix:mutation-stream-common"
@@ -1435,23 +1435,23 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.89",
+            "locked": "1.90",
             "requested": "latest.release"
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.89",
+            "locked": "1.90",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.1.1",
+            "locked": "3.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.1.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1854,7 +1854,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "18.0",
+            "locked": "19.0",
             "transitive": [
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
@@ -1872,26 +1872,26 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -1996,7 +1996,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.8",
+            "locked": "1.12",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -2167,7 +2167,7 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.4",
+            "locked": "2.5",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "netflix:mutation-stream-common"
@@ -2314,23 +2314,23 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.89",
+            "locked": "1.90",
             "requested": "latest.release"
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.89",
+            "locked": "1.90",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.1.1",
+            "locked": "3.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.1.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -2733,7 +2733,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "18.0",
+            "locked": "19.0",
             "transitive": [
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
@@ -2751,26 +2751,26 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -2875,7 +2875,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.8",
+            "locked": "1.12",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -3046,7 +3046,7 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.4",
+            "locked": "2.5",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "netflix:mutation-stream-common"
@@ -3193,23 +3193,23 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.89",
+            "locked": "1.90",
             "requested": "latest.release"
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.89",
+            "locked": "1.90",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.1.1",
+            "locked": "3.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.1.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3711,7 +3711,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "18.0",
+            "locked": "19.0",
             "transitive": [
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
@@ -3729,26 +3729,26 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -3853,7 +3853,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.8",
+            "locked": "1.12",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -4024,7 +4024,7 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.4",
+            "locked": "2.5",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "netflix:mutation-stream-common"
@@ -4171,23 +4171,23 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.89",
+            "locked": "1.90",
             "requested": "latest.release"
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.89",
+            "locked": "1.90",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.1.1",
+            "locked": "3.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.1.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -4590,7 +4590,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "18.0",
+            "locked": "19.0",
             "transitive": [
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
@@ -4608,26 +4608,26 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -4732,7 +4732,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.8",
+            "locked": "1.12",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -4903,7 +4903,7 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.4",
+            "locked": "2.5",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "netflix:mutation-stream-common"
@@ -5051,23 +5051,23 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.89",
+            "locked": "1.90",
             "requested": "latest.release"
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.89",
+            "locked": "1.90",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.1.1",
+            "locked": "3.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.1.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -5480,7 +5480,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "18.0",
+            "locked": "19.0",
             "transitive": [
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
@@ -5498,26 +5498,26 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -5622,7 +5622,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.8",
+            "locked": "1.12",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -5793,7 +5793,7 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.4",
+            "locked": "2.5",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "netflix:mutation-stream-common"
@@ -5941,23 +5941,23 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.89",
+            "locked": "1.90",
             "requested": "latest.release"
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.89",
+            "locked": "1.90",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.1.1",
+            "locked": "3.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.1.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -6370,7 +6370,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "18.0",
+            "locked": "19.0",
             "transitive": [
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
@@ -6388,26 +6388,26 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -6512,7 +6512,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.8",
+            "locked": "1.12",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -6683,7 +6683,7 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.4",
+            "locked": "2.5",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "netflix:mutation-stream-common"
@@ -6831,23 +6831,23 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.89",
+            "locked": "1.90",
             "requested": "latest.release"
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.89",
+            "locked": "1.90",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.1.1",
+            "locked": "3.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.1.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -7260,7 +7260,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "18.0",
+            "locked": "19.0",
             "transitive": [
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
@@ -7278,26 +7278,26 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.0",
+            "locked": "4.1.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -7402,7 +7402,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.8",
+            "locked": "1.12",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -7573,7 +7573,7 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.4",
+            "locked": "2.5",
             "transitive": [
                 "com.netflix.suro:suro-core",
                 "netflix:mutation-stream-common"
@@ -7721,23 +7721,23 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.89",
+            "locked": "1.90",
             "requested": "latest.release"
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.89",
+            "locked": "1.90",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.1.1",
+            "locked": "3.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.1.1",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config"
             ]

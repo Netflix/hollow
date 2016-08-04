@@ -6,7 +6,6 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.NonVideoSp
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformInfo;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformProgress;
 
-import java.lang.Integer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -30,7 +29,23 @@ import com.netflix.vms.transformer.hollowinput.CharacterListHollow;
 import com.netflix.vms.transformer.hollowinput.MovieCharacterPersonHollow;
 import com.netflix.vms.transformer.hollowinput.PersonCharacterHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
-import com.netflix.vms.transformer.hollowoutput.*;
+import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
+import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
+import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
+import com.netflix.vms.transformer.hollowoutput.FallbackUSArtwork;
+import com.netflix.vms.transformer.hollowoutput.GlobalPerson;
+import com.netflix.vms.transformer.hollowoutput.GlobalVideo;
+import com.netflix.vms.transformer.hollowoutput.ISOCountry;
+import com.netflix.vms.transformer.hollowoutput.MoviePersonCharacter;
+import com.netflix.vms.transformer.hollowoutput.Strings;
+import com.netflix.vms.transformer.hollowoutput.Video;
+import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
+import com.netflix.vms.transformer.hollowoutput.VideoImages;
+import com.netflix.vms.transformer.hollowoutput.VideoMediaData;
+import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
+import com.netflix.vms.transformer.hollowoutput.VideoMiscData;
+import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
+import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.logmessage.ProgressMessage;
@@ -54,7 +69,6 @@ import com.netflix.vms.transformer.modules.mpl.EncodingProfileModule;
 import com.netflix.vms.transformer.modules.mpl.OriginServerModule;
 import com.netflix.vms.transformer.modules.packages.PackageDataModule;
 import com.netflix.vms.transformer.modules.packages.contracts.LanguageRightsModule;
-import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkFormatModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkImageRecipeModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkTypeModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.DefaultExtensionRecipeModule;
@@ -177,7 +191,6 @@ public class SimpleTransformer {
                 new DrmSystemModule(api, ctx, objectMapper),
                 new OriginServerModule(api, ctx, objectMapper, indexer),
                 new EncodingProfileModule(api, ctx, objectMapper, indexer),
-                new ArtworkFormatModule(api, ctx, objectMapper),
                 new CacheDeploymentIntentModule(api, ctx, objectMapper),
                 new ArtworkTypeModule(api, ctx, objectMapper),
                 new ArtworkImageRecipeModule(api, ctx, objectMapper),

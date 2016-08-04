@@ -5,16 +5,16 @@ import com.netflix.hollow.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.read.customapi.HollowTypeAPI;
 
 @SuppressWarnings("all")
-public class ContractIdHollowFactory<T extends ContractIdHollow> extends HollowFactory<T> {
+public class DamMerchStillsHollowFactory<T extends DamMerchStillsHollow> extends HollowFactory<T> {
 
     @Override
     public T newHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return (T)new ContractIdHollow(((ContractIdTypeAPI)typeAPI).getDelegateLookupImpl(), ordinal);
+        return (T)new DamMerchStillsHollow(((DamMerchStillsTypeAPI)typeAPI).getDelegateLookupImpl(), ordinal);
     }
 
     @Override
     public T newCachedHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return (T)new ContractIdHollow(new ContractIdDelegateCachedImpl((ContractIdTypeAPI)typeAPI, ordinal), ordinal);
+        return (T)new DamMerchStillsHollow(new DamMerchStillsDelegateCachedImpl((DamMerchStillsTypeAPI)typeAPI, ordinal), ordinal);
     }
 
 }

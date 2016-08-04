@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer.publish.workflow;
 
 import com.netflix.vms.transformer.common.slice.DataSlicer;
-
 import com.netflix.vms.transformer.publish.status.WorkflowCycleStatusFuture;
 import com.netflix.vms.transformer.publish.status.CycleStatusFuture;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
@@ -76,6 +75,13 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     public void notifyRestoredStateEngine(HollowReadStateEngine restoredState) {
         if(circuitBreakerDataProvider != null)
             circuitBreakerDataProvider.notifyRestoredStateEngine(restoredState);
+    }
+    
+    @Override
+    public HollowReadStateEngine getCurrentReadStateEngine() {
+        if(circuitBreakerDataProvider != null)
+            return circuitBreakerDataProvider.getStateEngine();
+        throw new IllegalStateException("No HollowReadStateEngine is available");
     }
     
     @Override

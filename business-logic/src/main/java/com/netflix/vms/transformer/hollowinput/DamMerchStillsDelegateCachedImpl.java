@@ -7,22 +7,24 @@ import com.netflix.hollow.read.customapi.HollowTypeAPI;
 import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 
 @SuppressWarnings("all")
-public class ContractIdDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, ContractIdDelegate {
+public class DamMerchStillsDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, DamMerchStillsDelegate {
 
-    private final Long value;
-   private ContractIdTypeAPI typeAPI;
+    private final int assetIdOrdinal;
+    private final int momentOrdinal;
+   private DamMerchStillsTypeAPI typeAPI;
 
-    public ContractIdDelegateCachedImpl(ContractIdTypeAPI typeAPI, int ordinal) {
-        this.value = typeAPI.getValueBoxed(ordinal);
+    public DamMerchStillsDelegateCachedImpl(DamMerchStillsTypeAPI typeAPI, int ordinal) {
+        this.assetIdOrdinal = typeAPI.getAssetIdOrdinal(ordinal);
+        this.momentOrdinal = typeAPI.getMomentOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
-    public long getValue(int ordinal) {
-        return value.longValue();
+    public int getAssetIdOrdinal(int ordinal) {
+        return assetIdOrdinal;
     }
 
-    public Long getValueBoxed(int ordinal) {
-        return value;
+    public int getMomentOrdinal(int ordinal) {
+        return momentOrdinal;
     }
 
     @Override
@@ -35,12 +37,12 @@ public class ContractIdDelegateCachedImpl extends HollowObjectAbstractDelegate i
         return typeAPI.getTypeDataAccess();
     }
 
-    public ContractIdTypeAPI getTypeAPI() {
+    public DamMerchStillsTypeAPI getTypeAPI() {
         return typeAPI;
     }
 
     public void updateTypeAPI(HollowTypeAPI typeAPI) {
-        this.typeAPI = (ContractIdTypeAPI) typeAPI;
+        this.typeAPI = (DamMerchStillsTypeAPI) typeAPI;
     }
 
 }

@@ -5,23 +5,23 @@ import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.HollowObjectSchema;
 
 @SuppressWarnings("all")
-public class ContractIdDelegateLookupImpl extends HollowObjectAbstractDelegate implements ContractIdDelegate {
+public class DamMerchStillsDelegateLookupImpl extends HollowObjectAbstractDelegate implements DamMerchStillsDelegate {
 
-    private final ContractIdTypeAPI typeAPI;
+    private final DamMerchStillsTypeAPI typeAPI;
 
-    public ContractIdDelegateLookupImpl(ContractIdTypeAPI typeAPI) {
+    public DamMerchStillsDelegateLookupImpl(DamMerchStillsTypeAPI typeAPI) {
         this.typeAPI = typeAPI;
     }
 
-    public long getValue(int ordinal) {
-        return typeAPI.getValue(ordinal);
+    public int getAssetIdOrdinal(int ordinal) {
+        return typeAPI.getAssetIdOrdinal(ordinal);
     }
 
-    public Long getValueBoxed(int ordinal) {
-        return typeAPI.getValueBoxed(ordinal);
+    public int getMomentOrdinal(int ordinal) {
+        return typeAPI.getMomentOrdinal(ordinal);
     }
 
-    public ContractIdTypeAPI getTypeAPI() {
+    public DamMerchStillsTypeAPI getTypeAPI() {
         return typeAPI;
     }
 

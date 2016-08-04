@@ -24,9 +24,18 @@ public class ClientPinningUtil {
 			    			null, 
 			    			null, 
 			    			null);
-    	JsonElement jelement = new JsonParser().parse(json);
-    	JsonObject jobject = jelement.getAsJsonObject();
-    	String version = jobject.get("version").getAsString();
+		JsonElement jelement =  new JsonParser().parse(json);
+		JsonObject jobject = jelement.getAsJsonObject();
+		String dataStringJson = jobject.get("dataString").getAsString();
+		// Parse it again
+		jelement = new JsonParser().parse(dataStringJson);
+		String version = jelement
+							.getAsJsonObject()
+							.get("attributes")
+							.getAsJsonObject()
+							.get("dataVersion")
+							.getAsString();
+    	
     	return version;
     }
 
