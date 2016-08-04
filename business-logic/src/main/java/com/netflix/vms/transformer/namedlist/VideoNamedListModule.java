@@ -372,7 +372,7 @@ public class VideoNamedListModule {
 
     private boolean isUltraHD(Set<VideoFormatDescriptor> formats, final LinkedHashSetOfStrings cupTokens, final String deviceCategory) {
         if (formats.contains(constants.ULTRA_HD)) {
-            int maxHeightForCupTokens = ctx.getCupLibrary().getMaximumVideoHeight(newSet(cupTokens), "CE");
+            int maxHeightForCupTokens = ctx.getCupLibrary().getMaximumVideoHeight(newSet(cupTokens), deviceCategory);
             return constants.ULTRA_HD_MIN_HEIGHT <= maxHeightForCupTokens;
         }
         return false;
