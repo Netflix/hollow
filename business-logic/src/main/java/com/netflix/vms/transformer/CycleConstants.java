@@ -54,8 +54,8 @@ public class CycleConstants {
     
     public CycleConstants(HollowReadStateEngine inputStateEngine) {
         this.artworkDerivativeCache = new InputOrdinalResultCache<ArtworkDerivative>(inputStateEngine.getTypeState("ArtworkDerivative").maxOrdinal());
-        this.artworkDerivativesCache = new InputOrdinalResultCache<ArtworkDerivatives>(inputStateEngine.getTypeState("ListOfArtworkDerivative").maxOrdinal());
-        this.cdnListCache = new InputOrdinalResultCache<List<ArtworkCdn>>(inputStateEngine.getTypeState("ListOfArtworkDerivative").maxOrdinal());
+        this.artworkDerivativesCache = new InputOrdinalResultCache<ArtworkDerivatives>(inputStateEngine.getTypeState("ArtworkDerivativeSet").maxOrdinal());
+        this.cdnListCache = new InputOrdinalResultCache<List<ArtworkCdn>>(inputStateEngine.getTypeState("ArtworkDerivativeSet").maxOrdinal());
     }
 
     private static VideoFormatDescriptor videoFormatDescriptor(int id, String name, String description) {
