@@ -10,14 +10,12 @@ import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 public class MovieCharacterPersonDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, MovieCharacterPersonDelegate {
 
     private final Long movieId;
-    private final Long personId;
-    private final Long characterId;
+    private final int charactersOrdinal;
    private MovieCharacterPersonTypeAPI typeAPI;
 
     public MovieCharacterPersonDelegateCachedImpl(MovieCharacterPersonTypeAPI typeAPI, int ordinal) {
         this.movieId = typeAPI.getMovieIdBoxed(ordinal);
-        this.personId = typeAPI.getPersonIdBoxed(ordinal);
-        this.characterId = typeAPI.getCharacterIdBoxed(ordinal);
+        this.charactersOrdinal = typeAPI.getCharactersOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -29,20 +27,8 @@ public class MovieCharacterPersonDelegateCachedImpl extends HollowObjectAbstract
         return movieId;
     }
 
-    public long getPersonId(int ordinal) {
-        return personId.longValue();
-    }
-
-    public Long getPersonIdBoxed(int ordinal) {
-        return personId;
-    }
-
-    public long getCharacterId(int ordinal) {
-        return characterId.longValue();
-    }
-
-    public Long getCharacterIdBoxed(int ordinal) {
-        return characterId;
+    public int getCharactersOrdinal(int ordinal) {
+        return charactersOrdinal;
     }
 
     @Override

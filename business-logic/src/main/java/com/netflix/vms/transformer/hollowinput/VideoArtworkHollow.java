@@ -40,6 +40,13 @@ public class VideoArtworkHollow extends HollowObject {
         return  api().getArtworkDerivativeListHollow(refOrdinal);
     }
 
+    public ArtworkDerivativeSetHollow _getDerivativeSet() {
+        int refOrdinal = delegate().getDerivativeSetOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getArtworkDerivativeSetHollow(refOrdinal);
+    }
+
     public ArtworkLocaleListHollow _getLocales() {
         int refOrdinal = delegate().getLocalesOrdinal(ordinal);
         if(refOrdinal == -1)

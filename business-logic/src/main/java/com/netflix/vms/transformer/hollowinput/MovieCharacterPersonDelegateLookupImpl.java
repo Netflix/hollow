@@ -21,20 +21,8 @@ public class MovieCharacterPersonDelegateLookupImpl extends HollowObjectAbstract
         return typeAPI.getMovieIdBoxed(ordinal);
     }
 
-    public long getPersonId(int ordinal) {
-        return typeAPI.getPersonId(ordinal);
-    }
-
-    public Long getPersonIdBoxed(int ordinal) {
-        return typeAPI.getPersonIdBoxed(ordinal);
-    }
-
-    public long getCharacterId(int ordinal) {
-        return typeAPI.getCharacterId(ordinal);
-    }
-
-    public Long getCharacterIdBoxed(int ordinal) {
-        return typeAPI.getCharacterIdBoxed(ordinal);
+    public int getCharactersOrdinal(int ordinal) {
+        return typeAPI.getCharactersOrdinal(ordinal);
     }
 
     public MovieCharacterPersonTypeAPI getTypeAPI() {

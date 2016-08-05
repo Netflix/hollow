@@ -13,6 +13,7 @@ public class CharacterArtworkDelegateCachedImpl extends HollowObjectAbstractDele
     private final int sourceFileIdOrdinal;
     private final Long seqNum;
     private final int derivativesOrdinal;
+    private final int derivativeSetOrdinal;
     private final int localesOrdinal;
     private final int attributesOrdinal;
     private final Long ordinalPriority;
@@ -24,6 +25,7 @@ public class CharacterArtworkDelegateCachedImpl extends HollowObjectAbstractDele
         this.sourceFileIdOrdinal = typeAPI.getSourceFileIdOrdinal(ordinal);
         this.seqNum = typeAPI.getSeqNumBoxed(ordinal);
         this.derivativesOrdinal = typeAPI.getDerivativesOrdinal(ordinal);
+        this.derivativeSetOrdinal = typeAPI.getDerivativeSetOrdinal(ordinal);
         this.localesOrdinal = typeAPI.getLocalesOrdinal(ordinal);
         this.attributesOrdinal = typeAPI.getAttributesOrdinal(ordinal);
         this.ordinalPriority = typeAPI.getOrdinalPriorityBoxed(ordinal);
@@ -53,6 +55,10 @@ public class CharacterArtworkDelegateCachedImpl extends HollowObjectAbstractDele
 
     public int getDerivativesOrdinal(int ordinal) {
         return derivativesOrdinal;
+    }
+
+    public int getDerivativeSetOrdinal(int ordinal) {
+        return derivativeSetOrdinal;
     }
 
     public int getLocalesOrdinal(int ordinal) {

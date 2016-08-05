@@ -13,12 +13,16 @@ public class PersonArtworkDelegateLookupImpl extends HollowObjectAbstractDelegat
         this.typeAPI = typeAPI;
     }
 
-    public int getDerivativesOrdinal(int ordinal) {
-        return typeAPI.getDerivativesOrdinal(ordinal);
+    public long getPersonId(int ordinal) {
+        return typeAPI.getPersonId(ordinal);
     }
 
-    public int getLocalesOrdinal(int ordinal) {
-        return typeAPI.getLocalesOrdinal(ordinal);
+    public Long getPersonIdBoxed(int ordinal) {
+        return typeAPI.getPersonIdBoxed(ordinal);
+    }
+
+    public int getSourceFileIdOrdinal(int ordinal) {
+        return typeAPI.getSourceFileIdOrdinal(ordinal);
     }
 
     public long getSeqNum(int ordinal) {
@@ -29,6 +33,18 @@ public class PersonArtworkDelegateLookupImpl extends HollowObjectAbstractDelegat
         return typeAPI.getSeqNumBoxed(ordinal);
     }
 
+    public int getDerivativesOrdinal(int ordinal) {
+        return typeAPI.getDerivativesOrdinal(ordinal);
+    }
+
+    public int getDerivativeSetOrdinal(int ordinal) {
+        return typeAPI.getDerivativeSetOrdinal(ordinal);
+    }
+
+    public int getLocalesOrdinal(int ordinal) {
+        return typeAPI.getLocalesOrdinal(ordinal);
+    }
+
     public long getOrdinalPriority(int ordinal) {
         return typeAPI.getOrdinalPriority(ordinal);
     }
@@ -37,20 +53,8 @@ public class PersonArtworkDelegateLookupImpl extends HollowObjectAbstractDelegat
         return typeAPI.getOrdinalPriorityBoxed(ordinal);
     }
 
-    public int getSourceFileIdOrdinal(int ordinal) {
-        return typeAPI.getSourceFileIdOrdinal(ordinal);
-    }
-
     public int getAttributesOrdinal(int ordinal) {
         return typeAPI.getAttributesOrdinal(ordinal);
-    }
-
-    public long getPersonId(int ordinal) {
-        return typeAPI.getPersonId(ordinal);
-    }
-
-    public Long getPersonIdBoxed(int ordinal) {
-        return typeAPI.getPersonIdBoxed(ordinal);
     }
 
     public int getFileImageTypeOrdinal(int ordinal) {

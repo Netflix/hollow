@@ -10,18 +10,19 @@ public class PersonArtworkHollow extends HollowObject {
         super(delegate, ordinal);
     }
 
-    public ArtworkDerivativeListHollow _getDerivatives() {
-        int refOrdinal = delegate().getDerivativesOrdinal(ordinal);
-        if(refOrdinal == -1)
-            return null;
-        return  api().getArtworkDerivativeListHollow(refOrdinal);
+    public long _getPersonId() {
+        return delegate().getPersonId(ordinal);
     }
 
-    public ArtworkLocaleListHollow _getLocales() {
-        int refOrdinal = delegate().getLocalesOrdinal(ordinal);
+    public Long _getPersonIdBoxed() {
+        return delegate().getPersonIdBoxed(ordinal);
+    }
+
+    public StringHollow _getSourceFileId() {
+        int refOrdinal = delegate().getSourceFileIdOrdinal(ordinal);
         if(refOrdinal == -1)
             return null;
-        return  api().getArtworkLocaleListHollow(refOrdinal);
+        return  api().getStringHollow(refOrdinal);
     }
 
     public long _getSeqNum() {
@@ -32,6 +33,27 @@ public class PersonArtworkHollow extends HollowObject {
         return delegate().getSeqNumBoxed(ordinal);
     }
 
+    public ArtworkDerivativeListHollow _getDerivatives() {
+        int refOrdinal = delegate().getDerivativesOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getArtworkDerivativeListHollow(refOrdinal);
+    }
+
+    public ArtworkDerivativeSetHollow _getDerivativeSet() {
+        int refOrdinal = delegate().getDerivativeSetOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getArtworkDerivativeSetHollow(refOrdinal);
+    }
+
+    public ArtworkLocaleListHollow _getLocales() {
+        int refOrdinal = delegate().getLocalesOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getArtworkLocaleListHollow(refOrdinal);
+    }
+
     public long _getOrdinalPriority() {
         return delegate().getOrdinalPriority(ordinal);
     }
@@ -40,26 +62,11 @@ public class PersonArtworkHollow extends HollowObject {
         return delegate().getOrdinalPriorityBoxed(ordinal);
     }
 
-    public StringHollow _getSourceFileId() {
-        int refOrdinal = delegate().getSourceFileIdOrdinal(ordinal);
-        if(refOrdinal == -1)
-            return null;
-        return  api().getStringHollow(refOrdinal);
-    }
-
     public ArtworkAttributesHollow _getAttributes() {
         int refOrdinal = delegate().getAttributesOrdinal(ordinal);
         if(refOrdinal == -1)
             return null;
         return  api().getArtworkAttributesHollow(refOrdinal);
-    }
-
-    public long _getPersonId() {
-        return delegate().getPersonId(ordinal);
-    }
-
-    public Long _getPersonIdBoxed() {
-        return delegate().getPersonIdBoxed(ordinal);
     }
 
     public StringHollow _getFileImageType() {

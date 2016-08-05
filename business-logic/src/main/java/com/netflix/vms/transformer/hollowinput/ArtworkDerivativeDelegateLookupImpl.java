@@ -13,12 +13,12 @@ public class ArtworkDerivativeDelegateLookupImpl extends HollowObjectAbstractDel
         this.typeAPI = typeAPI;
     }
 
-    public int getRecipeNameOrdinal(int ordinal) {
-        return typeAPI.getRecipeNameOrdinal(ordinal);
+    public int getImageTypeOrdinal(int ordinal) {
+        return typeAPI.getImageTypeOrdinal(ordinal);
     }
 
-    public int getCdnOriginServerIdOrdinal(int ordinal) {
-        return typeAPI.getCdnOriginServerIdOrdinal(ordinal);
+    public int getRecipeNameOrdinal(int ordinal) {
+        return typeAPI.getRecipeNameOrdinal(ordinal);
     }
 
     public long getWidth(int ordinal) {
@@ -29,32 +29,24 @@ public class ArtworkDerivativeDelegateLookupImpl extends HollowObjectAbstractDel
         return typeAPI.getWidthBoxed(ordinal);
     }
 
-    public int getCdnDirectoryOrdinal(int ordinal) {
-        return typeAPI.getCdnDirectoryOrdinal(ordinal);
-    }
-
-    public int getCdnIdOrdinal(int ordinal) {
-        return typeAPI.getCdnIdOrdinal(ordinal);
-    }
-
-    public int getRecipeDescriptorOrdinal(int ordinal) {
-        return typeAPI.getRecipeDescriptorOrdinal(ordinal);
-    }
-
-    public int getImageTypeOrdinal(int ordinal) {
-        return typeAPI.getImageTypeOrdinal(ordinal);
-    }
-
-    public int getCdnOriginServerOrdinal(int ordinal) {
-        return typeAPI.getCdnOriginServerOrdinal(ordinal);
-    }
-
     public long getHeight(int ordinal) {
         return typeAPI.getHeight(ordinal);
     }
 
     public Long getHeightBoxed(int ordinal) {
         return typeAPI.getHeightBoxed(ordinal);
+    }
+
+    public int getRecipeDescriptorOrdinal(int ordinal) {
+        return typeAPI.getRecipeDescriptorOrdinal(ordinal);
+    }
+
+    public int getCdnDirectoryOrdinal(int ordinal) {
+        return typeAPI.getCdnDirectoryOrdinal(ordinal);
+    }
+
+    public int getCdnIdOrdinal(int ordinal) {
+        return typeAPI.getCdnIdOrdinal(ordinal);
     }
 
     public ArtworkDerivativeTypeAPI getTypeAPI() {

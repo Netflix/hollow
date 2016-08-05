@@ -9,34 +9,40 @@ import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 @SuppressWarnings("all")
 public class PersonArtworkDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, PersonArtworkDelegate {
 
-    private final int derivativesOrdinal;
-    private final int localesOrdinal;
-    private final Long seqNum;
-    private final Long ordinalPriority;
-    private final int sourceFileIdOrdinal;
-    private final int attributesOrdinal;
     private final Long personId;
+    private final int sourceFileIdOrdinal;
+    private final Long seqNum;
+    private final int derivativesOrdinal;
+    private final int derivativeSetOrdinal;
+    private final int localesOrdinal;
+    private final Long ordinalPriority;
+    private final int attributesOrdinal;
     private final int fileImageTypeOrdinal;
    private PersonArtworkTypeAPI typeAPI;
 
     public PersonArtworkDelegateCachedImpl(PersonArtworkTypeAPI typeAPI, int ordinal) {
-        this.derivativesOrdinal = typeAPI.getDerivativesOrdinal(ordinal);
-        this.localesOrdinal = typeAPI.getLocalesOrdinal(ordinal);
-        this.seqNum = typeAPI.getSeqNumBoxed(ordinal);
-        this.ordinalPriority = typeAPI.getOrdinalPriorityBoxed(ordinal);
-        this.sourceFileIdOrdinal = typeAPI.getSourceFileIdOrdinal(ordinal);
-        this.attributesOrdinal = typeAPI.getAttributesOrdinal(ordinal);
         this.personId = typeAPI.getPersonIdBoxed(ordinal);
+        this.sourceFileIdOrdinal = typeAPI.getSourceFileIdOrdinal(ordinal);
+        this.seqNum = typeAPI.getSeqNumBoxed(ordinal);
+        this.derivativesOrdinal = typeAPI.getDerivativesOrdinal(ordinal);
+        this.derivativeSetOrdinal = typeAPI.getDerivativeSetOrdinal(ordinal);
+        this.localesOrdinal = typeAPI.getLocalesOrdinal(ordinal);
+        this.ordinalPriority = typeAPI.getOrdinalPriorityBoxed(ordinal);
+        this.attributesOrdinal = typeAPI.getAttributesOrdinal(ordinal);
         this.fileImageTypeOrdinal = typeAPI.getFileImageTypeOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
-    public int getDerivativesOrdinal(int ordinal) {
-        return derivativesOrdinal;
+    public long getPersonId(int ordinal) {
+        return personId.longValue();
     }
 
-    public int getLocalesOrdinal(int ordinal) {
-        return localesOrdinal;
+    public Long getPersonIdBoxed(int ordinal) {
+        return personId;
+    }
+
+    public int getSourceFileIdOrdinal(int ordinal) {
+        return sourceFileIdOrdinal;
     }
 
     public long getSeqNum(int ordinal) {
@@ -47,6 +53,18 @@ public class PersonArtworkDelegateCachedImpl extends HollowObjectAbstractDelegat
         return seqNum;
     }
 
+    public int getDerivativesOrdinal(int ordinal) {
+        return derivativesOrdinal;
+    }
+
+    public int getDerivativeSetOrdinal(int ordinal) {
+        return derivativeSetOrdinal;
+    }
+
+    public int getLocalesOrdinal(int ordinal) {
+        return localesOrdinal;
+    }
+
     public long getOrdinalPriority(int ordinal) {
         return ordinalPriority.longValue();
     }
@@ -55,20 +73,8 @@ public class PersonArtworkDelegateCachedImpl extends HollowObjectAbstractDelegat
         return ordinalPriority;
     }
 
-    public int getSourceFileIdOrdinal(int ordinal) {
-        return sourceFileIdOrdinal;
-    }
-
     public int getAttributesOrdinal(int ordinal) {
         return attributesOrdinal;
-    }
-
-    public long getPersonId(int ordinal) {
-        return personId.longValue();
-    }
-
-    public Long getPersonIdBoxed(int ordinal) {
-        return personId;
     }
 
     public int getFileImageTypeOrdinal(int ordinal) {

@@ -37,6 +37,10 @@ public class CharacterArtworkDelegateLookupImpl extends HollowObjectAbstractDele
         return typeAPI.getDerivativesOrdinal(ordinal);
     }
 
+    public int getDerivativeSetOrdinal(int ordinal) {
+        return typeAPI.getDerivativeSetOrdinal(ordinal);
+    }
+
     public int getLocalesOrdinal(int ordinal) {
         return typeAPI.getLocalesOrdinal(ordinal);
     }
