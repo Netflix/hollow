@@ -6,8 +6,6 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.NonVideoSp
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformInfo;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformProgress;
 
-import com.netflix.hollow.sampling.DisabledSamplingDirector;
-
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.hollow.write.HollowWriteStateEngine;
@@ -89,7 +87,6 @@ public class SimpleTransformer {
     }
 
     public SimpleTransformer(VMSHollowInputAPI inputAPI, VMSTransformerWriteStateEngine outputStateEngine, TransformerContext ctx) {
-        inputAPI.setSamplingDirector(DisabledSamplingDirector.INSTANCE);
         this.api = inputAPI;
         this.writeStateEngine = outputStateEngine;
         this.ctx = ctx;
