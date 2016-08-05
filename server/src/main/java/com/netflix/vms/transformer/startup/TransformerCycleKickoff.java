@@ -175,7 +175,8 @@ public class TransformerCycleKickoff {
 
                 cycle.restore(outputClient);
             } else {
-                throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.restoreFromPreviousStateEngine=false.");
+                if(cfg.isFailIfRestoreNotAvailable())
+                    throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.failIfRestoreNotAvailable=false");
             }
         }
     }
