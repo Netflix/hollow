@@ -11,8 +11,7 @@ public class MovieCharacterPersonTypeAPI extends HollowObjectTypeAPI {
     MovieCharacterPersonTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "movieId",
-            "personId",
-            "characterId"
+            "characters"
         });
         this.delegateLookupImpl = new MovieCharacterPersonDelegateLookupImpl(this);
     }
@@ -38,47 +37,15 @@ public class MovieCharacterPersonTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public long getPersonId(int ordinal) {
+    public int getCharactersOrdinal(int ordinal) {
         if(fieldIndex[1] == -1)
-            return missingDataHandler().handleLong("MovieCharacterPerson", ordinal, "personId");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[1]);
+            return missingDataHandler().handleReferencedOrdinal("MovieCharacterPerson", ordinal, "characters");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[1]);
     }
 
-    public Long getPersonIdBoxed(int ordinal) {
-        long l;
-        if(fieldIndex[1] == -1) {
-            l = missingDataHandler().handleLong("MovieCharacterPerson", ordinal, "personId");
-        } else {
-            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[1]);
-            l = getTypeDataAccess().readLong(ordinal, fieldIndex[1]);
-        }
-        if(l == Long.MIN_VALUE)
-            return null;
-        return Long.valueOf(l);
+    public CharacterListTypeAPI getCharactersTypeAPI() {
+        return getAPI().getCharacterListTypeAPI();
     }
-
-
-
-    public long getCharacterId(int ordinal) {
-        if(fieldIndex[2] == -1)
-            return missingDataHandler().handleLong("MovieCharacterPerson", ordinal, "characterId");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[2]);
-    }
-
-    public Long getCharacterIdBoxed(int ordinal) {
-        long l;
-        if(fieldIndex[2] == -1) {
-            l = missingDataHandler().handleLong("MovieCharacterPerson", ordinal, "characterId");
-        } else {
-            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[2]);
-            l = getTypeDataAccess().readLong(ordinal, fieldIndex[2]);
-        }
-        if(l == Long.MIN_VALUE)
-            return null;
-        return Long.valueOf(l);
-    }
-
-
 
     public MovieCharacterPersonDelegateLookupImpl getDelegateLookupImpl() {
         return delegateLookupImpl;

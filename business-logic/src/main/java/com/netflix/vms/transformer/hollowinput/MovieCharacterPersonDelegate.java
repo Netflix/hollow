@@ -10,13 +10,7 @@ public interface MovieCharacterPersonDelegate extends HollowObjectDelegate {
 
     public Long getMovieIdBoxed(int ordinal);
 
-    public long getPersonId(int ordinal);
-
-    public Long getPersonIdBoxed(int ordinal);
-
-    public long getCharacterId(int ordinal);
-
-    public Long getCharacterIdBoxed(int ordinal);
+    public int getCharactersOrdinal(int ordinal);
 
     public MovieCharacterPersonTypeAPI getTypeAPI();
 

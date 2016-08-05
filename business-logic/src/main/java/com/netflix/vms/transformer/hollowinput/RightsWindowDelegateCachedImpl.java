@@ -11,12 +11,14 @@ public class RightsWindowDelegateCachedImpl extends HollowObjectAbstractDelegate
 
     private final Long startDate;
     private final Long endDate;
+    private final int contractIdsOrdinal;
     private final int contractIdsExtOrdinal;
    private RightsWindowTypeAPI typeAPI;
 
     public RightsWindowDelegateCachedImpl(RightsWindowTypeAPI typeAPI, int ordinal) {
         this.startDate = typeAPI.getStartDateBoxed(ordinal);
         this.endDate = typeAPI.getEndDateBoxed(ordinal);
+        this.contractIdsOrdinal = typeAPI.getContractIdsOrdinal(ordinal);
         this.contractIdsExtOrdinal = typeAPI.getContractIdsExtOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
@@ -35,6 +37,10 @@ public class RightsWindowDelegateCachedImpl extends HollowObjectAbstractDelegate
 
     public Long getEndDateBoxed(int ordinal) {
         return endDate;
+    }
+
+    public int getContractIdsOrdinal(int ordinal) {
+        return contractIdsOrdinal;
     }
 
     public int getContractIdsExtOrdinal(int ordinal) {

@@ -403,6 +403,7 @@ public class DataSlicerImpl implements DataSlicer {
             includeAll(stateEngine, "TurboCollections");
             includeAll(stateEngine, "PersonVideo");
             includeAll(stateEngine, "PersonBio");
+            includeAll(stateEngine, "MovieCharacterPerson");
             includeAll(stateEngine, "VMSAward");
     
             return populateFilteredBlob(stateEngine, ordinalsToInclude);

@@ -18,20 +18,11 @@ public class MovieCharacterPersonHollow extends HollowObject {
         return delegate().getMovieIdBoxed(ordinal);
     }
 
-    public long _getPersonId() {
-        return delegate().getPersonId(ordinal);
-    }
-
-    public Long _getPersonIdBoxed() {
-        return delegate().getPersonIdBoxed(ordinal);
-    }
-
-    public long _getCharacterId() {
-        return delegate().getCharacterId(ordinal);
-    }
-
-    public Long _getCharacterIdBoxed() {
-        return delegate().getCharacterIdBoxed(ordinal);
+    public CharacterListHollow _getCharacters() {
+        int refOrdinal = delegate().getCharactersOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getCharacterListHollow(refOrdinal);
     }
 
     public VMSHollowInputAPI api() {

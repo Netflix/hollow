@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import java.util.List;
 import java.util.Set;
 
 public class GlobalVideo implements Cloneable {
@@ -8,6 +9,7 @@ public class GlobalVideo implements Cloneable {
     public Set<Strings> aliases = null;
     public Set<ISOCountry> availableCountries = null;
     public boolean isSupplementalVideo = false;
+    public List<MoviePersonCharacter> personCharacters = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
