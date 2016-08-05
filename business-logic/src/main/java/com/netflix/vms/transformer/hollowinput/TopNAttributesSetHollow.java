@@ -1,14 +1,14 @@
 package com.netflix.vms.transformer.hollowinput;
 
-import com.netflix.hollow.objects.HollowList;
-import com.netflix.hollow.HollowListSchema;
-import com.netflix.hollow.objects.delegate.HollowListDelegate;
+import com.netflix.hollow.objects.HollowSet;
+import com.netflix.hollow.HollowSetSchema;
+import com.netflix.hollow.objects.delegate.HollowSetDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
 @SuppressWarnings("all")
-public class TopNAttributesListHollow extends HollowList<TopNAttributeHollow> {
+public class TopNAttributesSetHollow extends HollowSet<TopNAttributeHollow> {
 
-    public TopNAttributesListHollow(HollowListDelegate delegate, int ordinal) {
+    public TopNAttributesSetHollow(HollowSetDelegate delegate, int ordinal) {
         super(delegate, ordinal);
     }
 
@@ -26,8 +26,8 @@ public class TopNAttributesListHollow extends HollowList<TopNAttributeHollow> {
         return typeApi().getAPI();
     }
 
-    public TopNAttributesListTypeAPI typeApi() {
-        return (TopNAttributesListTypeAPI) delegate.getTypeAPI();
+    public TopNAttributesSetTypeAPI typeApi() {
+        return (TopNAttributesSetTypeAPI) delegate.getTypeAPI();
     }
 
 }

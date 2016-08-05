@@ -105,7 +105,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
         int ordinalPriority = (int) artworkHollowInput._getOrdinalPriority();
         int seqNum = (int) artworkHollowInput._getSeqNum();
         ArtworkAttributesHollow attributes = artworkHollowInput._getAttributes();
-        ArtworkDerivativeSetHollow inputDerivatives = artworkHollowInput._getDerivativeSet();
+        ArtworkDerivativeSetHollow inputDerivatives = artworkHollowInput._getDerivatives();
         
         Artwork artwork = new Artwork();
 

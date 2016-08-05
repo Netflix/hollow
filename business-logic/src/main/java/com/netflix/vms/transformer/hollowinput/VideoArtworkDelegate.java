@@ -18,8 +18,6 @@ public interface VideoArtworkDelegate extends HollowObjectDelegate {
 
     public int getDerivativesOrdinal(int ordinal);
 
-    public int getDerivativeSetOrdinal(int ordinal);
-
     public int getLocalesOrdinal(int ordinal);
 
     public int getAttributesOrdinal(int ordinal);

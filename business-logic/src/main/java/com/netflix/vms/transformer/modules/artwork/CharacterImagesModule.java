@@ -44,7 +44,7 @@ public class CharacterImagesModule extends ArtWorkModule{
             int ordinalPriority = (int) artworkHollowInput._getOrdinalPriority();
             int seqNum = (int) artworkHollowInput._getSeqNum();
             ArtworkAttributesHollow attributes = artworkHollowInput._getAttributes();
-            ArtworkDerivativeSetHollow derivatives = artworkHollowInput._getDerivativeSet();
+            ArtworkDerivativeSetHollow derivatives = artworkHollowInput._getDerivatives();
             Set<Artwork> artworkSet = getArtworkSet(entityId, descMap);
 
             transformArtworks(entityId, sourceFileId, ordinalPriority, seqNum, attributes, derivatives, localeSet, artworkSet);

@@ -14,7 +14,6 @@ public class VideoArtworkTypeAPI extends HollowObjectTypeAPI {
             "sourceFileId",
             "seqNum",
             "derivatives",
-            "derivativeSet",
             "locales",
             "attributes",
             "ordinalPriority",
@@ -81,24 +80,14 @@ public class VideoArtworkTypeAPI extends HollowObjectTypeAPI {
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[3]);
     }
 
-    public ArtworkDerivativeListTypeAPI getDerivativesTypeAPI() {
-        return getAPI().getArtworkDerivativeListTypeAPI();
-    }
-
-    public int getDerivativeSetOrdinal(int ordinal) {
-        if(fieldIndex[4] == -1)
-            return missingDataHandler().handleReferencedOrdinal("VideoArtwork", ordinal, "derivativeSet");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[4]);
-    }
-
-    public ArtworkDerivativeSetTypeAPI getDerivativeSetTypeAPI() {
+    public ArtworkDerivativeSetTypeAPI getDerivativesTypeAPI() {
         return getAPI().getArtworkDerivativeSetTypeAPI();
     }
 
     public int getLocalesOrdinal(int ordinal) {
-        if(fieldIndex[5] == -1)
+        if(fieldIndex[4] == -1)
             return missingDataHandler().handleReferencedOrdinal("VideoArtwork", ordinal, "locales");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[5]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[4]);
     }
 
     public ArtworkLocaleListTypeAPI getLocalesTypeAPI() {
@@ -106,9 +95,9 @@ public class VideoArtworkTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getAttributesOrdinal(int ordinal) {
-        if(fieldIndex[6] == -1)
+        if(fieldIndex[5] == -1)
             return missingDataHandler().handleReferencedOrdinal("VideoArtwork", ordinal, "attributes");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[6]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[5]);
     }
 
     public ArtworkAttributesTypeAPI getAttributesTypeAPI() {
@@ -116,18 +105,18 @@ public class VideoArtworkTypeAPI extends HollowObjectTypeAPI {
     }
 
     public long getOrdinalPriority(int ordinal) {
-        if(fieldIndex[7] == -1)
+        if(fieldIndex[6] == -1)
             return missingDataHandler().handleLong("VideoArtwork", ordinal, "ordinalPriority");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[7]);
+        return getTypeDataAccess().readLong(ordinal, fieldIndex[6]);
     }
 
     public Long getOrdinalPriorityBoxed(int ordinal) {
         long l;
-        if(fieldIndex[7] == -1) {
+        if(fieldIndex[6] == -1) {
             l = missingDataHandler().handleLong("VideoArtwork", ordinal, "ordinalPriority");
         } else {
-            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[7]);
-            l = getTypeDataAccess().readLong(ordinal, fieldIndex[7]);
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[6]);
+            l = getTypeDataAccess().readLong(ordinal, fieldIndex[6]);
         }
         if(l == Long.MIN_VALUE)
             return null;
@@ -137,9 +126,9 @@ public class VideoArtworkTypeAPI extends HollowObjectTypeAPI {
 
 
     public int getFileImageTypeOrdinal(int ordinal) {
-        if(fieldIndex[8] == -1)
+        if(fieldIndex[7] == -1)
             return missingDataHandler().handleReferencedOrdinal("VideoArtwork", ordinal, "fileImageType");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[8]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[7]);
     }
 
     public StringTypeAPI getFileImageTypeTypeAPI() {

@@ -18,8 +18,6 @@ public interface PersonArtworkDelegate extends HollowObjectDelegate {
 
     public int getDerivativesOrdinal(int ordinal);
 
-    public int getDerivativeSetOrdinal(int ordinal);
-
     public int getLocalesOrdinal(int ordinal);
 
     public long getOrdinalPriority(int ordinal);
