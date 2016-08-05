@@ -1,9 +1,5 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
-
-import java.util.Set;
-import java.util.function.Consumer;
 import com.netflix.archaius.ConfigProxyFactory;
 import com.netflix.archaius.config.EmptyConfig;
 import com.netflix.vms.logging.TaggingLogger;
@@ -11,9 +7,14 @@ import com.netflix.vms.logging.TaggingLoggers;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerFiles;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
+import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
+import com.netflix.vms.transformer.common.cup.CupLibrary;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
+
+import java.util.Set;
+import java.util.function.Consumer;
 
 public class SimpleTransformerContext implements TransformerContext {
 
@@ -35,7 +36,7 @@ public class SimpleTransformerContext implements TransformerContext {
 
     private long now = System.currentTimeMillis();
     private long currentCycleId;
-    
+
     private Set<Integer> fastlaneIds;
 
     @Override
@@ -57,26 +58,26 @@ public class SimpleTransformerContext implements TransformerContext {
     public long getNowMillis() {
         return now;
     }
-    
+
     @Override
     public void setFastlaneIds(Set<Integer> fastlaneIds) {
-    	this.fastlaneIds = fastlaneIds;
+        this.fastlaneIds = fastlaneIds;
     }
-    
+
     @Override
     public Set<Integer> getFastlaneIds() {
-    	return fastlaneIds;
+        return fastlaneIds;
     }
 
     @Override
     public TaggingLogger getLogger() {
         return logger;
     }
-    
-	@Override
-	public TransformerConfig getConfig() {
-		return config;
-	}
+
+    @Override
+    public TransformerConfig getConfig() {
+        return config;
+    }
 
     @Override
     public TransformerMetricRecorder getMetricRecorder() {
@@ -92,10 +93,15 @@ public class SimpleTransformerContext implements TransformerContext {
     public TransformerFiles files() {
         return files;
     }
-    
+
     @Override
     public OctoberSkyData getOctoberSkyData() {
-    	return SimpleOctoberSkyData.INSTANCE;
+        return SimpleOctoberSkyData.INSTANCE;
+    }
+
+    @Override
+    public CupLibrary getCupLibrary() {
+        return SimpleCupLibrary.INSTANCE;
     }
 
     @Override

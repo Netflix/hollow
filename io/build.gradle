@@ -5,6 +5,7 @@ dependencies {
     compile 'com.netflix.suro:suro-core:latest.release'
     compile 'netflix:mutation-stream-client:latest.release'
     compile 'netflix:country-launch:latest.release'
+    compile 'netflix:content-usage-policy:latest.release'
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.assertj:assertj-core:3.3+'
