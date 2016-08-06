@@ -13,6 +13,7 @@ public class GlobalPerson implements Cloneable {
     public List<Video> topVideos = null;
     public Strings currentRelationship = null;
     public List<Strings> relationships = null;
+    public List<MoviePersonCharacter> movieCharacters = null;    
 
     public boolean equals(Object other) {
         if(other == this)  return true;
