@@ -1648,11 +1648,11 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.90",
+            "locked": "1.91",
             "requested": "latest.release"
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.90",
+            "locked": "1.91",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -4065,11 +4065,11 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.90",
+            "locked": "1.91",
             "requested": "latest.release"
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.90",
+            "locked": "1.91",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -6482,11 +6482,11 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.90",
+            "locked": "1.91",
             "requested": "latest.release"
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.90",
+            "locked": "1.91",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -8899,11 +8899,11 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.90",
+            "locked": "1.91",
             "requested": "latest.release"
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.90",
+            "locked": "1.91",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -11415,11 +11415,11 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.90",
+            "locked": "1.91",
             "requested": "latest.release"
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.90",
+            "locked": "1.91",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -13833,11 +13833,11 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.90",
+            "locked": "1.91",
             "requested": "latest.release"
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.90",
+            "locked": "1.91",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -16256,11 +16256,11 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.90",
+            "locked": "1.91",
             "requested": "latest.release"
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.90",
+            "locked": "1.91",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -18679,11 +18679,11 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.90",
+            "locked": "1.91",
             "requested": "latest.release"
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.90",
+            "locked": "1.91",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -21102,11 +21102,11 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.90",
+            "locked": "1.91",
             "requested": "latest.release"
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.90",
+            "locked": "1.91",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
