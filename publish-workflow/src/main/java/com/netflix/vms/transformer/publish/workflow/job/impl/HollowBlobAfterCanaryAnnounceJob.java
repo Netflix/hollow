@@ -1,22 +1,23 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
+import static com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper.TransformerColumnFamily.CANARY_VALIDATION;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.PlaybackMonkey;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.astyanax.connectionpool.exceptions.NotFoundException;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.AfterCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.BeforeCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.PlaybackMonkeyTester;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class HollowBlobAfterCanaryAnnounceJob extends AfterCanaryAnnounceJob {
 
@@ -25,12 +26,14 @@ public class HollowBlobAfterCanaryAnnounceJob extends AfterCanaryAnnounceJob {
 	private final PlaybackMonkeyTester dataTester;
 	private Map<VideoCountryKey, Boolean> testResultVideoCountryKeys;
 	private final ValuableVideoHolder videoRanker;
+	private final TransformerCassandraColumnFamilyHelper cassandraHelper;
 
 	public HollowBlobAfterCanaryAnnounceJob(PublishWorkflowContext ctx, long newVersion,
 			RegionEnum region, BeforeCanaryAnnounceJob beforeCanaryAnnounceJob,
 			CanaryAnnounceJob canaryAnnounceJob, PlaybackMonkeyTester dataTester,
 			ValuableVideoHolder videoRanker) {
 		super(ctx, ctx.getVip(), newVersion, region, beforeCanaryAnnounceJob, canaryAnnounceJob);
+		this.cassandraHelper = ctx.getCassandraHelper().getColumnFamilyHelper(CANARY_VALIDATION);
 		this.dataTester = dataTester;
 		this.testResultVideoCountryKeys = Collections.emptyMap();
 		this.videoRanker = videoRanker;
@@ -84,7 +87,7 @@ public class HollowBlobAfterCanaryAnnounceJob extends AfterCanaryAnnounceJob {
 					continue;
 				}
 				
-				final Map<String, String> columns = ctx.getCanaryResultsCassandraHelper().getColumns(ctx.getCanaryResultsCassandraHelper().vipSpecificKey(vip, desiredVersion));
+				final Map<String, String> columns = cassandraHelper.getColumns(cassandraHelper.vipSpecificKey(vip, desiredVersion));
 				for(final String instance: columns.keySet()){
 					instancesNotInDesiredVersion.remove(instance.trim());
 				}

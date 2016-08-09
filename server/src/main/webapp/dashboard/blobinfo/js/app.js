@@ -97,18 +97,23 @@
 
     function _buildBlobRows (blobs, publishedVersions) {
         function isBlobPinnable (blob, pinnableJarVersion, publishedVersions) {
+            // Return false if the blob is poisoned
             if (blob.poisoned) {
                 return false;
             }
+            /*
+            Commented out at the moment as we do not want to force non-pinnability if the blob is produced by different jar version
             if (pinnableJarVersion && pinnableJarVersion !== blob.attribs.ProducedByJarVersion) {
                 return false;
             }
+            */
+            // If the version is not announced in all regions, it is not pinnable
             for (var region in publishedVersions) {
                 if (blob.version > publishedVersions[region]) {
                     return false;
                 }
             }
-            return true;
+            return blob.pinable;
         }
 
         var discoverybaseUrl = null;
@@ -135,6 +140,7 @@
             blobRow.selectedType = null;
             blobRow.isPoisoned = blob.poisoned || false;
             blobRow.isPinnable = isBlobPinnable(blob, pinnableJarVersion, publishedVersions);
+            //blobRow.isPinnable = blob.pinable
             blobRow.hasBrokenChain = !(typeof(blob.types.DELTA) === 'object') && !(typeof(blob.types.REVERSEDELTA) === 'object');
             blobRow.hasDelta = (typeof(blob.types.DELTA) === 'object');
             blobRow.hasReverseDelta = (typeof(blob.types.REVERSEDELTA) === 'object');

@@ -15,7 +15,7 @@ import com.netflix.archaius.api.annotations.PropertyName;
  */
 @Configuration(prefix = "vms")
 public interface TransformerConfig {
-
+	
     @DefaultValue("defaultConverterVip")
     String getConverterVip();
 
@@ -44,8 +44,22 @@ public interface TransformerConfig {
     
     String getOverrideFastlaneIds();
     
-    @DefaultValue("false")
+    @DefaultValue("true")
     boolean isRestoreFromPreviousStateEngine();
+    
+    @DefaultValue("true")
+    boolean isFailIfRestoreNotAvailable();
+    
+    Long getRestoreFromSpecificVersion();
+    
+    @DefaultValue("false")
+    boolean isCompactionEnabled();
+    
+    @DefaultValue("2000000")
+    long getCompactionHoleByteThreshold();
+    
+    @DefaultValue("10")
+    int getCompactionHolePercentThreshold();
 
     //////////////// PUBLISH WORKFLOW ///////////////////
 
@@ -104,7 +118,9 @@ public interface TransformerConfig {
 
     @DefaultValue("false")
     public boolean isBigGreenButton();
-
+    
+    @DefaultValue("false")
+    public boolean isCreateDevSlicedBlob();
 
     /////////////// VMS IOPS (ElasticSearch) ///////////////
 
@@ -143,5 +159,11 @@ public interface TransformerConfig {
 
     @DefaultValue("true")
     boolean isElasticSearchNoWaitingEnabled();
+    
+    ///////////// TEMPORARY FEATURE-BASED //////////////////
 
+    ////////////// BUSINESS LOGIC  ////////////////////////
+    
+    @DefaultValue("28")
+    int getNewContentFlagDuration();
 }

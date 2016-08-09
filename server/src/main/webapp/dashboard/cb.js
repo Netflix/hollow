@@ -58,7 +58,6 @@ function centerEditThresholdModal() {
 function populateResetBaselineForm() {
   for(var i = 0; i < ruleNames.length; i++) {
     var ruleName = ruleNames[i];
-    if(cbNames[ruleName] === 'false') continue;
     // Create an option out of it
     var ruleOption = $('<option>').append(ruleName).attr('value', ruleName);
     $('#reset-baseline-rule-name-select').append(ruleOption);
@@ -68,6 +67,14 @@ function populateResetBaselineForm() {
     var countryCode = cbCountries[i];
     var countryOption = $('<option>').append(countryCode).attr('value', countryCode);
     $('#reset-baseline-country-select').append(countryOption);
+  }
+
+  // Should we display country ot not
+  var currentlySelectedRule = $('#reset-baseline-rule-name-select').val();
+  
+  // If the currently selected rule does not have any variations, hide the country selector
+  if(cbNames[currentlySelectedRule] === 'false') {
+    $('#reset-baseline-country-select').hide();
   }
 }
 
@@ -559,9 +566,21 @@ function addEventListeners() {
   $('#reset-baseline-link').click(handleResetBaselineLink);
   $('#close-reset-baseline-modal').click(closeResetBaselineModal);
   $('#reset-baseline-button').click(resetBaseline);
+  $('#reset-baseline-rule-name-select').change(handleResetBaselineRuleNameSelectionChanged);
 }
 
 // ALL THE HANDLERS
+
+function handleResetBaselineRuleNameSelectionChanged() {
+  // Get the rulename
+  var ruleName = $('#reset-baseline-rule-name-select').val();
+  // Determine if this event has variations or not
+  var hasVariations = (cbNames[ruleName] === "true");
+  if(hasVariations)
+    $('#reset-baseline-country-select').show();
+  else
+    $('#reset-baseline-country-select').hide();
+}
 
 function handleResetBaselineLink(event) {
   event.preventDefault();
@@ -581,9 +600,17 @@ function resetBaseline() {
   // Get the country code
   var countryCode = $('#reset-baseline-country-select').val();
 
+  // Build the request data
+  var postData = {};
+  postData['name'] = ruleName;
+
+  // Only send country if the variation supports it
+  if(cbNames[ruleName] === 'true')
+    postData['country'] = countryCode;
+
   // Do the REST call to reset
   $.post('/REST/vms/cb/reset',
-    {name: ruleName, country: countryCode},
+    postData,
     function(message){alert(message)},
     'text'
   );

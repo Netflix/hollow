@@ -33,11 +33,11 @@ public class CharacterArtworkHollow extends HollowObject {
         return delegate().getSeqNumBoxed(ordinal);
     }
 
-    public ArtworkDerivativeListHollow _getDerivatives() {
+    public ArtworkDerivativeSetHollow _getDerivatives() {
         int refOrdinal = delegate().getDerivativesOrdinal(ordinal);
         if(refOrdinal == -1)
             return null;
-        return  api().getArtworkDerivativeListHollow(refOrdinal);
+        return  api().getArtworkDerivativeSetHollow(refOrdinal);
     }
 
     public ArtworkLocaleListHollow _getLocales() {

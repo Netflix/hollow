@@ -111,17 +111,17 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.3",
+            "locked": "1.12",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.6",
+            "locked": "0.12.7",
             "transitive": [
                 "netflix:netflix-config"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.5",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -265,17 +265,17 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.52.0",
+            "locked": "1.54.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.0.0",
+            "locked": "3.2.2",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "3.0.0",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -387,7 +387,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -404,7 +404,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
             ]
@@ -554,17 +554,17 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.3",
+            "locked": "1.12",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.6",
+            "locked": "0.12.7",
             "transitive": [
                 "netflix:netflix-config"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.5",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -708,17 +708,17 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.52.0",
+            "locked": "1.54.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.0.0",
+            "locked": "3.2.2",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "3.0.0",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -830,7 +830,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -847,7 +847,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
             ]
@@ -997,17 +997,17 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.3",
+            "locked": "1.12",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.6",
+            "locked": "0.12.7",
             "transitive": [
                 "netflix:netflix-config"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.5",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -1151,17 +1151,17 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.52.0",
+            "locked": "1.54.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.0.0",
+            "locked": "3.2.2",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "3.0.0",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1273,7 +1273,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -1290,7 +1290,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
             ]
@@ -1440,17 +1440,17 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.3",
+            "locked": "1.12",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.6",
+            "locked": "0.12.7",
             "transitive": [
                 "netflix:netflix-config"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.5",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -1594,17 +1594,17 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.52.0",
+            "locked": "1.54.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.0.0",
+            "locked": "3.2.2",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "3.0.0",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1716,7 +1716,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -1733,7 +1733,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
             ]
@@ -1862,11 +1862,11 @@
     },
     "resolutionRules": {
         "com.netflix.nebula:gradle-resolution-rules": {
-            "locked": "0.27.0",
+            "locked": "0.28.0",
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
-            "locked": "0.8.1",
+            "locked": "0.11.0",
             "requested": "latest.release"
         }
     },
@@ -1982,17 +1982,17 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.3",
+            "locked": "1.12",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.6",
+            "locked": "0.12.7",
             "transitive": [
                 "netflix:netflix-config"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.5",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -2136,17 +2136,17 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.52.0",
+            "locked": "1.54.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.0.0",
+            "locked": "3.2.2",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "3.0.0",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -2258,7 +2258,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -2275,7 +2275,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
             ]
@@ -2425,17 +2425,17 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.3",
+            "locked": "1.12",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.6",
+            "locked": "0.12.7",
             "transitive": [
                 "netflix:netflix-config"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.5",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -2580,17 +2580,17 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.52.0",
+            "locked": "1.54.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.0.0",
+            "locked": "3.2.2",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "3.0.0",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -2712,7 +2712,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -2729,7 +2729,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
             ]
@@ -2879,17 +2879,17 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.3",
+            "locked": "1.12",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.6",
+            "locked": "0.12.7",
             "transitive": [
                 "netflix:netflix-config"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.5",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -3034,17 +3034,17 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.52.0",
+            "locked": "1.54.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.0.0",
+            "locked": "3.2.2",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "3.0.0",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3166,7 +3166,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -3183,7 +3183,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
             ]
@@ -3333,17 +3333,17 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.3",
+            "locked": "1.12",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.6",
+            "locked": "0.12.7",
             "transitive": [
                 "netflix:netflix-config"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.5",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -3488,17 +3488,17 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.52.0",
+            "locked": "1.54.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.0.0",
+            "locked": "3.2.2",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "3.0.0",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3620,7 +3620,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -3637,7 +3637,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
             ]
@@ -3787,17 +3787,17 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.3",
+            "locked": "1.12",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.6",
+            "locked": "0.12.7",
             "transitive": [
                 "netflix:netflix-config"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.5",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -3942,17 +3942,17 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.52.0",
+            "locked": "1.54.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.0.0",
+            "locked": "3.2.2",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "3.0.0",
+            "locked": "3.2.2",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -4074,7 +4074,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -4091,7 +4091,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.13",
+            "locked": "1.7.21",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
             ]

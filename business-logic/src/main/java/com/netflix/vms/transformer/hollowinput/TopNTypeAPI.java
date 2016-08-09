@@ -43,8 +43,8 @@ public class TopNTypeAPI extends HollowObjectTypeAPI {
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[1]);
     }
 
-    public TopNAttributesListTypeAPI getAttributesTypeAPI() {
-        return getAPI().getTopNAttributesListTypeAPI();
+    public TopNAttributesSetTypeAPI getAttributesTypeAPI() {
+        return getAPI().getTopNAttributesSetTypeAPI();
     }
 
     public TopNDelegateLookupImpl getDelegateLookupImpl() {

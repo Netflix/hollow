@@ -1,24 +1,25 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.PlaybackMonkey;
+import static com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper.TransformerColumnFamily.CANARY_VALIDATION;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.DataCanary;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.PlaybackMonkey;
 
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.astyanax.connectionpool.exceptions.NotFoundException;
 import com.netflix.config.FastProperty;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
+import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.AfterCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.BeforeCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryValidationJob;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.VMSDataCanaryResult;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class CassandraCanaryValidationJob extends CanaryValidationJob {
 
@@ -30,10 +31,12 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
     private final Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs;
     private final Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs;
 	private final ValuableVideoHolder validationVideoHolder;
+	private final TransformerCassandraColumnFamilyHelper cassandraHelper;
 
     public CassandraCanaryValidationJob(PublishWorkflowContext ctx, long cycleVersion, Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs,
             Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs, ValuableVideoHolder videoRanker) {
         super(ctx, ctx.getVip(), cycleVersion, beforeCanaryAnnounceJobs, afterCanaryAnnounceJobs);
+        this.cassandraHelper = ctx.getCassandraHelper().getColumnFamilyHelper(CANARY_VALIDATION);
 		this.validationVideoHolder = videoRanker;
         this.beforeCanaryAnnounceJobs = beforeCanaryAnnounceJobs;
         this.afterCanaryAnnounceJobs = afterCanaryAnnounceJobs;
@@ -57,20 +60,25 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
 
             List<VideoCountryKey> failedIDs = new ArrayList<>();
             if (bothResultsAreNonEmpty(befTestResults, aftTestResults)) {
+            	List<VideoCountryKey> failedInBothBeforeAfter = new ArrayList<>();
                 for (final VideoCountryKey videoCountry: befTestResults.keySet()) {
                     final Boolean afterTestSuccess = aftTestResults.get(videoCountry);
                     final Boolean beforeTestSuccess = befTestResults.get(videoCountry);
 
                     // If before passed and after failed, then fail the data version.
                     if (videoFailedWithNewDataButPassedWithOld(beforeTestSuccess, afterTestSuccess)) {
-                        pbmSuccess = false;
                         failedIDs.add(videoCountry);
                     }
                     // If before passed and after passed or if before failed and after passed, the data is good.
                     // If before failed and after failed: if only a few videos are this way then with high confidence it's not data.
                     // If all videos are failing before and after then there is a potential data issue but playback monkey cannot give signal due
                     // its own environment issues. To handle this case we fail BeforeTest canary thus failing cycle if majority of videos are failing playback.
+                    if(videoFailedWithBothOldAndNew(beforeTestSuccess, afterTestSuccess)) // Collecting just for visibility
+                    	failedInBothBeforeAfter.add(videoCountry);
                 }
+                if(!failedInBothBeforeAfter.isEmpty())
+                	ctx.getLogger().warn(PlaybackMonkey, "PBM: IDs failed both before and after tests. "
+                			+ "Added for visibility and these do not break cycles. {}", failedInBothBeforeAfter);
             } else {
                 pbmSuccess = false;
             }
@@ -81,34 +89,44 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
             validationVideoHolder.onCycleComplete(getCycleVersion(), failedIDs);
 
             if(!failedIDs.isEmpty()){
-                ctx.getLogger().info(PlaybackMonkey, "failedIDs={}", failedIDs);
                 float missingViewShareThreshold = ctx.getConfig().getPlaybackmonkeyMissingViewShareThreshold();
                 Map<String, Float> viewShareOfFailedVideos = validationVideoHolder.getViewShareOfVideos(failedIDs);
                 for(String countryId: viewShareOfFailedVideos.keySet()){
+                	boolean pbmSuccessForThisCountry = true;
                     Float missingViewShareForCountry = viewShareOfFailedVideos.get(countryId);
-                    if(missingViewShareForCountry != null && 
-                            Float.compare(missingViewShareForCountry, missingViewShareThreshold) > 0){
+                    if(missingViewShareForCountry != null && Float.compare(missingViewShareForCountry, missingViewShareThreshold) > 0){
                         pbmSuccess = false;
+                        pbmSuccessForThisCountry = false;
                     }
-                    ctx.getLogger().info(PlaybackMonkey, "country={} missingViewShare={} threshold={}", countryId, missingViewShareForCountry, missingViewShareThreshold);
-                    ctx.getMetricRecorder().recordMetric(Metric.PBMFailuresMissingViewShare, missingViewShareForCountry, "country",countryId);
+                    logMissingViewShare(pbmSuccessForThisCountry, missingViewShareThreshold, countryId, missingViewShareForCountry);
                 }
             }
-
-            if (!pbmSuccess) {
-                // Log which results failed
-                ctx.getLogger().error(PlaybackMonkey, "PBM validation: for region {} failed. {}",
-                        region.name(), getFailureReason(befTestResults, failedIDs));
-            } else {
-                ctx.getLogger().info(PlaybackMonkey, "PBM validation {} region completed. Success validation: {}",
-                        region.name(), pbmSuccess);
-            }
+            logFailedIDs(pbmSuccess, befTestResults, failedIDs);
         } catch(Exception ex) {
             ctx.getLogger().error(PlaybackMonkey, "Error validating PBM results.", ex);
             pbmSuccess = false;
         }
         return PlaybackMonkeyUtil.getFinalResultAferPBMOverride(pbmSuccess, ctx.getConfig());
     }
+
+
+	private void logFailedIDs(boolean pbmSuccess, Map<VideoCountryKey, Boolean> befTestResults, List<VideoCountryKey> failedIDs) {
+		if(!failedIDs.isEmpty()){
+			if(!pbmSuccess)
+				ctx.getLogger().error(PlaybackMonkey, "PBM validation failed. {}", getFailureReason(befTestResults, failedIDs));
+			else
+				ctx.getLogger().warn(PlaybackMonkey, "PBM validation successful with failedIDs={}", failedIDs);
+		}
+	}
+
+	private void logMissingViewShare(boolean pbmSuccessForThisCountry, float missingViewShareThreshold, String countryId,
+			Float missingViewShareForCountry) {
+		if(pbmSuccessForThisCountry)
+			ctx.getLogger().error(PlaybackMonkey, "PBM: country={} missingViewShare={} threshold={}.",countryId, missingViewShareForCountry, missingViewShareThreshold);
+		else if(missingViewShareForCountry != null && Float.compare(missingViewShareForCountry, 0f) > 0)
+			ctx.getLogger().warn(PlaybackMonkey, "PBM: country={} missingViewShare={} threshold={}", countryId, missingViewShareForCountry, missingViewShareThreshold);
+		ctx.getMetricRecorder().recordMetric(Metric.PBMFailuresMissingViewShare, missingViewShareForCountry, "country",countryId);
+	}
 
 	private boolean videoFailedWithNewDataButPassedWithOld(
 			Boolean beforeTestSuccess, Boolean afterTestSuccess) {
@@ -119,6 +137,12 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
 		}
 		return (!afterTestSuccess && beforeTestSuccess);
 	}
+	
+	private boolean videoFailedWithBothOldAndNew(
+			Boolean beforeTestSuccess, Boolean afterTestSuccess) {
+		return(afterTestSuccess != null && (!beforeTestSuccess && !afterTestSuccess));
+	}
+			
 
 	private boolean bothResultsAreNonEmpty(Map<VideoCountryKey, Boolean> befTestResults,
 			Map<VideoCountryKey, Boolean> aftTestResults) {
@@ -150,7 +174,7 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
         List<String> remainingCanaryAppList = null;
         while(System.currentTimeMillis() < stopCheckingTime) {
             try {
-                final Map<String, String> columns = ctx.getCanaryResultsCassandraHelper().getColumns(ctx.getCanaryResultsCassandraHelper().vipSpecificKey(vip, String.valueOf(getCycleVersion())));
+                final Map<String, String> columns = cassandraHelper.getColumns(cassandraHelper.vipSpecificKey(vip, String.valueOf(getCycleVersion())));
 				remainingCanaryAppList = parseStringToListExcludeEmptyValues(requiredCanaryAppsStr, ",");
 
                 for(final Map.Entry<String, String> column : columns.entrySet()) {

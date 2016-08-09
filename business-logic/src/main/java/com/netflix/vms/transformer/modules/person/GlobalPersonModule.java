@@ -1,12 +1,17 @@
 package com.netflix.vms.transformer.modules.person;
 
+import com.netflix.hollow.index.HollowHashIndex;
+import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.ExplicitDateHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfVideoIdsHollow;
+import com.netflix.vms.transformer.hollowinput.MovieCharacterPersonHollow;
 import com.netflix.vms.transformer.hollowinput.PersonBioHollow;
+import com.netflix.vms.transformer.hollowinput.PersonCharacterHollow;
 import com.netflix.vms.transformer.hollowinput.PersonVideoAliasIdHollow;
 import com.netflix.vms.transformer.hollowinput.PersonVideoAliasIdsListHollow;
 import com.netflix.vms.transformer.hollowinput.PersonVideoHollow;
@@ -18,6 +23,7 @@ import com.netflix.vms.transformer.hollowinput.VideoIdHollow;
 import com.netflix.vms.transformer.hollowoutput.BirthDate;
 import com.netflix.vms.transformer.hollowoutput.GlobalPerson;
 import com.netflix.vms.transformer.hollowoutput.Integer;
+import com.netflix.vms.transformer.hollowoutput.MoviePersonCharacter;
 import com.netflix.vms.transformer.hollowoutput.PersonRole;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VPerson;
@@ -35,10 +41,13 @@ import java.util.List;
 public class GlobalPersonModule extends AbstractTransformModule {
 
     private final HollowPrimaryKeyIndex personBioIndex;
+    private final HollowHashIndex moviePersonCharacterIndex;
+    private final HollowHashIndex movieCharacterIndex;
 
     public GlobalPersonModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
         super(api, ctx, mapper);
-
+        this.moviePersonCharacterIndex = indexer.getHashIndex(IndexSpec.MOVIE_CHARACTER_PERSON_MOVIES_BY_PERSON_ID);
+        this.movieCharacterIndex = indexer.getHashIndex(IndexSpec.MOVIE_CHARACTER_PERSON_CHARACTERS_BY_PERSON_ID_AND_MOVIE_ID);
         this.personBioIndex = indexer.getPrimaryKeyIndex(IndexSpec.PERSON_BIO);
     }
 
@@ -56,13 +65,14 @@ public class GlobalPersonModule extends AbstractTransformModule {
 
         for (PersonVideoHollow input : api.getAllPersonVideoHollow()) {
             GlobalPerson output = new GlobalPerson();
-            output.id = (int) input._getPersonId();
+            long personId = input._getPersonId();
+            output.id = (int)input._getPersonId();
 
             VPerson person = new VPerson(output.id);
             output.aliasesIds = getAliasIds(input._getAliasIds());
             output.personRoles = getPersonRoles(person, input._getRoles());
 
-            int personBioOrdinal = personBioIndex.getMatchingOrdinal(input._getPersonId());
+            int personBioOrdinal = personBioIndex.getMatchingOrdinal(personId);
             if (personBioOrdinal != -1) {
                 PersonBioHollow personBioInput = api.getPersonBioHollow(personBioOrdinal);
                 output.spouses = stringsList(personBioInput._getSpouses());
@@ -78,12 +88,42 @@ public class GlobalPersonModule extends AbstractTransformModule {
                     output.relationships = stringsList(relationships);
                 }
             }
-
+            
+            output.movieCharacters = getMovieCharacters(personId);
             mapper.addObject(output);
             personList.add(output);
         }
-
+        
         return personList;
+    }
+
+    private List<MoviePersonCharacter> getMovieCharacters(long personId) {
+        List<MoviePersonCharacter> movieCharacters = new ArrayList<>();
+        HollowHashIndexResult moviePersonCharacterMatches = moviePersonCharacterIndex.findMatches(personId);
+        if(moviePersonCharacterMatches != null) {
+            HollowOrdinalIterator moviePersonCharacterIterator = moviePersonCharacterMatches.iterator();
+            int moviePersonCharacterOrdinal = moviePersonCharacterIterator.next();
+            while(moviePersonCharacterOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+                MovieCharacterPersonHollow movieCharacterPersonHollow = api.getMovieCharacterPersonHollow(moviePersonCharacterOrdinal);
+                long movieId = movieCharacterPersonHollow._getMovieId();
+                HollowHashIndexResult personCharacterMatches = movieCharacterIndex.findMatches(personId, movieId);
+                if(personCharacterMatches != null) {
+                    HollowOrdinalIterator personCharacterIterator = personCharacterMatches.iterator();
+                    int personCharacterOrdinal = personCharacterIterator.next();
+                    while(personCharacterOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+                        PersonCharacterHollow personCharacterHollow = api.getPersonCharacterHollow(personCharacterOrdinal);
+                        MoviePersonCharacter moviePersonCharacter = new MoviePersonCharacter();
+                        moviePersonCharacter.movieId = movieId;
+                        moviePersonCharacter.personId = personId;
+                        moviePersonCharacter.characterId = personCharacterHollow._getCharacterId();
+                        movieCharacters.add(moviePersonCharacter);
+                        personCharacterOrdinal = personCharacterIterator.next();
+                    }
+                }
+                moviePersonCharacterOrdinal = moviePersonCharacterIterator.next();
+            }
+        }
+        return movieCharacters;
     }
 
     private List<Video> videoList(ListOfVideoIdsHollow videos) {

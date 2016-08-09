@@ -1,5 +1,6 @@
 dependencies {
     compile project(':vmstransformer-common-interfaces')
+    compile project(':vmstransformer-io')
 
     compile 'com.netflix.hollow:netflix-hollow:latest.release'
     compile 'com.netflix.vms.logging:vmslogging-api:latest.release'

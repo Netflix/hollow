@@ -1,18 +1,19 @@
 package com.netflix.vms.transformer.publish.workflow;
 
-import java.util.function.Supplier;
-
 import com.netflix.aws.file.FileStore;
 import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
+import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
-import com.netflix.vms.transformer.common.publish.workflow.TransformerCassandraHelper;
+import com.netflix.vms.transformer.common.cup.CupLibrary;
 import com.netflix.vms.transformer.common.publish.workflow.VipAnnouncer;
 import com.netflix.vms.transformer.publish.poison.CassandraBasedPoisonedStateMarker;
 import com.netflix.vms.transformer.publish.poison.PoisonedStateMarker;
 import com.netflix.vms.transformer.publish.status.PublishWorkflowStatusIndicator;
+
+import java.util.function.Supplier;
 
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 
@@ -30,7 +31,7 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
 
     /* fields */
     private final String vip;
-	private final long nowMillis;
+    private final long nowMillis;
 
     public TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer, Supplier<ServerUploadStatus> uploadStatus, FileStore fileStore, String vip) {
         this(ctx, vipAnnouncer, uploadStatus, new PublishWorkflowStatusIndicator(ctx.getMetricRecorder()), fileStore, vip, new CassandraBasedPoisonedStateMarker(ctx, vip));
@@ -49,6 +50,7 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
         this.nowMillis = ctx.getNowMillis();
     }
 
+    @Override
     public TransformerPublishWorkflowContext withCurrentLoggerAndConfig() {
         return new TransformerPublishWorkflowContext(transformerCtx, vipAnnouncer, uploadStatus, statusIndicator, fileStore, vip, poisonStateMarker);
     }
@@ -69,13 +71,8 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
     }
 
     @Override
-    public TransformerCassandraHelper getValidationStatsCassandraHelper() {
-        return transformerCtx.getValidationStatsCassandraHelper();
-    }
-
-    @Override
-    public TransformerCassandraHelper getCanaryResultsCassandraHelper() {
-        return transformerCtx.getCanaryResultsCassandraHelper();
+    public TransformerCassandraHelper getCassandraHelper() {
+        return transformerCtx.getCassandraHelper();
     }
 
     @Override
@@ -93,23 +90,30 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
         return vipAnnouncer;
     }
 
-	@Override
-	public long getNowMillis() {
-		return nowMillis;
-	}
+    @Override
+    public long getNowMillis() {
+        return nowMillis;
+    }
 
-	public OctoberSkyData getOctoberSkyData() {
-		return transformerCtx.getOctoberSkyData();
-	}
+    @Override
+    public OctoberSkyData getOctoberSkyData() {
+        return transformerCtx.getOctoberSkyData();
+    }
 
-	@Override
-	public TransformerMetricRecorder getMetricRecorder() {
-		return transformerCtx.getMetricRecorder();
-	}
+    @Override
+    public CupLibrary getCupLibrary() {
+        return transformerCtx.getCupLibrary();
+    }
 
-	public Supplier<ServerUploadStatus> serverUploadStatus() {
-	    return uploadStatus;
-	}
+    @Override
+    public TransformerMetricRecorder getMetricRecorder() {
+        return transformerCtx.getMetricRecorder();
+    }
+
+    @Override
+    public Supplier<ServerUploadStatus> serverUploadStatus() {
+        return uploadStatus;
+    }
 
     @Override
     public PublishWorkflowStatusIndicator getStatusIndicator() {
