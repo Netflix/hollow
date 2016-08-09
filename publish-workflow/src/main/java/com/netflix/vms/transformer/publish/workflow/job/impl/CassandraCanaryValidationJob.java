@@ -121,7 +121,7 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
 
 	private void logMissingViewShare(boolean pbmSuccessForThisCountry, float missingViewShareThreshold, String countryId,
 			Float missingViewShareForCountry) {
-		if(pbmSuccessForThisCountry)
+		if(!pbmSuccessForThisCountry)
 			ctx.getLogger().error(PlaybackMonkey, "PBM: country={} missingViewShare={} threshold={}.",countryId, missingViewShareForCountry, missingViewShareThreshold);
 		else if(missingViewShareForCountry != null && Float.compare(missingViewShareForCountry, 0f) > 0)
 			ctx.getLogger().warn(PlaybackMonkey, "PBM: country={} missingViewShare={} threshold={}", countryId, missingViewShareForCountry, missingViewShareThreshold);
