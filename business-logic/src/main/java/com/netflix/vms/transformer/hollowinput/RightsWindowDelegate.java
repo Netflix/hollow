@@ -14,8 +14,6 @@ public interface RightsWindowDelegate extends HollowObjectDelegate {
 
     public Long getEndDateBoxed(int ordinal);
 
-    public int getContractIdsOrdinal(int ordinal);
-
     public int getContractIdsExtOrdinal(int ordinal);
 
     public RightsWindowTypeAPI getTypeAPI();

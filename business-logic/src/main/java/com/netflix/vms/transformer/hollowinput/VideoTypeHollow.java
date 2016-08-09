@@ -18,11 +18,11 @@ public class VideoTypeHollow extends HollowObject {
         return delegate().getVideoIdBoxed(ordinal);
     }
 
-    public VideoTypeDescriptorListHollow _getCountryInfos() {
+    public VideoTypeDescriptorSetHollow _getCountryInfos() {
         int refOrdinal = delegate().getCountryInfosOrdinal(ordinal);
         if(refOrdinal == -1)
             return null;
-        return  api().getVideoTypeDescriptorListHollow(refOrdinal);
+        return  api().getVideoTypeDescriptorSetHollow(refOrdinal);
     }
 
     public VMSHollowInputAPI api() {

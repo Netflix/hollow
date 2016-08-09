@@ -18,11 +18,11 @@ public class TopNHollow extends HollowObject {
         return delegate().getVideoIdBoxed(ordinal);
     }
 
-    public TopNAttributesListHollow _getAttributes() {
+    public TopNAttributesSetHollow _getAttributes() {
         int refOrdinal = delegate().getAttributesOrdinal(ordinal);
         if(refOrdinal == -1)
             return null;
-        return  api().getTopNAttributesListHollow(refOrdinal);
+        return  api().getTopNAttributesSetHollow(refOrdinal);
     }
 
     public VMSHollowInputAPI api() {

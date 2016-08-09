@@ -1,5 +1,10 @@
 package com.netflix.vms.transformer;
 
+import com.netflix.vms.transformer.hollowoutput.ArtworkCdn;
+
+import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.vms.transformer.hollowoutput.ArtworkDerivative;
+import com.netflix.vms.transformer.hollowoutput.ArtworkDerivatives;
 import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.SortedMapOfDateWindowToListOfInteger;
 import com.netflix.vms.transformer.hollowoutput.SortedMapOfIntegerToListOfVideoEpisode;
@@ -9,10 +14,9 @@ import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoImages;
 import com.netflix.vms.transformer.hollowoutput.VideoNodeType;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
-
+import com.netflix.vms.transformer.util.InputOrdinalResultCache;
 import java.util.Collections;
 import java.util.List;
-
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -42,7 +46,17 @@ public class CycleConstants {
     public final VideoImages EMPTY_VIDEO_IMAGES = emptyVideoImages();
     public final SortedMapOfDateWindowToListOfInteger EMPTY_DATE_WINDOW_SEASON_SEQ_MAP = new SortedMapOfDateWindowToListOfInteger(Collections.emptyMap());
     public final SortedMapOfIntegerToListOfVideoEpisode EMPTY_EPISODE_SEQUENCE_NUMBER_MAP = new SortedMapOfIntegerToListOfVideoEpisode(Collections.<com.netflix.vms.transformer.hollowoutput.Integer, List<VideoEpisode>>emptyMap());
-
+    
+    public final InputOrdinalResultCache<ArtworkDerivative> artworkDerivativeCache;
+    public final InputOrdinalResultCache<ArtworkDerivatives> artworkDerivativesCache;
+    public final InputOrdinalResultCache<List<ArtworkCdn>> cdnListCache;
+    
+    
+    public CycleConstants(HollowReadStateEngine inputStateEngine) {
+        this.artworkDerivativeCache = new InputOrdinalResultCache<ArtworkDerivative>(inputStateEngine.getTypeState("ArtworkDerivative").maxOrdinal());
+        this.artworkDerivativesCache = new InputOrdinalResultCache<ArtworkDerivatives>(inputStateEngine.getTypeState("ArtworkDerivativeSet").maxOrdinal());
+        this.cdnListCache = new InputOrdinalResultCache<List<ArtworkCdn>>(inputStateEngine.getTypeState("ArtworkDerivativeSet").maxOrdinal());
+    }
 
     private static VideoFormatDescriptor videoFormatDescriptor(int id, String name, String description) {
         VideoFormatDescriptor descriptor = new VideoFormatDescriptor();

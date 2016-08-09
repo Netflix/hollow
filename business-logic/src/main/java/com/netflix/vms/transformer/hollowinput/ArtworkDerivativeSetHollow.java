@@ -1,14 +1,14 @@
 package com.netflix.vms.transformer.hollowinput;
 
-import com.netflix.hollow.objects.HollowList;
-import com.netflix.hollow.HollowListSchema;
-import com.netflix.hollow.objects.delegate.HollowListDelegate;
+import com.netflix.hollow.objects.HollowSet;
+import com.netflix.hollow.HollowSetSchema;
+import com.netflix.hollow.objects.delegate.HollowSetDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
 @SuppressWarnings("all")
-public class ArtworkDerivativeListHollow extends HollowList<ArtworkDerivativeHollow> {
+public class ArtworkDerivativeSetHollow extends HollowSet<ArtworkDerivativeHollow> {
 
-    public ArtworkDerivativeListHollow(HollowListDelegate delegate, int ordinal) {
+    public ArtworkDerivativeSetHollow(HollowSetDelegate delegate, int ordinal) {
         super(delegate, ordinal);
     }
 
@@ -26,8 +26,8 @@ public class ArtworkDerivativeListHollow extends HollowList<ArtworkDerivativeHol
         return typeApi().getAPI();
     }
 
-    public ArtworkDerivativeListTypeAPI typeApi() {
-        return (ArtworkDerivativeListTypeAPI) delegate.getTypeAPI();
+    public ArtworkDerivativeSetTypeAPI typeApi() {
+        return (ArtworkDerivativeSetTypeAPI) delegate.getTypeAPI();
     }
 
 }

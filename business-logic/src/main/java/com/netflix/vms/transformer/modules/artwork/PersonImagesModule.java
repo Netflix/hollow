@@ -1,11 +1,12 @@
 package com.netflix.vms.transformer.modules.artwork;
 
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.*;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
 
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
-import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeListHollow;
+import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeSetHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleListHollow;
 import com.netflix.vms.transformer.hollowinput.PersonArtworkHollow;
@@ -19,8 +20,8 @@ import java.util.Set;
 
 public class PersonImagesModule extends ArtWorkModule{
 
-    public PersonImagesModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
-        super("Person", api, ctx, mapper, indexer);
+    public PersonImagesModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
+        super("Person", api, ctx, mapper, cycleConstants, indexer);
     }
 
     @Override
@@ -43,7 +44,7 @@ public class PersonImagesModule extends ArtWorkModule{
             int ordinalPriority = (int) artworkHollowInput._getOrdinalPriority();
             int seqNum = (int) artworkHollowInput._getSeqNum();
             ArtworkAttributesHollow attributes = artworkHollowInput._getAttributes();
-            ArtworkDerivativeListHollow derivatives = artworkHollowInput._getDerivatives();
+            ArtworkDerivativeSetHollow derivatives = artworkHollowInput._getDerivatives();
             Set<Artwork> artworkSet = getArtworkSet(entityId, artMap);
 
             transformArtworks(entityId, sourceFileId, ordinalPriority, seqNum, attributes, derivatives, localeSet, artworkSet);

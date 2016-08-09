@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.input;
 
+import com.netflix.hollow.sampling.DisabledSamplingDirector;
+
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.client.HollowAPIFactory;
 import com.netflix.hollow.client.HollowClient;
@@ -45,12 +47,16 @@ public class VMSInputDataClient extends HollowClient {
 
         @Override
         public HollowAPI createAPI(HollowDataAccess dataAccess) {
-            return new VMSHollowInputAPI(dataAccess);
+            VMSHollowInputAPI api = new VMSHollowInputAPI(dataAccess);
+            api.setSamplingDirector(DisabledSamplingDirector.INSTANCE);
+            return api;
         }
 
         @Override
         public HollowAPI createAPI(HollowDataAccess dataAccess, HollowAPI previousCycleAPI) {
-            return new VMSHollowInputAPI(dataAccess, Collections.emptySet(), Collections.emptyMap(), (VMSHollowInputAPI)previousCycleAPI);
+            VMSHollowInputAPI api = new VMSHollowInputAPI(dataAccess, Collections.emptySet(), Collections.emptyMap(), (VMSHollowInputAPI)previousCycleAPI);
+            api.setSamplingDirector(DisabledSamplingDirector.INSTANCE);
+            return api;
         }
 
     }
