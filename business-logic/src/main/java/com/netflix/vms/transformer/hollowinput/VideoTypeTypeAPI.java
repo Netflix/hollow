@@ -43,8 +43,8 @@ public class VideoTypeTypeAPI extends HollowObjectTypeAPI {
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[1]);
     }
 
-    public VideoTypeDescriptorListTypeAPI getCountryInfosTypeAPI() {
-        return getAPI().getVideoTypeDescriptorListTypeAPI();
+    public VideoTypeDescriptorSetTypeAPI getCountryInfosTypeAPI() {
+        return getAPI().getVideoTypeDescriptorSetTypeAPI();
     }
 
     public VideoTypeDelegateLookupImpl getDelegateLookupImpl() {

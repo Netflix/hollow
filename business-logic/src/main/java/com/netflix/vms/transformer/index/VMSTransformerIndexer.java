@@ -1,10 +1,10 @@
 package com.netflix.vms.transformer.index;
 
 import com.netflix.hollow.util.SimultaneousExecutor;
-
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -77,9 +77,14 @@ public class VMSTransformerIndexer {
     private Future<HollowPrimaryKeyIndex> primaryKeyIdx(ExecutorService executor, final HollowReadStateEngine stateEngine, final IndexSpec spec) {
         return executor.submit(new Callable<HollowPrimaryKeyIndex>() {
             public HollowPrimaryKeyIndex call() {
-                return new HollowPrimaryKeyIndex(stateEngine,
-                        spec.getParameters()[0],
-                        Arrays.copyOfRange(spec.getParameters(), 1, spec.getParameters().length));
+                try {
+                     HollowPrimaryKeyIndex hollowPrimaryKeyIndex = new HollowPrimaryKeyIndex(stateEngine,
+                            spec.getParameters()[0],
+                            Arrays.copyOfRange(spec.getParameters(), 1, spec.getParameters().length));
+                     return hollowPrimaryKeyIndex;
+                }catch(Throwable th) {
+                    throw new RuntimeException(th);
+                }
             }
         });
     }

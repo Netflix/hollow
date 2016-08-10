@@ -10,6 +10,7 @@ import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
+import com.netflix.vms.transformer.common.cup.CupLibrary;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
 
 import java.util.Set;
@@ -107,6 +108,11 @@ public class SimpleTransformerContext implements TransformerContext {
     @Override
     public OctoberSkyData getOctoberSkyData() {
         return SimpleOctoberSkyData.INSTANCE;
+    }
+
+    @Override
+    public CupLibrary getCupLibrary() {
+        return SimpleCupLibrary.INSTANCE;
     }
 
     @Override

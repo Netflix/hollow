@@ -60,6 +60,7 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
 
             List<VideoCountryKey> failedIDs = new ArrayList<>();
             if (bothResultsAreNonEmpty(befTestResults, aftTestResults)) {
+            	List<VideoCountryKey> failedInBothBeforeAfter = new ArrayList<>();
                 for (final VideoCountryKey videoCountry: befTestResults.keySet()) {
                     final Boolean afterTestSuccess = aftTestResults.get(videoCountry);
                     final Boolean beforeTestSuccess = befTestResults.get(videoCountry);
@@ -72,7 +73,12 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
                     // If before failed and after failed: if only a few videos are this way then with high confidence it's not data.
                     // If all videos are failing before and after then there is a potential data issue but playback monkey cannot give signal due
                     // its own environment issues. To handle this case we fail BeforeTest canary thus failing cycle if majority of videos are failing playback.
+                    if(videoFailedWithBothOldAndNew(beforeTestSuccess, afterTestSuccess)) // Collecting just for visibility
+                    	failedInBothBeforeAfter.add(videoCountry);
                 }
+                if(!failedInBothBeforeAfter.isEmpty())
+                	ctx.getLogger().warn(PlaybackMonkey, "PBM: IDs failed both before and after tests. "
+                			+ "Added for visibility and these do not break cycles. {}", failedInBothBeforeAfter);
             } else {
                 pbmSuccess = false;
             }
@@ -115,7 +121,7 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
 
 	private void logMissingViewShare(boolean pbmSuccessForThisCountry, float missingViewShareThreshold, String countryId,
 			Float missingViewShareForCountry) {
-		if(pbmSuccessForThisCountry)
+		if(!pbmSuccessForThisCountry)
 			ctx.getLogger().error(PlaybackMonkey, "PBM: country={} missingViewShare={} threshold={}.",countryId, missingViewShareForCountry, missingViewShareThreshold);
 		else if(missingViewShareForCountry != null && Float.compare(missingViewShareForCountry, 0f) > 0)
 			ctx.getLogger().warn(PlaybackMonkey, "PBM: country={} missingViewShare={} threshold={}", countryId, missingViewShareForCountry, missingViewShareThreshold);
@@ -131,6 +137,12 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
 		}
 		return (!afterTestSuccess && beforeTestSuccess);
 	}
+	
+	private boolean videoFailedWithBothOldAndNew(
+			Boolean beforeTestSuccess, Boolean afterTestSuccess) {
+		return(afterTestSuccess != null && (!beforeTestSuccess && !afterTestSuccess));
+	}
+			
 
 	private boolean bothResultsAreNonEmpty(Map<VideoCountryKey, Boolean> befTestResults,
 			Map<VideoCountryKey, Boolean> aftTestResults) {

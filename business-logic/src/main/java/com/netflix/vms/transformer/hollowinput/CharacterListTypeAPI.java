@@ -6,17 +6,17 @@ import com.netflix.hollow.read.dataaccess.HollowListTypeDataAccess;
 import com.netflix.hollow.objects.delegate.HollowListLookupDelegate;
 
 @SuppressWarnings("all")
-public class TopNAttributesListTypeAPI extends HollowListTypeAPI {
+public class CharacterListTypeAPI extends HollowListTypeAPI {
 
     private final HollowListLookupDelegate delegateLookupImpl;
 
-    TopNAttributesListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
+    CharacterListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowListLookupDelegate(this);
     }
 
-    public TopNAttributeTypeAPI getElementAPI() {
-        return getAPI().getTopNAttributeTypeAPI();
+    public PersonCharacterTypeAPI getElementAPI() {
+        return getAPI().getPersonCharacterTypeAPI();
     }
 
     public HollowListLookupDelegate getDelegateLookupImpl() {

@@ -4,7 +4,7 @@ import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.OutputTypeConfig;
 import com.netflix.vms.transformer.hollowinput.TopNAttributeHollow;
-import com.netflix.vms.transformer.hollowinput.TopNAttributesListHollow;
+import com.netflix.vms.transformer.hollowinput.TopNAttributesSetHollow;
 import com.netflix.vms.transformer.hollowinput.TopNHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.Float;
@@ -13,6 +13,8 @@ import com.netflix.vms.transformer.hollowoutput.TopNVideoData;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
 
 import java.util.HashMap;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map;
 
 public class TopNVideoDataModule extends AbstractTransformModule{
@@ -30,11 +32,9 @@ public class TopNVideoDataModule extends AbstractTransformModule{
         //Map Video id -> attributes to Country id -> TopNVideoData
         Map<String, TopNVideoData> topNVideoDataMap = new HashMap<>();
         for(TopNHollow topN : api.getAllTopNHollow()) {
-            TopNAttributesListHollow attributes = topN._getAttributes();
+            TopNAttributesSetHollow attributes = topN._getAttributes();
             int videoId = (int) topN._getVideoId();
-
-            for(int index = 0; index < attributes.size(); index++) {
-                TopNAttributeHollow topNAttribute = attributes.get(index);
+            for(TopNAttributeHollow topNAttribute : attributes) {
                 String countryId = topNAttribute._getCountry()._getValue();
                 TopNVideoData topNVideoData = getOrAddTopNVideoData(topNVideoDataMap, topNAttribute, countryId);
                 float viewShare = java.lang.Float.parseFloat(topNAttribute._getViewShare()._getValue());

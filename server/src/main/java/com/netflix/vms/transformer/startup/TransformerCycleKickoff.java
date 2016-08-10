@@ -15,6 +15,7 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
+import com.netflix.vms.transformer.common.cup.CupLibrary;
 import com.netflix.vms.transformer.context.TransformerServerContext;
 import com.netflix.vms.transformer.elasticsearch.ElasticSearchClient;
 import com.netflix.vms.transformer.fastlane.FastlaneIdRetriever;
@@ -28,7 +29,6 @@ import com.netflix.vms.transformer.publish.workflow.fastlane.HollowFastlanePubli
 import com.netflix.vms.transformer.publish.workflow.job.impl.HermesBlobAnnouncer;
 import com.netflix.vms.transformer.rest.VMSPublishWorkflowHistoryAdmin;
 import com.netflix.vms.transformer.util.VipUtil;
-import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
 import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
 
 import java.util.function.Supplier;
@@ -47,12 +47,13 @@ public class TransformerCycleKickoff {
             TransformerConfig transformerConfig,
             Config config,
             OctoberSkyData octoberSkyData,
+            CupLibrary cupLibrary,
             FastlaneIdRetriever fastlaneIdRetriever,
             TransformerServerHealthIndicator healthIndicator) {
 
         FileStore.useMultipartUploadWhenApplicable(true);
 
-        TransformerContext ctx = ctx(esClient, transformerConfig, config, octoberSkyData, cassandraHelper, healthIndicator);
+        TransformerContext ctx = ctx(esClient, transformerConfig, config, octoberSkyData, cupLibrary, cassandraHelper, healthIndicator);
         PublishWorkflowStager publishStager = publishStager(ctx, fileStore, hermesBlobAnnouncer);
 
         TransformCycle cycle = new TransformCycle(
@@ -139,11 +140,12 @@ public class TransformerCycleKickoff {
         t.start();
     }
 
-    private final TransformerContext ctx(ElasticSearchClient esClient, TransformerConfig transformerConfig, Config config, OctoberSkyData octoberSkyData, TransformerCassandraHelper cassandraHelper, TransformerServerHealthIndicator healthIndicator) {
+    private final TransformerContext ctx(ElasticSearchClient esClient, TransformerConfig transformerConfig, Config config, OctoberSkyData octoberSkyData, CupLibrary cupLibrary, TransformerCassandraHelper cassandraHelper, TransformerServerHealthIndicator healthIndicator) {
         return new TransformerServerContext(
                 new TransformerServerLogger(transformerConfig, esClient),
                 config,
                 octoberSkyData,
+                cupLibrary,
                 new AtlasTransformerMetricRecorder(),
                 cassandraHelper,
                 new LZ4VMSTransformerFiles(),
@@ -173,11 +175,12 @@ public class TransformerCycleKickoff {
                     throw new IllegalStateException("Failed to restore from state: " + restoreVersion);
                 cycle.restore(outputClient);
             } else {
-                throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.restoreFromPreviousStateEngine=false.");
+                if(cfg.isFailIfRestoreNotAvailable())
+                    throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.failIfRestoreNotAvailable=false");
             }
         }
     }
-    
+
     private boolean shouldTryCompaction(TransformerConfig cfg) {
         return !isFastlane(cfg) && cfg.isCompactionEnabled();
     }

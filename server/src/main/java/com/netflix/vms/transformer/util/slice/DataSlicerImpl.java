@@ -381,7 +381,6 @@ public class DataSlicerImpl implements DataSlicer {
 
             includeAll(stateEngine, "TopN");
             includeAll(stateEngine, "AltGenres");
-            includeAll(stateEngine, "ArtWorkImageFormat");
             includeAll(stateEngine, "ArtWorkImageType");
             includeAll(stateEngine, "ArtworkRecipe");
             includeAll(stateEngine, "AssetMetaDatas");
@@ -416,6 +415,7 @@ public class DataSlicerImpl implements DataSlicer {
             includeAll(stateEngine, "TurboCollections");
             includeAll(stateEngine, "PersonVideo");
             includeAll(stateEngine, "PersonBio");
+            includeAll(stateEngine, "MovieCharacterPerson");
             includeAll(stateEngine, "VMSAward");
 
             return populateFilteredBlob(stateEngine, ordinalsToInclude);

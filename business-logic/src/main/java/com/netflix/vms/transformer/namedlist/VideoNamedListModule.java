@@ -1,20 +1,27 @@
 package com.netflix.vms.transformer.namedlist;
 
-import java.util.GregorianCalendar;
-
-import java.util.Calendar;
-import com.netflix.vms.transformer.hollowoutput.VideoEpisode;
-import com.netflix.vms.transformer.hollowoutput.VideoSetType;
-import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
-import java.util.Map;
-import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.hollow.bitsandbytes.ThreadSafeBitSet;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
+import com.netflix.vms.transformer.hollowoutput.LinkedHashSetOfStrings;
+import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VMSAvailabilityWindow;
+import com.netflix.vms.transformer.hollowoutput.VideoContractInfo;
+import com.netflix.vms.transformer.hollowoutput.VideoEpisode;
+import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoNodeType;
+import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
+import com.netflix.vms.transformer.hollowoutput.VideoSetType;
+import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
+
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class VideoNamedListModule {
@@ -63,7 +70,7 @@ public class VideoNamedListModule {
 
     public class VideoNamedListPopulator {
 
-    	private String country;
+        private String country;
         private ConcurrentHashMap<VideoNamedListType, ThreadSafeBitSet> listsByName = null;
         private ThreadSafeBitSet episodeList;
         private CompleteVideo video;
@@ -72,18 +79,19 @@ public class VideoNamedListModule {
         private boolean isGoLive;
         private boolean isAvailableForED;
         private boolean isAvailableIn3D;
+        private boolean isAvailableForUltraHDForCE;
         private boolean isSupplemental;
         private long currentAvailabilityDate;
         private final Calendar calendar = new GregorianCalendar();
         private final int currentYear;
 
-        private VideoNamedListPopulator() { 
-        	calendar.setTimeInMillis(ctx.getNowMillis());
-        	currentYear = calendar.get(Calendar.YEAR);
+        private VideoNamedListPopulator() {
+            calendar.setTimeInMillis(ctx.getNowMillis());
+            currentYear = calendar.get(Calendar.YEAR);
         }
 
         public void setCountry(String country) {
-        	this.country = country;
+            this.country = country;
             listsByName = videoListsByCountryAndName.get(country);
             if(listsByName == null) {
                 listsByName = new ConcurrentHashMap<>();
@@ -103,9 +111,9 @@ public class VideoNamedListModule {
                     episodeList = existingEpisodeList;
             }
         }
-        
+
         public String getCountry() {
-        	return country;
+            return country;
         }
 
         public void addCompleteVideo(CompleteVideo video, boolean isTopNode) {
@@ -115,7 +123,7 @@ public class VideoNamedListModule {
                 this.topNodeVideoIdOrdinal = this.videoIdOrdinal;
 
             setMediaAvailabilityBooleans(video);
-            
+
             this.isSupplemental = video.facetData.videoCollectionsData.nodeType == constants.SUPPLEMENTAL;
 
             process();
@@ -159,8 +167,11 @@ public class VideoNamedListModule {
             if(isAvailableIn3D)
                 addToList(VideoNamedListType.VALID_3D_VIDEOS);
 
-            if(isAvailableForED && isAvailableIn3D)
+            if (isAvailableForED && isAvailableIn3D)
                 addToList(VideoNamedListType.ED_3D_VIDEOS);
+
+            if (isAvailableForED && isAvailableForUltraHDForCE)
+                addToList(VideoNamedListType.ED_CE_ULTRAHD_VIDEOS);
 
             for(VideoSetType setType : video.facetData.videoMetaData.videoSetTypes) {
                 if(setType == constants.PRESENT) {
@@ -201,7 +212,7 @@ public class VideoNamedListModule {
                 long theatricalReleaseDate = video.facetData.videoMetaData.theatricalReleaseDate == null ? 0 : video.facetData.videoMetaData.theatricalReleaseDate.val;
                 long dvdReleaseDate = video.facetData.videoMediaData.dvdReleaseDate == null ? 0 : video.facetData.videoMediaData.dvdReleaseDate.val;
                 long broadcastReleaseDate = video.facetData.videoMetaData.broadcastReleaseDate == null ? 0 : video.facetData.videoMetaData.broadcastReleaseDate.val;
-                
+
                 if(video.facetData.videoMetaData.broadcastReleaseDate != null)
                     theatricalReleaseDate = broadcastReleaseDate;
 
@@ -222,7 +233,7 @@ public class VideoNamedListModule {
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_HOLLYWOOD);
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES);
                         }
-                    } 
+                    }
 
                     if(video.facetData.videoMetaData.theatricalReleaseDate == null) {
                         if(dvdReleaseDaysAgo < (6 * 30) && !isTV) {
@@ -255,8 +266,8 @@ public class VideoNamedListModule {
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_HOLLYWOOD_EXTENDED);
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_EXTENDED);
                         }
-                    } 
-                    
+                    }
+
                     if(video.facetData.videoMetaData.theatricalReleaseDate == null) {
                         if(dvdReleaseDaysAgo < (6 * 30) && !isTV) {
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_DIRECT_TO_DVD_EXTENDED);
@@ -267,17 +278,17 @@ public class VideoNamedListModule {
                 }
 
                 if(!isTV && nodeType != constants.EPISODE) {
-                    int theatricalReleaseYear = video.facetData.videoMetaData.year; 
+                    int theatricalReleaseYear = video.facetData.videoMetaData.year;
                     if(theatricalReleaseYear >= (currentYear-3)) {
                         addTopNodeToList(VideoNamedListType.RECENT_THEATRICAL_RELEASES_NON_TV_ED_VIDEOS);
                     }
                 }
 
             }
-            
+
             if(isGoLive && isRecentlyAdded && topNodeVideoIdOrdinal == videoIdOrdinal) {
                 addTopNodeToList(VideoNamedListType.RECENTLY_ADDED_ED_VIDEOS);
-                
+
                 if(isTV) {
                     addTopNodeToList(VideoNamedListType.RECENTLY_ADDED_TV_ED_VIDEOS);
                 } else {
@@ -299,10 +310,10 @@ public class VideoNamedListModule {
         }
 
         private void addTopNodeToList(VideoNamedListType type) {
-        	if(!isSupplemental) {
-	            ThreadSafeBitSet list = getNamedList(listsByName, type);
-	            list.set(topNodeVideoIdOrdinal);
-        	}
+            if(!isSupplemental) {
+                ThreadSafeBitSet list = getNamedList(listsByName, type);
+                list.set(topNodeVideoIdOrdinal);
+            }
         }
 
         private ThreadSafeBitSet getNamedList(ConcurrentHashMap<VideoNamedListType, ThreadSafeBitSet> videoLists, VideoNamedListType type) {
@@ -320,19 +331,24 @@ public class VideoNamedListModule {
             isGoLive = false;
             isAvailableForED = false;
             isAvailableIn3D = false;
+            isAvailableForUltraHDForCE = false;
             currentAvailabilityDate = 0;
-            
+
             if(video.facetData.videoMediaData != null && video.facetData.videoMediaData.isGoLive) {
                 isGoLive = true;
                 for(VMSAvailabilityWindow window : video.countrySpecificData.mediaAvailabilityWindows) {
                     if(window.startDate.val <= ctx.getNowMillis() && window.endDate.val >= ctx.getNowMillis()) {
                         int maxPackageId = -1;
                         VideoPackageInfo maxPackageInfo = null;
+                        VideoContractInfo maxVideoContractInfo = null;
 
                         for(Map.Entry<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo> entry : window.windowInfosByPackageId.entrySet()) {
                             if(entry.getKey().val > maxPackageId) {
                                 maxPackageId = entry.getKey().val;
-                                maxPackageInfo = entry.getValue().videoPackageInfo;
+
+                                WindowPackageContractInfo info = entry.getValue();
+                                maxPackageInfo = info.videoPackageInfo;
+                                maxVideoContractInfo = info.videoContractInfo;
                             }
                         }
 
@@ -341,12 +357,40 @@ public class VideoNamedListModule {
                             isAvailableIn3D = maxPackageInfo.isAvailableIn3D;
                         }
 
+                        if (maxPackageInfo != null && maxVideoContractInfo != null) {
+                            isAvailableForUltraHDForCE = isUltraHD(maxPackageInfo.formats, maxVideoContractInfo.cupTokens, "CE");
+                        }
+
                         currentAvailabilityDate = window.startDate.val;
                         break;
                     }
                 }
             }
         }
+    }
+
+
+    private boolean isUltraHD(Set<VideoFormatDescriptor> formats, final LinkedHashSetOfStrings cupTokens, final String deviceCategory) {
+        if (formats.contains(constants.ULTRA_HD)) {
+            int maxHeightForCupTokens = ctx.getCupLibrary().getMaximumVideoHeight(newSet(cupTokens), deviceCategory);
+            return constants.ULTRA_HD_MIN_HEIGHT <= maxHeightForCupTokens;
+        }
+        return false;
+    }
+
+    private Set<String> newSet(LinkedHashSetOfStrings strings) {
+        if (strings == null || strings.ordinals == null || strings.ordinals.isEmpty()) return Collections.emptySet();
+
+        if (strings.ordinals.size() == 1) {
+            return Collections.<String> singleton(new String(strings.ordinals.get(0).value));
+        } else {
+            Set<String> result = new HashSet<>();
+            for (Strings s : strings.ordinals) {
+                result.add(new String(s.value));
+            }
+            return result;
+        }
+
     }
 
     private void addEmptyLists(ConcurrentHashMap<VideoNamedListType, ThreadSafeBitSet> listsByName) {

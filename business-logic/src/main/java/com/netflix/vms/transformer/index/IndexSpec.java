@@ -26,6 +26,7 @@ public enum IndexSpec {
     CERT_SYSTEM_RATING(PRIMARY_KEY, "ConsolidatedCertSystemRating", "ratingId"),
     PACKAGES(PRIMARY_KEY, "Package", "packageId"),
     PERSON_BIO(PRIMARY_KEY, "PersonBio", "personId"),
+    MOVIE_CHARACTER_PERSON(PRIMARY_KEY, "MovieCharacterPerson", "movieId"),
 
     L10N_STORIES_SYNOPSES(PRIMARY_KEY, "StoriesSynopses", "movieId"),
     L10N_MOVIES(PRIMARY_KEY, "Movies", "movieId"),
@@ -43,8 +44,11 @@ public enum IndexSpec {
     VIDEO_CONTRACTS(HASH, "Contracts", "", "movieId", "countryCode.value"),
     VIDEO_CONTRACT_BY_CONTRACTID(HASH, "Contracts", "contracts.element", "movieId", "countryCode.value", "contracts.element.contractId"),
     ROLLOUT_VIDEO_TYPE(HASH, "Rollout", "", "movieId", "rolloutType.value"),
-    SHOW_COUNTRY_LABEL(HASH, "ShowCountryLabel", "showMemberTypes.element", "videoId", "showMemberTypes.element.countryCodes.element.value");
-
+    SHOW_COUNTRY_LABEL(HASH, "ShowCountryLabel", "showMemberTypes.element", "videoId", "showMemberTypes.element.countryCodes.element.value"),
+    MOVIE_CHARACTER_PERSON_MOVIES_BY_PERSON_ID(HASH, "MovieCharacterPerson", "", "characters.element.personId"),
+    MOVIE_CHARACTER_PERSON_CHARACTERS_BY_PERSON_ID_AND_MOVIE_ID(HASH, "MovieCharacterPerson", "characters.element", "characters.element.personId", "movieId");
+    
+    
 
     private final IndexType indexType;
     private final String parameters[];

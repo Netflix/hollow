@@ -26,13 +26,6 @@ public class RightsWindowHollow extends HollowObject {
         return delegate().getEndDateBoxed(ordinal);
     }
 
-    public ListOfContractIdHollow _getContractIds() {
-        int refOrdinal = delegate().getContractIdsOrdinal(ordinal);
-        if(refOrdinal == -1)
-            return null;
-        return  api().getListOfContractIdHollow(refOrdinal);
-    }
-
     public ListOfRightsWindowContractHollow _getContractIdsExt() {
         int refOrdinal = delegate().getContractIdsExtOrdinal(ordinal);
         if(refOrdinal == -1)

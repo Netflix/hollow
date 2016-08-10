@@ -80,8 +80,8 @@ public class CharacterArtworkTypeAPI extends HollowObjectTypeAPI {
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[3]);
     }
 
-    public ArtworkDerivativeListTypeAPI getDerivativesTypeAPI() {
-        return getAPI().getArtworkDerivativeListTypeAPI();
+    public ArtworkDerivativeSetTypeAPI getDerivativesTypeAPI() {
+        return getAPI().getArtworkDerivativeSetTypeAPI();
     }
 
     public int getLocalesOrdinal(int ordinal) {

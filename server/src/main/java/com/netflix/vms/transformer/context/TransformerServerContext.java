@@ -9,6 +9,7 @@ import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
+import com.netflix.vms.transformer.common.cup.CupLibrary;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistoryConsumer;
 import com.netflix.vms.transformer.config.FrozenTransformerConfigFactory;
@@ -29,6 +30,7 @@ public class TransformerServerContext implements TransformerContext {
     private final PublicationHistoryConsumer publicationHistoryConsumer;
     private final TransformerMetricRecorder metricRecorder;
     private final OctoberSkyData octoberSkyData;
+    private final CupLibrary cupLibrary;
 
     private final FrozenTransformerConfigFactory configFactory;
 
@@ -45,12 +47,14 @@ public class TransformerServerContext implements TransformerContext {
             TransformerServerLogger logger,
             Config config,
             OctoberSkyData octoberSkyData,
+            CupLibrary cupLibrary,
             TransformerMetricRecorder metricRecorder,
             TransformerCassandraHelper cassandraHelper,
             TransformerFiles files,
             PublicationHistoryConsumer publicationHistoryConsumer) {
         this.logger = logger;
         this.octoberSkyData = octoberSkyData;
+        this.cupLibrary = cupLibrary;
         this.metricRecorder = metricRecorder;
         this.cassandraHelper = cassandraHelper;
         this.files = files;
@@ -135,5 +139,10 @@ public class TransformerServerContext implements TransformerContext {
     @Override
     public OctoberSkyData getOctoberSkyData() {
         return octoberSkyData;
+    }
+
+    @Override
+    public CupLibrary getCupLibrary() {
+        return cupLibrary;
     }
 }

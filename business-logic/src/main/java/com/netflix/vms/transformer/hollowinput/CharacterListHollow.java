@@ -6,15 +6,15 @@ import com.netflix.hollow.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
 @SuppressWarnings("all")
-public class TopNAttributesListHollow extends HollowList<TopNAttributeHollow> {
+public class CharacterListHollow extends HollowList<PersonCharacterHollow> {
 
-    public TopNAttributesListHollow(HollowListDelegate delegate, int ordinal) {
+    public CharacterListHollow(HollowListDelegate delegate, int ordinal) {
         super(delegate, ordinal);
     }
 
     @Override
-    public TopNAttributeHollow instantiateElement(int ordinal) {
-        return (TopNAttributeHollow) api().getTopNAttributeHollow(ordinal);
+    public PersonCharacterHollow instantiateElement(int ordinal) {
+        return (PersonCharacterHollow) api().getPersonCharacterHollow(ordinal);
     }
 
     @Override
@@ -26,8 +26,8 @@ public class TopNAttributesListHollow extends HollowList<TopNAttributeHollow> {
         return typeApi().getAPI();
     }
 
-    public TopNAttributesListTypeAPI typeApi() {
-        return (TopNAttributesListTypeAPI) delegate.getTypeAPI();
+    public CharacterListTypeAPI typeApi() {
+        return (CharacterListTypeAPI) delegate.getTypeAPI();
     }
 
 }
