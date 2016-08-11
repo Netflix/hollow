@@ -524,7 +524,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -545,7 +545,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -3364,7 +3364,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -3385,7 +3385,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -6204,7 +6204,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -6225,7 +6225,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -9044,7 +9044,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -9065,7 +9065,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -11983,7 +11983,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -12004,7 +12004,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -14823,7 +14823,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -14844,7 +14844,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -17669,7 +17669,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -17690,7 +17690,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -20515,7 +20515,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -20536,7 +20536,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -23361,7 +23361,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -23382,7 +23382,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra",
