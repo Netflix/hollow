@@ -2,11 +2,14 @@ package com.netflix.vms.transformer.index;
 
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.read.engine.HollowTypeReadState;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.vms.transformer.common.config.OutputTypeConfig;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -15,11 +18,17 @@ import java.util.concurrent.Future;
 public class VMSOutputTypeIndexer {
     private final String name;
     private final HollowReadStateEngine stateEngine;
+    private final Set<OutputTypeConfig> types;
     private final Map<String, Object> indexMap; // Type name to Index
 
     public VMSOutputTypeIndexer(String name, HollowReadStateEngine stateEngine) {
+        this(name, stateEngine, EnumSet.allOf(OutputTypeConfig.class));
+    }
+
+    public VMSOutputTypeIndexer(String name, HollowReadStateEngine stateEngine, Set<OutputTypeConfig> types) {
         this.name = name;
         this.stateEngine = stateEngine;
+        this.types = types;
 
         ExecutorService executor = new SimultaneousExecutor();
 
@@ -50,8 +59,12 @@ public class VMSOutputTypeIndexer {
     }
 
     private void submitIndexingJobs(HollowReadStateEngine stateEngine, ExecutorService executor, Map<String, Object> indexMap) {
-        for (OutputTypeConfig spec : OutputTypeConfig.values()) {
-            indexMap.put(spec.getType(), primaryKeyIdx(executor, stateEngine, spec));
+        for (OutputTypeConfig spec : types) {
+            String typeName = spec.getType();
+            HollowTypeReadState typeState = stateEngine.getTypeState(typeName);
+            if (typeState == null) continue;
+
+            indexMap.put(typeName, primaryKeyIdx(executor, stateEngine, spec));
         }
     }
 

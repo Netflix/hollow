@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.common.config;
 
+import com.netflix.hollow.index.key.PrimaryKey;
+
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
@@ -39,8 +41,10 @@ public enum OutputTypeConfig {
     NamedCollectionHolder("NamedCollectionHolder", "country.id");
 
     //---------------
-    public final static Set<OutputTypeConfig> VIDEO_RELATED_TYPES = Collections.unmodifiableSet(EnumSet.of(
-            CompleteVideo, VideoEpisode_CountryList, RolloutVideo, GlobalVideo, FallbackUSArtwork, LanguageRights, VideoPackageData, PackageData));
+    private final static EnumSet<OutputTypeConfig> VIDEO_RELATED_TYPES_ENUMSET = EnumSet.of(
+            CompleteVideo, VideoEpisode_CountryList, RolloutVideo, GlobalVideo, FallbackUSArtwork, LanguageRights, VideoPackageData, PackageData);
+    public final static Set<OutputTypeConfig> VIDEO_RELATED_TYPES = Collections.unmodifiableSet(VIDEO_RELATED_TYPES_ENUMSET);
+    public final static Set<OutputTypeConfig> NONE_VIDEO_RELATED_TYPES = Collections.unmodifiableSet(EnumSet.complementOf(VIDEO_RELATED_TYPES_ENUMSET));
 
     public final static Set<OutputTypeConfig> PERSON_RELATED_TYPES = Collections.unmodifiableSet(EnumSet.of(
             GlobalPerson, PersonImages));
@@ -60,19 +64,23 @@ public enum OutputTypeConfig {
             LanguageRights, TopNVideoData));
 
     //---------------
-    private final String type;
+    private final PrimaryKey primaryKey;
     private final String[] keyFieldPaths;
 
     OutputTypeConfig(String type, String... keyFieldPaths) {
-        this.type = type;
+        this.primaryKey = new PrimaryKey(type, keyFieldPaths);
         this.keyFieldPaths = keyFieldPaths;
     }
 
     public String getType() {
-        return type;
+        return primaryKey.getType();
     }
 
     public String[] getKeyFieldPaths() {
         return keyFieldPaths;
+    }
+
+    public PrimaryKey getPrimaryKey() {
+        return primaryKey;
     }
 }

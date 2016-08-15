@@ -5,12 +5,16 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.TitleOverr
 
 import com.netflix.hollow.HollowObjectSchema;
 import com.netflix.hollow.combine.HollowCombiner;
-import com.netflix.hollow.combine.HollowCombinerCopyDirector;
+import com.netflix.hollow.combine.HollowCombinerExcludePrimaryKeysCopyDirector;
+import com.netflix.hollow.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.index.key.PrimaryKey;
 import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.read.engine.HollowTypeReadState;
 import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.util.SimultaneousExecutor;
+import com.netflix.hollow.util.StateEngineRoundTripper;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowMapWriteRecord;
 import com.netflix.hollow.write.HollowObjectWriteRecord;
@@ -33,13 +37,16 @@ import com.netflix.vms.generated.notemplate.VPersonHollow;
 import com.netflix.vms.generated.notemplate.VideoHollow;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.OutputTypeConfig;
+import com.netflix.vms.transformer.index.VMSOutputTypeIndexer;
 import com.netflix.vms.transformer.publish.workflow.IndexDuplicateChecker;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -62,16 +69,10 @@ public class TitleOverrideHollowCombiner {
     public TitleOverrideHollowCombiner(TransformerContext ctx, HollowWriteStateEngine output, HollowWriteStateEngine fastlaneOutput, List<HollowReadStateEngine> overrideTitles) throws Exception {
         this.ctx = ctx;
 
-        HollowReadStateEngine fastlane = roundTrip(fastlaneOutput);
-        this.inputs = createReadStateEngines(fastlane, overrideTitles);
+        HollowReadStateEngine fastlane = StateEngineRoundTripper.roundTripSnapshot(fastlaneOutput);
+        this.inputs = createReadStateEngines(overrideTitles, fastlane);
         this.output = output;
-
-        HollowCombinerCopyDirector copyDirector = new TitleOverrideHollowCombinerCopyDirector(ctx, fastlane, overrideTitles);
-        this.combiner = new HollowCombiner(copyDirector, output, inputs);
-        for (OutputTypeConfig type : OutputTypeConfig.FASTLANE_SKIP_TYPES) {
-            combiner.addIgnoredTypes(type.getType());
-        }
-        combiner.addIgnoredTypes(NamedCollectionHolder.getType());
+        this.combiner = initCombiner(this.output, fastlane, overrideTitles, inputs);
 
         this.combinedVideoLists = new ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String,Set<Integer>>>();
         this.combinedPersonLists = new ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String,Set<Integer>>>();
@@ -79,17 +80,85 @@ public class TitleOverrideHollowCombiner {
     }
 
 
-    private static HollowReadStateEngine[] createReadStateEngines(HollowReadStateEngine fastlane, List<HollowReadStateEngine> overrideTitles) {
+    // Order the readstate engine such that by default fastlane is at the end - after pinned/override titles
+    private static HollowReadStateEngine[] createReadStateEngines(List<HollowReadStateEngine> overrideTitles, HollowReadStateEngine fastlane) throws IOException {
         int size = overrideTitles.size() + 1;
         HollowReadStateEngine[] outputs = new HollowReadStateEngine[size];
 
         int i = 0;
-        outputs[i++] = fastlane;
         for (HollowReadStateEngine item : overrideTitles) {
             outputs[i++] = item;
         }
+        outputs[i++] = fastlane; // fastlane last
 
         return outputs;
+    }
+
+    private static HollowCombiner initCombiner(HollowWriteStateEngine output, HollowReadStateEngine fastlane, List<HollowReadStateEngine> overrideTitles, HollowReadStateEngine allInputs[]) {
+        HollowCombinerExcludePrimaryKeysCopyDirector copyDirector = new HollowCombinerExcludePrimaryKeysCopyDirector();
+        prioritizeFastLaneTypes(copyDirector, OutputTypeConfig.NONE_VIDEO_RELATED_TYPES, fastlane, overrideTitles, allInputs);
+        HollowCombiner combiner = new HollowCombiner(copyDirector, output, allInputs);
+
+        // Configure Ignore Types and PrimaryKey for key based record deduping
+        List<PrimaryKey> primaryKeys = new ArrayList<>();
+        Set<OutputTypeConfig> excludeTypes = getExcludeTypes();
+        for (OutputTypeConfig config : OutputTypeConfig.values()) {
+            if (excludeTypes.contains(config)) {
+                combiner.addIgnoredTypes(config.getType());
+            } else {
+                primaryKeys.add(config.getPrimaryKey());
+            }
+        }
+        combiner.setPrimaryKeys(primaryKeys.toArray(new PrimaryKey[0]));
+
+        return combiner;
+    }
+
+    private static Set<OutputTypeConfig> getExcludeTypes() {
+        Set<OutputTypeConfig> excludeTypes = new HashSet<>(OutputTypeConfig.FASTLANE_SKIP_TYPES); //
+        excludeTypes.add(NamedCollectionHolder); // NamedList needs special manual combining
+        return excludeTypes;
+    }
+
+    private static void prioritizeFastLaneTypes(HollowCombinerExcludePrimaryKeysCopyDirector copyCombiner, Set<OutputTypeConfig> types, HollowReadStateEngine fastlane, List<HollowReadStateEngine> overrideTitles, HollowReadStateEngine allInputs[]) {
+        // create Index map
+        Map<HollowReadStateEngine, VMSOutputTypeIndexer> indexerMap = new HashMap<>();
+        for (HollowReadStateEngine stateEngine : allInputs) {
+            String blobID = TitleOverrideHelper.getBlobID(stateEngine);
+            VMSOutputTypeIndexer indexer = new VMSOutputTypeIndexer(blobID, stateEngine);
+            indexerMap.put(stateEngine, indexer);
+        }
+
+        // loop through all types that should favour fastlane
+        for (OutputTypeConfig type : types) {
+            String typeName = type.getType();
+            HollowTypeReadState fastlaneTypeState = fastlane.getTypeState(typeName);
+            if (fastlaneTypeState == null) continue; // skip - fastlane does not have this type
+
+            PopulatedOrdinalListener fastlaneTypeListener = fastlaneTypeState.getListener(PopulatedOrdinalListener.class);
+            BitSet populatedOrdinals = fastlaneTypeListener.getPopulatedOrdinals();
+            if (populatedOrdinals.isEmpty()) continue; // skip - fastlane has no data for this type
+
+            // loop through fastlane keys
+            VMSOutputTypeIndexer fastlaneIndexer = indexerMap.get(fastlane);
+            HollowPrimaryKeyIndex fastlaneIdx = fastlaneIndexer.getPrimaryKeyIndex(typeName);
+            int nextOrdinal = populatedOrdinals.nextSetBit(0);
+            while(nextOrdinal != -1) {
+                Object[] recKey = fastlaneIdx.getRecordKey(nextOrdinal);
+
+                // Exclude fastlane key from other inputs
+                for (HollowReadStateEngine input : overrideTitles) {
+                    VMSOutputTypeIndexer inputIndexer = indexerMap.get(input);
+                    HollowPrimaryKeyIndex inputIdx = inputIndexer.getPrimaryKeyIndex(typeName);
+                    if (inputIdx == null) continue;
+
+                    copyCombiner.excludeKey(inputIdx, recKey);
+                }
+
+                nextOrdinal = populatedOrdinals.nextSetBit(nextOrdinal + 1);
+            }
+
+        }
     }
 
     public HollowWriteStateEngine getCombinedStateEngine() {
@@ -113,11 +182,7 @@ public class TitleOverrideHollowCombiner {
         HollowReadStateEngine stateEngine = roundTrip(outputStateEngine);
 
         IndexDuplicateChecker dupChecker = new IndexDuplicateChecker(stateEngine);
-        for (OutputTypeConfig type : OutputTypeConfig.values()) {
-            // SKIP referenced types since there will be dups (combiner/copier copies referenced records hence likely resulting in dups)
-            if (OutputTypeConfig.REFERENCED_TYPES.contains(type)) continue;
-            dupChecker.checkDuplicates(type);
-        }
+        dupChecker.checkDuplicates();
 
         if (dupChecker.wasDupKeysDetected()) {
             ctx.getLogger().error(TitleOverride, "Duplicate Keys detected in Core Type(s): {}", dupChecker.getResults());
