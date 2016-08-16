@@ -2844,6 +2844,7 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -5844,6 +5845,7 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -8844,6 +8846,7 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -11809,6 +11812,7 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -14862,6 +14866,7 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -18954,6 +18959,7 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -21922,6 +21928,7 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -25037,6 +25044,7 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -28156,6 +28164,7 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -31275,6 +31284,7 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -34394,6 +34404,7 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -37415,6 +37426,7 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -40432,6 +40444,7 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -43449,6 +43462,7 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -46466,6 +46480,7 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
