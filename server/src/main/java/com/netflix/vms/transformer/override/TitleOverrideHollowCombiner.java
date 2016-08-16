@@ -22,7 +22,6 @@ import com.netflix.hollow.write.HollowSetWriteRecord;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.type.ISOCountry;
 import com.netflix.type.NFCountry;
-import com.netflix.vms.generated.notemplate.ArtWorkImageRecipeHollow;
 import com.netflix.vms.generated.notemplate.EpisodeHollow;
 import com.netflix.vms.generated.notemplate.MapOfStringsToSetOfEpisodeHollow;
 import com.netflix.vms.generated.notemplate.MapOfStringsToSetOfVPersonHollow;
@@ -54,6 +53,15 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Custom Combiner to handle title override / pinning
+ *
+ * - Combines NamedLists - special case (lifted off from legacy implementation)
+ * - Uses HollowCombinerExcludePrimaryKeysCopyDirector to prioritize Fastlane for Non-Video Related data
+ * - Uses HollowCombiner new feature to dedupe/remap referenced keys
+ *
+ * @author dsu
+ */
 public class TitleOverrideHollowCombiner {
     public static final String NAMEDLIST_TYPE_STATE_NAME = NamedCollectionHolder.getType();
 
@@ -62,6 +70,7 @@ public class TitleOverrideHollowCombiner {
     private final HollowReadStateEngine inputs[];
     private final HollowWriteStateEngine output;
 
+    // NamedList combined results
     protected final ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> combinedVideoLists;
     protected final ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> combinedPersonLists;
     protected final ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> combinedEpisodeLists;
@@ -70,7 +79,7 @@ public class TitleOverrideHollowCombiner {
         this.ctx = ctx;
 
         HollowReadStateEngine fastlane = StateEngineRoundTripper.roundTripSnapshot(fastlaneOutput);
-        this.inputs = createReadStateEngines(overrideTitles, fastlane);
+        this.inputs = createPrioritizedOrderingReadStateEngines(overrideTitles, fastlane);
         this.output = output;
         this.combiner = initCombiner(this.output, fastlane, overrideTitles, inputs);
 
@@ -80,8 +89,8 @@ public class TitleOverrideHollowCombiner {
     }
 
 
-    // Order the readstate engine such that by default fastlane is at the end - after pinned/override titles
-    private static HollowReadStateEngine[] createReadStateEngines(List<HollowReadStateEngine> overrideTitles, HollowReadStateEngine fastlane) throws IOException {
+    // Order the read state engine such that by default fastlane is at the end - after pinned/override titles
+    private static HollowReadStateEngine[] createPrioritizedOrderingReadStateEngines(List<HollowReadStateEngine> overrideTitles, HollowReadStateEngine fastlane) throws IOException {
         int size = overrideTitles.size() + 1;
         HollowReadStateEngine[] outputs = new HollowReadStateEngine[size];
 
@@ -94,12 +103,16 @@ public class TitleOverrideHollowCombiner {
         return outputs;
     }
 
+    // Initialize Hollow Combiner to handle special cases
     private static HollowCombiner initCombiner(HollowWriteStateEngine output, HollowReadStateEngine fastlane, List<HollowReadStateEngine> overrideTitles, HollowReadStateEngine allInputs[]) {
+        // 1) allInputs should have fastlane at the end of the list so that pinned video has higher precedence over fastlane
+        // 2) Prioritize Fastlane non video related data - allows newer non-video data to have higher precedence
         HollowCombinerExcludePrimaryKeysCopyDirector copyDirector = new HollowCombinerExcludePrimaryKeysCopyDirector();
         prioritizeFastLaneTypes(copyDirector, OutputTypeConfig.NONE_VIDEO_RELATED_TYPES, fastlane, overrideTitles, allInputs);
         HollowCombiner combiner = new HollowCombiner(copyDirector, output, allInputs);
 
-        // Configure Ignore Types and PrimaryKey for key based record deduping
+        // 3) Configure times to skip to be parity with fastlane produced data
+        // 4) Configure PrimaryKey for record deduping and remapping
         List<PrimaryKey> primaryKeys = new ArrayList<>();
         Set<OutputTypeConfig> excludeTypes = getExcludeTypes();
         for (OutputTypeConfig config : OutputTypeConfig.values()) {
@@ -120,6 +133,7 @@ public class TitleOverrideHollowCombiner {
         return excludeTypes;
     }
 
+    // Configure HollowCombinerExcludePrimaryKeysCopyDirector to favor fastlane for non-video related data
     private static void prioritizeFastLaneTypes(HollowCombinerExcludePrimaryKeysCopyDirector copyCombiner, Set<OutputTypeConfig> types, HollowReadStateEngine fastlane, List<HollowReadStateEngine> overrideTitles, HollowReadStateEngine allInputs[]) {
         // create Index map
         Map<HollowReadStateEngine, VMSOutputTypeIndexer> indexerMap = new HashMap<>();
@@ -161,6 +175,9 @@ public class TitleOverrideHollowCombiner {
         }
     }
 
+    /**
+     * Return combined Write State Engine
+     */
     public HollowWriteStateEngine getCombinedStateEngine() {
         return output;
     }
@@ -170,14 +187,15 @@ public class TitleOverrideHollowCombiner {
      */
     public String combine() throws Exception {
         combiner.combine();
-        buildPOJOLists();
-        writePOJOListsToOutput(output);
+        combineNamedLists();
+        writeNamedListsToOutput(output);
         String id = TitleOverrideHelper.addBlobID(output, inputs);
 
         validateCombinedData(output);
         return id;
     }
 
+    // Validates the combined data to check for duplicates
     private void validateCombinedData(HollowWriteStateEngine outputStateEngine) throws Exception {
         HollowReadStateEngine stateEngine = roundTrip(outputStateEngine);
 
@@ -187,19 +205,6 @@ public class TitleOverrideHollowCombiner {
         if (dupChecker.wasDupKeysDetected()) {
             ctx.getLogger().error(TitleOverride, "Duplicate Keys detected in Core Type(s): {}", dupChecker.getResults());
             throw new Exception("Duplicate Keys detected in Core Type(s): " + dupChecker.getResults());
-        }
-    }
-
-    public static void debug(String label, HollowReadStateEngine stateEngine) {
-        Set<String> keys = new HashSet<>();
-
-        int i = 0;
-        VMSRawHollowAPI finalAPI = new VMSRawHollowAPI(stateEngine);
-        for (ArtWorkImageRecipeHollow item : finalAPI.getAllArtWorkImageRecipeHollow()) {
-            String key = item._getRecipeNameStr();
-            boolean isDup = keys.contains(key);
-            keys.add(key);
-            System.out.println(i++ + ") [" + label + "] " + key + (isDup ? "****" : ""));
         }
     }
 
@@ -217,7 +222,9 @@ public class TitleOverrideHollowCombiner {
     }
 
 
-    protected void buildPOJOLists() throws Exception {
+    // ----- Logic to combine NamedList
+
+    protected void combineNamedLists() throws Exception {
         SimultaneousExecutor executor = new SimultaneousExecutor();
 
         for (HollowReadStateEngine input : inputs) {
@@ -319,7 +326,7 @@ public class TitleOverrideHollowCombiner {
         return set;
     }
 
-    private void writePOJOListsToOutput(HollowWriteStateEngine output) throws Exception {
+    private void writeNamedListsToOutput(HollowWriteStateEngine output) throws Exception {
         SimultaneousExecutor executor = new SimultaneousExecutor();
 
         final int emptyResourceIdMapOrdinal = writeEmptyResourceIdMapToOutput(output);
@@ -389,6 +396,4 @@ public class TitleOverrideHollowCombiner {
 
         return output.add("MapOfStringsToSetOf" + typeName, mapRec);
     }
-
-
 }
