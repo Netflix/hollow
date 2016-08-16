@@ -125,7 +125,7 @@ public class TitleOverrideHollowCombiner {
         Map<HollowReadStateEngine, VMSOutputTypeIndexer> indexerMap = new HashMap<>();
         for (HollowReadStateEngine stateEngine : allInputs) {
             String blobID = TitleOverrideHelper.getBlobID(stateEngine);
-            VMSOutputTypeIndexer indexer = new VMSOutputTypeIndexer(blobID, stateEngine);
+            VMSOutputTypeIndexer indexer = new VMSOutputTypeIndexer(blobID, stateEngine, types);
             indexerMap.put(stateEngine, indexer);
         }
 
