@@ -47,7 +47,7 @@ public class TitleOverrideManager {
      *
      * NOTE: call waitForResults to fetch the result
      */
-    public synchronized void processASync(Set<String> overrideTitleSpecs) throws Exception {
+    public void processASync(Set<String> overrideTitleSpecs) throws Exception {
         results.clear();
 
         if (overrideTitleSpecs == null || overrideTitleSpecs.isEmpty()) return;
@@ -98,7 +98,6 @@ public class TitleOverrideManager {
         for (TitleOverrideProcessorJob job : currJobs.values()) {
             executor.execute(job);
         }
-        executor.awaitSuccessfulCompletion();
 
         // Collect Results on sorted Order
         for (TitleOverrideJobSpec p : currJobs.keySet()) {
