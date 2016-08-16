@@ -42,26 +42,29 @@ public class TitleOverrideManager {
         this.outputDataVip = outputDataVip;
     }
 
-    public synchronized List<HollowReadStateEngine> runJobs(TitleOverrideJobSpec... jobSpecs) throws InterruptedException, ExecutionException {
-        List<HollowReadStateEngine> resultList = new ArrayList<>();
-        runJobs(new SimultaneousExecutor(), resultList, jobSpecs);
-        return resultList;
-    }
-
+    /**
+     * Process the title override for specific spec asynchronously
+     *
+     * NOTE: call waitForResults to fetch the result
+     */
     public synchronized void processASync(Set<String> overrideTitleSpecs) throws Exception {
         results.clear();
-        runJobs(mainExecutor, results, overrideTitleSpecs);
+
+        if (overrideTitleSpecs == null || overrideTitleSpecs.isEmpty()) return;
+        TitleOverrideJobSpec[] specs = procesSpecs(overrideTitleSpecs);
+        runJobs(mainExecutor, results, specs);
     }
 
-
+    /**
+     * Return the result of the complete job
+     */
     public List<HollowReadStateEngine> waitForResults() throws InterruptedException, ExecutionException {
         mainExecutor.awaitSuccessfulCompletion();
         return results;
     }
 
-    private void runJobs(SimultaneousExecutor executor, List<HollowReadStateEngine> resultList, Set<String> overrideTitleSpecs) throws InterruptedException, ExecutionException {
-        if (overrideTitleSpecs == null || overrideTitleSpecs.isEmpty()) return;
-
+    // Convert the spec Strings into TitleOverrideJobSpec POJO
+    private static TitleOverrideJobSpec[] procesSpecs(Set<String> overrideTitleSpecs) throws InterruptedException, ExecutionException {
         int i = 0;
         TitleOverrideJobSpec[] jobSpecs = new TitleOverrideJobSpec[overrideTitleSpecs.size()];
         for (String spec : overrideTitleSpecs) {
@@ -75,10 +78,11 @@ public class TitleOverrideManager {
             jobSpecs[i++] = new TitleOverrideJobSpec(version, topNode, isInputBased);
         }
 
-        runJobs(executor, resultList, jobSpecs);
+        return jobSpecs;
     }
 
-    private synchronized void runJobs(SimultaneousExecutor executor, List<HollowReadStateEngine> resultList, TitleOverrideJobSpec... jobSpecs) throws InterruptedException, ExecutionException {
+    // Run the jobs and order the results
+    private void runJobs(SimultaneousExecutor executor, List<HollowReadStateEngine> resultList, TitleOverrideJobSpec... jobSpecs) throws InterruptedException, ExecutionException {
         // Determine whether it could use prior results
         TreeMap<TitleOverrideJobSpec, TitleOverrideProcessorJob> currJobs = new TreeMap<>();
         for (TitleOverrideJobSpec p : jobSpecs) {
@@ -109,6 +113,7 @@ public class TitleOverrideManager {
         lastJobs = currJobs;
     }
 
+    // Create Job
     private TitleOverrideProcessorJob createNewProcessJob(TitleOverrideJobSpec jobSpec) {
         TitleOverrideProcessor processor;
         if (jobSpec.isInputBased) {
@@ -120,6 +125,7 @@ public class TitleOverrideManager {
         return new TitleOverrideProcessorJob(processor, jobSpec, ctx);
     }
 
+    // Create Input Based Processor
     private TitleOverrideProcessor createInputBasedProcessor() {
         String vip = inputDataVip != null ? inputDataVip : ctx.getConfig().getConverterVip();
         if (fileStore != null) {
@@ -129,6 +135,7 @@ public class TitleOverrideManager {
         }
     }
 
+    // Create Output Based Processor
     private TitleOverrideProcessor createOutputBasedProcessor() {
         String vip = outputDataVip != null ? outputDataVip : VipUtil.getTitleOverrideTransformerVip(ctx.getConfig());
         if (fileStore != null) {
