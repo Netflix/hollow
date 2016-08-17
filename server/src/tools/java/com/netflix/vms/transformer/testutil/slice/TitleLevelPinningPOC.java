@@ -48,6 +48,13 @@ public class TitleLevelPinningPOC {
     private static final String SNAPSHOT_FILE = "/space/transformer-data/pinned-blobs/input-snapshot";
 
     @Test
+    public void diff() throws Exception {
+        HollowReadStateEngine fromState = loadStateEngine(LOCAL_BLOB_STORE + "/vms.berlin_output-titleoverride-20160812090000000_80093198");
+        HollowReadStateEngine toState = loadStateEngine(LOCAL_BLOB_STORE + "/vms.berlin_output-titleoverride-20160812090815150_80093198");
+        ShowMeTheProgressDiffTool.startTheDiff(fromState, toState);
+    }
+
+    @Test
     public void testTitlePinning() throws Throwable {
         final int FASTLANE_ID = 80093198;
         int[] fastlaneIds = new int[] { FASTLANE_ID };

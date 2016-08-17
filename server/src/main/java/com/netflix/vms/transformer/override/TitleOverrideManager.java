@@ -8,9 +8,12 @@ import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.util.VipUtil;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 
 public class TitleOverrideManager {
@@ -21,10 +24,10 @@ public class TitleOverrideManager {
     private final String localBlobStore;
     private final TransformerContext ctx;
     private final FileStore fileStore;
-    private final SimultaneousExecutor mainExecutor = new SimultaneousExecutor();
-    private final List<HollowReadStateEngine> results = new ArrayList<>();
 
-    private TreeMap<TitleOverrideJobSpec, TitleOverrideProcessorJob> lastJobs = new TreeMap<>();
+    private final SimultaneousExecutor mainExecutor = new SimultaneousExecutor();
+    private Map<TitleOverrideJobSpec, TitleOverrideProcessorJob> priorJobs = Collections.emptyMap();
+    private Map<TitleOverrideJobSpec, TitleOverrideProcessorJob> activeJobs = new HashMap<TitleOverrideJobSpec, TitleOverrideProcessorJob>();
 
     public TitleOverrideManager(FileStore fileStore, TransformerContext ctx) {
         this.fileStore = fileStore;
@@ -42,31 +45,64 @@ public class TitleOverrideManager {
         this.outputDataVip = outputDataVip;
     }
 
+    public synchronized void clear() {
+        priorJobs.clear();
+        activeJobs.clear();
+    }
+
     /**
      * Process the title override for specific spec asynchronously
      *
      * NOTE: call waitForResults to fetch the result
      */
-    public void processASync(Set<String> overrideTitleSpecs) throws Exception {
-        results.clear();
-
+    public synchronized void processASync(Set<String> overrideTitleSpecs) throws Exception {
         if (overrideTitleSpecs == null || overrideTitleSpecs.isEmpty()) return;
-        TitleOverrideJobSpec[] specs = procesSpecs(overrideTitleSpecs);
-        runJobs(mainExecutor, results, specs);
+
+        // Execute them in parallel
+        Map<TitleOverrideJobSpec, TitleOverrideProcessorJob> currJobs = processSpecs(overrideTitleSpecs);
+        for (Map.Entry<TitleOverrideJobSpec, TitleOverrideProcessorJob> entry : currJobs.entrySet()) {
+            TitleOverrideJobSpec spec = entry.getKey();
+            TitleOverrideProcessorJob job = entry.getValue();
+
+            activeJobs.put(spec, job);
+            mainExecutor.execute(job);
+        }
     }
 
     /**
      * Return the result of the complete job
      */
-    public List<HollowReadStateEngine> waitForResults() throws InterruptedException, ExecutionException {
-        mainExecutor.awaitSuccessfulCompletion();
-        return results;
+    public synchronized List<HollowReadStateEngine> waitForResults() throws InterruptedException, ExecutionException {
+        mainExecutor.awaitSuccessfulCompletionOfCurrentTasks();
+
+        // Collect Results on sorted Order
+        List<HollowReadStateEngine> resultList = new ArrayList<>();
+        for (TitleOverrideJobSpec jobSpec : sortJobSpecs(activeJobs.keySet())) {
+            TitleOverrideProcessorJob job = activeJobs.get(jobSpec);
+
+            if (job.isSuccessfull()) {
+                resultList.add(job.getResult());
+            } else {
+                throw new ExecutionException("TitleOverrideProcessorJob failure", job.getFailure());
+            }
+        }
+
+        ctx.getLogger().info(TransformerLogTag.TitleOverride, "Misc Stat prioJobs={} currJobs={} results={}", priorJobs.size(), activeJobs.size(), resultList.size());
+        priorJobs = new HashMap<>(activeJobs);
+        activeJobs.clear();
+
+        return resultList;
     }
 
-    // Convert the spec Strings into TitleOverrideJobSpec POJO
-    private static TitleOverrideJobSpec[] procesSpecs(Set<String> overrideTitleSpecs) throws InterruptedException, ExecutionException {
-        int i = 0;
-        TitleOverrideJobSpec[] jobSpecs = new TitleOverrideJobSpec[overrideTitleSpecs.size()];
+    private static List<TitleOverrideJobSpec> sortJobSpecs(Collection<TitleOverrideJobSpec> specs) {
+        List<TitleOverrideJobSpec> result = new ArrayList<>(specs);
+        Collections.sort(result); // Sort based on TitleOverrideJobSpec ordering where olderst blob version ist first
+        return result;
+    }
+
+    // Convert the spec Strings into TitleOverrideProcessorJob
+    private Map<TitleOverrideJobSpec, TitleOverrideProcessorJob> processSpecs(Set<String> overrideTitleSpecs) throws InterruptedException, ExecutionException {
+        Map<TitleOverrideJobSpec, TitleOverrideProcessorJob> currJobs = new HashMap<>();
         for (String spec : overrideTitleSpecs) {
             String parts[] = spec.split(":");
             int topNode = Integer.parseInt(parts[0]);
@@ -75,41 +111,18 @@ public class TitleOverrideManager {
             if (parts.length >= 3) {
                 isInputBased = "in".equals(parts[2]);
             }
-            jobSpecs[i++] = new TitleOverrideJobSpec(version, topNode, isInputBased);
-        }
 
-        return jobSpecs;
-    }
-
-    // Run the jobs and order the results
-    private void runJobs(SimultaneousExecutor executor, List<HollowReadStateEngine> resultList, TitleOverrideJobSpec... jobSpecs) throws InterruptedException, ExecutionException {
-        // Determine whether it could use prior results
-        TreeMap<TitleOverrideJobSpec, TitleOverrideProcessorJob> currJobs = new TreeMap<>();
-        for (TitleOverrideJobSpec p : jobSpecs) {
-            TitleOverrideProcessorJob job = lastJobs.get(p);
-            if (job==null) {
+            TitleOverrideJobSpec p = new TitleOverrideJobSpec(version, topNode, isInputBased);
+            TitleOverrideProcessorJob job = priorJobs.get(p); // reuse last cycle's job if the same - to avoid re-processing
+            if (job == null) {
                 // prior result not found so create new job
                 job = createNewProcessJob(p);
             }
             currJobs.put(p, job);
+
         }
 
-        // Execute them in parallel
-        for (TitleOverrideProcessorJob job : currJobs.values()) {
-            executor.execute(job);
-        }
-
-        // Collect Results on sorted Order
-        for (TitleOverrideJobSpec p : currJobs.keySet()) {
-            TitleOverrideProcessorJob job = currJobs.get(p);
-            if (job.isSuccessfull()) {
-                resultList.add(job.getResult());
-            } else {
-                throw new ExecutionException("TitleOverrideProcessorJob failure", job.getFailure());
-            }
-        }
-
-        lastJobs = currJobs;
+        return currJobs;
     }
 
     // Create Job
