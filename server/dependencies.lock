@@ -103,7 +103,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -447,7 +447,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.27",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -485,27 +485,27 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -516,7 +516,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -524,7 +524,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -631,7 +631,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -984,7 +984,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -2009,7 +2009,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -2017,7 +2017,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -2327,14 +2327,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.131",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.131",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -2844,7 +2844,6 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -3104,7 +3103,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -3448,7 +3447,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.27",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -3486,27 +3485,27 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -3517,7 +3516,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -3525,7 +3524,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -3632,7 +3631,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -3985,7 +3984,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -5010,7 +5009,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -5018,7 +5017,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -5328,14 +5327,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.131",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.131",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -5845,7 +5844,6 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -6105,7 +6103,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -6449,7 +6447,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.27",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -6487,27 +6485,27 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -6518,7 +6516,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -6526,7 +6524,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -6633,7 +6631,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -6986,7 +6984,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -8011,7 +8009,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -8019,7 +8017,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -8329,14 +8327,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.131",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.131",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -8846,7 +8844,6 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -9106,7 +9103,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -9450,7 +9447,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.27",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -9488,27 +9485,27 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -9519,7 +9516,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -9527,7 +9524,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -9634,7 +9631,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -9987,7 +9984,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -11008,7 +11005,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -11016,7 +11013,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -11326,14 +11323,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.131",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.131",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -11812,7 +11809,6 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -12125,7 +12121,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -12469,7 +12465,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.27",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -12507,27 +12503,27 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -12538,7 +12534,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -12546,7 +12542,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -12653,7 +12649,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -13006,7 +13002,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -14031,7 +14027,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -14039,7 +14035,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -14349,14 +14345,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.131",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.131",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -14866,7 +14862,6 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -16218,7 +16213,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -16562,7 +16557,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.27",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -16600,27 +16595,27 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -16631,7 +16626,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -16639,7 +16634,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -16746,7 +16741,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -17099,7 +17094,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -18124,7 +18119,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -18132,7 +18127,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -18442,14 +18437,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.131",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.131",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -18959,7 +18954,6 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -19219,7 +19213,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -19563,7 +19557,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.27",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -19601,27 +19595,27 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -19632,7 +19626,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -19640,7 +19634,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -19747,7 +19741,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -20100,7 +20094,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -21124,7 +21118,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -21132,7 +21126,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -21442,14 +21436,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.131",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.131",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -21928,7 +21922,6 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -22200,7 +22193,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -22555,7 +22548,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.27",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -22563,13 +22556,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.14",
+            "locked": "1.16",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.25",
+            "locked": "1.27",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -22607,14 +22600,14 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -22622,13 +22615,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -22639,7 +22632,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -22647,7 +22640,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -22754,7 +22747,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -23113,7 +23106,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -24167,7 +24160,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -24176,7 +24169,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -24488,14 +24481,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.131",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.131",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -25044,7 +25037,6 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -25320,7 +25312,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -25675,7 +25667,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.27",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -25683,13 +25675,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.14",
+            "locked": "1.16",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.25",
+            "locked": "1.27",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -25727,14 +25719,14 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -25742,13 +25734,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -25759,7 +25751,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -25767,7 +25759,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -25874,7 +25866,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -26233,7 +26225,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -27287,7 +27279,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -27296,7 +27288,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -27608,14 +27600,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.131",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.131",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -28164,7 +28156,6 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -28440,7 +28431,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -28795,7 +28786,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.27",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -28803,13 +28794,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.14",
+            "locked": "1.16",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.25",
+            "locked": "1.27",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -28847,14 +28838,14 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -28862,13 +28853,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -28879,7 +28870,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -28887,7 +28878,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -28994,7 +28985,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -29353,7 +29344,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -30407,7 +30398,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -30416,7 +30407,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -30728,14 +30719,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.131",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.131",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -31284,7 +31275,6 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -31560,7 +31550,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -31915,7 +31905,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.27",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -31923,13 +31913,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.14",
+            "locked": "1.16",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.25",
+            "locked": "1.27",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -31967,14 +31957,14 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -31982,13 +31972,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -31999,7 +31989,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -32007,7 +31997,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -32114,7 +32104,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -32473,7 +32463,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -33527,7 +33517,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -33536,7 +33526,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -33848,14 +33838,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.131",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.131",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -34404,7 +34394,6 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -34668,7 +34657,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -35013,7 +35002,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.27",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -35051,27 +35040,27 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -35082,7 +35071,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -35090,7 +35079,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -35197,7 +35186,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -35555,7 +35544,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -36584,7 +36573,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -36592,7 +36581,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -36902,14 +36891,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.131",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.131",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -37426,7 +37415,6 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -37686,7 +37674,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -38031,7 +38019,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.27",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -38069,27 +38057,27 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -38100,7 +38088,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -38108,7 +38096,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -38215,7 +38203,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -38573,7 +38561,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -39602,7 +39590,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -39610,7 +39598,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -39920,14 +39908,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.131",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.131",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -40444,7 +40432,6 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -40704,7 +40691,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -41049,7 +41036,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.27",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -41087,27 +41074,27 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -41118,7 +41105,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -41126,7 +41113,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -41233,7 +41220,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -41591,7 +41578,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -42620,7 +42607,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -42628,7 +42615,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -42938,14 +42925,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.131",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.131",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -43462,7 +43449,6 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
@@ -43722,7 +43708,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -44067,7 +44053,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.27",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -44105,27 +44091,27 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -44136,7 +44122,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -44144,7 +44130,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.0",
+            "locked": "2.1.4",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -44251,7 +44237,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -44609,7 +44595,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -45638,7 +45624,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -45646,7 +45632,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -45956,14 +45942,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.131",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.131",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -46480,7 +46466,6 @@
         "org.reflections:reflections": {
             "locked": "0.9.9-RC2",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:vms-utils"
             ]
         },
