@@ -6,7 +6,7 @@ dependencies {
     compile 'netflix:mutation-stream-client:latest.release'
     compile 'netflix:country-launch:latest.release'
     compile 'netflix:content-usage-policy:latest.release'
-
+    
     testCompile 'junit:junit:4.11'
     testCompile 'org.assertj:assertj-core:3.3+'
 }
@@ -17,7 +17,6 @@ configurations {
   all*.exclude group: 'netflix', module: 'platform-core'
   all*.exclude group: 'netflix', module: 'nflibrary'
   all*.exclude group: 'netflix', module: 'hermes'
-  all*.exclude group: 'netflix', module: 'nfi18n-core'
   all*.exclude group: 'netflix', module: 'nfastyanax'
 }
 
