@@ -5,11 +5,11 @@ import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_IMAGE_FORMAT;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_RECIPE;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_TERRITORY_COUNTRIES;
 
+import com.netflix.vms.transformer.CycleConstants;
+
 import java.util.*;
 import java.util.Map.Entry;
-
 import org.apache.commons.codec.digest.DigestUtils;
-
 import com.google.common.collect.ComparisonChain;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
@@ -33,15 +33,16 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     private final Map<String, ArtWorkImageTypeEntry> imageTypeEntryCache;
     private final Map<String, ArtWorkImageFormatEntry> imageFormatEntryCache;
     private final Map<String, ArtWorkImageRecipe> imageRecipeCache;
-    private final Map<String, ArtworkDerivative> derivativeCache;
     private final Map<ArtworkCdn, ArtworkCdn> cdnLocationCache;
+    
+    private final CycleConstants cycleConstants;
 
     private final boolean isEnableCdnDirectoryOptimization;
     private final int computedCdnFolderLen;
 
     private final Set<String> unknownArtworkImageTypes = new HashSet<String>();
 
-    public ArtWorkModule(String entityType, VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+    public ArtWorkModule(String entityType, VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
         super(api, ctx, mapper);
         this.entityType = entityType;
         this.imageTypeIdx = indexer.getPrimaryKeyIndex(ARTWORK_IMAGE_FORMAT);
@@ -51,58 +52,81 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         this.imageFormatEntryCache = new HashMap<String, ArtWorkImageFormatEntry>();
         this.imageTypeEntryCache = new HashMap<String, ArtWorkImageTypeEntry>();
         this.imageRecipeCache = new HashMap<String, ArtWorkImageRecipe>();
-        this.derivativeCache = new HashMap<String, ArtworkDerivative>();
         this.cdnLocationCache = new HashMap<ArtworkCdn, ArtworkCdn>();
+        
+        this.cycleConstants = cycleConstants;
 
         this.computedCdnFolderLen = ctx.getConfig().getComputedCdnFolderLength();
         this.isEnableCdnDirectoryOptimization = ctx.getConfig().isEnableCdnDirectoryOptimization();
     }
 
-    protected void transformArtworks(int entityId, String sourceFileId, int ordinalPriority, int seqNum, ArtworkAttributesHollow attributes, ArtworkDerivativeListHollow derivatives, Set<ArtworkLocaleHollow> localeSet, Set<Artwork> artworkSet) {
-
+    protected void transformArtworks(int entityId, String sourceFileId, int ordinalPriority, int seqNum, ArtworkAttributesHollow attributes, ArtworkDerivativeSetHollow inputDerivatives, Set<ArtworkLocaleHollow> localeSet, Set<Artwork> artworkSet) {
         unknownArtworkImageTypes.clear();
 
+        Artwork artwork = new Artwork();
+        
         // Process list of derivatives
-        List<ArtworkDerivative> derivativeList = new ArrayList<ArtworkDerivative>();
-        List<ArtworkCdn> cdnList = new ArrayList<ArtworkCdn>();
-        processDerivatives(entityId, sourceFileId, derivatives, derivativeList, cdnList);
+        processDerivativesAndCdnList(entityId, sourceFileId, inputDerivatives, artwork);
+
+        artwork.sourceFileId = new Strings(sourceFileId);
+        artwork.seqNum = seqNum;
+        artwork.ordinalPriority = ordinalPriority;
+        fillPassThroughData(artwork, attributes);
 
         for (final ArtworkLocaleHollow localeHollow : localeSet) {
-            createArtworkForLocale(localeHollow, sourceFileId, ordinalPriority, seqNum, attributes, derivativeList, cdnList, artworkSet);
+            Artwork localeArtwork = artwork.clone();
+            localeArtwork.locale = NFLocaleUtil.createNFLocale(localeHollow._getBcp47Code()._getValue());
+            localeArtwork.effectiveDate = localeHollow._getEffectiveDate()._getValue();
+            artworkSet.add(localeArtwork);
         }
     }
 
-    // Process Derivatives to create derivativeList and cdnList
-    protected void processDerivatives(int entityId, String sourceFileId, ArtworkDerivativeListHollow derivatives, List<ArtworkDerivative> derivativeList, List<ArtworkCdn> cdnList) {
-        for (ArtworkDerivativeHollow derivativeHollow : sortInputDerivatives(derivatives)) {
-            ArtWorkImageFormatEntry formatEntry = getImageFormatEntry(derivativeHollow);
-            ArtWorkImageTypeEntry typeEntry = getImageTypeEntry(derivativeHollow);
-            ArtWorkImageRecipe recipeEntry = getImageRecipe(derivativeHollow);
-            if (typeEntry == null) {
-                String imageType = derivativeHollow._getImageType()._getValue();
-                if(!unknownArtworkImageTypes.contains(imageType)) {
-                    ctx.getLogger().warn(UnknownArtworkImageType, "Unknown Image Type for entity={}, id={}, type={}; data will be dropped.", entityType, entityId, imageType);
-                    unknownArtworkImageTypes.add(imageType);
+    // Process Derivatives
+    protected void processDerivativesAndCdnList(int entityId, String sourceFileId, ArtworkDerivativeSetHollow inputDerivatives, Artwork artwork) {
+        int inputDerivativeSetOrdinal = inputDerivatives.getOrdinal();
+                
+        ArtworkDerivatives outputDerivatives = cycleConstants.artworkDerivativesCache.getResult(inputDerivativeSetOrdinal);
+        if(outputDerivatives != null) {
+            artwork.derivatives = outputDerivatives;
+            artwork.cdns = cycleConstants.cdnListCache.getResult(inputDerivativeSetOrdinal);
+            return;
+        }
+        
+        List<ArtworkCdn> cdnList = new ArrayList<>();
+        List<ArtworkDerivative> derivativeList = new ArrayList<>();
+                
+        for (ArtworkDerivativeHollow derivativeHollow : sortInputDerivatives(inputDerivatives)) {
+            int inputDerivativeOrdinal = derivativeHollow.getOrdinal();
+            
+            ArtworkDerivative outputDerivative = cycleConstants.artworkDerivativeCache.getResult(inputDerivativeOrdinal);
+            
+            if(outputDerivative == null) {
+                outputDerivative = new ArtworkDerivative();
+                        
+                ArtWorkImageFormatEntry formatEntry = getImageFormatEntry(derivativeHollow);
+                ArtWorkImageTypeEntry typeEntry = getImageTypeEntry(derivativeHollow);
+                ArtWorkImageRecipe recipeEntry = getImageRecipe(derivativeHollow);
+                if (typeEntry == null) {
+                    String imageType = derivativeHollow._getImageType()._getValue();
+                    if(!unknownArtworkImageTypes.contains(imageType)) {
+                        ctx.getLogger().warn(UnknownArtworkImageType, "Unknown Image Type for entity={}, id={}, type={}; data will be dropped.", entityType, entityId, imageType);
+                        unknownArtworkImageTypes.add(imageType);
+                    }
+                    continue;
                 }
-                continue;
-            }
-
-            // NOTE: recipeDescriptor does not seem unique enough - likely because Beehieve is passing a different format(width/height) that was used to compute recipeDescriptor
-            String recipeDescriptor = derivativeHollow._getRecipeDescriptor()._getValue();
-            String derivativeKey = recipeDescriptor + "_" + new String(formatEntry.nameStr) + "_" + new String(typeEntry.nameStr);
-
-            ArtworkDerivative derivative = derivativeCache.get(derivativeKey);
-            if(derivative == null) {
-                derivative = new ArtworkDerivative();
-                derivative.format = formatEntry;
-                derivative.type = typeEntry;
-                derivative.recipe = recipeEntry;
-                derivative.recipeDesc = new Strings(recipeDescriptor);
-
-                derivativeCache.put(derivativeKey, derivative);
-            }
-
-            derivativeList.add(derivative);
+                
+                String recipeDescriptor = derivativeHollow._getRecipeDescriptor()._getValue();
+                
+                outputDerivative.format = formatEntry;
+                outputDerivative.type = typeEntry;
+                outputDerivative.recipe = recipeEntry;
+                outputDerivative.recipeDesc = new Strings(recipeDescriptor);
+                
+                outputDerivative = cycleConstants.artworkDerivativeCache.setResult(inputDerivativeOrdinal, outputDerivative);
+            } 
+            
+            derivativeList.add(outputDerivative);
+            
 
             ArtworkCdn cdn = new ArtworkCdn();
             cdn.cdnId = java.lang.Integer.parseInt(derivativeHollow._getCdnId()._getValue()); // @TODO: Is it Integer or String
@@ -117,6 +141,14 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
 
             cdnList.add(cdn);
         }
+        
+        outputDerivatives = artworkDerivatives(derivativeList);
+        
+        outputDerivatives = cycleConstants.artworkDerivativesCache.setResult(inputDerivativeSetOrdinal, outputDerivatives);
+        cdnList = cycleConstants.cdnListCache.setResult(inputDerivativeSetOrdinal, cdnList);
+        
+        artwork.cdns = cdnList;
+        artwork.derivatives = outputDerivatives;
     }
 
     protected final Strings getCdnDirectory(String sourceId, ArtworkDerivativeHollow derivative) {
@@ -144,22 +176,6 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         String filename_work_in_progress = sourceId + "_" + recipeDescriptor;
         String filename_without_extension = DigestUtils.shaHex(filename_work_in_progress);
         return filename_without_extension;
-    }
-
-    protected void createArtworkForLocale(ArtworkLocaleHollow localeHollow, String sourceFileId, int ordinalPriority, int seqNum, ArtworkAttributesHollow attributes, List<ArtworkDerivative> derivativeList, List<ArtworkCdn> cdnList, Set<Artwork> artworkSet) {
-        final NFLocale locale = NFLocaleUtil.createNFLocale(localeHollow._getBcp47Code()._getValue());
-
-        Artwork artwork = new Artwork();
-        artwork.sourceFileId = new Strings(sourceFileId);
-        artwork.seqNum = seqNum;
-        artwork.ordinalPriority = ordinalPriority;
-        artwork.locale = locale;
-        artwork.effectiveDate = localeHollow._getEffectiveDate()._getValue();
-        artwork.derivatives = artworkDerivatives(derivativeList);
-        artwork.cdns = cdnList;
-        fillPassThroughData(artwork, attributes);
-
-        artworkSet.add(artwork);
     }
 
     private ArtworkDerivatives artworkDerivatives(List<ArtworkDerivative> derivatives) {
@@ -248,7 +264,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         return map;
     }
 
-    private void fillPassThroughData(Artwork desc, ArtworkAttributesHollow attributes) {
+    protected void fillPassThroughData(Artwork desc, ArtworkAttributesHollow attributes) {
         SingleValuePassthroughMapHollow singleValuePassThrough = attributes._getPassthrough()._getSingleValues();
         HashMap<String, String> keyValues = new HashMap<>();
         for(Entry<MapKeyHollow, StringHollow> entry : singleValuePassThrough.entrySet()) {
@@ -462,7 +478,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         return artworkSet;
     }
 
-    protected List<ArtworkDerivativeHollow> sortInputDerivatives(ArtworkDerivativeListHollow derivatives) {
+    protected List<ArtworkDerivativeHollow> sortInputDerivatives(ArtworkDerivativeSetHollow derivatives) {
         List<ArtworkDerivativeHollow> sortedDerivativeHollowList = new ArrayList<>();
         for (ArtworkDerivativeHollow derivativeHollow : derivatives) {
             sortedDerivativeHollowList.add(derivativeHollow);

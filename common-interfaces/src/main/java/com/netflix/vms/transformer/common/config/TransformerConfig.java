@@ -47,6 +47,9 @@ public interface TransformerConfig {
     @DefaultValue("true")
     boolean isRestoreFromPreviousStateEngine();
     
+    @DefaultValue("true")
+    boolean isFailIfRestoreNotAvailable();
+    
     Long getRestoreFromSpecificVersion();
     
     @DefaultValue("false")

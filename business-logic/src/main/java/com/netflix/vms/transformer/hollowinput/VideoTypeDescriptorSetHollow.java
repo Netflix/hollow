@@ -1,14 +1,14 @@
 package com.netflix.vms.transformer.hollowinput;
 
-import com.netflix.hollow.objects.HollowList;
-import com.netflix.hollow.HollowListSchema;
-import com.netflix.hollow.objects.delegate.HollowListDelegate;
+import com.netflix.hollow.objects.HollowSet;
+import com.netflix.hollow.HollowSetSchema;
+import com.netflix.hollow.objects.delegate.HollowSetDelegate;
 import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
 
 @SuppressWarnings("all")
-public class VideoTypeDescriptorListHollow extends HollowList<VideoTypeDescriptorHollow> {
+public class VideoTypeDescriptorSetHollow extends HollowSet<VideoTypeDescriptorHollow> {
 
-    public VideoTypeDescriptorListHollow(HollowListDelegate delegate, int ordinal) {
+    public VideoTypeDescriptorSetHollow(HollowSetDelegate delegate, int ordinal) {
         super(delegate, ordinal);
     }
 
@@ -26,8 +26,8 @@ public class VideoTypeDescriptorListHollow extends HollowList<VideoTypeDescripto
         return typeApi().getAPI();
     }
 
-    public VideoTypeDescriptorListTypeAPI typeApi() {
-        return (VideoTypeDescriptorListTypeAPI) delegate.getTypeAPI();
+    public VideoTypeDescriptorSetTypeAPI typeApi() {
+        return (VideoTypeDescriptorSetTypeAPI) delegate.getTypeAPI();
     }
 
 }

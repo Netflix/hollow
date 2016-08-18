@@ -64,10 +64,11 @@
             ]
         },
         "com.google.code.findbugs:annotations": {
-            "locked": "2.0.0",
+            "locked": "2.0.2",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
-                "netflix:basicTypes"
+                "netflix:basicTypes",
+                "org.reflections:reflections"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -95,7 +96,8 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "netflix:nflibrary",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.reflections:reflections"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -174,24 +176,24 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
@@ -226,7 +228,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.13",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -284,14 +286,14 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.8",
+            "locked": "1.13",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.8",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
@@ -450,6 +452,12 @@
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
                 "netflix:nflibrary"
+            ]
+        },
+        "dom4j:dom4j": {
+            "locked": "1.6.1",
+            "transitive": [
+                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -755,6 +763,12 @@
                 "com.netflix.governator:governator"
             ]
         },
+        "org.javassist:javassist": {
+            "locked": "3.18.2-GA",
+            "transitive": [
+                "org.reflections:reflections"
+            ]
+        },
         "org.jboss.logging:jboss-logging": {
             "locked": "3.1.0.CR2",
             "transitive": [
@@ -790,6 +804,10 @@
             "transitive": [
                 "com.netflix.governator:governator"
             ]
+        },
+        "org.reflections:reflections": {
+            "locked": "0.9.9-RC2",
+            "requested": "0.9.9-RC2"
         },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.21",
@@ -843,6 +861,12 @@
             "transitive": [
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
+            ]
+        },
+        "xml-apis:xml-apis": {
+            "locked": "1.0.b2",
+            "transitive": [
+                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -923,10 +947,11 @@
             ]
         },
         "com.google.code.findbugs:annotations": {
-            "locked": "2.0.0",
+            "locked": "2.0.2",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
-                "netflix:basicTypes"
+                "netflix:basicTypes",
+                "org.reflections:reflections"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -954,7 +979,8 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "netflix:nflibrary",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.reflections:reflections"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -1033,24 +1059,24 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
@@ -1085,7 +1111,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.13",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -1143,14 +1169,14 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.8",
+            "locked": "1.13",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.8",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
@@ -1309,6 +1335,12 @@
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
                 "netflix:nflibrary"
+            ]
+        },
+        "dom4j:dom4j": {
+            "locked": "1.6.1",
+            "transitive": [
+                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -1614,6 +1646,12 @@
                 "com.netflix.governator:governator"
             ]
         },
+        "org.javassist:javassist": {
+            "locked": "3.18.2-GA",
+            "transitive": [
+                "org.reflections:reflections"
+            ]
+        },
         "org.jboss.logging:jboss-logging": {
             "locked": "3.1.0.CR2",
             "transitive": [
@@ -1649,6 +1687,10 @@
             "transitive": [
                 "com.netflix.governator:governator"
             ]
+        },
+        "org.reflections:reflections": {
+            "locked": "0.9.9-RC2",
+            "requested": "0.9.9-RC2"
         },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.21",
@@ -1702,6 +1744,12 @@
             "transitive": [
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
+            ]
+        },
+        "xml-apis:xml-apis": {
+            "locked": "1.0.b2",
+            "transitive": [
+                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -1782,10 +1830,11 @@
             ]
         },
         "com.google.code.findbugs:annotations": {
-            "locked": "2.0.0",
+            "locked": "2.0.2",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
-                "netflix:basicTypes"
+                "netflix:basicTypes",
+                "org.reflections:reflections"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -1813,7 +1862,8 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "netflix:nflibrary",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.reflections:reflections"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -1892,24 +1942,24 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
@@ -1944,7 +1994,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.13",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -2002,14 +2052,14 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.8",
+            "locked": "1.13",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.8",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
@@ -2168,6 +2218,12 @@
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
                 "netflix:nflibrary"
+            ]
+        },
+        "dom4j:dom4j": {
+            "locked": "1.6.1",
+            "transitive": [
+                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -2473,6 +2529,12 @@
                 "com.netflix.governator:governator"
             ]
         },
+        "org.javassist:javassist": {
+            "locked": "3.18.2-GA",
+            "transitive": [
+                "org.reflections:reflections"
+            ]
+        },
         "org.jboss.logging:jboss-logging": {
             "locked": "3.1.0.CR2",
             "transitive": [
@@ -2508,6 +2570,10 @@
             "transitive": [
                 "com.netflix.governator:governator"
             ]
+        },
+        "org.reflections:reflections": {
+            "locked": "0.9.9-RC2",
+            "requested": "0.9.9-RC2"
         },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.21",
@@ -2561,6 +2627,12 @@
             "transitive": [
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
+            ]
+        },
+        "xml-apis:xml-apis": {
+            "locked": "1.0.b2",
+            "transitive": [
+                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -2641,10 +2713,11 @@
             ]
         },
         "com.google.code.findbugs:annotations": {
-            "locked": "2.0.0",
+            "locked": "2.0.2",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
-                "netflix:basicTypes"
+                "netflix:basicTypes",
+                "org.reflections:reflections"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -2672,7 +2745,8 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "netflix:nflibrary",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.reflections:reflections"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -2751,24 +2825,24 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
@@ -2803,7 +2877,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.13",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -2861,14 +2935,14 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.8",
+            "locked": "1.13",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.8",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
@@ -3027,6 +3101,12 @@
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
                 "netflix:nflibrary"
+            ]
+        },
+        "dom4j:dom4j": {
+            "locked": "1.6.1",
+            "transitive": [
+                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -3332,6 +3412,12 @@
                 "com.netflix.governator:governator"
             ]
         },
+        "org.javassist:javassist": {
+            "locked": "3.18.2-GA",
+            "transitive": [
+                "org.reflections:reflections"
+            ]
+        },
         "org.jboss.logging:jboss-logging": {
             "locked": "3.1.0.CR2",
             "transitive": [
@@ -3367,6 +3453,10 @@
             "transitive": [
                 "com.netflix.governator:governator"
             ]
+        },
+        "org.reflections:reflections": {
+            "locked": "0.9.9-RC2",
+            "requested": "0.9.9-RC2"
         },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.21",
@@ -3420,6 +3510,12 @@
             "transitive": [
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
+            ]
+        },
+        "xml-apis:xml-apis": {
+            "locked": "1.0.b2",
+            "transitive": [
+                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -3526,11 +3622,11 @@
     },
     "resolutionRules": {
         "com.netflix.nebula:gradle-resolution-rules": {
-            "locked": "0.27.0",
+            "locked": "0.28.0",
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
-            "locked": "0.9.0",
+            "locked": "0.11.0",
             "requested": "latest.release"
         }
     },
@@ -3599,10 +3695,11 @@
             ]
         },
         "com.google.code.findbugs:annotations": {
-            "locked": "2.0.0",
+            "locked": "2.0.2",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
-                "netflix:basicTypes"
+                "netflix:basicTypes",
+                "org.reflections:reflections"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -3630,7 +3727,8 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "netflix:nflibrary",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.reflections:reflections"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -3709,24 +3807,24 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
@@ -3761,7 +3859,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.13",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -3819,14 +3917,14 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.8",
+            "locked": "1.13",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.8",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
@@ -3985,6 +4083,12 @@
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
                 "netflix:nflibrary"
+            ]
+        },
+        "dom4j:dom4j": {
+            "locked": "1.6.1",
+            "transitive": [
+                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -4290,6 +4394,12 @@
                 "com.netflix.governator:governator"
             ]
         },
+        "org.javassist:javassist": {
+            "locked": "3.18.2-GA",
+            "transitive": [
+                "org.reflections:reflections"
+            ]
+        },
         "org.jboss.logging:jboss-logging": {
             "locked": "3.1.0.CR2",
             "transitive": [
@@ -4325,6 +4435,10 @@
             "transitive": [
                 "com.netflix.governator:governator"
             ]
+        },
+        "org.reflections:reflections": {
+            "locked": "0.9.9-RC2",
+            "requested": "0.9.9-RC2"
         },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.21",
@@ -4378,6 +4492,12 @@
             "transitive": [
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
+            ]
+        },
+        "xml-apis:xml-apis": {
+            "locked": "1.0.b2",
+            "transitive": [
+                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -4458,10 +4578,11 @@
             ]
         },
         "com.google.code.findbugs:annotations": {
-            "locked": "2.0.0",
+            "locked": "2.0.2",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
-                "netflix:basicTypes"
+                "netflix:basicTypes",
+                "org.reflections:reflections"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -4489,7 +4610,8 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "netflix:nflibrary",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.reflections:reflections"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -4568,24 +4690,24 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
@@ -4620,7 +4742,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.13",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -4678,14 +4800,14 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.8",
+            "locked": "1.13",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.8",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
@@ -4844,6 +4966,12 @@
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
                 "netflix:nflibrary"
+            ]
+        },
+        "dom4j:dom4j": {
+            "locked": "1.6.1",
+            "transitive": [
+                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -5160,6 +5288,12 @@
                 "com.netflix.governator:governator"
             ]
         },
+        "org.javassist:javassist": {
+            "locked": "3.18.2-GA",
+            "transitive": [
+                "org.reflections:reflections"
+            ]
+        },
         "org.jboss.logging:jboss-logging": {
             "locked": "3.1.0.CR2",
             "transitive": [
@@ -5195,6 +5329,10 @@
             "transitive": [
                 "com.netflix.governator:governator"
             ]
+        },
+        "org.reflections:reflections": {
+            "locked": "0.9.9-RC2",
+            "requested": "0.9.9-RC2"
         },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.21",
@@ -5248,6 +5386,12 @@
             "transitive": [
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
+            ]
+        },
+        "xml-apis:xml-apis": {
+            "locked": "1.0.b2",
+            "transitive": [
+                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -5328,10 +5472,11 @@
             ]
         },
         "com.google.code.findbugs:annotations": {
-            "locked": "2.0.0",
+            "locked": "2.0.2",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
-                "netflix:basicTypes"
+                "netflix:basicTypes",
+                "org.reflections:reflections"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -5359,7 +5504,8 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "netflix:nflibrary",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.reflections:reflections"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -5438,24 +5584,24 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
@@ -5490,7 +5636,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.13",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -5548,14 +5694,14 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.8",
+            "locked": "1.13",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.8",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
@@ -5714,6 +5860,12 @@
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
                 "netflix:nflibrary"
+            ]
+        },
+        "dom4j:dom4j": {
+            "locked": "1.6.1",
+            "transitive": [
+                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -6030,6 +6182,12 @@
                 "com.netflix.governator:governator"
             ]
         },
+        "org.javassist:javassist": {
+            "locked": "3.18.2-GA",
+            "transitive": [
+                "org.reflections:reflections"
+            ]
+        },
         "org.jboss.logging:jboss-logging": {
             "locked": "3.1.0.CR2",
             "transitive": [
@@ -6065,6 +6223,10 @@
             "transitive": [
                 "com.netflix.governator:governator"
             ]
+        },
+        "org.reflections:reflections": {
+            "locked": "0.9.9-RC2",
+            "requested": "0.9.9-RC2"
         },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.21",
@@ -6118,6 +6280,12 @@
             "transitive": [
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
+            ]
+        },
+        "xml-apis:xml-apis": {
+            "locked": "1.0.b2",
+            "transitive": [
+                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -6198,10 +6366,11 @@
             ]
         },
         "com.google.code.findbugs:annotations": {
-            "locked": "2.0.0",
+            "locked": "2.0.2",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
-                "netflix:basicTypes"
+                "netflix:basicTypes",
+                "org.reflections:reflections"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -6229,7 +6398,8 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "netflix:nflibrary",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.reflections:reflections"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -6308,24 +6478,24 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
@@ -6360,7 +6530,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.13",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -6418,14 +6588,14 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.8",
+            "locked": "1.13",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.8",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
@@ -6584,6 +6754,12 @@
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
                 "netflix:nflibrary"
+            ]
+        },
+        "dom4j:dom4j": {
+            "locked": "1.6.1",
+            "transitive": [
+                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -6900,6 +7076,12 @@
                 "com.netflix.governator:governator"
             ]
         },
+        "org.javassist:javassist": {
+            "locked": "3.18.2-GA",
+            "transitive": [
+                "org.reflections:reflections"
+            ]
+        },
         "org.jboss.logging:jboss-logging": {
             "locked": "3.1.0.CR2",
             "transitive": [
@@ -6935,6 +7117,10 @@
             "transitive": [
                 "com.netflix.governator:governator"
             ]
+        },
+        "org.reflections:reflections": {
+            "locked": "0.9.9-RC2",
+            "requested": "0.9.9-RC2"
         },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.21",
@@ -6988,6 +7174,12 @@
             "transitive": [
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
+            ]
+        },
+        "xml-apis:xml-apis": {
+            "locked": "1.0.b2",
+            "transitive": [
+                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -7068,10 +7260,11 @@
             ]
         },
         "com.google.code.findbugs:annotations": {
-            "locked": "2.0.0",
+            "locked": "2.0.2",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
-                "netflix:basicTypes"
+                "netflix:basicTypes",
+                "org.reflections:reflections"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -7099,7 +7292,8 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "netflix:nflibrary",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.reflections:reflections"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -7178,24 +7372,24 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
@@ -7230,7 +7424,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.13",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -7288,14 +7482,14 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.8",
+            "locked": "1.13",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.8",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-common-interfaces": {
@@ -7454,6 +7648,12 @@
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
                 "netflix:nflibrary"
+            ]
+        },
+        "dom4j:dom4j": {
+            "locked": "1.6.1",
+            "transitive": [
+                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -7770,6 +7970,12 @@
                 "com.netflix.governator:governator"
             ]
         },
+        "org.javassist:javassist": {
+            "locked": "3.18.2-GA",
+            "transitive": [
+                "org.reflections:reflections"
+            ]
+        },
         "org.jboss.logging:jboss-logging": {
             "locked": "3.1.0.CR2",
             "transitive": [
@@ -7805,6 +8011,10 @@
             "transitive": [
                 "com.netflix.governator:governator"
             ]
+        },
+        "org.reflections:reflections": {
+            "locked": "0.9.9-RC2",
+            "requested": "0.9.9-RC2"
         },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.21",
@@ -7858,6 +8068,12 @@
             "transitive": [
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
+            ]
+        },
+        "xml-apis:xml-apis": {
+            "locked": "1.0.b2",
+            "transitive": [
+                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {

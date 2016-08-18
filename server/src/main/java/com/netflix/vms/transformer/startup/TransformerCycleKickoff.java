@@ -5,7 +5,7 @@ import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metri
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleSuccess;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WaitForNextCycle;
-import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
+
 import com.google.inject.Inject;
 import com.netflix.archaius.api.Config;
 import com.netflix.aws.file.FileStore;
@@ -15,6 +15,7 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
+import com.netflix.vms.transformer.common.cup.CupLibrary;
 import com.netflix.vms.transformer.context.TransformerServerContext;
 import com.netflix.vms.transformer.elasticsearch.ElasticSearchClient;
 import com.netflix.vms.transformer.fastlane.FastlaneIdRetriever;
@@ -27,7 +28,10 @@ import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.fastlane.HollowFastlanePublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HermesBlobAnnouncer;
 import com.netflix.vms.transformer.rest.VMSPublishWorkflowHistoryAdmin;
+import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
+
 import java.util.function.Supplier;
+
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 import netflix.admin.videometadata.uploadstat.VMSServerUploadStatus;
 
@@ -42,21 +46,22 @@ public class TransformerCycleKickoff {
             TransformerConfig transformerConfig,
             Config config,
             OctoberSkyData octoberSkyData,
-            FastlaneIdRetriever fastlaneIdRetriever, 
+            CupLibrary cupLibrary,
+            FastlaneIdRetriever fastlaneIdRetriever,
             TransformerServerHealthIndicator healthIndicator) {
 
         FileStore.useMultipartUploadWhenApplicable(true);
 
-        TransformerContext ctx = ctx(esClient, transformerConfig, config, octoberSkyData, cassandraHelper, healthIndicator);
+        TransformerContext ctx = ctx(esClient, transformerConfig, config, octoberSkyData, cupLibrary, cassandraHelper, healthIndicator);
         PublishWorkflowStager publishStager = publishStager(ctx, fileStore, hermesBlobAnnouncer);
 
         TransformCycle cycle = new TransformCycle(
-                                            ctx,
-                                            fileStore,
-                                            publishStager,
-                                            transformerConfig.getConverterVip(),
-                                            transformerConfig.getTransformerVip());
-        
+                ctx,
+                fileStore,
+                publishStager,
+                transformerConfig.getConverterVip(),
+                transformerConfig.getTransformerVip());
+
         if(!isFastlane(ctx.getConfig()))
             restore(cycle, ctx.getConfig(), fileStore, hermesBlobAnnouncer);
 
@@ -71,7 +76,7 @@ public class TransformerCycleKickoff {
                         waitForMinCycleTimeToPass();
                         if (isFastlane(ctx.getConfig()))
                             setUpFastlaneContext();
-	                    cycle.cycle();
+                        cycle.cycle();
                         markCycleSucessful();
                         if(shouldTryCompaction(ctx.getConfig())) {
                             cycle.tryCompaction();
@@ -86,10 +91,10 @@ public class TransformerCycleKickoff {
             }
 
             private void waitForMinCycleTimeToPass() {
-            	if(isFastlane(ctx.getConfig()))
-            		return;
-            	
-            	long minCycleTime = (long)transformerConfig.getMinCycleCadenceMinutes() * 60 * 1000; 
+                if(isFastlane(ctx.getConfig()))
+                    return;
+
+                long minCycleTime = (long)transformerConfig.getMinCycleCadenceMinutes() * 60 * 1000;
                 long timeSinceLastCycle = System.currentTimeMillis() - previousCycleStartTime;
                 long msUntilNextCycle = minCycleTime - timeSinceLastCycle;
 
@@ -109,7 +114,7 @@ public class TransformerCycleKickoff {
 
                 previousCycleStartTime = System.currentTimeMillis();
             }
-            
+
             private void setUpFastlaneContext() {
                 ctx.setFastlaneIds(fastlaneIdRetriever.getFastlaneIds());
             }
@@ -133,11 +138,12 @@ public class TransformerCycleKickoff {
         t.start();
     }
 
-    private final TransformerContext ctx(ElasticSearchClient esClient, TransformerConfig transformerConfig, Config config, OctoberSkyData octoberSkyData, TransformerCassandraHelper cassandraHelper, TransformerServerHealthIndicator healthIndicator) {
+    private final TransformerContext ctx(ElasticSearchClient esClient, TransformerConfig transformerConfig, Config config, OctoberSkyData octoberSkyData, CupLibrary cupLibrary, TransformerCassandraHelper cassandraHelper, TransformerServerHealthIndicator healthIndicator) {
         return new TransformerServerContext(
                 new TransformerServerLogger(transformerConfig, esClient),
                 config,
                 octoberSkyData,
+                cupLibrary,
                 new AtlasTransformerMetricRecorder(),
                 cassandraHelper,
                 new LZ4VMSTransformerFiles(),
@@ -153,33 +159,34 @@ public class TransformerCycleKickoff {
 
         return new HollowPublishWorkflowStager(ctx, fileStore, hermesBlobAnnouncer, new DataSlicerImpl(), uploadStatus, ctx.getConfig().getTransformerVip());
     }
-    
+
     private void restore(TransformCycle cycle, TransformerConfig cfg, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer) {
         if(cfg.isRestoreFromPreviousStateEngine() && !isFastlane(cfg)) {
             long latestVersion = hermesBlobAnnouncer.getLatestAnnouncedVersionFromCassandra(cfg.getTransformerVip());
-            
+
             long restoreVersion = cfg.getRestoreFromSpecificVersion() != null ? cfg.getRestoreFromSpecificVersion() : latestVersion;
-            
+
             if(restoreVersion != Long.MIN_VALUE) {
                 VMSOutputDataClient outputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip());
                 outputClient.triggerRefreshTo(restoreVersion);
-                
+
                 if(outputClient.getCurrentVersionId() != restoreVersion)
-                    throw new IllegalStateException("Failed to restore from state: " + restoreVersion); 
-                
+                    throw new IllegalStateException("Failed to restore from state: " + restoreVersion);
+
                 cycle.restore(outputClient);
             } else {
-                throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.restoreFromPreviousStateEngine=false.");
+                if(cfg.isFailIfRestoreNotAvailable())
+                    throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.failIfRestoreNotAvailable=false");
             }
         }
     }
-    
+
     private boolean shouldTryCompaction(TransformerConfig cfg) {
         return !isFastlane(cfg) && cfg.isCompactionEnabled();
     }
 
     private boolean isFastlane(TransformerConfig cfg) {
-    	return cfg.getTransformerVip().endsWith("_override");
+        return cfg.getTransformerVip().endsWith("_override");
     }
 
 }

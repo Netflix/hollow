@@ -10,36 +10,47 @@ public class PersonArtworkTypeAPI extends HollowObjectTypeAPI {
 
     PersonArtworkTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
+            "personId",
+            "sourceFileId",
+            "seqNum",
             "derivatives",
             "locales",
-            "seqNum",
             "ordinalPriority",
-            "sourceFileId",
             "attributes",
-            "personId",
             "fileImageType"
         });
         this.delegateLookupImpl = new PersonArtworkDelegateLookupImpl(this);
     }
 
-    public int getDerivativesOrdinal(int ordinal) {
+    public long getPersonId(int ordinal) {
         if(fieldIndex[0] == -1)
-            return missingDataHandler().handleReferencedOrdinal("PersonArtwork", ordinal, "derivatives");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[0]);
+            return missingDataHandler().handleLong("PersonArtwork", ordinal, "personId");
+        return getTypeDataAccess().readLong(ordinal, fieldIndex[0]);
     }
 
-    public ArtworkDerivativeListTypeAPI getDerivativesTypeAPI() {
-        return getAPI().getArtworkDerivativeListTypeAPI();
+    public Long getPersonIdBoxed(int ordinal) {
+        long l;
+        if(fieldIndex[0] == -1) {
+            l = missingDataHandler().handleLong("PersonArtwork", ordinal, "personId");
+        } else {
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[0]);
+            l = getTypeDataAccess().readLong(ordinal, fieldIndex[0]);
+        }
+        if(l == Long.MIN_VALUE)
+            return null;
+        return Long.valueOf(l);
     }
 
-    public int getLocalesOrdinal(int ordinal) {
+
+
+    public int getSourceFileIdOrdinal(int ordinal) {
         if(fieldIndex[1] == -1)
-            return missingDataHandler().handleReferencedOrdinal("PersonArtwork", ordinal, "locales");
+            return missingDataHandler().handleReferencedOrdinal("PersonArtwork", ordinal, "sourceFileId");
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[1]);
     }
 
-    public ArtworkLocaleListTypeAPI getLocalesTypeAPI() {
-        return getAPI().getArtworkLocaleListTypeAPI();
+    public StringTypeAPI getSourceFileIdTypeAPI() {
+        return getAPI().getStringTypeAPI();
     }
 
     public long getSeqNum(int ordinal) {
@@ -63,19 +74,39 @@ public class PersonArtworkTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public long getOrdinalPriority(int ordinal) {
+    public int getDerivativesOrdinal(int ordinal) {
         if(fieldIndex[3] == -1)
+            return missingDataHandler().handleReferencedOrdinal("PersonArtwork", ordinal, "derivatives");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[3]);
+    }
+
+    public ArtworkDerivativeSetTypeAPI getDerivativesTypeAPI() {
+        return getAPI().getArtworkDerivativeSetTypeAPI();
+    }
+
+    public int getLocalesOrdinal(int ordinal) {
+        if(fieldIndex[4] == -1)
+            return missingDataHandler().handleReferencedOrdinal("PersonArtwork", ordinal, "locales");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[4]);
+    }
+
+    public ArtworkLocaleListTypeAPI getLocalesTypeAPI() {
+        return getAPI().getArtworkLocaleListTypeAPI();
+    }
+
+    public long getOrdinalPriority(int ordinal) {
+        if(fieldIndex[5] == -1)
             return missingDataHandler().handleLong("PersonArtwork", ordinal, "ordinalPriority");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[3]);
+        return getTypeDataAccess().readLong(ordinal, fieldIndex[5]);
     }
 
     public Long getOrdinalPriorityBoxed(int ordinal) {
         long l;
-        if(fieldIndex[3] == -1) {
+        if(fieldIndex[5] == -1) {
             l = missingDataHandler().handleLong("PersonArtwork", ordinal, "ordinalPriority");
         } else {
-            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[3]);
-            l = getTypeDataAccess().readLong(ordinal, fieldIndex[3]);
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[5]);
+            l = getTypeDataAccess().readLong(ordinal, fieldIndex[5]);
         }
         if(l == Long.MIN_VALUE)
             return null;
@@ -84,46 +115,15 @@ public class PersonArtworkTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public int getSourceFileIdOrdinal(int ordinal) {
-        if(fieldIndex[4] == -1)
-            return missingDataHandler().handleReferencedOrdinal("PersonArtwork", ordinal, "sourceFileId");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[4]);
-    }
-
-    public StringTypeAPI getSourceFileIdTypeAPI() {
-        return getAPI().getStringTypeAPI();
-    }
-
     public int getAttributesOrdinal(int ordinal) {
-        if(fieldIndex[5] == -1)
+        if(fieldIndex[6] == -1)
             return missingDataHandler().handleReferencedOrdinal("PersonArtwork", ordinal, "attributes");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[5]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[6]);
     }
 
     public ArtworkAttributesTypeAPI getAttributesTypeAPI() {
         return getAPI().getArtworkAttributesTypeAPI();
     }
-
-    public long getPersonId(int ordinal) {
-        if(fieldIndex[6] == -1)
-            return missingDataHandler().handleLong("PersonArtwork", ordinal, "personId");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[6]);
-    }
-
-    public Long getPersonIdBoxed(int ordinal) {
-        long l;
-        if(fieldIndex[6] == -1) {
-            l = missingDataHandler().handleLong("PersonArtwork", ordinal, "personId");
-        } else {
-            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[6]);
-            l = getTypeDataAccess().readLong(ordinal, fieldIndex[6]);
-        }
-        if(l == Long.MIN_VALUE)
-            return null;
-        return Long.valueOf(l);
-    }
-
-
 
     public int getFileImageTypeOrdinal(int ordinal) {
         if(fieldIndex[7] == -1)

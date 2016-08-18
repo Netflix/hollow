@@ -6,18 +6,6 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.NonVideoSp
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformInfo;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformProgress;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.SimultaneousExecutor;
@@ -79,6 +67,17 @@ import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
 import com.netflix.vms.transformer.namedlist.NamedListCompletionModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule.VideoNamedListPopulator;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SimpleTransformer {
 
@@ -88,7 +87,7 @@ public class SimpleTransformer {
     private final VMSTransformerWriteStateEngine writeStateEngine;
     private final TransformerContext ctx;
     private final CycleConstants cycleConstants;
-    private VMSTransformerIndexer indexer;
+    private final VMSTransformerIndexer indexer;
 
     SimpleTransformer(VMSHollowInputAPI inputAPI, VMSTransformerWriteStateEngine outputStateEngine) {
         this(inputAPI, outputStateEngine, new SimpleTransformerContext());
@@ -99,7 +98,12 @@ public class SimpleTransformer {
         this.api = inputAPI;
         this.writeStateEngine = outputStateEngine;
         this.ctx = ctx;
-        this.cycleConstants = new CycleConstants();
+        HollowReadStateEngine inputStateEngine = (HollowReadStateEngine)inputAPI.getDataAccess();
+        this.cycleConstants = new CycleConstants(inputStateEngine);
+        long startTime = System.currentTimeMillis();
+        this.indexer = new VMSTransformerIndexer(inputStateEngine);
+        long endTime = System.currentTimeMillis();
+        System.out.println("INDEXED IN " + (endTime - startTime) + "ms");
     }
 
     public void setPublishCycleDataTS(long time) {
@@ -107,11 +111,6 @@ public class SimpleTransformer {
     }
 
     public HollowWriteStateEngine transform() throws Throwable {
-        long startTime = System.currentTimeMillis();
-        indexer = new VMSTransformerIndexer((HollowReadStateEngine)api.getDataAccess());
-        long endTime = System.currentTimeMillis();
-        System.out.println("INDEXED IN " + (endTime - startTime) + "ms");
-
         AtomicInteger failedIndividualTransforms = new AtomicInteger(0);
 
         final VideoHierarchyInitializer hierarchyInitializer = new VideoHierarchyInitializer(api, indexer, ctx);
@@ -122,7 +121,7 @@ public class SimpleTransformer {
 
         this.videoNamedListModule = new VideoNamedListModule(ctx, cycleConstants, objectMapper);
 
-        startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
         VideoHierarchyGrouper showGrouper = new VideoHierarchyGrouper(api, ctx);
 
         final List<Set<VideoHierarchyGroup>> processGroups = showGrouper.getProcessGroups();
@@ -138,7 +137,7 @@ public class SimpleTransformer {
                 VideoMetaDataModule metadataModule = new VideoMetaDataModule(api, ctx, cycleConstants, indexer);
                 VideoMediaDataModule mediaDataModule = new VideoMediaDataModule(api, indexer);
                 VideoMiscDataModule miscDataModule = new VideoMiscDataModule(api, indexer);
-                VideoImagesDataModule imagesDataModule = new VideoImagesDataModule(api, ctx, objectMapper, indexer);
+                VideoImagesDataModule imagesDataModule = new VideoImagesDataModule(api, ctx, objectMapper, cycleConstants, indexer);
                 CountrySpecificDataModule countrySpecificModule = new CountrySpecificDataModule(api, ctx, cycleConstants, indexer);
                 VideoEpisodeCountryDecoratorModule countryDecoratorModule = new VideoEpisodeCountryDecoratorModule(api, objectMapper);
                 L10NVideoResourcesModule l10nVideoResourcesModule = new L10NVideoResourcesModule(api, ctx, objectMapper, indexer);
@@ -202,8 +201,8 @@ public class SimpleTransformer {
                 new TopNVideoDataModule(api, ctx, objectMapper),
                 new RolloutCharacterModule(api, ctx, objectMapper),
                 new RolloutVideoModule(api, ctx, objectMapper, indexer),
-                new PersonImagesModule(api, ctx, objectMapper, indexer),
-                new CharacterImagesModule(api, ctx, objectMapper, indexer)
+                new PersonImagesModule(api, ctx, objectMapper, cycleConstants, indexer),
+                new CharacterImagesModule(api, ctx, objectMapper, cycleConstants, indexer)
                 );
 
         // @formatter:on
@@ -238,7 +237,7 @@ public class SimpleTransformer {
         if(failedIndividualTransforms.get() > ctx.getConfig().getMaxTolerableFailedTransformerHierarchies())
             throw new RuntimeException("More than " + ctx.getConfig().getMaxTolerableFailedTransformerHierarchies() + " individual hierarchies failed transformation -- not publishing data");
         
-        endTime = System.currentTimeMillis();
+        long endTime = System.currentTimeMillis();
         System.out.println("Processed all videos in " + (endTime - startTime) + "ms");
 
         return writeStateEngine;

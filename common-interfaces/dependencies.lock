@@ -97,21 +97,21 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -121,7 +121,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.8",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -540,21 +540,21 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -564,7 +564,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.8",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -983,21 +983,21 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -1007,7 +1007,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.8",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -1426,21 +1426,21 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -1450,7 +1450,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.8",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -1862,11 +1862,11 @@
     },
     "resolutionRules": {
         "com.netflix.nebula:gradle-resolution-rules": {
-            "locked": "0.27.0",
+            "locked": "0.28.0",
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
-            "locked": "0.9.0",
+            "locked": "0.11.0",
             "requested": "latest.release"
         }
     },
@@ -1968,21 +1968,21 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -1992,7 +1992,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.8",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -2411,21 +2411,21 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -2435,7 +2435,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.8",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -2865,21 +2865,21 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -2889,7 +2889,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.8",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -3319,21 +3319,21 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -3343,7 +3343,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.8",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -3773,21 +3773,21 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -3797,7 +3797,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.8",
+            "locked": "1.13",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
