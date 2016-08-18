@@ -103,7 +103,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -447,7 +447,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.26",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -984,7 +984,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -2009,7 +2009,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -2017,7 +2017,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -2327,14 +2327,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.135",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.135",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -3104,7 +3104,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -3448,7 +3448,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.26",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -3985,7 +3985,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -5010,7 +5010,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -5018,7 +5018,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -5328,14 +5328,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.135",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.135",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -6105,7 +6105,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -6449,7 +6449,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.26",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -6986,7 +6986,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -8011,7 +8011,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -8019,7 +8019,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -8329,14 +8329,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.135",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.135",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -9106,7 +9106,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -9450,7 +9450,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.26",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -9987,7 +9987,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -11008,7 +11008,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -11016,7 +11016,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -11326,14 +11326,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.135",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.135",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -12125,7 +12125,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -12469,7 +12469,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.26",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -13006,7 +13006,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -14031,7 +14031,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -14039,7 +14039,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -14349,14 +14349,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.135",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.135",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -16218,7 +16218,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -16562,7 +16562,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.26",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -17099,7 +17099,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -18124,7 +18124,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -18132,7 +18132,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -18442,14 +18442,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.135",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.135",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -19219,7 +19219,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -19563,7 +19563,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.26",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -20100,7 +20100,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -21124,7 +21124,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -21132,7 +21132,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -21442,14 +21442,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.135",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.135",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -22200,7 +22200,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -22555,7 +22555,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.26",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -22563,13 +22563,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.14",
+            "locked": "1.15",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.25",
+            "locked": "1.26",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -23113,7 +23113,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -24167,7 +24167,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -24176,7 +24176,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -24488,14 +24488,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.135",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.135",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -25320,7 +25320,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -25675,7 +25675,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.26",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -25683,13 +25683,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.14",
+            "locked": "1.15",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.25",
+            "locked": "1.26",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -26233,7 +26233,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -27287,7 +27287,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -27296,7 +27296,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -27608,14 +27608,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.135",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.135",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -28440,7 +28440,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -28795,7 +28795,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.26",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -28803,13 +28803,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.14",
+            "locked": "1.15",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.25",
+            "locked": "1.26",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -29353,7 +29353,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -30407,7 +30407,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -30416,7 +30416,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -30728,14 +30728,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.135",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.135",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -31560,7 +31560,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -31915,7 +31915,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.26",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -31923,13 +31923,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.14",
+            "locked": "1.15",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.25",
+            "locked": "1.26",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -32473,7 +32473,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -33527,7 +33527,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -33536,7 +33536,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -33848,14 +33848,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.135",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.135",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -34668,7 +34668,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -35013,7 +35013,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.26",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -35555,7 +35555,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -36584,7 +36584,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -36592,7 +36592,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -36902,14 +36902,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.135",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.135",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -37686,7 +37686,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -38031,7 +38031,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.26",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -38573,7 +38573,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -39602,7 +39602,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -39610,7 +39610,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -39920,14 +39920,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.135",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.135",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -40704,7 +40704,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -41049,7 +41049,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.26",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -41591,7 +41591,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -42620,7 +42620,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -42628,7 +42628,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -42938,14 +42938,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.135",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.135",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -43722,7 +43722,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.2",
+            "locked": "3.0.3",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -44067,7 +44067,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.25",
+            "locked": "1.26",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -44609,7 +44609,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.8",
+            "locked": "0.12.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -45638,7 +45638,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -45646,7 +45646,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.14",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -45956,14 +45956,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.135",
+            "locked": "59.137",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.135",
+            "locked": "59.137",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
