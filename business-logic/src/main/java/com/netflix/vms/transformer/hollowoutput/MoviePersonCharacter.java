@@ -5,8 +5,6 @@ public class MoviePersonCharacter implements Cloneable {
     public long movieId = java.lang.Long.MIN_VALUE;
     public long personId = java.lang.Long.MIN_VALUE;
     public long characterId = java.lang.Long.MIN_VALUE;
-    public Strings characterResourceId = null;
-
     
     @Override
     public int hashCode() {

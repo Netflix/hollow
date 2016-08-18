@@ -19,7 +19,7 @@ import com.netflix.hollow.write.HollowWriteStateEngine;
 
 public class GenerateAPIs {
 
-    private static final String WORKSPACE = getenv().containsKey("VMSWORKSPACE") ? getenv("VMSWORKSPACE") : "/common/git";
+    private static final String WORKSPACE = getenv().containsKey("VMSWORKSPACE") ? getenv("VMSWORKSPACE") : "/home/djayaraman/work/stash";
 
     private static final File workspaceFile(String...parts) throws IOException {
         return new File(WORKSPACE, String.join(File.separator, Arrays.asList(parts))).getCanonicalFile();
