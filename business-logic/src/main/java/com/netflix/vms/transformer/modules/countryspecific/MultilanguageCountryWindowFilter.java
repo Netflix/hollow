@@ -57,6 +57,9 @@ public class MultilanguageCountryWindowFilter {
      */
     
     public boolean packageIsAvailableForLanguage(String language, PackageData pkg, int languageAvailability) {
+        if(pkg == null)
+            return false;
+        
         boolean anyLanguageDiscovered = false;
         
         for(EncodeSummaryDescriptor descriptor : pkg.muxAudioStreamSummary) {
