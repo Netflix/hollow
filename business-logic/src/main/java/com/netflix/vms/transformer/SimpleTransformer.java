@@ -361,7 +361,7 @@ public class SimpleTransformer {
 
     private List<MoviePersonCharacter> getPersonCharacters(HollowPrimaryKeyIndex primaryKeyIndex, CompleteVideo completeVideo) {
         List<MoviePersonCharacter> personCharacters = new ArrayList<>();
-        long movieId = completeVideo.id.value;
+        int movieId = completeVideo.id.value;
         int matchingOrdinal = primaryKeyIndex.getMatchingOrdinal(movieId);
         if(matchingOrdinal != -1) {
             MovieCharacterPersonHollow movieCharacterPersonHollow = api.getMovieCharacterPersonHollow(matchingOrdinal);
@@ -371,7 +371,7 @@ public class SimpleTransformer {
                 PersonCharacterHollow personCharacterHollow = iterator.next();
                 MoviePersonCharacter moviePersonCharacter = new MoviePersonCharacter();
                 moviePersonCharacter.movieId = movieId;
-                moviePersonCharacter.personId = personCharacterHollow._getPersonId();
+                moviePersonCharacter.personId = (int)personCharacterHollow._getPersonId();
                 moviePersonCharacter.characterId = personCharacterHollow._getCharacterId();
                 personCharacters.add(moviePersonCharacter);
             }
