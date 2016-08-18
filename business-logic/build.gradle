@@ -6,10 +6,10 @@ dependencies {
     compile 'com.google.guava:guava:18.0'
     compile 'netflix:nfi18n-core:latest.release'
     compile 'commons-codec:commons-codec:1.8+'
-    compile 'org.reflections:reflections:0.9.9-RC2'
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.assertj:assertj-core:3.3+'
+    testCompile 'org.reflections:reflections:0.9.9-RC2'
 }
 
 configurations {
