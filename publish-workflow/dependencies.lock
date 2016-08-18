@@ -2003,10 +2003,12 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.41",
+            "locked": "2.43",
             "transitive": [
                 "netflix:base-server",
-                "netflix:nf-filter"
+                "netflix:country-launch",
+                "netflix:nf-filter",
+                "netflix:streaming-utilities"
             ]
         },
         "netflix:nflibrary": {
@@ -4846,10 +4848,12 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.41",
+            "locked": "2.43",
             "transitive": [
                 "netflix:base-server",
-                "netflix:nf-filter"
+                "netflix:country-launch",
+                "netflix:nf-filter",
+                "netflix:streaming-utilities"
             ]
         },
         "netflix:nflibrary": {
@@ -7689,10 +7693,12 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.41",
+            "locked": "2.43",
             "transitive": [
                 "netflix:base-server",
-                "netflix:nf-filter"
+                "netflix:country-launch",
+                "netflix:nf-filter",
+                "netflix:streaming-utilities"
             ]
         },
         "netflix:nflibrary": {
@@ -10532,10 +10538,12 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.41",
+            "locked": "2.43",
             "transitive": [
                 "netflix:base-server",
-                "netflix:nf-filter"
+                "netflix:country-launch",
+                "netflix:nf-filter",
+                "netflix:streaming-utilities"
             ]
         },
         "netflix:nflibrary": {
@@ -13474,10 +13482,12 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.41",
+            "locked": "2.43",
             "transitive": [
                 "netflix:base-server",
-                "netflix:nf-filter"
+                "netflix:country-launch",
+                "netflix:nf-filter",
+                "netflix:streaming-utilities"
             ]
         },
         "netflix:nflibrary": {
@@ -16318,10 +16328,12 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.41",
+            "locked": "2.43",
             "transitive": [
                 "netflix:base-server",
-                "netflix:nf-filter"
+                "netflix:country-launch",
+                "netflix:nf-filter",
+                "netflix:streaming-utilities"
             ]
         },
         "netflix:nflibrary": {
@@ -19167,10 +19179,12 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.41",
+            "locked": "2.43",
             "transitive": [
                 "netflix:base-server",
-                "netflix:nf-filter"
+                "netflix:country-launch",
+                "netflix:nf-filter",
+                "netflix:streaming-utilities"
             ]
         },
         "netflix:nflibrary": {
@@ -22016,10 +22030,12 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.41",
+            "locked": "2.43",
             "transitive": [
                 "netflix:base-server",
-                "netflix:nf-filter"
+                "netflix:country-launch",
+                "netflix:nf-filter",
+                "netflix:streaming-utilities"
             ]
         },
         "netflix:nflibrary": {
@@ -24865,10 +24881,12 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.41",
+            "locked": "2.43",
             "transitive": [
                 "netflix:base-server",
-                "netflix:nf-filter"
+                "netflix:country-launch",
+                "netflix:nf-filter",
+                "netflix:streaming-utilities"
             ]
         },
         "netflix:nflibrary": {
