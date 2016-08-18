@@ -76,8 +76,6 @@ public class ContractRestrictionModule {
     }
 
     public Map<ISOCountry, Set<ContractRestriction>> getContractRestrictions(PackageHollow packages) {
-        assetTypeDeterminer.clearCache();
-
         Map<ISOCountry, Set<ContractRestriction>> restrictions = new HashMap<ISOCountry, Set<ContractRestriction>>();
 
         // build an asset type index to look up excluded downloadables
