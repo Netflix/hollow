@@ -352,7 +352,8 @@
         "com.ibm.icu:icu4j": {
             "locked": "54.1.1",
             "transitive": [
-                "netflix:nf-filter"
+                "netflix:nf-filter",
+                "netflix:nfi18n-core"
             ]
         },
         "com.jamesmurty:java-xmlbuilder": {
@@ -1147,6 +1148,7 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
                 "netflix:base-server",
+                "netflix:nfi18n-core",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-logimpl",
@@ -1549,6 +1551,7 @@
             "transitive": [
                 "netflix:base-server",
                 "netflix:mapping-registry",
+                "netflix:nfi18n-core",
                 "netflix:server-context",
                 "netflix:streaming-utilities"
             ]
@@ -1737,6 +1740,15 @@
                 "netflix:base-server"
             ]
         },
+        "netflix:nfi18n-core": {
+            "locked": "2.43",
+            "transitive": [
+                "netflix:base-server",
+                "netflix:country-launch",
+                "netflix:nf-filter",
+                "netflix:streaming-utilities"
+            ]
+        },
         "netflix:nfsso": {
             "locked": "1.49.0",
             "transitive": [
@@ -1780,6 +1792,7 @@
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client",
+                "netflix:nfi18n-core",
                 "netflix:platform-ipc",
                 "netflix:streaming-utilities"
             ]
@@ -1867,6 +1880,7 @@
                 "netflix:fit",
                 "netflix:fit-impl",
                 "netflix:netflix-config",
+                "netflix:nfi18n-core",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
                 "netflix:platform-ipc",
@@ -2769,7 +2783,8 @@
         "com.ibm.icu:icu4j": {
             "locked": "54.1.1",
             "transitive": [
-                "netflix:nf-filter"
+                "netflix:nf-filter",
+                "netflix:nfi18n-core"
             ]
         },
         "com.jamesmurty:java-xmlbuilder": {
@@ -3564,6 +3579,7 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
                 "netflix:base-server",
+                "netflix:nfi18n-core",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-logimpl",
@@ -3966,6 +3982,7 @@
             "transitive": [
                 "netflix:base-server",
                 "netflix:mapping-registry",
+                "netflix:nfi18n-core",
                 "netflix:server-context",
                 "netflix:streaming-utilities"
             ]
@@ -4154,6 +4171,15 @@
                 "netflix:base-server"
             ]
         },
+        "netflix:nfi18n-core": {
+            "locked": "2.43",
+            "transitive": [
+                "netflix:base-server",
+                "netflix:country-launch",
+                "netflix:nf-filter",
+                "netflix:streaming-utilities"
+            ]
+        },
         "netflix:nfsso": {
             "locked": "1.49.0",
             "transitive": [
@@ -4197,6 +4223,7 @@
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client",
+                "netflix:nfi18n-core",
                 "netflix:platform-ipc",
                 "netflix:streaming-utilities"
             ]
@@ -4284,6 +4311,7 @@
                 "netflix:fit",
                 "netflix:fit-impl",
                 "netflix:netflix-config",
+                "netflix:nfi18n-core",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
                 "netflix:platform-ipc",
@@ -5186,7 +5214,8 @@
         "com.ibm.icu:icu4j": {
             "locked": "54.1.1",
             "transitive": [
-                "netflix:nf-filter"
+                "netflix:nf-filter",
+                "netflix:nfi18n-core"
             ]
         },
         "com.jamesmurty:java-xmlbuilder": {
@@ -5981,6 +6010,7 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
                 "netflix:base-server",
+                "netflix:nfi18n-core",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-logimpl",
@@ -6383,6 +6413,7 @@
             "transitive": [
                 "netflix:base-server",
                 "netflix:mapping-registry",
+                "netflix:nfi18n-core",
                 "netflix:server-context",
                 "netflix:streaming-utilities"
             ]
@@ -6571,6 +6602,15 @@
                 "netflix:base-server"
             ]
         },
+        "netflix:nfi18n-core": {
+            "locked": "2.43",
+            "transitive": [
+                "netflix:base-server",
+                "netflix:country-launch",
+                "netflix:nf-filter",
+                "netflix:streaming-utilities"
+            ]
+        },
         "netflix:nfsso": {
             "locked": "1.49.0",
             "transitive": [
@@ -6614,6 +6654,7 @@
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client",
+                "netflix:nfi18n-core",
                 "netflix:platform-ipc",
                 "netflix:streaming-utilities"
             ]
@@ -6701,6 +6742,7 @@
                 "netflix:fit",
                 "netflix:fit-impl",
                 "netflix:netflix-config",
+                "netflix:nfi18n-core",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
                 "netflix:platform-ipc",
@@ -7603,7 +7645,8 @@
         "com.ibm.icu:icu4j": {
             "locked": "54.1.1",
             "transitive": [
-                "netflix:nf-filter"
+                "netflix:nf-filter",
+                "netflix:nfi18n-core"
             ]
         },
         "com.jamesmurty:java-xmlbuilder": {
@@ -8398,6 +8441,7 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
                 "netflix:base-server",
+                "netflix:nfi18n-core",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-logimpl",
@@ -8800,6 +8844,7 @@
             "transitive": [
                 "netflix:base-server",
                 "netflix:mapping-registry",
+                "netflix:nfi18n-core",
                 "netflix:server-context",
                 "netflix:streaming-utilities"
             ]
@@ -8988,6 +9033,15 @@
                 "netflix:base-server"
             ]
         },
+        "netflix:nfi18n-core": {
+            "locked": "2.43",
+            "transitive": [
+                "netflix:base-server",
+                "netflix:country-launch",
+                "netflix:nf-filter",
+                "netflix:streaming-utilities"
+            ]
+        },
         "netflix:nfsso": {
             "locked": "1.49.0",
             "transitive": [
@@ -9031,6 +9085,7 @@
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client",
+                "netflix:nfi18n-core",
                 "netflix:platform-ipc",
                 "netflix:streaming-utilities"
             ]
@@ -9118,6 +9173,7 @@
                 "netflix:fit",
                 "netflix:fit-impl",
                 "netflix:netflix-config",
+                "netflix:nfi18n-core",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
                 "netflix:platform-ipc",
@@ -10119,7 +10175,8 @@
         "com.ibm.icu:icu4j": {
             "locked": "54.1.1",
             "transitive": [
-                "netflix:nf-filter"
+                "netflix:nf-filter",
+                "netflix:nfi18n-core"
             ]
         },
         "com.jamesmurty:java-xmlbuilder": {
@@ -10914,6 +10971,7 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
                 "netflix:base-server",
+                "netflix:nfi18n-core",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-logimpl",
@@ -11316,6 +11374,7 @@
             "transitive": [
                 "netflix:base-server",
                 "netflix:mapping-registry",
+                "netflix:nfi18n-core",
                 "netflix:server-context",
                 "netflix:streaming-utilities"
             ]
@@ -11504,6 +11563,15 @@
                 "netflix:base-server"
             ]
         },
+        "netflix:nfi18n-core": {
+            "locked": "2.43",
+            "transitive": [
+                "netflix:base-server",
+                "netflix:country-launch",
+                "netflix:nf-filter",
+                "netflix:streaming-utilities"
+            ]
+        },
         "netflix:nfsso": {
             "locked": "1.49.0",
             "transitive": [
@@ -11547,6 +11615,7 @@
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client",
+                "netflix:nfi18n-core",
                 "netflix:platform-ipc",
                 "netflix:streaming-utilities"
             ]
@@ -11634,6 +11703,7 @@
                 "netflix:fit",
                 "netflix:fit-impl",
                 "netflix:netflix-config",
+                "netflix:nfi18n-core",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
                 "netflix:platform-ipc",
@@ -12536,7 +12606,8 @@
         "com.ibm.icu:icu4j": {
             "locked": "54.1.1",
             "transitive": [
-                "netflix:nf-filter"
+                "netflix:nf-filter",
+                "netflix:nfi18n-core"
             ]
         },
         "com.jamesmurty:java-xmlbuilder": {
@@ -13331,6 +13402,7 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
                 "netflix:base-server",
+                "netflix:nfi18n-core",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-logimpl",
@@ -13734,6 +13806,7 @@
             "transitive": [
                 "netflix:base-server",
                 "netflix:mapping-registry",
+                "netflix:nfi18n-core",
                 "netflix:server-context",
                 "netflix:streaming-utilities"
             ]
@@ -13922,6 +13995,15 @@
                 "netflix:base-server"
             ]
         },
+        "netflix:nfi18n-core": {
+            "locked": "2.43",
+            "transitive": [
+                "netflix:base-server",
+                "netflix:country-launch",
+                "netflix:nf-filter",
+                "netflix:streaming-utilities"
+            ]
+        },
         "netflix:nfsso": {
             "locked": "1.49.0",
             "transitive": [
@@ -13965,6 +14047,7 @@
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client",
+                "netflix:nfi18n-core",
                 "netflix:platform-ipc",
                 "netflix:streaming-utilities"
             ]
@@ -14052,6 +14135,7 @@
                 "netflix:fit",
                 "netflix:fit-impl",
                 "netflix:netflix-config",
+                "netflix:nfi18n-core",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
                 "netflix:platform-ipc",
@@ -14959,7 +15043,8 @@
         "com.ibm.icu:icu4j": {
             "locked": "54.1.1",
             "transitive": [
-                "netflix:nf-filter"
+                "netflix:nf-filter",
+                "netflix:nfi18n-core"
             ]
         },
         "com.jamesmurty:java-xmlbuilder": {
@@ -15754,6 +15839,7 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
                 "netflix:base-server",
+                "netflix:nfi18n-core",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-logimpl",
@@ -16157,6 +16243,7 @@
             "transitive": [
                 "netflix:base-server",
                 "netflix:mapping-registry",
+                "netflix:nfi18n-core",
                 "netflix:server-context",
                 "netflix:streaming-utilities"
             ]
@@ -16345,6 +16432,15 @@
                 "netflix:base-server"
             ]
         },
+        "netflix:nfi18n-core": {
+            "locked": "2.43",
+            "transitive": [
+                "netflix:base-server",
+                "netflix:country-launch",
+                "netflix:nf-filter",
+                "netflix:streaming-utilities"
+            ]
+        },
         "netflix:nfsso": {
             "locked": "1.49.0",
             "transitive": [
@@ -16388,6 +16484,7 @@
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client",
+                "netflix:nfi18n-core",
                 "netflix:platform-ipc",
                 "netflix:streaming-utilities"
             ]
@@ -16475,6 +16572,7 @@
                 "netflix:fit",
                 "netflix:fit-impl",
                 "netflix:netflix-config",
+                "netflix:nfi18n-core",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
                 "netflix:platform-ipc",
@@ -17382,7 +17480,8 @@
         "com.ibm.icu:icu4j": {
             "locked": "54.1.1",
             "transitive": [
-                "netflix:nf-filter"
+                "netflix:nf-filter",
+                "netflix:nfi18n-core"
             ]
         },
         "com.jamesmurty:java-xmlbuilder": {
@@ -18177,6 +18276,7 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
                 "netflix:base-server",
+                "netflix:nfi18n-core",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-logimpl",
@@ -18580,6 +18680,7 @@
             "transitive": [
                 "netflix:base-server",
                 "netflix:mapping-registry",
+                "netflix:nfi18n-core",
                 "netflix:server-context",
                 "netflix:streaming-utilities"
             ]
@@ -18768,6 +18869,15 @@
                 "netflix:base-server"
             ]
         },
+        "netflix:nfi18n-core": {
+            "locked": "2.43",
+            "transitive": [
+                "netflix:base-server",
+                "netflix:country-launch",
+                "netflix:nf-filter",
+                "netflix:streaming-utilities"
+            ]
+        },
         "netflix:nfsso": {
             "locked": "1.49.0",
             "transitive": [
@@ -18811,6 +18921,7 @@
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client",
+                "netflix:nfi18n-core",
                 "netflix:platform-ipc",
                 "netflix:streaming-utilities"
             ]
@@ -18898,6 +19009,7 @@
                 "netflix:fit",
                 "netflix:fit-impl",
                 "netflix:netflix-config",
+                "netflix:nfi18n-core",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
                 "netflix:platform-ipc",
@@ -19805,7 +19917,8 @@
         "com.ibm.icu:icu4j": {
             "locked": "54.1.1",
             "transitive": [
-                "netflix:nf-filter"
+                "netflix:nf-filter",
+                "netflix:nfi18n-core"
             ]
         },
         "com.jamesmurty:java-xmlbuilder": {
@@ -20600,6 +20713,7 @@
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
                 "netflix:base-server",
+                "netflix:nfi18n-core",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-logimpl",
@@ -21003,6 +21117,7 @@
             "transitive": [
                 "netflix:base-server",
                 "netflix:mapping-registry",
+                "netflix:nfi18n-core",
                 "netflix:server-context",
                 "netflix:streaming-utilities"
             ]
@@ -21191,6 +21306,15 @@
                 "netflix:base-server"
             ]
         },
+        "netflix:nfi18n-core": {
+            "locked": "2.43",
+            "transitive": [
+                "netflix:base-server",
+                "netflix:country-launch",
+                "netflix:nf-filter",
+                "netflix:streaming-utilities"
+            ]
+        },
         "netflix:nfsso": {
             "locked": "1.49.0",
             "transitive": [
@@ -21234,6 +21358,7 @@
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client",
+                "netflix:nfi18n-core",
                 "netflix:platform-ipc",
                 "netflix:streaming-utilities"
             ]
@@ -21321,6 +21446,7 @@
                 "netflix:fit",
                 "netflix:fit-impl",
                 "netflix:netflix-config",
+                "netflix:nfi18n-core",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
                 "netflix:platform-ipc",

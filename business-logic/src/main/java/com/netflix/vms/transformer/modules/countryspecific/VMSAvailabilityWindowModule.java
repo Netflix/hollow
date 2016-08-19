@@ -61,6 +61,7 @@ public class VMSAvailabilityWindowModule {
     private Map<Integer, VideoPackageData> transformedPackageData;
 
     private final WindowPackageContractInfoModule windowPackageContractInfoModule;
+    private final MultilanguageCountryWindowFilter multilanguageCountryWindowFilter;
 
     public VMSAvailabilityWindowModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
         this.api = api;
@@ -69,6 +70,7 @@ public class VMSAvailabilityWindowModule {
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
 
         this.windowPackageContractInfoModule = new WindowPackageContractInfoModule(api, ctx, cycleConstants, indexer);
+        this.multilanguageCountryWindowFilter = new MultilanguageCountryWindowFilter(cycleConstants);
 
         EMPTY_CUP_TOKENS = new LinkedHashSetOfStrings();
         EMPTY_CUP_TOKENS.ordinals = Collections.emptyList();
@@ -82,20 +84,20 @@ public class VMSAvailabilityWindowModule {
         this.transformedPackageData = data;
     }
 
-    public List<VMSAvailabilityWindow> populateWindowData(Integer videoId, String country, CompleteVideoCountrySpecificData data, StatusHollow videoRights, CountrySpecificRollupValues rollup) {
+    public List<VMSAvailabilityWindow> populateWindowData(Integer videoId, String country, String locale, CompleteVideoCountrySpecificData data, StatusHollow videoRights, CountrySpecificRollupValues rollup) {
         boolean isGoLive = isGoLive(videoRights);
 
         RightsHollow rights = videoRights._getRights();
         if((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
             populateRolledUpWindowData(videoId, data, rollup, rights, isGoLive);
         } else {
-            populateEpisodeOrStandaloneWindowData(videoId, country, data, rollup, isGoLive, rights);
+            populateEpisodeOrStandaloneWindowData(videoId, country, locale, data, rollup, isGoLive, rights);
         }
 
         return data.mediaAvailabilityWindows;
     }
 
-    private void populateEpisodeOrStandaloneWindowData(Integer videoId, String country, CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup, boolean isGoLive, RightsHollow rights) {
+    private void populateEpisodeOrStandaloneWindowData(Integer videoId, String country, String locale, CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup, boolean isGoLive, RightsHollow rights) {
         List<VMSAvailabilityWindow> availabilityWindows = new ArrayList<VMSAvailabilityWindow>();
 
         long minWindowStartDate = Long.MAX_VALUE;
@@ -142,6 +144,13 @@ public class VMSAvailabilityWindowModule {
                 boolean isAvailableForDownload = entry.getValue().isAvailableForDownload;
 
                 if(rightsContract != null) {
+                    int contractAvailability = -1;
+                    if(locale != null) {
+                        contractAvailability = multilanguageCountryWindowFilter.contractAvailabilityForLanguage(locale, rightsContract);
+                        if(contractAvailability == 0)
+                            continue;
+                    }
+                    
                     ListOfRightsContractPackageHollow packageIdList = rightsContract._getPackages();
 
                     if(packageIdList != null && !packageIdList.isEmpty()) {
@@ -217,6 +226,10 @@ public class VMSAvailabilityWindowModule {
                                 } else {
                                     includedWindowPackageData = true;
                                     PackageData packageData = getPackageData(videoId, pkg._getPackageId());
+                                    
+                                    if(locale != null && !multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAvailability))
+                                        continue;
+                                    
                                     if(packageData != null) {
                                         /// package data is available
                                         windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(packageData, rightsContract, contract, country, isAvailableForDownload);

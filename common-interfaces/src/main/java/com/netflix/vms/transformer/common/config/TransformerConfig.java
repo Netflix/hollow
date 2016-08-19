@@ -171,4 +171,7 @@ public interface TransformerConfig {
     
     @DefaultValue("28")
     int getNewContentFlagDuration();
+    
+    @DefaultValue("BE,CH,LU")
+    String getMultilanguageCatalogCountries();
 }
