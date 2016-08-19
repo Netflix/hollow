@@ -959,7 +959,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.21",
+            "locked": "1.22",
             "requested": "latest.release",
             "transitive": [
                 "netflix:cryptexclient-standalone"
@@ -2009,7 +2009,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -2017,7 +2017,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -3961,7 +3961,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.21",
+            "locked": "1.22",
             "requested": "latest.release",
             "transitive": [
                 "netflix:cryptexclient-standalone"
@@ -5011,7 +5011,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -5019,7 +5019,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -6963,7 +6963,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.21",
+            "locked": "1.22",
             "requested": "latest.release",
             "transitive": [
                 "netflix:cryptexclient-standalone"
@@ -8013,7 +8013,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -8021,7 +8021,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -9965,7 +9965,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.21",
+            "locked": "1.22",
             "requested": "latest.release",
             "transitive": [
                 "netflix:cryptexclient-standalone"
@@ -11011,7 +11011,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -11019,7 +11019,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -12985,7 +12985,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.21",
+            "locked": "1.22",
             "requested": "latest.release",
             "transitive": [
                 "netflix:cryptexclient-standalone"
@@ -14035,7 +14035,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -14043,7 +14043,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -17079,7 +17079,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.21",
+            "locked": "1.22",
             "requested": "latest.release",
             "transitive": [
                 "netflix:cryptexclient-standalone"
@@ -18129,7 +18129,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -18137,7 +18137,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -20081,7 +20081,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.21",
+            "locked": "1.22",
             "requested": "latest.release",
             "transitive": [
                 "netflix:cryptexclient-standalone"
@@ -21130,7 +21130,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -21138,7 +21138,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -23094,7 +23094,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.21",
+            "locked": "1.22",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test",
@@ -24174,7 +24174,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -24183,7 +24183,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -26215,7 +26215,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.21",
+            "locked": "1.22",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test",
@@ -27295,7 +27295,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -27304,7 +27304,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -29336,7 +29336,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.21",
+            "locked": "1.22",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test",
@@ -30416,7 +30416,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -30425,7 +30425,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -32457,7 +32457,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.21",
+            "locked": "1.22",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test",
@@ -33537,7 +33537,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -33546,7 +33546,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -35541,7 +35541,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.21",
+            "locked": "1.22",
             "requested": "latest.release",
             "transitive": [
                 "netflix:cryptexclient-standalone"
@@ -36595,7 +36595,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -36603,7 +36603,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -38560,7 +38560,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.21",
+            "locked": "1.22",
             "requested": "latest.release",
             "transitive": [
                 "netflix:cryptexclient-standalone"
@@ -39614,7 +39614,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -39622,7 +39622,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -41579,7 +41579,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.21",
+            "locked": "1.22",
             "requested": "latest.release",
             "transitive": [
                 "netflix:cryptexclient-standalone"
@@ -42633,7 +42633,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -42641,7 +42641,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -44598,7 +44598,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.21",
+            "locked": "1.22",
             "requested": "latest.release",
             "transitive": [
                 "netflix:cryptexclient-standalone"
@@ -45652,7 +45652,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
@@ -45660,7 +45660,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.17",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
