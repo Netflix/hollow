@@ -227,7 +227,7 @@ public class VMSAvailabilityWindowModule {
                                     includedWindowPackageData = true;
                                     PackageData packageData = getPackageData(videoId, pkg._getPackageId());
                                     
-                                    if(locale != null && packageData != null && !multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAvailability))
+                                    if(locale != null && !multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAvailability))
                                         continue;
                                     
                                     if(packageData != null) {

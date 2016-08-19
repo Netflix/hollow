@@ -48,7 +48,7 @@ public class SimpleOctoberSkyData implements OctoberSkyData {
     }
     
     @Override
-    public Set<String> getMultilanguageCatalogLocalesForCountry(String country) {
+    public Set<String> getCatalogLanguages(String country) {
         return countryLocales.get(country);
     }
 

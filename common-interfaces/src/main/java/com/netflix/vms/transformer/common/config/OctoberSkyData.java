@@ -6,7 +6,7 @@ public interface OctoberSkyData {
 	
 	public Set<String> getSupportedCountries();
 	
-    public Set<String> getMultilanguageCatalogLocalesForCountry(String country);
+    public Set<String> getCatalogLanguages(String country);
     
     public void refresh();
 
