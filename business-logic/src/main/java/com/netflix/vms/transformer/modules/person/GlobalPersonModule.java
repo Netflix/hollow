@@ -113,8 +113,8 @@ public class GlobalPersonModule extends AbstractTransformModule {
                     while(personCharacterOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
                         PersonCharacterHollow personCharacterHollow = api.getPersonCharacterHollow(personCharacterOrdinal);
                         MoviePersonCharacter moviePersonCharacter = new MoviePersonCharacter();
-                        moviePersonCharacter.movieId = movieId;
-                        moviePersonCharacter.personId = personId;
+                        moviePersonCharacter.movieId = (int)movieId;
+                        moviePersonCharacter.personId = (int)personId;
                         moviePersonCharacter.characterId = personCharacterHollow._getCharacterId();
                         movieCharacters.add(moviePersonCharacter);
                         personCharacterOrdinal = personCharacterIterator.next();
@@ -123,6 +123,7 @@ public class GlobalPersonModule extends AbstractTransformModule {
                 moviePersonCharacterOrdinal = moviePersonCharacterIterator.next();
             }
         }
+        Collections.sort(movieCharacters);
         return movieCharacters;
     }
 

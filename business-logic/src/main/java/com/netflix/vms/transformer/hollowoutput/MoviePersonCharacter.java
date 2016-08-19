@@ -1,20 +1,18 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class MoviePersonCharacter implements Cloneable {
-    public long movieId = java.lang.Long.MIN_VALUE;
-    public long personId = java.lang.Long.MIN_VALUE;
+public class MoviePersonCharacter implements Cloneable, Comparable<MoviePersonCharacter> {
+    public int movieId = java.lang.Integer.MIN_VALUE;
+    public int personId = java.lang.Integer.MIN_VALUE;
     public long characterId = java.lang.Long.MIN_VALUE;
-    public Strings characterResourceId = null;
-
     
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + (int) (characterId ^ (characterId >>> 32));
-        result = prime * result + (int) (movieId ^ (movieId >>> 32));
-        result = prime * result + (int) (personId ^ (personId >>> 32));
+        result = prime * result + movieId;
+        result = prime * result + personId;
         return result;
     }
 
@@ -52,4 +50,17 @@ public class MoviePersonCharacter implements Cloneable {
 
     @SuppressWarnings("unused")
     private int __assigned_ordinal = -1;
+
+    @Override
+    public int compareTo(MoviePersonCharacter o) {
+        if(movieId != o.movieId){
+            return java.lang.Integer.compare(movieId, o.movieId);
+        }else if(personId != o.personId) {
+            return java.lang.Integer.compare(personId, o.personId);
+        }else if(characterId != o.characterId) {
+            return java.lang.Long.compare(characterId, o.characterId);
+        }
+        return 0;
+    }
+
 }
