@@ -372,8 +372,8 @@ public class SimpleTransformer {
             while(iterator.hasNext()) {
                 PersonCharacterHollow personCharacterHollow = iterator.next();
                 MoviePersonCharacter moviePersonCharacter = new MoviePersonCharacter();
-                moviePersonCharacter.movieId = (int)movieId;
-                moviePersonCharacter.personId = (int)personCharacterHollow._getPersonId();
+                moviePersonCharacter.movieId = movieId;
+                moviePersonCharacter.personId = personCharacterHollow._getPersonId();
                 moviePersonCharacter.characterId = personCharacterHollow._getCharacterId();
                 personCharacters.add(moviePersonCharacter);
             }
