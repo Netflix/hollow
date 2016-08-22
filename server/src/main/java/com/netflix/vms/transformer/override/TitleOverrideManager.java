@@ -50,6 +50,10 @@ public class TitleOverrideManager {
         activeJobs.clear();
     }
 
+    public synchronized void prepareForNextCycle() {
+        activeJobs.clear();
+    }
+
     /**
      * Process the title override for specific spec asynchronously
      *
@@ -70,26 +74,38 @@ public class TitleOverrideManager {
     }
 
     /**
+     * Just return the completed results without waiting pending ones
+     */
+    public List<HollowReadStateEngine> getCompletedResults() throws InterruptedException, ExecutionException {
+        return getResults("COMPLETED JOBS", false);
+    }
+
+    /**
      * Return the result of the complete job
      */
-    public synchronized List<HollowReadStateEngine> waitForResults() throws InterruptedException, ExecutionException {
+    public List<HollowReadStateEngine> waitForResults() throws InterruptedException, ExecutionException {
         mainExecutor.awaitSuccessfulCompletionOfCurrentTasks();
+        return getResults("ALL JOBS", true);
+    }
 
+    private synchronized List<HollowReadStateEngine> getResults(String label, boolean isPropagateFailure) throws InterruptedException, ExecutionException {
         // Collect Results on sorted Order
         List<HollowReadStateEngine> resultList = new ArrayList<>();
         for (TitleOverrideJobSpec jobSpec : sortJobSpecs(activeJobs.keySet())) {
             TitleOverrideProcessorJob job = activeJobs.get(jobSpec);
 
-            if (job.isSuccessfull()) {
+            if (job.isCompletedSuccessfully()) {
                 resultList.add(job.getResult());
             } else {
-                throw new ExecutionException("TitleOverrideProcessorJob failure", job.getFailure());
+                if (isPropagateFailure) throw new ExecutionException("TitleOverrideProcessorJob failure", job.getFailure());
             }
         }
 
-        ctx.getLogger().info(TransformerLogTag.TitleOverride, "Misc Stat prioJobs={} currJobs={} results={}", priorJobs.size(), activeJobs.size(), resultList.size());
-        priorJobs = new HashMap<>(activeJobs);
-        activeJobs.clear();
+        ctx.getLogger().info(TransformerLogTag.TitleOverride, "[{}] Misc Stat prioJobs={} currJobs={} results={}", label, priorJobs.size(), activeJobs.size(), resultList.size());
+        boolean allJobsCompleted = resultList.size() == activeJobs.size();
+        if (allJobsCompleted) {
+            priorJobs = new HashMap<>(activeJobs);
+        }
 
         return resultList;
     }
@@ -175,12 +191,10 @@ public class TitleOverrideManager {
 
         @Override
         public void run() {
-            // skip if result is already available
-            if (resultStateEngine != null) {
-                return;
-            }
+            if (isCompletedSuccessfully()) return;
 
             try {
+                reset();
                 resultStateEngine = processor.process(jobSpec.version, jobSpec.topNode);
             } catch (Throwable e) {
                 ctx.getLogger().error(TransformerLogTag.TitleOverride, "Failed to process override title={} for version={} and vip={}", jobSpec.topNode, jobSpec.version, processor.getVip());
@@ -188,12 +202,16 @@ public class TitleOverrideManager {
             }
         }
 
+        public boolean isCompletedSuccessfully() {
+            return resultStateEngine != null && failure == null;
+        }
+
         public HollowReadStateEngine getResult() {
             return resultStateEngine;
         }
 
-        public boolean isSuccessfull() {
-            return failure == null;
+        public void reset() {
+            failure = null;
         }
 
         public Throwable getFailure() {

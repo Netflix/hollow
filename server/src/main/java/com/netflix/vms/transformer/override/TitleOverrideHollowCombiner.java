@@ -44,6 +44,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,6 +65,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class TitleOverrideHollowCombiner {
     public static final String NAMEDLIST_TYPE_STATE_NAME = NamedCollectionHolder.getType();
+    private static final String SET_OF_PREFIX = "SetOf";
+    private static final String MAP_OF_PREFIX = "MapOfStringsToSetOf";
 
     private final TransformerContext ctx;
     private final HollowCombiner combiner;
@@ -108,16 +111,17 @@ public class TitleOverrideHollowCombiner {
         // 1) allInputs should have fastlane at the end of the list so that pinned video has higher precedence over fastlane
         // 2) Prioritize Fastlane non video related data - allows newer non-video data to have higher precedence
         HollowCombinerExcludePrimaryKeysCopyDirector copyDirector = new HollowCombinerExcludePrimaryKeysCopyDirector();
-        prioritizeFastLaneTypes(copyDirector, OutputTypeConfig.NONE_VIDEO_RELATED_TYPES, fastlane, overrideTitles, allInputs);
+        prioritizeFastLaneTypes(copyDirector, OutputTypeConfig.NON_VIDEO_RELATED_TYPES, fastlane, overrideTitles, allInputs);
         HollowCombiner combiner = new HollowCombiner(copyDirector, output, allInputs);
 
-        // 3) Configure times to skip to be parity with fastlane produced data
+        // 3) Configure to skip NamedLists and its sub-types
         // 4) Configure PrimaryKey for record deduping and remapping
         List<PrimaryKey> primaryKeys = new ArrayList<>();
-        Set<OutputTypeConfig> excludeTypes = getExcludeTypes();
+        Set<String> excludeTypes = getExcludeTypes();
         for (OutputTypeConfig config : OutputTypeConfig.values()) {
-            if (excludeTypes.contains(config)) {
-                combiner.addIgnoredTypes(config.getType());
+            String typeName = config.getType();
+            if (excludeTypes.contains(typeName)) {
+                combiner.addIgnoredTypes(typeName);
             } else {
                 primaryKeys.add(config.getPrimaryKey());
             }
@@ -127,9 +131,14 @@ public class TitleOverrideHollowCombiner {
         return combiner;
     }
 
-    private static Set<OutputTypeConfig> getExcludeTypes() {
-        Set<OutputTypeConfig> excludeTypes = new HashSet<>(OutputTypeConfig.FASTLANE_SKIP_TYPES); //
-        excludeTypes.add(NamedCollectionHolder); // NamedList needs special manual combining
+    private static Set<String> getExcludeTypes() {
+        // NamedList needs special manual combining so must be excluded as well as its sub-types
+        Set<String> excludeTypes = new HashSet<>();
+        excludeTypes.add(NamedCollectionHolder.getType());
+        for (String subType : Arrays.asList("Video", "Episode", "VPerson")) {
+            excludeTypes.add(SET_OF_PREFIX + subType);
+            excludeTypes.add(MAP_OF_PREFIX + subType);
+        }
         return excludeTypes;
     }
 
@@ -375,7 +384,7 @@ public class TitleOverrideHollowCombiner {
 
 
     private int writeToOutput(Map<String, Set<Integer>> itemLists, HollowObjectWriteRecord itemRec, String typeName, String itemIdFieldName, HollowWriteStateEngine output) {
-        String setName = "SetOf" + typeName;
+        String setName = SET_OF_PREFIX + typeName;
         HollowMapWriteRecord mapRec = new HollowMapWriteRecord();
         HollowSetWriteRecord setRec = new HollowSetWriteRecord();
         HollowObjectWriteRecord stringsRec = new HollowObjectWriteRecord((HollowObjectSchema)output.getSchema("Strings"));
@@ -394,6 +403,6 @@ public class TitleOverrideHollowCombiner {
             mapRec.addEntry(nameOrdinal, setOrdinal, itemListEntry.getKey().hashCode());
         }
 
-        return output.add("MapOfStringsToSetOf" + typeName, mapRec);
+        return output.add(MAP_OF_PREFIX + typeName, mapRec);
     }
 }

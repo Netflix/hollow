@@ -44,7 +44,7 @@ public enum OutputTypeConfig {
     private final static EnumSet<OutputTypeConfig> VIDEO_RELATED_TYPES_ENUMSET = EnumSet.of(
             CompleteVideo, VideoEpisode_CountryList, RolloutVideo, GlobalVideo, FallbackUSArtwork, LanguageRights, VideoPackageData, PackageData);
     public final static Set<OutputTypeConfig> VIDEO_RELATED_TYPES = Collections.unmodifiableSet(VIDEO_RELATED_TYPES_ENUMSET);
-    public final static Set<OutputTypeConfig> NONE_VIDEO_RELATED_TYPES = Collections.unmodifiableSet(EnumSet.complementOf(VIDEO_RELATED_TYPES_ENUMSET));
+    public final static Set<OutputTypeConfig> NON_VIDEO_RELATED_TYPES = Collections.unmodifiableSet(EnumSet.complementOf(VIDEO_RELATED_TYPES_ENUMSET));
 
     public final static Set<OutputTypeConfig> PERSON_RELATED_TYPES = Collections.unmodifiableSet(EnumSet.of(
             GlobalPerson, PersonImages));
@@ -59,7 +59,7 @@ public enum OutputTypeConfig {
             ArtWorkImageFormatEntry, ArtWorkImageTypeEntry, ArtWorkImageRecipe, DefaultExtensionRecipe,
             StreamData, DrmKey, WmDrmKey));
 
-    public final static Set<OutputTypeConfig> FASTLANE_SKIP_TYPES = Collections.unmodifiableSet(EnumSet.of(
+    public final static Set<OutputTypeConfig> FASTLANE_EXCLUDED_TYPES = Collections.unmodifiableSet(EnumSet.of(
             GlobalPerson, PersonImages, CharacterImages,
             LanguageRights, TopNVideoData));
 

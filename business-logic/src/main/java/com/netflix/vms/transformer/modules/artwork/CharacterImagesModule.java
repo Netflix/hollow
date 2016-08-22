@@ -29,7 +29,7 @@ public class CharacterImagesModule extends ArtWorkModule{
     @Override
     public void transform() {
         /// short-circuit Fastlane
-        if (OutputTypeConfig.FASTLANE_SKIP_TYPES.contains(OutputTypeConfig.CharacterImages) && ctx.getFastlaneIds() != null)
+        if (OutputTypeConfig.FASTLANE_EXCLUDED_TYPES.contains(OutputTypeConfig.CharacterImages) && ctx.getFastlaneIds() != null)
             return;
 
         Map<Integer, Set<Artwork>> descMap = new HashMap<>();

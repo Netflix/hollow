@@ -44,9 +44,10 @@ public class DataSlicerImpl implements DataSlicer {
         return new SliceTaskImpl(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude);
     }
 
-    public SliceTask getSliceTask(boolean isIncludeNonVideoL10N, int numberOfRandomTopNodesToInclude, int... specificTopNodeIdsToInclude) {
+    public SliceTask getSliceTask(Set<String> excludedTypes, boolean isIncludeNonVideoL10N, int numberOfRandomTopNodesToInclude, int... specificTopNodeIdsToInclude) {
         SliceTaskImpl task = new SliceTaskImpl(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude);
         task.setIncludeNonVideoL10N(isIncludeNonVideoL10N);
+        task.setExcludedTypes(excludedTypes);
         return task;
     }
 
@@ -57,6 +58,7 @@ public class DataSlicerImpl implements DataSlicer {
 
         private Map<String, BitSet> ordinalsToInclude;
         private boolean isIncludeNonVideoL10N = true;
+        private Set<String> excludedTypes = new HashSet<>();
 
         public SliceTaskImpl(int numberOfRandomTopNodesToInclude, int... specificTopNodeIdsToInclude) {
             this.numberOfRandomTopNodesToInclude = numberOfRandomTopNodesToInclude;
@@ -67,6 +69,10 @@ public class DataSlicerImpl implements DataSlicer {
 
         public void setIncludeNonVideoL10N(boolean value) {
             isIncludeNonVideoL10N = value;
+        }
+
+        public void setExcludedTypes(Set<String> excludedTypes) {
+            this.excludedTypes = excludedTypes;
         }
 
         @Override
@@ -422,10 +428,14 @@ public class DataSlicerImpl implements DataSlicer {
         }
 
         private void includeAll(HollowReadStateEngine stateEngine, String type) {
+            if (excludedTypes.contains(type)) return;
+
             ordinalsToInclude.put(type, populatedOrdinals(stateEngine, type));
         }
 
         private BitSet findIncludedOrdinals(HollowReadStateEngine stateEngine, String type, Set<Integer> includedVideoIds, VideoIdDeriver idDeriver) {
+            if (excludedTypes.contains(type)) return new BitSet();
+
             int maxOrdinal = stateEngine.getTypeState(type).maxOrdinal();
             BitSet populatedOrdinals = new BitSet(maxOrdinal + 1);
             for(int i=0;i<maxOrdinal + 1;i++) {

@@ -59,7 +59,7 @@ public class GlobalPersonModule extends AbstractTransformModule {
 
     public List<GlobalPerson> transformPersons() {
         /// short-circuit Fastlane
-        if (OutputTypeConfig.FASTLANE_SKIP_TYPES.contains(OutputTypeConfig.GlobalPerson) && ctx.getFastlaneIds() != null)
+        if (OutputTypeConfig.FASTLANE_EXCLUDED_TYPES.contains(OutputTypeConfig.GlobalPerson) && ctx.getFastlaneIds() != null)
             return Collections.emptyList();
 
         List<GlobalPerson> personList = new ArrayList<GlobalPerson>();

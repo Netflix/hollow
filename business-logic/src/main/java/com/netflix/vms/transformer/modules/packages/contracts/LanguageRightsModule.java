@@ -40,7 +40,7 @@ public class LanguageRightsModule extends AbstractTransformModule {
     @Override
     public void transform() {
         /// short circuit FastLane
-        if (OutputTypeConfig.FASTLANE_SKIP_TYPES.contains(OutputTypeConfig.LanguageRights) && ctx.getFastlaneIds() != null)
+        if (OutputTypeConfig.FASTLANE_EXCLUDED_TYPES.contains(OutputTypeConfig.LanguageRights) && ctx.getFastlaneIds() != null)
             return;
 
         Map<Pair<Integer, Integer>, LanguageRights> contractMovieRights = new HashMap<>();

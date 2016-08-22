@@ -26,7 +26,7 @@ public class TopNVideoDataModule extends AbstractTransformModule{
     @Override
     public void transform() {
         /// short-circuit for FastLane
-        if (OutputTypeConfig.FASTLANE_SKIP_TYPES.contains(OutputTypeConfig.TopNVideoData) && ctx.getFastlaneIds() != null)
+        if (OutputTypeConfig.FASTLANE_EXCLUDED_TYPES.contains(OutputTypeConfig.TopNVideoData) && ctx.getFastlaneIds() != null)
             return;
 
         //Map Video id -> attributes to Country id -> TopNVideoData

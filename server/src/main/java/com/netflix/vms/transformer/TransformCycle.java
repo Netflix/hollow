@@ -60,6 +60,7 @@ public class TransformCycle {
 
     private long previousCycleNumber = Long.MIN_VALUE;
     private long currentCycleNumber = Long.MIN_VALUE;
+    private boolean isFirstCycle = true;
 
     public TransformCycle(TransformerContext ctx, FileStore fileStore, PublishWorkflowStager publishStager, String converterVip, String transformerVip) {
         this.transformerVip = transformerVip;
@@ -96,6 +97,8 @@ public class TransformCycle {
             ctx.getLogger().error(RollbackStateEngine, "Transformer failed cycle -- rolling back write state engine", th);
             outputStateEngine.resetToLastPrepareForNextCycle();
             throw th;
+        } finally {
+            isFirstCycle = false;
         }
     }
 
@@ -135,6 +138,7 @@ public class TransformCycle {
         ctx.getLogger().info(TransformCycleBegin, "Beginning cycle={} jarVersion={}", currentCycleNumber, BlobMetaDataUtil.getJarVersion());
 
         outputStateEngine.prepareForNextCycle();
+        titleOverrideMgr.prepareForNextCycle();
     }
 
     private void updateTheInput() {
@@ -174,24 +178,28 @@ public class TransformCycle {
 
         try {
             Set<String> titleOverrideSpecs = ctx.getTitleOverrideSpecs();
-            if (titleOverrideSpecs == null || titleOverrideSpecs.isEmpty()) {
-                // Process normally
-                trasformInputData(inputClient.getAPI(), outputStateEngine, ctx);
-                titleOverrideMgr.clear();
-            } else {
-                // Kick off processing of Title Override/Pinning
-                titleOverrideMgr.processASync(titleOverrideSpecs);
 
+            // Kick off processing of Title Override/Pinning
+            titleOverrideMgr.processASync(titleOverrideSpecs);
+            List<HollowReadStateEngine> availableTitleOverrideBlobs = titleOverrideMgr.getCompletedResults();
+
+            boolean haveTitleOverrideJobs = titleOverrideSpecs != null && !titleOverrideSpecs.isEmpty();
+            boolean haveTitleOverrideBlobs = haveTitleOverrideJobs && !availableTitleOverrideBlobs.isEmpty();
+            if (haveTitleOverrideBlobs || (isFirstCycle && haveTitleOverrideJobs)) {
                 // Process cycle data transformation
                 VMSTransformerWriteStateEngine cycleOutput = new VMSTransformerWriteStateEngine();
                 trasformInputData(inputClient.getAPI(), cycleOutput, ctx);
 
-                // Wait for everything to finish and combine them
-                List<HollowReadStateEngine> overrideTitleOutputs = titleOverrideMgr.waitForResults();
+                // Combine already available blobs or wait for everything to finish then combine
+                boolean waitForAllResults = isFirstCycle && haveTitleOverrideJobs;
+                List<HollowReadStateEngine> overrideTitleOutputs = waitForAllResults ? titleOverrideMgr.waitForResults() : availableTitleOverrideBlobs;
                 TitleOverrideHollowCombiner combiner = new TitleOverrideHollowCombiner(ctx, outputStateEngine, cycleOutput, overrideTitleOutputs);
                 String overrideBlobID = combiner.combine();
 
                 ctx.getLogger().info(TitleOverride, "Processed override config={} with blobId={}", titleOverrideSpecs, overrideBlobID);
+            } else {
+                trasformInputData(inputClient.getAPI(), outputStateEngine, ctx);
+                titleOverrideMgr.clear();
             }
         } catch(Throwable th) {
             ctx.getLogger().error(TransformCycleFailed, "transform failed", th);
