@@ -115,16 +115,18 @@ public class TitleOverrideHollowCombiner {
         HollowCombiner combiner = new HollowCombiner(copyDirector, output, allInputs);
 
         // 3) Configure to skip NamedLists and its sub-types
+        Set<String> excludeTypes = getExcludeTypes();
+        for (String typeName : excludeTypes) {
+            combiner.addIgnoredTypes(typeName);
+        }
+
         // 4) Configure PrimaryKey for record deduping and remapping
         List<PrimaryKey> primaryKeys = new ArrayList<>();
-        Set<String> excludeTypes = getExcludeTypes();
         for (OutputTypeConfig config : OutputTypeConfig.values()) {
             String typeName = config.getType();
-            if (excludeTypes.contains(typeName)) {
-                combiner.addIgnoredTypes(typeName);
-            } else {
-                primaryKeys.add(config.getPrimaryKey());
-            }
+            if (excludeTypes.contains(typeName)) continue;
+
+            primaryKeys.add(config.getPrimaryKey());
         }
         combiner.setPrimaryKeys(primaryKeys.toArray(new PrimaryKey[0]));
 
