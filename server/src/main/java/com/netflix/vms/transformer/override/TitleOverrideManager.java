@@ -26,7 +26,7 @@ public class TitleOverrideManager {
     private final FileStore fileStore;
 
     private final SimultaneousExecutor mainExecutor = new SimultaneousExecutor();
-    private Map<TitleOverrideJobSpec, TitleOverrideProcessorJob> priorJobs = Collections.emptyMap();
+    private Map<TitleOverrideJobSpec, TitleOverrideProcessorJob> completedJobs = new HashMap<TitleOverrideJobSpec, TitleOverrideProcessorJob>();
     private Map<TitleOverrideJobSpec, TitleOverrideProcessorJob> activeJobs = new HashMap<TitleOverrideJobSpec, TitleOverrideProcessorJob>();
 
     public TitleOverrideManager(FileStore fileStore, TransformerContext ctx) {
@@ -46,11 +46,22 @@ public class TitleOverrideManager {
     }
 
     public synchronized void clear() {
-        priorJobs.clear();
+        completedJobs.clear();
         activeJobs.clear();
     }
 
     public synchronized void prepareForNextCycle() {
+        // cleanup completed jobs that are no longer needed
+        Map<TitleOverrideJobSpec, TitleOverrideProcessorJob> neededJobs = new HashMap<TitleOverrideJobSpec, TitleOverrideProcessorJob>();
+        for(Map.Entry<TitleOverrideJobSpec, TitleOverrideProcessorJob> entry : completedJobs.entrySet()) {
+            TitleOverrideJobSpec spec = entry.getKey();
+            if (activeJobs.containsKey(spec)) {
+                neededJobs.put(spec, entry.getValue());
+            }
+        }
+        completedJobs = neededJobs;
+
+        // reset active Jobs
         activeJobs.clear();
     }
 
@@ -101,11 +112,7 @@ public class TitleOverrideManager {
             }
         }
 
-        ctx.getLogger().info(TransformerLogTag.TitleOverride, "[{}] Misc Stat prioJobs={} currJobs={} results={}", label, priorJobs.size(), activeJobs.size(), resultList.size());
-        boolean allJobsCompleted = resultList.size() == activeJobs.size();
-        if (allJobsCompleted) {
-            priorJobs = new HashMap<>(activeJobs);
-        }
+        ctx.getLogger().info(TransformerLogTag.TitleOverride, "[{}] Misc Stat completedJobs={} currJobs={} results={}", label, completedJobs.size(), activeJobs.size(), resultList.size());
 
         return resultList;
     }
@@ -129,7 +136,7 @@ public class TitleOverrideManager {
             }
 
             TitleOverrideJobSpec p = new TitleOverrideJobSpec(version, topNode, isInputBased);
-            TitleOverrideProcessorJob job = priorJobs.get(p); // reuse last cycle's job if the same - to avoid re-processing
+            TitleOverrideProcessorJob job = completedJobs.get(p); // reuse last cycle's job if the same - to avoid re-processing
             if (job == null) {
                 // prior result not found so create new job
                 job = createNewProcessJob(p);
@@ -150,7 +157,15 @@ public class TitleOverrideManager {
             processor = createOutputBasedProcessor();
         }
 
-        return new TitleOverrideProcessorJob(processor, jobSpec, ctx);
+        return new TitleOverrideProcessorJob(processor, jobSpec, ctx, new CompleteJobCallback() {
+            @Override
+            public void completedJob(TitleOverrideJobSpec jobSpec, TitleOverrideProcessorJob job, boolean isSuccessfull) {
+                if (isSuccessfull) {
+                    completedJobs.put(jobSpec, job);
+                }
+            }
+
+        });
     }
 
     // Create Input Based Processor
@@ -173,6 +188,10 @@ public class TitleOverrideManager {
         }
     }
 
+    private interface CompleteJobCallback {
+        void completedJob(TitleOverrideJobSpec jobSpec, TitleOverrideProcessorJob job, boolean isSuccessfull);
+    }
+
     /**
      * Processor Job
      */
@@ -180,13 +199,15 @@ public class TitleOverrideManager {
         private final TitleOverrideProcessor processor;
         private final TitleOverrideJobSpec jobSpec;
         private final TransformerContext ctx;
+        private final CompleteJobCallback callback;
         private HollowReadStateEngine resultStateEngine;
         private Throwable failure;
 
-        TitleOverrideProcessorJob(TitleOverrideProcessor processor, TitleOverrideJobSpec jobSpec, TransformerContext ctx) {
+        TitleOverrideProcessorJob(TitleOverrideProcessor processor, TitleOverrideJobSpec jobSpec, TransformerContext ctx, CompleteJobCallback callback) {
             this.processor = processor;
             this.jobSpec = jobSpec;
             this.ctx = ctx;
+            this.callback = callback;
         }
 
         @Override
@@ -199,6 +220,8 @@ public class TitleOverrideManager {
             } catch (Throwable e) {
                 ctx.getLogger().error(TransformerLogTag.TitleOverride, "Failed to process override title={} for version={} and vip={}", jobSpec.topNode, jobSpec.version, processor.getVip());
                 failure = new Exception("Failed to process topNode=" + jobSpec.version + " for version=" + jobSpec.topNode + "\t on vip=" + processor.getVip(), e);
+            } finally {
+                callback.completedJob(jobSpec, this, isCompletedSuccessfully());
             }
         }
 
