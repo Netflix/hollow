@@ -116,11 +116,12 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -128,17 +129,18 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -147,15 +149,17 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -166,24 +170,31 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
-                "com.amazonaws:aws-java-sdk-core"
+                "com.amazonaws:aws-java-sdk-core",
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer"
+            ]
+        },
+        "com.fasterxml.jackson.module:jackson-module-afterburner": {
+            "locked": "2.7.5",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -720,22 +731,29 @@
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.hystrix:hystrix-servo-metrics-publisher",
                 "netflix:geoip-client",
                 "netflix:platform-dependency-command"
             ]
         },
         "com.netflix.hystrix:hystrix-metrics-event-stream": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
         },
+        "com.netflix.hystrix:hystrix-serialization": {
+            "locked": "1.5.4",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-metrics-event-stream"
+            ]
+        },
         "com.netflix.hystrix:hystrix-servo-metrics-publisher": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
@@ -2085,7 +2103,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -2190,7 +2208,7 @@
             ]
         },
         "netflix:platform-dependency-command": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -2756,7 +2774,7 @@
             ]
         },
         "org.hdrhistogram:HdrHistogram": {
-            "locked": "2.1.7",
+            "locked": "2.1.9",
             "transitive": [
                 "com.netflix.hystrix:hystrix-core"
             ]
@@ -3118,11 +3136,12 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -3130,17 +3149,18 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -3149,15 +3169,17 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -3168,24 +3190,31 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
-                "com.amazonaws:aws-java-sdk-core"
+                "com.amazonaws:aws-java-sdk-core",
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer"
+            ]
+        },
+        "com.fasterxml.jackson.module:jackson-module-afterburner": {
+            "locked": "2.7.5",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -3722,22 +3751,29 @@
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.hystrix:hystrix-servo-metrics-publisher",
                 "netflix:geoip-client",
                 "netflix:platform-dependency-command"
             ]
         },
         "com.netflix.hystrix:hystrix-metrics-event-stream": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
         },
+        "com.netflix.hystrix:hystrix-serialization": {
+            "locked": "1.5.4",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-metrics-event-stream"
+            ]
+        },
         "com.netflix.hystrix:hystrix-servo-metrics-publisher": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
@@ -5087,7 +5123,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -5192,7 +5228,7 @@
             ]
         },
         "netflix:platform-dependency-command": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -5758,7 +5794,7 @@
             ]
         },
         "org.hdrhistogram:HdrHistogram": {
-            "locked": "2.1.7",
+            "locked": "2.1.9",
             "transitive": [
                 "com.netflix.hystrix:hystrix-core"
             ]
@@ -6120,11 +6156,12 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -6132,17 +6169,18 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -6151,15 +6189,17 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -6170,24 +6210,31 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
-                "com.amazonaws:aws-java-sdk-core"
+                "com.amazonaws:aws-java-sdk-core",
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer"
+            ]
+        },
+        "com.fasterxml.jackson.module:jackson-module-afterburner": {
+            "locked": "2.7.5",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -6724,22 +6771,29 @@
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.hystrix:hystrix-servo-metrics-publisher",
                 "netflix:geoip-client",
                 "netflix:platform-dependency-command"
             ]
         },
         "com.netflix.hystrix:hystrix-metrics-event-stream": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
         },
+        "com.netflix.hystrix:hystrix-serialization": {
+            "locked": "1.5.4",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-metrics-event-stream"
+            ]
+        },
         "com.netflix.hystrix:hystrix-servo-metrics-publisher": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
@@ -8089,7 +8143,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -8194,7 +8248,7 @@
             ]
         },
         "netflix:platform-dependency-command": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -8760,7 +8814,7 @@
             ]
         },
         "org.hdrhistogram:HdrHistogram": {
-            "locked": "2.1.7",
+            "locked": "2.1.9",
             "transitive": [
                 "com.netflix.hystrix:hystrix-core"
             ]
@@ -9122,11 +9176,12 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -9134,17 +9189,18 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -9153,15 +9209,17 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -9172,24 +9230,31 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
-                "com.amazonaws:aws-java-sdk-core"
+                "com.amazonaws:aws-java-sdk-core",
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer"
+            ]
+        },
+        "com.fasterxml.jackson.module:jackson-module-afterburner": {
+            "locked": "2.7.5",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -9726,22 +9791,29 @@
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.hystrix:hystrix-servo-metrics-publisher",
                 "netflix:geoip-client",
                 "netflix:platform-dependency-command"
             ]
         },
         "com.netflix.hystrix:hystrix-metrics-event-stream": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
         },
+        "com.netflix.hystrix:hystrix-serialization": {
+            "locked": "1.5.4",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-metrics-event-stream"
+            ]
+        },
         "com.netflix.hystrix:hystrix-servo-metrics-publisher": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
@@ -11087,7 +11159,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -11192,7 +11264,7 @@
             ]
         },
         "netflix:platform-dependency-command": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -11727,7 +11799,7 @@
             ]
         },
         "org.hdrhistogram:HdrHistogram": {
-            "locked": "2.1.7",
+            "locked": "2.1.9",
             "transitive": [
                 "com.netflix.hystrix:hystrix-core"
             ]
@@ -12142,11 +12214,12 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -12154,17 +12227,18 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -12173,15 +12247,17 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -12192,24 +12268,31 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
-                "com.amazonaws:aws-java-sdk-core"
+                "com.amazonaws:aws-java-sdk-core",
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer"
+            ]
+        },
+        "com.fasterxml.jackson.module:jackson-module-afterburner": {
+            "locked": "2.7.5",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -12746,22 +12829,29 @@
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.hystrix:hystrix-servo-metrics-publisher",
                 "netflix:geoip-client",
                 "netflix:platform-dependency-command"
             ]
         },
         "com.netflix.hystrix:hystrix-metrics-event-stream": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
         },
+        "com.netflix.hystrix:hystrix-serialization": {
+            "locked": "1.5.4",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-metrics-event-stream"
+            ]
+        },
         "com.netflix.hystrix:hystrix-servo-metrics-publisher": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
@@ -14111,7 +14201,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -14216,7 +14306,7 @@
             ]
         },
         "netflix:platform-dependency-command": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -14782,7 +14872,7 @@
             ]
         },
         "org.hdrhistogram:HdrHistogram": {
-            "locked": "2.1.7",
+            "locked": "2.1.9",
             "transitive": [
                 "com.netflix.hystrix:hystrix-core"
             ]
@@ -16236,11 +16326,12 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -16248,17 +16339,18 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -16267,15 +16359,17 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -16286,24 +16380,31 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
-                "com.amazonaws:aws-java-sdk-core"
+                "com.amazonaws:aws-java-sdk-core",
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer"
+            ]
+        },
+        "com.fasterxml.jackson.module:jackson-module-afterburner": {
+            "locked": "2.7.5",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -16840,22 +16941,29 @@
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.hystrix:hystrix-servo-metrics-publisher",
                 "netflix:geoip-client",
                 "netflix:platform-dependency-command"
             ]
         },
         "com.netflix.hystrix:hystrix-metrics-event-stream": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
         },
+        "com.netflix.hystrix:hystrix-serialization": {
+            "locked": "1.5.4",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-metrics-event-stream"
+            ]
+        },
         "com.netflix.hystrix:hystrix-servo-metrics-publisher": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
@@ -18205,7 +18313,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -18310,7 +18418,7 @@
             ]
         },
         "netflix:platform-dependency-command": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -18876,7 +18984,7 @@
             ]
         },
         "org.hdrhistogram:HdrHistogram": {
-            "locked": "2.1.7",
+            "locked": "2.1.9",
             "transitive": [
                 "com.netflix.hystrix:hystrix-core"
             ]
@@ -19238,11 +19346,12 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -19250,17 +19359,18 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -19269,15 +19379,17 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -19288,24 +19400,31 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
-                "com.amazonaws:aws-java-sdk-core"
+                "com.amazonaws:aws-java-sdk-core",
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer"
+            ]
+        },
+        "com.fasterxml.jackson.module:jackson-module-afterburner": {
+            "locked": "2.7.5",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -19842,22 +19961,29 @@
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.hystrix:hystrix-servo-metrics-publisher",
                 "netflix:geoip-client",
                 "netflix:platform-dependency-command"
             ]
         },
         "com.netflix.hystrix:hystrix-metrics-event-stream": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
         },
+        "com.netflix.hystrix:hystrix-serialization": {
+            "locked": "1.5.4",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-metrics-event-stream"
+            ]
+        },
         "com.netflix.hystrix:hystrix-servo-metrics-publisher": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
@@ -21206,7 +21332,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -21311,7 +21437,7 @@
             ]
         },
         "netflix:platform-dependency-command": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -21846,7 +21972,7 @@
             ]
         },
         "org.hdrhistogram:HdrHistogram": {
-            "locked": "2.1.7",
+            "locked": "2.1.9",
             "transitive": [
                 "com.netflix.hystrix:hystrix-core"
             ]
@@ -22221,11 +22347,12 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -22233,17 +22360,18 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -22252,15 +22380,17 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -22271,24 +22401,31 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
-                "com.amazonaws:aws-java-sdk-core"
+                "com.amazonaws:aws-java-sdk-core",
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer"
+            ]
+        },
+        "com.fasterxml.jackson.module:jackson-module-afterburner": {
+            "locked": "2.7.5",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.github.jbellis:jamm": {
@@ -22855,22 +22992,29 @@
             "requested": "latest.release"
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.hystrix:hystrix-servo-metrics-publisher",
                 "netflix:geoip-client",
                 "netflix:platform-dependency-command"
             ]
         },
         "com.netflix.hystrix:hystrix-metrics-event-stream": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
         },
+        "com.netflix.hystrix:hystrix-serialization": {
+            "locked": "1.5.4",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-metrics-event-stream"
+            ]
+        },
         "com.netflix.hystrix:hystrix-servo-metrics-publisher": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
@@ -24252,7 +24396,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -24358,7 +24502,7 @@
             ]
         },
         "netflix:platform-dependency-command": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -24958,7 +25102,7 @@
             ]
         },
         "org.hdrhistogram:HdrHistogram": {
-            "locked": "2.1.7",
+            "locked": "2.1.9",
             "transitive": [
                 "com.netflix.hystrix:hystrix-core"
             ]
@@ -25342,11 +25486,12 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -25354,17 +25499,18 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -25373,15 +25519,17 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -25392,24 +25540,31 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
-                "com.amazonaws:aws-java-sdk-core"
+                "com.amazonaws:aws-java-sdk-core",
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer"
+            ]
+        },
+        "com.fasterxml.jackson.module:jackson-module-afterburner": {
+            "locked": "2.7.5",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.github.jbellis:jamm": {
@@ -25976,22 +26131,29 @@
             "requested": "latest.release"
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.hystrix:hystrix-servo-metrics-publisher",
                 "netflix:geoip-client",
                 "netflix:platform-dependency-command"
             ]
         },
         "com.netflix.hystrix:hystrix-metrics-event-stream": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
         },
+        "com.netflix.hystrix:hystrix-serialization": {
+            "locked": "1.5.4",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-metrics-event-stream"
+            ]
+        },
         "com.netflix.hystrix:hystrix-servo-metrics-publisher": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
@@ -27373,7 +27535,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -27479,7 +27641,7 @@
             ]
         },
         "netflix:platform-dependency-command": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -28079,7 +28241,7 @@
             ]
         },
         "org.hdrhistogram:HdrHistogram": {
-            "locked": "2.1.7",
+            "locked": "2.1.9",
             "transitive": [
                 "com.netflix.hystrix:hystrix-core"
             ]
@@ -28463,11 +28625,12 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -28475,17 +28638,18 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -28494,15 +28658,17 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -28513,24 +28679,31 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
-                "com.amazonaws:aws-java-sdk-core"
+                "com.amazonaws:aws-java-sdk-core",
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer"
+            ]
+        },
+        "com.fasterxml.jackson.module:jackson-module-afterburner": {
+            "locked": "2.7.5",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.github.jbellis:jamm": {
@@ -29097,22 +29270,29 @@
             "requested": "latest.release"
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.hystrix:hystrix-servo-metrics-publisher",
                 "netflix:geoip-client",
                 "netflix:platform-dependency-command"
             ]
         },
         "com.netflix.hystrix:hystrix-metrics-event-stream": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
         },
+        "com.netflix.hystrix:hystrix-serialization": {
+            "locked": "1.5.4",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-metrics-event-stream"
+            ]
+        },
         "com.netflix.hystrix:hystrix-servo-metrics-publisher": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
@@ -30494,7 +30674,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -30600,7 +30780,7 @@
             ]
         },
         "netflix:platform-dependency-command": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -31200,7 +31380,7 @@
             ]
         },
         "org.hdrhistogram:HdrHistogram": {
-            "locked": "2.1.7",
+            "locked": "2.1.9",
             "transitive": [
                 "com.netflix.hystrix:hystrix-core"
             ]
@@ -31584,11 +31764,12 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -31596,17 +31777,18 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -31615,15 +31797,17 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -31634,24 +31818,31 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
-                "com.amazonaws:aws-java-sdk-core"
+                "com.amazonaws:aws-java-sdk-core",
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer"
+            ]
+        },
+        "com.fasterxml.jackson.module:jackson-module-afterburner": {
+            "locked": "2.7.5",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.github.jbellis:jamm": {
@@ -32218,22 +32409,29 @@
             "requested": "latest.release"
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.hystrix:hystrix-servo-metrics-publisher",
                 "netflix:geoip-client",
                 "netflix:platform-dependency-command"
             ]
         },
         "com.netflix.hystrix:hystrix-metrics-event-stream": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
         },
+        "com.netflix.hystrix:hystrix-serialization": {
+            "locked": "1.5.4",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-metrics-event-stream"
+            ]
+        },
         "com.netflix.hystrix:hystrix-servo-metrics-publisher": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
@@ -33615,7 +33813,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -33721,7 +33919,7 @@
             ]
         },
         "netflix:platform-dependency-command": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -34321,7 +34519,7 @@
             ]
         },
         "org.hdrhistogram:HdrHistogram": {
-            "locked": "2.1.7",
+            "locked": "2.1.9",
             "transitive": [
                 "com.netflix.hystrix:hystrix-core"
             ]
@@ -34692,11 +34890,12 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -34704,17 +34903,18 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -34723,15 +34923,17 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -34742,24 +34944,31 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
-                "com.amazonaws:aws-java-sdk-core"
+                "com.amazonaws:aws-java-sdk-core",
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer"
+            ]
+        },
+        "com.fasterxml.jackson.module:jackson-module-afterburner": {
+            "locked": "2.7.5",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -35302,22 +35511,29 @@
             "requested": "latest.release"
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.hystrix:hystrix-servo-metrics-publisher",
                 "netflix:geoip-client",
                 "netflix:platform-dependency-command"
             ]
         },
         "com.netflix.hystrix:hystrix-metrics-event-stream": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
         },
+        "com.netflix.hystrix:hystrix-serialization": {
+            "locked": "1.5.4",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-metrics-event-stream"
+            ]
+        },
         "com.netflix.hystrix:hystrix-servo-metrics-publisher": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
@@ -36671,7 +36887,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -36776,7 +36992,7 @@
             ]
         },
         "netflix:platform-dependency-command": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -37349,7 +37565,7 @@
             ]
         },
         "org.hdrhistogram:HdrHistogram": {
-            "locked": "2.1.7",
+            "locked": "2.1.9",
             "transitive": [
                 "com.netflix.hystrix:hystrix-core"
             ]
@@ -37711,11 +37927,12 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -37723,17 +37940,18 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -37742,15 +37960,17 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -37761,24 +37981,31 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
-                "com.amazonaws:aws-java-sdk-core"
+                "com.amazonaws:aws-java-sdk-core",
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer"
+            ]
+        },
+        "com.fasterxml.jackson.module:jackson-module-afterburner": {
+            "locked": "2.7.5",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -38321,22 +38548,29 @@
             "requested": "latest.release"
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.hystrix:hystrix-servo-metrics-publisher",
                 "netflix:geoip-client",
                 "netflix:platform-dependency-command"
             ]
         },
         "com.netflix.hystrix:hystrix-metrics-event-stream": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
         },
+        "com.netflix.hystrix:hystrix-serialization": {
+            "locked": "1.5.4",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-metrics-event-stream"
+            ]
+        },
         "com.netflix.hystrix:hystrix-servo-metrics-publisher": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
@@ -39690,7 +39924,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -39795,7 +40029,7 @@
             ]
         },
         "netflix:platform-dependency-command": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -40368,7 +40602,7 @@
             ]
         },
         "org.hdrhistogram:HdrHistogram": {
-            "locked": "2.1.7",
+            "locked": "2.1.9",
             "transitive": [
                 "com.netflix.hystrix:hystrix-core"
             ]
@@ -40730,11 +40964,12 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -40742,17 +40977,18 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -40761,15 +40997,17 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -40780,24 +41018,31 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
-                "com.amazonaws:aws-java-sdk-core"
+                "com.amazonaws:aws-java-sdk-core",
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer"
+            ]
+        },
+        "com.fasterxml.jackson.module:jackson-module-afterburner": {
+            "locked": "2.7.5",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -41340,22 +41585,29 @@
             "requested": "latest.release"
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.hystrix:hystrix-servo-metrics-publisher",
                 "netflix:geoip-client",
                 "netflix:platform-dependency-command"
             ]
         },
         "com.netflix.hystrix:hystrix-metrics-event-stream": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
         },
+        "com.netflix.hystrix:hystrix-serialization": {
+            "locked": "1.5.4",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-metrics-event-stream"
+            ]
+        },
         "com.netflix.hystrix:hystrix-servo-metrics-publisher": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
@@ -42709,7 +42961,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -42814,7 +43066,7 @@
             ]
         },
         "netflix:platform-dependency-command": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -43387,7 +43639,7 @@
             ]
         },
         "org.hdrhistogram:HdrHistogram": {
-            "locked": "2.1.7",
+            "locked": "2.1.9",
             "transitive": [
                 "com.netflix.hystrix:hystrix-core"
             ]
@@ -43749,11 +44001,12 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -43761,17 +44014,18 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -43780,15 +44034,17 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
+                "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -43799,24 +44055,31 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
-                "com.amazonaws:aws-java-sdk-core"
+                "com.amazonaws:aws-java-sdk-core",
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.4",
+            "locked": "2.7.5",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer"
+            ]
+        },
+        "com.fasterxml.jackson.module:jackson-module-afterburner": {
+            "locked": "2.7.5",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-serialization"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -44359,22 +44622,29 @@
             "requested": "latest.release"
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
+                "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.hystrix:hystrix-servo-metrics-publisher",
                 "netflix:geoip-client",
                 "netflix:platform-dependency-command"
             ]
         },
         "com.netflix.hystrix:hystrix-metrics-event-stream": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
         },
+        "com.netflix.hystrix:hystrix-serialization": {
+            "locked": "1.5.4",
+            "transitive": [
+                "com.netflix.hystrix:hystrix-metrics-event-stream"
+            ]
+        },
         "com.netflix.hystrix:hystrix-servo-metrics-publisher": {
-            "locked": "1.5.3",
+            "locked": "1.5.4",
             "transitive": [
                 "netflix:platform-dependency-command"
             ]
@@ -45728,7 +45998,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -45833,7 +46103,7 @@
             ]
         },
         "netflix:platform-dependency-command": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -46406,7 +46676,7 @@
             ]
         },
         "org.hdrhistogram:HdrHistogram": {
-            "locked": "2.1.7",
+            "locked": "2.1.9",
             "transitive": [
                 "com.netflix.hystrix:hystrix-core"
             ]
