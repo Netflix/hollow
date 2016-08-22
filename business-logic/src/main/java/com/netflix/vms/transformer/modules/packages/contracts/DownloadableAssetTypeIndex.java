@@ -31,6 +31,12 @@ public class DownloadableAssetTypeIndex {
             idList.mark();
     }
     
+    public void markForDownload(ContractAsset assetType) {
+        DownloadableIdList idList = downloadableIdsByContract.get(assetType);
+        if(idList != null)
+            idList.markForDownload();
+    }
+    
     public void markAll() {
         for(Map.Entry<ContractAsset, DownloadableIdList> entry : downloadableIdsByContract.entrySet()) {
             entry.getValue().mark();
@@ -54,10 +60,22 @@ public class DownloadableAssetTypeIndex {
         return set;
     }
 
+    public Set<com.netflix.vms.transformer.hollowoutput.Long> getAllUnmarkedForDownload() {
+        Set<com.netflix.vms.transformer.hollowoutput.Long> set = new HashSet<com.netflix.vms.transformer.hollowoutput.Long>();
+
+        for(Map.Entry<ContractAsset, DownloadableIdList> entry : downloadableIdsByContract.entrySet()) {
+            if(!entry.getValue().isMarkedForDownload())
+                set.addAll(entry.getValue().getList());
+        }
+
+        return set;
+    }
+    
     private static class DownloadableIdList {
 
         private final List<com.netflix.vms.transformer.hollowoutput.Long> list;
         private boolean marked;
+        private boolean markedForDownload;
 
         public DownloadableIdList() {
             this.list = new ArrayList<com.netflix.vms.transformer.hollowoutput.Long>();
@@ -70,15 +88,24 @@ public class DownloadableAssetTypeIndex {
         public void mark() {
             this.marked = true;
         }
+        
+        public void markForDownload() {
+            this.markedForDownload = true;
+        }
 
         public void resetMark() {
             this.marked = false;
+            this.markedForDownload = false;
         }
 
         public boolean isMarked() {
             return marked;
         }
 
+        public boolean isMarkedForDownload() {
+            return markedForDownload;
+        }
+        
         public List<com.netflix.vms.transformer.hollowoutput.Long> getList() {
             return list;
         }
