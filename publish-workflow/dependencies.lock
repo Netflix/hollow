@@ -620,7 +620,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -2221,11 +2221,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.137",
+            "locked": "59.139",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.137",
+            "locked": "59.139",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -3465,7 +3465,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -5066,11 +5066,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.137",
+            "locked": "59.139",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.137",
+            "locked": "59.139",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -6310,7 +6310,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -7911,11 +7911,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.137",
+            "locked": "59.139",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.137",
+            "locked": "59.139",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -9155,7 +9155,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -10756,11 +10756,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.137",
+            "locked": "59.139",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.137",
+            "locked": "59.139",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -12099,7 +12099,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -13700,11 +13700,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.137",
+            "locked": "59.139",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.137",
+            "locked": "59.139",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -14944,7 +14944,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -16546,11 +16546,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.137",
+            "locked": "59.139",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.137",
+            "locked": "59.139",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -17795,7 +17795,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -19397,11 +19397,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.137",
+            "locked": "59.139",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.137",
+            "locked": "59.139",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -20646,7 +20646,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -22248,11 +22248,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.137",
+            "locked": "59.139",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.137",
+            "locked": "59.139",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -23497,7 +23497,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.10",
+            "locked": "1.4.11",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -25099,11 +25099,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.137",
+            "locked": "59.139",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.137",
+            "locked": "59.139",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
