@@ -123,6 +123,7 @@ public class GlobalPersonModule extends AbstractTransformModule {
                 moviePersonCharacterOrdinal = moviePersonCharacterIterator.next();
             }
         }
+        Collections.sort(movieCharacters);
         return movieCharacters;
     }
 
