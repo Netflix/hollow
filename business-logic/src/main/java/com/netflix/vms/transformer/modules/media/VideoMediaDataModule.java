@@ -112,7 +112,6 @@ public class VideoMediaDataModule {
         if (statusOrdinal != -1) {
             status = api.getStatusHollow(statusOrdinal);
             vmd.isGoLive = status._getFlags()._getGoLive();
-            vmd.hasLocalText = status._getFlags()._getLocalText();
             vmd.isAutoPlayEnabled = status._getFlags()._getAutoPlay();
             vmd.isLanguageOverride = status._getFlags()._getLanguageOverride();
             vmd.hasLocalText = status._getFlags()._getLocalText();
