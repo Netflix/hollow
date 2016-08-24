@@ -21,6 +21,7 @@ import com.netflix.hollow.compact.HollowCompactor;
 import com.netflix.hollow.read.customapi.HollowAPI;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.write.HollowBlobWriter;
+import com.netflix.hollow.write.HollowTypeWriteState;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.common.VersionMinter;
@@ -37,8 +38,8 @@ import com.netflix.vms.transformer.publish.status.CycleStatusFuture;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.job.impl.BlobMetaDataUtil;
+import com.netflix.vms.transformer.util.OverrideVipNameUtil;
 import com.netflix.vms.transformer.util.SequenceVersionMinter;
-import com.netflix.vms.transformer.util.VipUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,6 +52,7 @@ public class TransformCycle {
     private final String transformerVip;
     private final HollowClient inputClient;
     private final VMSTransformerWriteStateEngine outputStateEngine;
+    private final VMSTransformerWriteStateEngine fastlaneOutputStateEngine;
     private final TransformerContext ctx;
     private final TransformerOutputBlobHeaderPopulator headerPopulator;
     private final PublishWorkflowStager publishWorkflowStager;
@@ -60,13 +62,16 @@ public class TransformCycle {
 
     private long previousCycleNumber = Long.MIN_VALUE;
     private long currentCycleNumber = Long.MIN_VALUE;
+    private boolean isFastlane = false;
     private boolean isFirstCycle = true;
 
     public TransformCycle(TransformerContext ctx, FileStore fileStore, PublishWorkflowStager publishStager, String converterVip, String transformerVip) {
+        this.ctx = ctx;
         this.transformerVip = transformerVip;
         this.inputClient = new VMSInputDataClient(fileStore, converterVip);
+        this.isFastlane = OverrideVipNameUtil.isOverrideVip(ctx.getConfig());
         this.outputStateEngine = new VMSTransformerWriteStateEngine();
-        this.ctx = ctx;
+        this.fastlaneOutputStateEngine = new VMSTransformerWriteStateEngine();
         this.headerPopulator = new TransformerOutputBlobHeaderPopulator(inputClient, outputStateEngine, ctx);
         this.publishWorkflowStager = publishStager;
         this.versionMinter = new SequenceVersionMinter();
@@ -96,6 +101,7 @@ public class TransformCycle {
         } catch (Throwable th) {
             ctx.getLogger().error(RollbackStateEngine, "Transformer failed cycle -- rolling back write state engine", th);
             outputStateEngine.resetToLastPrepareForNextCycle();
+            fastlaneOutputStateEngine.resetToLastPrepareForNextCycle();
             throw th;
         } finally {
             isFirstCycle = false;
@@ -118,6 +124,7 @@ public class TransformCycle {
             } catch(Throwable th) {
                 ctx.getLogger().error(RollbackStateEngine, "Transformer failed compaction cycle -- rolling back write state engine", th);
                 outputStateEngine.resetToLastPrepareForNextCycle();
+                fastlaneOutputStateEngine.resetToLastPrepareForNextCycle();
                 throw th;
             }
         }
@@ -138,6 +145,7 @@ public class TransformCycle {
         ctx.getLogger().info(TransformCycleBegin, "Beginning cycle={} jarVersion={}", currentCycleNumber, BlobMetaDataUtil.getJarVersion());
 
         outputStateEngine.prepareForNextCycle();
+        fastlaneOutputStateEngine.prepareForNextCycle();
         titleOverrideMgr.prepareForNextCycle();
     }
 
@@ -177,29 +185,26 @@ public class TransformCycle {
         long startTime = System.currentTimeMillis();
 
         try {
-            Set<String> titleOverrideSpecs = ctx.getTitleOverrideSpecs();
+            if (isFastlane) {
+                // Kick off processing of Title Override/Pinning and use blobs that is ready
+                Set<String> titleOverrideSpecs = ctx.getTitleOverrideSpecs();
+                List<HollowReadStateEngine> availableTitleOverrideBlobs = titleOverrideMgr.processASync(titleOverrideSpecs);
 
-            // Kick off processing of Title Override/Pinning
-            titleOverrideMgr.processASync(titleOverrideSpecs);
-            List<HollowReadStateEngine> availableTitleOverrideBlobs = titleOverrideMgr.getCompletedResults();
+                // Process fastlane
+                trasformInputData(inputClient.getAPI(), fastlaneOutputStateEngine, ctx);
 
-            boolean haveTitleOverrideJobs = titleOverrideSpecs != null && !titleOverrideSpecs.isEmpty();
-            boolean haveTitleOverrideBlobs = haveTitleOverrideJobs && !availableTitleOverrideBlobs.isEmpty();
-            if (haveTitleOverrideBlobs || (isFirstCycle && haveTitleOverrideJobs)) {
-                // Process cycle data transformation
-                VMSTransformerWriteStateEngine cycleOutput = new VMSTransformerWriteStateEngine();
-                trasformInputData(inputClient.getAPI(), cycleOutput, ctx);
-
-                // Combine already available blobs or wait for everything to finish then combine
+                // Check whether it needs to wait for all jobs to finish (firstCycle) or just existing blobs
+                boolean haveTitleOverrideJobs = titleOverrideSpecs != null && !titleOverrideSpecs.isEmpty();
                 boolean waitForAllResults = isFirstCycle && haveTitleOverrideJobs;
+
+                // Combine data
                 List<HollowReadStateEngine> overrideTitleOutputs = waitForAllResults ? titleOverrideMgr.waitForResults() : availableTitleOverrideBlobs;
-                TitleOverrideHollowCombiner combiner = new TitleOverrideHollowCombiner(ctx, outputStateEngine, cycleOutput, overrideTitleOutputs);
+                TitleOverrideHollowCombiner combiner = new TitleOverrideHollowCombiner(ctx, outputStateEngine, fastlaneOutputStateEngine, overrideTitleOutputs);
                 String overrideBlobID = combiner.combine();
 
-                ctx.getLogger().info(TitleOverride, "Processed override config={} with blobId={}", titleOverrideSpecs, overrideBlobID);
+                ctx.getLogger().info(TitleOverride, "Processed Fastlane isFirstCycle={}, config={} with blobId={}", isFirstCycle, titleOverrideSpecs, overrideBlobID);
             } else {
                 trasformInputData(inputClient.getAPI(), outputStateEngine, ctx);
-                titleOverrideMgr.clear();
             }
         } catch(Throwable th) {
             ctx.getLogger().error(TransformCycleFailed, "transform failed", th);
@@ -216,7 +221,7 @@ public class TransformCycle {
         SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI) inputAPI, outputStateEngine, ctx);
         transformer.transform();
 
-        String BLOB_ID = VipUtil.isOverrideVip(ctx.getConfig()) ? "FASTLANE" : "BASEBLOB";
+        String BLOB_ID = OverrideVipNameUtil.isOverrideVip(ctx.getConfig()) ? "FASTLANE" : "BASEBLOB";
         TitleOverrideHelper.addBlobID(outputStateEngine, BLOB_ID);
     }
 
@@ -260,11 +265,21 @@ public class TransformCycle {
     }
 
     private boolean isUnchangedFastlaneState() {
+        // @TODO : Needs to be removed
+        if (outputStateEngine.hasChangedSinceLastCycle()) {
+            for (HollowTypeWriteState state : outputStateEngine.getOrderedTypeStates()) {
+                if (!isFirstCycle && state.hasChangedSinceLastCycle()) {
+                    ctx.getLogger().info(TitleOverride, "Type State changed={}", state.getSchema().getName());
+                }
+            }
+        }
+
         return ctx.getFastlaneIds() != null && previousCycleNumber != Long.MIN_VALUE && !outputStateEngine.hasChangedSinceLastCycle();
     }
 
     private boolean rollbackFastlaneStateEngine() {
         outputStateEngine.resetToLastPrepareForNextCycle();
+        fastlaneOutputStateEngine.resetToLastPrepareForNextCycle();
         ctx.getMetricRecorder().recordMetric(WriteOutputDataDuration, 0);
         return true;
     }

@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.util;
 
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 
-public class VipUtil {
+public class OverrideVipNameUtil {
     private static final String OVERRIDE_VIP_SUFFIX = "_override";
 
     private static boolean isOverrideVip(String vip) {
