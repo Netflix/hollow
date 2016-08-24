@@ -130,10 +130,6 @@ public class VMSAvailabilityWindowModule {
             outputWindow.endDate = OutputUtil.getRoundedDate(window._getEndDate());
             outputWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
 
-            if(isGoLive && rollup.doEpisode()) {
-                rollup.newSeasonWindow(window._getStartDate(), window._getEndDate(), rollup.getSeasonSequenceNumber());
-            }
-
             LinkedHashMap<Long, RightsWindowContract> rightsContractMap = getRightsContractMap(rights, window);
             boolean shouldFilterOutWindowInfo = shouldFilterOutWindowInfo(videoId, country, isGoLive, rightsContractMap.keySet(), includedPackageDataCount, outputWindow.startDate.val, outputWindow.endDate.val);
 
@@ -224,11 +220,12 @@ public class VMSAvailabilityWindowModule {
                                     if(thisWindowMaxPackageId == 0)
                                         thisWindowBundledAssetsGroupId = Math.max(thisWindowBundledAssetsGroupId, (int)contractId);
                                 } else {
-                                    includedWindowPackageData = true;
                                     PackageData packageData = getPackageData(videoId, pkg._getPackageId());
                                     
                                     if(locale != null && !multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAvailability))
                                         continue;
+                                    
+                                    includedWindowPackageData = true;
                                     
                                     if(packageData != null) {
                                         /// package data is available
@@ -290,7 +287,11 @@ public class VMSAvailabilityWindowModule {
 
             outputWindow.bundledAssetsGroupId = thisWindowBundledAssetsGroupId;
 
-            availabilityWindows.add(outputWindow);
+            if(locale == null || !outputWindow.windowInfosByPackageId.isEmpty()) {  /// do not add if all windows were filtered out for multicatalog country
+                availabilityWindows.add(outputWindow);
+                if(isGoLive && rollup.doEpisode())
+                    rollup.newSeasonWindow(window._getStartDate(), window._getEndDate(), rollup.getSeasonSequenceNumber());
+            }
 
             if(includedWindowPackageData)
                 includedPackageDataCount++;

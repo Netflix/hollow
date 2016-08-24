@@ -89,7 +89,7 @@ public class WindowPackageContractInfoModule {
         long longestRuntimeInSeconds = 0;
 
         for(StreamData streamData : packageData.streams) {
-            int streamProfileOrdinal = streamProfileIdx.getMatchingOrdinal((long) streamData.downloadDescriptor.encodingProfileId);
+            int streamProfileOrdinal = streamProfileIdx.getMatchingOrdinal((long) streamData.downloadDescriptor.encodingProfileId);  /// TODO: Map of encodingProfileID to encoding profile data.
             StreamProfilesHollow profile = api.getStreamProfilesHollow(streamProfileOrdinal);
             String streamProfileType = profile._getProfileType()._getValue();
 
