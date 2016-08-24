@@ -74,6 +74,17 @@ public class CountrySpecificDataModule {
 
         for(Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
+            
+            String locale = null;
+            switch(countryCode) {
+            case "BE":
+            case "CH":
+            case "LU":
+                locale = "fr";
+                break;
+            default:
+                locale = null;
+            }
 
             Map<Integer, CompleteVideoCountrySpecificData> countryMap = new HashMap<Integer, CompleteVideoCountrySpecificData>();
             allCountrySpecificDataMap.put(entry.getKey(), countryMap);
@@ -86,24 +97,24 @@ public class CountrySpecificDataModule {
                     for(int j=0;j<hierarchy.getEpisodeIds()[i].length;j++) {
                         int videoId = hierarchy.getEpisodeIds()[i][j];
                         rollup.setDoEpisode(true);
-                        convert(videoId, countryCode, countryMap, rollup);
+                        convert(videoId, countryCode, locale, countryMap, rollup);
                         rollup.setDoEpisode(false);
                         rollup.episodeFound();
                     }
 
                     rollup.setDoSeason(true);
-                    convert(hierarchy.getSeasonIds()[i], countryCode, countryMap, rollup);
+                    convert(hierarchy.getSeasonIds()[i], countryCode, locale, countryMap, rollup);
                     rollup.setDoSeason(false);
                     rollup.resetSeason();
                 }
 
                 rollup.setDoShow(true);
-                convert(hierarchy.getTopNodeId(), countryCode, countryMap, rollup);
+                convert(hierarchy.getTopNodeId(), countryCode, locale, countryMap, rollup);
                 rollup.setDoShow(false);
                 rollup.resetShow();
 
                 for(int i=0;i<hierarchy.getSupplementalIds().length;i++) {
-                    convert(hierarchy.getSupplementalIds()[i], countryCode, countryMap, rollup);
+                    convert(hierarchy.getSupplementalIds()[i], countryCode, locale, countryMap, rollup);
                 }
 
                 rollup.reset();
@@ -116,10 +127,10 @@ public class CountrySpecificDataModule {
         return allCountrySpecificDataMap;
     }
 
-    private void convert(Integer videoId, String countryCode, Map<Integer, CompleteVideoCountrySpecificData> countryMap, CountrySpecificRollupValues rollup) {
+    private void convert(Integer videoId, String countryCode, String locale, Map<Integer, CompleteVideoCountrySpecificData> countryMap, CountrySpecificRollupValues rollup) {
         CompleteVideoCountrySpecificData data = new CompleteVideoCountrySpecificData();
 
-        populateDatesAndWindowData(videoId, countryCode, data, rollup);
+        populateDatesAndWindowData(videoId, countryCode, locale, data, rollup);
         certificationListsModule.populateCertificationLists(videoId, countryCode, data);
 
         if(rollup.doShow() && isTopNodeGoLive(videoId, countryCode))
@@ -130,7 +141,7 @@ public class CountrySpecificDataModule {
         countryMap.put(videoId, data);
     }
 
-    private void populateDatesAndWindowData(Integer videoId, String countryCode, CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup) {
+    private void populateDatesAndWindowData(Integer videoId, String countryCode, String locale, CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup) {
         Long firstDisplayDate = null;
         List<VMSAvailabilityWindow> availabilityWindowList = null;
 
@@ -138,7 +149,7 @@ public class CountrySpecificDataModule {
         if (statusOrdinal != -1) {
             StatusHollow status = api.getStatusHollow(statusOrdinal);
 
-            availabilityWindowList = availabilityWindowModule.populateWindowData(videoId, countryCode, null, data, status, rollup);
+            availabilityWindowList = availabilityWindowModule.populateWindowData(videoId, countryCode, locale, data, status, rollup);
             firstDisplayDate = populateFirstDisplayDateData(data, status, availabilityWindowList);
         }
 
