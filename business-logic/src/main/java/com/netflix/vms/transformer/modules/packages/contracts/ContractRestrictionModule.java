@@ -275,7 +275,7 @@ public class ContractRestrictionModule {
             /// if any rights contract is downloadable, then the package is downloadable.
             if(thisRightsContract.isAvailableForDownload){
             	restriction.isAvailableForDownload = true;
-            	String cupKey = orderedContractIdCupKeyMap.get(contractId);
+            	String cupKey = orderedContractIdCupKeyMap.get((int) contractId);
             	restriction.offlineViewingRestrictions.downloadOnlyCupKeys.add(getCupKey(cupKey));	
             } 
         }
