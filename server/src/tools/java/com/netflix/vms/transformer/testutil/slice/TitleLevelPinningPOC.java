@@ -6,6 +6,7 @@ import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.memory.WastefulRecycler;
 import com.netflix.hollow.write.HollowBlobWriter;
+import com.netflix.hollow.write.HollowTypeWriteState;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.vms.generated.notemplate.GlobalVideoHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
@@ -30,6 +31,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -46,6 +48,46 @@ public class TitleLevelPinningPOC {
     private static final String SLICED_INPUT_FILE = LOCAL_BLOB_STORE + "/fastlane_input-slice";
     private static final String FASTLANE_FILE = LOCAL_BLOB_STORE + "/fastlane_output-slice";
     private static final String SNAPSHOT_FILE = "/space/transformer-data/pinned-blobs/input-snapshot";
+
+    @Test
+    public void debug() throws Exception {
+        SimpleTransformerContext ctx = new SimpleTransformerContext();
+        VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
+
+        HollowReadStateEngine pinnedInput = loadStateEngine("/space/debug/vms.berlin_output-titleoverride-20160823190912102-70303291.log");
+        List<HollowReadStateEngine> pinnedInputs = Collections.singletonList(pinnedInput);
+
+        long[] versions = new long[] { 20160824214830013L, 20160824214900014L, 20160824214931015L };
+        while (true) {
+            boolean isFirstCycle = true;
+            for (long v : versions) {
+                HollowReadStateEngine fastlane = loadFastlane(v);
+
+                TitleOverrideHollowCombiner combiner = new TitleOverrideHollowCombiner(ctx, outputStateEngine, fastlane, pinnedInputs);
+                String overrideBlobID = combiner.combine();
+
+                System.out.println(v + ": \t" + overrideBlobID + "\t hasChanged=" + outputStateEngine.hasChangedSinceLastCycle());
+                if (!isFirstCycle && outputStateEngine.hasChangedSinceLastCycle()) {
+                    for (HollowTypeWriteState state : outputStateEngine.getOrderedTypeStates()) {
+                        if (!isFirstCycle && state.hasChangedSinceLastCycle()) {
+                            System.out.println("FASTLANE Type changed=" + state.getSchema().getName());
+                        }
+                    }
+
+                    System.out.println("CHANGED");
+                }
+
+                outputStateEngine.prepareForWrite();
+                outputStateEngine.prepareForNextCycle();
+                isFirstCycle = false;
+            }
+        }
+    }
+
+    public HollowReadStateEngine loadFastlane(long version) throws Exception {
+        String fn = "/space/debug/fastlane_" + version + ".log";
+        return loadStateEngine(fn);
+    }
 
     @Test
     public void diff() throws Exception {
@@ -85,7 +127,7 @@ public class TitleLevelPinningPOC {
 
         {
             TitleOverrideManager mgr = new TitleOverrideManager(BASE_PROXY, "boson", "berlin", LOCAL_BLOB_STORE, ctx);
-            mgr.processASync(overrideTitleSpecs);
+            mgr.submitJobsToProcessASync(overrideTitleSpecs);
 
             VMSTransformerWriteStateEngine fastlaneOutput = new VMSTransformerWriteStateEngine();
             SimpleTransformer transformer = new SimpleTransformer(api, fastlaneOutput, ctx);
@@ -93,7 +135,7 @@ public class TitleLevelPinningPOC {
             TitleOverrideHelper.addBlobID(fastlaneOutput, "FASTLANE");
             writeStateEngine(fastlaneOutput, new File(FASTLANE_FILE));
 
-            List<HollowReadStateEngine> overrideTitleOutputs = mgr.waitForResults();
+            List<HollowReadStateEngine> overrideTitleOutputs = mgr.getResults(true);
 
             TitleOverrideHollowCombiner combiner = new TitleOverrideHollowCombiner(ctx, outputStateEngine, fastlaneOutput, overrideTitleOutputs);
             combiner.combine();

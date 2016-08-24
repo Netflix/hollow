@@ -14,7 +14,6 @@ import com.netflix.hollow.read.engine.HollowTypeReadState;
 import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.util.SimultaneousExecutor;
-import com.netflix.hollow.util.StateEngineRoundTripper;
 import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.hollow.write.HollowMapWriteRecord;
 import com.netflix.hollow.write.HollowObjectWriteRecord;
@@ -36,7 +35,6 @@ import com.netflix.vms.generated.notemplate.VPersonHollow;
 import com.netflix.vms.generated.notemplate.VideoHollow;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.OutputTypeConfig;
-import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.index.VMSOutputTypeIndexer;
 import com.netflix.vms.transformer.publish.workflow.IndexDuplicateChecker;
 
@@ -80,12 +78,15 @@ public class TitleOverrideHollowCombiner {
     protected final ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> combinedEpisodeLists;
 
     public TitleOverrideHollowCombiner(TransformerContext ctx, HollowWriteStateEngine output, HollowWriteStateEngine fastlaneOutput, List<HollowReadStateEngine> pinnedTitleInputs) throws Exception {
+        this(ctx, output, roundTrip(fastlaneOutput), pinnedTitleInputs);
+    }
+
+    public TitleOverrideHollowCombiner(TransformerContext ctx, HollowWriteStateEngine output, HollowReadStateEngine fastlaneInput, List<HollowReadStateEngine> pinnedTitleInputs) throws Exception {
         this.ctx = ctx;
 
-        HollowReadStateEngine fastlane = StateEngineRoundTripper.roundTripSnapshot(fastlaneOutput);
-        this.inputs = createPrioritizedOrderingReadStateEngines(pinnedTitleInputs, fastlane);
+        this.inputs = createPrioritizedOrderingReadStateEngines(pinnedTitleInputs, fastlaneInput);
         this.output = output;
-        this.combiner = initCombiner(ctx, this.output, fastlane, pinnedTitleInputs, inputs);
+        this.combiner = initCombiner(this.output, fastlaneInput, pinnedTitleInputs, inputs);
 
         this.combinedVideoLists = new ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String,Set<Integer>>>();
         this.combinedPersonLists = new ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String,Set<Integer>>>();
@@ -108,7 +109,7 @@ public class TitleOverrideHollowCombiner {
     }
 
     // Initialize Hollow Combiner to handle special cases
-    private static HollowCombiner initCombiner(TransformerContext ctx, HollowWriteStateEngine output, HollowReadStateEngine fastlane, List<HollowReadStateEngine> pinnedTitleInputs, HollowReadStateEngine allInputs[]) {
+    private static HollowCombiner initCombiner(HollowWriteStateEngine output, HollowReadStateEngine fastlane, List<HollowReadStateEngine> pinnedTitleInputs, HollowReadStateEngine allInputs[]) {
         if (pinnedTitleInputs.isEmpty() && fastlane != null) {
             // Only fastlane and no override/pin title exists so just use simple combiner
             HollowCombiner combiner = new HollowCombiner(output, fastlane);
@@ -130,7 +131,6 @@ public class TitleOverrideHollowCombiner {
         for (OutputTypeConfig config : OutputTypeConfig.values()) {
             primaryKeys.add(config.getPrimaryKey());
         }
-        ctx.getLogger().info(TransformerLogTag.TitleOverride, "Combiner.primaryKeys={}", primaryKeys);
         combiner.setPrimaryKeys(primaryKeys.toArray(new PrimaryKey[0]));
 
         return combiner;
@@ -184,6 +184,9 @@ public class TitleOverrideHollowCombiner {
                 nextOrdinal = populatedOrdinals.nextSetBit(nextOrdinal + 1);
             }
         }
+
+        // Make sure to exclude sub-types; otherwise, there might be a possibility of data flapping between (sub-types copied from any inputs)
+        copyCombiner.excludeReferencedObjects();
     }
 
     /**
@@ -210,7 +213,7 @@ public class TitleOverrideHollowCombiner {
     private void validateCombinedData(HollowWriteStateEngine outputStateEngine) throws Exception {
         HollowReadStateEngine stateEngine = roundTrip(outputStateEngine);
 
-        IndexDuplicateChecker dupChecker = new IndexDuplicateChecker(stateEngine, ctx);
+        IndexDuplicateChecker dupChecker = new IndexDuplicateChecker(stateEngine);
         dupChecker.checkDuplicates();
 
         if (dupChecker.wasDupKeysDetected()) {
@@ -219,7 +222,7 @@ public class TitleOverrideHollowCombiner {
         }
     }
 
-    private static HollowReadStateEngine roundTrip(HollowWriteStateEngine writeEngine) throws IOException {
+    public static HollowReadStateEngine roundTrip(HollowWriteStateEngine writeEngine) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
         writer.writeSnapshot(baos);

@@ -58,33 +58,25 @@ public class TitleOverrideManager {
     }
 
     /**
-     * Process the title override for specific spec asynchronously
-     *
-     * NOTE: call waitForResults to fetch the result
+     * Submit Jobs to be processed asynchronously
      */
-    public synchronized List<HollowReadStateEngine> processASync(Set<String> overrideTitleSpecs) throws Exception {
+    public synchronized void submitJobsToProcessASync(Set<String> overrideTitleSpecs) throws Exception {
         // Execute them in parallel
         activeJobs = processSpecs(overrideTitleSpecs);
         for (TitleOverrideProcessorJob job : activeJobs.values()) {
             mainExecutor.execute(job);
         }
-
-        return getCompletedResults();
-    }
-
-    /**
-     * Just return the completed results without waiting pending ones
-     */
-    public List<HollowReadStateEngine> getCompletedResults() throws InterruptedException, ExecutionException {
-        return getResults("COMPLETED JOBS", false);
     }
 
     /**
      * Return the result of the complete job
      */
-    public List<HollowReadStateEngine> waitForResults() throws InterruptedException, ExecutionException {
-        mainExecutor.awaitSuccessfulCompletionOfCurrentTasks();
-        return getResults("ALL JOBS", true);
+    public List<HollowReadStateEngine> getResults(boolean isWaitForAllJobs) throws InterruptedException, ExecutionException {
+        if (isWaitForAllJobs) {
+            mainExecutor.awaitSuccessfulCompletionOfCurrentTasks();
+        }
+        String label = isWaitForAllJobs ? "ALL_JOBS" : "ONLY_COMPLETED_JOBS";
+        return getResults(label, true);
     }
 
     private synchronized List<HollowReadStateEngine> getResults(String label, boolean isPropagateFailure) throws InterruptedException, ExecutionException {
