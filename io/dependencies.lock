@@ -1593,7 +1593,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -1773,7 +1773,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -4057,7 +4057,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -4237,7 +4237,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -6521,7 +6521,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -6701,7 +6701,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -8985,7 +8985,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -9165,7 +9165,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -11548,7 +11548,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -11728,7 +11728,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -14013,7 +14013,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -14193,7 +14193,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -16483,7 +16483,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -16663,7 +16663,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -18953,7 +18953,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -19133,7 +19133,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -21423,7 +21423,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -21603,7 +21603,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
