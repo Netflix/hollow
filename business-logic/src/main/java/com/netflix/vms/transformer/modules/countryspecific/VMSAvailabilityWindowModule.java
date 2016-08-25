@@ -140,12 +140,7 @@ public class VMSAvailabilityWindowModule {
                 boolean isAvailableForDownload = entry.getValue().isAvailableForDownload;
 
                 if(rightsContract != null) {
-                    int contractAvailability = -1;
-                    if(locale != null) {
-                        contractAvailability = multilanguageCountryWindowFilter.contractAvailabilityForLanguage(locale, rightsContract);
-                        if(contractAvailability == 0)
-                            continue;
-                    }
+                    int contractAvailability = locale == null ? -1 : multilanguageCountryWindowFilter.contractAvailabilityForLanguage(locale, rightsContract);
                     
                     ListOfRightsContractPackageHollow packageIdList = rightsContract._getPackages();
 
