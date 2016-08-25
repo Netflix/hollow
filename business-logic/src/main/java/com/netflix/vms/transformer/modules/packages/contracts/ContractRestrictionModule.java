@@ -396,25 +396,10 @@ public class ContractRestrictionModule {
 
         }
 
-        LinkedHashSet<String> streamingCupKeys = new LinkedHashSet<String>(orderedContractIdCupKeyMap.values());
-		for (String cupToken : streamingCupKeys)
+        for (String cupToken : new LinkedHashSet<String>(orderedContractIdCupKeyMap.values()))
             restriction.cupKeys.add(getCupKey(cupToken));
-
-		/******************* Offline Cupkeys Calculation ************************/
-        // Optimization: If download cupkeys is same as streaming cup keys then just return null
-        // On client side if the restriction is available for download and if either offline restriction is null
-        // or if offline cup keys are null then streaming cup keys are returned. 
-		LinkedHashSet<String> offlineCupKeys = new LinkedHashSet<String>(offlineOrderedContractIdCupKeyMap.values());
-        if(!offlineCupKeys.equals(streamingCupKeys)){
-        	// Streaming cup keys are different from offline cup keys: then calculate and hold values
-			for (String cupToken : offlineCupKeys)
-	            restriction.offlineViewingRestrictions.downloadOnlyCupKeys.add(getCupKey(cupToken));
-        } else{
-        	// Streaming and offline cup keys are same. Set offline cup keys to null and 
-        	// client side logic will return streaming cup keys if offlineViewing is true.
-        	restriction.offlineViewingRestrictions.downloadOnlyCupKeys = null;
-        }
-        	
+        for (String cupToken : new LinkedHashSet<String>(offlineOrderedContractIdCupKeyMap.values()))
+            restriction.offlineViewingRestrictions.downloadOnlyCupKeys.add(getCupKey(cupToken));
 
         ContractHollow selectedContract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, selectedRightsContract.contractId);
         finalizeContractRestriction(assetTypeIdx, restriction, selectedContract, downloadRightsDifferentForContracts, isFirstContractAvailableForDownload);
@@ -470,22 +455,33 @@ public class ContractRestrictionModule {
 
         restriction.excludedDownloadables = assetTypeIdx.getAllUnmarked();
         
-        /// Offline viewing rights
-        if(downloadRightsDifferentForContracts){
-        	// Calculate and store offline viewing excluded downloadables only when differnet contracts have different offline viewing rights
-        	// And store only downloadables that are unmarked for download but are marked from streaming. Unmarkes for streaming and unmakred for download are not needed.
+        // Offline viewing rights
+        if(downloadRightsDifferentForContracts)
         	restriction.offlineViewingRestrictions.streamOnlyDownloadables = assetTypeIdx.getAllUnmarkedForDownloadAndMarkedForStreaming();
-        } else {
-        	// If all contracts have offline viewing rights then
-        	// no need to capture extra information for offline viewing restrictions.
-        	// Offline viewing restrictions can be answered using streaming restrictions
-        	// data on client side. 
-        	// Refer to com.netflix.vms.type.hollow.stream.ContractRestrictionHollowImpl for more details.
+        
+        // Offline viewing rights: optimization. 
+        // If all contracts have same download rights OR
+        // cupkeys, excluded downloadables and language restrictions are all same as streaming ones
+        // set offline restrictions to null. 
+        // Assumption: Client side logic will have enough information to return appropriate values
+        // in the cases where offline restriction is null.
+        if(!downloadRightsDifferentForContracts || (restriction.offlineViewingRestrictions != null && 
+        		restriction.offlineViewingRestrictions.streamOnlyDownloadables.isEmpty() &&
+        		cupTokensForOfflineIsSameAsStreaming(restriction) &&
+        		offlineLanguageRestrictionsSameAsStreaming(restriction))){
         	restriction.offlineViewingRestrictions = null;
         }
     }
 
-    private String getLanguageForAsset(PackageStreamHollow stream, ContractAssetType assetType) {
+    private boolean offlineLanguageRestrictionsSameAsStreaming(ContractRestriction restriction) {
+		return true;
+	}
+
+	private boolean cupTokensForOfflineIsSameAsStreaming(ContractRestriction restriction) {
+		return(restriction.cupKeys.equals(restriction.offlineViewingRestrictions.downloadOnlyCupKeys));
+	}
+
+	private String getLanguageForAsset(PackageStreamHollow stream, ContractAssetType assetType) {
         StreamNonImageInfoHollow nonImageInfo = stream._getNonImageInfo();
         if (assetType == ContractAssetType.SUBTITLES) {
             return nonImageInfo._getTextInfo()._getTextLanguageCode()._getValue();
