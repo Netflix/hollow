@@ -240,6 +240,7 @@ public class ContractRestrictionModule {
         Set<String> audioLanguagesWithDisallowedAssetBundles = new HashSet<String>();
         Set<String> audioLanguagesWhichRequireForcedSubtitles = new HashSet<String>();
         Map<Integer, String> orderedContractIdCupKeyMap = new TreeMap<Integer, String>();
+        Map<Integer, String> offlineOrderedContractIdCupKeyMap = new TreeMap<Integer, String>();
 
         boolean downloadRightsDifferentForContracts = false;
         boolean isFirstContractAvailableForDownload = applicableRightsContracts.get(0).isAvailableForDownload;
@@ -266,7 +267,8 @@ public class ContractRestrictionModule {
             }
             
             StringHollow cupKeyHollow = contract == null ? null : contract._getCupToken();
-            orderedContractIdCupKeyMap.put((int) contractId, cupKeyHollow == null ? CupKey.DEFAULT : cupKeyHollow._getValue());
+            String cupKey = (cupKeyHollow == null ? CupKey.DEFAULT : cupKeyHollow._getValue());
+			orderedContractIdCupKeyMap.put((int) contractId, cupKey);
             
             if(isFirstContractAvailableForDownload != thisRightsContract.isAvailableForDownload)
             	// Indicates some contract has different download rights than other.
@@ -275,8 +277,7 @@ public class ContractRestrictionModule {
             /// if any rights contract is downloadable, then the package is downloadable.
             if(thisRightsContract.isAvailableForDownload){
             	restriction.isAvailableForDownload = true;
-            	String cupKey = orderedContractIdCupKeyMap.get((int) contractId);
-            	restriction.offlineViewingRestrictions.downloadOnlyCupKeys.add(getCupKey(cupKey));	
+            	offlineOrderedContractIdCupKeyMap.put((int) contractId, cupKey);
             } 
         }
 
@@ -397,6 +398,8 @@ public class ContractRestrictionModule {
 
         for (String cupToken : new LinkedHashSet<String>(orderedContractIdCupKeyMap.values()))
             restriction.cupKeys.add(getCupKey(cupToken));
+        for (String cupToken : new LinkedHashSet<String>(offlineOrderedContractIdCupKeyMap.values()))
+            restriction.offlineViewingRestrictions.downloadOnlyCupKeys.add(getCupKey(cupToken));
 
         ContractHollow selectedContract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, selectedRightsContract.contractId);
         finalizeContractRestriction(assetTypeIdx, restriction, selectedContract, downloadRightsDifferentForContracts, isFirstContractAvailableForDownload);
