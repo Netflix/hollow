@@ -287,8 +287,11 @@ public class VMSAvailabilityWindowModule {
 
             if(locale == null || !outputWindow.windowInfosByPackageId.isEmpty()) {  /// do not add if all windows were filtered out for multicatalog country
                 availabilityWindows.add(outputWindow);
-                if(isGoLive && rollup.doEpisode())
-                    rollup.newSeasonWindow(window._getStartDate(), window._getEndDate(), rollup.getSeasonSequenceNumber());
+                if(rollup.doEpisode()) {
+                    rollup.windowFound();
+                    if(isGoLive)
+                        rollup.newSeasonWindow(window._getStartDate(), window._getEndDate(), rollup.getSeasonSequenceNumber());
+                }
             }
 
             if(includedWindowPackageData)
@@ -377,7 +380,11 @@ public class VMSAvailabilityWindowModule {
     private void populateRolledUpWindowData(Integer videoId, CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup, RightsHollow rights, boolean isGoLive) {
         ListOfRightsWindowHollow windows = rights._getWindows();
 
-        if(windows.isEmpty()) {
+        boolean windowsEmpty = windows.isEmpty();
+        if((rollup.doSeason() && !rollup.wasSeasonWindowFound()) || (rollup.doShow() && !rollup.wasShowWindowFound()))
+            windowsEmpty = true;
+        
+        if(windowsEmpty) {
             data.mediaAvailabilityWindows = Collections.emptyList();
             data.imagesAvailabilityWindows = Collections.emptyList();
         } else {

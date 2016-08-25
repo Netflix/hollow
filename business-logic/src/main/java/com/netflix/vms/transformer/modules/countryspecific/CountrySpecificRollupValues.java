@@ -49,6 +49,9 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
     private boolean seasonHasRollingEpisodes = false;
     private boolean showIsAvailableForDownload = false;
     private boolean seasonIsAvailableForDownload = false;
+    
+    private boolean showWindowFound = false;
+    private boolean seasonWindowFound = false;
 
     public void setSeasonSequenceNumber(int seasonSequenceNumber) {
         this.seasonSequenceNumber = seasonSequenceNumber;
@@ -75,6 +78,7 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         seasonLevelTaggedVideoImagesRollup = new HashMap<Strings, List<VideoImage>>();
         seasonBundledAssetFromFirstAvailableEpisode = Integer.MIN_VALUE;
         seasonBundledAssetFromFirstUnavailableEpisode = Integer.MIN_VALUE;
+        seasonWindowFound = false;
     }
 
     public void resetShow() {
@@ -90,19 +94,33 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         seasonSequenceNumberMap = new HashMap<>();
         showBundledAssetFromFirstAvailableEpisode = Integer.MIN_VALUE;
         showBundledAssetFromFirstUnavailableEpisode = Integer.MIN_VALUE;
+        showWindowFound = false;
     }
 
     public void episodeFound() {
         this.showEpisodeFound = true;
         this.seasonEpisodeFound = true;
     }
-
+    
     public boolean wasShowEpisodeFound() {
         return showEpisodeFound;
     }
 
     public boolean wasSeasonEpisodeFound() {
         return seasonEpisodeFound;
+    }
+    
+    public void windowFound() {
+        this.showWindowFound = true;
+        this.seasonWindowFound = true;
+    }
+    
+    public boolean wasShowWindowFound() {
+        return showWindowFound;
+    }
+    
+    public boolean wasSeasonWindowFound() {
+        return seasonWindowFound;
     }
 
     public void newAssetBcp47Codes(Set<Strings> assetCodes) {
