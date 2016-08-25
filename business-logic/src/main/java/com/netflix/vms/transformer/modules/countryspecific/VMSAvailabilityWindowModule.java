@@ -120,8 +120,9 @@ public class VMSAvailabilityWindowModule {
             }
         });
 
-        //Map<Long, ContractHollow> fullContractMap = VideoContractUtil.getContractMap(api, indexer, videoId, country);
-
+        if(videoId == 80036776 && "CH".equals(country))
+            System.out.println("watch");
+        
         ///TODO: Find some way to simplify this logic.
         for (RightsWindowHollow window : sortedWindows) {
             boolean includedWindowPackageData = false;
@@ -264,21 +265,25 @@ public class VMSAvailabilityWindowModule {
                         }
 
                     } else {
-                        /// packageIdList was empty -- packagedata not available -- use the contract only
-                        WindowPackageContractInfo windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(0, rightsContract, contract, country, videoId);
-                        outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfo);
-
-                        if(thisWindowMaxPackageId == 0)
-                            thisWindowBundledAssetsGroupId = Math.max((int)contractId, thisWindowBundledAssetsGroupId);
-                        if(maxPackageId == 0)
-                            bundledAssetsGroupId = Math.max((int)contractId, bundledAssetsGroupId);
+                        if(contractAvailability != 0) {
+                            /// packageIdList was empty -- packagedata not available -- use the contract only
+                            WindowPackageContractInfo windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(0, rightsContract, contract, country, videoId);
+                            outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfo);
+    
+                            if(thisWindowMaxPackageId == 0)
+                                thisWindowBundledAssetsGroupId = Math.max((int)contractId, thisWindowBundledAssetsGroupId);
+                            if(maxPackageId == 0)
+                                bundledAssetsGroupId = Math.max((int)contractId, bundledAssetsGroupId);
+                        }
                     }
                 } else {
-                    outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractId, videoId));
-
-                    if(maxPackageId == 0) {
-                        bundledAssetsGroupId = (int)contractId;
-                        thisWindowBundledAssetsGroupId = (int) contractId;
+                    if(locale == null) {
+                        outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractId, videoId));
+    
+                        if(maxPackageId == 0) {
+                            bundledAssetsGroupId = (int)contractId;
+                            thisWindowBundledAssetsGroupId = (int) contractId;
+                        }
                     }
                 }
             }
