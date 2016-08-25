@@ -86,7 +86,10 @@ public class VMSAvailabilityWindowModule {
 
     public List<VMSAvailabilityWindow> populateWindowData(Integer videoId, String country, String locale, CompleteVideoCountrySpecificData data, StatusHollow videoRights, CountrySpecificRollupValues rollup) {
         boolean isGoLive = isGoLive(videoRights);
-
+        
+        if(locale != null && isLanguageOverride(videoRights))
+            locale = null;
+            
         RightsHollow rights = videoRights._getRights();
         if((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
             populateRolledUpWindowData(videoId, data, rollup, rights, isGoLive);
@@ -515,6 +518,11 @@ public class VMSAvailabilityWindowModule {
     private boolean isGoLive(StatusHollow status) {
         FlagsHollow flags = status._getFlags();
         return flags != null && flags._getGoLive();
+    }
+    
+    private boolean isLanguageOverride(StatusHollow status) {
+        FlagsHollow flags = status._getFlags();
+        return flags != null && flags._getLanguageOverride();
     }
 
     public void reset() {
