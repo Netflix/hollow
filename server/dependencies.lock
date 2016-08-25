@@ -1874,7 +1874,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -4907,7 +4907,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -7940,7 +7940,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -10969,7 +10969,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -14024,7 +14024,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -18149,7 +18149,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -21181,7 +21181,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -24256,7 +24256,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -27408,7 +27408,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -30560,7 +30560,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -33712,7 +33712,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -36801,7 +36801,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -39851,7 +39851,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -42901,7 +42901,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -45951,7 +45951,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "15.15",
+            "locked": "16.44",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
