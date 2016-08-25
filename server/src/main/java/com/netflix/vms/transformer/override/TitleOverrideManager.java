@@ -76,23 +76,26 @@ public class TitleOverrideManager {
             mainExecutor.awaitSuccessfulCompletionOfCurrentTasks();
         }
 
-        return processResults(true);
+        List<HollowReadStateEngine> resultList = processResults(true);
+        ctx.getLogger().info(TransformerLogTag.TitleOverride, "Misc Stat completedJobs={} currJobs={} results={} waitedForAllJobs={}", completedJobs.size(), activeJobs.size(), resultList.size(), isWaitForAllJobs);
+        return resultList;
     }
 
-    private synchronized List<HollowReadStateEngine> processResults(boolean isPropagateFailure) throws InterruptedException, ExecutionException {
+    private synchronized List<HollowReadStateEngine> processResults(boolean isPropagateFailure) throws ExecutionException {
         // Collect Results on sorted Order
         List<HollowReadStateEngine> resultList = new ArrayList<>();
         for (TitleOverrideJobSpec jobSpec : sortJobSpecs(activeJobs.keySet())) {
             TitleOverrideProcessorJob job = activeJobs.get(jobSpec);
+            if (!job.getStatus().isCompleted()) continue;
 
             if (job.isCompletedSuccessfully()) {
                 resultList.add(job.getResult());
             } else {
-                if (isPropagateFailure) throw new ExecutionException("TitleOverrideProcessorJob failure", job.getFailure());
+                if (isPropagateFailure) {
+                    throw new ExecutionException("TitleOverrideProcessorJob failure: " + jobSpec, job.getFailure());
+                }
             }
         }
-
-        ctx.getLogger().info(TransformerLogTag.TitleOverride, "Misc Stat completedJobs={} currJobs={} results={}", completedJobs.size(), activeJobs.size(), resultList.size());
         return resultList;
     }
 
@@ -181,6 +184,20 @@ public class TitleOverrideManager {
         void completedJob(TitleOverrideJobSpec jobSpec, TitleOverrideProcessorJob job, boolean isSuccessfull);
     }
 
+    public enum JobStatus {
+        PENDING(false), RUNNING(false), COMPLETED_SUCC(true), COMPLETED_FAIL(true);
+
+        private boolean isCompleted;
+
+        JobStatus(boolean isCompleted) {
+            this.isCompleted = isCompleted;
+        }
+
+        public boolean isCompleted() {
+            return this.isCompleted;
+        }
+    }
+
     /**
      * Processor Job
      */
@@ -191,6 +208,7 @@ public class TitleOverrideManager {
         private final CompleteJobCallback callback;
         private HollowReadStateEngine resultStateEngine;
         private Throwable failure;
+        private JobStatus status = JobStatus.PENDING;
 
         TitleOverrideProcessorJob(TitleOverrideProcessor processor, TitleOverrideJobSpec jobSpec, TransformerContext ctx, CompleteJobCallback callback) {
             this.processor = processor;
@@ -205,8 +223,12 @@ public class TitleOverrideManager {
 
             try {
                 reset();
+                status = JobStatus.RUNNING;
                 resultStateEngine = processor.process(jobSpec.version, jobSpec.topNode);
+
+                status = JobStatus.COMPLETED_SUCC;
             } catch (Throwable e) {
+                status = JobStatus.COMPLETED_FAIL;
                 ctx.getLogger().error(TransformerLogTag.TitleOverride, "Failed to process override title={} for version={} and vip={}", jobSpec.topNode, jobSpec.version, processor.getVip());
                 failure = new Exception("Failed to process topNode=" + jobSpec.version + " for version=" + jobSpec.topNode + "\t on vip=" + processor.getVip(), e);
             } finally {
@@ -214,8 +236,12 @@ public class TitleOverrideManager {
             }
         }
 
+        public JobStatus getStatus() {
+            return status;
+        }
+
         public boolean isCompletedSuccessfully() {
-            return resultStateEngine != null && failure == null;
+            return status == JobStatus.COMPLETED_SUCC;
         }
 
         public HollowReadStateEngine getResult() {
@@ -223,6 +249,7 @@ public class TitleOverrideManager {
         }
 
         public void reset() {
+            status = JobStatus.PENDING;
             failure = null;
         }
 
