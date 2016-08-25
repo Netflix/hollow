@@ -396,10 +396,25 @@ public class ContractRestrictionModule {
 
         }
 
-        for (String cupToken : new LinkedHashSet<String>(orderedContractIdCupKeyMap.values()))
+        LinkedHashSet<String> streamingCupKeys = new LinkedHashSet<String>(orderedContractIdCupKeyMap.values());
+		for (String cupToken : streamingCupKeys)
             restriction.cupKeys.add(getCupKey(cupToken));
-        for (String cupToken : new LinkedHashSet<String>(offlineOrderedContractIdCupKeyMap.values()))
-            restriction.offlineViewingRestrictions.downloadOnlyCupKeys.add(getCupKey(cupToken));
+
+		/******************* Offline Cupkeys Calculation ************************/
+        // Optimization: If download cupkeys is same as streaming cup keys then just return null
+        // On client side if the restriction is available for download and if either offline restriction is null
+        // or if offline cup keys are null then streaming cup keys are returned. 
+		LinkedHashSet<String> offlineCupKeys = new LinkedHashSet<String>(offlineOrderedContractIdCupKeyMap.values());
+        if(!offlineCupKeys.equals(streamingCupKeys)){
+        	// Streaming cup keys are different from offline cup keys: then calculate and hold values
+			for (String cupToken : offlineCupKeys)
+	            restriction.offlineViewingRestrictions.downloadOnlyCupKeys.add(getCupKey(cupToken));
+        } else{
+        	// Streaming and offline cup keys are same. Set offline cup keys to null and 
+        	// client side logic will return streaming cup keys if offlineViewing is true.
+        	restriction.offlineViewingRestrictions.downloadOnlyCupKeys = null;
+        }
+        	
 
         ContractHollow selectedContract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, selectedRightsContract.contractId);
         finalizeContractRestriction(assetTypeIdx, restriction, selectedContract, downloadRightsDifferentForContracts, isFirstContractAvailableForDownload);
@@ -456,9 +471,11 @@ public class ContractRestrictionModule {
         restriction.excludedDownloadables = assetTypeIdx.getAllUnmarked();
         
         /// Offline viewing rights
-        if(downloadRightsDifferentForContracts)
-        	restriction.offlineViewingRestrictions.streamOnlyDownloadables = assetTypeIdx.getAllUnmarkedForDownload();
-        else {
+        if(downloadRightsDifferentForContracts){
+        	// Calculate and store offline viewing excluded downloadables only when differnet contracts have different offline viewing rights
+        	// And store only downloadables that are unmarked for download but are marked from streaming. Unmarkes for streaming and unmakred for download are not needed.
+        	restriction.offlineViewingRestrictions.streamOnlyDownloadables = assetTypeIdx.getAllUnmarkedForDownloadAndMarkedForStreaming();
+        } else {
         	// If all contracts have offline viewing rights then
         	// no need to capture extra information for offline viewing restrictions.
         	// Offline viewing restrictions can be answered using streaming restrictions
