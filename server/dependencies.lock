@@ -458,7 +458,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.29",
+            "locked": "1.30",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -505,7 +505,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.4",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -697,7 +696,6 @@
             "locked": "1.14.2",
             "requested": "1.12.15",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
@@ -2041,7 +2039,6 @@
         "netflix:nf-archaius2": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -2049,7 +2046,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:platform-management"
             ]
@@ -3491,7 +3487,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.29",
+            "locked": "1.30",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -3538,7 +3534,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.4",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -3730,7 +3725,6 @@
             "locked": "1.14.2",
             "requested": "1.12.15",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
@@ -5074,7 +5068,6 @@
         "netflix:nf-archaius2": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -5082,7 +5075,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:platform-management"
             ]
@@ -6524,7 +6516,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.29",
+            "locked": "1.30",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -6571,7 +6563,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.4",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -6763,7 +6754,6 @@
             "locked": "1.14.2",
             "requested": "1.12.15",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
@@ -8107,7 +8097,6 @@
         "netflix:nf-archaius2": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -8115,7 +8104,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:platform-management"
             ]
@@ -9557,7 +9545,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.29",
+            "locked": "1.30",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -9604,7 +9592,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.4",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -9796,7 +9783,6 @@
             "locked": "1.14.2",
             "requested": "1.12.15",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
@@ -11136,7 +11122,6 @@
         "netflix:nf-archaius2": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -11144,7 +11129,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:platform-management"
             ]
@@ -12608,7 +12592,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.29",
+            "locked": "1.30",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -12655,7 +12639,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.4",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -12847,7 +12830,6 @@
             "locked": "1.14.2",
             "requested": "1.12.15",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
@@ -14191,7 +14173,6 @@
         "netflix:nf-archaius2": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -14199,7 +14180,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:platform-management"
             ]
@@ -16733,7 +16713,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.29",
+            "locked": "1.30",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -16780,7 +16760,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.4",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -16972,7 +16951,6 @@
             "locked": "1.14.2",
             "requested": "1.12.15",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
@@ -18316,7 +18294,6 @@
         "netflix:nf-archaius2": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -18324,7 +18301,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:platform-management"
             ]
@@ -19766,7 +19742,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.29",
+            "locked": "1.30",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -19813,7 +19789,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.4",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -20005,7 +19980,6 @@
             "locked": "1.14.2",
             "requested": "1.12.15",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
@@ -21348,7 +21322,6 @@
         "netflix:nf-archaius2": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -21356,7 +21329,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:platform-management"
             ]
@@ -22790,7 +22762,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.29",
+            "locked": "1.30",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -22798,13 +22770,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.18",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.29",
+            "locked": "1.30",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -22851,8 +22823,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.4",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
-                "com.netflix.aeneas:aeneas-test",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -23044,7 +23014,6 @@
             "locked": "1.14.2",
             "requested": "1.12.15",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
@@ -24423,8 +24392,6 @@
         "netflix:nf-archaius2": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -24432,8 +24399,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:platform-management"
             ]
@@ -25942,7 +25907,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.29",
+            "locked": "1.30",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -25950,13 +25915,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.18",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.29",
+            "locked": "1.30",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -26003,8 +25968,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.4",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
-                "com.netflix.aeneas:aeneas-test",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -26196,7 +26159,6 @@
             "locked": "1.14.2",
             "requested": "1.12.15",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
@@ -27575,8 +27537,6 @@
         "netflix:nf-archaius2": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -27584,8 +27544,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:platform-management"
             ]
@@ -29094,7 +29052,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.29",
+            "locked": "1.30",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -29102,13 +29060,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.18",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.29",
+            "locked": "1.30",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -29155,8 +29113,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.4",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
-                "com.netflix.aeneas:aeneas-test",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -29348,7 +29304,6 @@
             "locked": "1.14.2",
             "requested": "1.12.15",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
@@ -30727,8 +30682,6 @@
         "netflix:nf-archaius2": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -30736,8 +30689,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:platform-management"
             ]
@@ -32246,7 +32197,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.29",
+            "locked": "1.30",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -32254,13 +32205,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.18",
+            "locked": "1.19",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.29",
+            "locked": "1.30",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -32307,8 +32258,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.4",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
-                "com.netflix.aeneas:aeneas-test",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -32500,7 +32449,6 @@
             "locked": "1.14.2",
             "requested": "1.12.15",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
@@ -33879,8 +33827,6 @@
         "netflix:nf-archaius2": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -33888,8 +33834,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:platform-management"
             ]
@@ -35376,7 +35320,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.29",
+            "locked": "1.30",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -35423,7 +35367,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.4",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -35615,7 +35558,6 @@
             "locked": "1.14.2",
             "requested": "1.12.15",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
@@ -36968,7 +36910,6 @@
         "netflix:nf-archaius2": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -36976,7 +36917,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:platform-management"
             ]
@@ -38426,7 +38366,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.29",
+            "locked": "1.30",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -38473,7 +38413,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.4",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -38665,7 +38604,6 @@
             "locked": "1.14.2",
             "requested": "1.12.15",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
@@ -40018,7 +39956,6 @@
         "netflix:nf-archaius2": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -40026,7 +39963,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:platform-management"
             ]
@@ -41476,7 +41412,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.29",
+            "locked": "1.30",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -41523,7 +41459,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.4",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -41715,7 +41650,6 @@
             "locked": "1.14.2",
             "requested": "1.12.15",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
@@ -43068,7 +43002,6 @@
         "netflix:nf-archaius2": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -43076,7 +43009,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:platform-management"
             ]
@@ -44526,7 +44458,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.29",
+            "locked": "1.30",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -44573,7 +44505,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.4",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -44765,7 +44696,6 @@
             "locked": "1.14.2",
             "requested": "1.12.15",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
@@ -46118,7 +46048,6 @@
         "netflix:nf-archaius2": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -46126,7 +46055,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.19",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:platform-management"
             ]
