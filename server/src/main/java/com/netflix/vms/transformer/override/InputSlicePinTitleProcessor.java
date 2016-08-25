@@ -14,54 +14,58 @@ import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Generates Title Override based on Input Slice
  *
  * @author dsu
  */
-public class InputSliceTitleOverrideProcessor extends AbstractTitleOverrideProcessor {
+public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
 
     private final VMSInputDataClient inputDataClient;
 
-    public InputSliceTitleOverrideProcessor(String vip, FileStore fileStore, String localBlobStore, TransformerContext ctx) {
+    public InputSlicePinTitleProcessor(String vip, FileStore fileStore, String localBlobStore, TransformerContext ctx) {
         super(vip, localBlobStore, ctx);
 
         this.inputDataClient = new VMSInputDataClient(fileStore, vip);
     }
 
-    public InputSliceTitleOverrideProcessor(String vip, String baseProxyURL, String localBlobStore, TransformerContext ctx) {
+    public InputSlicePinTitleProcessor(String vip, String baseProxyURL, String localBlobStore, TransformerContext ctx) {
         super(vip, localBlobStore, ctx);
 
         this.inputDataClient = new VMSInputDataClient(baseProxyURL, localBlobStore, vip);
     }
 
     @Override
-    public HollowReadStateEngine process(long inputDataVersion, int topNode) throws Throwable {
-        File localFile = getFile("output", inputDataVersion, topNode);
+    public HollowReadStateEngine process(long inputDataVersion, int... topNodes) throws Throwable {
+        File localFile = getFile("output", inputDataVersion, topNodes);
         if (!localFile.exists()) {
-            File slicedInputFile = getFile("input", inputDataVersion, topNode);
-            HollowReadStateEngine inputStateEngineSlice = fetchStateEngineSlice(slicedInputFile, inputDataVersion, topNode);
+            File slicedInputFile = getFile("input", inputDataVersion, topNodes);
+            HollowReadStateEngine inputStateEngineSlice = fetchStateEngineSlice(slicedInputFile, inputDataVersion, topNodes);
 
             VMSHollowInputAPI api = new VMSHollowInputAPI(inputStateEngineSlice);
             VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
             new SimpleTransformer(api, outputStateEngine, ctx).transform();
-            writeStateEngine(outputStateEngine, localFile);
+
+            String blobID = PinTitleHelper.createBlobID("i", inputDataVersion, topNodes);
+            writeStateEngine(outputStateEngine, localFile, blobID);
         }
 
         return readStateEngine(localFile);
     }
 
-    private HollowReadStateEngine fetchStateEngineSlice(File slicedFile, Long inputDataVersion, int topNode) throws IOException {
+    private HollowReadStateEngine fetchStateEngineSlice(File slicedFile, Long inputDataVersion, int... topNodes) throws IOException {
         if (!slicedFile.exists()) {
             long start = System.currentTimeMillis();
             HollowReadStateEngine inputStateEngine = readInputData(inputDataVersion);
 
-            DataSlicer.SliceTask slicer = new DataSlicerImpl().getSliceTask(0, topNode);
+            DataSlicer.SliceTask slicer = new DataSlicerImpl().getSliceTask(0, topNodes);
             HollowWriteStateEngine slicedStateEngine = slicer.sliceInputBlob(inputStateEngine);
 
-            writeStateEngine(slicedStateEngine, slicedFile);
-            ctx.getLogger().info(TransformerLogTag.TitleOverride, "Sliced[INPUT] videoId={} from vip={}, version={}, duration={}", topNode, vip, inputDataVersion, (System.currentTimeMillis() - start));
+            String blobID = PinTitleHelper.createBlobID("sliced_input", inputDataVersion, topNodes);
+            writeStateEngine(slicedStateEngine, slicedFile, blobID);
+            ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Sliced[INPUT] videoId={} from vip={}, version={}, duration={}", Arrays.toString(topNodes), vip, inputDataVersion, (System.currentTimeMillis() - start));
         }
 
         return readStateEngine(slicedFile);

@@ -24,9 +24,9 @@ public interface TransformerContext {
 
     Set<Integer> getFastlaneIds();
 
-    void setTitleOverrideSpecs(Set<String> titleOverrideSpecs);
+    void setPinTitleSpecs(Set<String> pinnedTitleSpecs);
 
-    Set<String> getTitleOverrideSpecs();
+    Set<String> getPinTitleSpecs();
 
     TaggingLogger getLogger();
 

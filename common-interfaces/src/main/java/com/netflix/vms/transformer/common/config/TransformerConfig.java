@@ -15,7 +15,7 @@ import com.netflix.archaius.api.annotations.PropertyName;
  */
 @Configuration(prefix = "vms")
 public interface TransformerConfig {
-	
+
     @DefaultValue("defaultConverterVip")
     String getConverterVip();
 
@@ -44,25 +44,30 @@ public interface TransformerConfig {
 
     String getOverrideFastlaneIds();
 
-    // FORMAT: topNodeId:version or topNodeId:version:[in|out] - in=input pinning; otherwise, output slicing
-    String getOverrideTitleSpecs();
+    // The Pin Title Specs
+    // Supported FORMAT:
+    //    - single title pinned:                                                        version:topNodeId
+    //    - multiple title pinned from same blob (ids separated by comman):             version1:topNodeId1,topNodeId2
+    //    - multiple title pinned from multiple blobs (specs separated by semicolon):   version1:topNodeId1;version2:topNodeId2
+    String getOverridePinTitleSpecs();
 
-    String getOverrideTitleDataVip();
+    // The VIP of the output data to use when pinning title using output data
+    String getOverridePinTitleOutputDataVip();
 
     @DefaultValue("true")
     boolean isRestoreFromPreviousStateEngine();
-    
+
     @DefaultValue("true")
     boolean isFailIfRestoreNotAvailable();
-    
+
     Long getRestoreFromSpecificVersion();
-    
+
     @DefaultValue("false")
     boolean isCompactionEnabled();
-    
+
     @DefaultValue("2000000")
     long getCompactionHoleByteThreshold();
-    
+
     @DefaultValue("10")
     int getCompactionHolePercentThreshold();
 
@@ -164,14 +169,14 @@ public interface TransformerConfig {
 
     @DefaultValue("true")
     boolean isElasticSearchNoWaitingEnabled();
-    
+
     ///////////// TEMPORARY FEATURE-BASED //////////////////
 
     ////////////// BUSINESS LOGIC  ////////////////////////
-    
+
     @DefaultValue("28")
     int getNewContentFlagDuration();
-    
+
     @DefaultValue("BE,CH,LU")
     String getMultilanguageCatalogCountries();
 }

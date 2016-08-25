@@ -30,12 +30,12 @@ public class FastlaneIdRetriever {
             return fastlaneIdsFromCassandra();
     }
 
-    public Set<String> getTitleOverrideSpecs() {
-        String specsConfig = config.getOverrideTitleSpecs();
+    public Set<String> getPinnedTitleSpecs() {
+        String specsConfig = config.getOverridePinTitleSpecs();
         if (specsConfig == null || specsConfig.trim().isEmpty()) return Collections.emptySet();
 
         Set<String> specs = new HashSet<>();
-        for (String spec : specsConfig.split(",")) {
+        for (String spec : specsConfig.split(";")) {
             specs.add(spec);
         }
         return specs;

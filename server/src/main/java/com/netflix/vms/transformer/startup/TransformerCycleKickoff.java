@@ -118,7 +118,7 @@ public class TransformerCycleKickoff {
 
             private void setUpFastlaneContext() {
                 ctx.setFastlaneIds(fastlaneIdRetriever.getFastlaneIds());
-                ctx.setTitleOverrideSpecs(fastlaneIdRetriever.getTitleOverrideSpecs());
+                ctx.setPinTitleSpecs(fastlaneIdRetriever.getPinnedTitleSpecs());
             }
 
             private void markCycleFailed(Throwable th) {

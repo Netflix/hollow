@@ -16,13 +16,13 @@ import java.io.IOException;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
 
-public abstract class AbstractTitleOverrideProcessor implements TitleOverrideProcessor {
+public abstract class AbstractPinTitleProcessor implements PinTitleProcessor {
 
     protected final String vip;
     protected final String localBlobStore;
     protected final TransformerContext ctx;
 
-    protected AbstractTitleOverrideProcessor(String vip, String localBlobStore, TransformerContext ctx) {
+    protected AbstractPinTitleProcessor(String vip, String localBlobStore, TransformerContext ctx) {
         this.vip = vip;
         this.localBlobStore = localBlobStore;
         this.ctx = ctx;
@@ -35,17 +35,18 @@ public abstract class AbstractTitleOverrideProcessor implements TitleOverridePro
         return vip;
     }
 
-    protected File getFile(String type, long version, int topNode) {
+    protected File getFile(String type, long version, int ... topNodes) {
         String fileVIP = vip + "_" + type;
+        HollowBlobFileNamer namer = new HollowBlobFileNamer(fileVIP);
         if (localBlobStore != null) {
-            return new File(localBlobStore, "vms." + fileVIP + "-titleoverride-" + version + "_" + topNode);
+            return new File(localBlobStore, namer.getPinTitleFileName(version, false, topNodes));
         } else {
-            return new File(new HollowBlobFileNamer(fileVIP).getTitleOverrideFileName(version, topNode));
+            return new File(namer.getPinTitleFileName(version, true, topNodes));
         }
     }
 
     protected HollowReadStateEngine readStateEngine(File inputFile) throws IOException {
-        ctx.getLogger().info(TransformerLogTag.TitleOverride, "Read StateEngine file:{}", inputFile);
+        ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Read StateEngine file:{}", inputFile);
 
         HollowReadStateEngine stateEngine = new HollowReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(stateEngine);
@@ -56,10 +57,11 @@ public abstract class AbstractTitleOverrideProcessor implements TitleOverridePro
         return stateEngine;
     }
 
-    protected void writeStateEngine(HollowWriteStateEngine stateEngine, File outputFile) throws IOException {
-        ctx.getLogger().info(TransformerLogTag.TitleOverride, "Write StateEngine file:{}", outputFile);
+    protected void writeStateEngine(HollowWriteStateEngine stateEngine, File outputFile, String blobID) throws IOException {
+        ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Write StateEngine file:{}", outputFile);
 
-        TitleOverrideHelper.addBlobID(stateEngine, outputFile);
+        if (blobID == null) blobID = outputFile.getName();
+        PinTitleHelper.addBlobID(stateEngine, blobID);
         HollowBlobWriter writer = new HollowBlobWriter(stateEngine);
         try (LZ4BlockOutputStream os = new LZ4BlockOutputStream(new FileOutputStream(outputFile))) {
             writer.writeSnapshot(os);

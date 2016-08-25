@@ -5,11 +5,11 @@ import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metri
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WaitForPublishWorkflowDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WriteOutputDataDuration;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleFastlaneIds;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.CyclePinnedTitles;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InputDataConverterVersionId;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.ProcessNowMillis;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.RollbackStateEngine;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.StateEngineCompaction;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.TitleOverride;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleBegin;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WritingBlobsFailed;
@@ -30,9 +30,9 @@ import com.netflix.vms.transformer.input.FollowVipPinExtractor;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
 import com.netflix.vms.transformer.input.VMSInputDataVersionLogger;
 import com.netflix.vms.transformer.input.VMSOutputDataClient;
-import com.netflix.vms.transformer.override.TitleOverrideHelper;
-import com.netflix.vms.transformer.override.TitleOverrideHollowCombiner;
-import com.netflix.vms.transformer.override.TitleOverrideManager;
+import com.netflix.vms.transformer.override.PinTitleHelper;
+import com.netflix.vms.transformer.override.PinTitleHollowCombiner;
+import com.netflix.vms.transformer.override.PinTitleManager;
 import com.netflix.vms.transformer.publish.status.CycleStatusFuture;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
@@ -57,7 +57,7 @@ public class TransformCycle {
     private final PublishWorkflowStager publishWorkflowStager;
     private final VersionMinter versionMinter;
     private final FollowVipPinExtractor followVipPinExtractor;
-    private final TitleOverrideManager titleOverrideMgr;
+    private final PinTitleManager pinTitleMgr;
 
     private long previousCycleNumber = Long.MIN_VALUE;
     private long currentCycleNumber = Long.MIN_VALUE;
@@ -75,7 +75,7 @@ public class TransformCycle {
         this.publishWorkflowStager = publishStager;
         this.versionMinter = new SequenceVersionMinter();
         this.followVipPinExtractor = new FollowVipPinExtractor(fileStore);
-        this.titleOverrideMgr = new TitleOverrideManager(fileStore, ctx);
+        this.pinTitleMgr = new PinTitleManager(fileStore, ctx);
     }
 
     public void restore(VMSOutputDataClient restoreFrom) {
@@ -137,15 +137,15 @@ public class TransformCycle {
         if(ctx.getFastlaneIds() != null)
             ctx.getLogger().info(CycleFastlaneIds, ctx.getFastlaneIds());
 
-        if (ctx.getTitleOverrideSpecs() != null) {
-            ctx.getLogger().info(TitleOverride, "Config Spec={}", ctx.getTitleOverrideSpecs());
+        if (ctx.getPinTitleSpecs() != null) {
+            ctx.getLogger().info(CyclePinnedTitles, "Config Spec={}", ctx.getPinTitleSpecs());
         }
 
         ctx.getLogger().info(TransformCycleBegin, "Beginning cycle={} jarVersion={}", currentCycleNumber, BlobMetaDataUtil.getJarVersion());
 
         outputStateEngine.prepareForNextCycle();
         fastlaneOutputStateEngine.prepareForNextCycle();
-        titleOverrideMgr.prepareForNextCycle();
+        pinTitleMgr.prepareForNextCycle();
     }
 
     private void updateTheInput() {
@@ -186,18 +186,18 @@ public class TransformCycle {
         try {
             if (isFastlane) {
                 // Kick off processing of Title Override/Pinning and use blobs that is ready
-                Set<String> titleOverrideSpecs = ctx.getTitleOverrideSpecs();
-                titleOverrideMgr.submitJobsToProcessASync(titleOverrideSpecs);
+                Set<String> pinnedTitleSpecs = ctx.getPinTitleSpecs();
+                pinTitleMgr.submitJobsToProcessASync(pinnedTitleSpecs);
 
                 // Process fastlane
                 trasformInputData(inputClient.getAPI(), fastlaneOutputStateEngine, ctx);
 
                 // Combine data
-                List<HollowReadStateEngine> overrideTitleOutputs = titleOverrideMgr.getResults(isFirstCycle);
-                TitleOverrideHollowCombiner combiner = new TitleOverrideHollowCombiner(ctx, outputStateEngine, fastlaneOutputStateEngine, overrideTitleOutputs);
+                List<HollowReadStateEngine> overrideTitleOutputs = pinTitleMgr.getResults(isFirstCycle);
+                PinTitleHollowCombiner combiner = new PinTitleHollowCombiner(ctx, outputStateEngine, fastlaneOutputStateEngine, overrideTitleOutputs);
                 String overrideBlobID = combiner.combine();
 
-                ctx.getLogger().info(TitleOverride, "Processed Fastlane cycleNumber={}, config={}, blobId={}, hasDataChanged={}, fastlaneChanged={}, isFirstCycle={}", currentCycleNumber, titleOverrideSpecs, overrideBlobID, outputStateEngine.hasChangedSinceLastCycle(), fastlaneOutputStateEngine.hasChangedSinceLastCycle(), isFirstCycle);
+                ctx.getLogger().info(CyclePinnedTitles, "Processed cycleNumber={}, blobId={}, hasDataChanged={}, fastlaneChanged={}, isFirstCycle={}", currentCycleNumber, overrideBlobID, outputStateEngine.hasChangedSinceLastCycle(), fastlaneOutputStateEngine.hasChangedSinceLastCycle(), isFirstCycle);
             } else {
                 trasformInputData(inputClient.getAPI(), outputStateEngine, ctx);
             }
@@ -217,7 +217,7 @@ public class TransformCycle {
         transformer.transform();
 
         String BLOB_ID = OverrideVipNameUtil.isOverrideVip(ctx.getConfig()) ? "FASTLANE" : "BASEBLOB";
-        TitleOverrideHelper.addBlobID(outputStateEngine, BLOB_ID);
+        PinTitleHelper.addBlobID(outputStateEngine, BLOB_ID);
     }
 
     private void writeTheBlobFiles() throws IOException {

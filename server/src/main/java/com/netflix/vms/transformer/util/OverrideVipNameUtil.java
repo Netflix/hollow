@@ -13,10 +13,14 @@ public class OverrideVipNameUtil {
         return isOverrideVip(cfg.getTransformerVip());
     }
 
-    public static String getTitleOverrideTransformerVip(TransformerConfig cfg) {
-        String overrideTitleDataVip = cfg.getOverrideTitleDataVip();
-        if (overrideTitleDataVip != null) return overrideTitleDataVip;
+    /**
+     * Return the Transformer/Output Data Vip - used to figure out where the pinned data comes from
+     */
+    public static String getPinTitleDataTransformerVip(TransformerConfig cfg) {
+        String dataVip = cfg.getOverridePinTitleOutputDataVip();
+        if (dataVip != null) return dataVip;
 
+        // By Default use the corresponding normal cluster vip (e.g. berlin_override, then return berlin)
         String vip = cfg.getTransformerVip();
         if (isOverrideVip(vip)) {
             int len = vip.length() - OVERRIDE_VIP_SUFFIX.length();

@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.override;
 
 import static com.netflix.vms.transformer.common.config.OutputTypeConfig.NamedCollectionHolder;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.TitleOverride;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.CyclePinnedTitles;
 
 import com.netflix.hollow.HollowObjectSchema;
 import com.netflix.hollow.combine.HollowCombiner;
@@ -62,7 +62,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author dsu
  */
-public class TitleOverrideHollowCombiner {
+public class PinTitleHollowCombiner {
     public static final String NAMEDLIST_TYPE_STATE_NAME = NamedCollectionHolder.getType();
     private static final String SET_OF_PREFIX = "SetOf";
     private static final String MAP_OF_PREFIX = "MapOfStringsToSetOf";
@@ -77,11 +77,11 @@ public class TitleOverrideHollowCombiner {
     protected final ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> combinedPersonLists;
     protected final ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> combinedEpisodeLists;
 
-    public TitleOverrideHollowCombiner(TransformerContext ctx, HollowWriteStateEngine output, HollowWriteStateEngine fastlaneOutput, List<HollowReadStateEngine> pinnedTitleInputs) throws Exception {
+    public PinTitleHollowCombiner(TransformerContext ctx, HollowWriteStateEngine output, HollowWriteStateEngine fastlaneOutput, List<HollowReadStateEngine> pinnedTitleInputs) throws Exception {
         this(ctx, output, roundTrip(fastlaneOutput), pinnedTitleInputs);
     }
 
-    public TitleOverrideHollowCombiner(TransformerContext ctx, HollowWriteStateEngine output, HollowReadStateEngine fastlaneInput, List<HollowReadStateEngine> pinnedTitleInputs) throws Exception {
+    public PinTitleHollowCombiner(TransformerContext ctx, HollowWriteStateEngine output, HollowReadStateEngine fastlaneInput, List<HollowReadStateEngine> pinnedTitleInputs) throws Exception {
         this.ctx = ctx;
 
         this.inputs = createPrioritizedOrderingReadStateEngines(pinnedTitleInputs, fastlaneInput);
@@ -150,7 +150,7 @@ public class TitleOverrideHollowCombiner {
         // create Index map
         Map<HollowReadStateEngine, VMSOutputTypeIndexer> indexerMap = new HashMap<>();
         for (HollowReadStateEngine stateEngine : allInputs) {
-            String blobID = TitleOverrideHelper.getBlobID(stateEngine);
+            String blobID = PinTitleHelper.getBlobID(stateEngine);
             VMSOutputTypeIndexer indexer = new VMSOutputTypeIndexer(blobID, stateEngine, types);
             indexerMap.put(stateEngine, indexer);
         }
@@ -203,7 +203,7 @@ public class TitleOverrideHollowCombiner {
         combiner.combine();
         combineNamedLists();
         writeNamedListsToOutput(output);
-        String id = TitleOverrideHelper.addBlobID(output, inputs);
+        String id = PinTitleHelper.addBlobID(output, inputs);
 
         validateCombinedData(output);
         return id;
@@ -217,7 +217,7 @@ public class TitleOverrideHollowCombiner {
         dupChecker.checkDuplicates();
 
         if (dupChecker.wasDupKeysDetected()) {
-            ctx.getLogger().error(TitleOverride, "Duplicate Keys detected in Core Type(s): {}", dupChecker.getResults());
+            ctx.getLogger().error(CyclePinnedTitles, "Duplicate Keys detected in Core Type(s): {}", dupChecker.getResults());
             throw new Exception("Duplicate Keys detected in Core Type(s): " + dupChecker.getResults());
         }
     }

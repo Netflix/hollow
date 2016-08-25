@@ -1,22 +1,22 @@
 package com.netflix.vms.transformer.override;
 
-public class TitleOverrideJobSpec implements Comparable<TitleOverrideJobSpec> {
+import java.util.Arrays;
+
+public class PinTitleJobSpec implements Comparable<PinTitleJobSpec> {
     final long version;
-    final int topNode;
+    final int[] topNodes;
     final boolean isInputBased;
 
-    public TitleOverrideJobSpec(long version, int topNode, boolean isInputBased) {
+    public PinTitleJobSpec(boolean isInputBased, long version, int... topNodes) {
         this.version = version;
-        this.topNode = topNode;
         this.isInputBased = isInputBased;
+        this.topNodes = topNodes;
     }
 
-    @Override
-    public int compareTo(TitleOverrideJobSpec o) {
-        int result = Long.compare(this.version, o.version);
-        if (result != 0) return result;
 
-        result = Integer.compare(this.topNode, o.topNode);
+    @Override
+    public int compareTo(PinTitleJobSpec o) {
+        int result = Long.compare(this.version, o.version);
         if (result != 0) return result;
 
         return Boolean.compare(this.isInputBased, o.isInputBased);
@@ -27,9 +27,9 @@ public class TitleOverrideJobSpec implements Comparable<TitleOverrideJobSpec> {
         if (this == obj) return true;
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
-        TitleOverrideJobSpec other = (TitleOverrideJobSpec) obj;
+        PinTitleJobSpec other = (PinTitleJobSpec) obj;
         if (isInputBased != other.isInputBased) return false;
-        if (topNode != other.topNode) return false;
+        if (!Arrays.equals(topNodes, other.topNodes)) return false;
         if (version != other.version) return false;
         return true;
     }
@@ -39,21 +39,13 @@ public class TitleOverrideJobSpec implements Comparable<TitleOverrideJobSpec> {
         final int prime = 31;
         int result = 1;
         result = prime * result + (isInputBased ? 1231 : 1237);
-        result = prime * result + topNode;
+        result = prime * result + Arrays.hashCode(topNodes);
         result = prime * result + (int) (version ^ (version >>> 32));
         return result;
     }
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("TitleOverrideJobSpec [version=");
-        builder.append(version);
-        builder.append(", topNode=");
-        builder.append(topNode);
-        builder.append(", isInputBased=");
-        builder.append(isInputBased);
-        builder.append("]");
-        return builder.toString();
+        return isInputBased ? "i" : "o" + ":" + version + ":" + PinTitleHelper.toString(topNodes);
     }
 }

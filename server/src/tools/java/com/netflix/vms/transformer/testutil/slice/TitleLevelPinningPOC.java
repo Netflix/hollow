@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.testutil.slice;
 
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.TitleOverride;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.CyclePinnedTitles;
 
 import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
@@ -16,9 +16,9 @@ import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.common.slice.DataSlicer;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
-import com.netflix.vms.transformer.override.TitleOverrideHelper;
-import com.netflix.vms.transformer.override.TitleOverrideHollowCombiner;
-import com.netflix.vms.transformer.override.TitleOverrideManager;
+import com.netflix.vms.transformer.override.PinTitleHelper;
+import com.netflix.vms.transformer.override.PinTitleHollowCombiner;
+import com.netflix.vms.transformer.override.PinTitleManager;
 import com.netflix.vms.transformer.publish.workflow.IndexDuplicateChecker;
 import com.netflix.vms.transformer.testutil.migration.ShowMeTheProgressDiffTool;
 import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
@@ -63,7 +63,7 @@ public class TitleLevelPinningPOC {
             for (long v : versions) {
                 HollowReadStateEngine fastlane = loadFastlane(v);
 
-                TitleOverrideHollowCombiner combiner = new TitleOverrideHollowCombiner(ctx, outputStateEngine, fastlane, pinnedInputs);
+                PinTitleHollowCombiner combiner = new PinTitleHollowCombiner(ctx, outputStateEngine, fastlane, pinnedInputs);
                 String overrideBlobID = combiner.combine();
 
                 System.out.println(v + ": \t" + overrideBlobID + "\t hasChanged=" + outputStateEngine.hasChangedSinceLastCycle());
@@ -75,6 +75,13 @@ public class TitleLevelPinningPOC {
                     }
 
                     System.out.println("CHANGED");
+                }
+
+                String blobId = outputStateEngine.getHeaderTag("blobID") + "_" + v;
+                outputStateEngine.addHeaderTag("blobID", blobId);
+
+                if (blobId.length() % 100 == 0) {
+                    System.out.println(blobId.length() + "\t" + blobId);
                 }
 
                 outputStateEngine.prepareForWrite();
@@ -126,24 +133,24 @@ public class TitleLevelPinningPOC {
         Set<String> overrideTitleSpecs = new HashSet<>(Arrays.asList("70303291:20160810105115158", FASTLANE_ID + ":20160812090815150", "80124890:20160810105115158"));
 
         {
-            TitleOverrideManager mgr = new TitleOverrideManager(BASE_PROXY, "boson", "berlin", LOCAL_BLOB_STORE, ctx);
+            PinTitleManager mgr = new PinTitleManager(BASE_PROXY, "boson", "berlin", LOCAL_BLOB_STORE, ctx);
             mgr.submitJobsToProcessASync(overrideTitleSpecs);
 
             VMSTransformerWriteStateEngine fastlaneOutput = new VMSTransformerWriteStateEngine();
             SimpleTransformer transformer = new SimpleTransformer(api, fastlaneOutput, ctx);
             transformer.transform();
-            TitleOverrideHelper.addBlobID(fastlaneOutput, "FASTLANE");
+            PinTitleHelper.addBlobID(fastlaneOutput, "FASTLANE");
             writeStateEngine(fastlaneOutput, new File(FASTLANE_FILE));
 
             List<HollowReadStateEngine> overrideTitleOutputs = mgr.getResults(true);
 
-            TitleOverrideHollowCombiner combiner = new TitleOverrideHollowCombiner(ctx, outputStateEngine, fastlaneOutput, overrideTitleOutputs);
+            PinTitleHollowCombiner combiner = new PinTitleHollowCombiner(ctx, outputStateEngine, fastlaneOutput, overrideTitleOutputs);
             combiner.combine();
             HollowReadStateEngine fastlaneBlob = loadStateEngine(FASTLANE_FILE);
             HollowReadStateEngine combinedBlob = roundTrip(outputStateEngine);
 
-            String blobID = TitleOverrideHelper.getBlobID(combinedBlob);
-            ctx.getLogger().info(TitleOverride, "Processed override titles={} blodId={}", overrideTitleSpecs, blobID);
+            String blobID = PinTitleHelper.getBlobID(combinedBlob);
+            ctx.getLogger().info(CyclePinnedTitles, "Processed override titles={} blodId={}", overrideTitleSpecs, blobID);
 
             validateAndDiff(fastlaneBlob, combinedBlob);
         }

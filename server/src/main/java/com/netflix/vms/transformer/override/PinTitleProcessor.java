@@ -2,9 +2,9 @@ package com.netflix.vms.transformer.override;
 
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 
-public interface TitleOverrideProcessor {
+public interface PinTitleProcessor {
 
-    public HollowReadStateEngine process(long dataVersion, int topNode) throws Throwable;
+    public HollowReadStateEngine process(long dataVersion, int... topNodes) throws Throwable;
 
     public String getVip();
 }
