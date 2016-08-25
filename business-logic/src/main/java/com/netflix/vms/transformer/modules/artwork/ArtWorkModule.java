@@ -5,8 +5,9 @@ import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_IMAGE_FORMAT;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_RECIPE;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_TERRITORY_COUNTRIES;
 
-import com.netflix.vms.transformer.hollowinput.StringHollow;
+import com.netflix.vms.transformer.util.ArraySet;
 
+import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.CycleConstants;
 import java.util.*;
 import java.util.Map.Entry;
@@ -477,7 +478,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     protected Set<Artwork> getArtworkSet(int entityId, Map<java.lang.Integer, Set<Artwork>> artMap) {
         Set<Artwork> artworkSet = artMap.get(entityId);
         if (artworkSet == null) {
-            artworkSet = new HashSet<>();
+            artworkSet = new ArraySet<>();
             artMap.put(entityId, artworkSet);
         }
         return artworkSet;
