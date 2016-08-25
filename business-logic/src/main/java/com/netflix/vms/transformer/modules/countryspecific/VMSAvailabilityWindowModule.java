@@ -120,9 +120,6 @@ public class VMSAvailabilityWindowModule {
             }
         });
 
-        if(videoId == 80036776 && "CH".equals(country))
-            System.out.println("watch");
-        
         ///TODO: Find some way to simplify this logic.
         for (RightsWindowHollow window : sortedWindows) {
             boolean includedWindowPackageData = false;
