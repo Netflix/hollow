@@ -75,11 +75,11 @@ public class TitleOverrideManager {
         if (isWaitForAllJobs) {
             mainExecutor.awaitSuccessfulCompletionOfCurrentTasks();
         }
-        String label = isWaitForAllJobs ? "ALL_JOBS" : "ONLY_COMPLETED_JOBS";
-        return getResults(label, true);
+
+        return processResults(true);
     }
 
-    private synchronized List<HollowReadStateEngine> getResults(String label, boolean isPropagateFailure) throws InterruptedException, ExecutionException {
+    private synchronized List<HollowReadStateEngine> processResults(boolean isPropagateFailure) throws InterruptedException, ExecutionException {
         // Collect Results on sorted Order
         List<HollowReadStateEngine> resultList = new ArrayList<>();
         for (TitleOverrideJobSpec jobSpec : sortJobSpecs(activeJobs.keySet())) {
@@ -92,8 +92,7 @@ public class TitleOverrideManager {
             }
         }
 
-        ctx.getLogger().info(TransformerLogTag.TitleOverride, "[{}] Misc Stat completedJobs={} currJobs={} results={}", label, completedJobs.size(), activeJobs.size(), resultList.size());
-
+        ctx.getLogger().info(TransformerLogTag.TitleOverride, "Misc Stat completedJobs={} currJobs={} results={}", completedJobs.size(), activeJobs.size(), resultList.size());
         return resultList;
     }
 
