@@ -13,6 +13,8 @@ public class ContractRestriction implements Cloneable {
     public int postPromotionDays = java.lang.Integer.MIN_VALUE;
     public boolean isAvailableForDownload = false;
     public Map<Strings, LanguageRestrictions> languageBcp47RestrictionsMap = null;
+    public OfflineViewingRestrictions offlineViewingRestrictions = null;
+
 
     public boolean equals(Object other) {
         if(other == this)  return true;
@@ -63,6 +65,7 @@ public class ContractRestriction implements Cloneable {
         return builder.toString();
     }
 
+    @Override
     public ContractRestriction clone() {
         try {
             ContractRestriction clone = (ContractRestriction)super.clone();

@@ -1,13 +1,12 @@
 package com.netflix.vms.transformer.modules.packages.contracts;
 
-import com.netflix.vms.transformer.contract.ContractAsset;
-
-import com.netflix.vms.transformer.contract.ContractAssetType;
-import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
+import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.contract.ContractAsset;
+import com.netflix.vms.transformer.contract.ContractAssetType;
 import com.netflix.vms.transformer.hollowinput.AudioStreamInfoHollow;
 import com.netflix.vms.transformer.hollowinput.ContractHollow;
 import com.netflix.vms.transformer.hollowinput.DisallowedAssetBundleHollow;
@@ -33,6 +32,7 @@ import com.netflix.vms.transformer.hollowoutput.ContractRestriction;
 import com.netflix.vms.transformer.hollowoutput.CupKey;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.LanguageRestrictions;
+import com.netflix.vms.transformer.hollowoutput.OfflineViewingRestrictions;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
@@ -131,6 +131,11 @@ public class ContractRestrictionModule {
                     restriction.languageBcp47RestrictionsMap = new HashMap<Strings, LanguageRestrictions>();
                     restriction.excludedDownloadables = new HashSet<com.netflix.vms.transformer.hollowoutput.Long>();
 
+                    restriction.offlineViewingRestrictions = new OfflineViewingRestrictions();
+                    restriction.offlineViewingRestrictions.downloadOnlyCupKeys = new ArrayList<>();
+                    restriction.offlineViewingRestrictions.streamOnlyDownloadables = new HashSet<>();
+                    restriction.offlineViewingRestrictions.downloadLanguageBcp47RestrictionsMap = new HashMap<Strings, LanguageRestrictions>();
+                    
                     assetTypeIdx.resetMarks();
 
                     List<RightsWindowContract> applicableRightsContracts = filterToApplicableContracts(packages, rightsContracts, contractIds);
@@ -184,7 +189,7 @@ public class ContractRestrictionModule {
     private void buildRestrictionBasedOnSingleApplicableContract(DownloadableAssetTypeIndex assetTypeIdx, ContractRestriction restriction, RightsWindowContract rightsContract, long videoId, String countryCode) {
         ListOfRightsContractAssetHollow contractAssets = rightsContract.contract._getAssets();
         if(!markAllAssetsIfNoAssetsPresent(assetTypeIdx, contractAssets))
-            markAssetTypeIndexForExcludedDownloadablesCalculation(assetTypeIdx, contractAssets);
+            markAssetTypeIndexForExcludedDownloadablesCalculation(assetTypeIdx, contractAssets, rightsContract.isAvailableForDownload);
 
         ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, rightsContract.contractId);
         if (contract!=null) {
@@ -220,7 +225,10 @@ public class ContractRestrictionModule {
 
         restriction.isAvailableForDownload = rightsContract.isAvailableForDownload;
         
-        finalizeContractRestriction(assetTypeIdx, restriction, contract);
+        // Since there is only one contract, there are no different contracts.
+        boolean downloadRightsDifferentForContracts = false;
+        
+        finalizeContractRestriction(assetTypeIdx, restriction, contract, downloadRightsDifferentForContracts, restriction.isAvailableForDownload);
     }
 
     // we need to merge both the allowed asset types (for excluded downloadable calculations) and the language bundle restrictions
@@ -233,14 +241,18 @@ public class ContractRestrictionModule {
         Set<String> audioLanguagesWhichRequireForcedSubtitles = new HashSet<String>();
         Map<Integer, String> orderedContractIdCupKeyMap = new TreeMap<Integer, String>();
 
-        for (RightsWindowContract rightsContract : applicableRightsContracts) {
+        boolean downloadRightsDifferentForContracts = false;
+        boolean isFirstContractAvailableForDownload = applicableRightsContracts.get(0).isAvailableForDownload;
+        
+        for (RightsWindowContract thisRightsContract : applicableRightsContracts) {
             // // for unmerged fields, select the contract with the highest ID.
-            if (selectedRightsContract == null || rightsContract.contractId > selectedRightsContract.contractId)
-                selectedRightsContract = rightsContract;
+            if (selectedRightsContract == null || thisRightsContract.contractId > selectedRightsContract.contractId)
+                selectedRightsContract = thisRightsContract;
 
-            markAssetTypeIndexForExcludedDownloadablesCalculation(assetTypeIdx, rightsContract.contract._getAssets());
+            markAssetTypeIndexForExcludedDownloadablesCalculation(assetTypeIdx, thisRightsContract.contract._getAssets(), thisRightsContract.isAvailableForDownload);
 
-            ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, rightsContract.contract._getContractId());
+            long contractId = thisRightsContract.contract._getContractId();
+			ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, contractId);
             if (contract != null) {
                 for (DisallowedAssetBundleHollow disallowedAssetBundle : contract._getDisallowedAssetBundles()) {
                     String audioLang = disallowedAssetBundle._getAudioLanguageCode()._getValue();
@@ -252,13 +264,20 @@ public class ContractRestrictionModule {
                     audioLanguagesWhichRequireForcedSubtitles.add(audioLang);
                 }
             }
-
-            /// if any rights contract is downloadable, then the package is downloadable.
-            if(rightsContract.isAvailableForDownload)
-            	restriction.isAvailableForDownload = true;
             
-            StringHollow cupKey = contract == null ? null : contract._getCupToken();
-            orderedContractIdCupKeyMap.put((int) rightsContract.contract._getContractId(), cupKey == null ? CupKey.DEFAULT : cupKey._getValue());
+            StringHollow cupKeyHollow = contract == null ? null : contract._getCupToken();
+            orderedContractIdCupKeyMap.put((int) contractId, cupKeyHollow == null ? CupKey.DEFAULT : cupKeyHollow._getValue());
+            
+            if(isFirstContractAvailableForDownload != thisRightsContract.isAvailableForDownload)
+            	// Indicates some contract has different download rights than other.
+            	downloadRightsDifferentForContracts = true; 
+            	
+            /// if any rights contract is downloadable, then the package is downloadable.
+            if(thisRightsContract.isAvailableForDownload){
+            	restriction.isAvailableForDownload = true;
+            	String cupKey = orderedContractIdCupKeyMap.get((int) contractId);
+            	restriction.offlineViewingRestrictions.downloadOnlyCupKeys.add(getCupKey(cupKey));	
+            } 
         }
 
         // Step 2: if any audio languages have language bundle restrictions, then determine the merged set of disallowed text languages for each
@@ -380,7 +399,7 @@ public class ContractRestrictionModule {
             restriction.cupKeys.add(getCupKey(cupToken));
 
         ContractHollow selectedContract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, selectedRightsContract.contractId);
-        finalizeContractRestriction(assetTypeIdx, restriction, selectedContract);
+        finalizeContractRestriction(assetTypeIdx, restriction, selectedContract, downloadRightsDifferentForContracts, isFirstContractAvailableForDownload);
     }
 
     private MergeableTextLanguageBundleRestriction getMergeableTextRestrictionsByAudioLang(Map<String, MergeableTextLanguageBundleRestriction> mergedLanguageBundleRestrictions,
@@ -412,7 +431,7 @@ public class ContractRestrictionModule {
         return emptyAssets;
     }
 
-    private void markAssetTypeIndexForExcludedDownloadablesCalculation(DownloadableAssetTypeIndex assetTypeIdx, ListOfRightsContractAssetHollow contractAssets) {
+    private void markAssetTypeIndexForExcludedDownloadablesCalculation(DownloadableAssetTypeIndex assetTypeIdx, ListOfRightsContractAssetHollow contractAssets, boolean isAvailableForDownload) {
         for (RightsContractAssetHollow assetInput : contractAssets) {
             ContractAsset asset = cycleConstants.rightsContractAssetCache.getResult(assetInput.getOrdinal());
             if(asset == null) {
@@ -421,14 +440,29 @@ public class ContractRestrictionModule {
             }
 
             assetTypeIdx.mark(asset);
+            if(isAvailableForDownload)
+            	assetTypeIdx.markForDownload(asset);
         }
     }
 
-    private void finalizeContractRestriction(DownloadableAssetTypeIndex assetTypeIdx, ContractRestriction restriction, ContractHollow selectedContract) {
+    private void finalizeContractRestriction(DownloadableAssetTypeIndex assetTypeIdx, ContractRestriction restriction, ContractHollow selectedContract,
+    		boolean downloadRightsDifferentForContracts, boolean isAvailableForDownload) {
         if (selectedContract != null && selectedContract._getPrePromotionDays() != Long.MIN_VALUE)
             restriction.prePromotionDays = (int) selectedContract._getPrePromotionDays();
 
         restriction.excludedDownloadables = assetTypeIdx.getAllUnmarked();
+        
+        /// Offline viewing rights
+        if(downloadRightsDifferentForContracts)
+        	restriction.offlineViewingRestrictions.streamOnlyDownloadables = assetTypeIdx.getAllUnmarkedForDownload();
+        else {
+        	// If all contracts have offline viewing rights then
+        	// no need to capture extra information for offline viewing restrictions.
+        	// Offline viewing restrictions can be answered using streaming restrictions
+        	// data on client side. 
+        	// Refer to com.netflix.vms.type.hollow.stream.ContractRestrictionHollowImpl for more details.
+        	restriction.offlineViewingRestrictions = null;
+        }
     }
 
     private String getLanguageForAsset(PackageStreamHollow stream, ContractAssetType assetType) {

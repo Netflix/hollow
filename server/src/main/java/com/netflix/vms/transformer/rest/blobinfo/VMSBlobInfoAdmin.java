@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +47,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("deprecation")
 @Singleton
 @Path("/vms/blobinfo")
-public class VMSBlobInfoAdmin {
+public class VMSBlobInfoAdmin  {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(VMSBlobInfoAdmin.class);
 
@@ -64,7 +65,9 @@ public class VMSBlobInfoAdmin {
     private final TransformerCassandraColumnFamilyHelper poisonedCassandraHelper;
     
     @Inject
-    public VMSBlobInfoAdmin(TransformerConfig config, FileStore fileStore, TransformerServerCassandraHelper cassandra) {
+    public VMSBlobInfoAdmin(TransformerConfig config, 
+    		FileStore fileStore, 
+    		TransformerServerCassandraHelper cassandra) {
         this.transformerConfig = config;
         this.fileStore = fileStore;
         this.cassandraHelper = cassandra;
@@ -78,7 +81,7 @@ public class VMSBlobInfoAdmin {
             @QueryParam("details") boolean details,
             @QueryParam("format") final String format
             ) throws Exception {
-
+    	
         if (StringUtils.isBlank(vip)) vip = transformerConfig.getTransformerVip();
         
         BlobImageEntryLoader loader = new BlobImageEntryLoader(vip, fileStore);
@@ -97,10 +100,12 @@ public class VMSBlobInfoAdmin {
         }
 
         // Build the announced version map
-        Map<RegionEnum, String> announcedVersions = new HashMap<RegionEnum, String>();
-        for(RegionEnum region : regions) {
-        	String version = ClientPinningUtil.getLastAnnouncedVersion(vip, region);
-        	announcedVersions.put(region, version);
+        Map<RegionEnum, String> announcedVersions = ClientPinningUtil.getAnnouncedVersions(vip);
+        if(announcedVersions == null) {
+        	announcedVersions = new Hashtable<RegionEnum, String>();
+            for(RegionEnum region : regions) {
+            	announcedVersions.put(region, (new Long(Long.MAX_VALUE)).toString());
+            }        	
         }
 
         final StringBuilder sb = new StringBuilder();
@@ -450,5 +455,6 @@ public class VMSBlobInfoAdmin {
             return String.format(pinLinkFormat, vip, version, region.toString(), region.toString());
         }
     }
+
 
 }
