@@ -266,12 +266,13 @@ public class ContractRestrictionModule {
                     .collect(Collectors.toList());
             ContractRestriction offlineViewingContractRestriction = buildIntermediateRestrictionBasedOnMultipleApplicableContracts(assetTypeIdx, offlineViewingRightsContracts, videoId, countryCode, DOWNLOAD);
 
-            // TODO: timt: only assign when these fields actually differ
             restriction.offlineViewingRestrictions = new OfflineViewingRestrictions();
             restriction.offlineViewingRestrictions.downloadOnlyCupKeys = offlineViewingContractRestriction.cupKeys.equals(restriction.cupKeys)
                     ? new ArrayList<>()
                     : offlineViewingContractRestriction.cupKeys;
-            restriction.offlineViewingRestrictions.downloadLanguageBcp47RestrictionsMap = new HashMap<>();
+            restriction.offlineViewingRestrictions.downloadLanguageBcp47RestrictionsMap = offlineViewingContractRestriction.languageBcp47RestrictionsMap.equals(restriction.languageBcp47RestrictionsMap)
+                    ? new HashMap<>()
+                    : offlineViewingContractRestriction.languageBcp47RestrictionsMap;
         }
 
         ContractHollow selectedContract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, selectedRightsContract.contractId);
@@ -505,11 +506,15 @@ public class ContractRestrictionModule {
     }
 
     private boolean offlineLanguageRestrictionsSameAsStreaming(ContractRestriction restriction) {
-		return true;
+        OfflineViewingRestrictions offlineRestrictions = restriction.offlineViewingRestrictions;
+        return offlineRestrictions.downloadLanguageBcp47RestrictionsMap.isEmpty()
+                || restriction.languageBcp47RestrictionsMap.equals(offlineRestrictions.downloadLanguageBcp47RestrictionsMap);
 	}
 
 	private boolean cupTokensForOfflineIsSameAsStreaming(ContractRestriction restriction) {
-		return(restriction.cupKeys.equals(restriction.offlineViewingRestrictions.downloadOnlyCupKeys) || restriction.offlineViewingRestrictions.downloadOnlyCupKeys.isEmpty());
+		OfflineViewingRestrictions offlineRestrictions = restriction.offlineViewingRestrictions;
+        return offlineRestrictions.downloadOnlyCupKeys.isEmpty()
+		        || restriction.cupKeys.equals(offlineRestrictions.downloadOnlyCupKeys);
 	}
 
 	private String getLanguageForAsset(PackageStreamHollow stream, ContractAssetType assetType) {
