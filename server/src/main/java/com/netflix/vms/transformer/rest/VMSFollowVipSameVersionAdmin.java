@@ -11,8 +11,10 @@ import com.netflix.vms.transformer.util.HollowBlobKeybaseBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -42,17 +44,20 @@ public class VMSFollowVipSameVersionAdmin {
         if(toVip == null)
             toVip = config.getTransformerVip();
 
-        Map<String, Long>fromVipVersions = getVersionsByInputParameters(fromVip);
-        Map<String, Long>toVipVersions = getVersionsByInputParameters(toVip);
+        Map<String, Set<Long>> fromVipVersions = getVersionsByInputParameters(fromVip);
+        Map<String, Set<Long>> toVipVersions = getVersionsByInputParameters(toVip);
 
         List<VersionPair> versionPairs = new ArrayList<VersionPair>();
 
-        for(Map.Entry<String, Long> entry : fromVipVersions.entrySet()) {
-            Long fromVipVersion = entry.getValue();
-            Long toVipVersion = toVipVersions.get(entry.getKey());
+        for (Map.Entry<String, Set<Long>> entry : fromVipVersions.entrySet()) {
+            Long fromVipVersion = getLatest(entry.getValue());
 
-            if(toVipVersion != null)
-                versionPairs.add(new VersionPair(fromVipVersion, toVipVersion));
+            Set<Long> toVipVersionList = toVipVersions.get(entry.getKey());
+            if (toVipVersionList != null) {
+                for (long toVipVersion : toVipVersionList) {
+                    versionPairs.add(new VersionPair(fromVipVersion, toVipVersion));
+                }
+            }
         }
 
         Collections.sort(versionPairs);
@@ -94,28 +99,44 @@ public class VMSFollowVipSameVersionAdmin {
         return Response.ok(response.toString(), mediaType).build();
     }
 
-    private final Map<String, Long> getVersionsByInputParameters(String vip) throws Exception {
+    private final Map<String, Set<Long>> getVersionsByInputParameters(String vip) throws Exception {
         HollowBlobKeybaseBuilder keybaseBuilder = new HollowBlobKeybaseBuilder(vip);
 
-        Map<String, Long> map = new HashMap<String, Long>();
-
+        Map<String, Set<Long>> map = new HashMap<>();
         addVersionsByKeybase(map, keybaseBuilder.getSnapshotKeybase());
         addVersionsByKeybase(map, keybaseBuilder.getDeltaKeybase());
 
         return map;
     }
 
-    private void addVersionsByKeybase(Map<String, Long> map, String snapshotKeybase) {
+    private final Long getLatest(Set<Long> versions) {
+        Long result = null;
+
+        for (Long v : versions) {
+            if (result == null || result.longValue() < v.longValue()) {
+                result = v;
+            }
+        }
+
+        return result;
+    }
+
+    // Need to support multiple outputs using same inputVersion+cycleDataTimestamp
+    private void addVersionsByKeybase(Map<String, Set<Long>> map, String snapshotKeybase) {
         List<FileAccessItem> allVersionItems = fileStore.getAllFileAccessItems(snapshotKeybase);
 
         for(FileAccessItem item : allVersionItems) {
-            Long toVersion = FileStoreUtil.getToVersion(item);
+            Long outputVersion = FileStoreUtil.getToVersion(item);
             Long inputVersion = FileStoreUtil.getInputDataVersion(item);
             Long cycleDataTimestamp = FileStoreUtil.getPublishCycleDataTS(item);
 
             String key = inputVersion + "_" + cycleDataTimestamp;
-
-            map.put(key, toVersion);
+            Set<Long> outputVersionSet = map.get(key);
+            if (outputVersionSet == null) {
+                outputVersionSet = new HashSet<>();
+                map.put(key, outputVersionSet);
+            }
+            outputVersionSet.add(outputVersion);
         }
     }
 
@@ -147,7 +168,10 @@ public class VMSFollowVipSameVersionAdmin {
 
         @Override
         public int compareTo(VersionPair other) {
-            return Long.compare(other.fromVersion, fromVersion);
+            int result = Long.compare(other.fromVersion, fromVersion);
+            if (result != 0) return result;
+
+            return Long.compare(other.toVersion, toVersion);
         }
     }
 
