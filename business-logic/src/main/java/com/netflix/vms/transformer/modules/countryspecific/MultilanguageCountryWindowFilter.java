@@ -16,10 +16,13 @@ import java.util.Arrays;
 
 public class MultilanguageCountryWindowFilter {
     
-    public final InputOrdinalResultCache<ContractAsset> rightsContractAssetCache;
+    private final InputOrdinalResultCache<ContractAsset> rightsContractAssetCache;
+    private final MultilanguageCountryDialectOrdinalAssigner dialectOrdinalAssigner;
+    
     
     public MultilanguageCountryWindowFilter(CycleConstants cycleConstants) {
         this.rightsContractAssetCache = cycleConstants.rightsContractAssetCache;
+        this.dialectOrdinalAssigner = cycleConstants.dialectOrdinalAssigner;
     }
     
     /**
@@ -40,7 +43,7 @@ public class MultilanguageCountryWindowFilter {
             }
             
             if(language.equals(asset.getLanguage())) {
-                availability |= asset.getType().getBitIdentifier();
+                availability |= (ContractAssetType.values().length * languageDialectOffset(language, asset.getLocale())) + asset.getType().getBitIdentifier();
             }
         }
         
@@ -95,11 +98,13 @@ public class MultilanguageCountryWindowFilter {
         EncodeSummaryDescriptorData descriptorData = descriptor.descriptorData;
         
         if(checkAudio && languageMatches(language, descriptorData.audioLanguage)) {
+            int localeBitOffset = ContractAssetType.values().length * languageDialectOffset(language, descriptorData.audioLanguage);
+            
             if(descriptorData.assetType.id == 2) {
-                if((languageAvailability & ContractAssetType.DESCRIPTIVE_AUDIO.getBitIdentifier()) != 0)
+                if((languageAvailability & (localeBitOffset + ContractAssetType.DESCRIPTIVE_AUDIO.getBitIdentifier())) != 0)
                     return true;
             } else {
-                if((languageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0)
+                if((languageAvailability & (localeBitOffset + ContractAssetType.AUDIO.getBitIdentifier())) != 0)
                     return true;
             }
         }
@@ -109,7 +114,9 @@ public class MultilanguageCountryWindowFilter {
             
             if(textType != null && !Arrays.equals(FORCED_CHARS, textType.nameStr)) {
                 if(languageMatches(language, descriptorData.textLanguage)) {
-                    if((languageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0)
+                    int localeBitOffset = ContractAssetType.values().length * languageDialectOffset(language, descriptorData.textLanguage);
+                    
+                    if((languageAvailability & (localeBitOffset + ContractAssetType.SUBTITLES.getBitIdentifier())) != 0)
                         return true;
                 }
             }
@@ -131,7 +138,7 @@ public class MultilanguageCountryWindowFilter {
         return true;
     }    
     
-    private static boolean languageMatches(String language, Strings locale) {
+    private boolean languageMatches(String language, Strings locale) {
         if(locale == null)
             return false;
         
@@ -144,6 +151,20 @@ public class MultilanguageCountryWindowFilter {
         }
         
         return true;
+    }
+    
+    private int languageDialectOffset(String language, Strings locale) {
+        if(locale.value.length == language.length())
+            return 0;
+        
+        return dialectOrdinalAssigner.getDialectOrdinal(language, String.valueOf(locale.value));
+    }
+
+    private int languageDialectOffset(String language, String locale) {
+        if(locale.length() == language.length())
+            return 0;
+        
+        return dialectOrdinalAssigner.getDialectOrdinal(language, locale);
     }
 
 }
