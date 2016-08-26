@@ -487,25 +487,22 @@ public class ContractRestrictionModule {
         // Offline viewing rights
         if(restriction.offlineViewingRestrictions != null){
             restriction.offlineViewingRestrictions.streamOnlyDownloadables = assetTypeIdx.getAllUnmarkedForDownloadAndMarkedForStreaming();
-        }
-        if(isNoExtraOfflineViewingRestrictions(restriction, restriction.offlineViewingRestrictions != null)){
-            restriction.offlineViewingRestrictions = null;
+            if(isNoExtraOfflineViewingRestrictions(restriction)) restriction.offlineViewingRestrictions = null;
         }
     }
 
-	private boolean isNoExtraOfflineViewingRestrictions(ContractRestriction restriction,
-			boolean downloadRightsDifferentForContracts) {
+    private boolean isNoExtraOfflineViewingRestrictions(ContractRestriction restriction) {
         // Offline viewing rights: optimization. 
         // If all contracts have same download rights OR
         // cupkeys, excluded downloadables and language restrictions are all same as streaming ones
         // set offline restrictions to null. 
         // Assumption: Client side logic will have enough information to return appropriate values
         // in the cases where offline restriction is null.
-		return !downloadRightsDifferentForContracts || (restriction.offlineViewingRestrictions != null && 
-        		restriction.offlineViewingRestrictions.streamOnlyDownloadables.isEmpty() &&
-        		cupTokensForOfflineIsSameAsStreaming(restriction) &&
-        		offlineLanguageRestrictionsSameAsStreaming(restriction));
-	}
+        return restriction.offlineViewingRestrictions != null &&
+                restriction.offlineViewingRestrictions.streamOnlyDownloadables.isEmpty() &&
+                cupTokensForOfflineIsSameAsStreaming(restriction) &&
+                offlineLanguageRestrictionsSameAsStreaming(restriction);
+    }
 
     private boolean offlineLanguageRestrictionsSameAsStreaming(ContractRestriction restriction) {
 		return true;
