@@ -35,17 +35,9 @@ public class DownloadableAssetTypeIndex {
             idList.mark(viewing);
     }
 
-    public void mark(ContractAsset assetType) {
-        mark(assetType, STREAM);
-    }
-    
-    public void markForDownload(ContractAsset assetType) {
-        mark(assetType, DOWNLOAD);
-    }
-
-    public void markAll() {
+    public void markAll(Viewing viewing) {
         for(Map.Entry<ContractAsset, DownloadableIdList> entry : downloadableIdsByContract.entrySet()) {
-            entry.getValue().mark(STREAM);
+            entry.getValue().mark(viewing);
         }
     }
 
