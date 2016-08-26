@@ -17,60 +17,6 @@ public class Artwork implements Cloneable {
     public ArtworkBasicPassthrough basic_passthrough = null;
     public int file_seq = java.lang.Integer.MIN_VALUE;
 
-    public boolean equals(Object other) {
-        if(other == this)  return true;
-        if(!(other instanceof Artwork))
-            return false;
-
-        Artwork o = (Artwork) other;
-        if(o.sourceFileId == null) {
-            if(sourceFileId != null) return false;
-        } else if(!o.sourceFileId.equals(sourceFileId)) return false;
-        if(o.effectiveDate != effectiveDate) return false;
-        if(o.locale == null) {
-            if(locale != null) return false;
-        } else if(!o.locale.equals(locale)) return false;
-        if(o.seqNum != seqNum) return false;
-        if(o.ordinalPriority != ordinalPriority) return false;
-        if(o.derivatives == null) {
-            if(derivatives != null) return false;
-        } else if(!o.derivatives.equals(derivatives)) return false;
-        if(o.cdns == null) {
-            if(cdns != null) return false;
-        } else if(!o.cdns.equals(cdns)) return false;
-        if(o.deprecatedImageIds == null) {
-            if(deprecatedImageIds != null) return false;
-        } else if(!o.deprecatedImageIds.equals(deprecatedImageIds)) return false;
-        if(o.source_movie_id == null) {
-            if(source_movie_id != null) return false;
-        } else if(!o.source_movie_id.equals(source_movie_id)) return false;
-        if(o.source == null) {
-            if(source != null) return false;
-        } else if(!o.source.equals(source)) return false;
-        if(o.basic_passthrough == null) {
-            if(basic_passthrough != null) return false;
-        } else if(!o.basic_passthrough.equals(basic_passthrough)) return false;
-        if(o.file_seq != file_seq) return false;
-        return true;
-    }
-
-    public int hashCode() {
-        int hashCode = 1;
-        hashCode = hashCode * 31 + (sourceFileId == null ? 1237 : sourceFileId.hashCode());
-        hashCode = hashCode * 31 + (int) (effectiveDate ^ (effectiveDate >>> 32));
-        hashCode = hashCode * 31 + (locale == null ? 1237 : locale.hashCode());
-        hashCode = hashCode * 31 + seqNum;
-        hashCode = hashCode * 31 + ordinalPriority;
-        hashCode = hashCode * 31 + (derivatives == null ? 1237 : derivatives.hashCode());
-        hashCode = hashCode * 31 + (cdns == null ? 1237 : cdns.hashCode());
-        hashCode = hashCode * 31 + (deprecatedImageIds == null ? 1237 : deprecatedImageIds.hashCode());
-        hashCode = hashCode * 31 + (source_movie_id == null ? 1237 : source_movie_id.hashCode());
-        hashCode = hashCode * 31 + (source == null ? 1237 : source.hashCode());
-        hashCode = hashCode * 31 + (basic_passthrough == null ? 1237 : basic_passthrough.hashCode());
-        hashCode = hashCode * 31 + file_seq;
-        return hashCode;
-    }
-
     public String toString() {
         StringBuilder builder = new StringBuilder("Artwork{");
         builder.append("sourceFileId=").append(sourceFileId);
