@@ -459,26 +459,31 @@ public class ContractRestrictionModule {
         if(downloadRightsDifferentForContracts)
         	restriction.offlineViewingRestrictions.streamOnlyDownloadables = assetTypeIdx.getAllUnmarkedForDownloadAndMarkedForStreaming();
         
+        if(isNoExtraOfflineViewingRestrictions(restriction, downloadRightsDifferentForContracts)){
+        	restriction.offlineViewingRestrictions = null;
+        }
+    }
+
+	private boolean isNoExtraOfflineViewingRestrictions(ContractRestriction restriction,
+			boolean downloadRightsDifferentForContracts) {
         // Offline viewing rights: optimization. 
         // If all contracts have same download rights OR
         // cupkeys, excluded downloadables and language restrictions are all same as streaming ones
         // set offline restrictions to null. 
         // Assumption: Client side logic will have enough information to return appropriate values
         // in the cases where offline restriction is null.
-        if(!downloadRightsDifferentForContracts || (restriction.offlineViewingRestrictions != null && 
+		return !downloadRightsDifferentForContracts || (restriction.offlineViewingRestrictions != null && 
         		restriction.offlineViewingRestrictions.streamOnlyDownloadables.isEmpty() &&
         		cupTokensForOfflineIsSameAsStreaming(restriction) &&
-        		offlineLanguageRestrictionsSameAsStreaming(restriction))){
-        	restriction.offlineViewingRestrictions = null;
-        }
-    }
+        		offlineLanguageRestrictionsSameAsStreaming(restriction));
+	}
 
     private boolean offlineLanguageRestrictionsSameAsStreaming(ContractRestriction restriction) {
 		return true;
 	}
 
 	private boolean cupTokensForOfflineIsSameAsStreaming(ContractRestriction restriction) {
-		return(restriction.cupKeys.equals(restriction.offlineViewingRestrictions.downloadOnlyCupKeys));
+		return(restriction.cupKeys.equals(restriction.offlineViewingRestrictions.downloadOnlyCupKeys) || restriction.offlineViewingRestrictions.downloadOnlyCupKeys.isEmpty());
 	}
 
 	private String getLanguageForAsset(PackageStreamHollow stream, ContractAssetType assetType) {
