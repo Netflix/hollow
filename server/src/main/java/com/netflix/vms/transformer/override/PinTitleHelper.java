@@ -7,7 +7,7 @@ public class PinTitleHelper {
     public static final String BLOB_ID = "BLOB_ID";
 
     public static String createBlobID(String prefix, long version, int... topNodes) {
-        return prefix + ":" + version + ":" + toString(topNodes);
+        return prefix + ":" + version + ":" + toString("_", topNodes);
     }
 
     public static String addBlobID(HollowWriteStateEngine writeStateEngine, String blobID) {
@@ -30,13 +30,17 @@ public class PinTitleHelper {
     }
 
     public static final String toString(int... topNodes) {
+        return toString(",", topNodes);
+    }
+
+    public static final String toString(String delim, int... topNodes) {
         if (topNodes == null || topNodes.length == 0) return "";
 
         if (topNodes.length == 1) return String.valueOf(topNodes[0]);
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < topNodes.length; i++) {
-            if (i > 0) sb.append(",");
+            if (i > 0) sb.append(delim);
             sb.append(topNodes[i]);
         }
         return sb.toString();
