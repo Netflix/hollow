@@ -60,11 +60,11 @@ public class DownloadableAssetTypeIndex {
         return set;
     }
 
-    public Set<com.netflix.vms.transformer.hollowoutput.Long> getAllUnmarkedForDownload() {
+    public Set<com.netflix.vms.transformer.hollowoutput.Long> getAllUnmarkedForDownloadAndMarkedForStreaming() {
         Set<com.netflix.vms.transformer.hollowoutput.Long> set = new HashSet<com.netflix.vms.transformer.hollowoutput.Long>();
 
         for(Map.Entry<ContractAsset, DownloadableIdList> entry : downloadableIdsByContract.entrySet()) {
-            if(!entry.getValue().isMarkedForDownload())
+            if(!entry.getValue().isMarkedForDownload() && entry.getValue().isMarked())
                 set.addAll(entry.getValue().getList());
         }
 
