@@ -268,14 +268,7 @@ public class ContractRestrictionModule {
 
             restriction.offlineViewingRestrictions = new OfflineViewingRestrictions();
             restriction.offlineViewingRestrictions.downloadOnlyCupKeys = offlineViewingContractRestriction.cupKeys;
-            if (offlineViewingContractRestriction.languageBcp47RestrictionsMap.equals(restriction.languageBcp47RestrictionsMap)) {
-                restriction.offlineViewingRestrictions.downloadLanguageBcp47RestrictionsMap = restriction.languageBcp47RestrictionsMap;
-            } else {
-                HashMap<Strings, LanguageRestrictions> merged = new HashMap<>();
-                merged.putAll(restriction.languageBcp47RestrictionsMap);
-                merged.putAll(offlineViewingContractRestriction.languageBcp47RestrictionsMap);
-                restriction.offlineViewingRestrictions.downloadLanguageBcp47RestrictionsMap = merged;
-            }
+            restriction.offlineViewingRestrictions.downloadLanguageBcp47RestrictionsMap = offlineViewingContractRestriction.languageBcp47RestrictionsMap;
         }
 
         ContractHollow selectedContract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, selectedRightsContract.contractId);
@@ -504,23 +497,11 @@ public class ContractRestrictionModule {
         // in the cases where offline restriction is null.
         return restriction.offlineViewingRestrictions != null &&
                 restriction.offlineViewingRestrictions.streamOnlyDownloadables.isEmpty() &&
-                cupTokensForOfflineIsSameAsStreaming(restriction) &&
-                offlineLanguageRestrictionsSameAsStreaming(restriction);
+                restriction.cupKeys.equals(restriction.offlineViewingRestrictions.downloadOnlyCupKeys) &&
+                restriction.languageBcp47RestrictionsMap.equals(restriction.offlineViewingRestrictions.downloadLanguageBcp47RestrictionsMap);
     }
 
-    private boolean offlineLanguageRestrictionsSameAsStreaming(ContractRestriction restriction) {
-        OfflineViewingRestrictions offlineRestrictions = restriction.offlineViewingRestrictions;
-        return offlineRestrictions.downloadLanguageBcp47RestrictionsMap.isEmpty()
-                || restriction.languageBcp47RestrictionsMap.equals(offlineRestrictions.downloadLanguageBcp47RestrictionsMap);
-	}
-
-	private boolean cupTokensForOfflineIsSameAsStreaming(ContractRestriction restriction) {
-		OfflineViewingRestrictions offlineRestrictions = restriction.offlineViewingRestrictions;
-        return offlineRestrictions.downloadOnlyCupKeys.isEmpty()
-		        || restriction.cupKeys.equals(offlineRestrictions.downloadOnlyCupKeys);
-	}
-
-	private String getLanguageForAsset(PackageStreamHollow stream, ContractAssetType assetType) {
+    private String getLanguageForAsset(PackageStreamHollow stream, ContractAssetType assetType) {
         StreamNonImageInfoHollow nonImageInfo = stream._getNonImageInfo();
         if (assetType == ContractAssetType.SUBTITLES) {
             return nonImageInfo._getTextInfo()._getTextLanguageCode()._getValue();
