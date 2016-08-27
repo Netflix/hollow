@@ -267,12 +267,15 @@ public class ContractRestrictionModule {
             ContractRestriction offlineViewingContractRestriction = buildIntermediateRestrictionBasedOnMultipleApplicableContracts(assetTypeIdx, offlineViewingRightsContracts, videoId, countryCode, DOWNLOAD);
 
             restriction.offlineViewingRestrictions = new OfflineViewingRestrictions();
-            restriction.offlineViewingRestrictions.downloadOnlyCupKeys = offlineViewingContractRestriction.cupKeys.equals(restriction.cupKeys)
-                    ? new ArrayList<>()
-                    : offlineViewingContractRestriction.cupKeys;
-            restriction.offlineViewingRestrictions.downloadLanguageBcp47RestrictionsMap = offlineViewingContractRestriction.languageBcp47RestrictionsMap.equals(restriction.languageBcp47RestrictionsMap)
-                    ? new HashMap<>()
-                    : offlineViewingContractRestriction.languageBcp47RestrictionsMap;
+            restriction.offlineViewingRestrictions.downloadOnlyCupKeys = offlineViewingContractRestriction.cupKeys;
+            if (offlineViewingContractRestriction.languageBcp47RestrictionsMap.equals(restriction.languageBcp47RestrictionsMap)) {
+                restriction.offlineViewingRestrictions.downloadLanguageBcp47RestrictionsMap = restriction.languageBcp47RestrictionsMap;
+            } else {
+                HashMap<Strings, LanguageRestrictions> merged = new HashMap<>();
+                merged.putAll(restriction.languageBcp47RestrictionsMap);
+                merged.putAll(offlineViewingContractRestriction.languageBcp47RestrictionsMap);
+                restriction.offlineViewingRestrictions.downloadLanguageBcp47RestrictionsMap = merged;
+            }
         }
 
         ContractHollow selectedContract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, selectedRightsContract.contractId);
