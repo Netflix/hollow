@@ -419,50 +419,42 @@ public class VMSAvailabilityWindowModule {
             outputWindow.endDate = OutputUtil.getRoundedDate(maxEndDate);
             outputWindow.bundledAssetsGroupId = maxContractId; //rollup.getFirstEpisodeBundledAssetId();
 
-            WindowPackageContractInfo videoImagesContractInfo = createEmptyContractInfoForRollup(outputWindow);
-            WindowPackageContractInfo videoMediaContractInfo = createEmptyContractInfoForRollup(outputWindow);
-
-            VMSAvailabilityWindow videoImagesAvailabilityWindow = outputWindow.clone();
-            VMSAvailabilityWindow videoMediaAvailabilityWindow = outputWindow.clone();
+            WindowPackageContractInfo outputContractInfo = createEmptyContractInfoForRollup(outputWindow);
 
 
-            videoImagesAvailabilityWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
-            videoMediaAvailabilityWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
+            outputWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
+            outputWindow.windowInfosByPackageId.put(ZERO, outputContractInfo);
 
-            videoImagesAvailabilityWindow.windowInfosByPackageId.put(ZERO, videoImagesContractInfo);
-            videoMediaAvailabilityWindow.windowInfosByPackageId.put(ZERO, videoMediaContractInfo);
-
-            videoImagesContractInfo.videoContractInfo.cupTokens = EMPTY_CUP_TOKENS;
-            videoImagesContractInfo.videoContractInfo.isAvailableForDownload = rollup.isAvailableForDownload();
-            videoMediaContractInfo.videoContractInfo.assetBcp47Codes = rollup.getAssetBcp47Codes();
-            videoMediaContractInfo.videoContractInfo.prePromotionDays = rollup.getPrePromoDays();
-            videoMediaContractInfo.videoContractInfo.isDayAfterBroadcast = rollup.hasRollingEpisodes();
-            videoMediaContractInfo.videoContractInfo.hasRollingEpisodes = rollup.hasRollingEpisodes();
-            videoMediaContractInfo.videoContractInfo.isAvailableForDownload = rollup.isAvailableForDownload();
-            videoMediaContractInfo.videoContractInfo.postPromotionDays = 0;
-            videoMediaContractInfo.videoContractInfo.cupTokens = rollup.getCupTokens() != null ? rollup.getCupTokens() : DEFAULT_CUP_TOKENS;
-            videoMediaContractInfo.videoPackageInfo.formats = rollup.getVideoFormatDescriptors();
+            outputContractInfo.videoContractInfo.assetBcp47Codes = rollup.getAssetBcp47Codes();
+            outputContractInfo.videoContractInfo.prePromotionDays = rollup.getPrePromoDays();
+            outputContractInfo.videoContractInfo.isDayAfterBroadcast = rollup.hasRollingEpisodes();
+            outputContractInfo.videoContractInfo.hasRollingEpisodes = rollup.hasRollingEpisodes();
+            outputContractInfo.videoContractInfo.isAvailableForDownload = rollup.isAvailableForDownload();
+            outputContractInfo.videoContractInfo.postPromotionDays = 0;
+            outputContractInfo.videoContractInfo.cupTokens = rollup.getCupTokens() != null ? rollup.getCupTokens() : DEFAULT_CUP_TOKENS;
+            outputContractInfo.videoPackageInfo.formats = rollup.getVideoFormatDescriptors();
 
             if(rollup.getFirstEpisodeBundledAssetId() != 0) {
-                videoMediaAvailabilityWindow.bundledAssetsGroupId = rollup.getFirstEpisodeBundledAssetId();
-                videoMediaContractInfo.videoContractInfo.contractId = rollup.getFirstEpisodeBundledAssetId();
+                outputWindow.bundledAssetsGroupId = rollup.getFirstEpisodeBundledAssetId();
+                outputContractInfo.videoContractInfo.contractId = rollup.getFirstEpisodeBundledAssetId();
             }
 
             if(isGoLive && isInWindow)
-                videoImagesContractInfo.videoPackageInfo.stillImagesMap = rollup.getVideoImageMap();
+                outputContractInfo.videoPackageInfo.stillImagesMap = rollup.getVideoImageMap();
             else
-                videoMediaContractInfo.videoPackageInfo.formats = Collections.emptySet();  ///TODO: This seems totally unnecessary.  We should remove this line after parity testing.
+                outputContractInfo.videoPackageInfo.formats = Collections.emptySet();  ///TODO: This seems totally unnecessary.  We should remove this line after parity testing.
 
             int videoGeneralOrdinal = videoGeneralIdx.getMatchingOrdinal(Long.valueOf(videoId.intValue()));
             if(videoGeneralOrdinal != -1) {
                 VideoGeneralHollow general = api.getVideoGeneralHollow(videoGeneralOrdinal);
                 long runtime = general._getRuntime();
                 if(runtime != Long.MIN_VALUE)
-                    videoImagesContractInfo.videoPackageInfo.runtimeInSeconds = (int)runtime;
+                    outputContractInfo.videoPackageInfo.runtimeInSeconds = (int)runtime;
             }
 
-            data.mediaAvailabilityWindows = Collections.singletonList(videoMediaAvailabilityWindow);
-            data.imagesAvailabilityWindows = Collections.singletonList(videoImagesAvailabilityWindow);
+            
+            data.mediaAvailabilityWindows = Collections.singletonList(outputWindow);
+            data.imagesAvailabilityWindows = data.mediaAvailabilityWindows;
         }
     }
 
