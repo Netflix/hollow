@@ -84,23 +84,31 @@ public class VMSAvailabilityWindowModule {
         this.transformedPackageData = data;
     }
 
-    public List<VMSAvailabilityWindow> populateWindowData(Integer videoId, String country, String locale, CompleteVideoCountrySpecificData data, StatusHollow videoRights, CountrySpecificRollupValues rollup) {
+    public List<VMSAvailabilityWindow> populateWindowData(Integer videoId, String country, CompleteVideoCountrySpecificData data, StatusHollow videoRights, CountrySpecificRollupValues rollup) {
         boolean isGoLive = isGoLive(videoRights);
         
-        if(locale != null && isLanguageOverride(videoRights))
-            locale = null;
+        List<VMSAvailabilityWindow> windows = calculateWindowData(videoId, country, null, videoRights, rollup, isGoLive);
+
+        data.mediaAvailabilityWindows = windows;
+        data.imagesAvailabilityWindows = windows;
+        
+        return windows;
+    }
+
+
+    List<VMSAvailabilityWindow> calculateWindowData(Integer videoId, String country, String locale, StatusHollow videoRights, CountrySpecificRollupValues rollup, boolean isGoLive) {
+        List<VMSAvailabilityWindow> windows = null;
             
         RightsHollow rights = videoRights._getRights();
         if((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
-            populateRolledUpWindowData(videoId, data, rollup, rights, isGoLive);
+            windows = populateRolledUpWindowData(videoId, rollup, rights, isGoLive);
         } else {
-            populateEpisodeOrStandaloneWindowData(videoId, country, locale, data, rollup, isGoLive, rights);
+            windows = populateEpisodeOrStandaloneWindowData(videoId, country, locale, rollup, isGoLive, rights);
         }
-
-        return data.mediaAvailabilityWindows;
+        return windows;
     }
-
-    private void populateEpisodeOrStandaloneWindowData(Integer videoId, String country, String locale, CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup, boolean isGoLive, RightsHollow rights) {
+    
+    private List<VMSAvailabilityWindow> populateEpisodeOrStandaloneWindowData(Integer videoId, String country, String locale, CountrySpecificRollupValues rollup, boolean isGoLive, RightsHollow rights) {
         List<VMSAvailabilityWindow> availabilityWindows = new ArrayList<VMSAvailabilityWindow>();
 
         long minWindowStartDate = Long.MAX_VALUE;
@@ -298,7 +306,6 @@ public class VMSAvailabilityWindowModule {
 
             if(includedWindowPackageData)
                 includedPackageDataCount++;
-
         }
 
 
@@ -354,8 +361,7 @@ public class VMSAvailabilityWindowModule {
                 rollup.newPrePromoDays(0);
         }
 
-        data.mediaAvailabilityWindows = availabilityWindows;
-        data.imagesAvailabilityWindows = availabilityWindows;
+        return availabilityWindows;
     }
 
     private final LinkedHashMap<Long, RightsWindowContract> theRightsContractMap = new LinkedHashMap<>();
@@ -379,18 +385,14 @@ public class VMSAvailabilityWindowModule {
     }
 
     // Return AvailabilityWindow from MediaData
-    private void populateRolledUpWindowData(Integer videoId, CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup, RightsHollow rights, boolean isGoLive) {
+    private List<VMSAvailabilityWindow> populateRolledUpWindowData(Integer videoId, CountrySpecificRollupValues rollup, RightsHollow rights, boolean isGoLive) {
         ListOfRightsWindowHollow windows = rights._getWindows();
 
         boolean windowsEmpty = windows.isEmpty();
         if((rollup.doSeason() && !rollup.wasSeasonWindowFound()) || (rollup.doShow() && !rollup.wasShowWindowFound()))
             windowsEmpty = true;
         
-        if(windowsEmpty) {
-            data.mediaAvailabilityWindows = Collections.emptyList();
-            data.imagesAvailabilityWindows = Collections.emptyList();
-        } else {
-
+        if(!windowsEmpty) {
             long minStartDate = Long.MAX_VALUE;
             long maxEndDate = 0;
             boolean isInWindow = false;
@@ -452,10 +454,10 @@ public class VMSAvailabilityWindowModule {
                     outputContractInfo.videoPackageInfo.runtimeInSeconds = (int)runtime;
             }
 
-            
-            data.mediaAvailabilityWindows = Collections.singletonList(outputWindow);
-            data.imagesAvailabilityWindows = data.mediaAvailabilityWindows;
+            return Collections.singletonList(outputWindow);
         }
+        
+        return Collections.emptyList();
     }
 
     private WindowPackageContractInfo createEmptyContractInfoForRollup(VMSAvailabilityWindow outputWindow) {
@@ -516,12 +518,12 @@ public class VMSAvailabilityWindowModule {
     }
 
 
-    private boolean isGoLive(StatusHollow status) {
+    boolean isGoLive(StatusHollow status) {
         FlagsHollow flags = status._getFlags();
         return flags != null && flags._getGoLive();
     }
     
-    private boolean isLanguageOverride(StatusHollow status) {
+    boolean isLanguageOverride(StatusHollow status) {
         FlagsHollow flags = status._getFlags();
         return flags != null && flags._getLanguageOverride();
     }
