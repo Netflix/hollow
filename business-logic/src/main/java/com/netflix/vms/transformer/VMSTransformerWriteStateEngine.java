@@ -1,7 +1,8 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.vms.transformer.hollowoutput.TopNVideoData;
+import com.netflix.vms.transformer.hollowoutput.MulticatalogCountryData;
 
+import com.netflix.vms.transformer.hollowoutput.TopNVideoData;
 import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageFormatEntry;
@@ -71,7 +72,8 @@ public class VMSTransformerWriteStateEngine extends HollowWriteStateEngine {
                 RolloutVideo.class,
                 RolloutCharacter.class,
                 FallbackUSArtwork.class,
-                TopNVideoData.class
+                TopNVideoData.class,
+                MulticatalogCountryData.class
         );
     }
     
