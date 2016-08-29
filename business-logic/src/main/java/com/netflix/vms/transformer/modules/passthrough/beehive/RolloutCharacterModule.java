@@ -18,6 +18,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
+/**
+ * @Deprecated - to be removed on next VIP
+ */
+@Deprecated
 public class RolloutCharacterModule extends AbstractTransformModule {
 
     public RolloutCharacterModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
@@ -26,10 +30,10 @@ public class RolloutCharacterModule extends AbstractTransformModule {
 
     @Override
     public void transform() {
-    	/// short-circuit Fastlane
-    	if(ctx.getFastlaneIds() != null)
-    		return;
-    	
+        /// short-circuit Fastlane
+        if(ctx.getFastlaneIds() != null)
+            return;
+
         Strings bottomLineKey = new Strings("Blade Bottom Line");
         Strings topLineKey = new Strings("Blade Top Line");
         Strings charBioKey = new Strings("Character Bio");

@@ -38,6 +38,7 @@ public class SimpleTransformerContext implements TransformerContext {
     private long currentCycleId;
 
     private Set<Integer> fastlaneIds;
+    private Set<String> pinnedTitleSpecs;
 
     @Override
     public void setCurrentCycleId(long cycleId) {
@@ -67,6 +68,16 @@ public class SimpleTransformerContext implements TransformerContext {
     @Override
     public Set<Integer> getFastlaneIds() {
         return fastlaneIds;
+    }
+
+    @Override
+    public void setPinTitleSpecs(Set<String> specs) {
+        this.pinnedTitleSpecs = specs;
+    }
+
+    @Override
+    public Set<String> getPinTitleSpecs() {
+        return this.pinnedTitleSpecs;
     }
 
     @Override

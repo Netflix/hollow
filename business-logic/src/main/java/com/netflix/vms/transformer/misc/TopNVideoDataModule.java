@@ -2,6 +2,7 @@ package com.netflix.vms.transformer.misc;
 
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.config.OutputTypeConfig;
 import com.netflix.vms.transformer.hollowinput.TopNAttributeHollow;
 import com.netflix.vms.transformer.hollowinput.TopNAttributesSetHollow;
 import com.netflix.vms.transformer.hollowinput.TopNHollow;
@@ -10,27 +11,29 @@ import com.netflix.vms.transformer.hollowoutput.Float;
 import com.netflix.vms.transformer.hollowoutput.Integer;
 import com.netflix.vms.transformer.hollowoutput.TopNVideoData;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
+
 import java.util.HashMap;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map;
 
 public class TopNVideoDataModule extends AbstractTransformModule{
 
     public TopNVideoDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
-	    super(api, ctx, mapper);
-	}
-	
+        super(api, ctx, mapper);
+    }
+
     @Override
     public void transform() {
-    	/// short-circuit for FastLane
-    	if(ctx.getFastlaneIds() != null)
-    		return;
-    	
+        /// short-circuit for FastLane
+        if (OutputTypeConfig.FASTLANE_EXCLUDED_TYPES.contains(OutputTypeConfig.TopNVideoData) && ctx.getFastlaneIds() != null)
+            return;
+
         //Map Video id -> attributes to Country id -> TopNVideoData
         Map<String, TopNVideoData> topNVideoDataMap = new HashMap<>();
         for(TopNHollow topN : api.getAllTopNHollow()) {
             TopNAttributesSetHollow attributes = topN._getAttributes();
             int videoId = (int) topN._getVideoId();
-             
             for(TopNAttributeHollow topNAttribute : attributes) {
                 String countryId = topNAttribute._getCountry()._getValue();
                 TopNVideoData topNVideoData = getOrAddTopNVideoData(topNVideoDataMap, topNAttribute, countryId);
@@ -39,9 +42,9 @@ public class TopNVideoDataModule extends AbstractTransformModule{
             }
         }
 
-         for(TopNVideoData topNVideoData : topNVideoDataMap.values()) {
-             mapper.addObject(topNVideoData);
-         }
+        for(TopNVideoData topNVideoData : topNVideoDataMap.values()) {
+            mapper.addObject(topNVideoData);
+        }
     }
 
     private TopNVideoData getOrAddTopNVideoData(Map<String, TopNVideoData> topNVideoDataMap,
