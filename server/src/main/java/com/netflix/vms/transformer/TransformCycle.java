@@ -197,7 +197,8 @@ public class TransformCycle {
                 PinTitleHollowCombiner combiner = new PinTitleHollowCombiner(ctx, outputStateEngine, fastlaneOutputStateEngine, overrideTitleOutputs);
                 String overrideBlobID = combiner.combine();
 
-                ctx.getLogger().info(CyclePinnedTitles, "Processed cycleNumber={}, blobId={}, hasDataChanged={}, fastlaneChanged={}, isFirstCycle={}", currentCycleNumber, overrideBlobID, outputStateEngine.hasChangedSinceLastCycle(), fastlaneOutputStateEngine.hasChangedSinceLastCycle(), isFirstCycle);
+                ctx.getLogger().info(CyclePinnedTitles, "Processed cycleNumber={}, blobId={}, hasDataChanged={}, fastlaneChanged={}, isFirstCycle={}, duration={}",
+                        currentCycleNumber, overrideBlobID, outputStateEngine.hasChangedSinceLastCycle(), fastlaneOutputStateEngine.hasChangedSinceLastCycle(), isFirstCycle, (System.currentTimeMillis() - startTime));
             } else {
                 trasformInputData(inputClient.getAPI(), outputStateEngine, ctx);
             }
