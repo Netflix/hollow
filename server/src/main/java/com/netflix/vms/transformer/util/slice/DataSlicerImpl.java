@@ -1,6 +1,5 @@
 package com.netflix.vms.transformer.util.slice;
 
-import com.netflix.vms.transformer.common.slice.DataSlicer;
 import com.netflix.hollow.combine.HollowCombiner;
 import com.netflix.hollow.combine.HollowCombinerIncludeOrdinalsCopyDirector;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
@@ -21,6 +20,7 @@ import com.netflix.vms.generated.notemplate.StringsHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
 import com.netflix.vms.generated.notemplate.VPersonHollow;
 import com.netflix.vms.generated.notemplate.VideoHollow;
+import com.netflix.vms.transformer.common.slice.DataSlicer;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.Episode;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
@@ -366,6 +366,7 @@ public class DataSlicerImpl implements DataSlicer {
                 }
             });
     
+            includeAll(stateEngine, "DamMerchStills");
             includeAll(stateEngine, "TopN");
             includeAll(stateEngine, "AltGenres");
             includeAll(stateEngine, "ArtWorkImageType");
