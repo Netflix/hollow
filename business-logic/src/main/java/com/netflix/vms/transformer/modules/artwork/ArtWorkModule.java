@@ -5,8 +5,9 @@ import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_IMAGE_FORMAT;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_RECIPE;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_TERRITORY_COUNTRIES;
 
-import com.netflix.vms.transformer.CycleConstants;
+import com.netflix.vms.transformer.hollowinput.StringHollow;
 
+import com.netflix.vms.transformer.CycleConstants;
 import java.util.*;
 import java.util.Map.Entry;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -152,7 +153,11 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     }
 
     protected final Strings getCdnDirectory(String sourceId, ArtworkDerivativeHollow derivative) {
-        String cdnDirectory = derivative._getCdnDirectory()._getValue();
+        StringHollow cdnDirString = derivative._getCdnDirectory();
+        if(cdnDirString == null)
+        	return null;
+        
+		String cdnDirectory = cdnDirString._getValue();
         if (isEnableCdnDirectoryOptimization) {
             String recipeDescriptor = derivative._getRecipeDescriptor()._getValue();
             String filename_without_extension = createFilenameWithoutExtension(sourceId, recipeDescriptor);

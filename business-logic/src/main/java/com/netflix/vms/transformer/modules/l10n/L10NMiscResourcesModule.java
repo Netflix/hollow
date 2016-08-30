@@ -19,6 +19,7 @@ import com.netflix.vms.transformer.modules.l10n.processor.L10NMiscProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.LanguagesProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.LocalizedCharacterProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.PersonAliasesProcessor;
+import com.netflix.vms.transformer.modules.l10n.processor.PersonCharacterProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.PersonsProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.ShowMemberTypesProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.TurboCollectionsProcessor;
@@ -39,6 +40,7 @@ public class L10NMiscResourcesModule extends AbstractTransformModule {
         processorList.add(new CategoryGroupsProcessor(api, ctx, mapper));
         processorList.add(new CertificationSystemsProcessor(api, ctx, mapper));
         processorList.add(new CharactersProcessor(api, ctx, mapper));
+        processorList.add(new PersonCharacterProcessor(api, ctx, mapper));
         processorList.add(new FestivalsProcessor(api, ctx, mapper));
         processorList.add(new LanguagesProcessor(api, ctx, mapper));
         processorList.add(new LocalizedCharacterProcessor(api, ctx, mapper));

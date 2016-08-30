@@ -92,6 +92,7 @@
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "netflix:nflibrary",
@@ -120,6 +121,7 @@
         "com.google.inject.extensions:guice-servlet": {
             "locked": "4.1.0",
             "transitive": [
+                "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
@@ -174,24 +176,24 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
@@ -226,7 +228,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.16",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -245,13 +247,13 @@
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
-            "locked": "2.7.5",
+            "locked": "2.8.0",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin-web"
             ]
         },
         "com.netflix.karyon:karyon2-admin-web": {
-            "locked": "2.7.5",
+            "locked": "2.8.0",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -269,8 +271,14 @@
                 "com.netflix.netflix-commons:netflix-eventbus"
             ]
         },
+        "com.netflix.pytheas:pytheas-api": {
+            "locked": "1.29.0",
+            "transitive": [
+                "com.netflix.pytheas:pytheas-core"
+            ]
+        },
         "com.netflix.pytheas:pytheas-core": {
-            "locked": "1.25",
+            "locked": "1.29.0",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin"
             ]
@@ -304,30 +312,32 @@
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client4": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client"
             ]
         },
         "com.sun.jersey.contribs:jersey-guice": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core"
             ]
         },
         "com.sun.jersey:jersey-client": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4"
             ]
         },
         "com.sun.jersey:jersey-core": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-client",
                 "com.sun.jersey:jersey-json",
@@ -335,13 +345,15 @@
             ]
         },
         "com.sun.jersey:jersey-json": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
+                "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core"
             ]
         },
         "com.sun.jersey:jersey-server": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
@@ -349,9 +361,10 @@
             ]
         },
         "com.sun.jersey:jersey-servlet": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
@@ -419,13 +432,14 @@
             "locked": "1.8",
             "transitive": [
                 "com.netflix.archaius:archaius-core",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary"
             ]
         },
         "commons-io:commons-io": {
-            "locked": "1.4",
+            "locked": "2.4",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core"
             ]
@@ -503,6 +517,7 @@
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-core"
             ]
@@ -571,7 +586,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -596,17 +611,17 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -731,7 +746,6 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json"
             ]
         },
@@ -806,6 +820,7 @@
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -951,6 +966,7 @@
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "netflix:nflibrary",
@@ -979,6 +995,7 @@
         "com.google.inject.extensions:guice-servlet": {
             "locked": "4.1.0",
             "transitive": [
+                "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
@@ -1033,24 +1050,24 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
@@ -1085,7 +1102,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.16",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -1104,13 +1121,13 @@
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
-            "locked": "2.7.5",
+            "locked": "2.8.0",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin-web"
             ]
         },
         "com.netflix.karyon:karyon2-admin-web": {
-            "locked": "2.7.5",
+            "locked": "2.8.0",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -1128,8 +1145,14 @@
                 "com.netflix.netflix-commons:netflix-eventbus"
             ]
         },
+        "com.netflix.pytheas:pytheas-api": {
+            "locked": "1.29.0",
+            "transitive": [
+                "com.netflix.pytheas:pytheas-core"
+            ]
+        },
         "com.netflix.pytheas:pytheas-core": {
-            "locked": "1.25",
+            "locked": "1.29.0",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin"
             ]
@@ -1163,30 +1186,32 @@
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client4": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client"
             ]
         },
         "com.sun.jersey.contribs:jersey-guice": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core"
             ]
         },
         "com.sun.jersey:jersey-client": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4"
             ]
         },
         "com.sun.jersey:jersey-core": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-client",
                 "com.sun.jersey:jersey-json",
@@ -1194,13 +1219,15 @@
             ]
         },
         "com.sun.jersey:jersey-json": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
+                "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core"
             ]
         },
         "com.sun.jersey:jersey-server": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
@@ -1208,9 +1235,10 @@
             ]
         },
         "com.sun.jersey:jersey-servlet": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
@@ -1278,13 +1306,14 @@
             "locked": "1.8",
             "transitive": [
                 "com.netflix.archaius:archaius-core",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary"
             ]
         },
         "commons-io:commons-io": {
-            "locked": "1.4",
+            "locked": "2.4",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core"
             ]
@@ -1362,6 +1391,7 @@
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-core"
             ]
@@ -1430,7 +1460,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -1455,17 +1485,17 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -1590,7 +1620,6 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json"
             ]
         },
@@ -1665,6 +1694,7 @@
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -1810,6 +1840,7 @@
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "netflix:nflibrary",
@@ -1838,6 +1869,7 @@
         "com.google.inject.extensions:guice-servlet": {
             "locked": "4.1.0",
             "transitive": [
+                "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
@@ -1892,24 +1924,24 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
@@ -1944,7 +1976,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.16",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -1963,13 +1995,13 @@
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
-            "locked": "2.7.5",
+            "locked": "2.8.0",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin-web"
             ]
         },
         "com.netflix.karyon:karyon2-admin-web": {
-            "locked": "2.7.5",
+            "locked": "2.8.0",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -1987,8 +2019,14 @@
                 "com.netflix.netflix-commons:netflix-eventbus"
             ]
         },
+        "com.netflix.pytheas:pytheas-api": {
+            "locked": "1.29.0",
+            "transitive": [
+                "com.netflix.pytheas:pytheas-core"
+            ]
+        },
         "com.netflix.pytheas:pytheas-core": {
-            "locked": "1.25",
+            "locked": "1.29.0",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin"
             ]
@@ -2022,30 +2060,32 @@
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client4": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client"
             ]
         },
         "com.sun.jersey.contribs:jersey-guice": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core"
             ]
         },
         "com.sun.jersey:jersey-client": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4"
             ]
         },
         "com.sun.jersey:jersey-core": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-client",
                 "com.sun.jersey:jersey-json",
@@ -2053,13 +2093,15 @@
             ]
         },
         "com.sun.jersey:jersey-json": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
+                "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core"
             ]
         },
         "com.sun.jersey:jersey-server": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
@@ -2067,9 +2109,10 @@
             ]
         },
         "com.sun.jersey:jersey-servlet": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
@@ -2137,13 +2180,14 @@
             "locked": "1.8",
             "transitive": [
                 "com.netflix.archaius:archaius-core",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary"
             ]
         },
         "commons-io:commons-io": {
-            "locked": "1.4",
+            "locked": "2.4",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core"
             ]
@@ -2221,6 +2265,7 @@
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-core"
             ]
@@ -2289,7 +2334,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -2314,17 +2359,17 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -2449,7 +2494,6 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json"
             ]
         },
@@ -2524,6 +2568,7 @@
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -2669,6 +2714,7 @@
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "netflix:nflibrary",
@@ -2697,6 +2743,7 @@
         "com.google.inject.extensions:guice-servlet": {
             "locked": "4.1.0",
             "transitive": [
+                "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
@@ -2751,24 +2798,24 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
@@ -2803,7 +2850,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.16",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -2822,13 +2869,13 @@
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
-            "locked": "2.7.5",
+            "locked": "2.8.0",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin-web"
             ]
         },
         "com.netflix.karyon:karyon2-admin-web": {
-            "locked": "2.7.5",
+            "locked": "2.8.0",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -2846,8 +2893,14 @@
                 "com.netflix.netflix-commons:netflix-eventbus"
             ]
         },
+        "com.netflix.pytheas:pytheas-api": {
+            "locked": "1.29.0",
+            "transitive": [
+                "com.netflix.pytheas:pytheas-core"
+            ]
+        },
         "com.netflix.pytheas:pytheas-core": {
-            "locked": "1.25",
+            "locked": "1.29.0",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin"
             ]
@@ -2881,30 +2934,32 @@
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client4": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client"
             ]
         },
         "com.sun.jersey.contribs:jersey-guice": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core"
             ]
         },
         "com.sun.jersey:jersey-client": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4"
             ]
         },
         "com.sun.jersey:jersey-core": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-client",
                 "com.sun.jersey:jersey-json",
@@ -2912,13 +2967,15 @@
             ]
         },
         "com.sun.jersey:jersey-json": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
+                "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core"
             ]
         },
         "com.sun.jersey:jersey-server": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
@@ -2926,9 +2983,10 @@
             ]
         },
         "com.sun.jersey:jersey-servlet": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
@@ -2996,13 +3054,14 @@
             "locked": "1.8",
             "transitive": [
                 "com.netflix.archaius:archaius-core",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary"
             ]
         },
         "commons-io:commons-io": {
-            "locked": "1.4",
+            "locked": "2.4",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core"
             ]
@@ -3080,6 +3139,7 @@
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-core"
             ]
@@ -3148,7 +3208,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -3173,17 +3233,17 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -3308,7 +3368,6 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json"
             ]
         },
@@ -3383,6 +3442,7 @@
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -3627,6 +3687,7 @@
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "netflix:nflibrary",
@@ -3655,6 +3716,7 @@
         "com.google.inject.extensions:guice-servlet": {
             "locked": "4.1.0",
             "transitive": [
+                "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
@@ -3709,24 +3771,24 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
@@ -3761,7 +3823,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.16",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -3780,13 +3842,13 @@
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
-            "locked": "2.7.5",
+            "locked": "2.8.0",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin-web"
             ]
         },
         "com.netflix.karyon:karyon2-admin-web": {
-            "locked": "2.7.5",
+            "locked": "2.8.0",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -3804,8 +3866,14 @@
                 "com.netflix.netflix-commons:netflix-eventbus"
             ]
         },
+        "com.netflix.pytheas:pytheas-api": {
+            "locked": "1.29.0",
+            "transitive": [
+                "com.netflix.pytheas:pytheas-core"
+            ]
+        },
         "com.netflix.pytheas:pytheas-core": {
-            "locked": "1.25",
+            "locked": "1.29.0",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin"
             ]
@@ -3839,30 +3907,32 @@
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client4": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client"
             ]
         },
         "com.sun.jersey.contribs:jersey-guice": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core"
             ]
         },
         "com.sun.jersey:jersey-client": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4"
             ]
         },
         "com.sun.jersey:jersey-core": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-client",
                 "com.sun.jersey:jersey-json",
@@ -3870,13 +3940,15 @@
             ]
         },
         "com.sun.jersey:jersey-json": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
+                "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core"
             ]
         },
         "com.sun.jersey:jersey-server": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
@@ -3884,9 +3956,10 @@
             ]
         },
         "com.sun.jersey:jersey-servlet": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
@@ -3954,13 +4027,14 @@
             "locked": "1.8",
             "transitive": [
                 "com.netflix.archaius:archaius-core",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary"
             ]
         },
         "commons-io:commons-io": {
-            "locked": "1.4",
+            "locked": "2.4",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core"
             ]
@@ -4038,6 +4112,7 @@
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-core"
             ]
@@ -4106,7 +4181,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -4131,17 +4206,17 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -4266,7 +4341,6 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json"
             ]
         },
@@ -4341,6 +4415,7 @@
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -4458,10 +4533,11 @@
             ]
         },
         "com.google.code.findbugs:annotations": {
-            "locked": "2.0.0",
+            "locked": "2.0.2",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
-                "netflix:basicTypes"
+                "netflix:basicTypes",
+                "org.reflections:reflections"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -4486,10 +4562,12 @@
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "netflix:nflibrary",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.reflections:reflections"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -4514,6 +4592,7 @@
         "com.google.inject.extensions:guice-servlet": {
             "locked": "4.1.0",
             "transitive": [
+                "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
@@ -4568,24 +4647,24 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
@@ -4620,7 +4699,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.16",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -4639,13 +4718,13 @@
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
-            "locked": "2.7.5",
+            "locked": "2.8.0",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin-web"
             ]
         },
         "com.netflix.karyon:karyon2-admin-web": {
-            "locked": "2.7.5",
+            "locked": "2.8.0",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -4663,8 +4742,14 @@
                 "com.netflix.netflix-commons:netflix-eventbus"
             ]
         },
+        "com.netflix.pytheas:pytheas-api": {
+            "locked": "1.29.0",
+            "transitive": [
+                "com.netflix.pytheas:pytheas-core"
+            ]
+        },
         "com.netflix.pytheas:pytheas-core": {
-            "locked": "1.25",
+            "locked": "1.29.0",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin"
             ]
@@ -4698,30 +4783,32 @@
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client4": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client"
             ]
         },
         "com.sun.jersey.contribs:jersey-guice": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core"
             ]
         },
         "com.sun.jersey:jersey-client": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4"
             ]
         },
         "com.sun.jersey:jersey-core": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-client",
                 "com.sun.jersey:jersey-json",
@@ -4729,13 +4816,15 @@
             ]
         },
         "com.sun.jersey:jersey-json": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
+                "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core"
             ]
         },
         "com.sun.jersey:jersey-server": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
@@ -4743,9 +4832,10 @@
             ]
         },
         "com.sun.jersey:jersey-servlet": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
@@ -4813,13 +4903,14 @@
             "locked": "1.8",
             "transitive": [
                 "com.netflix.archaius:archaius-core",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary"
             ]
         },
         "commons-io:commons-io": {
-            "locked": "1.4",
+            "locked": "2.4",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core"
             ]
@@ -4844,6 +4935,12 @@
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
                 "netflix:nflibrary"
+            ]
+        },
+        "dom4j:dom4j": {
+            "locked": "1.6.1",
+            "transitive": [
+                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -4897,6 +4994,7 @@
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-core"
             ]
@@ -4966,7 +5064,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -4991,17 +5089,17 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -5130,7 +5228,6 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json"
             ]
         },
@@ -5158,6 +5255,12 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.governator:governator"
+            ]
+        },
+        "org.javassist:javassist": {
+            "locked": "3.18.2-GA",
+            "transitive": [
+                "org.reflections:reflections"
             ]
         },
         "org.jboss.logging:jboss-logging": {
@@ -5196,6 +5299,10 @@
                 "com.netflix.governator:governator"
             ]
         },
+        "org.reflections:reflections": {
+            "locked": "0.9.9-RC2",
+            "requested": "0.9.9-RC2"
+        },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.21",
             "transitive": [
@@ -5211,6 +5318,7 @@
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -5248,6 +5356,12 @@
             "transitive": [
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
+            ]
+        },
+        "xml-apis:xml-apis": {
+            "locked": "1.0.b2",
+            "transitive": [
+                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -5328,10 +5442,11 @@
             ]
         },
         "com.google.code.findbugs:annotations": {
-            "locked": "2.0.0",
+            "locked": "2.0.2",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
-                "netflix:basicTypes"
+                "netflix:basicTypes",
+                "org.reflections:reflections"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -5356,10 +5471,12 @@
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "netflix:nflibrary",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.reflections:reflections"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -5384,6 +5501,7 @@
         "com.google.inject.extensions:guice-servlet": {
             "locked": "4.1.0",
             "transitive": [
+                "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
@@ -5438,24 +5556,24 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
@@ -5490,7 +5608,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.16",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -5509,13 +5627,13 @@
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
-            "locked": "2.7.5",
+            "locked": "2.8.0",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin-web"
             ]
         },
         "com.netflix.karyon:karyon2-admin-web": {
-            "locked": "2.7.5",
+            "locked": "2.8.0",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -5533,8 +5651,14 @@
                 "com.netflix.netflix-commons:netflix-eventbus"
             ]
         },
+        "com.netflix.pytheas:pytheas-api": {
+            "locked": "1.29.0",
+            "transitive": [
+                "com.netflix.pytheas:pytheas-core"
+            ]
+        },
         "com.netflix.pytheas:pytheas-core": {
-            "locked": "1.25",
+            "locked": "1.29.0",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin"
             ]
@@ -5568,30 +5692,32 @@
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client4": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client"
             ]
         },
         "com.sun.jersey.contribs:jersey-guice": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core"
             ]
         },
         "com.sun.jersey:jersey-client": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4"
             ]
         },
         "com.sun.jersey:jersey-core": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-client",
                 "com.sun.jersey:jersey-json",
@@ -5599,13 +5725,15 @@
             ]
         },
         "com.sun.jersey:jersey-json": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
+                "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core"
             ]
         },
         "com.sun.jersey:jersey-server": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
@@ -5613,9 +5741,10 @@
             ]
         },
         "com.sun.jersey:jersey-servlet": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
@@ -5683,13 +5812,14 @@
             "locked": "1.8",
             "transitive": [
                 "com.netflix.archaius:archaius-core",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary"
             ]
         },
         "commons-io:commons-io": {
-            "locked": "1.4",
+            "locked": "2.4",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core"
             ]
@@ -5714,6 +5844,12 @@
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
                 "netflix:nflibrary"
+            ]
+        },
+        "dom4j:dom4j": {
+            "locked": "1.6.1",
+            "transitive": [
+                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -5767,6 +5903,7 @@
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-core"
             ]
@@ -5836,7 +5973,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -5861,17 +5998,17 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -6000,7 +6137,6 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json"
             ]
         },
@@ -6028,6 +6164,12 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.governator:governator"
+            ]
+        },
+        "org.javassist:javassist": {
+            "locked": "3.18.2-GA",
+            "transitive": [
+                "org.reflections:reflections"
             ]
         },
         "org.jboss.logging:jboss-logging": {
@@ -6066,6 +6208,10 @@
                 "com.netflix.governator:governator"
             ]
         },
+        "org.reflections:reflections": {
+            "locked": "0.9.9-RC2",
+            "requested": "0.9.9-RC2"
+        },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.21",
             "transitive": [
@@ -6081,6 +6227,7 @@
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -6118,6 +6265,12 @@
             "transitive": [
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
+            ]
+        },
+        "xml-apis:xml-apis": {
+            "locked": "1.0.b2",
+            "transitive": [
+                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -6198,10 +6351,11 @@
             ]
         },
         "com.google.code.findbugs:annotations": {
-            "locked": "2.0.0",
+            "locked": "2.0.2",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
-                "netflix:basicTypes"
+                "netflix:basicTypes",
+                "org.reflections:reflections"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -6226,10 +6380,12 @@
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "netflix:nflibrary",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.reflections:reflections"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -6254,6 +6410,7 @@
         "com.google.inject.extensions:guice-servlet": {
             "locked": "4.1.0",
             "transitive": [
+                "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
@@ -6308,24 +6465,24 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
@@ -6360,7 +6517,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.16",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -6379,13 +6536,13 @@
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
-            "locked": "2.7.5",
+            "locked": "2.8.0",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin-web"
             ]
         },
         "com.netflix.karyon:karyon2-admin-web": {
-            "locked": "2.7.5",
+            "locked": "2.8.0",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -6403,8 +6560,14 @@
                 "com.netflix.netflix-commons:netflix-eventbus"
             ]
         },
+        "com.netflix.pytheas:pytheas-api": {
+            "locked": "1.29.0",
+            "transitive": [
+                "com.netflix.pytheas:pytheas-core"
+            ]
+        },
         "com.netflix.pytheas:pytheas-core": {
-            "locked": "1.25",
+            "locked": "1.29.0",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin"
             ]
@@ -6438,30 +6601,32 @@
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client4": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client"
             ]
         },
         "com.sun.jersey.contribs:jersey-guice": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core"
             ]
         },
         "com.sun.jersey:jersey-client": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4"
             ]
         },
         "com.sun.jersey:jersey-core": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-client",
                 "com.sun.jersey:jersey-json",
@@ -6469,13 +6634,15 @@
             ]
         },
         "com.sun.jersey:jersey-json": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
+                "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core"
             ]
         },
         "com.sun.jersey:jersey-server": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
@@ -6483,9 +6650,10 @@
             ]
         },
         "com.sun.jersey:jersey-servlet": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
@@ -6553,13 +6721,14 @@
             "locked": "1.8",
             "transitive": [
                 "com.netflix.archaius:archaius-core",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary"
             ]
         },
         "commons-io:commons-io": {
-            "locked": "1.4",
+            "locked": "2.4",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core"
             ]
@@ -6584,6 +6753,12 @@
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
                 "netflix:nflibrary"
+            ]
+        },
+        "dom4j:dom4j": {
+            "locked": "1.6.1",
+            "transitive": [
+                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -6637,6 +6812,7 @@
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-core"
             ]
@@ -6706,7 +6882,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -6731,17 +6907,17 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -6870,7 +7046,6 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json"
             ]
         },
@@ -6898,6 +7073,12 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.governator:governator"
+            ]
+        },
+        "org.javassist:javassist": {
+            "locked": "3.18.2-GA",
+            "transitive": [
+                "org.reflections:reflections"
             ]
         },
         "org.jboss.logging:jboss-logging": {
@@ -6936,6 +7117,10 @@
                 "com.netflix.governator:governator"
             ]
         },
+        "org.reflections:reflections": {
+            "locked": "0.9.9-RC2",
+            "requested": "0.9.9-RC2"
+        },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.21",
             "transitive": [
@@ -6951,6 +7136,7 @@
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -6988,6 +7174,12 @@
             "transitive": [
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
+            ]
+        },
+        "xml-apis:xml-apis": {
+            "locked": "1.0.b2",
+            "transitive": [
+                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -7068,10 +7260,11 @@
             ]
         },
         "com.google.code.findbugs:annotations": {
-            "locked": "2.0.0",
+            "locked": "2.0.2",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
-                "netflix:basicTypes"
+                "netflix:basicTypes",
+                "org.reflections:reflections"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -7096,10 +7289,12 @@
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-core",
                 "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "netflix:nflibrary",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.reflections:reflections"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -7124,6 +7319,7 @@
         "com.google.inject.extensions:guice-servlet": {
             "locked": "4.1.0",
             "transitive": [
+                "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
@@ -7178,24 +7374,24 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.0.6",
+            "locked": "2.1.4",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.8.0",
+            "locked": "3.9.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
@@ -7230,7 +7426,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.12",
+            "locked": "1.16",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -7249,13 +7445,13 @@
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
-            "locked": "2.7.5",
+            "locked": "2.8.0",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin-web"
             ]
         },
         "com.netflix.karyon:karyon2-admin-web": {
-            "locked": "2.7.5",
+            "locked": "2.8.0",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -7273,8 +7469,14 @@
                 "com.netflix.netflix-commons:netflix-eventbus"
             ]
         },
+        "com.netflix.pytheas:pytheas-api": {
+            "locked": "1.29.0",
+            "transitive": [
+                "com.netflix.pytheas:pytheas-core"
+            ]
+        },
         "com.netflix.pytheas:pytheas-core": {
-            "locked": "1.25",
+            "locked": "1.29.0",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin"
             ]
@@ -7308,30 +7510,32 @@
             ]
         },
         "com.sun.jersey.contribs:jersey-apache-client4": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client"
             ]
         },
         "com.sun.jersey.contribs:jersey-guice": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core"
             ]
         },
         "com.sun.jersey:jersey-client": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.sun.jersey.contribs:jersey-apache-client4"
             ]
         },
         "com.sun.jersey:jersey-core": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-client",
                 "com.sun.jersey:jersey-json",
@@ -7339,13 +7543,15 @@
             ]
         },
         "com.sun.jersey:jersey-json": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
+                "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core"
             ]
         },
         "com.sun.jersey:jersey-server": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
@@ -7353,9 +7559,10 @@
             ]
         },
         "com.sun.jersey:jersey-servlet": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice"
             ]
@@ -7423,13 +7630,14 @@
             "locked": "1.8",
             "transitive": [
                 "com.netflix.archaius:archaius-core",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary"
             ]
         },
         "commons-io:commons-io": {
-            "locked": "1.4",
+            "locked": "2.4",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core"
             ]
@@ -7454,6 +7662,12 @@
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
                 "netflix:nflibrary"
+            ]
+        },
+        "dom4j:dom4j": {
+            "locked": "1.6.1",
+            "transitive": [
+                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -7507,6 +7721,7 @@
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.karyon:karyon2-admin",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-core"
             ]
@@ -7576,7 +7791,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -7601,17 +7816,17 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.43",
+            "locked": "2.45",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.2",
+            "locked": "3.2.3",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -7740,7 +7955,6 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
-                "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json"
             ]
         },
@@ -7768,6 +7982,12 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.governator:governator"
+            ]
+        },
+        "org.javassist:javassist": {
+            "locked": "3.18.2-GA",
+            "transitive": [
+                "org.reflections:reflections"
             ]
         },
         "org.jboss.logging:jboss-logging": {
@@ -7806,6 +8026,10 @@
                 "com.netflix.governator:governator"
             ]
         },
+        "org.reflections:reflections": {
+            "locked": "0.9.9-RC2",
+            "requested": "0.9.9-RC2"
+        },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.21",
             "transitive": [
@@ -7821,6 +8045,7 @@
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.servo:servo-core",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -7858,6 +8083,12 @@
             "transitive": [
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
+            ]
+        },
+        "xml-apis:xml-apis": {
+            "locked": "1.0.b2",
+            "transitive": [
+                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {

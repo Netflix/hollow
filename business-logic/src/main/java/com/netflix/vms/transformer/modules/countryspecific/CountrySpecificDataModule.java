@@ -138,7 +138,7 @@ public class CountrySpecificDataModule {
         if (statusOrdinal != -1) {
             StatusHollow status = api.getStatusHollow(statusOrdinal);
 
-            availabilityWindowList = availabilityWindowModule.populateWindowData(videoId, countryCode, data, status, rollup);
+            availabilityWindowList = availabilityWindowModule.populateWindowData(videoId, countryCode, null, data, status, rollup);
             firstDisplayDate = populateFirstDisplayDateData(data, status, availabilityWindowList);
         }
 

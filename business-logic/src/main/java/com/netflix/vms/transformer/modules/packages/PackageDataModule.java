@@ -72,7 +72,7 @@ public class PackageDataModule {
         this.drmInfoByGroupId = new HashMap<Integer, DrmInfo>();
 
         this.streamDataModule = new StreamDataModule(api, cycleConstants, indexer, objectMapper, drmKeysByGroupId, drmInfoByGroupId);
-        this.contractRestrictionModule = new ContractRestrictionModule(api, ctx, indexer);
+        this.contractRestrictionModule = new ContractRestrictionModule(api, ctx, cycleConstants, indexer);
         this.encodeSummaryModule = new EncodeSummaryDescriptorModule(api, indexer);
     }
 

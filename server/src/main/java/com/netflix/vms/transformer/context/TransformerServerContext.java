@@ -41,6 +41,7 @@ public class TransformerServerContext implements TransformerContext {
     private long now = System.currentTimeMillis();
 
     private Set<Integer> fastlaneIds;
+    private Set<String> pinTitleSpecs;
 
     public TransformerServerContext(
             TransformerServerLogger logger,
@@ -93,6 +94,16 @@ public class TransformerServerContext implements TransformerContext {
     @Override
     public Set<Integer> getFastlaneIds() {
         return fastlaneIds;
+    }
+
+    @Override
+    public void setPinTitleSpecs(Set<String> specs) {
+        this.pinTitleSpecs = specs;
+    }
+
+    @Override
+    public Set<String> getPinTitleSpecs() {
+        return this.pinTitleSpecs;
     }
 
     @Override

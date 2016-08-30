@@ -61,6 +61,7 @@ public class VMSAvailabilityWindowModule {
     private Map<Integer, VideoPackageData> transformedPackageData;
 
     private final WindowPackageContractInfoModule windowPackageContractInfoModule;
+    private final MultilanguageCountryWindowFilter multilanguageCountryWindowFilter;
 
     public VMSAvailabilityWindowModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
         this.api = api;
@@ -69,6 +70,7 @@ public class VMSAvailabilityWindowModule {
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
 
         this.windowPackageContractInfoModule = new WindowPackageContractInfoModule(api, ctx, cycleConstants, indexer);
+        this.multilanguageCountryWindowFilter = new MultilanguageCountryWindowFilter(cycleConstants);
 
         EMPTY_CUP_TOKENS = new LinkedHashSetOfStrings();
         EMPTY_CUP_TOKENS.ordinals = Collections.emptyList();
@@ -82,20 +84,20 @@ public class VMSAvailabilityWindowModule {
         this.transformedPackageData = data;
     }
 
-    public List<VMSAvailabilityWindow> populateWindowData(Integer videoId, String country, CompleteVideoCountrySpecificData data, StatusHollow videoRights, CountrySpecificRollupValues rollup) {
+    public List<VMSAvailabilityWindow> populateWindowData(Integer videoId, String country, String locale, CompleteVideoCountrySpecificData data, StatusHollow videoRights, CountrySpecificRollupValues rollup) {
         boolean isGoLive = isGoLive(videoRights);
 
         RightsHollow rights = videoRights._getRights();
         if((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
             populateRolledUpWindowData(videoId, data, rollup, rights, isGoLive);
         } else {
-            populateEpisodeOrStandaloneWindowData(videoId, country, data, rollup, isGoLive, rights);
+            populateEpisodeOrStandaloneWindowData(videoId, country, locale, data, rollup, isGoLive, rights);
         }
 
         return data.mediaAvailabilityWindows;
     }
 
-    private void populateEpisodeOrStandaloneWindowData(Integer videoId, String country, CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup, boolean isGoLive, RightsHollow rights) {
+    private void populateEpisodeOrStandaloneWindowData(Integer videoId, String country, String locale, CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup, boolean isGoLive, RightsHollow rights) {
         List<VMSAvailabilityWindow> availabilityWindows = new ArrayList<VMSAvailabilityWindow>();
 
         long minWindowStartDate = Long.MAX_VALUE;
@@ -142,6 +144,13 @@ public class VMSAvailabilityWindowModule {
                 boolean isAvailableForDownload = entry.getValue().isAvailableForDownload;
 
                 if(rightsContract != null) {
+                    int contractAvailability = -1;
+                    if(locale != null) {
+                        contractAvailability = multilanguageCountryWindowFilter.contractAvailabilityForLanguage(locale, rightsContract);
+                        if(contractAvailability == 0)
+                            continue;
+                    }
+                    
                     ListOfRightsContractPackageHollow packageIdList = rightsContract._getPackages();
 
                     if(packageIdList != null && !packageIdList.isEmpty()) {
@@ -217,6 +226,10 @@ public class VMSAvailabilityWindowModule {
                                 } else {
                                     includedWindowPackageData = true;
                                     PackageData packageData = getPackageData(videoId, pkg._getPackageId());
+                                    
+                                    if(locale != null && !multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAvailability))
+                                        continue;
+                                    
                                     if(packageData != null) {
                                         /// package data is available
                                         windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(packageData, rightsContract, contract, country, isAvailableForDownload);
@@ -398,50 +411,42 @@ public class VMSAvailabilityWindowModule {
             outputWindow.endDate = OutputUtil.getRoundedDate(maxEndDate);
             outputWindow.bundledAssetsGroupId = maxContractId; //rollup.getFirstEpisodeBundledAssetId();
 
-            WindowPackageContractInfo videoImagesContractInfo = createEmptyContractInfoForRollup(outputWindow);
-            WindowPackageContractInfo videoMediaContractInfo = createEmptyContractInfoForRollup(outputWindow);
-
-            VMSAvailabilityWindow videoImagesAvailabilityWindow = outputWindow.clone();
-            VMSAvailabilityWindow videoMediaAvailabilityWindow = outputWindow.clone();
+            WindowPackageContractInfo outputContractInfo = createEmptyContractInfoForRollup(outputWindow);
 
 
-            videoImagesAvailabilityWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
-            videoMediaAvailabilityWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
+            outputWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
+            outputWindow.windowInfosByPackageId.put(ZERO, outputContractInfo);
 
-            videoImagesAvailabilityWindow.windowInfosByPackageId.put(ZERO, videoImagesContractInfo);
-            videoMediaAvailabilityWindow.windowInfosByPackageId.put(ZERO, videoMediaContractInfo);
-
-            videoImagesContractInfo.videoContractInfo.cupTokens = EMPTY_CUP_TOKENS;
-            videoImagesContractInfo.videoContractInfo.isAvailableForDownload = rollup.isAvailableForDownload();
-            videoMediaContractInfo.videoContractInfo.assetBcp47Codes = rollup.getAssetBcp47Codes();
-            videoMediaContractInfo.videoContractInfo.prePromotionDays = rollup.getPrePromoDays();
-            videoMediaContractInfo.videoContractInfo.isDayAfterBroadcast = rollup.hasRollingEpisodes();
-            videoMediaContractInfo.videoContractInfo.hasRollingEpisodes = rollup.hasRollingEpisodes();
-            videoMediaContractInfo.videoContractInfo.isAvailableForDownload = rollup.isAvailableForDownload();
-            videoMediaContractInfo.videoContractInfo.postPromotionDays = 0;
-            videoMediaContractInfo.videoContractInfo.cupTokens = rollup.getCupTokens() != null ? rollup.getCupTokens() : DEFAULT_CUP_TOKENS;
-            videoMediaContractInfo.videoPackageInfo.formats = rollup.getVideoFormatDescriptors();
+            outputContractInfo.videoContractInfo.assetBcp47Codes = rollup.getAssetBcp47Codes();
+            outputContractInfo.videoContractInfo.prePromotionDays = rollup.getPrePromoDays();
+            outputContractInfo.videoContractInfo.isDayAfterBroadcast = rollup.hasRollingEpisodes();
+            outputContractInfo.videoContractInfo.hasRollingEpisodes = rollup.hasRollingEpisodes();
+            outputContractInfo.videoContractInfo.isAvailableForDownload = rollup.isAvailableForDownload();
+            outputContractInfo.videoContractInfo.postPromotionDays = 0;
+            outputContractInfo.videoContractInfo.cupTokens = rollup.getCupTokens() != null ? rollup.getCupTokens() : DEFAULT_CUP_TOKENS;
+            outputContractInfo.videoPackageInfo.formats = rollup.getVideoFormatDescriptors();
 
             if(rollup.getFirstEpisodeBundledAssetId() != 0) {
-                videoMediaAvailabilityWindow.bundledAssetsGroupId = rollup.getFirstEpisodeBundledAssetId();
-                videoMediaContractInfo.videoContractInfo.contractId = rollup.getFirstEpisodeBundledAssetId();
+                outputWindow.bundledAssetsGroupId = rollup.getFirstEpisodeBundledAssetId();
+                outputContractInfo.videoContractInfo.contractId = rollup.getFirstEpisodeBundledAssetId();
             }
 
             if(isGoLive && isInWindow)
-                videoImagesContractInfo.videoPackageInfo.stillImagesMap = rollup.getVideoImageMap();
+                outputContractInfo.videoPackageInfo.stillImagesMap = rollup.getVideoImageMap();
             else
-                videoMediaContractInfo.videoPackageInfo.formats = Collections.emptySet();  ///TODO: This seems totally unnecessary.  We should remove this line after parity testing.
+                outputContractInfo.videoPackageInfo.formats = Collections.emptySet();  ///TODO: This seems totally unnecessary.  We should remove this line after parity testing.
 
             int videoGeneralOrdinal = videoGeneralIdx.getMatchingOrdinal(Long.valueOf(videoId.intValue()));
             if(videoGeneralOrdinal != -1) {
                 VideoGeneralHollow general = api.getVideoGeneralHollow(videoGeneralOrdinal);
                 long runtime = general._getRuntime();
                 if(runtime != Long.MIN_VALUE)
-                    videoImagesContractInfo.videoPackageInfo.runtimeInSeconds = (int)runtime;
+                    outputContractInfo.videoPackageInfo.runtimeInSeconds = (int)runtime;
             }
 
-            data.mediaAvailabilityWindows = Collections.singletonList(videoMediaAvailabilityWindow);
-            data.imagesAvailabilityWindows = Collections.singletonList(videoImagesAvailabilityWindow);
+            
+            data.mediaAvailabilityWindows = Collections.singletonList(outputWindow);
+            data.imagesAvailabilityWindows = data.mediaAvailabilityWindows;
         }
     }
 

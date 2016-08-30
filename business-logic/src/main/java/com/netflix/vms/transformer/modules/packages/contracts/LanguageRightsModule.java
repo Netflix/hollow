@@ -3,6 +3,7 @@ package com.netflix.vms.transformer.modules.packages.contracts;
 import com.netflix.config.utils.Pair;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.config.OutputTypeConfig;
 import com.netflix.vms.transformer.hollowinput.ContractHollow;
 import com.netflix.vms.transformer.hollowinput.DisallowedAssetBundleHollow;
 import com.netflix.vms.transformer.hollowinput.DisallowedAssetBundlesListHollow;
@@ -39,7 +40,7 @@ public class LanguageRightsModule extends AbstractTransformModule {
     @Override
     public void transform() {
         /// short circuit FastLane
-        if(ctx.getFastlaneIds() != null)
+        if (OutputTypeConfig.FASTLANE_EXCLUDED_TYPES.contains(OutputTypeConfig.LanguageRights) && ctx.getFastlaneIds() != null)
             return;
 
         Map<Pair<Integer, Integer>, LanguageRights> contractMovieRights = new HashMap<>();

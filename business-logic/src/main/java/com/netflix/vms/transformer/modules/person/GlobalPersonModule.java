@@ -6,6 +6,7 @@ import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.config.OutputTypeConfig;
 import com.netflix.vms.transformer.hollowinput.ExplicitDateHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfVideoIdsHollow;
@@ -57,10 +58,10 @@ public class GlobalPersonModule extends AbstractTransformModule {
     }
 
     public List<GlobalPerson> transformPersons() {
-    	/// short-circuit Fastlane
-    	if(ctx.getFastlaneIds() != null)
-    		return Collections.emptyList();
-    	
+        /// short-circuit Fastlane
+        if (OutputTypeConfig.FASTLANE_EXCLUDED_TYPES.contains(OutputTypeConfig.GlobalPerson) && ctx.getFastlaneIds() != null)
+            return Collections.emptyList();
+
         List<GlobalPerson> personList = new ArrayList<GlobalPerson>();
 
         for (PersonVideoHollow input : api.getAllPersonVideoHollow()) {
@@ -123,6 +124,7 @@ public class GlobalPersonModule extends AbstractTransformModule {
                 moviePersonCharacterOrdinal = moviePersonCharacterIterator.next();
             }
         }
+        Collections.sort(movieCharacters);
         return movieCharacters;
     }
 

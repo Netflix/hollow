@@ -28,6 +28,7 @@ import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.fastlane.HollowFastlanePublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HermesBlobAnnouncer;
 import com.netflix.vms.transformer.rest.VMSPublishWorkflowHistoryAdmin;
+import com.netflix.vms.transformer.util.OverrideVipNameUtil;
 import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
 
 import java.util.function.Supplier;
@@ -117,6 +118,7 @@ public class TransformerCycleKickoff {
 
             private void setUpFastlaneContext() {
                 ctx.setFastlaneIds(fastlaneIdRetriever.getFastlaneIds());
+                ctx.setPinTitleSpecs(fastlaneIdRetriever.getPinnedTitleSpecs());
             }
 
             private void markCycleFailed(Throwable th) {
@@ -163,7 +165,6 @@ public class TransformerCycleKickoff {
     private void restore(TransformCycle cycle, TransformerConfig cfg, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer) {
         if(cfg.isRestoreFromPreviousStateEngine() && !isFastlane(cfg)) {
             long latestVersion = hermesBlobAnnouncer.getLatestAnnouncedVersionFromCassandra(cfg.getTransformerVip());
-
             long restoreVersion = cfg.getRestoreFromSpecificVersion() != null ? cfg.getRestoreFromSpecificVersion() : latestVersion;
 
             if(restoreVersion != Long.MIN_VALUE) {
@@ -172,7 +173,6 @@ public class TransformerCycleKickoff {
 
                 if(outputClient.getCurrentVersionId() != restoreVersion)
                     throw new IllegalStateException("Failed to restore from state: " + restoreVersion);
-
                 cycle.restore(outputClient);
             } else {
                 if(cfg.isFailIfRestoreNotAvailable())
@@ -186,7 +186,7 @@ public class TransformerCycleKickoff {
     }
 
     private boolean isFastlane(TransformerConfig cfg) {
-        return cfg.getTransformerVip().endsWith("_override");
+        return OverrideVipNameUtil.isOverrideVip(cfg);
     }
 
 }
