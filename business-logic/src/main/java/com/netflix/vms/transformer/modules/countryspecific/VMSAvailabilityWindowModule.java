@@ -98,7 +98,10 @@ public class VMSAvailabilityWindowModule {
 
     List<VMSAvailabilityWindow> calculateWindowData(Integer videoId, String country, String locale, StatusHollow videoRights, CountrySpecificRollupValues rollup, boolean isGoLive) {
         List<VMSAvailabilityWindow> windows = null;
-            
+        
+        if(videoId == 70247686 && "CH".equals(country) && "fr".equals(locale))
+            System.out.println("watch");
+        
         RightsHollow rights = videoRights._getRights();
         if((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
             windows = populateRolledUpWindowData(videoId, rollup, rights, isGoLive);
@@ -298,7 +301,8 @@ public class VMSAvailabilityWindowModule {
             if(locale == null || !outputWindow.windowInfosByPackageId.isEmpty()) {  /// do not add if all windows were filtered out for multicatalog country
                 availabilityWindows.add(outputWindow);
                 if(rollup.doEpisode()) {
-                    rollup.windowFound();
+                    if(locale == null || (window._getStartDate() <= ctx.getNowMillis() && window._getEndDate() > ctx.getNowMillis()))
+                        rollup.windowFound();
                     if(isGoLive)
                         rollup.newSeasonWindow(window._getStartDate(), window._getEndDate(), rollup.getSeasonSequenceNumber());
                 }
