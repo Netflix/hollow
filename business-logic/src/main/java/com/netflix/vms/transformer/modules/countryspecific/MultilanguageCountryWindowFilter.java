@@ -32,8 +32,8 @@ public class MultilanguageCountryWindowFilter {
      * @param contract
      * @return
      */
-    public int contractAvailabilityForLanguage(String language, RightsContractHollow contract) {
-        int availability = 0;
+    public long contractAvailabilityForLanguage(String language, RightsContractHollow contract) {
+        long availability = 0;
         
         for(RightsContractAssetHollow assetInput : contract._getAssets()) {
             ContractAsset asset = rightsContractAssetCache.getResult(assetInput.getOrdinal());
@@ -43,7 +43,8 @@ public class MultilanguageCountryWindowFilter {
             }
             
             if(language.equals(asset.getLanguage())) {
-                availability |= (ContractAssetType.values().length * languageDialectOffset(language, asset.getLocale())) + asset.getType().getBitIdentifier();
+                int localeBitOffset = ContractAssetType.values().length * languageDialectOffset(language, asset.getLocale());
+                availability |= asset.getType().getBitIdentifier() << localeBitOffset;
             }
         }
         
@@ -59,7 +60,7 @@ public class MultilanguageCountryWindowFilter {
      * @return
      */
     
-    public boolean packageIsAvailableForLanguage(String language, PackageData pkg, int languageAvailability) {
+    public boolean packageIsAvailableForLanguage(String language, PackageData pkg, long languageAvailability) {
         if(pkg == null)
             return false;
         
@@ -94,17 +95,17 @@ public class MultilanguageCountryWindowFilter {
     
     private static final char[] FORCED_CHARS = "Forced".toCharArray();
     
-    private boolean languageIsAvailable(String language, EncodeSummaryDescriptor descriptor,  int languageAvailability, boolean checkAudio, boolean checkText) {
+    private boolean languageIsAvailable(String language, EncodeSummaryDescriptor descriptor,  long languageAvailability, boolean checkAudio, boolean checkText) {
         EncodeSummaryDescriptorData descriptorData = descriptor.descriptorData;
         
         if(checkAudio && languageMatches(language, descriptorData.audioLanguage)) {
             int localeBitOffset = ContractAssetType.values().length * languageDialectOffset(language, descriptorData.audioLanguage);
             
             if(descriptorData.assetType.id == 2) {
-                if((languageAvailability & (localeBitOffset + ContractAssetType.DESCRIPTIVE_AUDIO.getBitIdentifier())) != 0)
+                if((languageAvailability & ContractAssetType.DESCRIPTIVE_AUDIO.getBitIdentifier() << localeBitOffset) != 0)
                     return true;
             } else {
-                if((languageAvailability & (localeBitOffset + ContractAssetType.AUDIO.getBitIdentifier())) != 0)
+                if((languageAvailability & ContractAssetType.AUDIO.getBitIdentifier() << localeBitOffset) != 0)
                     return true;
             }
         }
@@ -116,7 +117,7 @@ public class MultilanguageCountryWindowFilter {
                 if(languageMatches(language, descriptorData.textLanguage)) {
                     int localeBitOffset = ContractAssetType.values().length * languageDialectOffset(language, descriptorData.textLanguage);
                     
-                    if((languageAvailability & (localeBitOffset + ContractAssetType.SUBTITLES.getBitIdentifier())) != 0)
+                    if((languageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier() << localeBitOffset) != 0)
                         return true;
                 }
             }
