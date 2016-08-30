@@ -95,12 +95,8 @@ public class VMSAvailabilityWindowModule {
         return windows;
     }
 
-
     List<VMSAvailabilityWindow> calculateWindowData(Integer videoId, String country, String locale, StatusHollow videoRights, CountrySpecificRollupValues rollup, boolean isGoLive) {
         List<VMSAvailabilityWindow> windows = null;
-        
-        if(videoId == 70247686 && "CH".equals(country) && "fr".equals(locale))
-            System.out.println("watch");
         
         RightsHollow rights = videoRights._getRights();
         if((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
@@ -130,7 +126,7 @@ public class VMSAvailabilityWindowModule {
                 return Long.compare(o1._getStartDate(), o2._getStartDate());
             }
         });
-
+        
         ///TODO: Find some way to simplify this logic.
         for (RightsWindowHollow window : sortedWindows) {
             boolean includedWindowPackageData = false;
@@ -525,11 +521,6 @@ public class VMSAvailabilityWindowModule {
     boolean isGoLive(StatusHollow status) {
         FlagsHollow flags = status._getFlags();
         return flags != null && flags._getGoLive();
-    }
-    
-    boolean isLanguageOverride(StatusHollow status) {
-        FlagsHollow flags = status._getFlags();
-        return flags != null && flags._getLanguageOverride();
     }
 
     public void reset() {

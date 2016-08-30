@@ -194,7 +194,7 @@ public class CountrySpecificDataModule {
             StatusHollow status = api.getStatusHollow(statusOrdinal);
             FlagsHollow flags = status._getFlags();
             
-            if(flags != null && flags._getGoLive() && !flags._getLanguageOverride()) {
+            if(flags != null && flags._getGoLive()) {
                 List<VMSAvailabilityWindow> availabilityWindows = availabilityWindowModule.calculateWindowData(videoId, countryCode, language, status, rollup, true);
                 
                 /// Check the generated windows against the main country window -- if not different, exclude the record.
