@@ -1618,7 +1618,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "3.11",
+            "locked": "3.12",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -4185,7 +4185,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "3.11",
+            "locked": "3.12",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -6752,7 +6752,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "3.11",
+            "locked": "3.12",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -9319,7 +9319,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "3.11",
+            "locked": "3.12",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -11985,7 +11985,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "3.11",
+            "locked": "3.12",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -14553,7 +14553,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "3.11",
+            "locked": "3.12",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -17126,7 +17126,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "3.11",
+            "locked": "3.12",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -19699,7 +19699,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "3.11",
+            "locked": "3.12",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -22272,7 +22272,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "3.11",
+            "locked": "3.12",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
