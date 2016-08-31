@@ -100,18 +100,26 @@ public class VMSAvailabilityWindowModule {
     List<VMSAvailabilityWindow> calculateWindowData(Integer videoId, String country, String locale, StatusHollow videoRights, CountrySpecificRollupValues rollup, boolean isGoLive) {
         List<VMSAvailabilityWindow> windows = null;
         
+        if(videoId == 80133037 && "CH".equals(country) && "fr".equals(locale))
+            System.out.println("show " + 80133037);
+        if(videoId == 80132885 && "CH".equals(country) && "fr".equals(locale))
+            System.out.println("season " + 80132885);
+        if(videoId == 80132886 && "CH".equals(country) && "fr".equals(locale))
+            System.out.println("episode " + 80132886);
+        
+        
         RightsHollow rights = videoRights._getRights();
         if((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
             windows = populateRolledUpWindowData(videoId, rollup, rights, isGoLive, locale != null);
         } else {
-            windows = populateEpisodeOrStandaloneWindowData(videoId, country, locale, rollup, isGoLive, rights);
+            windows = populateEpisodeOrStandaloneWindowData(videoId, country, locale, rollup, isGoLive, rights, locale != null);
             if(locale != null && windows.isEmpty() && isLanguageOverride(videoRights))
-                windows = populateEpisodeOrStandaloneWindowData(videoId, country, null, rollup, isGoLive, rights);
+                windows = populateEpisodeOrStandaloneWindowData(videoId, country, null, rollup, isGoLive, rights, locale != null);
         }
         return windows;
     }
     
-    private List<VMSAvailabilityWindow> populateEpisodeOrStandaloneWindowData(Integer videoId, String country, String locale, CountrySpecificRollupValues rollup, boolean isGoLive, RightsHollow rights) {
+    private List<VMSAvailabilityWindow> populateEpisodeOrStandaloneWindowData(Integer videoId, String country, String locale, CountrySpecificRollupValues rollup, boolean isGoLive, RightsHollow rights, boolean isMulticatalogRollup) {
         List<VMSAvailabilityWindow> availabilityWindows = new ArrayList<VMSAvailabilityWindow>();
 
         long minWindowStartDate = Long.MAX_VALUE;
@@ -301,7 +309,7 @@ public class VMSAvailabilityWindowModule {
             if(locale == null || !outputWindow.windowInfosByPackageId.isEmpty()) {  /// do not add if all windows were filtered out for multicatalog country
                 availabilityWindows.add(outputWindow);
                 if(rollup.doEpisode()) {
-                    if(locale != null)
+                    if(isMulticatalogRollup)
                         rollup.windowFound(outputWindow.startDate.val, outputWindow.endDate.val);
                     if(isGoLive)
                         rollup.newSeasonWindow(outputWindow.startDate.val, outputWindow.endDate.val, rollup.getSeasonSequenceNumber());
@@ -389,7 +397,7 @@ public class VMSAvailabilityWindowModule {
     }
 
     // Return AvailabilityWindow from MediaData
-    private List<VMSAvailabilityWindow> populateRolledUpWindowData(Integer videoId, CountrySpecificRollupValues rollup, RightsHollow rights, boolean isGoLive, boolean isMultilanguageProcessing) {
+    private List<VMSAvailabilityWindow> populateRolledUpWindowData(Integer videoId, CountrySpecificRollupValues rollup, RightsHollow rights, boolean isGoLive, boolean isMulticatalogRollup) {
         ListOfRightsWindowHollow windows = rights._getWindows();
 
         boolean windowsEmpty = windows.isEmpty();
@@ -419,7 +427,7 @@ public class VMSAvailabilityWindowModule {
             }
 
             boolean includeWindow = true;
-            if(isMultilanguageProcessing) {
+            if(isMulticatalogRollup) {
                 DateWindow windowWithEpisodes = rollup.doShow() ? rollup.getValidShowWindow(minStartDate, maxEndDate) : rollup.getValidSeasonWindow(minStartDate, maxEndDate);
                 
                 if(windowWithEpisodes != null) {
