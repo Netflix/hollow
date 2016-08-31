@@ -188,31 +188,27 @@ public class CountrySpecificDataModule {
     private void convertLocale(Integer videoId, String countryCode, String language, CountrySpecificRollupValues rollup, Map<Integer, MulticatalogCountryData> data, Map<Integer, CompleteVideoCountrySpecificData> nonLocaleSpecificData) {
         CompleteVideoCountrySpecificData baseData = nonLocaleSpecificData.get(videoId);
         
-        
         int statusOrdinal = videoStatusIdx.getMatchingOrdinal(videoId.longValue(), countryCode);
         if (statusOrdinal != -1) {
             StatusHollow status = api.getStatusHollow(statusOrdinal);
-            FlagsHollow flags = status._getFlags();
             
-            if(flags != null && flags._getGoLive()) {
-                List<VMSAvailabilityWindow> availabilityWindows = availabilityWindowModule.calculateWindowData(videoId, countryCode, language, status, rollup, true);
-                
-                /// Check the generated windows against the main country window -- if not different, exclude the record.
-                if(!availabilityWindows.equals(baseData.mediaAvailabilityWindows)) {
-                    MulticatalogCountryData countryData = data.get(videoId);
-                    if(countryData == null) {
-                        countryData = new MulticatalogCountryData();
-                        countryData.country = new ISOCountry(countryCode);
-                        countryData.videoId = new Video(videoId);
-                        countryData.languageData = new HashMap<>();
-                        data.put(videoId, countryData);
-                    }
-                    
-                    MulticatalogCountryLocaleData result = new MulticatalogCountryLocaleData();
-                    result.availabilityWindows = availabilityWindows;
-                    
-                    countryData.languageData.put(new NFLocale(language), result);
+            List<VMSAvailabilityWindow> availabilityWindows = availabilityWindowModule.calculateWindowData(videoId, countryCode, language, status, rollup, availabilityWindowModule.isGoLive(status));
+            
+            /// Check the generated windows against the main country window -- if not different, exclude the record.
+            if(!availabilityWindows.equals(baseData.mediaAvailabilityWindows)) {
+                MulticatalogCountryData countryData = data.get(videoId);
+                if(countryData == null) {
+                    countryData = new MulticatalogCountryData();
+                    countryData.country = new ISOCountry(countryCode);
+                    countryData.videoId = new Video(videoId);
+                    countryData.languageData = new HashMap<>();
+                    data.put(videoId, countryData);
                 }
+                
+                MulticatalogCountryLocaleData result = new MulticatalogCountryLocaleData();
+                result.availabilityWindows = availabilityWindows;
+                
+                countryData.languageData.put(new NFLocale(language), result);
             }
         }
     }

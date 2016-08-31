@@ -100,11 +100,6 @@ public class VMSAvailabilityWindowModule {
     List<VMSAvailabilityWindow> calculateWindowData(Integer videoId, String country, String locale, StatusHollow videoRights, CountrySpecificRollupValues rollup, boolean isGoLive) {
         List<VMSAvailabilityWindow> windows = null;
         
-        if(videoId == 80108971 && "CH".equals(country) && "fr".equals(locale))
-            System.out.println("watch");
-        if(videoId == 80108963 && "CH".equals(country) && "fr".equals(locale))
-            System.out.println("watch");
-        
         RightsHollow rights = videoRights._getRights();
         if((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
             windows = populateRolledUpWindowData(videoId, rollup, rights, isGoLive, locale != null);
