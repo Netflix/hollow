@@ -2,6 +2,8 @@ package com.netflix.vms.transformer.modules.countryspecific;
 
 import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
 
+import com.netflix.vms.transformer.hollowoutput.DateWindow;
+
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -98,9 +100,14 @@ public class VMSAvailabilityWindowModule {
     List<VMSAvailabilityWindow> calculateWindowData(Integer videoId, String country, String locale, StatusHollow videoRights, CountrySpecificRollupValues rollup, boolean isGoLive) {
         List<VMSAvailabilityWindow> windows = null;
         
+        if(videoId == 80108971 && "CH".equals(country) && "fr".equals(locale))
+            System.out.println("watch");
+        if(videoId == 80108963 && "CH".equals(country) && "fr".equals(locale))
+            System.out.println("watch");
+        
         RightsHollow rights = videoRights._getRights();
         if((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
-            windows = populateRolledUpWindowData(videoId, rollup, rights, isGoLive);
+            windows = populateRolledUpWindowData(videoId, rollup, rights, isGoLive, locale != null);
         } else {
             windows = populateEpisodeOrStandaloneWindowData(videoId, country, locale, rollup, isGoLive, rights);
         }
@@ -297,10 +304,10 @@ public class VMSAvailabilityWindowModule {
             if(locale == null || !outputWindow.windowInfosByPackageId.isEmpty()) {  /// do not add if all windows were filtered out for multicatalog country
                 availabilityWindows.add(outputWindow);
                 if(rollup.doEpisode()) {
-                    if(locale == null || (window._getStartDate() <= ctx.getNowMillis() && window._getEndDate() > ctx.getNowMillis()))
-                        rollup.windowFound();
+                    if(locale != null)
+                        rollup.windowFound(outputWindow.startDate.val, outputWindow.endDate.val);
                     if(isGoLive)
-                        rollup.newSeasonWindow(window._getStartDate(), window._getEndDate(), rollup.getSeasonSequenceNumber());
+                        rollup.newSeasonWindow(outputWindow.startDate.val, outputWindow.endDate.val, rollup.getSeasonSequenceNumber());
                 }
             }
 
@@ -385,12 +392,10 @@ public class VMSAvailabilityWindowModule {
     }
 
     // Return AvailabilityWindow from MediaData
-    private List<VMSAvailabilityWindow> populateRolledUpWindowData(Integer videoId, CountrySpecificRollupValues rollup, RightsHollow rights, boolean isGoLive) {
+    private List<VMSAvailabilityWindow> populateRolledUpWindowData(Integer videoId, CountrySpecificRollupValues rollup, RightsHollow rights, boolean isGoLive, boolean isMultilanguageProcessing) {
         ListOfRightsWindowHollow windows = rights._getWindows();
 
         boolean windowsEmpty = windows.isEmpty();
-        if((rollup.doSeason() && !rollup.wasSeasonWindowFound()) || (rollup.doShow() && !rollup.wasShowWindowFound()))
-            windowsEmpty = true;
         
         if(!windowsEmpty) {
             long minStartDate = Long.MAX_VALUE;
@@ -416,45 +421,60 @@ public class VMSAvailabilityWindowModule {
                 }
             }
 
-            VMSAvailabilityWindow outputWindow = new VMSAvailabilityWindow();
-            outputWindow.startDate = OutputUtil.getRoundedDate(minStartDate);
-            outputWindow.endDate = OutputUtil.getRoundedDate(maxEndDate);
-            outputWindow.bundledAssetsGroupId = maxContractId; //rollup.getFirstEpisodeBundledAssetId();
-
-            WindowPackageContractInfo outputContractInfo = createEmptyContractInfoForRollup(outputWindow);
-
-
-            outputWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
-            outputWindow.windowInfosByPackageId.put(ZERO, outputContractInfo);
-
-            outputContractInfo.videoContractInfo.assetBcp47Codes = rollup.getAssetBcp47Codes();
-            outputContractInfo.videoContractInfo.prePromotionDays = rollup.getPrePromoDays();
-            outputContractInfo.videoContractInfo.isDayAfterBroadcast = rollup.hasRollingEpisodes();
-            outputContractInfo.videoContractInfo.hasRollingEpisodes = rollup.hasRollingEpisodes();
-            outputContractInfo.videoContractInfo.isAvailableForDownload = rollup.isAvailableForDownload();
-            outputContractInfo.videoContractInfo.postPromotionDays = 0;
-            outputContractInfo.videoContractInfo.cupTokens = rollup.getCupTokens() != null ? rollup.getCupTokens() : DEFAULT_CUP_TOKENS;
-            outputContractInfo.videoPackageInfo.formats = rollup.getVideoFormatDescriptors();
-
-            if(rollup.getFirstEpisodeBundledAssetId() != 0) {
-                outputWindow.bundledAssetsGroupId = rollup.getFirstEpisodeBundledAssetId();
-                outputContractInfo.videoContractInfo.contractId = rollup.getFirstEpisodeBundledAssetId();
+            boolean includeWindow = true;
+            if(isMultilanguageProcessing) {
+                DateWindow windowWithEpisodes = rollup.doShow() ? rollup.getValidShowWindow(minStartDate, maxEndDate) : rollup.getValidSeasonWindow(minStartDate, maxEndDate);
+                
+                if(windowWithEpisodes != null) {
+                    minStartDate = windowWithEpisodes.startDateTimestamp;
+                    maxEndDate = windowWithEpisodes.endDateTimestamp;
+                } else {
+                    includeWindow = false;
+                }
             }
-
-            if(isGoLive && isInWindow)
-                outputContractInfo.videoPackageInfo.stillImagesMap = rollup.getVideoImageMap();
-            else
-                outputContractInfo.videoPackageInfo.formats = Collections.emptySet();  ///TODO: This seems totally unnecessary.  We should remove this line after parity testing.
-
-            int videoGeneralOrdinal = videoGeneralIdx.getMatchingOrdinal(Long.valueOf(videoId.intValue()));
-            if(videoGeneralOrdinal != -1) {
-                VideoGeneralHollow general = api.getVideoGeneralHollow(videoGeneralOrdinal);
-                long runtime = general._getRuntime();
-                if(runtime != Long.MIN_VALUE)
-                    outputContractInfo.videoPackageInfo.runtimeInSeconds = (int)runtime;
+            
+            if(includeWindow) {
+                VMSAvailabilityWindow outputWindow = new VMSAvailabilityWindow();
+                outputWindow.startDate = OutputUtil.getRoundedDate(minStartDate);
+                outputWindow.endDate = OutputUtil.getRoundedDate(maxEndDate);
+                outputWindow.bundledAssetsGroupId = maxContractId; //rollup.getFirstEpisodeBundledAssetId();
+                
+    
+                WindowPackageContractInfo outputContractInfo = createEmptyContractInfoForRollup(outputWindow);
+    
+    
+                outputWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
+                outputWindow.windowInfosByPackageId.put(ZERO, outputContractInfo);
+    
+                outputContractInfo.videoContractInfo.assetBcp47Codes = rollup.getAssetBcp47Codes();
+                outputContractInfo.videoContractInfo.prePromotionDays = rollup.getPrePromoDays();
+                outputContractInfo.videoContractInfo.isDayAfterBroadcast = rollup.hasRollingEpisodes();
+                outputContractInfo.videoContractInfo.hasRollingEpisodes = rollup.hasRollingEpisodes();
+                outputContractInfo.videoContractInfo.isAvailableForDownload = rollup.isAvailableForDownload();
+                outputContractInfo.videoContractInfo.postPromotionDays = 0;
+                outputContractInfo.videoContractInfo.cupTokens = rollup.getCupTokens() != null ? rollup.getCupTokens() : DEFAULT_CUP_TOKENS;
+                outputContractInfo.videoPackageInfo.formats = rollup.getVideoFormatDescriptors();
+    
+                if(rollup.getFirstEpisodeBundledAssetId() != 0) {
+                    outputWindow.bundledAssetsGroupId = rollup.getFirstEpisodeBundledAssetId();
+                    outputContractInfo.videoContractInfo.contractId = rollup.getFirstEpisodeBundledAssetId();
+                }
+    
+                if(isGoLive && isInWindow)
+                    outputContractInfo.videoPackageInfo.stillImagesMap = rollup.getVideoImageMap();
+                else
+                    outputContractInfo.videoPackageInfo.formats = Collections.emptySet();  ///TODO: This seems totally unnecessary.  We should remove this line after parity testing.
+    
+                int videoGeneralOrdinal = videoGeneralIdx.getMatchingOrdinal(Long.valueOf(videoId.intValue()));
+                if(videoGeneralOrdinal != -1) {
+                    VideoGeneralHollow general = api.getVideoGeneralHollow(videoGeneralOrdinal);
+                    long runtime = general._getRuntime();
+                    if(runtime != Long.MIN_VALUE)
+                        outputContractInfo.videoPackageInfo.runtimeInSeconds = (int)runtime;
+                }
+    
+                return Collections.singletonList(outputWindow);
             }
-
-            return Collections.singletonList(outputWindow);
         }
         
         return Collections.emptyList();

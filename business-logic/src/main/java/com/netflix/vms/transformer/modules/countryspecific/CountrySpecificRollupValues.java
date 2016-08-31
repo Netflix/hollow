@@ -26,19 +26,19 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
     private int showBundledAssetFromFirstUnavailableEpisode = Integer.MIN_VALUE;
     private int seasonBundledAssetFromFirstUnavailableEpisode = Integer.MIN_VALUE;
 
-    private Set<Strings> aggregatedShowAssetCodes = new HashSet<Strings>();
-    private Set<Strings> aggregatedSeasonAssetCodes = new HashSet<Strings>();
+    private Set<Strings> aggregatedShowAssetCodes = new HashSet<>();
+    private Set<Strings> aggregatedSeasonAssetCodes = new HashSet<>();
 
-    private Set<VideoFormatDescriptor> showVideoFormatDescriptors = new HashSet<VideoFormatDescriptor>();
-    private Set<VideoFormatDescriptor> seasonVideoFormatDescriptors = new HashSet<VideoFormatDescriptor>();
+    private Set<VideoFormatDescriptor> showVideoFormatDescriptors = new HashSet<>();
+    private Set<VideoFormatDescriptor> seasonVideoFormatDescriptors = new HashSet<>();
 
     private LinkedHashSetOfStrings showCupTokensFromFirstStreamableEpisode = null;
     private LinkedHashSetOfStrings seasonCupTokensFromFirstStreamableEpisode = null;
 
     private Map<Strings, List<VideoImage>> showFirstEpisodeVideoImagesMap = Collections.emptyMap();
     private Map<Strings, List<VideoImage>> seasonFirstEpisodeVideoImagesMap = Collections.emptyMap();
-    private Map<Strings, List<VideoImage>> showLevelTaggedVideoImagesRollup = new HashMap<Strings, List<VideoImage>>();
-    private Map<Strings, List<VideoImage>> seasonLevelTaggedVideoImagesRollup = new HashMap<Strings, List<VideoImage>>();
+    private Map<Strings, List<VideoImage>> showLevelTaggedVideoImagesRollup = new HashMap<>();
+    private Map<Strings, List<VideoImage>> seasonLevelTaggedVideoImagesRollup = new HashMap<>();
 
     private int seasonSequenceNumber = 0;
     private Map<DateWindow, BitSet> seasonSequenceNumberMap = new HashMap<>();
@@ -50,8 +50,8 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
     private boolean showIsAvailableForDownload = false;
     private boolean seasonIsAvailableForDownload = false;
     
-    private boolean showWindowFound = false;
-    private boolean seasonWindowFound = false;
+    private DateWindowAggregator showWindowAggregator = new DateWindowAggregator();
+    private DateWindowAggregator seasonWindowAggregator = new DateWindowAggregator();
 
     public void setSeasonSequenceNumber(int seasonSequenceNumber) {
         this.seasonSequenceNumber = seasonSequenceNumber;
@@ -78,7 +78,7 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         seasonLevelTaggedVideoImagesRollup = new HashMap<Strings, List<VideoImage>>();
         seasonBundledAssetFromFirstAvailableEpisode = Integer.MIN_VALUE;
         seasonBundledAssetFromFirstUnavailableEpisode = Integer.MIN_VALUE;
-        seasonWindowFound = false;
+        seasonWindowAggregator.reset();
     }
 
     public void resetShow() {
@@ -94,7 +94,7 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         seasonSequenceNumberMap = new HashMap<>();
         showBundledAssetFromFirstAvailableEpisode = Integer.MIN_VALUE;
         showBundledAssetFromFirstUnavailableEpisode = Integer.MIN_VALUE;
-        showWindowFound = false;
+        showWindowAggregator.reset();
     }
 
     public void episodeFound() {
@@ -110,17 +110,19 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         return seasonEpisodeFound;
     }
     
-    public void windowFound() {
-        this.showWindowFound = true;
-        this.seasonWindowFound = true;
+    public void windowFound(long startDate, long endDate) {
+        showWindowAggregator.addDateWindow(startDate, endDate);
+        seasonWindowAggregator.addDateWindow(startDate, endDate);
     }
     
-    public boolean wasShowWindowFound() {
-        return showWindowFound;
+    public DateWindow getValidShowWindow(long startDate, long endDate) {
+        showWindowAggregator.mergeDateWindows();
+        return showWindowAggregator.matchDateWindowAgainstMergedDateWindows(startDate, endDate);
     }
     
-    public boolean wasSeasonWindowFound() {
-        return seasonWindowFound;
+    public DateWindow getValidSeasonWindow(long startDate, long endDate) {
+        seasonWindowAggregator.mergeDateWindows();
+        return seasonWindowAggregator.matchDateWindowAgainstMergedDateWindows(startDate, endDate);
     }
 
     public void newAssetBcp47Codes(Set<Strings> assetCodes) {
