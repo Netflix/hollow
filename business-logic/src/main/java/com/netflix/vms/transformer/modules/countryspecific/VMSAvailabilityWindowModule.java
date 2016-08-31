@@ -105,6 +105,8 @@ public class VMSAvailabilityWindowModule {
             windows = populateRolledUpWindowData(videoId, rollup, rights, isGoLive, locale != null);
         } else {
             windows = populateEpisodeOrStandaloneWindowData(videoId, country, locale, rollup, isGoLive, rights);
+            if(locale != null && windows.isEmpty() && isLanguageOverride(videoRights))
+                windows = populateEpisodeOrStandaloneWindowData(videoId, country, null, rollup, isGoLive, rights);
         }
         return windows;
     }
@@ -357,7 +359,7 @@ public class VMSAvailabilityWindowModule {
                 rollup.newEpisodeStillImagesByTypeMapForShowLevelExtraction(stillImagesByTypeMapForShowLevelExtraction);
 
             rollup.newEpisodeData(isGoLive, currentOrFirstFutureWindow.bundledAssetsGroupId);
-        } else {
+        } else if(locale == null) {
             rollup.newEpisodeData(isGoLive, bundledAssetsGroupId);
             if(rollup.doEpisode())
                 rollup.newPrePromoDays(0);
@@ -536,6 +538,11 @@ public class VMSAvailabilityWindowModule {
     boolean isGoLive(StatusHollow status) {
         FlagsHollow flags = status._getFlags();
         return flags != null && flags._getGoLive();
+    }
+    
+    boolean isLanguageOverride(StatusHollow status) {
+        FlagsHollow flags = status._getFlags();
+        return flags != null && flags._getLanguageOverride();
     }
 
     public void reset() {
