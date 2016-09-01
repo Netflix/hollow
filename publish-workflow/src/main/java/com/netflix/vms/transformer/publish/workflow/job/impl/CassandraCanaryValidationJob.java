@@ -15,6 +15,7 @@ import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.AfterCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.BeforeCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryValidationJob;
+import com.netflix.vms.transformer.publish.workflow.logmessage.PbmsMessage;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.VMSDataCanaryResult;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -77,8 +78,8 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
                     	failedInBothBeforeAfter.add(videoCountry);
                 }
                 if(!failedInBothBeforeAfter.isEmpty())
-                	ctx.getLogger().warn(PlaybackMonkey, "PBM: IDs failed both before and after tests. "
-                			+ "Added for visibility and these do not break cycles. {}", failedInBothBeforeAfter);
+                    ctx.getLogger().warn(PlaybackMonkey, new PbmsMessage(
+                            "PBM: IDs failed both before and after tests. " + "Added for visibility and these do not break cycles", failedInBothBeforeAfter));
             } else {
                 pbmSuccess = false;
             }
