@@ -66,6 +66,8 @@ public class VideoImagesDataModule extends ArtWorkModule {
         }
 
         Set<Integer> rollupMerchstillVideoIds = new HashSet<>();
+        Set<String> rollupSourceFieldIds = new HashSet<>();
+
         Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap = new HashMap<>();
 
         for (Integer videoId : ids) {
@@ -75,16 +77,17 @@ public class VideoImagesDataModule extends ArtWorkModule {
                 int videoArtworkOrdinal = iter.next();
                 while (videoArtworkOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
                     VideoArtworkHollow artworkHollowInput = api.getVideoArtworkHollow(videoArtworkOrdinal);
-                    boolean doRollupMerchStill = processArtwork(artworkHollowInput, countryArtworkMap);
-                    if (doRollupMerchStill) {
+                    String rollupSourceFileId = processArtwork(artworkHollowInput, countryArtworkMap);
+                    if (rollupSourceFileId != null) {
                         rollupMerchstillVideoIds.add(videoId);
+                        rollupSourceFieldIds.add(rollupSourceFileId);
                     }
                     videoArtworkOrdinal = iter.next();
                 }
             }
         }
 
-        rollupMerchstills(rollupMerchstillVideoIds, showHierarchiesByCountry, countryArtworkMap);
+        rollupMerchstills(rollupMerchstillVideoIds, rollupSourceFieldIds, showHierarchiesByCountry, countryArtworkMap);
 
         // Create VideoImages
         Map<String, Map<Integer, VideoImages>> countryImagesMap = new HashMap<>();
@@ -110,7 +113,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
         return countryImagesMap;
     }
 
-    private void rollupMerchstills(Set<Integer> rollupMerchstillVideoIds /* in */, Map<String, Set<VideoHierarchy>> showHierarchiesByCountry/* in */,
+    private void rollupMerchstills(Set<Integer> rollupMerchstillVideoIds /* in */, Set<String> rollupSourceFieldIds /* in */, Map<String, Set<VideoHierarchy>> showHierarchiesByCountry/* in */,
             Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap /* out */) {
 
         if (rollupMerchstillVideoIds.isEmpty()) {
@@ -148,8 +151,11 @@ public class VideoImagesDataModule extends ArtWorkModule {
                                 Set<Artwork> episodeArtwork = artworkMap.get(episodeId);
                                 if (episodeArtwork != null && !episodeArtwork.isEmpty()) {
                                     for (Artwork artwork : episodeArtwork) {
-                                        seasonArtwork.add(artwork.clone());
-                                        showArtwork.add(artwork.clone());
+                                        String sourceFieldId =  artwork.sourceFileId == null ? null : new String(artwork.sourceFileId.value);
+                                        if (artwork.sourceFileId != null && rollupSourceFieldIds.contains(sourceFieldId)) {
+                                            seasonArtwork.add(artwork.clone());
+                                            showArtwork.add(artwork.clone());
+                                        }
                                     }
                                 }
                             }
@@ -202,7 +208,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
         throw new UnsupportedOperationException("Use buildVideoImagesByCountry");
     }
 
-    private boolean processArtwork(VideoArtworkHollow artworkHollowInput,
+    private String processArtwork(VideoArtworkHollow artworkHollowInput,
             Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap) {
         ArtworkLocaleListHollow locales = artworkHollowInput._getLocales();
         int entityId = (int) artworkHollowInput._getMovieId();
@@ -210,7 +216,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
         Set<ArtworkLocaleHollow> localeSet = getLocalTerritories(locales);
         if (localeSet.isEmpty()) {
             ctx.getLogger().error(MissingLocaleForArtwork, "Missing artwork locale for {} with id={}; data will be dropped.", entityType, entityId);
-            return false;
+            return null;
         }
         String sourceFileId = artworkHollowInput._getSourceFileId()._getValue();
         int ordinalPriority = (int) artworkHollowInput._getOrdinalPriority();
@@ -275,7 +281,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
             }
         }
 
-        return isMerchstillRollup;
+        return isMerchstillRollup ? sourceFileId : null;
     }
 
     protected Map<Integer, Set<Artwork>> getArtworkMap(String countryCode, Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap) {
