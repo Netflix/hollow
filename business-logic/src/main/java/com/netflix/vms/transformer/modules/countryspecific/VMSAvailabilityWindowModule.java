@@ -104,8 +104,8 @@ public class VMSAvailabilityWindowModule {
             System.out.println("show " + 80133037);
         if(videoId == 80132885 && "CH".equals(country) && "fr".equals(locale))
             System.out.println("season " + 80132885);
-        if(videoId == 80132886 && "CH".equals(country) && "fr".equals(locale))
-            System.out.println("episode " + 80132886);
+        if(videoId == 80004187 && "CH".equals(country) && "fr".equals(locale))
+            System.out.println("episode " + 80004187);
         
         
         RightsHollow rights = videoRights._getRights();
@@ -169,6 +169,13 @@ public class VMSAvailabilityWindowModule {
                         for (RightsContractPackageHollow pkg : packageIdList) {
                             com.netflix.vms.transformer.hollowoutput.Integer packageId = new com.netflix.vms.transformer.hollowoutput.Integer((int)pkg._getPackageId());
 
+                            PackageData packageData = null;
+                            if(locale != null) {
+                                packageData = getPackageData(videoId, pkg._getPackageId());
+                                if(locale != null && !multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAvailability)) //// multicatalog processing -- make sure contract gives access to some existing asset understandable in this language
+                                    continue;
+                            }
+                            
                             WindowPackageContractInfo windowPackageContractInfo = outputWindow.windowInfosByPackageId.get(packageId);
                             if(windowPackageContractInfo != null) {
                                 // MERGE MULTIPLE CONTRACTS
@@ -235,12 +242,10 @@ public class VMSAvailabilityWindowModule {
                                     if(thisWindowMaxPackageId == 0)
                                         thisWindowBundledAssetsGroupId = Math.max(thisWindowBundledAssetsGroupId, (int)contractId);
                                 } else {
-                                    PackageData packageData = getPackageData(videoId, pkg._getPackageId());
-                                    
-                                    if(locale != null && !multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAvailability))
-                                        continue;
-                                    
                                     includedWindowPackageData = true;
+                                    
+                                    if(packageData == null)
+                                        packageData = getPackageData(videoId, pkg._getPackageId());
                                     
                                     if(packageData != null) {
                                         /// package data is available
@@ -281,7 +286,7 @@ public class VMSAvailabilityWindowModule {
                         }
 
                     } else {
-                        if(contractAvailability != 0) {
+                        if(locale == null) {
                             /// packageIdList was empty -- packagedata not available -- use the contract only
                             WindowPackageContractInfo windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(0, rightsContract, contract, country, videoId);
                             outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfo);
