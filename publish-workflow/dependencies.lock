@@ -1419,6 +1419,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -1832,7 +1833,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -2353,11 +2354,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.144",
+            "locked": "59.146",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.144",
+            "locked": "59.146",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -4398,6 +4399,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -4811,7 +4813,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -5332,11 +5334,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.144",
+            "locked": "59.146",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.144",
+            "locked": "59.146",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -7377,6 +7379,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -7790,7 +7793,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -8311,11 +8314,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.144",
+            "locked": "59.146",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.144",
+            "locked": "59.146",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -10356,6 +10359,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -10769,7 +10773,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -11290,11 +11294,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.144",
+            "locked": "59.146",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.144",
+            "locked": "59.146",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -13434,6 +13438,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -13847,7 +13852,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -14368,11 +14373,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.144",
+            "locked": "59.146",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.144",
+            "locked": "59.146",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -16413,6 +16418,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -16827,7 +16833,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -17348,11 +17354,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.144",
+            "locked": "59.146",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.144",
+            "locked": "59.146",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -19398,6 +19404,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -19812,7 +19819,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -20333,11 +20340,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.144",
+            "locked": "59.146",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.144",
+            "locked": "59.146",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -22383,6 +22390,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -22797,7 +22805,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -23318,11 +23326,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.144",
+            "locked": "59.146",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.144",
+            "locked": "59.146",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -25368,6 +25376,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -25782,7 +25791,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -26303,11 +26312,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.144",
+            "locked": "59.146",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.144",
+            "locked": "59.146",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
