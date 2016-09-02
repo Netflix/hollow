@@ -15,6 +15,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformC
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WritingBlobsFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WroteBlob;
 
+import com.google.gson.Gson;
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.client.HollowClient;
 import com.netflix.hollow.compact.HollowCompactor;
@@ -44,30 +45,39 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class TransformCycle {
     private final String transformerVip;
-    private final HollowClient inputClient;
+    private HollowClient inputClient;
     private final VMSTransformerWriteStateEngine outputStateEngine;
     private final VMSTransformerWriteStateEngine fastlaneOutputStateEngine;
     private final TransformerContext ctx;
-    private final TransformerOutputBlobHeaderPopulator headerPopulator;
+    private TransformerOutputBlobHeaderPopulator headerPopulator;
     private final PublishWorkflowStager publishWorkflowStager;
     private final VersionMinter versionMinter;
     private final FollowVipPinExtractor followVipPinExtractor;
+    private final FileStore filestore;
+    private final String converterVip;
     private final PinTitleManager pinTitleMgr;
 
     private long previousCycleNumber = Long.MIN_VALUE;
     private long currentCycleNumber = Long.MIN_VALUE;
     private boolean isFastlane = false;
     private boolean isFirstCycle = true;
+    
+    private String previouslyResolvedConverterVip;
 
     public TransformCycle(TransformerContext ctx, FileStore fileStore, PublishWorkflowStager publishStager, String converterVip, String transformerVip) {
         this.ctx = ctx;
         this.transformerVip = transformerVip;
-        this.inputClient = new VMSInputDataClient(fileStore, converterVip);
+        this.converterVip = converterVip;
+        this.previouslyResolvedConverterVip = resolveConverterVip(ctx, converterVip);
+        this.filestore = fileStore;
+        this.inputClient = new VMSInputDataClient(fileStore, previouslyResolvedConverterVip);
         this.isFastlane = OverrideVipNameUtil.isOverrideVip(ctx.getConfig());
         this.outputStateEngine = new VMSTransformerWriteStateEngine();
         this.fastlaneOutputStateEngine = new VMSTransformerWriteStateEngine();
@@ -157,6 +167,13 @@ public class TransformCycle {
         Long pinnedInputVersion = ctx.getConfig().getPinInputVersion();
         if(pinnedInputVersion == null && followVipPin != null)
             pinnedInputVersion = followVipPin.getInputVersionId();
+        
+        // If the converter vip has changed we need to re-initialize the client
+        if(hasConverterVipChanged()) {
+        	inputClient = new VMSInputDataClient(filestore, resolveConverterVip(ctx, converterVip));
+        	this.headerPopulator = new TransformerOutputBlobHeaderPopulator(inputClient, outputStateEngine, ctx);
+        	previouslyResolvedConverterVip = resolveConverterVip(ctx, converterVip);
+        }
 
         if(pinnedInputVersion == null)
             inputClient.triggerRefresh();
@@ -293,5 +310,28 @@ public class TransformCycle {
     private void incrementSuccessCounter() {
         ctx.getMetricRecorder().incrementCounter(Metric.CycleSuccessCounter, 1);
     }
+    
+    private boolean hasConverterVipChanged() {
+        if(!this.previouslyResolvedConverterVip.equals(resolveConverterVip(this.ctx, this.converterVip))) {
+          return true;
+        }
+        return false;
+      }
+      
+      private String resolveConverterVip(TransformerContext ctx, String converterVip) {
+        
+        // get the map of converterVip vs keybase
+        String json = this.ctx.getConfig().getConverterVipToKeybaseMap();
+
+        Map<String, String> map = new HashMap<String, String>();
+        Gson gson = new Gson();
+        map = gson.fromJson(json, map.getClass());
+        
+        // See if we have an entry for converterVip
+        if(map.containsKey(converterVip))
+          return map.get(converterVip);
+        else
+          return converterVip;
+      }
 
 }
