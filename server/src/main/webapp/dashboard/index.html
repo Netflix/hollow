@@ -180,10 +180,10 @@
                             <input  type="textbox" id="id-search-error-box" size="25" value=""></input>
                             Log-level:
                             <select id="id-loglevel-select" style="display:inline-block;">
-                                <option value="logLevel:error">Error</option>
-                                <option value="logLevel:error AND exception">Errors with Exceptions</option>
-                                <option value="(logLevel:warn OR logLevel:error)">Warn and above</option>
-                                <option value="(logLevel:warn OR logLevel:error OR logLevel:info)">Info and above</option>
+                                <option value="eventInfo.logLevel:error">Error</option>
+                                <option value="eventInfo.logLevel:error AND exception">Errors with Exceptions</option>
+                                <option value="(eventInfo.logLevel:warn OR eventInfo.logLevel:error)">Warn and above</option>
+                                <option value="(eventInfo.logLevel:warn OR eventInfo.logLevel:error OR eventInfo.logLevel:info)">Info and above</option>
                                 <option value="">No filter</option>
                             </select>
                             <button id="id-search-error-btn" class='ui-widget-content'>search</button>
@@ -390,6 +390,6 @@
             </div>
         </div>
         <!-- TODO: change back es_vmsops.us-east-1.dyntest.netflix.net ec2-54-81-202-224.compute-1.amazonaws.com-->
-        <input  type="textbox" id="id-elasticsearchhost-box" class = "hidden" size="35" value="es_vmsops.us-east-1.dyntest.netflix.net"></input>
+        <input  type="textbox" id="id-elasticsearchhost-box" class = "hidden" size="35" value="es_vmsops2.us-east-1.dyntest.netflix.net"></input>
     </body>
 </html>

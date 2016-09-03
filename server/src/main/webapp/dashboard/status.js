@@ -63,8 +63,8 @@ function ServerCycleStatusTab(dashboard) {
             var query = new SearchQuery();
             query.indexName = dashboard.vmsIndex;
             query.add("eventInfo.currentCycle:" + dashboard.vmsCycleId);
-            query.add("(logLevel:warn OR logLevel:error)");
-            query.aggregate = "tag";
+            query.add("(eventInfo.logLevel:warn OR eventInfo.logLevel:error)");
+            query.aggregate = "eventInfo.tag";
             var searchDao = new SearchAggregationDAO(cycleSummaryTab.warnCodesWidget, query, true);
             searchDao.updateJsonFromSearch();
     }
@@ -80,7 +80,7 @@ function ServerCycleStatusTab(dashboard) {
         searchDao.searchQuery.size = "1";
         searchDao.searchQuery.indexName = dashboard.vmsIndex;
         searchDao.searchQuery.add("eventInfo.currentCycle:" + dashboard.vmsCycleId);
-        searchDao.searchQuery.add("tag:TransformProgress");
+        searchDao.searchQuery.add("eventInfo.tag:TransformProgress");
         searchDao.searchQuery.sort = "eventInfo.timestamp:desc";
         searchDao.updateJsonFromSearch();
     }
@@ -118,7 +118,7 @@ function ServerCycleStatusTab(dashboard) {
         query.indexName = dashboard.vmsIndex;
         query.indexType = "vmsserver";
         query.size = "1";
-        query.add(dashboard.vmsCycleId).add("tag:TransformCycleBegin");
+        query.add(dashboard.vmsCycleId).add("eventInfo.tag:TransformCycleBegin");
         widgetExecutor.updateJsonFromSearch();
     }
 
@@ -130,7 +130,7 @@ function ServerCycleStatusTab(dashboard) {
         searchDao.searchQuery.indexType = "vmsserver";
         searchDao.searchQuery.indexName = dashboard.vmsIndex;
         searchDao.searchQuery.fields = fieldList;
-        searchDao.searchQuery.add("tag:TransformCycleBegin");
+        searchDao.searchQuery.add("eventInfo.tag:TransformCycleBegin");
         searchDao.searchQuery.sort = "eventInfo.timestamp:desc";
         searchDao.updateJsonFromSearch();
     }
@@ -173,7 +173,7 @@ function ServerCycleStatusTab(dashboard) {
         query.indexName = dashboard.vmsIndex;
         query.indexType = "vmsserver";
         query.size = 50;
-        query.add(dashboard.vmsCycleId).add("tag:InputDataVersionIds");
+        query.add(dashboard.vmsCycleId).add("eventInfo.tag:InputDataVersionIds");
         widgetExecutor.updateJsonFromSearch();
     }
 

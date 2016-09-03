@@ -3,6 +3,7 @@
         "antlr:antlr": {
             "locked": "2.7.7",
             "transitive": [
+                "org.antlr:antlr-runtime",
                 "org.antlr:stringtemplate"
             ]
         },
@@ -95,6 +96,12 @@
                 "netflix:platform-chukwaClient"
             ]
         },
+        "com.carrotsearch:hppc": {
+            "locked": "0.7.1",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "com.eaio.uuid:uuid": {
             "locked": "3.2",
             "transitive": [
@@ -120,6 +127,7 @@
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
@@ -131,7 +139,8 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
-                "netflix:country-launch"
+                "netflix:country-launch",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -158,14 +167,22 @@
             "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
-                "com.netflix.hystrix:hystrix-serialization"
+                "com.netflix.hystrix:hystrix-serialization",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
             "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
+            "locked": "2.7.5",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
@@ -293,7 +310,8 @@
                 "netflix:streaming-metrics",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -963,7 +981,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.17",
+            "locked": "1.13",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -972,16 +990,17 @@
             "project": true
         },
         "com.ning:compress-lzf": {
-            "locked": "0.9.5",
+            "locked": "1.0.2",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.spatial4j:spatial4j": {
-            "locked": "0.4.1",
+            "locked": "0.5",
             "transitive": [
                 "org.apache.lucene:lucene-spatial"
             ]
@@ -1094,6 +1113,12 @@
                 "com.sun.jersey:jersey-json"
             ]
         },
+        "com.tdunning:t-digest": {
+            "locked": "3.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "com.thinkaurelius.thrift:thrift-server": {
             "locked": "0.3.7",
             "transitive": [
@@ -1112,6 +1137,12 @@
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
+            ]
+        },
+        "com.twitter:jsr166e": {
+            "locked": "1.1.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.yammer.metrics:metrics-core": {
@@ -1133,9 +1164,10 @@
             ]
         },
         "commons-cli:commons-cli": {
-            "locked": "1.1",
+            "locked": "1.3.1",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "commons-codec:commons-codec": {
@@ -1260,7 +1292,6 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
-                "net.sf.json-lib:json-lib",
                 "org.apache.httpcomponents:httpclient"
             ]
         },
@@ -1284,9 +1315,10 @@
             ]
         },
         "io.netty:netty": {
-            "locked": "3.6.6.Final",
+            "locked": "3.10.5.Final",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "io.netty:netty-buffer": {
@@ -1464,7 +1496,8 @@
                 "netflix:platform-utils",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing"
+                "netflix:streaming-utilities-testing",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "junit:junit": {
@@ -1623,7 +1656,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "17.7",
+            "locked": "16.44",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -2053,13 +2086,12 @@
             ]
         },
         "org.antlr:antlr-runtime": {
-            "locked": "3.5",
+            "locked": "3.4",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.suro:suro-core",
                 "netflix:nf-eventbus",
-                "org.antlr:antlr",
-                "org.elasticsearch:elasticsearch"
+                "org.antlr:antlr"
             ]
         },
         "org.antlr:stringtemplate": {
@@ -2136,66 +2168,70 @@
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
+                "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.apache.lucene:lucene-backward-codecs": {
+            "locked": "5.5.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "org.apache.lucene:lucene-core": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.apache.lucene:lucene-analyzers-common",
-                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
-                "org.apache.lucene:lucene-misc",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
-                "org.apache.lucene:lucene-sandbox",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-grouping": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-join",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-join": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
+                "org.apache.lucene:lucene-highlighter",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-memory": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.apache.lucene:lucene-highlighter",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-misc": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-suggest",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest"
             ]
         },
         "org.apache.lucene:lucene-queries": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-grouping",
                 "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
@@ -2204,26 +2240,31 @@
             ]
         },
         "org.apache.lucene:lucene-queryparser": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-sandbox": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-queryparser",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-queryparser"
             ]
         },
         "org.apache.lucene:lucene-spatial": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.apache.lucene:lucene-spatial3d": {
+            "locked": "5.5.0",
+            "transitive": [
+                "org.apache.lucene:lucene-spatial"
+            ]
+        },
         "org.apache.lucene:lucene-suggest": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
@@ -2334,8 +2375,14 @@
             ]
         },
         "org.elasticsearch:elasticsearch": {
-            "locked": "1.5.2",
-            "requested": "1.5.2"
+            "locked": "2.3.3",
+            "requested": "2.3.3"
+        },
+        "org.elasticsearch:securesm": {
+            "locked": "1.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
         },
         "org.freemarker:freemarker": {
             "locked": "2.3.15",
@@ -2354,7 +2401,8 @@
         "org.hdrhistogram:HdrHistogram": {
             "locked": "2.1.9",
             "transitive": [
-                "com.netflix.hystrix:hystrix-core"
+                "com.netflix.hystrix:hystrix-core",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.hibernate:hibernate-validator": {
@@ -2375,6 +2423,12 @@
             "locked": "3.1.0.CR2",
             "transitive": [
                 "org.hibernate:hibernate-validator"
+            ]
+        },
+        "org.joda:joda-convert": {
+            "locked": "1.2",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.jvnet.mimepull:mimepull": {
@@ -2422,14 +2476,7 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator",
-                "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.ow2.asm:asm-commons": {
-            "locked": "4.1",
-            "transitive": [
-                "org.elasticsearch:elasticsearch"
+                "com.netflix.governator:governator"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -2530,9 +2577,10 @@
             ]
         },
         "org.yaml:snakeyaml": {
-            "locked": "1.12",
+            "locked": "1.15",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
                 "org.apache.cassandra:cassandra-all"
             ]
         },
@@ -2571,6 +2619,7 @@
         "antlr:antlr": {
             "locked": "2.7.7",
             "transitive": [
+                "org.antlr:antlr-runtime",
                 "org.antlr:stringtemplate"
             ]
         },
@@ -2663,6 +2712,12 @@
                 "netflix:platform-chukwaClient"
             ]
         },
+        "com.carrotsearch:hppc": {
+            "locked": "0.7.1",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "com.eaio.uuid:uuid": {
             "locked": "3.2",
             "transitive": [
@@ -2688,6 +2743,7 @@
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
@@ -2699,7 +2755,8 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
-                "netflix:country-launch"
+                "netflix:country-launch",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -2726,14 +2783,22 @@
             "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
-                "com.netflix.hystrix:hystrix-serialization"
+                "com.netflix.hystrix:hystrix-serialization",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
             "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
+            "locked": "2.7.5",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
@@ -2861,7 +2926,8 @@
                 "netflix:streaming-metrics",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -3531,7 +3597,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.17",
+            "locked": "1.13",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -3540,16 +3606,17 @@
             "project": true
         },
         "com.ning:compress-lzf": {
-            "locked": "0.9.5",
+            "locked": "1.0.2",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.spatial4j:spatial4j": {
-            "locked": "0.4.1",
+            "locked": "0.5",
             "transitive": [
                 "org.apache.lucene:lucene-spatial"
             ]
@@ -3662,6 +3729,12 @@
                 "com.sun.jersey:jersey-json"
             ]
         },
+        "com.tdunning:t-digest": {
+            "locked": "3.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "com.thinkaurelius.thrift:thrift-server": {
             "locked": "0.3.7",
             "transitive": [
@@ -3680,6 +3753,12 @@
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
+            ]
+        },
+        "com.twitter:jsr166e": {
+            "locked": "1.1.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.yammer.metrics:metrics-core": {
@@ -3701,9 +3780,10 @@
             ]
         },
         "commons-cli:commons-cli": {
-            "locked": "1.1",
+            "locked": "1.3.1",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "commons-codec:commons-codec": {
@@ -3828,7 +3908,6 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
-                "net.sf.json-lib:json-lib",
                 "org.apache.httpcomponents:httpclient"
             ]
         },
@@ -3852,9 +3931,10 @@
             ]
         },
         "io.netty:netty": {
-            "locked": "3.6.6.Final",
+            "locked": "3.10.5.Final",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "io.netty:netty-buffer": {
@@ -4032,7 +4112,8 @@
                 "netflix:platform-utils",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing"
+                "netflix:streaming-utilities-testing",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "junit:junit": {
@@ -4191,7 +4272,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "17.7",
+            "locked": "16.44",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -4621,13 +4702,12 @@
             ]
         },
         "org.antlr:antlr-runtime": {
-            "locked": "3.5",
+            "locked": "3.4",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.suro:suro-core",
                 "netflix:nf-eventbus",
-                "org.antlr:antlr",
-                "org.elasticsearch:elasticsearch"
+                "org.antlr:antlr"
             ]
         },
         "org.antlr:stringtemplate": {
@@ -4704,66 +4784,70 @@
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
+                "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.apache.lucene:lucene-backward-codecs": {
+            "locked": "5.5.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "org.apache.lucene:lucene-core": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.apache.lucene:lucene-analyzers-common",
-                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
-                "org.apache.lucene:lucene-misc",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
-                "org.apache.lucene:lucene-sandbox",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-grouping": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-join",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-join": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
+                "org.apache.lucene:lucene-highlighter",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-memory": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.apache.lucene:lucene-highlighter",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-misc": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-suggest",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest"
             ]
         },
         "org.apache.lucene:lucene-queries": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-grouping",
                 "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
@@ -4772,26 +4856,31 @@
             ]
         },
         "org.apache.lucene:lucene-queryparser": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-sandbox": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-queryparser",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-queryparser"
             ]
         },
         "org.apache.lucene:lucene-spatial": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.apache.lucene:lucene-spatial3d": {
+            "locked": "5.5.0",
+            "transitive": [
+                "org.apache.lucene:lucene-spatial"
+            ]
+        },
         "org.apache.lucene:lucene-suggest": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
@@ -4902,8 +4991,14 @@
             ]
         },
         "org.elasticsearch:elasticsearch": {
-            "locked": "1.5.2",
-            "requested": "1.5.2"
+            "locked": "2.3.3",
+            "requested": "2.3.3"
+        },
+        "org.elasticsearch:securesm": {
+            "locked": "1.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
         },
         "org.freemarker:freemarker": {
             "locked": "2.3.15",
@@ -4922,7 +5017,8 @@
         "org.hdrhistogram:HdrHistogram": {
             "locked": "2.1.9",
             "transitive": [
-                "com.netflix.hystrix:hystrix-core"
+                "com.netflix.hystrix:hystrix-core",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.hibernate:hibernate-validator": {
@@ -4943,6 +5039,12 @@
             "locked": "3.1.0.CR2",
             "transitive": [
                 "org.hibernate:hibernate-validator"
+            ]
+        },
+        "org.joda:joda-convert": {
+            "locked": "1.2",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.jvnet.mimepull:mimepull": {
@@ -4990,14 +5092,7 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator",
-                "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.ow2.asm:asm-commons": {
-            "locked": "4.1",
-            "transitive": [
-                "org.elasticsearch:elasticsearch"
+                "com.netflix.governator:governator"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -5098,9 +5193,10 @@
             ]
         },
         "org.yaml:snakeyaml": {
-            "locked": "1.12",
+            "locked": "1.15",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
                 "org.apache.cassandra:cassandra-all"
             ]
         },
@@ -5139,6 +5235,7 @@
         "antlr:antlr": {
             "locked": "2.7.7",
             "transitive": [
+                "org.antlr:antlr-runtime",
                 "org.antlr:stringtemplate"
             ]
         },
@@ -5231,6 +5328,12 @@
                 "netflix:platform-chukwaClient"
             ]
         },
+        "com.carrotsearch:hppc": {
+            "locked": "0.7.1",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "com.eaio.uuid:uuid": {
             "locked": "3.2",
             "transitive": [
@@ -5256,6 +5359,7 @@
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
@@ -5267,7 +5371,8 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
-                "netflix:country-launch"
+                "netflix:country-launch",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -5294,14 +5399,22 @@
             "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
-                "com.netflix.hystrix:hystrix-serialization"
+                "com.netflix.hystrix:hystrix-serialization",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
             "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
+            "locked": "2.7.5",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
@@ -5429,7 +5542,8 @@
                 "netflix:streaming-metrics",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -6099,7 +6213,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.17",
+            "locked": "1.13",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -6108,16 +6222,17 @@
             "project": true
         },
         "com.ning:compress-lzf": {
-            "locked": "0.9.5",
+            "locked": "1.0.2",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.spatial4j:spatial4j": {
-            "locked": "0.4.1",
+            "locked": "0.5",
             "transitive": [
                 "org.apache.lucene:lucene-spatial"
             ]
@@ -6230,6 +6345,12 @@
                 "com.sun.jersey:jersey-json"
             ]
         },
+        "com.tdunning:t-digest": {
+            "locked": "3.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "com.thinkaurelius.thrift:thrift-server": {
             "locked": "0.3.7",
             "transitive": [
@@ -6248,6 +6369,12 @@
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
+            ]
+        },
+        "com.twitter:jsr166e": {
+            "locked": "1.1.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.yammer.metrics:metrics-core": {
@@ -6269,9 +6396,10 @@
             ]
         },
         "commons-cli:commons-cli": {
-            "locked": "1.1",
+            "locked": "1.3.1",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "commons-codec:commons-codec": {
@@ -6396,7 +6524,6 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
-                "net.sf.json-lib:json-lib",
                 "org.apache.httpcomponents:httpclient"
             ]
         },
@@ -6420,9 +6547,10 @@
             ]
         },
         "io.netty:netty": {
-            "locked": "3.6.6.Final",
+            "locked": "3.10.5.Final",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "io.netty:netty-buffer": {
@@ -6600,7 +6728,8 @@
                 "netflix:platform-utils",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing"
+                "netflix:streaming-utilities-testing",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "junit:junit": {
@@ -6759,7 +6888,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "17.7",
+            "locked": "16.44",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -7189,13 +7318,12 @@
             ]
         },
         "org.antlr:antlr-runtime": {
-            "locked": "3.5",
+            "locked": "3.4",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.suro:suro-core",
                 "netflix:nf-eventbus",
-                "org.antlr:antlr",
-                "org.elasticsearch:elasticsearch"
+                "org.antlr:antlr"
             ]
         },
         "org.antlr:stringtemplate": {
@@ -7272,66 +7400,70 @@
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
+                "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.apache.lucene:lucene-backward-codecs": {
+            "locked": "5.5.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "org.apache.lucene:lucene-core": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.apache.lucene:lucene-analyzers-common",
-                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
-                "org.apache.lucene:lucene-misc",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
-                "org.apache.lucene:lucene-sandbox",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-grouping": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-join",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-join": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
+                "org.apache.lucene:lucene-highlighter",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-memory": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.apache.lucene:lucene-highlighter",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-misc": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-suggest",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest"
             ]
         },
         "org.apache.lucene:lucene-queries": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-grouping",
                 "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
@@ -7340,26 +7472,31 @@
             ]
         },
         "org.apache.lucene:lucene-queryparser": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-sandbox": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-queryparser",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-queryparser"
             ]
         },
         "org.apache.lucene:lucene-spatial": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.apache.lucene:lucene-spatial3d": {
+            "locked": "5.5.0",
+            "transitive": [
+                "org.apache.lucene:lucene-spatial"
+            ]
+        },
         "org.apache.lucene:lucene-suggest": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
@@ -7470,8 +7607,14 @@
             ]
         },
         "org.elasticsearch:elasticsearch": {
-            "locked": "1.5.2",
-            "requested": "1.5.2"
+            "locked": "2.3.3",
+            "requested": "2.3.3"
+        },
+        "org.elasticsearch:securesm": {
+            "locked": "1.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
         },
         "org.freemarker:freemarker": {
             "locked": "2.3.15",
@@ -7490,7 +7633,8 @@
         "org.hdrhistogram:HdrHistogram": {
             "locked": "2.1.9",
             "transitive": [
-                "com.netflix.hystrix:hystrix-core"
+                "com.netflix.hystrix:hystrix-core",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.hibernate:hibernate-validator": {
@@ -7511,6 +7655,12 @@
             "locked": "3.1.0.CR2",
             "transitive": [
                 "org.hibernate:hibernate-validator"
+            ]
+        },
+        "org.joda:joda-convert": {
+            "locked": "1.2",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.jvnet.mimepull:mimepull": {
@@ -7558,14 +7708,7 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator",
-                "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.ow2.asm:asm-commons": {
-            "locked": "4.1",
-            "transitive": [
-                "org.elasticsearch:elasticsearch"
+                "com.netflix.governator:governator"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -7666,9 +7809,10 @@
             ]
         },
         "org.yaml:snakeyaml": {
-            "locked": "1.12",
+            "locked": "1.15",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
                 "org.apache.cassandra:cassandra-all"
             ]
         },
@@ -7707,6 +7851,7 @@
         "antlr:antlr": {
             "locked": "2.7.7",
             "transitive": [
+                "org.antlr:antlr-runtime",
                 "org.antlr:stringtemplate"
             ]
         },
@@ -7799,6 +7944,12 @@
                 "netflix:platform-chukwaClient"
             ]
         },
+        "com.carrotsearch:hppc": {
+            "locked": "0.7.1",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "com.eaio.uuid:uuid": {
             "locked": "3.2",
             "transitive": [
@@ -7824,6 +7975,7 @@
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
@@ -7835,7 +7987,8 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
-                "netflix:country-launch"
+                "netflix:country-launch",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -7862,14 +8015,22 @@
             "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
-                "com.netflix.hystrix:hystrix-serialization"
+                "com.netflix.hystrix:hystrix-serialization",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
             "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
+            "locked": "2.7.5",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
@@ -7997,7 +8158,8 @@
                 "netflix:streaming-metrics",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -8667,7 +8829,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.17",
+            "locked": "1.13",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -8676,16 +8838,17 @@
             "project": true
         },
         "com.ning:compress-lzf": {
-            "locked": "0.9.5",
+            "locked": "1.0.2",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.spatial4j:spatial4j": {
-            "locked": "0.4.1",
+            "locked": "0.5",
             "transitive": [
                 "org.apache.lucene:lucene-spatial"
             ]
@@ -8798,6 +8961,12 @@
                 "com.sun.jersey:jersey-json"
             ]
         },
+        "com.tdunning:t-digest": {
+            "locked": "3.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "com.thinkaurelius.thrift:thrift-server": {
             "locked": "0.3.7",
             "transitive": [
@@ -8816,6 +8985,12 @@
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
+            ]
+        },
+        "com.twitter:jsr166e": {
+            "locked": "1.1.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.yammer.metrics:metrics-core": {
@@ -8837,9 +9012,10 @@
             ]
         },
         "commons-cli:commons-cli": {
-            "locked": "1.1",
+            "locked": "1.3.1",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "commons-codec:commons-codec": {
@@ -8964,7 +9140,6 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
-                "net.sf.json-lib:json-lib",
                 "org.apache.httpcomponents:httpclient"
             ]
         },
@@ -8988,9 +9163,10 @@
             ]
         },
         "io.netty:netty": {
-            "locked": "3.6.6.Final",
+            "locked": "3.10.5.Final",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "io.netty:netty-buffer": {
@@ -9168,7 +9344,8 @@
                 "netflix:platform-utils",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing"
+                "netflix:streaming-utilities-testing",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "junit:junit": {
@@ -9327,7 +9504,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "17.7",
+            "locked": "16.44",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -9757,13 +9934,12 @@
             ]
         },
         "org.antlr:antlr-runtime": {
-            "locked": "3.5",
+            "locked": "3.4",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.suro:suro-core",
                 "netflix:nf-eventbus",
-                "org.antlr:antlr",
-                "org.elasticsearch:elasticsearch"
+                "org.antlr:antlr"
             ]
         },
         "org.antlr:stringtemplate": {
@@ -9840,66 +10016,70 @@
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
+                "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.apache.lucene:lucene-backward-codecs": {
+            "locked": "5.5.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "org.apache.lucene:lucene-core": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.apache.lucene:lucene-analyzers-common",
-                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
-                "org.apache.lucene:lucene-misc",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
-                "org.apache.lucene:lucene-sandbox",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-grouping": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-join",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-join": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
+                "org.apache.lucene:lucene-highlighter",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-memory": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.apache.lucene:lucene-highlighter",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-misc": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-suggest",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest"
             ]
         },
         "org.apache.lucene:lucene-queries": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-grouping",
                 "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
@@ -9908,26 +10088,31 @@
             ]
         },
         "org.apache.lucene:lucene-queryparser": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-sandbox": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-queryparser",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-queryparser"
             ]
         },
         "org.apache.lucene:lucene-spatial": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.apache.lucene:lucene-spatial3d": {
+            "locked": "5.5.0",
+            "transitive": [
+                "org.apache.lucene:lucene-spatial"
+            ]
+        },
         "org.apache.lucene:lucene-suggest": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
@@ -10038,8 +10223,14 @@
             ]
         },
         "org.elasticsearch:elasticsearch": {
-            "locked": "1.5.2",
-            "requested": "1.5.2"
+            "locked": "2.3.3",
+            "requested": "2.3.3"
+        },
+        "org.elasticsearch:securesm": {
+            "locked": "1.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
         },
         "org.freemarker:freemarker": {
             "locked": "2.3.15",
@@ -10058,7 +10249,8 @@
         "org.hdrhistogram:HdrHistogram": {
             "locked": "2.1.9",
             "transitive": [
-                "com.netflix.hystrix:hystrix-core"
+                "com.netflix.hystrix:hystrix-core",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.hibernate:hibernate-validator": {
@@ -10079,6 +10271,12 @@
             "locked": "3.1.0.CR2",
             "transitive": [
                 "org.hibernate:hibernate-validator"
+            ]
+        },
+        "org.joda:joda-convert": {
+            "locked": "1.2",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.jvnet.mimepull:mimepull": {
@@ -10126,14 +10324,7 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator",
-                "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.ow2.asm:asm-commons": {
-            "locked": "4.1",
-            "transitive": [
-                "org.elasticsearch:elasticsearch"
+                "com.netflix.governator:governator"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -10234,9 +10425,10 @@
             ]
         },
         "org.yaml:snakeyaml": {
-            "locked": "1.12",
+            "locked": "1.15",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
                 "org.apache.cassandra:cassandra-all"
             ]
         },
@@ -10374,6 +10566,7 @@
         "antlr:antlr": {
             "locked": "2.7.7",
             "transitive": [
+                "org.antlr:antlr-runtime",
                 "org.antlr:stringtemplate"
             ]
         },
@@ -10466,6 +10659,12 @@
                 "netflix:platform-chukwaClient"
             ]
         },
+        "com.carrotsearch:hppc": {
+            "locked": "0.7.1",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "com.eaio.uuid:uuid": {
             "locked": "3.2",
             "transitive": [
@@ -10491,6 +10690,7 @@
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
@@ -10502,7 +10702,8 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
-                "netflix:country-launch"
+                "netflix:country-launch",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -10529,14 +10730,22 @@
             "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
-                "com.netflix.hystrix:hystrix-serialization"
+                "com.netflix.hystrix:hystrix-serialization",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
             "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
+            "locked": "2.7.5",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
@@ -10664,7 +10873,8 @@
                 "netflix:streaming-metrics",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -11334,7 +11544,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.17",
+            "locked": "1.13",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -11343,16 +11553,17 @@
             "project": true
         },
         "com.ning:compress-lzf": {
-            "locked": "0.9.5",
+            "locked": "1.0.2",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.spatial4j:spatial4j": {
-            "locked": "0.4.1",
+            "locked": "0.5",
             "transitive": [
                 "org.apache.lucene:lucene-spatial"
             ]
@@ -11465,6 +11676,12 @@
                 "com.sun.jersey:jersey-json"
             ]
         },
+        "com.tdunning:t-digest": {
+            "locked": "3.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "com.thinkaurelius.thrift:thrift-server": {
             "locked": "0.3.7",
             "transitive": [
@@ -11483,6 +11700,12 @@
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
+            ]
+        },
+        "com.twitter:jsr166e": {
+            "locked": "1.1.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.yammer.metrics:metrics-core": {
@@ -11504,9 +11727,10 @@
             ]
         },
         "commons-cli:commons-cli": {
-            "locked": "1.1",
+            "locked": "1.3.1",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "commons-codec:commons-codec": {
@@ -11631,7 +11855,6 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
-                "net.sf.json-lib:json-lib",
                 "org.apache.httpcomponents:httpclient"
             ]
         },
@@ -11655,9 +11878,10 @@
             ]
         },
         "io.netty:netty": {
-            "locked": "3.6.6.Final",
+            "locked": "3.10.5.Final",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "io.netty:netty-buffer": {
@@ -11835,7 +12059,8 @@
                 "netflix:platform-utils",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing"
+                "netflix:streaming-utilities-testing",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "junit:junit": {
@@ -11994,7 +12219,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "17.7",
+            "locked": "16.44",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -12424,13 +12649,12 @@
             ]
         },
         "org.antlr:antlr-runtime": {
-            "locked": "3.5",
+            "locked": "3.4",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.suro:suro-core",
                 "netflix:nf-eventbus",
-                "org.antlr:antlr",
-                "org.elasticsearch:elasticsearch"
+                "org.antlr:antlr"
             ]
         },
         "org.antlr:stringtemplate": {
@@ -12507,66 +12731,70 @@
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
+                "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.apache.lucene:lucene-backward-codecs": {
+            "locked": "5.5.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "org.apache.lucene:lucene-core": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.apache.lucene:lucene-analyzers-common",
-                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
-                "org.apache.lucene:lucene-misc",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
-                "org.apache.lucene:lucene-sandbox",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-grouping": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-join",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-join": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
+                "org.apache.lucene:lucene-highlighter",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-memory": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.apache.lucene:lucene-highlighter",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-misc": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-suggest",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest"
             ]
         },
         "org.apache.lucene:lucene-queries": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-grouping",
                 "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
@@ -12575,26 +12803,31 @@
             ]
         },
         "org.apache.lucene:lucene-queryparser": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-sandbox": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-queryparser",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-queryparser"
             ]
         },
         "org.apache.lucene:lucene-spatial": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.apache.lucene:lucene-spatial3d": {
+            "locked": "5.5.0",
+            "transitive": [
+                "org.apache.lucene:lucene-spatial"
+            ]
+        },
         "org.apache.lucene:lucene-suggest": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
@@ -12705,8 +12938,14 @@
             ]
         },
         "org.elasticsearch:elasticsearch": {
-            "locked": "1.5.2",
-            "requested": "1.5.2"
+            "locked": "2.3.3",
+            "requested": "2.3.3"
+        },
+        "org.elasticsearch:securesm": {
+            "locked": "1.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
         },
         "org.freemarker:freemarker": {
             "locked": "2.3.15",
@@ -12725,7 +12964,8 @@
         "org.hdrhistogram:HdrHistogram": {
             "locked": "2.1.9",
             "transitive": [
-                "com.netflix.hystrix:hystrix-core"
+                "com.netflix.hystrix:hystrix-core",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.hibernate:hibernate-validator": {
@@ -12746,6 +12986,12 @@
             "locked": "3.1.0.CR2",
             "transitive": [
                 "org.hibernate:hibernate-validator"
+            ]
+        },
+        "org.joda:joda-convert": {
+            "locked": "1.2",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.jvnet.mimepull:mimepull": {
@@ -12793,14 +13039,7 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator",
-                "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.ow2.asm:asm-commons": {
-            "locked": "4.1",
-            "transitive": [
-                "org.elasticsearch:elasticsearch"
+                "com.netflix.governator:governator"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -12901,9 +13140,10 @@
             ]
         },
         "org.yaml:snakeyaml": {
-            "locked": "1.12",
+            "locked": "1.15",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
                 "org.apache.cassandra:cassandra-all"
             ]
         },
@@ -12942,6 +13182,7 @@
         "antlr:antlr": {
             "locked": "2.7.7",
             "transitive": [
+                "org.antlr:antlr-runtime",
                 "org.antlr:stringtemplate"
             ]
         },
@@ -13034,6 +13275,12 @@
                 "netflix:platform-chukwaClient"
             ]
         },
+        "com.carrotsearch:hppc": {
+            "locked": "0.7.1",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "com.eaio.uuid:uuid": {
             "locked": "3.2",
             "transitive": [
@@ -13059,6 +13306,7 @@
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
@@ -13070,7 +13318,8 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
-                "netflix:country-launch"
+                "netflix:country-launch",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -13097,14 +13346,22 @@
             "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
-                "com.netflix.hystrix:hystrix-serialization"
+                "com.netflix.hystrix:hystrix-serialization",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
             "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
+            "locked": "2.7.5",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
@@ -13232,7 +13489,8 @@
                 "netflix:streaming-metrics",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -13902,7 +14160,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.17",
+            "locked": "1.13",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -13911,16 +14169,17 @@
             "project": true
         },
         "com.ning:compress-lzf": {
-            "locked": "0.9.5",
+            "locked": "1.0.2",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.spatial4j:spatial4j": {
-            "locked": "0.4.1",
+            "locked": "0.5",
             "transitive": [
                 "org.apache.lucene:lucene-spatial"
             ]
@@ -14033,6 +14292,12 @@
                 "com.sun.jersey:jersey-json"
             ]
         },
+        "com.tdunning:t-digest": {
+            "locked": "3.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "com.thinkaurelius.thrift:thrift-server": {
             "locked": "0.3.7",
             "transitive": [
@@ -14051,6 +14316,12 @@
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
+            ]
+        },
+        "com.twitter:jsr166e": {
+            "locked": "1.1.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.yammer.metrics:metrics-core": {
@@ -14072,9 +14343,10 @@
             ]
         },
         "commons-cli:commons-cli": {
-            "locked": "1.1",
+            "locked": "1.3.1",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "commons-codec:commons-codec": {
@@ -14199,7 +14471,6 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
-                "net.sf.json-lib:json-lib",
                 "org.apache.httpcomponents:httpclient"
             ]
         },
@@ -14223,9 +14494,10 @@
             ]
         },
         "io.netty:netty": {
-            "locked": "3.6.6.Final",
+            "locked": "3.10.5.Final",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "io.netty:netty-buffer": {
@@ -14403,7 +14675,8 @@
                 "netflix:platform-utils",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing"
+                "netflix:streaming-utilities-testing",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "junit:junit": {
@@ -14563,7 +14836,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "17.7",
+            "locked": "16.44",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -14993,13 +15266,12 @@
             ]
         },
         "org.antlr:antlr-runtime": {
-            "locked": "3.5",
+            "locked": "3.4",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.suro:suro-core",
                 "netflix:nf-eventbus",
-                "org.antlr:antlr",
-                "org.elasticsearch:elasticsearch"
+                "org.antlr:antlr"
             ]
         },
         "org.antlr:stringtemplate": {
@@ -15076,66 +15348,70 @@
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
+                "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.apache.lucene:lucene-backward-codecs": {
+            "locked": "5.5.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "org.apache.lucene:lucene-core": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.apache.lucene:lucene-analyzers-common",
-                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
-                "org.apache.lucene:lucene-misc",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
-                "org.apache.lucene:lucene-sandbox",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-grouping": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-join",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-join": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
+                "org.apache.lucene:lucene-highlighter",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-memory": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.apache.lucene:lucene-highlighter",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-misc": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-suggest",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest"
             ]
         },
         "org.apache.lucene:lucene-queries": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-grouping",
                 "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
@@ -15144,26 +15420,31 @@
             ]
         },
         "org.apache.lucene:lucene-queryparser": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-sandbox": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-queryparser",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-queryparser"
             ]
         },
         "org.apache.lucene:lucene-spatial": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.apache.lucene:lucene-spatial3d": {
+            "locked": "5.5.0",
+            "transitive": [
+                "org.apache.lucene:lucene-spatial"
+            ]
+        },
         "org.apache.lucene:lucene-suggest": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
@@ -15278,8 +15559,14 @@
             ]
         },
         "org.elasticsearch:elasticsearch": {
-            "locked": "1.5.2",
-            "requested": "1.5.2"
+            "locked": "2.3.3",
+            "requested": "2.3.3"
+        },
+        "org.elasticsearch:securesm": {
+            "locked": "1.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
         },
         "org.freemarker:freemarker": {
             "locked": "2.3.15",
@@ -15299,7 +15586,8 @@
         "org.hdrhistogram:HdrHistogram": {
             "locked": "2.1.9",
             "transitive": [
-                "com.netflix.hystrix:hystrix-core"
+                "com.netflix.hystrix:hystrix-core",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.hibernate:hibernate-validator": {
@@ -15320,6 +15608,12 @@
             "locked": "3.1.0.CR2",
             "transitive": [
                 "org.hibernate:hibernate-validator"
+            ]
+        },
+        "org.joda:joda-convert": {
+            "locked": "1.2",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.jvnet.mimepull:mimepull": {
@@ -15367,14 +15661,7 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator",
-                "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.ow2.asm:asm-commons": {
-            "locked": "4.1",
-            "transitive": [
-                "org.elasticsearch:elasticsearch"
+                "com.netflix.governator:governator"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -15475,9 +15762,10 @@
             ]
         },
         "org.yaml:snakeyaml": {
-            "locked": "1.12",
+            "locked": "1.15",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
                 "org.apache.cassandra:cassandra-all"
             ]
         },
@@ -15516,6 +15804,7 @@
         "antlr:antlr": {
             "locked": "2.7.7",
             "transitive": [
+                "org.antlr:antlr-runtime",
                 "org.antlr:stringtemplate"
             ]
         },
@@ -15608,6 +15897,12 @@
                 "netflix:platform-chukwaClient"
             ]
         },
+        "com.carrotsearch:hppc": {
+            "locked": "0.7.1",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "com.eaio.uuid:uuid": {
             "locked": "3.2",
             "transitive": [
@@ -15633,6 +15928,7 @@
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
@@ -15644,7 +15940,8 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
-                "netflix:country-launch"
+                "netflix:country-launch",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -15671,14 +15968,22 @@
             "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
-                "com.netflix.hystrix:hystrix-serialization"
+                "com.netflix.hystrix:hystrix-serialization",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
             "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
+            "locked": "2.7.5",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
@@ -15806,7 +16111,8 @@
                 "netflix:streaming-metrics",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -16476,7 +16782,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.17",
+            "locked": "1.13",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -16485,16 +16791,17 @@
             "project": true
         },
         "com.ning:compress-lzf": {
-            "locked": "0.9.5",
+            "locked": "1.0.2",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.spatial4j:spatial4j": {
-            "locked": "0.4.1",
+            "locked": "0.5",
             "transitive": [
                 "org.apache.lucene:lucene-spatial"
             ]
@@ -16607,6 +16914,12 @@
                 "com.sun.jersey:jersey-json"
             ]
         },
+        "com.tdunning:t-digest": {
+            "locked": "3.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "com.thinkaurelius.thrift:thrift-server": {
             "locked": "0.3.7",
             "transitive": [
@@ -16625,6 +16938,12 @@
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
+            ]
+        },
+        "com.twitter:jsr166e": {
+            "locked": "1.1.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.yammer.metrics:metrics-core": {
@@ -16646,9 +16965,10 @@
             ]
         },
         "commons-cli:commons-cli": {
-            "locked": "1.1",
+            "locked": "1.3.1",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "commons-codec:commons-codec": {
@@ -16773,7 +17093,6 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
-                "net.sf.json-lib:json-lib",
                 "org.apache.httpcomponents:httpclient"
             ]
         },
@@ -16797,9 +17116,10 @@
             ]
         },
         "io.netty:netty": {
-            "locked": "3.6.6.Final",
+            "locked": "3.10.5.Final",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "io.netty:netty-buffer": {
@@ -16977,7 +17297,8 @@
                 "netflix:platform-utils",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing"
+                "netflix:streaming-utilities-testing",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "junit:junit": {
@@ -17137,7 +17458,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "17.7",
+            "locked": "16.44",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -17567,13 +17888,12 @@
             ]
         },
         "org.antlr:antlr-runtime": {
-            "locked": "3.5",
+            "locked": "3.4",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.suro:suro-core",
                 "netflix:nf-eventbus",
-                "org.antlr:antlr",
-                "org.elasticsearch:elasticsearch"
+                "org.antlr:antlr"
             ]
         },
         "org.antlr:stringtemplate": {
@@ -17650,66 +17970,70 @@
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
+                "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.apache.lucene:lucene-backward-codecs": {
+            "locked": "5.5.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "org.apache.lucene:lucene-core": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.apache.lucene:lucene-analyzers-common",
-                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
-                "org.apache.lucene:lucene-misc",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
-                "org.apache.lucene:lucene-sandbox",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-grouping": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-join",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-join": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
+                "org.apache.lucene:lucene-highlighter",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-memory": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.apache.lucene:lucene-highlighter",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-misc": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-suggest",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest"
             ]
         },
         "org.apache.lucene:lucene-queries": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-grouping",
                 "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
@@ -17718,26 +18042,31 @@
             ]
         },
         "org.apache.lucene:lucene-queryparser": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-sandbox": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-queryparser",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-queryparser"
             ]
         },
         "org.apache.lucene:lucene-spatial": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.apache.lucene:lucene-spatial3d": {
+            "locked": "5.5.0",
+            "transitive": [
+                "org.apache.lucene:lucene-spatial"
+            ]
+        },
         "org.apache.lucene:lucene-suggest": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
@@ -17852,8 +18181,14 @@
             ]
         },
         "org.elasticsearch:elasticsearch": {
-            "locked": "1.5.2",
-            "requested": "1.5.2"
+            "locked": "2.3.3",
+            "requested": "2.3.3"
+        },
+        "org.elasticsearch:securesm": {
+            "locked": "1.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
         },
         "org.freemarker:freemarker": {
             "locked": "2.3.15",
@@ -17873,7 +18208,8 @@
         "org.hdrhistogram:HdrHistogram": {
             "locked": "2.1.9",
             "transitive": [
-                "com.netflix.hystrix:hystrix-core"
+                "com.netflix.hystrix:hystrix-core",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.hibernate:hibernate-validator": {
@@ -17894,6 +18230,12 @@
             "locked": "3.1.0.CR2",
             "transitive": [
                 "org.hibernate:hibernate-validator"
+            ]
+        },
+        "org.joda:joda-convert": {
+            "locked": "1.2",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.jvnet.mimepull:mimepull": {
@@ -17941,14 +18283,7 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator",
-                "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.ow2.asm:asm-commons": {
-            "locked": "4.1",
-            "transitive": [
-                "org.elasticsearch:elasticsearch"
+                "com.netflix.governator:governator"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -18049,9 +18384,10 @@
             ]
         },
         "org.yaml:snakeyaml": {
-            "locked": "1.12",
+            "locked": "1.15",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
                 "org.apache.cassandra:cassandra-all"
             ]
         },
@@ -18090,6 +18426,7 @@
         "antlr:antlr": {
             "locked": "2.7.7",
             "transitive": [
+                "org.antlr:antlr-runtime",
                 "org.antlr:stringtemplate"
             ]
         },
@@ -18182,6 +18519,12 @@
                 "netflix:platform-chukwaClient"
             ]
         },
+        "com.carrotsearch:hppc": {
+            "locked": "0.7.1",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "com.eaio.uuid:uuid": {
             "locked": "3.2",
             "transitive": [
@@ -18207,6 +18550,7 @@
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
@@ -18218,7 +18562,8 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
-                "netflix:country-launch"
+                "netflix:country-launch",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -18245,14 +18590,22 @@
             "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
-                "com.netflix.hystrix:hystrix-serialization"
+                "com.netflix.hystrix:hystrix-serialization",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
             "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
+            "locked": "2.7.5",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
@@ -18380,7 +18733,8 @@
                 "netflix:streaming-metrics",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -19050,7 +19404,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.17",
+            "locked": "1.13",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -19059,16 +19413,17 @@
             "project": true
         },
         "com.ning:compress-lzf": {
-            "locked": "0.9.5",
+            "locked": "1.0.2",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.spatial4j:spatial4j": {
-            "locked": "0.4.1",
+            "locked": "0.5",
             "transitive": [
                 "org.apache.lucene:lucene-spatial"
             ]
@@ -19181,6 +19536,12 @@
                 "com.sun.jersey:jersey-json"
             ]
         },
+        "com.tdunning:t-digest": {
+            "locked": "3.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "com.thinkaurelius.thrift:thrift-server": {
             "locked": "0.3.7",
             "transitive": [
@@ -19199,6 +19560,12 @@
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
+            ]
+        },
+        "com.twitter:jsr166e": {
+            "locked": "1.1.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.yammer.metrics:metrics-core": {
@@ -19220,9 +19587,10 @@
             ]
         },
         "commons-cli:commons-cli": {
-            "locked": "1.1",
+            "locked": "1.3.1",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "commons-codec:commons-codec": {
@@ -19347,7 +19715,6 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
-                "net.sf.json-lib:json-lib",
                 "org.apache.httpcomponents:httpclient"
             ]
         },
@@ -19371,9 +19738,10 @@
             ]
         },
         "io.netty:netty": {
-            "locked": "3.6.6.Final",
+            "locked": "3.10.5.Final",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "io.netty:netty-buffer": {
@@ -19551,7 +19919,8 @@
                 "netflix:platform-utils",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing"
+                "netflix:streaming-utilities-testing",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "junit:junit": {
@@ -19711,7 +20080,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "17.7",
+            "locked": "16.44",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -20141,13 +20510,12 @@
             ]
         },
         "org.antlr:antlr-runtime": {
-            "locked": "3.5",
+            "locked": "3.4",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.suro:suro-core",
                 "netflix:nf-eventbus",
-                "org.antlr:antlr",
-                "org.elasticsearch:elasticsearch"
+                "org.antlr:antlr"
             ]
         },
         "org.antlr:stringtemplate": {
@@ -20224,66 +20592,70 @@
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
+                "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.apache.lucene:lucene-backward-codecs": {
+            "locked": "5.5.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "org.apache.lucene:lucene-core": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.apache.lucene:lucene-analyzers-common",
-                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
-                "org.apache.lucene:lucene-misc",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
-                "org.apache.lucene:lucene-sandbox",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-grouping": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-join",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-join": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
+                "org.apache.lucene:lucene-highlighter",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-memory": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.apache.lucene:lucene-highlighter",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-misc": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-suggest",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest"
             ]
         },
         "org.apache.lucene:lucene-queries": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-grouping",
                 "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
@@ -20292,26 +20664,31 @@
             ]
         },
         "org.apache.lucene:lucene-queryparser": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-sandbox": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-queryparser",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-queryparser"
             ]
         },
         "org.apache.lucene:lucene-spatial": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.apache.lucene:lucene-spatial3d": {
+            "locked": "5.5.0",
+            "transitive": [
+                "org.apache.lucene:lucene-spatial"
+            ]
+        },
         "org.apache.lucene:lucene-suggest": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
@@ -20426,8 +20803,14 @@
             ]
         },
         "org.elasticsearch:elasticsearch": {
-            "locked": "1.5.2",
-            "requested": "1.5.2"
+            "locked": "2.3.3",
+            "requested": "2.3.3"
+        },
+        "org.elasticsearch:securesm": {
+            "locked": "1.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
         },
         "org.freemarker:freemarker": {
             "locked": "2.3.15",
@@ -20447,7 +20830,8 @@
         "org.hdrhistogram:HdrHistogram": {
             "locked": "2.1.9",
             "transitive": [
-                "com.netflix.hystrix:hystrix-core"
+                "com.netflix.hystrix:hystrix-core",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.hibernate:hibernate-validator": {
@@ -20468,6 +20852,12 @@
             "locked": "3.1.0.CR2",
             "transitive": [
                 "org.hibernate:hibernate-validator"
+            ]
+        },
+        "org.joda:joda-convert": {
+            "locked": "1.2",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.jvnet.mimepull:mimepull": {
@@ -20515,14 +20905,7 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator",
-                "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.ow2.asm:asm-commons": {
-            "locked": "4.1",
-            "transitive": [
-                "org.elasticsearch:elasticsearch"
+                "com.netflix.governator:governator"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -20623,9 +21006,10 @@
             ]
         },
         "org.yaml:snakeyaml": {
-            "locked": "1.12",
+            "locked": "1.15",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
                 "org.apache.cassandra:cassandra-all"
             ]
         },
@@ -20664,6 +21048,7 @@
         "antlr:antlr": {
             "locked": "2.7.7",
             "transitive": [
+                "org.antlr:antlr-runtime",
                 "org.antlr:stringtemplate"
             ]
         },
@@ -20756,6 +21141,12 @@
                 "netflix:platform-chukwaClient"
             ]
         },
+        "com.carrotsearch:hppc": {
+            "locked": "0.7.1",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "com.eaio.uuid:uuid": {
             "locked": "3.2",
             "transitive": [
@@ -20781,6 +21172,7 @@
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-smile",
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.fasterxml.jackson.module:jackson-module-afterburner",
                 "com.netflix.archaius:archaius-core",
@@ -20792,7 +21184,8 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
-                "netflix:country-launch"
+                "netflix:country-launch",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
@@ -20819,14 +21212,22 @@
             "locked": "2.7.5",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
-                "com.netflix.hystrix:hystrix-serialization"
+                "com.netflix.hystrix:hystrix-serialization",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
             "locked": "2.7.5",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
+            "locked": "2.7.5",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
@@ -20954,7 +21355,8 @@
                 "netflix:streaming-metrics",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -21624,7 +22026,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.17",
+            "locked": "1.13",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -21633,16 +22035,17 @@
             "project": true
         },
         "com.ning:compress-lzf": {
-            "locked": "0.9.5",
+            "locked": "1.0.2",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.spatial4j:spatial4j": {
-            "locked": "0.4.1",
+            "locked": "0.5",
             "transitive": [
                 "org.apache.lucene:lucene-spatial"
             ]
@@ -21755,6 +22158,12 @@
                 "com.sun.jersey:jersey-json"
             ]
         },
+        "com.tdunning:t-digest": {
+            "locked": "3.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "com.thinkaurelius.thrift:thrift-server": {
             "locked": "0.3.7",
             "transitive": [
@@ -21773,6 +22182,12 @@
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
+            ]
+        },
+        "com.twitter:jsr166e": {
+            "locked": "1.1.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.yammer.metrics:metrics-core": {
@@ -21794,9 +22209,10 @@
             ]
         },
         "commons-cli:commons-cli": {
-            "locked": "1.1",
+            "locked": "1.3.1",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "commons-codec:commons-codec": {
@@ -21921,7 +22337,6 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
-                "net.sf.json-lib:json-lib",
                 "org.apache.httpcomponents:httpclient"
             ]
         },
@@ -21945,9 +22360,10 @@
             ]
         },
         "io.netty:netty": {
-            "locked": "3.6.6.Final",
+            "locked": "3.10.5.Final",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "io.netty:netty-buffer": {
@@ -22125,7 +22541,8 @@
                 "netflix:platform-utils",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing"
+                "netflix:streaming-utilities-testing",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "junit:junit": {
@@ -22285,7 +22702,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "17.7",
+            "locked": "16.44",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -22715,13 +23132,12 @@
             ]
         },
         "org.antlr:antlr-runtime": {
-            "locked": "3.5",
+            "locked": "3.4",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.suro:suro-core",
                 "netflix:nf-eventbus",
-                "org.antlr:antlr",
-                "org.elasticsearch:elasticsearch"
+                "org.antlr:antlr"
             ]
         },
         "org.antlr:stringtemplate": {
@@ -22798,66 +23214,70 @@
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
+                "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.apache.lucene:lucene-backward-codecs": {
+            "locked": "5.5.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
+        },
         "org.apache.lucene:lucene-core": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.apache.lucene:lucene-analyzers-common",
-                "org.apache.lucene:lucene-grouping",
+                "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
-                "org.apache.lucene:lucene-misc",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
-                "org.apache.lucene:lucene-sandbox",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-grouping": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-join",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-join": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
+                "org.apache.lucene:lucene-highlighter",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-memory": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.apache.lucene:lucene-highlighter",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-misc": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-suggest",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-spatial",
+                "org.apache.lucene:lucene-suggest"
             ]
         },
         "org.apache.lucene:lucene-queries": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-grouping",
                 "org.apache.lucene:lucene-highlighter",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
@@ -22866,26 +23286,31 @@
             ]
         },
         "org.apache.lucene:lucene-queryparser": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "org.apache.lucene:lucene-sandbox": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
-                "org.apache.lucene:lucene-queryparser",
-                "org.elasticsearch:elasticsearch"
+                "org.apache.lucene:lucene-queryparser"
             ]
         },
         "org.apache.lucene:lucene-spatial": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.apache.lucene:lucene-spatial3d": {
+            "locked": "5.5.0",
+            "transitive": [
+                "org.apache.lucene:lucene-spatial"
+            ]
+        },
         "org.apache.lucene:lucene-suggest": {
-            "locked": "4.10.4",
+            "locked": "5.5.0",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
@@ -23000,8 +23425,14 @@
             ]
         },
         "org.elasticsearch:elasticsearch": {
-            "locked": "1.5.2",
-            "requested": "1.5.2"
+            "locked": "2.3.3",
+            "requested": "2.3.3"
+        },
+        "org.elasticsearch:securesm": {
+            "locked": "1.0",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
+            ]
         },
         "org.freemarker:freemarker": {
             "locked": "2.3.15",
@@ -23021,7 +23452,8 @@
         "org.hdrhistogram:HdrHistogram": {
             "locked": "2.1.9",
             "transitive": [
-                "com.netflix.hystrix:hystrix-core"
+                "com.netflix.hystrix:hystrix-core",
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.hibernate:hibernate-validator": {
@@ -23042,6 +23474,12 @@
             "locked": "3.1.0.CR2",
             "transitive": [
                 "org.hibernate:hibernate-validator"
+            ]
+        },
+        "org.joda:joda-convert": {
+            "locked": "1.2",
+            "transitive": [
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "org.jvnet.mimepull:mimepull": {
@@ -23089,14 +23527,7 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator",
-                "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.ow2.asm:asm-commons": {
-            "locked": "4.1",
-            "transitive": [
-                "org.elasticsearch:elasticsearch"
+                "com.netflix.governator:governator"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -23197,9 +23628,10 @@
             ]
         },
         "org.yaml:snakeyaml": {
-            "locked": "1.12",
+            "locked": "1.15",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
                 "org.apache.cassandra:cassandra-all"
             ]
         },
