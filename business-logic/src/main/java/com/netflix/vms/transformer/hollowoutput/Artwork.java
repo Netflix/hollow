@@ -15,6 +15,7 @@ public class Artwork implements Cloneable {
     public PassthroughVideo source_movie_id = null;
     public ArtworkSourcePassthrough source = null;
     public ArtworkBasicPassthrough basic_passthrough = null;
+    public ArtworkMerchStillPackageData merchstillsPackageData = null;
     public int file_seq = java.lang.Integer.MIN_VALUE;
 
     public String toString() {
@@ -31,6 +32,7 @@ public class Artwork implements Cloneable {
         builder.append(",source=").append(source);
         builder.append(",basic_passthrough=").append(basic_passthrough);
         builder.append(",file_seq=").append(file_seq);
+        builder.append(",merchstillsPackage=").append(merchstillsPackageData);
         builder.append("}");
         return builder.toString();
     }

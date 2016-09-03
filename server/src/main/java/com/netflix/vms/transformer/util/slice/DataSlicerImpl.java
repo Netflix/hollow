@@ -29,7 +29,6 @@ import com.netflix.vms.transformer.hollowoutput.NamedCollectionHolder;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VPerson;
 import com.netflix.vms.transformer.hollowoutput.Video;
-
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
@@ -384,7 +383,7 @@ public class DataSlicerImpl implements DataSlicer {
                     return Integer.valueOf((int) inputAPI.getShowCountryLabelHollow(ordinal)._getVideoId());
                 }
             });
-
+            includeAll(stateEngine, "DamMerchStills");
             includeAll(stateEngine, "TopN");
             includeAll(stateEngine, "AltGenres");
             includeAll(stateEngine, "ArtWorkImageType");
