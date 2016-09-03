@@ -2,8 +2,9 @@ package com.netflix.vms.transformer.modules.countryspecific;
 
 import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
 
-import com.netflix.vms.transformer.hollowoutput.DateWindow;
+import com.netflix.vms.transformer.contract.ContractAssetType;
 
+import com.netflix.vms.transformer.hollowoutput.DateWindow;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -100,14 +101,6 @@ public class VMSAvailabilityWindowModule {
     List<VMSAvailabilityWindow> calculateWindowData(Integer videoId, String country, String locale, StatusHollow videoRights, CountrySpecificRollupValues rollup, boolean isGoLive) {
         List<VMSAvailabilityWindow> windows = null;
         
-        if(videoId == 80133037 && "CH".equals(country) && "fr".equals(locale))
-            System.out.println("show " + 80133037);
-        if(videoId == 80132885 && "CH".equals(country) && "fr".equals(locale))
-            System.out.println("season " + 80132885);
-        if(videoId == 80004187 && "CH".equals(country) && "fr".equals(locale))
-            System.out.println("episode " + 80004187);
-        
-        
         RightsHollow rights = videoRights._getRights();
         if((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
             windows = populateRolledUpWindowData(videoId, rollup, rights, isGoLive, locale != null);
@@ -172,8 +165,15 @@ public class VMSAvailabilityWindowModule {
                             PackageData packageData = null;
                             if(locale != null) {
                                 packageData = getPackageData(videoId, pkg._getPackageId());
-                                if(locale != null && !multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAvailability)) //// multicatalog processing -- make sure contract gives access to some existing asset understandable in this language
+                                
+                                long packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAvailability);
+                                if(packageAvailability == 0) //// multicatalog processing -- make sure contract gives access to some existing asset understandable in this language
                                     continue;
+
+                                if((packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0)
+                                    rollup.foundLocalAudio();
+                                if((packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0)
+                                    rollup.foundLocalText();
                             }
                             
                             WindowPackageContractInfo windowPackageContractInfo = outputWindow.windowInfosByPackageId.get(packageId);
@@ -274,12 +274,16 @@ public class VMSAvailabilityWindowModule {
                                     }
                                 }
 
-                                if (window._getEndDate() > ctx.getNowMillis() && window._getStartDate() < minWindowStartDate) {
-                                    minWindowStartDate = window._getStartDate();
+                                long windowEndDate = window._getEndDate();
+                                long windowStartDate = window._getStartDate();
+                                if(isGoLive && windowEndDate > ctx.getNowMillis() && windowStartDate < ctx.getNowMillis()) {
+                                    rollup.newInWindowStartDate(windowStartDate);
+                                    isInWindow = true;
+                                }
+                                
+                                if (windowEndDate > ctx.getNowMillis() && windowStartDate < minWindowStartDate) {
+                                    minWindowStartDate = windowStartDate;
                                     currentOrFirstFutureWindow = outputWindow;
-
-                                    if (isGoLive && window._getStartDate() < ctx.getNowMillis())
-                                        isInWindow = true;
                                 }
                             }
 

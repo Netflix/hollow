@@ -52,7 +52,17 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
     
     private DateWindowAggregator showWindowAggregator = new DateWindowAggregator();
     private DateWindowAggregator seasonWindowAggregator = new DateWindowAggregator();
-
+    
+    private long maxInWindowStartDate = 0;
+    
+    private boolean episodeFoundLocalAudio = false;
+    private boolean seasonFoundLocalAudio = false;
+    private boolean showFoundLocalAudio = false;
+    private boolean showFoundLocalText = false;
+    private boolean seasonFoundLocalText = false;
+    private boolean episodeFoundLocalText = false;
+    
+    
     public void setSeasonSequenceNumber(int seasonSequenceNumber) {
         this.seasonSequenceNumber = seasonSequenceNumber;
     }
@@ -78,6 +88,8 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         seasonLevelTaggedVideoImagesRollup = new HashMap<Strings, List<VideoImage>>();
         seasonBundledAssetFromFirstAvailableEpisode = Integer.MIN_VALUE;
         seasonBundledAssetFromFirstUnavailableEpisode = Integer.MIN_VALUE;
+        seasonFoundLocalAudio = false;
+        seasonFoundLocalText = false;
         seasonWindowAggregator.reset();
     }
 
@@ -94,7 +106,15 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         seasonSequenceNumberMap = new HashMap<>();
         showBundledAssetFromFirstAvailableEpisode = Integer.MIN_VALUE;
         showBundledAssetFromFirstUnavailableEpisode = Integer.MIN_VALUE;
+        maxInWindowStartDate = 0;
+        showFoundLocalAudio = false;
+        showFoundLocalText = false;
         showWindowAggregator.reset();
+    }
+    
+    public void resetEpisode() {
+        episodeFoundLocalAudio = false;
+        episodeFoundLocalText = false;
     }
 
     public void episodeFound() {
@@ -225,6 +245,15 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
 
         seasonSeqNums.set(sequenceNumber);
     }
+    
+    public void newInWindowStartDate(long startDate) {
+        if(startDate > maxInWindowStartDate)
+            maxInWindowStartDate = startDate;
+    }
+    
+    public long getMaxInWindowStartDate() {
+        return maxInWindowStartDate;
+    }
 
     public int getFirstEpisodeBundledAssetId() {
         if (doSeason()) {
@@ -331,4 +360,41 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
 
         return mergedWindowSeqNumMap;
     }
+    
+    public void foundLocalAudio() {
+        showFoundLocalAudio = true;
+        seasonFoundLocalAudio = true;
+        episodeFoundLocalAudio = true;
+    }
+    
+    public void foundLocalText() {
+        showFoundLocalText = true;
+        seasonFoundLocalText = true;
+        episodeFoundLocalText = true;
+    }
+
+    public boolean isFoundLocalAudio() {
+        if(doSeason())
+            return seasonFoundLocalAudio;
+        if(doShow())
+            return showFoundLocalAudio;
+        return episodeFoundLocalAudio;
+    }
+
+    public boolean isFoundLocalText() {
+        if(doShow())
+            return showFoundLocalText;
+        if(doSeason())
+            return seasonFoundLocalText;
+        return episodeFoundLocalText;
+    }
+
+    public boolean isSeasonFoundLocalText() {
+        return seasonFoundLocalText;
+    }
+
+    public boolean isEpisodeFoundLocalText() {
+        return episodeFoundLocalText;
+    }
+
 }

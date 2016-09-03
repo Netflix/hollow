@@ -43,6 +43,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class CountrySpecificDataModule {
+    
+    private static final long THIRTY_DAYS = 30L * 24L * 60L * 60L * 1000L;
 
     private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
@@ -144,6 +146,7 @@ public class CountrySpecificDataModule {
                         rollup.setDoEpisode(true);
                         convertLocale(videoId, countryCode, locale, rollup, map, nonLocaleSpecificData);
                         rollup.setDoEpisode(false);
+                        rollup.resetEpisode();
                         rollup.episodeFound();
                     }
     
@@ -207,10 +210,40 @@ public class CountrySpecificDataModule {
                 
                 MulticatalogCountryLocaleData result = new MulticatalogCountryLocaleData();
                 result.availabilityWindows = availabilityWindows;
+                result.isSearchOnly = calculateSearchOnly(availabilityWindows);
+                result.hasNewContent = calculateHasNewContent(rollup.getMaxInWindowStartDate(), availabilityWindows);
+                result.hasLocalAudio = rollup.isFoundLocalAudio();
+                result.hasLocalText = rollup.isFoundLocalText();
+                
+                if(rollup.doShow() && isTopNodeGoLive(videoId, countryCode))
+                    result.dateWindowWiseSeasonSequenceNumberMap = new SortedMapOfDateWindowToListOfInteger(rollup.getDateWindowWiseSeasonSequenceNumbers()); 
+                else
+                    result.dateWindowWiseSeasonSequenceNumberMap = constants.EMPTY_DATE_WINDOW_SEASON_SEQ_MAP;
                 
                 countryData.languageData.put(new NFLocale(language), result);
             }
         }
+    }
+    
+    private boolean calculateSearchOnly(List<VMSAvailabilityWindow> windows) {
+        if(windows == null)
+            return false;
+        
+        for(VMSAvailabilityWindow window : windows) {
+            if(window.startDate.val <= ctx.getNowMillis() && window.endDate.val > ctx.getNowMillis()) {
+                return ((window.endDate.val - ctx.getNowMillis()) < THIRTY_DAYS);
+            }
+        }
+        return false;
+    }
+    
+    private boolean calculateHasNewContent(long maxInWindowStartDate, List<VMSAvailabilityWindow> windows) {
+        for(VMSAvailabilityWindow window : windows) {
+            if(window.startDate.val <= ctx.getNowMillis()) {
+                return (window.startDate.val - ctx.getNowMillis() > THIRTY_DAYS) && (ctx.getNowMillis() - maxInWindowStartDate < THIRTY_DAYS);
+            }
+        }
+        return false;
     }
 
     private void populateDatesAndWindowData(Integer videoId, String countryCode, CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup) {

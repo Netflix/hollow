@@ -10,6 +10,7 @@ public class MulticatalogCountryLocaleData {
     public boolean hasLocalText = false;
     public boolean isSearchOnly = false;
     public boolean hasNewContent = false;
+    public SortedMapOfDateWindowToListOfInteger dateWindowWiseSeasonSequenceNumberMap;
 
     @Override
     public int hashCode() {
