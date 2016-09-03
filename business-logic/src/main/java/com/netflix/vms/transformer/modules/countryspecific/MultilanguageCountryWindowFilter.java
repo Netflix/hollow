@@ -68,7 +68,7 @@ public class MultilanguageCountryWindowFilter {
         boolean anyLanguageDiscovered = false;
         
         for(EncodeSummaryDescriptor descriptor : pkg.muxAudioStreamSummary) {
-            packageAvailability |= languageIsAvailable(language, descriptor, languageAvailability, true, false);
+            packageAvailability |= languageIsAvailable(language, descriptor, languageAvailability, true, true);
             if(packageAvailability == (ContractAssetType.AUDIO.getBitIdentifier() | ContractAssetType.SUBTITLES.getBitIdentifier()))
                 return packageAvailability;
             
@@ -76,10 +76,10 @@ public class MultilanguageCountryWindowFilter {
                 anyLanguageDiscovered = true;
         }
         
-        if((packageAvailability | ContractAssetType.AUDIO.getBitIdentifier()) == 0) {
+        if((packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) == 0) {
             for(EncodeSummaryDescriptor descriptor : pkg.audioStreamSummary) {
                 packageAvailability |= languageIsAvailable(language, descriptor, languageAvailability, true, false);
-                if((packageAvailability | ContractAssetType.AUDIO.getBitIdentifier()) != 0)
+                if((packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0)
                     break;
                 
                 if(!anyLanguageDiscovered && !noLanguageIsAvailable(descriptor, true, false))
@@ -87,10 +87,10 @@ public class MultilanguageCountryWindowFilter {
             }
         }
         
-        if((packageAvailability | ContractAssetType.SUBTITLES.getBitIdentifier()) == 0) {
+        if((packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) == 0) {
             for(EncodeSummaryDescriptor descriptor : pkg.textStreamSummary) {
                 packageAvailability |= languageIsAvailable(language, descriptor, languageAvailability, false, true);
-                if((packageAvailability | ContractAssetType.SUBTITLES.getBitIdentifier()) != 0)
+                if((packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0)
                     break;
                 
                 if(!anyLanguageDiscovered && !noLanguageIsAvailable(descriptor, false, true))
