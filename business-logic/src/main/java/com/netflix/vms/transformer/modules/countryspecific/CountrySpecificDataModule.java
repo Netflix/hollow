@@ -198,7 +198,7 @@ public class CountrySpecificDataModule {
             List<VMSAvailabilityWindow> availabilityWindows = availabilityWindowModule.calculateWindowData(videoId, countryCode, language, status, rollup, availabilityWindowModule.isGoLive(status));
             
             /// Check the generated windows against the main country window -- if not different, exclude the record.
-            if(!availabilityWindows.equals(baseData.mediaAvailabilityWindows)) {
+            ///if(!availabilityWindows.equals(baseData.mediaAvailabilityWindows)) {
                 MulticatalogCountryData countryData = data.get(videoId);
                 if(countryData == null) {
                     countryData = new MulticatalogCountryData();
@@ -221,7 +221,7 @@ public class CountrySpecificDataModule {
                     result.dateWindowWiseSeasonSequenceNumberMap = constants.EMPTY_DATE_WINDOW_SEASON_SEQ_MAP;
                 
                 countryData.languageData.put(new NFLocale(language), result);
-            }
+            ///}
         }
     }
     
