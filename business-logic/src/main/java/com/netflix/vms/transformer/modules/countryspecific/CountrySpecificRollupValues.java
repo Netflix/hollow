@@ -55,12 +55,12 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
     
     private long maxInWindowStartDate = 0;
     
-    private boolean episodeFoundLocalAudio = false;
+    private boolean viewableFoundLocalAudio = false;
     private boolean seasonFoundLocalAudio = false;
     private boolean showFoundLocalAudio = false;
     private boolean showFoundLocalText = false;
     private boolean seasonFoundLocalText = false;
-    private boolean episodeFoundLocalText = false;
+    private boolean viewableFoundLocalText = false;
     
     
     public void setSeasonSequenceNumber(int seasonSequenceNumber) {
@@ -112,9 +112,9 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         showWindowAggregator.reset();
     }
     
-    public void resetEpisode() {
-        episodeFoundLocalAudio = false;
-        episodeFoundLocalText = false;
+    public void resetViewable() {
+        viewableFoundLocalAudio = false;
+        viewableFoundLocalText = false;
     }
 
     public void episodeFound() {
@@ -364,13 +364,13 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
     public void foundLocalAudio() {
         showFoundLocalAudio = true;
         seasonFoundLocalAudio = true;
-        episodeFoundLocalAudio = true;
+        viewableFoundLocalAudio = true;
     }
     
     public void foundLocalText() {
         showFoundLocalText = true;
         seasonFoundLocalText = true;
-        episodeFoundLocalText = true;
+        viewableFoundLocalText = true;
     }
 
     public boolean isFoundLocalAudio() {
@@ -378,7 +378,7 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
             return seasonFoundLocalAudio;
         if(doShow())
             return showFoundLocalAudio;
-        return episodeFoundLocalAudio;
+        return viewableFoundLocalAudio;
     }
 
     public boolean isFoundLocalText() {
@@ -386,7 +386,7 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
             return showFoundLocalText;
         if(doSeason())
             return seasonFoundLocalText;
-        return episodeFoundLocalText;
+        return viewableFoundLocalText;
     }
 
     public boolean isSeasonFoundLocalText() {
@@ -394,7 +394,7 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
     }
 
     public boolean isEpisodeFoundLocalText() {
-        return episodeFoundLocalText;
+        return viewableFoundLocalText;
     }
 
 }
