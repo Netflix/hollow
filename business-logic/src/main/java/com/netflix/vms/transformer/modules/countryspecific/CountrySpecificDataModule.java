@@ -209,10 +209,11 @@ public class CountrySpecificDataModule {
                 
                 MulticatalogCountryLocaleData result = new MulticatalogCountryLocaleData();
                 result.availabilityWindows = availabilityWindows;
-                result.isSearchOnly = calculateSearchOnly(availabilityWindows);
                 result.hasNewContent = calculateHasNewContent(rollup.getMaxInWindowStartDate(), availabilityWindows);
                 result.hasLocalAudio = rollup.isFoundLocalAudio();
                 result.hasLocalText = rollup.isFoundLocalText();
+                if(rollup.doShow())
+                    result.isSearchOnly = calculateSearchOnly(availabilityWindows);
                 
                 if(rollup.doShow() && isTopNodeGoLive(videoId, countryCode))
                     result.dateWindowWiseSeasonSequenceNumberMap = new SortedMapOfDateWindowToListOfInteger(rollup.getDateWindowWiseSeasonSequenceNumbers()); 
