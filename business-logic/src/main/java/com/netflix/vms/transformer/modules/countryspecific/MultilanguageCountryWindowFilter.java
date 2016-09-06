@@ -98,7 +98,7 @@ public class MultilanguageCountryWindowFilter {
             }
         }
         
-        if(!anyLanguageDiscovered)
+        if(packageAvailability == 0 && !anyLanguageDiscovered)
             return Long.MIN_VALUE;
         return packageAvailability;
     }
