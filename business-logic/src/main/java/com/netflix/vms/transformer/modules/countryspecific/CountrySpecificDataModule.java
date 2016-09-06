@@ -239,7 +239,7 @@ public class CountrySpecificDataModule {
     private boolean calculateHasNewContent(long maxInWindowStartDate, List<VMSAvailabilityWindow> windows) {
         for(VMSAvailabilityWindow window : windows) {
             if(window.startDate.val <= ctx.getNowMillis()) {
-                return (window.startDate.val - ctx.getNowMillis() > THIRTY_DAYS) && (ctx.getNowMillis() - maxInWindowStartDate < THIRTY_DAYS);
+                return (ctx.getNowMillis() - window.startDate.val > THIRTY_DAYS) && (ctx.getNowMillis() - maxInWindowStartDate < THIRTY_DAYS);
             }
         }
         return false;
