@@ -123,10 +123,66 @@ public class PinTitleManagerTest {
 
     }
 
+    @Test
+    public void testProcessFailureAndRecovers() throws Exception {
+        String spec1 = "123:456";
+
+        // Processor that will fail
+        DummyProcessor processor = new DummyProcessor();
+        processor.isThrowException = true;
+        Mockito.when(mgr.createOutputBasedProcessor()).thenReturn(processor);
+
+        { // cycle 1 - fail
+            try {
+                mgr.submitJobsToProcessASync(new HashSet<>(Arrays.asList(spec1)));
+                mgr.getResults(true); // Fail on first cycle
+                Assert.fail("should not get here");
+            } catch (Exception ex) {
+                System.out.println(ex.toString());
+            }
+        }
+
+        { // cycle 2 - continues to fail even when not waiting for all results
+            try {
+                mgr.prepareForNextCycle();
+                mgr.submitJobsToProcessASync(new HashSet<>(Arrays.asList(spec1)));
+                mgr.getResults(false); // Don't wait for sub-sequent cycles
+                Assert.fail("should not get here");
+            } catch (Exception ex) {
+                System.out.println("EXPECTED: " + ex);
+            }
+        }
+
+        // Successful
+        processor.isThrowException = false;
+        { // cycle 3 - recovers
+            try {
+                mgr.prepareForNextCycle();
+                mgr.submitJobsToProcessASync(new HashSet<>(Arrays.asList(spec1)));
+                mgr.getResults(true);
+            } catch (Exception ex) {
+                Assert.fail("should not get here");
+            }
+        }
+    }
+
     public static class DummyProcessor implements PinTitleProcessor {
+        boolean isThrowException;
+
+        DummyProcessor() {
+            this.isThrowException = false;
+        }
+
+        DummyProcessor(boolean isThrowException) {
+            this.isThrowException = isThrowException;
+        }
 
         @Override
         public HollowReadStateEngine process(long dataVersion, int... topNodes) throws Throwable {
+            if (isThrowException) {
+                throw new Exception("Failed to proceess");
+            }
+
             return null;
         }
 

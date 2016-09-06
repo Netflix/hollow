@@ -34,6 +34,7 @@ public class PinTitleManager {
 
     private final SimultaneousExecutor mainExecutor = new SimultaneousExecutor();
     private Map<PinTitleJobSpec, PinTitleProcessorJob> completedJobs = new HashMap<PinTitleJobSpec, PinTitleProcessorJob>();
+    private Map<PinTitleJobSpec, PinTitleProcessorJob> failedJobs = new HashMap<PinTitleJobSpec, PinTitleProcessorJob>();
     private Map<PinTitleJobSpec, PinTitleProcessorJob> activeJobs = new HashMap<PinTitleJobSpec, PinTitleProcessorJob>();
 
     public PinTitleManager(FileStore fileStore, TransformerContext ctx) {
@@ -54,14 +55,19 @@ public class PinTitleManager {
 
     public synchronized void prepareForNextCycle() {
         // cleanup completed jobs that are no longer needed
+        completedJobs = cleanupJobs(completedJobs, activeJobs);
+        failedJobs = cleanupJobs(failedJobs, activeJobs);
+    }
+
+    private static Map<PinTitleJobSpec, PinTitleProcessorJob> cleanupJobs(Map<PinTitleJobSpec, PinTitleProcessorJob> existingJobs, Map<PinTitleJobSpec, PinTitleProcessorJob> activeJobs) {
         Map<PinTitleJobSpec, PinTitleProcessorJob> neededJobs = new HashMap<PinTitleJobSpec, PinTitleProcessorJob>();
-        for (Map.Entry<PinTitleJobSpec, PinTitleProcessorJob> entry : completedJobs.entrySet()) {
+        for (Map.Entry<PinTitleJobSpec, PinTitleProcessorJob> entry : existingJobs.entrySet()) {
             PinTitleJobSpec spec = entry.getKey();
             if (activeJobs.containsKey(spec)) {
                 neededJobs.put(spec, entry.getValue());
             }
         }
-        completedJobs = neededJobs;
+        return neededJobs;
     }
 
     /**
@@ -89,7 +95,7 @@ public class PinTitleManager {
         }
 
         List<HollowReadStateEngine> resultList = processResults(true);
-        ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Misc Stat completedJobs={} currJobs={} results={} waitedForAllJobs={}", completedJobs.size(), activeJobs.size(), resultList.size(), isWaitForAllJobs);
+        ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Misc Stat completedJobs={} failedJobs={} currJobs={} results={} waitedForAllJobs={}", completedJobs.size(), failedJobs.size(), activeJobs.size(), resultList.size(), isWaitForAllJobs);
         return resultList;
     }
 
@@ -120,6 +126,7 @@ public class PinTitleManager {
     @VisibleForTesting
     void reset() {
         activeJobs.clear();
+        failedJobs.clear();
         completedJobs.clear();
     }
 
@@ -209,6 +216,9 @@ public class PinTitleManager {
         PinTitleProcessorJob job = completedJobs.get(spec);
         if (job!=null) return job;
 
+        job = failedJobs.get(spec);
+        if (job != null) return job;
+
         job = activeJobs.get(spec);
         return job;
     }
@@ -229,6 +239,9 @@ public class PinTitleManager {
             public void completedJob(PinTitleJobSpec jobSpec, PinTitleProcessorJob job, boolean isSuccessfull) {
                 if (isSuccessfull) {
                     completedJobs.put(jobSpec, job);
+                    failedJobs.remove(jobSpec);
+                } else {
+                    failedJobs.put(jobSpec, job);
                 }
             }
 
@@ -262,7 +275,7 @@ public class PinTitleManager {
     }
 
     public enum JobStatus {
-        PENDING(false), RUNNING(false), COMPLETED_SUCC(true), COMPLETED_FAIL(true), COMPLETED_WITH_PENDING_CHANGES(true);
+        PENDING(false), RUNNING(false), COMPLETED_SUCC(true), COMPLETED_FAIL(true);
 
         private boolean isCompleted;
 
@@ -285,6 +298,7 @@ public class PinTitleManager {
         private final CompleteJobCallback callback;
         private HollowReadStateEngine resultStateEngine;
         private Throwable failure;
+        private int retryCount = 0;
         protected JobStatus status = JobStatus.PENDING;
 
         PinTitleProcessorJob(PinTitleProcessor processor, PinTitleJobSpec jobSpec, TransformerContext ctx, CompleteJobCallback callback) {
@@ -299,9 +313,13 @@ public class PinTitleManager {
             if (isCompletedSuccessfully()) return;
 
             try {
-                reset();
-                status = JobStatus.RUNNING;
-                resultStateEngine = processor.process(jobSpec.version, jobSpec.topNodes);
+                if (status == JobStatus.COMPLETED_FAIL) {
+                    ctx.getLogger().error(TransformerLogTag.CyclePinnedTitles, "Retring failed job={} retry={}", this.jobSpec, ++retryCount);
+                    resultStateEngine = processor.process(jobSpec.version, jobSpec.topNodes);
+                } else {
+                    status = JobStatus.RUNNING;
+                    resultStateEngine = processor.process(jobSpec.version, jobSpec.topNodes);
+                }
 
                 status = JobStatus.COMPLETED_SUCC;
             } catch (Throwable ex) {
@@ -324,11 +342,6 @@ public class PinTitleManager {
 
         public HollowReadStateEngine getResult() {
             return resultStateEngine;
-        }
-
-        public void reset() {
-            status = JobStatus.PENDING;
-            failure = null;
         }
 
         public Throwable getFailure() {
