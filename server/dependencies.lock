@@ -1150,7 +1150,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
@@ -1159,13 +1159,13 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "com.netflix.vms.logging:vmslogging-slf4j": {
-            "locked": "1.11",
+            "locked": "1.15",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
@@ -1520,6 +1520,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -1958,7 +1959,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -4366,7 +4367,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
@@ -4375,13 +4376,13 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "com.netflix.vms.logging:vmslogging-slf4j": {
-            "locked": "1.11",
+            "locked": "1.15",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
@@ -4736,6 +4737,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -5174,7 +5176,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -7582,7 +7584,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
@@ -7591,13 +7593,13 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "com.netflix.vms.logging:vmslogging-slf4j": {
-            "locked": "1.11",
+            "locked": "1.15",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
@@ -7952,6 +7954,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -8390,7 +8393,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -10798,7 +10801,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
@@ -10807,13 +10810,13 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "com.netflix.vms.logging:vmslogging-slf4j": {
-            "locked": "1.11",
+            "locked": "1.15",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
@@ -11168,6 +11171,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -11600,7 +11604,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -14030,7 +14034,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
@@ -14039,13 +14043,13 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "com.netflix.vms.logging:vmslogging-slf4j": {
-            "locked": "1.11",
+            "locked": "1.15",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
@@ -14400,6 +14404,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -14838,7 +14843,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -18338,7 +18343,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
@@ -18347,13 +18352,13 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "com.netflix.vms.logging:vmslogging-slf4j": {
-            "locked": "1.11",
+            "locked": "1.15",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
@@ -18708,6 +18713,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -19146,7 +19152,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -21554,7 +21560,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
@@ -21563,13 +21569,13 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "com.netflix.vms.logging:vmslogging-slf4j": {
-            "locked": "1.11",
+            "locked": "1.15",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
@@ -21924,6 +21930,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -22361,7 +22368,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -24783,7 +24790,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
@@ -24792,13 +24799,13 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "com.netflix.vms.logging:vmslogging-slf4j": {
-            "locked": "1.11",
+            "locked": "1.15",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
@@ -25161,6 +25168,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -25620,7 +25628,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -28117,7 +28125,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
@@ -28126,13 +28134,13 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "com.netflix.vms.logging:vmslogging-slf4j": {
-            "locked": "1.11",
+            "locked": "1.15",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
@@ -28495,6 +28503,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -28954,7 +28963,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -31451,7 +31460,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
@@ -31460,13 +31469,13 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "com.netflix.vms.logging:vmslogging-slf4j": {
-            "locked": "1.11",
+            "locked": "1.15",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
@@ -31829,6 +31838,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -32288,7 +32298,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -34785,7 +34795,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
@@ -34794,13 +34804,13 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "com.netflix.vms.logging:vmslogging-slf4j": {
-            "locked": "1.11",
+            "locked": "1.15",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
@@ -35163,6 +35173,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -35622,7 +35633,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -38080,7 +38091,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
@@ -38089,13 +38100,13 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "com.netflix.vms.logging:vmslogging-slf4j": {
-            "locked": "1.11",
+            "locked": "1.15",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
@@ -38454,6 +38465,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -38892,7 +38904,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -41313,7 +41325,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
@@ -41322,13 +41334,13 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "com.netflix.vms.logging:vmslogging-slf4j": {
-            "locked": "1.11",
+            "locked": "1.15",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
@@ -41687,6 +41699,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -42125,7 +42138,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -44546,7 +44559,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
@@ -44555,13 +44568,13 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "com.netflix.vms.logging:vmslogging-slf4j": {
-            "locked": "1.11",
+            "locked": "1.15",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
@@ -44920,6 +44933,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -45358,7 +45372,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -47779,7 +47793,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
@@ -47788,13 +47802,13 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-core": {
-            "locked": "1.13",
+            "locked": "1.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "com.netflix.vms.logging:vmslogging-slf4j": {
-            "locked": "1.11",
+            "locked": "1.15",
             "requested": "latest.release"
         },
         "com.netflix.vms.transformer:vmstransformer-business-logic": {
@@ -48153,6 +48167,7 @@
                 "commons-configuration:commons-configuration",
                 "commons-httpclient:commons-httpclient",
                 "net.java.dev.jets3t:jets3t",
+                "net.sf.json-lib:json-lib",
                 "netflix:evcache-client",
                 "netflix:nflibrary",
                 "netflix:platform-core",
@@ -48591,7 +48606,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "16.44",
+            "locked": "17.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
