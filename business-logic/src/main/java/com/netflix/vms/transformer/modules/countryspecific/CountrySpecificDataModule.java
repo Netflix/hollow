@@ -145,25 +145,25 @@ public class CountrySpecificDataModule {
                         int videoId = hierarchy.getEpisodeIds()[i][j];
                         rollup.resetViewable();
                         rollup.setDoEpisode(true);
-                        convertLocale(videoId, countryCode, locale, rollup, map);
+                        convertLocale(videoId, false, countryCode, locale, rollup, map);
                         rollup.setDoEpisode(false);
                         rollup.episodeFound();
                     }
     
                     rollup.setDoSeason(true);
-                    convertLocale(hierarchy.getSeasonIds()[i], countryCode, locale, rollup, map);
+                    convertLocale(hierarchy.getSeasonIds()[i], false, countryCode, locale, rollup, map);
                     rollup.setDoSeason(false);
                     rollup.resetSeason();
                 }
     
                 rollup.setDoShow(true);
-                convertLocale(hierarchy.getTopNodeId(), countryCode, locale, rollup, map);
+                convertLocale(hierarchy.getTopNodeId(), hierarchy.isStandalone(), countryCode, locale, rollup, map);
                 rollup.setDoShow(false);
                 rollup.resetShow();
     
                 for(int i=0;i<hierarchy.getSupplementalIds().length;i++) {
                     rollup.resetViewable();
-                    convertLocale(hierarchy.getSupplementalIds()[i], countryCode, locale, rollup, map);
+                    convertLocale(hierarchy.getSupplementalIds()[i], false, countryCode, locale, rollup, map);
                 }
     
                 rollup.reset();
@@ -189,7 +189,7 @@ public class CountrySpecificDataModule {
         countryMap.put(videoId, data);
     }
     
-    private void convertLocale(Integer videoId, String countryCode, String language, CountrySpecificRollupValues rollup, Map<Integer, MulticatalogCountryData> data) {
+    private void convertLocale(Integer videoId, boolean isStandalone, String countryCode, String language, CountrySpecificRollupValues rollup, Map<Integer, MulticatalogCountryData> data) {
         int statusOrdinal = videoStatusIdx.getMatchingOrdinal(videoId.longValue(), countryCode);
         if (statusOrdinal != -1) {
             StatusHollow status = api.getStatusHollow(statusOrdinal);
@@ -212,7 +212,7 @@ public class CountrySpecificDataModule {
                 result.hasNewContent = calculateHasNewContent(rollup.getMaxInWindowStartDate(), availabilityWindows);
                 result.hasLocalAudio = rollup.isFoundLocalAudio();
                 result.hasLocalText = rollup.isFoundLocalText();
-                if(rollup.doShow())
+                if(rollup.doShow() && !isStandalone)
                     result.isSearchOnly = calculateSearchOnly(availabilityWindows);
                 
                 if(rollup.doShow() && isTopNodeGoLive(videoId, countryCode))

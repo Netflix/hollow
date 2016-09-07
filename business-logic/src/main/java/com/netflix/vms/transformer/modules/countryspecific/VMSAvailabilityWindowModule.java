@@ -134,10 +134,7 @@ public class VMSAvailabilityWindowModule {
             }
         });
         
-        if(videoId == 80019124 && "LU".equals(country) && "de".equals(locale))
-            System.out.println("watch");
-        
-        ///TODO: Find some way to simplify this logic.
+        ///TODO: simplify this logic.
         for (RightsWindowHollow window : sortedWindows) {
             boolean includedWindowPackageData = false;
             int thisWindowMaxPackageId = 0;
