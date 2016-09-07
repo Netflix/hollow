@@ -140,7 +140,7 @@ public class SimpleTransformer {
                 VideoMediaDataModule mediaDataModule = new VideoMediaDataModule(api, indexer);
                 VideoMiscDataModule miscDataModule = new VideoMiscDataModule(api, indexer);
                 VideoImagesDataModule imagesDataModule = new VideoImagesDataModule(api, ctx, objectMapper, cycleConstants, indexer);
-                CountrySpecificDataModule countrySpecificModule = new CountrySpecificDataModule(api, ctx, cycleConstants, indexer);
+                CountrySpecificDataModule countrySpecificModule = new CountrySpecificDataModule(api, ctx, objectMapper, cycleConstants, indexer);
                 VideoEpisodeCountryDecoratorModule countryDecoratorModule = new VideoEpisodeCountryDecoratorModule(api, objectMapper);
                 L10NVideoResourcesModule l10nVideoResourcesModule = new L10NVideoResourcesModule(api, ctx, objectMapper, indexer);
 

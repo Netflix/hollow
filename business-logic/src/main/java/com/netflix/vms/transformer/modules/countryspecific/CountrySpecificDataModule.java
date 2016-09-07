@@ -1,7 +1,11 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import com.netflix.vms.transformer.hollowoutput.MulticatalogCountryLocaleData;
+import com.netflix.vms.transformer.hollowoutput.Video;
+import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.vms.transformer.hollowoutput.ISOCountry;
+import com.netflix.vms.transformer.hollowoutput.MulticatalogCountryData;
 import java.util.Collections;
-
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
@@ -33,16 +37,18 @@ import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.util.SensitiveVideoServerSideUtil;
 import com.netflix.vms.transformer.util.VideoDateUtil;
 import com.netflix.vms.transformer.util.VideoSetTypeUtil;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class CountrySpecificDataModule {
+    
+    private static final long THIRTY_DAYS = 30L * 24L * 60L * 60L * 1000L;
 
     private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
+    private final HollowObjectMapper mapper;
     private final CycleConstants constants;
     private final VMSTransformerIndexer indexer;
 
@@ -53,9 +59,10 @@ public class CountrySpecificDataModule {
     private final CertificationListsModule certificationListsModule;
     private final VMSAvailabilityWindowModule availabilityWindowModule;
 
-    public CountrySpecificDataModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants constants, VMSTransformerIndexer indexer) {
+    public CountrySpecificDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, CycleConstants constants, VMSTransformerIndexer indexer) {
         this.api = api;
         this.ctx = ctx;
+        this.mapper = mapper;
         this.constants = constants;
         this.indexer = indexer;
         this.videoStatusIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_STATUS);
@@ -74,39 +81,15 @@ public class CountrySpecificDataModule {
 
         for(Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
-
+            
             Map<Integer, CompleteVideoCountrySpecificData> countryMap = new HashMap<Integer, CompleteVideoCountrySpecificData>();
-            allCountrySpecificDataMap.put(entry.getKey(), countryMap);
+            allCountrySpecificDataMap.put(countryCode, countryMap);
 
-            for(VideoHierarchy hierarchy : entry.getValue()) {
-
-                for(int i=0;i<hierarchy.getSeasonIds().length;i++) {
-                    rollup.setSeasonSequenceNumber(hierarchy.getSeasonSequenceNumbers()[i]);
-
-                    for(int j=0;j<hierarchy.getEpisodeIds()[i].length;j++) {
-                        int videoId = hierarchy.getEpisodeIds()[i][j];
-                        rollup.setDoEpisode(true);
-                        convert(videoId, countryCode, countryMap, rollup);
-                        rollup.setDoEpisode(false);
-                        rollup.episodeFound();
-                    }
-
-                    rollup.setDoSeason(true);
-                    convert(hierarchy.getSeasonIds()[i], countryCode, countryMap, rollup);
-                    rollup.setDoSeason(false);
-                    rollup.resetSeason();
-                }
-
-                rollup.setDoShow(true);
-                convert(hierarchy.getTopNodeId(), countryCode, countryMap, rollup);
-                rollup.setDoShow(false);
-                rollup.resetShow();
-
-                for(int i=0;i<hierarchy.getSupplementalIds().length;i++) {
-                    convert(hierarchy.getSupplementalIds()[i], countryCode, countryMap, rollup);
-                }
-
-                rollup.reset();
+            processCountrySpecificData(rollup, entry.getValue(), countryCode, countryMap);
+            
+            Set<String> catalogLanguages = ctx.getOctoberSkyData().getCatalogLanguages(countryCode);
+            if(catalogLanguages != null) {
+                processLocaleSpecificData(rollup, entry.getValue(), countryCode, catalogLanguages);
             }
         }
 
@@ -116,6 +99,82 @@ public class CountrySpecificDataModule {
         return allCountrySpecificDataMap;
     }
 
+    private void processCountrySpecificData(CountrySpecificRollupValues rollup, Set<VideoHierarchy> hierarchies, String countryCode, Map<Integer, CompleteVideoCountrySpecificData> countryMap) {
+        for(VideoHierarchy hierarchy : hierarchies) {
+
+            for(int i=0;i<hierarchy.getSeasonIds().length;i++) {
+                rollup.setSeasonSequenceNumber(hierarchy.getSeasonSequenceNumbers()[i]);
+
+                for(int j=0;j<hierarchy.getEpisodeIds()[i].length;j++) {
+                    int videoId = hierarchy.getEpisodeIds()[i][j];
+                    rollup.setDoEpisode(true);
+                    convert(videoId, countryCode, countryMap, rollup);
+                    rollup.setDoEpisode(false);
+                    rollup.episodeFound();
+                }
+
+                rollup.setDoSeason(true);
+                convert(hierarchy.getSeasonIds()[i], countryCode, countryMap, rollup);
+                rollup.setDoSeason(false);
+                rollup.resetSeason();
+            }
+
+            rollup.setDoShow(true);
+            convert(hierarchy.getTopNodeId(), countryCode, countryMap, rollup);
+            rollup.setDoShow(false);
+            rollup.resetShow();
+
+            for(int i=0;i<hierarchy.getSupplementalIds().length;i++) {
+                convert(hierarchy.getSupplementalIds()[i], countryCode, countryMap, rollup);
+            }
+
+            rollup.reset();
+        }
+    }
+    
+    private void processLocaleSpecificData(CountrySpecificRollupValues rollup, Set<VideoHierarchy> hierarchies, String countryCode, Set<String> locales) {
+        Map<Integer, MulticatalogCountryData> map = new HashMap<>();
+        
+        for(String locale : locales) {
+        
+            for(VideoHierarchy hierarchy : hierarchies) {
+                for(int i=0;i<hierarchy.getSeasonIds().length;i++) {
+                    rollup.setSeasonSequenceNumber(hierarchy.getSeasonSequenceNumbers()[i]);
+    
+                    for(int j=0;j<hierarchy.getEpisodeIds()[i].length;j++) {
+                        int videoId = hierarchy.getEpisodeIds()[i][j];
+                        rollup.resetViewable();
+                        rollup.setDoEpisode(true);
+                        convertLocale(videoId, false, countryCode, locale, rollup, map);
+                        rollup.setDoEpisode(false);
+                        rollup.episodeFound();
+                    }
+    
+                    rollup.setDoSeason(true);
+                    convertLocale(hierarchy.getSeasonIds()[i], false, countryCode, locale, rollup, map);
+                    rollup.setDoSeason(false);
+                    rollup.resetSeason();
+                }
+    
+                rollup.setDoShow(true);
+                convertLocale(hierarchy.getTopNodeId(), hierarchy.isStandalone(), countryCode, locale, rollup, map);
+                rollup.setDoShow(false);
+                rollup.resetShow();
+    
+                for(int i=0;i<hierarchy.getSupplementalIds().length;i++) {
+                    rollup.resetViewable();
+                    convertLocale(hierarchy.getSupplementalIds()[i], false, countryCode, locale, rollup, map);
+                }
+    
+                rollup.reset();
+            }
+        }
+        
+        for(Map.Entry<Integer, MulticatalogCountryData> entry : map.entrySet()) {
+            mapper.addObject(entry.getValue());
+        }
+    }
+
     private void convert(Integer videoId, String countryCode, Map<Integer, CompleteVideoCountrySpecificData> countryMap, CountrySpecificRollupValues rollup) {
         CompleteVideoCountrySpecificData data = new CompleteVideoCountrySpecificData();
 
@@ -123,11 +182,68 @@ public class CountrySpecificDataModule {
         certificationListsModule.populateCertificationLists(videoId, countryCode, data);
 
         if(rollup.doShow() && isTopNodeGoLive(videoId, countryCode))
-            data.dateWindowWiseSeasonSequenceNumberMap = new SortedMapOfDateWindowToListOfInteger(rollup.getDateWindowWiseSeasonSequenceNumbers()); // VideoCollectionsShowDataHolder.computeEpisodeSeasonSequenceNumberMap(showVideoEpisodeList)
+            data.dateWindowWiseSeasonSequenceNumberMap = new SortedMapOfDateWindowToListOfInteger(rollup.getDateWindowWiseSeasonSequenceNumbers()); 
         else
             data.dateWindowWiseSeasonSequenceNumberMap = constants.EMPTY_DATE_WINDOW_SEASON_SEQ_MAP;
 
         countryMap.put(videoId, data);
+    }
+    
+    private void convertLocale(Integer videoId, boolean isStandalone, String countryCode, String language, CountrySpecificRollupValues rollup, Map<Integer, MulticatalogCountryData> data) {
+        int statusOrdinal = videoStatusIdx.getMatchingOrdinal(videoId.longValue(), countryCode);
+        if (statusOrdinal != -1) {
+            StatusHollow status = api.getStatusHollow(statusOrdinal);
+            
+            List<VMSAvailabilityWindow> availabilityWindows = availabilityWindowModule.calculateWindowData(videoId, countryCode, language, status, rollup, availabilityWindowModule.isGoLive(status));
+            
+            /// Check the generated windows against the main country window -- if not different, exclude the record.
+            ///if(!availabilityWindows.equals(baseData.mediaAvailabilityWindows)) {
+                MulticatalogCountryData countryData = data.get(videoId);
+                if(countryData == null) {
+                    countryData = new MulticatalogCountryData();
+                    countryData.country = new ISOCountry(countryCode);
+                    countryData.videoId = new Video(videoId);
+                    countryData.languageData = new HashMap<>();
+                    data.put(videoId, countryData);
+                }
+                
+                MulticatalogCountryLocaleData result = new MulticatalogCountryLocaleData();
+                result.availabilityWindows = availabilityWindows;
+                result.hasNewContent = calculateHasNewContent(rollup.getMaxInWindowStartDate(), availabilityWindows);
+                result.hasLocalAudio = rollup.isFoundLocalAudio();
+                result.hasLocalText = rollup.isFoundLocalText();
+                if(rollup.doShow() && !isStandalone)
+                    result.isSearchOnly = calculateSearchOnly(availabilityWindows);
+                
+                if(rollup.doShow() && isTopNodeGoLive(videoId, countryCode))
+                    result.dateWindowWiseSeasonSequenceNumberMap = new SortedMapOfDateWindowToListOfInteger(rollup.getDateWindowWiseSeasonSequenceNumbers()); 
+                else
+                    result.dateWindowWiseSeasonSequenceNumberMap = constants.EMPTY_DATE_WINDOW_SEASON_SEQ_MAP;
+                
+                countryData.languageData.put(new NFLocale(language), result);
+            ///}
+        }
+    }
+    
+    private boolean calculateSearchOnly(List<VMSAvailabilityWindow> windows) {
+        if(windows == null)
+            return false;
+        
+        for(VMSAvailabilityWindow window : windows) {
+            if(window.startDate.val <= ctx.getNowMillis() && window.endDate.val > ctx.getNowMillis()) {
+                return ((window.endDate.val - ctx.getNowMillis()) < THIRTY_DAYS);
+            }
+        }
+        return false;
+    }
+    
+    private boolean calculateHasNewContent(long maxInWindowStartDate, List<VMSAvailabilityWindow> windows) {
+        for(VMSAvailabilityWindow window : windows) {
+            if(window.startDate.val <= ctx.getNowMillis()) {
+                return (ctx.getNowMillis() - window.startDate.val > THIRTY_DAYS) && (ctx.getNowMillis() - maxInWindowStartDate < THIRTY_DAYS);
+            }
+        }
+        return false;
     }
 
     private void populateDatesAndWindowData(Integer videoId, String countryCode, CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup) {
@@ -138,7 +254,7 @@ public class CountrySpecificDataModule {
         if (statusOrdinal != -1) {
             StatusHollow status = api.getStatusHollow(statusOrdinal);
 
-            availabilityWindowList = availabilityWindowModule.populateWindowData(videoId, countryCode, null, data, status, rollup);
+            availabilityWindowList = availabilityWindowModule.populateWindowData(videoId, countryCode, data, status, rollup);
             firstDisplayDate = populateFirstDisplayDateData(data, status, availabilityWindowList);
         }
 

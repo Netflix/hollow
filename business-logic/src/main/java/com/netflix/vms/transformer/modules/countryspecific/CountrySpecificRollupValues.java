@@ -26,19 +26,19 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
     private int showBundledAssetFromFirstUnavailableEpisode = Integer.MIN_VALUE;
     private int seasonBundledAssetFromFirstUnavailableEpisode = Integer.MIN_VALUE;
 
-    private Set<Strings> aggregatedShowAssetCodes = new HashSet<Strings>();
-    private Set<Strings> aggregatedSeasonAssetCodes = new HashSet<Strings>();
+    private Set<Strings> aggregatedShowAssetCodes = new HashSet<>();
+    private Set<Strings> aggregatedSeasonAssetCodes = new HashSet<>();
 
-    private Set<VideoFormatDescriptor> showVideoFormatDescriptors = new HashSet<VideoFormatDescriptor>();
-    private Set<VideoFormatDescriptor> seasonVideoFormatDescriptors = new HashSet<VideoFormatDescriptor>();
+    private Set<VideoFormatDescriptor> showVideoFormatDescriptors = new HashSet<>();
+    private Set<VideoFormatDescriptor> seasonVideoFormatDescriptors = new HashSet<>();
 
     private LinkedHashSetOfStrings showCupTokensFromFirstStreamableEpisode = null;
     private LinkedHashSetOfStrings seasonCupTokensFromFirstStreamableEpisode = null;
 
     private Map<Strings, List<VideoImage>> showFirstEpisodeVideoImagesMap = Collections.emptyMap();
     private Map<Strings, List<VideoImage>> seasonFirstEpisodeVideoImagesMap = Collections.emptyMap();
-    private Map<Strings, List<VideoImage>> showLevelTaggedVideoImagesRollup = new HashMap<Strings, List<VideoImage>>();
-    private Map<Strings, List<VideoImage>> seasonLevelTaggedVideoImagesRollup = new HashMap<Strings, List<VideoImage>>();
+    private Map<Strings, List<VideoImage>> showLevelTaggedVideoImagesRollup = new HashMap<>();
+    private Map<Strings, List<VideoImage>> seasonLevelTaggedVideoImagesRollup = new HashMap<>();
 
     private int seasonSequenceNumber = 0;
     private Map<DateWindow, BitSet> seasonSequenceNumberMap = new HashMap<>();
@@ -49,7 +49,20 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
     private boolean seasonHasRollingEpisodes = false;
     private boolean showIsAvailableForDownload = false;
     private boolean seasonIsAvailableForDownload = false;
-
+    
+    private DateWindowAggregator showWindowAggregator = new DateWindowAggregator();
+    private DateWindowAggregator seasonWindowAggregator = new DateWindowAggregator();
+    
+    private long maxInWindowStartDate = 0;
+    
+    private boolean viewableFoundLocalAudio = false;
+    private boolean seasonFoundLocalAudio = false;
+    private boolean showFoundLocalAudio = false;
+    private boolean showFoundLocalText = false;
+    private boolean seasonFoundLocalText = false;
+    private boolean viewableFoundLocalText = false;
+    
+    
     public void setSeasonSequenceNumber(int seasonSequenceNumber) {
         this.seasonSequenceNumber = seasonSequenceNumber;
     }
@@ -75,6 +88,9 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         seasonLevelTaggedVideoImagesRollup = new HashMap<Strings, List<VideoImage>>();
         seasonBundledAssetFromFirstAvailableEpisode = Integer.MIN_VALUE;
         seasonBundledAssetFromFirstUnavailableEpisode = Integer.MIN_VALUE;
+        seasonFoundLocalAudio = false;
+        seasonFoundLocalText = false;
+        seasonWindowAggregator.reset();
     }
 
     public void resetShow() {
@@ -90,19 +106,43 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         seasonSequenceNumberMap = new HashMap<>();
         showBundledAssetFromFirstAvailableEpisode = Integer.MIN_VALUE;
         showBundledAssetFromFirstUnavailableEpisode = Integer.MIN_VALUE;
+        maxInWindowStartDate = 0;
+        showFoundLocalAudio = false;
+        showFoundLocalText = false;
+        showWindowAggregator.reset();
+    }
+    
+    public void resetViewable() {
+        viewableFoundLocalAudio = false;
+        viewableFoundLocalText = false;
     }
 
     public void episodeFound() {
         this.showEpisodeFound = true;
         this.seasonEpisodeFound = true;
     }
-
+    
     public boolean wasShowEpisodeFound() {
         return showEpisodeFound;
     }
 
     public boolean wasSeasonEpisodeFound() {
         return seasonEpisodeFound;
+    }
+    
+    public void windowFound(long startDate, long endDate) {
+        showWindowAggregator.addDateWindow(startDate, endDate);
+        seasonWindowAggregator.addDateWindow(startDate, endDate);
+    }
+    
+    public DateWindow getValidShowWindow(long startDate, long endDate) {
+        showWindowAggregator.mergeDateWindows();
+        return showWindowAggregator.matchDateWindowAgainstMergedDateWindows(startDate, endDate);
+    }
+    
+    public DateWindow getValidSeasonWindow(long startDate, long endDate) {
+        seasonWindowAggregator.mergeDateWindows();
+        return seasonWindowAggregator.matchDateWindowAgainstMergedDateWindows(startDate, endDate);
     }
 
     public void newAssetBcp47Codes(Set<Strings> assetCodes) {
@@ -204,6 +244,15 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         }
 
         seasonSeqNums.set(sequenceNumber);
+    }
+    
+    public void newInWindowStartDate(long startDate) {
+        if(startDate > maxInWindowStartDate)
+            maxInWindowStartDate = startDate;
+    }
+    
+    public long getMaxInWindowStartDate() {
+        return maxInWindowStartDate;
     }
 
     public int getFirstEpisodeBundledAssetId() {
@@ -311,4 +360,41 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
 
         return mergedWindowSeqNumMap;
     }
+    
+    public void foundLocalAudio() {
+        showFoundLocalAudio = true;
+        seasonFoundLocalAudio = true;
+        viewableFoundLocalAudio = true;
+    }
+    
+    public void foundLocalText() {
+        showFoundLocalText = true;
+        seasonFoundLocalText = true;
+        viewableFoundLocalText = true;
+    }
+
+    public boolean isFoundLocalAudio() {
+        if(doSeason())
+            return seasonFoundLocalAudio;
+        if(doShow())
+            return showFoundLocalAudio;
+        return viewableFoundLocalAudio;
+    }
+
+    public boolean isFoundLocalText() {
+        if(doShow())
+            return showFoundLocalText;
+        if(doSeason())
+            return seasonFoundLocalText;
+        return viewableFoundLocalText;
+    }
+
+    public boolean isSeasonFoundLocalText() {
+        return seasonFoundLocalText;
+    }
+
+    public boolean isEpisodeFoundLocalText() {
+        return viewableFoundLocalText;
+    }
+
 }

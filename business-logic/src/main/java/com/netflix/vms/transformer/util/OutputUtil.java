@@ -5,7 +5,7 @@ import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.Integer;
 
 public class OutputUtil {
-    public static final long FIVE_SECOND_MILLIES = 5000l;
+    public static final long FIVE_SECOND_MILLIS = 5000l;
 
     public static Integer getNullableInteger(int value) {
         if (java.lang.Integer.MIN_VALUE == value) return null;
@@ -19,12 +19,12 @@ public class OutputUtil {
         return value;
     }
 
-    public static long round(final long date, final long roundByMillies) {
-        return (date / roundByMillies) * roundByMillies;
+    public static long round(final long date, final long roundByMillis) {
+        return (date / roundByMillis) * roundByMillis;
     }
 
     public static long getRoundedTimeStamp(long value) {
-        return round(value, FIVE_SECOND_MILLIES);
+        return round(value, FIVE_SECOND_MILLIS);
     }
 
     public static Date getRoundedDate(long value) {
