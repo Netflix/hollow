@@ -137,7 +137,7 @@ public interface TransformerConfig {
     @DefaultValue("true")
     boolean isElasticSearchLoggingEnabled();
 
-    @DefaultValue("es_vmsops")
+    @DefaultValue("es_vmsops2")
     String getElasticSearchClusterName();
 
     @DefaultValue("7102")
