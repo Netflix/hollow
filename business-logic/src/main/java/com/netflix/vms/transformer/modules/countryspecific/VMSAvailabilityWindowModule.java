@@ -117,6 +117,8 @@ public class VMSAvailabilityWindowModule {
 
         long minWindowStartDate = Long.MAX_VALUE;
         VMSAvailabilityWindow currentOrFirstFutureWindow = null;
+        boolean currentOrFirstFutureWindowFoundLocalAudio = false;
+        boolean currentOrFirstFutureWindowFoundLocalText = false;
         boolean isInWindow = false;
 
         int includedPackageDataCount = 0;
@@ -132,11 +134,16 @@ public class VMSAvailabilityWindowModule {
             }
         });
         
+        if(videoId == 80019124 && "LU".equals(country) && "de".equals(locale))
+            System.out.println("watch");
+        
         ///TODO: Find some way to simplify this logic.
         for (RightsWindowHollow window : sortedWindows) {
             boolean includedWindowPackageData = false;
             int thisWindowMaxPackageId = 0;
             int thisWindowBundledAssetsGroupId = 0;
+            boolean thisWindowFoundLocalAudio = false;
+            boolean thisWindowFoundLocalText = false;
 
             VMSAvailabilityWindow outputWindow = new VMSAvailabilityWindow();
             outputWindow.startDate = OutputUtil.getRoundedDate(window._getStartDate());
@@ -170,10 +177,16 @@ public class VMSAvailabilityWindowModule {
                                 if(packageAvailability == 0) //// multicatalog processing -- make sure contract gives access to some existing asset understandable in this language
                                     continue;
 
-                                if((packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0)
-                                    rollup.foundLocalAudio();
-                                if((packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0)
-                                    rollup.foundLocalText();
+                                if((packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0) {
+                                    thisWindowFoundLocalAudio = true; // rollup.foundLocalAudio();
+                                    if(currentOrFirstFutureWindow == outputWindow)
+                                        currentOrFirstFutureWindowFoundLocalAudio = true;
+                                }
+                                if((packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0) {
+                                    thisWindowFoundLocalText = true; //rollup.foundLocalText();
+                                    if(currentOrFirstFutureWindow == outputWindow)
+                                        currentOrFirstFutureWindowFoundLocalText = true;
+                                }
                             }
                             
                             WindowPackageContractInfo windowPackageContractInfo = outputWindow.windowInfosByPackageId.get(packageId);
@@ -284,6 +297,8 @@ public class VMSAvailabilityWindowModule {
                                 if (windowEndDate > ctx.getNowMillis() && windowStartDate < minWindowStartDate) {
                                     minWindowStartDate = windowStartDate;
                                     currentOrFirstFutureWindow = outputWindow;
+                                    currentOrFirstFutureWindowFoundLocalAudio = thisWindowFoundLocalAudio;
+                                    currentOrFirstFutureWindowFoundLocalText = thisWindowFoundLocalText;
                                 }
                             }
 
@@ -376,6 +391,14 @@ public class VMSAvailabilityWindowModule {
                 rollup.newEpisodeStillImagesByTypeMapForShowLevelExtraction(stillImagesByTypeMapForShowLevelExtraction);
 
             rollup.newEpisodeData(isGoLive, currentOrFirstFutureWindow.bundledAssetsGroupId);
+            
+            if(locale != null) {
+                if(currentOrFirstFutureWindowFoundLocalAudio)
+                    rollup.foundLocalAudio();
+                if(currentOrFirstFutureWindowFoundLocalText)
+                    rollup.foundLocalText();
+            }
+            
         } else if(locale == null) {
             rollup.newEpisodeData(isGoLive, bundledAssetsGroupId);
             if(rollup.doEpisode())
