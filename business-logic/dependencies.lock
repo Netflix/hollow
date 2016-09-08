@@ -573,7 +573,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -611,7 +611,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.45",
+            "locked": "2.47",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
@@ -1447,7 +1447,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -1485,7 +1485,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.45",
+            "locked": "2.47",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
@@ -2321,7 +2321,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -2359,7 +2359,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.45",
+            "locked": "2.47",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
@@ -3195,7 +3195,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -3233,7 +3233,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.45",
+            "locked": "2.47",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
@@ -4168,7 +4168,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -4206,7 +4206,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.45",
+            "locked": "2.47",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
@@ -5051,7 +5051,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -5089,7 +5089,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.45",
+            "locked": "2.47",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
@@ -5960,7 +5960,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -5998,7 +5998,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.45",
+            "locked": "2.47",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
@@ -6869,7 +6869,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -6907,7 +6907,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.45",
+            "locked": "2.47",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
@@ -7778,7 +7778,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -7816,7 +7816,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.45",
+            "locked": "2.47",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
