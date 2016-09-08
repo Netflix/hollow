@@ -95,7 +95,7 @@ public class PinTitleManager {
         }
 
         List<HollowReadStateEngine> resultList = processResults(true);
-        ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Misc Stat completedJobs={} failedJobs={} currJobs={} results={} waitedForAllJobs={}", completedJobs.size(), failedJobs.size(), activeJobs.size(), resultList.size(), isWaitForAllJobs);
+        ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Misc Stat failedJobs={} activeJobs={} completedJobs={} results={} waitedForAllJobs={}", failedJobs.size(), activeJobs.size(), completedJobs.size(), resultList.size(), isWaitForAllJobs);
         return resultList;
     }
 
