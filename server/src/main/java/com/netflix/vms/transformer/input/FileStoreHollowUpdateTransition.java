@@ -50,36 +50,36 @@ public class FileStoreHollowUpdateTransition extends HollowUpdateTransition {
 
         File localFile = new File(localFileLocation, filename);
 
-        if(localFile.exists())
+        if(localFile.exists()) 
             return useVMSLZ4 ? new LZ4VMSInputStream(new FileInputStream(localFile)) : new LZ4BlockInputStream(new FileInputStream(localFile));
 
-            int retryCount = 0;
-            int randomIncompleteExtension = new Random().nextInt() & Integer.MAX_VALUE;
-            final File localIncompleteFile = new File(localFileLocation, filename + "." + Integer.toString(randomIncompleteExtension, 16));
+        int retryCount = 0;
+        int randomIncompleteExtension = new Random().nextInt() & Integer.MAX_VALUE;
+        final File localIncompleteFile = new File(localFileLocation, filename + "." + Integer.toString(randomIncompleteExtension, 16));
 
-            while(retryCount < NUM_RETRIES) {
-                retryCount++;
+        while(retryCount < NUM_RETRIES) {
+            retryCount++;
 
-                try {
-                    S3Object s3Object = fileStore.getPublishedFile(fileStoreKeybase, fileStoreVersion);
-                    LOGGER.info("Copying object {} to {}", s3Object, localIncompleteFile);
-                    fileStore.copyFile(s3Object, localIncompleteFile);
+            try {
+                S3Object s3Object = fileStore.getPublishedFile(fileStoreKeybase, fileStoreVersion);
+                LOGGER.info("Copying object {} to {}", s3Object, localIncompleteFile);
+                fileStore.copyFile(s3Object, localIncompleteFile);
 
-                    if(!localFile.exists()) {
-                        localIncompleteFile.renameTo(localFile);
-                    }
+                if(!localFile.exists()) {
+                    localIncompleteFile.renameTo(localFile);
+                }
 
-                    break;
-                } catch(Exception e) {
-                    LOGGER.error("Retrieval of transition input stream failed", e);
-                    if(retryCount == NUM_RETRIES) {
-                        if(localFile.exists())
-                            localFile.delete();
-                        throw new IOException(e);
-                    }
+                break;
+            } catch(Exception e) {
+                LOGGER.error("Retrieval of transition input stream failed", e);
+                if(retryCount == NUM_RETRIES) {
+                    if(localFile.exists())
+                        localFile.delete();
+                    throw new IOException(e);
                 }
             }
+        }
 
-            return useVMSLZ4 ? new LZ4VMSInputStream(new DeleteOnCloseFileInputStream(localFile)) : new LZ4BlockInputStream(new DeleteOnCloseFileInputStream(localFile));
+        return useVMSLZ4 ? new LZ4VMSInputStream(new DeleteOnCloseFileInputStream(localFile)) : new LZ4BlockInputStream(new DeleteOnCloseFileInputStream(localFile));
     }
 }
