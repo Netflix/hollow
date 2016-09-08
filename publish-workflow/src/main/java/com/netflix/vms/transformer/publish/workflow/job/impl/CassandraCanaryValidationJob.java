@@ -16,6 +16,7 @@ import com.netflix.vms.transformer.publish.workflow.job.AfterCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.BeforeCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryValidationJob;
 import com.netflix.vms.transformer.publish.workflow.logmessage.PbmsMessage;
+import com.netflix.vms.transformer.publish.workflow.logmessage.ViewShareMessage;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.VMSDataCanaryResult;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -99,7 +100,7 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
                         pbmSuccess = false;
                         pbmSuccessForThisCountry = false;
                     }
-                    logMissingViewShare(pbmSuccessForThisCountry, missingViewShareThreshold, countryId, missingViewShareForCountry);
+                    logMissingViewShare(pbmSuccessForThisCountry, missingViewShareThreshold, countryId, missingViewShareForCountry, failedIDs);
                 }
             }
             logFailedIDs(pbmSuccess, befTestResults, failedIDs);
@@ -122,11 +123,11 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
 	}
 
 	private void logMissingViewShare(boolean pbmSuccessForThisCountry, float missingViewShareThreshold, String countryId,
-			Float missingViewShareForCountry) {
+            Float missingViewShareForCountry, List<VideoCountryKey> failedIDs) {
 		if(!pbmSuccessForThisCountry)
-			ctx.getLogger().error(PlaybackMonkey, "PBM: country={} missingViewShare={} threshold={}.",countryId, missingViewShareForCountry, missingViewShareThreshold);
+            ctx.getLogger().error(PlaybackMonkey, new ViewShareMessage("PBM", countryId, failedIDs, missingViewShareForCountry, missingViewShareThreshold));
 		else if(missingViewShareForCountry != null && Float.compare(missingViewShareForCountry, 0f) > 0)
-			ctx.getLogger().warn(PlaybackMonkey, "PBM: country={} missingViewShare={} threshold={}", countryId, missingViewShareForCountry, missingViewShareThreshold);
+            ctx.getLogger().warn(PlaybackMonkey, new ViewShareMessage("PBM", countryId, failedIDs, missingViewShareForCountry, missingViewShareThreshold));
 		ctx.getMetricRecorder().recordMetric(Metric.PBMFailuresMissingViewShare, missingViewShareForCountry, "country",countryId);
 	}
 
