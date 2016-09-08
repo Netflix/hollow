@@ -261,7 +261,7 @@ public class TransformCycle {
     }
 
     private boolean isUnchangedFastlaneState() {
-        return ctx.getFastlaneIds() != null && previousCycleNumber != Long.MIN_VALUE && !outputStateEngine.hasChangedSinceLastCycle();
+        return ctx.getFastlaneIds() != null && previousCycleNumber != Long.MIN_VALUE && !outputStateEngine.isRestored() && !outputStateEngine.hasChangedSinceLastCycle();
     }
 
     private boolean rollbackFastlaneStateEngine() {
