@@ -83,14 +83,18 @@ public class PinTitleManagerTest {
         PinTitleJobSpec jSpec1 = mgr.createJobSpec(spec1);
         PinTitleJobSpec jSpec2 = mgr.createJobSpec(spec2);
 
-        PinTitleJobSpec expectedJobSpec = jSpec1.merge(jSpec2);
+        PinTitleJobSpec expectedMergedJobSpec = jSpec1.merge(jSpec2);
         Assert.assertEquals(2, jSpec1.topNodes.length);
         Assert.assertEquals(2, jSpec2.topNodes.length);
-        Assert.assertEquals(3, expectedJobSpec.topNodes.length);
+        Assert.assertEquals(3, expectedMergedJobSpec.topNodes.length);
         Mockito.when(mgr.createOutputBasedProcessor()).thenReturn(new DummyProcessor());
 
         { // cycle 1
             mgr.submitJobsToProcessASync(new HashSet<>(Arrays.asList(spec1)));
+            Map<PinTitleJobSpec, PinTitleProcessorJob> activeJobs = mgr.getActiveJobs();
+            Assert.assertEquals(1, activeJobs.size());
+            Assert.assertTrue(activeJobs.containsKey(jSpec1));
+
             List<HollowReadStateEngine> results = mgr.getResults(true);
             Map<PinTitleJobSpec, PinTitleProcessorJob> completedjobs = mgr.getCompletedJobs();
             Assert.assertEquals(1, results.size());
@@ -101,24 +105,33 @@ public class PinTitleManagerTest {
         { // cycle 2 - not merge since duplicate are from from different cycles
             mgr.prepareForNextCycle();
             mgr.submitJobsToProcessASync(new HashSet<>(Arrays.asList(spec1, spec2)));
+            Map<PinTitleJobSpec, PinTitleProcessorJob> activeJobs = mgr.getActiveJobs();
+            Assert.assertEquals(2, activeJobs.size());
+            Assert.assertTrue(activeJobs.containsKey(jSpec1));
+            Assert.assertTrue(activeJobs.containsKey(jSpec2));
+
             List<HollowReadStateEngine> results = mgr.getResults(true);
             Map<PinTitleJobSpec, PinTitleProcessorJob> completedjobs = mgr.getCompletedJobs();
             Assert.assertEquals(2, results.size());
             Assert.assertEquals(2, completedjobs.size());
             Assert.assertTrue(completedjobs.containsKey(jSpec1));
             Assert.assertTrue(completedjobs.containsKey(jSpec2));
-            Assert.assertFalse(completedjobs.containsKey(expectedJobSpec));
+            Assert.assertFalse(completedjobs.containsKey(expectedMergedJobSpec));
         }
 
         mgr.reset(); // Simulate startup - with merge multiple spec of same blob version
         {
             mgr.prepareForNextCycle();
             mgr.submitJobsToProcessASync(new HashSet<>(Arrays.asList(spec1, spec2)));
+            Map<PinTitleJobSpec, PinTitleProcessorJob> activeJobs = mgr.getActiveJobs();
+            Assert.assertEquals(1, activeJobs.size());
+            Assert.assertTrue(activeJobs.containsKey(expectedMergedJobSpec));
+
             List<HollowReadStateEngine> results = mgr.getResults(true);
             Map<PinTitleJobSpec, PinTitleProcessorJob> completedjobs = mgr.getCompletedJobs();
             Assert.assertEquals(1, results.size());
             Assert.assertEquals(1, completedjobs.size());
-            Assert.assertTrue(completedjobs.containsKey(expectedJobSpec));
+            Assert.assertTrue(completedjobs.containsKey(expectedMergedJobSpec));
         }
 
     }
@@ -126,6 +139,7 @@ public class PinTitleManagerTest {
     @Test
     public void testProcessFailureAndRecovers() throws Exception {
         String spec1 = "123:456";
+        PinTitleJobSpec jSpec1 = mgr.createJobSpec(spec1);
 
         // Processor that will fail
         DummyProcessor processor = new DummyProcessor();
@@ -135,10 +149,16 @@ public class PinTitleManagerTest {
         { // cycle 1 - fail
             try {
                 mgr.submitJobsToProcessASync(new HashSet<>(Arrays.asList(spec1)));
+                Map<PinTitleJobSpec, PinTitleProcessorJob> activeJobs = mgr.getActiveJobs();
+                Assert.assertEquals(1, activeJobs.size());
+                Assert.assertTrue(activeJobs.containsKey(jSpec1));
+
                 mgr.getResults(true); // Fail on first cycle
                 Assert.fail("should not get here");
             } catch (Exception ex) {
-                System.out.println(ex.toString());
+                Map<PinTitleJobSpec, PinTitleProcessorJob> failedJob = mgr.getFailedJobs();
+                Assert.assertEquals(1, failedJob.size());
+                Assert.assertTrue(failedJob.containsKey(jSpec1));
             }
         }
 
@@ -146,10 +166,16 @@ public class PinTitleManagerTest {
             try {
                 mgr.prepareForNextCycle();
                 mgr.submitJobsToProcessASync(new HashSet<>(Arrays.asList(spec1)));
+                Map<PinTitleJobSpec, PinTitleProcessorJob> activeJobs = mgr.getActiveJobs();
+                Assert.assertEquals(1, activeJobs.size());
+                Assert.assertTrue(activeJobs.containsKey(jSpec1));
+
                 mgr.getResults(false); // Don't wait for sub-sequent cycles
                 Assert.fail("should not get here");
             } catch (Exception ex) {
-                System.out.println("EXPECTED: " + ex);
+                Map<PinTitleJobSpec, PinTitleProcessorJob> failedJob = mgr.getFailedJobs();
+                Assert.assertEquals(1, failedJob.size());
+                Assert.assertTrue(failedJob.containsKey(jSpec1));
             }
         }
 
@@ -159,7 +185,14 @@ public class PinTitleManagerTest {
             try {
                 mgr.prepareForNextCycle();
                 mgr.submitJobsToProcessASync(new HashSet<>(Arrays.asList(spec1)));
+                Map<PinTitleJobSpec, PinTitleProcessorJob> activeJobs = mgr.getActiveJobs();
+                Assert.assertEquals(1, activeJobs.size());
+                Assert.assertTrue(activeJobs.containsKey(jSpec1));
+
                 mgr.getResults(true);
+                Map<PinTitleJobSpec, PinTitleProcessorJob> completedJobs = mgr.getCompletedJobs();
+                Assert.assertEquals(1, completedJobs.size());
+                Assert.assertTrue(completedJobs.containsKey(jSpec1));
             } catch (Exception ex) {
                 Assert.fail("should not get here");
             }

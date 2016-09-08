@@ -131,9 +131,20 @@ public class PinTitleManager {
     }
 
     @VisibleForTesting
+    Map<PinTitleJobSpec, PinTitleProcessorJob> getActiveJobs() {
+        return activeJobs;
+    }
+
+    @VisibleForTesting
+    Map<PinTitleJobSpec, PinTitleProcessorJob> getFailedJobs() {
+        return failedJobs;
+    }
+
+    @VisibleForTesting
     Map<PinTitleJobSpec, PinTitleProcessorJob> getCompletedJobs() {
         return completedJobs;
     }
+
 
     // Convert the spec Strings into ProcessorJob
     @VisibleForTesting
