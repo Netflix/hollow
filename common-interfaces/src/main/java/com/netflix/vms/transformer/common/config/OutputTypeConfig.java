@@ -8,6 +8,7 @@ import java.util.Set;
 
 public enum OutputTypeConfig {
     CompleteVideo("CompleteVideo", "id.value", "country.id"),
+    MulticatalogCountryData("MulticatalogCountryData", "videoId.value", "country.id"),
     VideoEpisode_CountryList("VideoEpisode_CountryList", "country.id", "item.deliverableVideo.value"),
     RolloutVideo("RolloutVideo", "video.value"),
     GlobalVideo("GlobalVideo", "completeVideo.id.value"),
