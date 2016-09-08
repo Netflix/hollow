@@ -81,7 +81,7 @@ public class PinTitleManager {
                 mainExecutor.execute(job);
             }
         } catch (Exception ex) {
-            ctx.getLogger().error(TransformerLogTag.CyclePinnedTitles, "Failed to submit job spec={} ex={}", pinnedTitleSpecs, ex);
+            ctx.getLogger().error(TransformerLogTag.CyclePinnedTitles, "Failed to submit job spec={}", pinnedTitleSpecs, ex);
             throw ex;
         }
     }
@@ -165,7 +165,7 @@ public class PinTitleManager {
                         currJobs.put(jobSpec, job);
                     }
                 } catch (Exception ex) {
-                    ctx.getLogger().error(TransformerLogTag.CyclePinnedTitles, "Failed to process spec={} ex={}", spec, ex);
+                    ctx.getLogger().error(TransformerLogTag.CyclePinnedTitles, "Failed to process spec={}", spec, ex);
                 }
             }
 
@@ -336,7 +336,7 @@ public class PinTitleManager {
             } catch (Throwable ex) {
                 status = JobStatus.COMPLETED_FAIL;
                 String topNodes = Arrays.toString(jobSpec.topNodes);
-                ctx.getLogger().error(TransformerLogTag.CyclePinnedTitles, "Failed to process override topNodes={} for version={} and vip={}, ex={}", topNodes, jobSpec.version, processor.getVip(), ex);
+                ctx.getLogger().error(TransformerLogTag.CyclePinnedTitles, "Failed to process override topNodes={} for version={} and vip={}", topNodes, jobSpec.version, processor.getVip(), ex);
                 failure = new Exception("Failed to process topNodes=" + topNodes + " for version=" + jobSpec.version + " on vip=" + processor.getVip(), ex);
             } finally {
                 callback.completedJob(jobSpec, this, isCompletedSuccessfully());
