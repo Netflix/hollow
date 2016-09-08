@@ -50,8 +50,9 @@ public class FileStoreHollowUpdateTransition extends HollowUpdateTransition {
 
         File localFile = new File(localFileLocation, filename);
 
-        if(localFile.exists()) 
+        if (localFile.exists()) {
             return useVMSLZ4 ? new LZ4VMSInputStream(new FileInputStream(localFile)) : new LZ4BlockInputStream(new FileInputStream(localFile));
+        }
 
         int retryCount = 0;
         int randomIncompleteExtension = new Random().nextInt() & Integer.MAX_VALUE;
@@ -73,8 +74,8 @@ public class FileStoreHollowUpdateTransition extends HollowUpdateTransition {
             } catch(Exception e) {
                 LOGGER.error("Retrieval of transition input stream failed", e);
                 if(retryCount == NUM_RETRIES) {
-                    if(localFile.exists())
-                        localFile.delete();
+                    if(localIncompleteFile.exists())
+                        localIncompleteFile.delete();
                     throw new IOException(e);
                 }
             }
