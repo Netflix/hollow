@@ -377,6 +377,7 @@
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -832,6 +833,12 @@
                 "netflix:platform-ipc"
             ]
         },
+        "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper": {
+            "locked": "1.0",
+            "transitive": [
+                "netflix:nf-eventbus"
+            ]
+        },
         "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf": {
             "locked": "1.4",
             "transitive": [
@@ -1258,6 +1265,7 @@
             "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -1303,6 +1311,7 @@
         "com.sun.jersey:jersey-servlet": {
             "locked": "1.19.1",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -1655,6 +1664,7 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
                 "com.netflix.vms.logging:vmslogging-core",
@@ -2105,6 +2115,7 @@
         "netflix:netflix-config": {
             "locked": "3.2.3",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -2158,14 +2169,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -2174,7 +2185,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -2592,6 +2603,7 @@
             "locked": "3.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift"
             ]
@@ -2829,6 +2841,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:content-usage-policy",
@@ -2857,6 +2870,7 @@
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.pytheas:pytheas-core",
@@ -2890,6 +2904,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:base-server",
@@ -3082,6 +3097,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.karyon:karyon-admin-healthcheck-plugin",
                 "com.netflix.karyon:karyon-core",
@@ -3594,6 +3610,7 @@
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -4049,6 +4066,12 @@
                 "netflix:platform-ipc"
             ]
         },
+        "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper": {
+            "locked": "1.0",
+            "transitive": [
+                "netflix:nf-eventbus"
+            ]
+        },
         "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf": {
             "locked": "1.4",
             "transitive": [
@@ -4475,6 +4498,7 @@
             "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -4520,6 +4544,7 @@
         "com.sun.jersey:jersey-servlet": {
             "locked": "1.19.1",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -4872,6 +4897,7 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
                 "com.netflix.vms.logging:vmslogging-core",
@@ -5322,6 +5348,7 @@
         "netflix:netflix-config": {
             "locked": "3.2.3",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -5375,14 +5402,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -5391,7 +5418,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -5809,6 +5836,7 @@
             "locked": "3.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift"
             ]
@@ -6046,6 +6074,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:content-usage-policy",
@@ -6074,6 +6103,7 @@
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.pytheas:pytheas-core",
@@ -6107,6 +6137,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:base-server",
@@ -6299,6 +6330,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.karyon:karyon-admin-healthcheck-plugin",
                 "com.netflix.karyon:karyon-core",
@@ -6811,6 +6843,7 @@
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -7266,6 +7299,12 @@
                 "netflix:platform-ipc"
             ]
         },
+        "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper": {
+            "locked": "1.0",
+            "transitive": [
+                "netflix:nf-eventbus"
+            ]
+        },
         "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf": {
             "locked": "1.4",
             "transitive": [
@@ -7692,6 +7731,7 @@
             "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -7737,6 +7777,7 @@
         "com.sun.jersey:jersey-servlet": {
             "locked": "1.19.1",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -8089,6 +8130,7 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
                 "com.netflix.vms.logging:vmslogging-core",
@@ -8539,6 +8581,7 @@
         "netflix:netflix-config": {
             "locked": "3.2.3",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -8592,14 +8635,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -8608,7 +8651,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -9026,6 +9069,7 @@
             "locked": "3.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift"
             ]
@@ -9263,6 +9307,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:content-usage-policy",
@@ -9291,6 +9336,7 @@
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.pytheas:pytheas-core",
@@ -9324,6 +9370,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:base-server",
@@ -9516,6 +9563,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.karyon:karyon-admin-healthcheck-plugin",
                 "com.netflix.karyon:karyon-core",
@@ -10028,6 +10076,7 @@
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -10483,6 +10532,12 @@
                 "netflix:platform-ipc"
             ]
         },
+        "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper": {
+            "locked": "1.0",
+            "transitive": [
+                "netflix:nf-eventbus"
+            ]
+        },
         "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf": {
             "locked": "1.4",
             "transitive": [
@@ -10909,6 +10964,7 @@
             "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -10954,6 +11010,7 @@
         "com.sun.jersey:jersey-servlet": {
             "locked": "1.19.1",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -11306,6 +11363,7 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
                 "com.netflix.vms.logging:vmslogging-core",
@@ -11333,7 +11391,6 @@
             "transitive": [
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.pytheas:pytheas-core",
-                "netflix:nf-eventbus",
                 "org.mortbay.jetty:servlet-api"
             ]
         },
@@ -11750,6 +11807,7 @@
         "netflix:netflix-config": {
             "locked": "3.2.3",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -11803,14 +11861,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -11819,7 +11877,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -12237,6 +12295,7 @@
             "locked": "3.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift"
             ]
@@ -12474,6 +12533,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:content-usage-policy",
@@ -12502,6 +12562,7 @@
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.pytheas:pytheas-core",
@@ -12535,6 +12596,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:base-server",
@@ -12696,6 +12758,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.karyon:karyon-admin-healthcheck-plugin",
                 "com.netflix.karyon:karyon-core",
@@ -13261,6 +13324,7 @@
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -13716,6 +13780,12 @@
                 "netflix:platform-ipc"
             ]
         },
+        "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper": {
+            "locked": "1.0",
+            "transitive": [
+                "netflix:nf-eventbus"
+            ]
+        },
         "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf": {
             "locked": "1.4",
             "transitive": [
@@ -14142,6 +14212,7 @@
             "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -14187,6 +14258,7 @@
         "com.sun.jersey:jersey-servlet": {
             "locked": "1.19.1",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -14539,6 +14611,7 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
                 "com.netflix.vms.logging:vmslogging-core",
@@ -14989,6 +15062,7 @@
         "netflix:netflix-config": {
             "locked": "3.2.3",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -15042,14 +15116,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -15058,7 +15132,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -15476,6 +15550,7 @@
             "locked": "3.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift"
             ]
@@ -15713,6 +15788,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:content-usage-policy",
@@ -15741,6 +15817,7 @@
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.pytheas:pytheas-core",
@@ -15774,6 +15851,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:base-server",
@@ -15966,6 +16044,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.karyon:karyon-admin-healthcheck-plugin",
                 "com.netflix.karyon:karyon-core",
@@ -17570,6 +17649,7 @@
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -18025,6 +18105,12 @@
                 "netflix:platform-ipc"
             ]
         },
+        "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper": {
+            "locked": "1.0",
+            "transitive": [
+                "netflix:nf-eventbus"
+            ]
+        },
         "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf": {
             "locked": "1.4",
             "transitive": [
@@ -18451,6 +18537,7 @@
             "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -18496,6 +18583,7 @@
         "com.sun.jersey:jersey-servlet": {
             "locked": "1.19.1",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -18848,6 +18936,7 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
                 "com.netflix.vms.logging:vmslogging-core",
@@ -19298,6 +19387,7 @@
         "netflix:netflix-config": {
             "locked": "3.2.3",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -19351,14 +19441,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -19367,7 +19457,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -19785,6 +19875,7 @@
             "locked": "3.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift"
             ]
@@ -20022,6 +20113,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:content-usage-policy",
@@ -20050,6 +20142,7 @@
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.pytheas:pytheas-core",
@@ -20083,6 +20176,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:base-server",
@@ -20275,6 +20369,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.karyon:karyon-admin-healthcheck-plugin",
                 "com.netflix.karyon:karyon-core",
@@ -20787,6 +20882,7 @@
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -21242,6 +21338,12 @@
                 "netflix:platform-ipc"
             ]
         },
+        "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper": {
+            "locked": "1.0",
+            "transitive": [
+                "netflix:nf-eventbus"
+            ]
+        },
         "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf": {
             "locked": "1.4",
             "transitive": [
@@ -21668,6 +21770,7 @@
             "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -21713,6 +21816,7 @@
         "com.sun.jersey:jersey-servlet": {
             "locked": "1.19.1",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -22065,6 +22169,7 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
                 "com.netflix.vms.logging:vmslogging-core",
@@ -22514,6 +22619,7 @@
         "netflix:netflix-config": {
             "locked": "3.2.3",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -22567,14 +22673,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -22583,7 +22689,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -23001,6 +23107,7 @@
             "locked": "3.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift"
             ]
@@ -23238,6 +23345,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:content-usage-policy",
@@ -23266,6 +23374,7 @@
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.pytheas:pytheas-core",
@@ -23299,6 +23408,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:base-server",
@@ -23460,6 +23570,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.karyon:karyon-admin-healthcheck-plugin",
                 "com.netflix.karyon:karyon-core",
@@ -23992,6 +24103,7 @@
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -24469,6 +24581,12 @@
                 "netflix:platform-ipc"
             ]
         },
+        "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper": {
+            "locked": "1.0",
+            "transitive": [
+                "netflix:nf-eventbus"
+            ]
+        },
         "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf": {
             "locked": "1.4",
             "transitive": [
@@ -24899,6 +25017,7 @@
             "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -24944,6 +25063,7 @@
         "com.sun.jersey:jersey-servlet": {
             "locked": "1.19.1",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -25312,6 +25432,7 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
                 "com.netflix.vms.logging:vmslogging-core",
@@ -25774,6 +25895,7 @@
         "netflix:netflix-config": {
             "locked": "3.2.3",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -25827,14 +25949,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -25843,7 +25965,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -26262,6 +26384,7 @@
             "locked": "3.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
                 "org.cassandraunit:cassandra-unit-shaded"
@@ -26523,6 +26646,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:content-usage-policy",
@@ -26551,6 +26675,7 @@
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.pytheas:pytheas-core",
@@ -26584,6 +26709,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:base-server",
@@ -26791,6 +26917,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.karyon:karyon-admin-healthcheck-plugin",
                 "com.netflix.karyon:karyon-core",
@@ -27327,6 +27454,7 @@
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -27804,6 +27932,12 @@
                 "netflix:platform-ipc"
             ]
         },
+        "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper": {
+            "locked": "1.0",
+            "transitive": [
+                "netflix:nf-eventbus"
+            ]
+        },
         "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf": {
             "locked": "1.4",
             "transitive": [
@@ -28234,6 +28368,7 @@
             "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -28279,6 +28414,7 @@
         "com.sun.jersey:jersey-servlet": {
             "locked": "1.19.1",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -28647,6 +28783,7 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
                 "com.netflix.vms.logging:vmslogging-core",
@@ -29109,6 +29246,7 @@
         "netflix:netflix-config": {
             "locked": "3.2.3",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -29162,14 +29300,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -29178,7 +29316,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -29597,6 +29735,7 @@
             "locked": "3.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
                 "org.cassandraunit:cassandra-unit-shaded"
@@ -29858,6 +29997,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:content-usage-policy",
@@ -29886,6 +30026,7 @@
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.pytheas:pytheas-core",
@@ -29919,6 +30060,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:base-server",
@@ -30126,6 +30268,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.karyon:karyon-admin-healthcheck-plugin",
                 "com.netflix.karyon:karyon-core",
@@ -30662,6 +30805,7 @@
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -31139,6 +31283,12 @@
                 "netflix:platform-ipc"
             ]
         },
+        "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper": {
+            "locked": "1.0",
+            "transitive": [
+                "netflix:nf-eventbus"
+            ]
+        },
         "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf": {
             "locked": "1.4",
             "transitive": [
@@ -31569,6 +31719,7 @@
             "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -31614,6 +31765,7 @@
         "com.sun.jersey:jersey-servlet": {
             "locked": "1.19.1",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -31982,6 +32134,7 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
                 "com.netflix.vms.logging:vmslogging-core",
@@ -32444,6 +32597,7 @@
         "netflix:netflix-config": {
             "locked": "3.2.3",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -32497,14 +32651,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -32513,7 +32667,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -32932,6 +33086,7 @@
             "locked": "3.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
                 "org.cassandraunit:cassandra-unit-shaded"
@@ -33193,6 +33348,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:content-usage-policy",
@@ -33221,6 +33377,7 @@
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.pytheas:pytheas-core",
@@ -33254,6 +33411,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:base-server",
@@ -33461,6 +33619,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.karyon:karyon-admin-healthcheck-plugin",
                 "com.netflix.karyon:karyon-core",
@@ -33997,6 +34156,7 @@
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -34474,6 +34634,12 @@
                 "netflix:platform-ipc"
             ]
         },
+        "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper": {
+            "locked": "1.0",
+            "transitive": [
+                "netflix:nf-eventbus"
+            ]
+        },
         "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf": {
             "locked": "1.4",
             "transitive": [
@@ -34904,6 +35070,7 @@
             "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -34949,6 +35116,7 @@
         "com.sun.jersey:jersey-servlet": {
             "locked": "1.19.1",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -35317,6 +35485,7 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
                 "com.netflix.vms.logging:vmslogging-core",
@@ -35779,6 +35948,7 @@
         "netflix:netflix-config": {
             "locked": "3.2.3",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -35832,14 +36002,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -35848,7 +36018,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -36267,6 +36437,7 @@
             "locked": "3.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
                 "org.cassandraunit:cassandra-unit-shaded"
@@ -36528,6 +36699,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:content-usage-policy",
@@ -36556,6 +36728,7 @@
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.pytheas:pytheas-core",
@@ -36589,6 +36762,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:base-server",
@@ -36796,6 +36970,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.karyon:karyon-admin-healthcheck-plugin",
                 "com.netflix.karyon:karyon-core",
@@ -37313,6 +37488,7 @@
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -37773,6 +37949,12 @@
                 "netflix:platform-ipc"
             ]
         },
+        "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper": {
+            "locked": "1.0",
+            "transitive": [
+                "netflix:nf-eventbus"
+            ]
+        },
         "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf": {
             "locked": "1.4",
             "transitive": [
@@ -38199,6 +38381,7 @@
             "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -38244,6 +38427,7 @@
         "com.sun.jersey:jersey-servlet": {
             "locked": "1.19.1",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -38600,6 +38784,7 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
                 "com.netflix.vms.logging:vmslogging-core",
@@ -39050,6 +39235,7 @@
         "netflix:netflix-config": {
             "locked": "3.2.3",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -39103,14 +39289,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -39119,7 +39305,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -39537,6 +39723,7 @@
             "locked": "3.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift"
             ]
@@ -39780,6 +39967,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:content-usage-policy",
@@ -39808,6 +39996,7 @@
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.pytheas:pytheas-core",
@@ -39841,6 +40030,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:base-server",
@@ -40034,6 +40224,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.karyon:karyon-admin-healthcheck-plugin",
                 "com.netflix.karyon:karyon-core",
@@ -40547,6 +40738,7 @@
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -41007,6 +41199,12 @@
                 "netflix:platform-ipc"
             ]
         },
+        "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper": {
+            "locked": "1.0",
+            "transitive": [
+                "netflix:nf-eventbus"
+            ]
+        },
         "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf": {
             "locked": "1.4",
             "transitive": [
@@ -41433,6 +41631,7 @@
             "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -41478,6 +41677,7 @@
         "com.sun.jersey:jersey-servlet": {
             "locked": "1.19.1",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -41834,6 +42034,7 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
                 "com.netflix.vms.logging:vmslogging-core",
@@ -42284,6 +42485,7 @@
         "netflix:netflix-config": {
             "locked": "3.2.3",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -42337,14 +42539,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -42353,7 +42555,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -42771,6 +42973,7 @@
             "locked": "3.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift"
             ]
@@ -43014,6 +43217,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:content-usage-policy",
@@ -43042,6 +43246,7 @@
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.pytheas:pytheas-core",
@@ -43075,6 +43280,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:base-server",
@@ -43268,6 +43474,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.karyon:karyon-admin-healthcheck-plugin",
                 "com.netflix.karyon:karyon-core",
@@ -43781,6 +43988,7 @@
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -44241,6 +44449,12 @@
                 "netflix:platform-ipc"
             ]
         },
+        "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper": {
+            "locked": "1.0",
+            "transitive": [
+                "netflix:nf-eventbus"
+            ]
+        },
         "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf": {
             "locked": "1.4",
             "transitive": [
@@ -44667,6 +44881,7 @@
             "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -44712,6 +44927,7 @@
         "com.sun.jersey:jersey-servlet": {
             "locked": "1.19.1",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -45068,6 +45284,7 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
                 "com.netflix.vms.logging:vmslogging-core",
@@ -45518,6 +45735,7 @@
         "netflix:netflix-config": {
             "locked": "3.2.3",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -45571,14 +45789,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -45587,7 +45805,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -46005,6 +46223,7 @@
             "locked": "3.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift"
             ]
@@ -46248,6 +46467,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:content-usage-policy",
@@ -46276,6 +46496,7 @@
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.pytheas:pytheas-core",
@@ -46309,6 +46530,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:base-server",
@@ -46502,6 +46724,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.karyon:karyon-admin-healthcheck-plugin",
                 "com.netflix.karyon:karyon-core",
@@ -47015,6 +47238,7 @@
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -47475,6 +47699,12 @@
                 "netflix:platform-ipc"
             ]
         },
+        "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper": {
+            "locked": "1.0",
+            "transitive": [
+                "netflix:nf-eventbus"
+            ]
+        },
         "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf": {
             "locked": "1.4",
             "transitive": [
@@ -47901,6 +48131,7 @@
             "locked": "1.19.1",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -47946,6 +48177,7 @@
         "com.sun.jersey:jersey-servlet": {
             "locked": "1.19.1",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -48302,6 +48534,7 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-api",
                 "com.netflix.governator:governator-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
                 "com.netflix.vms.logging:vmslogging-core",
@@ -48752,6 +48985,7 @@
         "netflix:netflix-config": {
             "locked": "3.2.3",
             "transitive": [
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -48805,14 +49039,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -48821,7 +49055,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -49239,6 +49473,7 @@
             "locked": "3.4",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift"
             ]
@@ -49482,6 +49717,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:content-usage-policy",
@@ -49510,6 +49746,7 @@
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-queue",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.pytheas:pytheas-core",
@@ -49543,6 +49780,7 @@
             "transitive": [
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.sun.jersey:jersey-json",
                 "netflix:base-explorer",
                 "netflix:base-server",
@@ -49736,6 +49974,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-avro",
+                "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.karyon:karyon-admin-healthcheck-plugin",
                 "com.netflix.karyon:karyon-core",
