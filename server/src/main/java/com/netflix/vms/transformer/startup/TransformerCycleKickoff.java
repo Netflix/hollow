@@ -63,8 +63,7 @@ public class TransformerCycleKickoff {
                 transformerConfig.getConverterVip(),
                 transformerConfig.getTransformerVip());
 
-        if(!isFastlane(ctx.getConfig()))
-            restore(cycle, ctx.getConfig(), fileStore, hermesBlobAnnouncer);
+        restore(cycle, ctx.getConfig(), fileStore, hermesBlobAnnouncer);
 
         Thread t = new Thread(new Runnable() {
             private long previousCycleStartTime;
@@ -163,7 +162,7 @@ public class TransformerCycleKickoff {
     }
 
     private void restore(TransformCycle cycle, TransformerConfig cfg, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer) {
-        if(cfg.isRestoreFromPreviousStateEngine() && !isFastlane(cfg)) {
+        if(cfg.isRestoreFromPreviousStateEngine()) {
             long latestVersion = hermesBlobAnnouncer.getLatestAnnouncedVersionFromCassandra(cfg.getTransformerVip());
             long restoreVersion = cfg.getRestoreFromSpecificVersion() != null ? cfg.getRestoreFromSpecificVersion() : latestVersion;
 

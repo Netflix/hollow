@@ -124,9 +124,7 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
     }
 
     @Override
-    public void notifyRestoredStateEngine(HollowReadStateEngine stateEngine) { 
-        throw new UnsupportedOperationException("The FastTrack doesn't restore state");
-    }
+    public void notifyRestoredStateEngine(HollowReadStateEngine stateEngine) {  }
     
     @Override
     public HollowReadStateEngine getCurrentReadStateEngine() {
