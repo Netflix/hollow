@@ -53,7 +53,9 @@
 
             $(document).ready(function() {new Dashboard().initialize(); $(document).tooltip();});
         </script>
-        
+
+        <!-- Netflix specific -->
+        <script async src="https://blesk.prod.netflix.net/static/js/blesk.js"></script>
     </head>
 
     <!--
@@ -64,7 +66,7 @@
             <div class='spinnaker-banner-text' id='id-env-txt'>TEST</div>
             <!-- div class='spinnaker-banner-text' id='id-vip-txt'>local-vip</div -->
         </div>
-
+        <div id="blesk" data-appid="vmstransformer"></div>
         <div id="okeanos-tabs">
             <ul>
                 <li><a href="#cycle-view">Server</a></li>
