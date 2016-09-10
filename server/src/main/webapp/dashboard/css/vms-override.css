@@ -88,6 +88,10 @@
     background-color: #eeeeee;
 }
 
+.ui-widget-content {
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
 /************ table ****************/
 .ui-widget-table-header {
 /*     border: 1px solid silver; */
