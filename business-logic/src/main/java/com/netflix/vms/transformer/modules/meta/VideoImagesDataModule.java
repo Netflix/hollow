@@ -208,8 +208,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
         throw new UnsupportedOperationException("Use buildVideoImagesByCountry");
     }
 
-    private String processArtwork(VideoArtworkHollow artworkHollowInput,
-            Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap) {
+    private String processArtwork(VideoArtworkHollow artworkHollowInput, Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap) {
         ArtworkLocaleListHollow locales = artworkHollowInput._getLocales();
         int entityId = (int) artworkHollowInput._getMovieId();
 
