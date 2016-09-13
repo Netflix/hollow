@@ -68,29 +68,29 @@ function ServerCycleSummaryTab(dashboard) {
             }
             if (purpose == "CacheFail") {
                 query.indexType = "vmsserver";
-                query.add("tag:TransformCycleFailed");
+                query.add("eventInfo.tag:TransformCycleFailed");
             } else if (purpose == "CacheSuccess") {
                 query.indexType = "vmsserver";
-                query.add("tag:TransformCycleSuccess");
+                query.add("eventInfo.tag:TransformCycleSuccess");
             } else if (purpose == "CycleInfo") {
                 query.indexType = "vmsserver";
-                query.add("tag:TransformCycleBegin").add("jarVersion");
+                query.add("eventInfo.tag:TransformCycleBegin").add("jarVersion").add("NOT%20HideCycleFromDashboard");
             } else if (purpose == "TopNodes") {
                 query.indexType = "vmsserver";
-                query.add("tag:TransformInfo").add("topNodes");
+                query.add("eventInfo.tag:TransformInfo").add("topNodes");
             } else if (purpose == "BlobPublishFail") {
                 query.indexType = "vmsserver";
-                query.add("tag:BlobPlubishStatus").add("false");
+                query.add("eventInfo.tag:BlobPlubishStatus").add("false");
             } else if (purpose == "S3Errors") {
                 query.add("org.jets3t.service.S3ServiceException");
             } else if (purpose == "WorkerPublish") {
                 query.indexType = "vmsserver";
-                query.add("tag:PublishedBlob").add("\"netflix.vms.hollowblob." + dashboard.vipAddress + ".all.snapshot\"");
+                query.add("eventInfo.tag:PublishedBlob").add("\"netflix.vms.hollowblob." + dashboard.vipAddress + ".all.snapshot\"");
             } else if (purpose == "StateEnginePublish") {
                 query.indexType = "vmsserver";
-                query.add("tag:PublishedBlob").add("\"netflix.vms.hollowblob." + dashboard.vipAddress + ".all.snapshot\"").add("\"us-east-1\"");
+                query.add("eventInfo.tag:PublishedBlob").add("\"netflix.vms.hollowblob." + dashboard.vipAddress + ".all.snapshot\"").add("\"us-east-1\"");
             }  else if (purpose == "hollowPublishRegion") {
-                query.add("tag:AnnouncementSuccess");
+                query.add("eventInfo.tag:AnnouncementSuccess");
             }
             return query;
         };

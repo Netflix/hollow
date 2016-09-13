@@ -176,14 +176,14 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.4",
+            "locked": "2.1.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.4",
+            "locked": "2.1.5",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
@@ -228,7 +228,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -573,7 +573,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -586,7 +586,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -599,29 +599,29 @@
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "transitive": [
                 "netflix:nf-eventbus-guice"
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "transitive": [
                 "netflix:nflibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.45",
+            "locked": "2.47",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -1050,14 +1050,14 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.4",
+            "locked": "2.1.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.4",
+            "locked": "2.1.5",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
@@ -1102,7 +1102,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -1447,7 +1447,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -1460,7 +1460,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -1473,29 +1473,29 @@
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "transitive": [
                 "netflix:nf-eventbus-guice"
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "transitive": [
                 "netflix:nflibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.45",
+            "locked": "2.47",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -1924,14 +1924,14 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.4",
+            "locked": "2.1.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.4",
+            "locked": "2.1.5",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
@@ -1976,7 +1976,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -2321,7 +2321,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -2334,7 +2334,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -2347,29 +2347,29 @@
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "transitive": [
                 "netflix:nf-eventbus-guice"
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "transitive": [
                 "netflix:nflibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.45",
+            "locked": "2.47",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -2798,14 +2798,14 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.4",
+            "locked": "2.1.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.4",
+            "locked": "2.1.5",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
@@ -2850,7 +2850,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -3195,7 +3195,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -3208,7 +3208,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -3221,29 +3221,29 @@
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "transitive": [
                 "netflix:nf-eventbus-guice"
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "transitive": [
                 "netflix:nflibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.45",
+            "locked": "2.47",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -3590,7 +3590,7 @@
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
-            "locked": "0.11.0",
+            "locked": "0.12.0",
             "requested": "latest.release"
         }
     },
@@ -3771,14 +3771,14 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.4",
+            "locked": "2.1.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.4",
+            "locked": "2.1.5",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
@@ -3823,7 +3823,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -4168,7 +4168,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -4181,7 +4181,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -4194,29 +4194,29 @@
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "transitive": [
                 "netflix:nf-eventbus-guice"
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "transitive": [
                 "netflix:nflibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.45",
+            "locked": "2.47",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -4647,14 +4647,14 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.4",
+            "locked": "2.1.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.4",
+            "locked": "2.1.5",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
@@ -4699,7 +4699,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -5051,7 +5051,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -5064,7 +5064,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -5077,29 +5077,29 @@
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "transitive": [
                 "netflix:nf-eventbus-guice"
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "transitive": [
                 "netflix:nflibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.45",
+            "locked": "2.47",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -5556,14 +5556,14 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.4",
+            "locked": "2.1.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.4",
+            "locked": "2.1.5",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
@@ -5608,7 +5608,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -5960,7 +5960,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -5973,7 +5973,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -5986,29 +5986,29 @@
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "transitive": [
                 "netflix:nf-eventbus-guice"
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "transitive": [
                 "netflix:nflibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.45",
+            "locked": "2.47",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -6465,14 +6465,14 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.4",
+            "locked": "2.1.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.4",
+            "locked": "2.1.5",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
@@ -6517,7 +6517,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -6869,7 +6869,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -6882,7 +6882,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -6895,29 +6895,29 @@
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "transitive": [
                 "netflix:nf-eventbus-guice"
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "transitive": [
                 "netflix:nflibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.45",
+            "locked": "2.47",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -7374,14 +7374,14 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.4",
+            "locked": "2.1.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.4",
+            "locked": "2.1.5",
             "requested": "latest.release"
         },
         "com.netflix.astyanax:astyanax-cassandra": {
@@ -7426,7 +7426,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -7778,7 +7778,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -7791,7 +7791,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
@@ -7804,29 +7804,29 @@
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "transitive": [
                 "netflix:nf-eventbus-guice"
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.30.0",
+            "locked": "1.31.0",
             "transitive": [
                 "netflix:nflibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.45",
+            "locked": "2.47",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:server-context": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"

@@ -16,6 +16,8 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.WritingBlo
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WroteBlob;
 
 import com.google.gson.Gson;
+import com.netflix.vms.transformer.common.io.TransformerLogTag;
+
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.client.HollowClient;
 import com.netflix.hollow.compact.HollowCompactor;
@@ -40,7 +42,6 @@ import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.job.impl.BlobMetaDataUtil;
 import com.netflix.vms.transformer.util.OverrideVipNameUtil;
 import com.netflix.vms.transformer.util.SequenceVersionMinter;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -278,13 +279,14 @@ public class TransformCycle {
     }
 
     private boolean isUnchangedFastlaneState() {
-        return ctx.getFastlaneIds() != null && previousCycleNumber != Long.MIN_VALUE && !outputStateEngine.hasChangedSinceLastCycle();
+        return ctx.getFastlaneIds() != null && previousCycleNumber != Long.MIN_VALUE && !outputStateEngine.isRestored() && !outputStateEngine.hasChangedSinceLastCycle();
     }
 
     private boolean rollbackFastlaneStateEngine() {
         outputStateEngine.resetToLastPrepareForNextCycle();
         fastlaneOutputStateEngine.resetToLastPrepareForNextCycle();
         ctx.getMetricRecorder().recordMetric(WriteOutputDataDuration, 0);
+        ctx.getLogger().info(TransformerLogTag.HideCycleFromDashboard, "Fastlane data was unchanged -- rolling back and trying again");
         return true;
     }
 

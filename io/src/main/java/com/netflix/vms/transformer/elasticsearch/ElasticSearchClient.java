@@ -15,7 +15,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Singleton;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.support.replication.ReplicationType;
 import org.elasticsearch.client.Client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -181,7 +180,7 @@ public class ElasticSearchClient {
                 indexableItemQueue.drainTo(items, 200);
                 final Client esTransportClient = esClientBridge.getClient();
                 try {
-                    final BulkRequestBuilder bulkRequest = esTransportClient.prepareBulk().setReplicationType(ReplicationType.ASYNC);
+                    final BulkRequestBuilder bulkRequest = esTransportClient.prepareBulk();
 
                     for (ElasticSearchLogMessage item : items) {
                         bulkRequest.add(esTransportClient.prepareIndex(item.getIndexName(), item.getIndexType()).setSource(item.getJsonData()));

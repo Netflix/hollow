@@ -43,10 +43,10 @@ function VmsServerInfoTab(dashboard) {
             url : '/REST/vms/elasticsearchadmin?query=elasticsearchhost',
             success : function(data) {
                 var hostname = new String(data);
-                if (hostname.indexOf("ec") == 0) {
+                // if (hostname.indexOf("ec") == 0) {
                     $("#id-elasticsearchhost-box").val(data);
                     serverInfoView.elasticSearchHost = hostname;
-                }
+                //}
             }
         });
 
@@ -145,7 +145,7 @@ function VmsServerInfoTab(dashboard) {
             var cycleWidgetExecutor = new KeyValueWidgetExecutor(cycSelectWidget, 'currentCycle', true);
             cycleWidgetExecutor.searchQuery.indexName = $("#id-vms-index-select").val();
             cycleWidgetExecutor.searchQuery.indexType = "vmsserver";
-            cycleWidgetExecutor.searchQuery.add("tag:TransformCycleBegin");
+            cycleWidgetExecutor.searchQuery.add("eventInfo.tag:TransformCycleBegin");
             cycleWidgetExecutor.searchQuery.size = VipAddressHolder.prototype.getSummaryQuerySize();
             cycleWidgetExecutor.searchQuery.sort = "eventInfo.timestamp:desc";
             cycleWidgetExecutor.updateJsonFromSearch();
@@ -397,7 +397,7 @@ function CyclePropertiesTab(serverInfoView) {
         query.indexType = "vmsserver";
         query.size = "200";
         query.sort = "eventInfo.timestamp:desc";
-        query.add(serverInfoView.vmsCycleId).add("tag:PropertyValue");
+        query.add(serverInfoView.vmsCycleId).add("eventInfo.tag:PropertyValue");
         widgetExecutor.updateJsonFromSearch();
         this.init = true;
     };
@@ -469,7 +469,7 @@ function CycleErrorTab(serverInfoView) {
         query.indexName = serverInfoView.vmsIndex;
         query.add("eventInfo.currentCycle:" + serverInfoView.vmsCycleId);
         query.add($("#id-loglevel-select").val());
-        query.aggregate = "tag";
+        query.aggregate = "eventInfo.tag";
         var searchDao = new SearchAggregationDAO(errCodesWidget, query, true);
         searchDao.updateJsonFromSearch();
     }
@@ -554,7 +554,7 @@ function CycleInputDataInformation(serverInfoView) {
         query.indexName = serverInfoView.vmsIndex;
         query.indexType = indexType;
         query.size = num;
-        query.add(serverInfoView.vmsCycleId).add("tag:InputDataVersionIds");
+        query.add(serverInfoView.vmsCycleId).add("eventInfo.tag:InputDataVersionIds");
     };
 
     this.refresh = function() {

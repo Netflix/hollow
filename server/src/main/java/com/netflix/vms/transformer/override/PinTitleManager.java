@@ -1,12 +1,5 @@
 package com.netflix.vms.transformer.override;
 
-import com.netflix.aws.file.FileStore;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.util.SimultaneousExecutor;
-import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.io.TransformerLogTag;
-import com.netflix.vms.transformer.util.OverrideVipNameUtil;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,6 +9,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.netflix.aws.file.FileStore;
+import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.util.SimultaneousExecutor;
+import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.io.TransformerLogTag;
+import com.netflix.vms.transformer.util.OverrideVipNameUtil;
 
 /**
  * Manager to support Pinned Titles
@@ -33,6 +34,7 @@ public class PinTitleManager {
 
     private final SimultaneousExecutor mainExecutor = new SimultaneousExecutor();
     private Map<PinTitleJobSpec, PinTitleProcessorJob> completedJobs = new HashMap<PinTitleJobSpec, PinTitleProcessorJob>();
+    private Map<PinTitleJobSpec, PinTitleProcessorJob> failedJobs = new HashMap<PinTitleJobSpec, PinTitleProcessorJob>();
     private Map<PinTitleJobSpec, PinTitleProcessorJob> activeJobs = new HashMap<PinTitleJobSpec, PinTitleProcessorJob>();
 
     public PinTitleManager(FileStore fileStore, TransformerContext ctx) {
@@ -53,14 +55,19 @@ public class PinTitleManager {
 
     public synchronized void prepareForNextCycle() {
         // cleanup completed jobs that are no longer needed
+        completedJobs = cleanupJobs(completedJobs, activeJobs);
+        failedJobs = cleanupJobs(failedJobs, activeJobs);
+    }
+
+    private static Map<PinTitleJobSpec, PinTitleProcessorJob> cleanupJobs(Map<PinTitleJobSpec, PinTitleProcessorJob> existingJobs, Map<PinTitleJobSpec, PinTitleProcessorJob> activeJobs) {
         Map<PinTitleJobSpec, PinTitleProcessorJob> neededJobs = new HashMap<PinTitleJobSpec, PinTitleProcessorJob>();
-        for (Map.Entry<PinTitleJobSpec, PinTitleProcessorJob> entry : completedJobs.entrySet()) {
+        for (Map.Entry<PinTitleJobSpec, PinTitleProcessorJob> entry : existingJobs.entrySet()) {
             PinTitleJobSpec spec = entry.getKey();
             if (activeJobs.containsKey(spec)) {
                 neededJobs.put(spec, entry.getValue());
             }
         }
-        completedJobs = neededJobs;
+        return neededJobs;
     }
 
     /**
@@ -74,7 +81,7 @@ public class PinTitleManager {
                 mainExecutor.execute(job);
             }
         } catch (Exception ex) {
-            ctx.getLogger().error(TransformerLogTag.CyclePinnedTitles, "Failed to submit job spec={} ex={}", pinnedTitleSpecs, ex);
+            ctx.getLogger().error(TransformerLogTag.CyclePinnedTitles, "Failed to submit job spec={}", pinnedTitleSpecs, ex);
             throw ex;
         }
     }
@@ -88,7 +95,7 @@ public class PinTitleManager {
         }
 
         List<HollowReadStateEngine> resultList = processResults(true);
-        ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Misc Stat completedJobs={} currJobs={} results={} waitedForAllJobs={}", completedJobs.size(), activeJobs.size(), resultList.size(), isWaitForAllJobs);
+        ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Misc Stat failedJobs={} activeJobs={} completedJobs={} results={} waitedForAllJobs={}", failedJobs.size(), activeJobs.size(), completedJobs.size(), resultList.size(), isWaitForAllJobs);
         return resultList;
     }
 
@@ -116,36 +123,87 @@ public class PinTitleManager {
         return result;
     }
 
+    @VisibleForTesting
+    void reset() {
+        activeJobs.clear();
+        failedJobs.clear();
+        completedJobs.clear();
+    }
+
+    @VisibleForTesting
+    Map<PinTitleJobSpec, PinTitleProcessorJob> getActiveJobs() {
+        return activeJobs;
+    }
+
+    @VisibleForTesting
+    Map<PinTitleJobSpec, PinTitleProcessorJob> getFailedJobs() {
+        return failedJobs;
+    }
+
+    @VisibleForTesting
+    Map<PinTitleJobSpec, PinTitleProcessorJob> getCompletedJobs() {
+        return completedJobs;
+    }
+
+
     // Convert the spec Strings into ProcessorJob
-    private Map<PinTitleJobSpec, PinTitleProcessorJob> processSpecs(Set<String> pinnedTitleSpecs) {
+    @VisibleForTesting
+    Map<PinTitleJobSpec, PinTitleProcessorJob> processSpecs(Set<String> pinnedTitleSpecs) {
         Map<PinTitleJobSpec, PinTitleProcessorJob> currJobs = new HashMap<>();
 
         if (pinnedTitleSpecs != null) {
+            Map<String, PinTitleJobSpec> newSpecsMap = new HashMap<>();
+
             for (String spec : pinnedTitleSpecs) {
                 try {
-                    String parts[] = spec.split(":");
-                    long version = Long.parseLong(parts[0]);
-                    int[] topNodes = parseTopNodes(parts[1]);
-                    boolean isInputBased = false;
-                    if (parts.length >= 3) {
-                        isInputBased = "in".equals(parts[2]);
-                    }
-
-                    PinTitleJobSpec p = new PinTitleJobSpec(isInputBased, version, topNodes);
-                    PinTitleProcessorJob job = getExistingJob(p); // reuse last cycle's job if the same - to avoid re-processing
+                    PinTitleJobSpec jobSpec = createJobSpec(spec);
+                    PinTitleProcessorJob job = getExistingJob(jobSpec); // reuse last cycle's job if the same - to avoid re-processing
                     if (job == null) {
-                        // prior result not found so create new job
-                        job = createNewProcessJob(p);
+                        // prior result not found track/merge new jobs
+                        trackNewJob(jobSpec, newSpecsMap);
+                    } else {
+                        currJobs.put(jobSpec, job);
                     }
-                    currJobs.put(p, job);
                 } catch (Exception ex) {
-                    ctx.getLogger().error(TransformerLogTag.CyclePinnedTitles, "Failed to process spec={} ex={}", spec, ex);
+                    ctx.getLogger().error(TransformerLogTag.CyclePinnedTitles, "Failed to process spec={}", spec, ex);
                 }
+            }
+
+            // Process new specs
+            for (PinTitleJobSpec jobSpec : newSpecsMap.values()) {
+                PinTitleProcessorJob job = createNewProcessJob(jobSpec);
+                currJobs.put(jobSpec, job);
             }
         }
 
         return currJobs;
     }
+
+    @VisibleForTesting
+    PinTitleJobSpec createJobSpec(String spec) throws Exception {
+        String parts[] = spec.split(":");
+        long version = Long.parseLong(parts[0].trim());
+        int[] topNodes = parseTopNodes(parts[1]);
+        boolean isInputBased = false;
+        if (parts.length >= 3) {
+            isInputBased = "in".equals(parts[2]);
+        }
+
+        PinTitleJobSpec jobSpec = new PinTitleJobSpec(isInputBased, version, topNodes);
+        return jobSpec;
+    }
+
+    private static void trackNewJob(PinTitleJobSpec newJobSpec, Map<String, PinTitleJobSpec> newSpecsMap) {
+        PinTitleJobSpec jobSpec = newSpecsMap.get(newJobSpec.getID());
+        if (jobSpec == null) {
+            // add new one
+            newSpecsMap.put(newJobSpec.getID(), newJobSpec);
+        } else {
+            // merge
+            newSpecsMap.put(jobSpec.getID(), jobSpec.merge(newJobSpec));
+        }
+    }
+
 
     private int[] parseTopNodes(String value) throws Exception {
         int[] topNodes = null;
@@ -154,7 +212,7 @@ public class PinTitleManager {
             String[] parts = value.split(",");
             topNodes = new int[parts.length];
             for (int i = 0; i < parts.length; i++) {
-                topNodes[i] = Integer.parseInt(parts[i]);
+                topNodes[i] = Integer.parseInt(parts[i].trim());
             }
         }
 
@@ -169,12 +227,17 @@ public class PinTitleManager {
         PinTitleProcessorJob job = completedJobs.get(spec);
         if (job!=null) return job;
 
+        job = failedJobs.get(spec);
+        if (job != null) return job;
+
         job = activeJobs.get(spec);
         return job;
     }
 
+
     // Create Job
-    private PinTitleProcessorJob createNewProcessJob(PinTitleJobSpec jobSpec) {
+    @VisibleForTesting
+    PinTitleProcessorJob createNewProcessJob(PinTitleJobSpec jobSpec) {
         PinTitleProcessor processor;
         if (jobSpec.isInputBased) {
             processor = createInputBasedProcessor();
@@ -187,6 +250,9 @@ public class PinTitleManager {
             public void completedJob(PinTitleJobSpec jobSpec, PinTitleProcessorJob job, boolean isSuccessfull) {
                 if (isSuccessfull) {
                     completedJobs.put(jobSpec, job);
+                    failedJobs.remove(jobSpec);
+                } else {
+                    failedJobs.put(jobSpec, job);
                 }
             }
 
@@ -194,7 +260,8 @@ public class PinTitleManager {
     }
 
     // Create Input Based Processor
-    private PinTitleProcessor createInputBasedProcessor() {
+    @VisibleForTesting
+    PinTitleProcessor createInputBasedProcessor() {
         String vip = inputDataVip != null ? inputDataVip : ctx.getConfig().getConverterVip();
         if (fileStore != null) {
             return new InputSlicePinTitleProcessor(vip, fileStore, localBlobStore, ctx);
@@ -204,7 +271,8 @@ public class PinTitleManager {
     }
 
     // Create Output Based Processor
-    private PinTitleProcessor createOutputBasedProcessor() {
+    @VisibleForTesting
+    PinTitleProcessor createOutputBasedProcessor() {
         String vip = outputDataVip != null ? outputDataVip : OverrideVipNameUtil.getPinTitleDataTransformerVip(ctx.getConfig());
         if (fileStore != null) {
             return new OutputSlicePinTitleProcessor(vip, fileStore, localBlobStore, ctx);
@@ -234,14 +302,15 @@ public class PinTitleManager {
     /**
      * Processor Job
      */
-    private static class PinTitleProcessorJob implements Runnable, Comparable<PinTitleProcessorJob> {
+    public static class PinTitleProcessorJob implements Runnable, Comparable<PinTitleProcessorJob> {
         private final PinTitleProcessor processor;
         private final PinTitleJobSpec jobSpec;
         private final TransformerContext ctx;
         private final CompleteJobCallback callback;
         private HollowReadStateEngine resultStateEngine;
         private Throwable failure;
-        private JobStatus status = JobStatus.PENDING;
+        private int retryCount = 0;
+        protected JobStatus status = JobStatus.PENDING;
 
         PinTitleProcessorJob(PinTitleProcessor processor, PinTitleJobSpec jobSpec, TransformerContext ctx, CompleteJobCallback callback) {
             this.processor = processor;
@@ -255,15 +324,19 @@ public class PinTitleManager {
             if (isCompletedSuccessfully()) return;
 
             try {
-                reset();
-                status = JobStatus.RUNNING;
-                resultStateEngine = processor.process(jobSpec.version, jobSpec.topNodes);
+                if (status == JobStatus.COMPLETED_FAIL) {
+                    ctx.getLogger().error(TransformerLogTag.CyclePinnedTitles, "Retring failed job={} retry={}", this.jobSpec, ++retryCount);
+                    resultStateEngine = processor.process(jobSpec.version, jobSpec.topNodes);
+                } else {
+                    status = JobStatus.RUNNING;
+                    resultStateEngine = processor.process(jobSpec.version, jobSpec.topNodes);
+                }
 
                 status = JobStatus.COMPLETED_SUCC;
             } catch (Throwable ex) {
                 status = JobStatus.COMPLETED_FAIL;
                 String topNodes = Arrays.toString(jobSpec.topNodes);
-                ctx.getLogger().error(TransformerLogTag.CyclePinnedTitles, "Failed to process override topNodes={} for version={} and vip={}, ex={}", topNodes, jobSpec.version, processor.getVip(), ex);
+                ctx.getLogger().error(TransformerLogTag.CyclePinnedTitles, "Failed to process override topNodes={} for version={} and vip={}", topNodes, jobSpec.version, processor.getVip(), ex);
                 failure = new Exception("Failed to process topNodes=" + topNodes + " for version=" + jobSpec.version + " on vip=" + processor.getVip(), ex);
             } finally {
                 callback.completedJob(jobSpec, this, isCompletedSuccessfully());
@@ -280,11 +353,6 @@ public class PinTitleManager {
 
         public HollowReadStateEngine getResult() {
             return resultStateEngine;
-        }
-
-        public void reset() {
-            status = JobStatus.PENDING;
-            failure = null;
         }
 
         public Throwable getFailure() {

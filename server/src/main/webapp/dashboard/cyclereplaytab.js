@@ -159,7 +159,7 @@ function ReplayCycleView(dashboard) {
         var searchDao = new SearchDAO(regexSourceModel, graphWidget, true);
         searchDao.searchQuery = this.getTimeRangeQueryInstance("vmsserver", null);
         searchDao.searchQuery.size = "1";
-        searchDao.searchQuery.add("tag:TransformProgress");
+        searchDao.searchQuery.add("eventInfo.tag:TransformProgress");
         searchDao.searchQuery.sort = "eventInfo.timestamp:desc";
         replayCycleTab.autoUpdateDAO.push(searchDao);
     };
@@ -172,7 +172,7 @@ function ReplayCycleView(dashboard) {
 
         var searchFieldModelDAO = new FieldModelSearchDAO(tableWidget, this.getTimeRangeQueryInstance(null), [ "timestamp", "message" ], false);
         searchFieldModelDAO.timestampParserFunc = this.parseTimeStamp;
-        searchFieldModelDAO.searchQuery.add("NOT tag:TransformProgress");
+        searchFieldModelDAO.searchQuery.add("NOT eventInfo.tag:TransformProgress");
         searchFieldModelDAO.searchQuery.size = "100";
         searchFieldModelDAO.searchQuery.sort = "eventInfo.timestamp:desc";
         replayCycleTab.autoUpdateDAO.push(searchFieldModelDAO);

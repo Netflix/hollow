@@ -32,7 +32,7 @@ function ServerPublishTab(serverInfoView) {
         var widgetExecutor = new RegexSearchWidgetExecutor(tableWidget, RegexParserMapper.prototype.getBlobStatusRegexInfo());
 
         this.setPropertiesForQueryObject(widgetExecutor.searchQuery, "vmsserver", "50", "eventInfo.timestamp:desc");
-        widgetExecutor.searchQuery.add("tag:BlobPlubishStatus").add("false");
+        widgetExecutor.searchQuery.add("eventInfo.tag:BlobPlubishStatus").add("false");
         widgetExecutor.updateJsonFromSearch();
     };
 
@@ -45,7 +45,7 @@ function ServerPublishTab(serverInfoView) {
 
         this.setPropertiesForQueryObject(widgetExecutor.searchQuery, "vmsserver", "50", "eventInfo.timestamp:desc");
         widgetExecutor.searchQuery.add("\"dataVersion=" + serverInfoView.vmsCycleId + "\"");
-        widgetExecutor.searchQuery.add("tag:PublishedBlob")
+        widgetExecutor.searchQuery.add("eventInfo.tag:PublishedBlob")
         widgetExecutor.updateJsonFromSearch();
     };
 }

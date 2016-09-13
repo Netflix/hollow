@@ -6,13 +6,13 @@ public enum ContractAssetType {
     SUBTITLES(2),
     DESCRIPTIVE_AUDIO(4);
     
-    private final int bitIdentifier;
+    private final long bitIdentifier;
     
     private ContractAssetType(int bitIdentifier) {
         this.bitIdentifier = bitIdentifier;
     }
     
-    public int getBitIdentifier() {
+    public long getBitIdentifier() {
         return bitIdentifier;
     }
     

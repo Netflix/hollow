@@ -15,6 +15,8 @@ import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.AfterCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.BeforeCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryValidationJob;
+import com.netflix.vms.transformer.publish.workflow.logmessage.PbmsMessage;
+import com.netflix.vms.transformer.publish.workflow.logmessage.ViewShareMessage;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.VMSDataCanaryResult;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -77,8 +79,8 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
                     	failedInBothBeforeAfter.add(videoCountry);
                 }
                 if(!failedInBothBeforeAfter.isEmpty())
-                	ctx.getLogger().warn(PlaybackMonkey, "PBM: IDs failed both before and after tests. "
-                			+ "Added for visibility and these do not break cycles. {}", failedInBothBeforeAfter);
+                    ctx.getLogger().warn(PlaybackMonkey, new PbmsMessage(true,
+                            "IDs failed both before and after tests (added for visibility and these do not break cycles)", failedInBothBeforeAfter));
             } else {
                 pbmSuccess = false;
             }
@@ -98,7 +100,7 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
                         pbmSuccess = false;
                         pbmSuccessForThisCountry = false;
                     }
-                    logMissingViewShare(pbmSuccessForThisCountry, missingViewShareThreshold, countryId, missingViewShareForCountry);
+                    logMissingViewShare(pbmSuccessForThisCountry, missingViewShareThreshold, countryId, missingViewShareForCountry, failedIDs);
                 }
             }
             logFailedIDs(pbmSuccess, befTestResults, failedIDs);
@@ -113,18 +115,19 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
 	private void logFailedIDs(boolean pbmSuccess, Map<VideoCountryKey, Boolean> befTestResults, List<VideoCountryKey> failedIDs) {
 		if(!failedIDs.isEmpty()){
 			if(!pbmSuccess)
-				ctx.getLogger().error(PlaybackMonkey, "PBM validation failed. {}", getFailureReason(befTestResults, failedIDs));
+                ctx.getLogger().error(PlaybackMonkey, getFailureReason(befTestResults, failedIDs));
 			else
-				ctx.getLogger().warn(PlaybackMonkey, "PBM validation successful with failedIDs={}", failedIDs);
+                ctx.getLogger().warn(PlaybackMonkey, new PbmsMessage(true, "failedIds not empty", failedIDs));
+            ;
 		}
 	}
 
 	private void logMissingViewShare(boolean pbmSuccessForThisCountry, float missingViewShareThreshold, String countryId,
-			Float missingViewShareForCountry) {
+            Float missingViewShareForCountry, List<VideoCountryKey> failedIDs) {
 		if(!pbmSuccessForThisCountry)
-			ctx.getLogger().error(PlaybackMonkey, "PBM: country={} missingViewShare={} threshold={}.",countryId, missingViewShareForCountry, missingViewShareThreshold);
+            ctx.getLogger().error(PlaybackMonkey, new ViewShareMessage("PBM", countryId, failedIDs, missingViewShareForCountry, missingViewShareThreshold));
 		else if(missingViewShareForCountry != null && Float.compare(missingViewShareForCountry, 0f) > 0)
-			ctx.getLogger().warn(PlaybackMonkey, "PBM: country={} missingViewShare={} threshold={}", countryId, missingViewShareForCountry, missingViewShareThreshold);
+            ctx.getLogger().warn(PlaybackMonkey, new ViewShareMessage("PBM", countryId, failedIDs, missingViewShareForCountry, missingViewShareThreshold));
 		ctx.getMetricRecorder().recordMetric(Metric.PBMFailuresMissingViewShare, missingViewShareForCountry, "country",countryId);
 	}
 
@@ -151,17 +154,13 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
 		return false;
 	}
 
-	private String getFailureReason(final Map<VideoCountryKey, Boolean> befTestResults, List<VideoCountryKey> failedIDs) {
-		String msg = "";
+    private PbmsMessage getFailureReason(final Map<VideoCountryKey, Boolean> befTestResults, List<VideoCountryKey> failedIDs) {
 		if(failedIDs.size() > 0){
-			StringBuilder idStr = new StringBuilder();
-			for(int i = 0; i < failedIDs.size(); i++){
-				idStr.append(failedIDs.get(i).toShortString()).append(",");
-			}
-			msg = failedIDs.size()+" ids failed with new data but passed with old. Failed ids: "+idStr;
-		} else
-			msg = ((befTestResults == null)?"Before test results were not available.":"After test results were not available.");
-		return msg;
+            return new PbmsMessage(false, "ids failed with new data but passed with old", failedIDs);
+        } else {
+            return (befTestResults == null) ? new PbmsMessage(false, "before test results were not available")
+                    : new PbmsMessage(false, "after test results were not available");
+        }
 	}
 
 	private boolean getCanaryValidationResult() {

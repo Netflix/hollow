@@ -98,7 +98,7 @@ public class PlaybackMonkeyTester {
                             testIds[i] = initiateTest(key);
                             // System.out.println("Initiated test for : "+key);
                         } catch (Exception e) {
-                            logger.error(PlaybackMonkey, "Playback monkey test failed", e);
+                            logger.warn(PlaybackMonkey, "Playback monkey test failed", e);
                         }
                     }
                 }
@@ -156,7 +156,7 @@ public class PlaybackMonkeyTester {
 										break;
                                     }
                                 } catch(Exception e) {
-                                    logger.error(PlaybackMonkey, "Exception running PBM tests.", e);
+                                    logger.warn(PlaybackMonkey, "Exception running PBM tests.", e);
                                 }
                             }
                         }

@@ -60,6 +60,8 @@ table.dataTable tr.even td.sorting_3 { background-color: #F9F9FF; }
 }
 .dataTables_wrapper .ui-toolbar {
 	padding: 5px;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 115%;
 }
 
 
