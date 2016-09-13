@@ -717,7 +717,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.11",
+            "locked": "1.5.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.dyno:dyno-contrib",
@@ -794,7 +794,6 @@
         "com.netflix.governator:governator-api": {
             "locked": "1.14.2",
             "transitive": [
-                "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core"
@@ -2043,7 +2042,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.3",
+            "locked": "4.4",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -4041,7 +4040,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.11",
+            "locked": "1.5.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.dyno:dyno-contrib",
@@ -4118,7 +4117,6 @@
         "com.netflix.governator:governator-api": {
             "locked": "1.14.2",
             "transitive": [
-                "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core"
@@ -5367,7 +5365,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.3",
+            "locked": "4.4",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -7365,7 +7363,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.11",
+            "locked": "1.5.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.dyno:dyno-contrib",
@@ -7442,7 +7440,6 @@
         "com.netflix.governator:governator-api": {
             "locked": "1.14.2",
             "transitive": [
-                "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core"
@@ -8691,7 +8688,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.3",
+            "locked": "4.4",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -10689,7 +10686,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.11",
+            "locked": "1.5.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.dyno:dyno-contrib",
@@ -10766,7 +10763,6 @@
         "com.netflix.governator:governator-api": {
             "locked": "1.14.2",
             "transitive": [
-                "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core"
@@ -12015,7 +12011,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.3",
+            "locked": "4.4",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -14112,7 +14108,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.11",
+            "locked": "1.5.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.dyno:dyno-contrib",
@@ -14189,7 +14185,6 @@
         "com.netflix.governator:governator-api": {
             "locked": "1.14.2",
             "transitive": [
-                "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core"
@@ -15438,7 +15433,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.3",
+            "locked": "4.4",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -17436,7 +17431,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.11",
+            "locked": "1.5.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.dyno:dyno-contrib",
@@ -17513,7 +17508,6 @@
         "com.netflix.governator:governator-api": {
             "locked": "1.14.2",
             "transitive": [
-                "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core"
@@ -18763,7 +18757,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.3",
+            "locked": "4.4",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -20766,7 +20760,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.11",
+            "locked": "1.5.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.dyno:dyno-contrib",
@@ -20843,7 +20837,6 @@
         "com.netflix.governator:governator-api": {
             "locked": "1.14.2",
             "transitive": [
-                "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core"
@@ -22093,7 +22086,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.3",
+            "locked": "4.4",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -24096,7 +24089,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.11",
+            "locked": "1.5.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.dyno:dyno-contrib",
@@ -24173,7 +24166,6 @@
         "com.netflix.governator:governator-api": {
             "locked": "1.14.2",
             "transitive": [
-                "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core"
@@ -25423,7 +25415,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.3",
+            "locked": "4.4",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -27426,7 +27418,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.4.11",
+            "locked": "1.5.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.dyno:dyno-contrib",
@@ -27503,7 +27495,6 @@
         "com.netflix.governator:governator-api": {
             "locked": "1.14.2",
             "transitive": [
-                "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core"
@@ -28753,7 +28744,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.3",
+            "locked": "4.4",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
