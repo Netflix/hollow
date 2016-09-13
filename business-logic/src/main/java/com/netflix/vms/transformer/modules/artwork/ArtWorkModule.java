@@ -229,11 +229,9 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         Set<Strings> imageTypes = new HashSet<>();
         for (Artwork artwork : allArtwork) {
             imageTypes.clear();
-            for (ArtworkDerivative derivative : artwork.derivatives.list) {
-                imageTypes.add(new Strings(derivative.type.nameStr));
-            }
 
-            for (Strings imageType : imageTypes) {
+            for (Map.Entry<ArtWorkImageTypeEntry, ?> entry : artwork.derivatives.typeFormatIndex.entrySet()) {
+                Strings imageType = new Strings(entry.getKey().nameStr);
                 List<Artwork> list = artworks.get(imageType);
                 if (list == null) {
                     list = new ArrayList<Artwork>();
@@ -254,16 +252,15 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         Map<ArtWorkImageTypeEntry, Set<ArtWorkImageFormatEntry>> map = new HashMap<>();
 
         for (Artwork artwork : allArtwork) {
-            for (ArtworkDerivative derivative : artwork.derivatives.list) {
-                ArtWorkImageTypeEntry imageType = getImageTypeEntry(new String(derivative.type.nameStr));
-                if (imageType == null) continue;
+            for (Map.Entry<ArtWorkImageTypeEntry, Map<ArtWorkImageFormatEntry, List<Integer>>> entry : artwork.derivatives.typeFormatIndex.entrySet()) {
+                ArtWorkImageTypeEntry imageType = entry.getKey();
 
-                Set<ArtWorkImageFormatEntry> list = map.get(imageType);
-                if (list == null) {
-                    list = new HashSet<ArtWorkImageFormatEntry>();
-                    map.put(imageType, list);
+                Set<ArtWorkImageFormatEntry> set = map.get(imageType);
+                if (set == null) {
+                    set = new HashSet<ArtWorkImageFormatEntry>();
+                    map.put(imageType, set);
                 }
-                list.add(derivative.format);
+                set.addAll(entry.getValue().keySet());
             }
         }
         return map;

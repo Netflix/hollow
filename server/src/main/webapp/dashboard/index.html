@@ -53,7 +53,9 @@
 
             $(document).ready(function() {new Dashboard().initialize(); $(document).tooltip();});
         </script>
-        
+
+        <!-- Netflix specific -->
+        <script async src="https://blesk.prod.netflix.net/static/js/blesk.js"></script>
     </head>
 
     <!--
@@ -64,7 +66,7 @@
             <div class='spinnaker-banner-text' id='id-env-txt'>TEST</div>
             <!-- div class='spinnaker-banner-text' id='id-vip-txt'>local-vip</div -->
         </div>
-
+        <div id="blesk" data-appid="vmstransformer"></div>
         <div id="okeanos-tabs">
             <ul>
                 <li><a href="#cycle-view">Server</a></li>
@@ -146,15 +148,12 @@
                                 <div class='ui-inner' id="id-cycle-transform-progress">
                                     <div id="id-cycle-transform-progress-label" class="progress-label-rel"></div>
                                 </div>
-                                <div class='hr-line'></div>
-                                <div class='vms-info'>WARNINGS/ERRORS</div>
-                                <div class='ui-inner' id="id-cycle-warn-aggregate"></div>
-                                <div class='hr-line'></div>
-                                <div class='vms-info'>SYSTEM INFORMATION</div>
-                                <div class='ui-inner' id="id-cycle-system-info"></div>
-                                <div class='hr-line'></div>
-                                <div class='vms-info'>OLDEST COLDSTARTS</div>
-                                <div class='ui-inner' id="id-cycle-oldest-coldstart"></div>
+
+                                <div id='cycle-warn-aggregate' info='WARNINGS/ERRORS'></div>
+                                <div id='cycle-system-info' info='SYSTEM INFORMATION'></div>
+                                <div id='cycle-oldest-coldstart' info='OLDEST COLDSTARTS'></div>
+                                <div id='fastlane-ids' info='FASTLANE IDS'></div>
+                                <div id='pinned-titles-ids' info='PINNED TITLES'></div>
                         </div>
                         <div id ="id-atlas-durations" class="ui-group ui-helper-clearfix" style="width:56%; float:right">
                                 <div class='vms-info'>COMPONENT DURATION</div>

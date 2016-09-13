@@ -1,4 +1,11 @@
 function ServerCycleStatusTab(dashboard) {
+    new InfoTile("cycle-warn-aggregate");
+    new InfoTile("cycle-system-info");
+    new InfoTile("fastlane-ids");
+    new InfoTile("cycle-oldest-coldstart");
+    new InfoTile("pinned-titles-ids");
+
+
     var cycleSummaryTab = this;
     this.graphWidth = 0;
     this.autoUpdateFlag = false;
@@ -25,6 +32,8 @@ function ServerCycleStatusTab(dashboard) {
         cycleSummaryTab.progressWidget.value = 0;
         cycleSummaryTab.createSystemInfoTable();
         cycleSummaryTab.findOldestColdstart();
+        cycleSummaryTab.createFastlaneView();
+        cycleSummaryTab.createPinnedTitlesView();
     }
 
 
@@ -131,6 +140,67 @@ function ServerCycleStatusTab(dashboard) {
         searchDao.searchQuery.indexName = dashboard.vmsIndex;
         searchDao.searchQuery.fields = fieldList;
         searchDao.searchQuery.add("eventInfo.tag:TransformCycleBegin");
+        searchDao.searchQuery.sort = "eventInfo.timestamp:desc";
+        searchDao.updateJsonFromSearch();
+    }
+
+
+    // find the latest fast_lane cycle within +/- 15mins
+    this.createFastlaneView = function() {
+         $("#id-fastlane-ids").text("");
+        const callbackFn = new CallbackWidget(function(data) {$("#id-fastlane-ids").text(cycleSummaryTab.formatMessage(data))});
+        const fieldList = ["message" ];
+        const searchDao = new FieldModelSearchDAO(callbackFn, new SearchQuery(), fieldList, true);
+        var index = dashboard.vmsIndex;
+        if(index.search("override") == -1) {
+            index = "vms-" + dashboard.vipAddress + "_override" + index.substring(index.length - 13, index.length);
+            searchDao.searchQuery.startTime = (dashboard.vmsCycleDate - 900 * 1000);
+            searchDao.searchQuery.endTime = searchDao.searchQuery.startTime + (900 * 1000);
+        }
+
+        searchDao.searchQuery.size = "1";
+        searchDao.searchQuery.indexType = "vmsserver";
+        searchDao.searchQuery.indexName =  index;
+        searchDao.searchQuery.fields = fieldList;
+        searchDao.searchQuery.add("eventInfo.tag:CycleFastlaneIds");
+        searchDao.searchQuery.sort = "eventInfo.timestamp:desc";
+        searchDao.updateJsonFromSearch();
+    }
+
+    this.formatMessage = function(data) {
+        if(data && data.length == 1) {
+            var idstring = data[0].message;
+            if(idstring.length > 2) {
+                const ieq = idstring.indexOf("=");
+                if(ieq != -1) {
+                    idstring = idstring.substr(ieq+1);
+                }
+                idstring = idstring.substring(1, idstring.length-1);
+                idstring = idstring.replace(/,/g , ", ");
+                return idstring;
+            }
+        }
+        return "";
+    }
+
+    // find the latest fast_lane cycle within +/- 15mins
+    this.createPinnedTitlesView = function() {
+         $("#id-pinned-titles-ids").text("");
+        const callbackFn = new CallbackWidget(function(data) {$("#id-pinned-titles-ids").text(cycleSummaryTab.formatMessage(data))});
+        const fieldList = ["message" ];
+        const searchDao = new FieldModelSearchDAO(callbackFn, new SearchQuery(), fieldList, true);
+        var index = dashboard.vmsIndex;
+        if(index.search("override") == -1) {
+            index = "vms-" + dashboard.vipAddress + "_override" + index.substring(index.length - 13, index.length);
+            searchDao.searchQuery.startTime = (dashboard.vmsCycleDate - 900 * 1000);
+            searchDao.searchQuery.endTime = searchDao.searchQuery.startTime + (900 * 1000);
+        }
+
+        searchDao.searchQuery.size = "1";
+        searchDao.searchQuery.indexType = "vmsserver";
+        searchDao.searchQuery.indexName =  index;
+        searchDao.searchQuery.fields = fieldList;
+        searchDao.searchQuery.add("eventInfo.tag:CyclePinnedTitles").add("config").add("spec");
         searchDao.searchQuery.sort = "eventInfo.timestamp:desc";
         searchDao.updateJsonFromSearch();
     }

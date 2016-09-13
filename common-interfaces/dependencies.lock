@@ -111,7 +111,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -121,7 +121,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -265,17 +265,17 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -554,7 +554,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -564,7 +564,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -708,17 +708,17 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -997,7 +997,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -1007,7 +1007,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -1151,17 +1151,17 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1440,7 +1440,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -1450,7 +1450,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -1594,17 +1594,17 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1866,7 +1866,7 @@
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
-            "locked": "0.11.0",
+            "locked": "0.12.0",
             "requested": "latest.release"
         }
     },
@@ -1982,7 +1982,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -1992,7 +1992,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -2136,17 +2136,17 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -2425,7 +2425,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -2435,7 +2435,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -2580,17 +2580,17 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -2879,7 +2879,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -2889,7 +2889,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -3034,17 +3034,17 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3333,7 +3333,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -3343,7 +3343,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -3488,17 +3488,17 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3787,7 +3787,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-core": {
@@ -3797,7 +3797,7 @@
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
-            "locked": "1.13",
+            "locked": "1.17",
             "requested": "latest.release"
         },
         "com.ning:compress-lzf": {
@@ -3942,17 +3942,17 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "3.2.3",
+            "locked": "3.3.0",
             "transitive": [
                 "netflix:netflix-config"
             ]

@@ -1,9 +1,8 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.vms.transformer.contract.ContractAsset;
-
-import com.netflix.vms.transformer.hollowoutput.ArtworkCdn;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.vms.transformer.contract.ContractAsset;
+import com.netflix.vms.transformer.hollowoutput.ArtworkCdn;
 import com.netflix.vms.transformer.hollowoutput.ArtworkDerivative;
 import com.netflix.vms.transformer.hollowoutput.ArtworkDerivatives;
 import com.netflix.vms.transformer.hollowoutput.Date;
@@ -15,6 +14,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoImages;
 import com.netflix.vms.transformer.hollowoutput.VideoNodeType;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
+import com.netflix.vms.transformer.modules.countryspecific.MultilanguageCountryDialectOrdinalAssigner;
 import com.netflix.vms.transformer.util.InputOrdinalResultCache;
 import java.util.Collections;
 import java.util.List;
@@ -53,6 +53,7 @@ public class CycleConstants {
     public final InputOrdinalResultCache<List<ArtworkCdn>> cdnListCache;
     
     public final InputOrdinalResultCache<ContractAsset> rightsContractAssetCache;
+    public final MultilanguageCountryDialectOrdinalAssigner dialectOrdinalAssigner = new MultilanguageCountryDialectOrdinalAssigner();
     
     
     public CycleConstants(HollowReadStateEngine inputStateEngine) {

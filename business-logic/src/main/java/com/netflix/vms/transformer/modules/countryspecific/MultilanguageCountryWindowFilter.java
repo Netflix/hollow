@@ -16,10 +16,13 @@ import java.util.Arrays;
 
 public class MultilanguageCountryWindowFilter {
     
-    public final InputOrdinalResultCache<ContractAsset> rightsContractAssetCache;
+    private final InputOrdinalResultCache<ContractAsset> rightsContractAssetCache;
+    private final MultilanguageCountryDialectOrdinalAssigner dialectOrdinalAssigner;
+    
     
     public MultilanguageCountryWindowFilter(CycleConstants cycleConstants) {
         this.rightsContractAssetCache = cycleConstants.rightsContractAssetCache;
+        this.dialectOrdinalAssigner = cycleConstants.dialectOrdinalAssigner;
     }
     
     /**
@@ -29,8 +32,8 @@ public class MultilanguageCountryWindowFilter {
      * @param contract
      * @return
      */
-    public int contractAvailabilityForLanguage(String language, RightsContractHollow contract) {
-        int availability = 0;
+    public long contractAvailabilityForLanguage(String language, RightsContractHollow contract) {
+        long availability = 0;
         
         for(RightsContractAssetHollow assetInput : contract._getAssets()) {
             ContractAsset asset = rightsContractAssetCache.getResult(assetInput.getOrdinal());
@@ -40,7 +43,8 @@ public class MultilanguageCountryWindowFilter {
             }
             
             if(language.equals(asset.getLanguage())) {
-                availability |= asset.getType().getBitIdentifier();
+                int localeBitOffset = ContractAssetType.values().length * languageDialectOffset(language, asset.getLocale());
+                availability |= asset.getType().getBitIdentifier() << localeBitOffset;
             }
         }
         
@@ -55,52 +59,69 @@ public class MultilanguageCountryWindowFilter {
      * @param languageAvailability The asset type rights as returned from contractAvailabilityForLangauge()
      * @return
      */
-    
-    public boolean packageIsAvailableForLanguage(String language, PackageData pkg, int languageAvailability) {
+    public long packageIsAvailableForLanguage(String language, PackageData pkg, long languageAvailability) {
         if(pkg == null)
-            return false;
+            return 0;
+        
+        long packageAvailability = 0;
         
         boolean anyLanguageDiscovered = false;
         
         for(EncodeSummaryDescriptor descriptor : pkg.muxAudioStreamSummary) {
-            if(languageIsAvailable(language, descriptor, languageAvailability, true, true))
-                return true;
+            packageAvailability |= languageIsAvailable(language, descriptor, languageAvailability, true, true);
+            if(packageAvailability == (ContractAssetType.AUDIO.getBitIdentifier() | ContractAssetType.SUBTITLES.getBitIdentifier()))
+                return packageAvailability;
             
             if(!anyLanguageDiscovered && !noLanguageIsAvailable(descriptor, true, true))
                 anyLanguageDiscovered = true;
         }
         
-        for(EncodeSummaryDescriptor descriptor : pkg.audioStreamSummary) {
-            if(languageIsAvailable(language, descriptor, languageAvailability, true, false))
-                return true;
-            
-            if(!anyLanguageDiscovered && !noLanguageIsAvailable(descriptor, true, false))
-                anyLanguageDiscovered = true;
+        if((packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) == 0) {
+            for(EncodeSummaryDescriptor descriptor : pkg.audioStreamSummary) {
+                packageAvailability |= languageIsAvailable(language, descriptor, languageAvailability, true, false);
+                if((packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0)
+                    break;
+                
+                if(!anyLanguageDiscovered && !noLanguageIsAvailable(descriptor, true, false))
+                    anyLanguageDiscovered = true;
+            }
         }
         
-        for(EncodeSummaryDescriptor descriptor : pkg.textStreamSummary) {
-            if(languageIsAvailable(language, descriptor, languageAvailability, false, true))
-                return true;
-            
-            if(!anyLanguageDiscovered && !noLanguageIsAvailable(descriptor, false, true))
-                anyLanguageDiscovered = true;
+        if((packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) == 0) {
+            for(EncodeSummaryDescriptor descriptor : pkg.textStreamSummary) {
+                packageAvailability |= languageIsAvailable(language, descriptor, languageAvailability, false, true);
+                if((packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0)
+                    break;
+                
+                if(!anyLanguageDiscovered && !noLanguageIsAvailable(descriptor, false, true))
+                    anyLanguageDiscovered = true;
+            }
         }
         
-        return !anyLanguageDiscovered;
+        if(packageAvailability == 0 && !anyLanguageDiscovered)
+            return Long.MIN_VALUE;
+        return packageAvailability;
     }
     
     private static final char[] FORCED_CHARS = "Forced".toCharArray();
     
-    private boolean languageIsAvailable(String language, EncodeSummaryDescriptor descriptor,  int languageAvailability, boolean checkAudio, boolean checkText) {
+    private long languageIsAvailable(String language, EncodeSummaryDescriptor descriptor,  long contractAvailability, boolean checkAudio, boolean checkText) {
         EncodeSummaryDescriptorData descriptorData = descriptor.descriptorData;
         
+        long languageAvailability = 0;
+        
         if(checkAudio && languageMatches(language, descriptorData.audioLanguage)) {
+            int localeBitOffset = ContractAssetType.values().length * languageDialectOffset(language, descriptorData.audioLanguage);
+            
             if(descriptorData.assetType.id == 2) {
-                if((languageAvailability & ContractAssetType.DESCRIPTIVE_AUDIO.getBitIdentifier()) != 0)
-                    return true;
+                if((contractAvailability & ContractAssetType.DESCRIPTIVE_AUDIO.getBitIdentifier() << localeBitOffset) != 0) {
+                    languageAvailability |= ContractAssetType.AUDIO.getBitIdentifier();
+                }
             } else {
-                if((languageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0)
-                    return true;
+                if((contractAvailability & ContractAssetType.AUDIO.getBitIdentifier() << localeBitOffset) != 0) {
+                    languageAvailability |= ContractAssetType.AUDIO.getBitIdentifier();
+                }
+                
             }
         }
         
@@ -109,13 +130,16 @@ public class MultilanguageCountryWindowFilter {
             
             if(textType != null && !Arrays.equals(FORCED_CHARS, textType.nameStr)) {
                 if(languageMatches(language, descriptorData.textLanguage)) {
-                    if((languageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0)
-                        return true;
+                    int localeBitOffset = ContractAssetType.values().length * languageDialectOffset(language, descriptorData.textLanguage);
+                    
+                    if((contractAvailability & ContractAssetType.SUBTITLES.getBitIdentifier() << localeBitOffset) != 0) {
+                        languageAvailability |= ContractAssetType.SUBTITLES.getBitIdentifier();
+                    }
                 }
             }
         }
         
-        return false;
+        return languageAvailability;
     }
     
     private boolean noLanguageIsAvailable(EncodeSummaryDescriptor descriptor, boolean checkAudio, boolean checkText) {
@@ -131,7 +155,7 @@ public class MultilanguageCountryWindowFilter {
         return true;
     }    
     
-    private static boolean languageMatches(String language, Strings locale) {
+    private boolean languageMatches(String language, Strings locale) {
         if(locale == null)
             return false;
         
@@ -144,6 +168,20 @@ public class MultilanguageCountryWindowFilter {
         }
         
         return true;
+    }
+    
+    private int languageDialectOffset(String language, Strings locale) {
+        if(locale.value.length == language.length())
+            return 0;
+        
+        return dialectOrdinalAssigner.getDialectOrdinal(language, String.valueOf(locale.value));
+    }
+
+    private int languageDialectOffset(String language, String locale) {
+        if(locale.length() == language.length())
+            return 0;
+        
+        return dialectOrdinalAssigner.getDialectOrdinal(language, locale);
     }
 
 }

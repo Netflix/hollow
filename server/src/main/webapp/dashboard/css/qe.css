@@ -154,7 +154,23 @@ div.ui-refresh-button {
     cursor: pointer;
     float: right;
     margin-left: 25px;
-    margin-left: 25px;
+}
+
+div.ui-tile-info {
+    background-repeat: no-repeat;
+    cursor: pointer;
+    float: left;
+    padding-top: 0px;
+    margin-left: 0px;
+    margin-right: 5px;
+}
+
+div.ui-info-show {
+    content: url('arrow-down-1.png');
+}
+
+div.ui-info-hide {
+    content: url('arrow-right-1.png');
 }
 
 .ui-inner {
@@ -180,7 +196,7 @@ div.ui-refresh-button {
 .spinnaker-banner-text {
     font-family: Trebuchet MS,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Tahoma,sans-serif;
     display: inline-block;
-    font-size:larger;
+    font-size:20px;
     color: #cccccc;
     padding-top: 20px;
     padding-bottom: 0px;

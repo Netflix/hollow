@@ -1,28 +1,31 @@
 package com.netflix.vms.transformer.input;
 
-import com.netflix.vms.transformer.io.LZ4VMSInputStream;
-import com.netflix.aws.S3.S3Object;
-import com.netflix.aws.file.FileAccessItem;
-import com.netflix.aws.file.FileStore;
-import com.netflix.hollow.client.HollowUpdateTransition;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import net.jpountz.lz4.LZ4BlockInputStream;
+import java.util.Random;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.netflix.aws.S3.S3Object;
+import com.netflix.aws.file.FileAccessItem;
+import com.netflix.aws.file.FileStore;
+import com.netflix.hollow.client.HollowUpdateTransition;
+import com.netflix.vms.transformer.io.LZ4VMSInputStream;
+import net.jpountz.lz4.LZ4BlockInputStream;
+
 public class FileStoreHollowUpdateTransition extends HollowUpdateTransition {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileStoreHollowUpdateTransition.class);
-    
+
     private static final int NUM_RETRIES = 3;
-    
+
     private final String fileStoreKeybase;
     private final String fileStoreVersion;
 
     private final FileStore fileStore;
-    
+
     private final boolean useVMSLZ4;
 
     private String localFileLocation = System.getProperty("java.io.tmpdir");
@@ -47,24 +50,32 @@ public class FileStoreHollowUpdateTransition extends HollowUpdateTransition {
 
         File localFile = new File(localFileLocation, filename);
 
-        if(localFile.exists())
+        if (localFile.exists()) {
             return useVMSLZ4 ? new LZ4VMSInputStream(new FileInputStream(localFile)) : new LZ4BlockInputStream(new FileInputStream(localFile));
+        }
 
         int retryCount = 0;
+        int randomIncompleteExtension = new Random().nextInt() & Integer.MAX_VALUE;
+        final File localIncompleteFile = new File(localFileLocation, filename + "." + Integer.toString(randomIncompleteExtension, 16));
 
         while(retryCount < NUM_RETRIES) {
             retryCount++;
 
             try {
                 S3Object s3Object = fileStore.getPublishedFile(fileStoreKeybase, fileStoreVersion);
-                LOGGER.info("Copying object {} to {}", s3Object, localFile);
-                fileStore.copyFile(s3Object, localFile);
+                LOGGER.info("Copying object {} to {}", s3Object, localIncompleteFile);
+                fileStore.copyFile(s3Object, localIncompleteFile);
+
+                if(!localFile.exists()) {
+                    localIncompleteFile.renameTo(localFile);
+                }
+
                 break;
             } catch(Exception e) {
                 LOGGER.error("Retrieval of transition input stream failed", e);
                 if(retryCount == NUM_RETRIES) {
-                    if(localFile.exists())
-                        localFile.delete();
+                    if(localIncompleteFile.exists())
+                        localIncompleteFile.delete();
                     throw new IOException(e);
                 }
             }
@@ -72,5 +83,4 @@ public class FileStoreHollowUpdateTransition extends HollowUpdateTransition {
 
         return useVMSLZ4 ? new LZ4VMSInputStream(new DeleteOnCloseFileInputStream(localFile)) : new LZ4BlockInputStream(new DeleteOnCloseFileInputStream(localFile));
     }
-
 }

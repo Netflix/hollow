@@ -1,12 +1,11 @@
 package com.netflix.vms.transformer.cup;
 
+import java.util.Set;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.netflix.cup.ContentUsagePolicy;
 import com.netflix.cup.ContentUsagePolicyFactory;
 import com.netflix.vms.transformer.common.cup.CupLibrary;
-
-import java.util.Set;
 
 @Singleton
 public class CupLibraryImpl implements CupLibrary {
@@ -19,7 +18,6 @@ public class CupLibraryImpl implements CupLibrary {
     }
     @Override
     public int getMaximumVideoHeight(Set<String> cupTokens, String deviceCategory) {
-        final ContentUsagePolicy cup = cupFactory.findLenientContentUsagePolicyFromCupTokenIds(cupTokens, deviceCategory);
-        return cup.getMaximumVideoHeight();
+        return cupFactory.getCupMaximumVideoHeight(cupTokens, deviceCategory);
     }
 }

@@ -8,6 +8,7 @@ import java.util.Set;
 
 public enum OutputTypeConfig {
     CompleteVideo("CompleteVideo", "id.value", "country.id"),
+    MulticatalogCountryData("MulticatalogCountryData", "videoId.value", "country.id"),
     VideoEpisode_CountryList("VideoEpisode_CountryList", "country.id", "item.deliverableVideo.value"),
     RolloutVideo("RolloutVideo", "video.value"),
     GlobalVideo("GlobalVideo", "completeVideo.id.value"),
@@ -42,7 +43,7 @@ public enum OutputTypeConfig {
 
     //---------------
     private final static EnumSet<OutputTypeConfig> VIDEO_RELATED_TYPES_ENUMSET = EnumSet.of(
-            CompleteVideo, VideoEpisode_CountryList, RolloutVideo, GlobalVideo, FallbackUSArtwork, LanguageRights, VideoPackageData, PackageData);
+            CompleteVideo, MulticatalogCountryData, VideoEpisode_CountryList, RolloutVideo, GlobalVideo, FallbackUSArtwork, LanguageRights, VideoPackageData, PackageData);
     public final static Set<OutputTypeConfig> VIDEO_RELATED_TYPES = Collections.unmodifiableSet(VIDEO_RELATED_TYPES_ENUMSET);
     public final static Set<OutputTypeConfig> NON_VIDEO_RELATED_TYPES = Collections.unmodifiableSet(EnumSet.complementOf(VIDEO_RELATED_TYPES_ENUMSET));
 

@@ -74,7 +74,7 @@ function ServerCycleSummaryTab(dashboard) {
                 query.add("eventInfo.tag:TransformCycleSuccess");
             } else if (purpose == "CycleInfo") {
                 query.indexType = "vmsserver";
-                query.add("eventInfo.tag:TransformCycleBegin").add("jarVersion");
+                query.add("eventInfo.tag:TransformCycleBegin").add("jarVersion").add("NOT%20HideCycleFromDashboard");
             } else if (purpose == "TopNodes") {
                 query.indexType = "vmsserver";
                 query.add("eventInfo.tag:TransformInfo").add("topNodes");

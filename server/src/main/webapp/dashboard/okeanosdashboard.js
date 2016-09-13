@@ -7,7 +7,7 @@ function Dashboard() {
     var vmsblobinfo;
 
     this.nflxEnvironment = "test";
-    this.dataNameSpace = "boson";
+    this.dataNameSpace = "muon";
     this.vipAddress = "";
 
     // --------------------------------------------------------------------

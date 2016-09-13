@@ -43,10 +43,10 @@ function VmsServerInfoTab(dashboard) {
             url : '/REST/vms/elasticsearchadmin?query=elasticsearchhost',
             success : function(data) {
                 var hostname = new String(data);
-                if (hostname.indexOf("ec") == 0) {
+                // if (hostname.indexOf("ec") == 0) {
                     $("#id-elasticsearchhost-box").val(data);
                     serverInfoView.elasticSearchHost = hostname;
-                }
+                //}
             }
         });
 

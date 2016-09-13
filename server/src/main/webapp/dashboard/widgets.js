@@ -423,6 +423,46 @@ function JsonViewWidget(divname, useTextView) {
 }
 
 //--------------------------------------------------------------------
+// InfoTile <div id='myinfo' title='FASTLANE IDS'></div>
+// prepends "id": id-myinfo for child (to be populated by caller), and id-myinfo-toggle for ui
+//--------------------------------------------------------------------
+function InfoTile(divId, params) {
+    var ref = this;
+    this.topSeparator = params ? params.addSeparator : true;
+    this.hidden = params ? params.hidden : false;
+    this.parentDivId = divId.startsWith("#") ? divId : "#" + divId;
+    this.childId = divId.startsWith("#") ? "id-" + divId.substr(1) : "id-" + divId;
+    this.toggleId =  this.childId + "-toggle";
+
+
+    if(ref.topSeparator) {
+        $('<div/>', {
+            class : "hr-line"
+        }).appendTo(ref.parentDivId);
+    }
+    var hclass = ref.hidden ? "ui-info-hide" : "ui-info-show";
+    var banner = "<div class='vms-info'>" + $(ref.parentDivId).attr("info");
+    banner += "  <div id='" + ref.toggleId + "' class='ui-tile-info " + hclass + "'></div></div>";
+    $(banner).appendTo(ref.parentDivId);
+    // $("<div class='vms-info'>" + $(ref.parentDivId).attr("info") + "</div>").appendTo(ref.parentDivId);
+    $("<div class='ui-inner' id='" + ref.childId + "'></div>").appendTo(ref.parentDivId);
+    const childref = "#" + ref.childId;
+    $("#" + ref.toggleId).click(function() {
+        if($(childref).is(":visible")) {
+            $("#"+ref.toggleId).switchClass("ui-info-show","ui-info-hide", 10);
+        } else {
+            $("#"+ref.toggleId).switchClass("ui-info-hide", "ui-info-show", 10);
+        }
+        $(childref).toggle("blind");
+    });
+
+    if(ref.hidden) {
+        $(childref).hide();
+    }
+}
+
+
+//--------------------------------------------------------------------
 //PlainTextViewWidget
 //--------------------------------------------------------------------
 function PlainTextViewWidget(divname, field) {
