@@ -1,5 +1,9 @@
 package com.netflix.vms.transformer.publish.workflow.circuitbreaker;
 
+import java.util.Arrays;
+
+import java.util.Collection;
+import java.util.Map;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.publish.workflow.IndexDuplicateChecker;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
@@ -24,8 +28,15 @@ public class DuplicateDetectionCircuitBreaker extends HollowCircuitBreaker {
             return PASSED;
 
         CircuitBreakerResults results = new CircuitBreakerResults();
-        for (String type : dupChecker.getResults()) {
-            results.addResult(false, "Duplicate keys found for type: " + type);
+        for (Map.Entry<String, Collection<Object[]>> dupEntry : dupChecker.getResults().entrySet()) {
+            StringBuilder message = new StringBuilder("Duplicate keys found for type ");
+            message.append(dupEntry.getKey()).append(": ");
+            
+            for(Object[] key : dupEntry.getValue()) {
+                message.append(Arrays.toString(key)).append(" ");
+            }
+            
+            results.addResult(false, message.toString());
         }
 
         return results;
