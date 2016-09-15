@@ -24,6 +24,7 @@ public enum TransformerLogTag implements LogTag {
     CyclePinnedTitles,
     StateEngineCompaction,
     HideCycleFromDashboard,
+    DroppedTopNodeOnFloor,
 
 
     //// TRANSFORMATION ERRORS ////
