@@ -671,7 +671,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.0",
+            "locked": "1.5.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -3905,7 +3905,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.0",
+            "locked": "1.5.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -7139,7 +7139,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.0",
+            "locked": "1.5.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -10373,7 +10373,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.0",
+            "locked": "1.5.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -13622,7 +13622,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.0",
+            "locked": "1.5.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -17948,7 +17948,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.0",
+            "locked": "1.5.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -21182,7 +21182,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.0",
+            "locked": "1.5.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -24421,7 +24421,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.0",
+            "locked": "1.5.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -27773,7 +27773,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.0",
+            "locked": "1.5.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -31125,7 +31125,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.0",
+            "locked": "1.5.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -34477,7 +34477,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.0",
+            "locked": "1.5.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -37793,7 +37793,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.0",
+            "locked": "1.5.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -41044,7 +41044,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.0",
+            "locked": "1.5.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -44295,7 +44295,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.0",
+            "locked": "1.5.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -47546,7 +47546,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.0",
+            "locked": "1.5.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
