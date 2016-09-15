@@ -598,7 +598,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.17",
+            "locked": "1.18",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -3216,7 +3216,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.17",
+            "locked": "1.18",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -5834,7 +5834,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.17",
+            "locked": "1.18",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -8452,7 +8452,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.17",
+            "locked": "1.18",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -11169,7 +11169,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.17",
+            "locked": "1.18",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -13787,7 +13787,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.17",
+            "locked": "1.18",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -16411,7 +16411,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.17",
+            "locked": "1.18",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -19035,7 +19035,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.17",
+            "locked": "1.18",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -21659,7 +21659,7 @@
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.17",
+            "locked": "1.18",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
