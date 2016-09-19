@@ -136,6 +136,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
                     showAttached = false;
                 }
 
+                int episodeSeqNum = 0;
                 for (int iseason = 0; iseason < hierarchy.getSeasonIds().length; iseason++) {
                     int seasonId = hierarchy.getSeasonIds()[iseason];
                     Set<Artwork> seasonArtwork = artworkMap.get(seasonId);
@@ -146,6 +147,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
                     }
 
                     for (int iepisode = 0; iepisode < hierarchy.getEpisodeIds()[iseason].length; iepisode++) {
+                        episodeSeqNum++;
                         int episodeId = hierarchy.getEpisodeIds()[iseason][iepisode];
                         if (rollupMerchstillVideoIds.contains(Integer.valueOf(episodeId))) {
                             if (isAvailableForED(episodeId, countryCode)) {
@@ -154,8 +156,12 @@ public class VideoImagesDataModule extends ArtWorkModule {
                                     for (Artwork artwork : episodeArtwork) {
                                         String sourceFieldId =  artwork.sourceFileId == null ? null : new String(artwork.sourceFileId.value);
                                         if (artwork.sourceFileId != null && rollupSourceFieldIds.contains(sourceFieldId)) {
-                                            seasonArtwork.add(artwork.clone());
-                                            showArtwork.add(artwork.clone());
+                                            Artwork seasonArt = artwork.clone();
+                                            Artwork showArt = artwork.clone();
+                                            seasonArt.seqNum = episodeSeqNum;
+                                            showArt.seqNum = episodeSeqNum;
+                                            seasonArtwork.add(seasonArt);
+                                            showArtwork.add(showArt);
                                         }
                                     }
                                 }
