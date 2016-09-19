@@ -209,7 +209,7 @@ public class TitleLevelPinningPOC {
                     // make sure there is no dups
                     IndexDuplicateChecker dupChecker = new IndexDuplicateChecker(toState);
                     dupChecker.checkDuplicates();
-                    Assert.assertFalse("Duplicate keys found: " + dupChecker.getResults(), dupChecker.wasDupKeysDetected());
+                    Assert.assertFalse("Duplicate keys found: " + dupChecker.getResults().keySet(), dupChecker.wasDupKeysDetected());
 
                     // lauch diff report
                     ShowMeTheProgressDiffTool.startTheDiff(fromState, toState);

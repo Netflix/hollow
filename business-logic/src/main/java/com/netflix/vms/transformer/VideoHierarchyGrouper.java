@@ -2,6 +2,7 @@ package com.netflix.vms.transformer;
 
 
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.hollowinput.DeployablePackagesHollow;
 import com.netflix.vms.transformer.hollowinput.EpisodeHollow;
 import com.netflix.vms.transformer.hollowinput.EpisodesHollow;
@@ -109,6 +110,7 @@ public class VideoHierarchyGrouper {
         Set<Integer> fastlaneIds = ctx.getFastlaneIds();
         Set<Integer> potentialOrphans = new HashSet<Integer>();
         Set<Integer> alreadyAddedTopNodes = new HashSet<Integer>();
+        Set<Integer> topNodesToDropOnFloor = getTopNodesToDropOnFloor();
 
         for(VideoGeneralHollow videoGeneral : api.getAllVideoGeneralHollow()) {
             Integer videoId = Integer.valueOf((int)videoGeneral._getVideoId());
@@ -122,7 +124,10 @@ public class VideoHierarchyGrouper {
                 Set<ShowSeasonEpisodeHollow> displaySets = displaySetsByVideoId.get(videoId);
 
                 if(displaySets == null) {
-                    processGroups.add(Collections.singleton(new VideoHierarchyGroup(videoId)));
+                    if(!topNodesToDropOnFloor.contains(videoId))
+                        processGroups.add(Collections.singleton(new VideoHierarchyGroup(videoId)));
+                    else
+                        ctx.getLogger().warn(TransformerLogTag.DroppedTopNodeOnFloor, "Dropped hierarchy for {} on floor", videoId);
                 } else {
                     Map<Integer, VideoHierarchyGroup> theseGroupsByTopNode = new HashMap<>();
 
@@ -142,10 +147,14 @@ public class VideoHierarchyGrouper {
                     Set<VideoHierarchyGroup> groups = new HashSet<VideoHierarchyGroup>();
 
                     for (Map.Entry<Integer, VideoHierarchyGroup> entry : theseGroupsByTopNode.entrySet()) {
-                        groups.add(entry.getValue());
+                        if(!topNodesToDropOnFloor.contains(entry.getKey()))
+                            groups.add(entry.getValue());
+                        else
+                            ctx.getLogger().warn(TransformerLogTag.DroppedTopNodeOnFloor, "Dropped hierarchy for {} on floor", entry.getKey());
                     }
 
-                    processGroups.add(groups);
+                    if(!groups.isEmpty())
+                        processGroups.add(groups);
                 }
 
                 alreadyAddedTopNodes.add(videoId);
@@ -184,12 +193,18 @@ public class VideoHierarchyGrouper {
 
             Set<Integer> topParents = topParentMap.get(videoId);
             if (topParents == null) {
-                processGroups.add(Collections.singleton(new VideoHierarchyGroup(videoId)));
+                if(!topNodesToDropOnFloor.contains(videoId))
+                    processGroups.add(Collections.singleton(new VideoHierarchyGroup(videoId)));
+                else
+                    ctx.getLogger().warn(TransformerLogTag.DroppedTopNodeOnFloor, "Dropped hierarchy for {} on floor", videoId);
             } else {
                 for (int parentId : topParents) {
                     if (alreadyAddedTopNodes.contains(parentId)) continue;
 
-                    processGroups.add(Collections.singleton(new VideoHierarchyGroup(parentId)));
+                    if(!topNodesToDropOnFloor.contains(parentId))
+                        processGroups.add(Collections.singleton(new VideoHierarchyGroup(parentId)));
+                    else
+                        ctx.getLogger().warn(TransformerLogTag.DroppedTopNodeOnFloor, "Dropped hierarchy for {} on floor", parentId);
                 }
             }
         }
@@ -232,6 +247,23 @@ public class VideoHierarchyGrouper {
         }
 
         return setOfIds;
+    }
+    
+    private Set<Integer> getTopNodesToDropOnFloor() {
+        String csv = ctx.getConfig().getDropTopNodesOnFloor();
+        if(csv == null)
+            return Collections.emptySet();
+        
+        Set<Integer> set = new HashSet<Integer>();
+        for(String id : csv.split(",")) {
+            try {
+                set.add(Integer.parseInt(id.trim()));
+            } catch(Exception e) {
+                ctx.getLogger().error(TransformerLogTag.DroppedTopNodeOnFloor, "Unable to parse top node ID: {}", id);
+            }
+        }
+        
+        return set;
     }
 
     public static class VideoHierarchyGroup {
