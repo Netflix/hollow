@@ -1082,7 +1082,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.9-platform",
+            "locked": "0.9.0.10-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -2271,7 +2271,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.11",
+            "locked": "2.12",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -4111,7 +4111,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.9-platform",
+            "locked": "0.9.0.10-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -5300,7 +5300,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.11",
+            "locked": "2.12",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -7140,7 +7140,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.9-platform",
+            "locked": "0.9.0.10-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -8329,7 +8329,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.11",
+            "locked": "2.12",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -10169,7 +10169,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.9-platform",
+            "locked": "0.9.0.10-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -11358,7 +11358,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.11",
+            "locked": "2.12",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -13297,7 +13297,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.9-platform",
+            "locked": "0.9.0.10-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -14486,7 +14486,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.11",
+            "locked": "2.12",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -16326,7 +16326,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.9-platform",
+            "locked": "0.9.0.10-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -17516,7 +17516,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.11",
+            "locked": "2.12",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -19361,7 +19361,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.9-platform",
+            "locked": "0.9.0.10-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -20551,7 +20551,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.11",
+            "locked": "2.12",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -22396,7 +22396,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.9-platform",
+            "locked": "0.9.0.10-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -23586,7 +23586,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.11",
+            "locked": "2.12",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -25431,7 +25431,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.9-platform",
+            "locked": "0.9.0.10-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -26621,7 +26621,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.11",
+            "locked": "2.12",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
