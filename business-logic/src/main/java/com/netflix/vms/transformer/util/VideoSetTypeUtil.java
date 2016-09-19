@@ -2,6 +2,7 @@ package com.netflix.vms.transformer.util;
 
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_STATUS;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
+import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
@@ -15,7 +16,6 @@ import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,7 +41,12 @@ public class VideoSetTypeUtil {
             ListOfRightsWindowHollow windows = rights._getRights()._getWindows();
             for (RightsWindowHollow window : windows) {
                 long windowStart = window._getStartDate();
-                if (windowStart < ctx.getNowMillis() && window._getEndDate() > ctx.getNowMillis()) {
+                long windowEnd = window._getEndDate();
+                if(window._getOnHold()) {
+                    windowStart += ONE_THOUSAND_YEARS;
+                    windowEnd += ONE_THOUSAND_YEARS;
+                }
+                if (windowStart < ctx.getNowMillis() && windowEnd > ctx.getNowMillis()) {
                     isInWindow = true;
                     break;
                 } else if (windowStart > ctx.getNowMillis()) {

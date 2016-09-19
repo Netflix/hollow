@@ -232,10 +232,11 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         list.add(img);
     }
 
-    public void newSeasonWindow(long startDate, long endDate, int sequenceNumber) {
+    public void newSeasonWindow(long startDate, long endDate, boolean onHold, int sequenceNumber) {
         DateWindow dateWindow = new DateWindow();
         dateWindow.startDateTimestamp = startDate;
         dateWindow.endDateTimestamp = endDate;
+        dateWindow.onHold = onHold;
 
         BitSet seasonSeqNums = seasonSequenceNumberMap.get(dateWindow);
         if (seasonSeqNums == null) {
@@ -335,17 +336,22 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         for (int i = 0; i < sortedWindowDates.size() - 1; i++) {
             Long currentStartDate = sortedWindowDates.get(i);
             Long currentEndDate = sortedWindowDates.get(i + 1);
+            boolean onHold = false;
             mergedSeqNums.clear();
 
             for (Map.Entry<DateWindow, BitSet> entry : seasonSequenceNumberMap.entrySet()) {
                 if (entry.getKey().startDateTimestamp <= currentStartDate && entry.getKey().endDateTimestamp >= currentEndDate) {
                     mergedSeqNums.or(entry.getValue());
+                    /// assumption: windows which are on hold are separated by large amounts of time, no overlapping onHold with not onHold windows.
+                    if(entry.getKey().onHold)
+                        onHold = true;
                 }
             }
 
             DateWindow key = new DateWindow();
             key.startDateTimestamp = currentStartDate.longValue();
             key.endDateTimestamp = currentEndDate.longValue();
+            key.onHold = onHold;
 
             List<com.netflix.vms.transformer.hollowoutput.Integer> seqNums = new ArrayList<>();
             int currentSeqNum = mergedSeqNums.nextSetBit(0);

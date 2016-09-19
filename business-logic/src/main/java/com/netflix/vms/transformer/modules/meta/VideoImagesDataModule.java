@@ -2,6 +2,7 @@ package com.netflix.vms.transformer.modules.meta;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidImagesTerritoryCode;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
+import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
@@ -193,7 +194,14 @@ public class VideoImagesDataModule extends ArtWorkModule {
 
             ListOfRightsWindowHollow windows = status._getRights()._getWindows();
             for (RightsWindowHollow window : windows) {
-                if (window._getStartDate() < ctx.getNowMillis() && window._getEndDate() > ctx.getNowMillis()) {
+                long windowStart = window._getStartDate();
+                long windowEnd = window._getEndDate();
+                if(window._getOnHold()) {
+                    windowStart += ONE_THOUSAND_YEARS;
+                    windowEnd += ONE_THOUSAND_YEARS;
+                }
+                
+                if (windowStart < ctx.getNowMillis() && windowEnd > ctx.getNowMillis()) {
                     isInWindow = true;
                     break;
                 }

@@ -29,6 +29,14 @@ public class RightsWindowDelegateLookupImpl extends HollowObjectAbstractDelegate
         return typeAPI.getEndDateBoxed(ordinal);
     }
 
+    public boolean getOnHold(int ordinal) {
+        return typeAPI.getOnHold(ordinal);
+    }
+
+    public Boolean getOnHoldBoxed(int ordinal) {
+        return typeAPI.getOnHoldBoxed(ordinal);
+    }
+
     public int getContractIdsExtOrdinal(int ordinal) {
         return typeAPI.getContractIdsExtOrdinal(ordinal);
     }
