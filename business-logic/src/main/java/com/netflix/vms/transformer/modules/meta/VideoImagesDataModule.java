@@ -39,6 +39,7 @@ import com.netflix.vms.transformer.modules.artwork.ArtWorkModule;
 import com.netflix.vms.transformer.util.NFLocaleUtil;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -131,7 +132,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
                 Set<Artwork> showArtwork = artworkMap.get(topNodeId);
                 boolean showAttached = true;
                 if (showArtwork == null) {
-                    showArtwork = new HashSet<>();
+                    showArtwork = new LinkedHashSet<>();
                     showAttached = false;
                 }
 
@@ -140,7 +141,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
                     Set<Artwork> seasonArtwork = artworkMap.get(seasonId);
                     boolean seasonAttached = true;
                     if (seasonArtwork == null) {
-                        seasonArtwork = new HashSet<>();
+                        seasonArtwork = new LinkedHashSet<>();
                         seasonAttached = false;
                     }
 
