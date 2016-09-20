@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.modules.packages.contracts;
 
+import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 import static com.netflix.vms.transformer.modules.packages.contracts.DownloadableAssetTypeIndex.Viewing.DOWNLOAD;
 import static com.netflix.vms.transformer.modules.packages.contracts.DownloadableAssetTypeIndex.Viewing.STREAM;
 
@@ -56,7 +57,7 @@ import java.util.stream.Collectors;
 
 /// Documentation of this logic available at: https://docs.google.com/document/d/15eGhbVPcEK_ARZA8OrtXpPAzrTalVqmZnKuzK_hrZAA/edit
 public class ContractRestrictionModule {
-
+    
     private final HollowHashIndex videoStatusIdx;
     // private final HollowPrimaryKeyIndex bcp47CodeIdx;
 
@@ -144,6 +145,11 @@ public class ContractRestrictionModule {
                         restriction.availabilityWindow = new AvailabilityWindow();
                         restriction.availabilityWindow.startDate = OutputUtil.getRoundedDate(window._getStartDate());
                         restriction.availabilityWindow.endDate = OutputUtil.getRoundedDate(window._getEndDate());
+                        if(window._getOnHold()) {
+                            restriction.availabilityWindow.startDate.val += ONE_THOUSAND_YEARS;
+                            restriction.availabilityWindow.endDate.val += ONE_THOUSAND_YEARS;
+                            restriction.availabilityWindow.onHold = true;
+                        }
 
                         contractRestrictions.add(restriction);
                     }
