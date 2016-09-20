@@ -200,7 +200,7 @@ function ServerCycleStatusTab(dashboard) {
         searchDao.searchQuery.indexType = "vmsserver";
         searchDao.searchQuery.indexName =  index;
         searchDao.searchQuery.fields = fieldList;
-        searchDao.searchQuery.add("eventInfo.tag:CyclePinnedTitles").add("config").add("spec");
+        searchDao.searchQuery.add("eventInfo.tag:CyclePinnedTitles").add("pinned").add("titles");
         searchDao.searchQuery.sort = "eventInfo.timestamp:desc";
         searchDao.updateJsonFromSearch();
     }

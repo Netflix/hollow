@@ -1,5 +1,10 @@
 package com.netflix.vms.transformer.override;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.write.HollowBlobWriter;
@@ -7,12 +12,6 @@ import com.netflix.hollow.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
 
@@ -57,11 +56,13 @@ public abstract class AbstractPinTitleProcessor implements PinTitleProcessor {
         return stateEngine;
     }
 
-    protected void writeStateEngine(HollowWriteStateEngine stateEngine, File outputFile, String blobID) throws IOException {
+    protected void writeStateEngine(HollowWriteStateEngine stateEngine, File outputFile, String blobID, long version, int... topNodes) throws IOException {
         ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Write StateEngine file:{}", outputFile);
 
         if (blobID == null) blobID = outputFile.getName();
         PinTitleHelper.addBlobID(stateEngine, blobID);
+        PinTitleHelper.addPinnedTitles(stateEngine, version, topNodes);
+
         HollowBlobWriter writer = new HollowBlobWriter(stateEngine);
         try (LZ4BlockOutputStream os = new LZ4BlockOutputStream(new FileOutputStream(outputFile))) {
             writer.writeSnapshot(os);
