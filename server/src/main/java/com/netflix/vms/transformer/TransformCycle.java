@@ -15,7 +15,12 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformC
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WritingBlobsFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WroteBlob;
 
-import com.netflix.vms.transformer.common.io.TransformerLogTag;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.client.HollowClient;
@@ -26,6 +31,7 @@ import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.common.VersionMinter;
+import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.FollowVipPin;
 import com.netflix.vms.transformer.input.FollowVipPinExtractor;
@@ -41,12 +47,6 @@ import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.job.impl.BlobMetaDataUtil;
 import com.netflix.vms.transformer.util.OverrideVipNameUtil;
 import com.netflix.vms.transformer.util.SequenceVersionMinter;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
 
 public class TransformCycle {
     private final String transformerVip;
@@ -196,10 +196,13 @@ public class TransformCycle {
                 // Combine data
                 List<HollowReadStateEngine> overrideTitleOutputs = pinTitleMgr.getResults(isFirstCycle);
                 PinTitleHollowCombiner combiner = new PinTitleHollowCombiner(ctx, outputStateEngine, fastlaneOutputStateEngine, overrideTitleOutputs);
-                String overrideBlobID = combiner.combine();
+                combiner.combine();
 
-                ctx.getLogger().info(CyclePinnedTitles, "Processed cycleNumber={}, blobId={}, hasDataChanged={}, fastlaneChanged={}, isFirstCycle={}, duration={}",
-                        currentCycleNumber, overrideBlobID, outputStateEngine.hasChangedSinceLastCycle(), fastlaneOutputStateEngine.hasChangedSinceLastCycle(), isFirstCycle, (System.currentTimeMillis() - startTime));
+                String overrideBlobID = PinTitleHelper.getBlobID(outputStateEngine);
+                String pinnedTitles = PinTitleHelper.getPinnedTitles(outputStateEngine);
+                ctx.getLogger().info(CyclePinnedTitles, "Pinned Titles=[{}]", pinnedTitles);
+                ctx.getLogger().info(CyclePinnedTitles, "Processed blobId={}, pinnedTitles={}, hasDataChanged={}, fastlaneChanged={}, isFirstCycle={}, duration={}",
+                        overrideBlobID, pinnedTitles, outputStateEngine.hasChangedSinceLastCycle(), fastlaneOutputStateEngine.hasChangedSinceLastCycle(), isFirstCycle, (System.currentTimeMillis() - startTime));
             } else {
                 trasformInputData(inputClient.getAPI(), outputStateEngine, ctx);
             }

@@ -2,6 +2,22 @@ package com.netflix.vms.transformer.testutil.slice;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CyclePinnedTitles;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.junit.Assert;
+import org.junit.Test;
+
 import com.netflix.hollow.read.engine.HollowBlobReader;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.util.memory.WastefulRecycler;
@@ -22,23 +38,6 @@ import com.netflix.vms.transformer.override.PinTitleManager;
 import com.netflix.vms.transformer.publish.workflow.IndexDuplicateChecker;
 import com.netflix.vms.transformer.testutil.migration.ShowMeTheProgressDiffTool;
 import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
 
@@ -64,9 +63,11 @@ public class TitleLevelPinningPOC {
                 HollowReadStateEngine fastlane = loadFastlane(v);
 
                 PinTitleHollowCombiner combiner = new PinTitleHollowCombiner(ctx, outputStateEngine, fastlane, pinnedInputs);
-                String overrideBlobID = combiner.combine();
+                combiner.combine();
+                String overrideBlobID = PinTitleHelper.getBlobID(outputStateEngine);
+                String pinnedTitles = PinTitleHelper.getPinnedTitles(outputStateEngine);
 
-                System.out.println(v + ": \t" + overrideBlobID + "\t hasChanged=" + outputStateEngine.hasChangedSinceLastCycle());
+                System.out.println(v + ": \t" + overrideBlobID + "\t" + pinnedTitles + "\t hasChanged=" + outputStateEngine.hasChangedSinceLastCycle());
                 if (!isFirstCycle && outputStateEngine.hasChangedSinceLastCycle()) {
                     for (HollowTypeWriteState state : outputStateEngine.getOrderedTypeStates()) {
                         if (!isFirstCycle && state.hasChangedSinceLastCycle()) {
@@ -130,7 +131,7 @@ public class TitleLevelPinningPOC {
         // Make sure to pin fastlane id
         //Set<String> overrideTitleSpecs = new HashSet<>(Arrays.asList(FASTLANE_ID + ":20160812090000000"));
         //Set<String> overrideTitleSpecs = new HashSet<>(Arrays.asList(FASTLANE_ID + ":20160812090815150"));
-        Set<String> overrideTitleSpecs = new HashSet<>(Arrays.asList("70303291:20160810105115158", FASTLANE_ID + ":20160812090815150", "80124890:20160810105115158"));
+        Set<String> overrideTitleSpecs = new HashSet<>(Arrays.asList("20160915161802282:80097539"));
 
         {
             PinTitleManager mgr = new PinTitleManager(BASE_PROXY, "boson", "berlin", LOCAL_BLOB_STORE, ctx);
@@ -150,7 +151,8 @@ public class TitleLevelPinningPOC {
             HollowReadStateEngine combinedBlob = roundTrip(outputStateEngine);
 
             String blobID = PinTitleHelper.getBlobID(combinedBlob);
-            ctx.getLogger().info(CyclePinnedTitles, "Processed override titles={} blodId={}", overrideTitleSpecs, blobID);
+            String pinnedTitles = PinTitleHelper.getPinnedTitles(combinedBlob);
+            ctx.getLogger().info(CyclePinnedTitles, "Processed override titles={} blodId={} pinnedTitles={}", overrideTitleSpecs, blobID, pinnedTitles);
 
             validateAndDiff(fastlaneBlob, combinedBlob);
         }
