@@ -26,6 +26,14 @@ public class RightsWindowHollow extends HollowObject {
         return delegate().getEndDateBoxed(ordinal);
     }
 
+    public boolean _getOnHold() {
+        return delegate().getOnHold(ordinal);
+    }
+
+    public Boolean _getOnHoldBoxed() {
+        return delegate().getOnHoldBoxed(ordinal);
+    }
+
     public ListOfRightsWindowContractHollow _getContractIdsExt() {
         int refOrdinal = delegate().getContractIdsExtOrdinal(ordinal);
         if(refOrdinal == -1)

@@ -16,7 +16,6 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.WritingBlo
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WroteBlob;
 
 import com.google.gson.Gson;
-import com.netflix.vms.transformer.common.io.TransformerLogTag;
 
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.client.HollowClient;
@@ -27,6 +26,7 @@ import com.netflix.hollow.write.HollowBlobWriter;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.common.VersionMinter;
+import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.FollowVipPin;
 import com.netflix.vms.transformer.input.FollowVipPinExtractor;
@@ -213,10 +213,13 @@ public class TransformCycle {
                 // Combine data
                 List<HollowReadStateEngine> overrideTitleOutputs = pinTitleMgr.getResults(isFirstCycle);
                 PinTitleHollowCombiner combiner = new PinTitleHollowCombiner(ctx, outputStateEngine, fastlaneOutputStateEngine, overrideTitleOutputs);
-                String overrideBlobID = combiner.combine();
+                combiner.combine();
 
-                ctx.getLogger().info(CyclePinnedTitles, "Processed cycleNumber={}, blobId={}, hasDataChanged={}, fastlaneChanged={}, isFirstCycle={}, duration={}",
-                        currentCycleNumber, overrideBlobID, outputStateEngine.hasChangedSinceLastCycle(), fastlaneOutputStateEngine.hasChangedSinceLastCycle(), isFirstCycle, (System.currentTimeMillis() - startTime));
+                String overrideBlobID = PinTitleHelper.getBlobID(outputStateEngine);
+                String pinnedTitles = PinTitleHelper.getPinnedTitles(outputStateEngine);
+                ctx.getLogger().info(CyclePinnedTitles, "Pinned Titles=[{}]", pinnedTitles);
+                ctx.getLogger().info(CyclePinnedTitles, "Processed blobId={}, pinnedTitles={}, hasDataChanged={}, fastlaneChanged={}, isFirstCycle={}, duration={}",
+                        overrideBlobID, pinnedTitles, outputStateEngine.hasChangedSinceLastCycle(), fastlaneOutputStateEngine.hasChangedSinceLastCycle(), isFirstCycle, (System.currentTimeMillis() - startTime));
             } else {
                 trasformInputData(inputClient.getAPI(), outputStateEngine, ctx);
             }

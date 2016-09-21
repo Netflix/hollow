@@ -6,6 +6,7 @@ public class VMSAvailabilityWindow implements Cloneable {
 
     public Date startDate = null;
     public Date endDate = null;
+    public boolean onHold = false;
     public int bundledAssetsGroupId = java.lang.Integer.MIN_VALUE;
     public Map<Integer, WindowPackageContractInfo> windowInfosByPackageId = null;
 
@@ -21,6 +22,7 @@ public class VMSAvailabilityWindow implements Cloneable {
         if(o.endDate == null) {
             if(endDate != null) return false;
         } else if(!o.endDate.equals(endDate)) return false;
+        if(onHold != o.onHold) return false;
         if(o.bundledAssetsGroupId != bundledAssetsGroupId) return false;
         if(o.windowInfosByPackageId == null) {
             if(windowInfosByPackageId != null) return false;
@@ -32,6 +34,7 @@ public class VMSAvailabilityWindow implements Cloneable {
         int hashCode = 1;
         hashCode = hashCode * 31 + (startDate == null ? 1237 : startDate.hashCode());
         hashCode = hashCode * 31 + (endDate == null ? 1237 : endDate.hashCode());
+        hashCode = hashCode * 31 + (onHold ? 1231 : 1237);
         hashCode = hashCode * 31 + bundledAssetsGroupId;
         hashCode = hashCode * 31 + (windowInfosByPackageId == null ? 1237 : windowInfosByPackageId.hashCode());
         return hashCode;
@@ -41,6 +44,7 @@ public class VMSAvailabilityWindow implements Cloneable {
         StringBuilder builder = new StringBuilder("VMSAvailabilityWindow{");
         builder.append("startDate=").append(startDate);
         builder.append(",endDate=").append(endDate);
+        builder.append(",onHold=").append(onHold);
         builder.append(",bundledAssetsGroupId=").append(bundledAssetsGroupId);
         builder.append(",windowInfosByPackageId=").append(windowInfosByPackageId);
         builder.append("}");

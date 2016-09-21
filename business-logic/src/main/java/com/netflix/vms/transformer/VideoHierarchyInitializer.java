@@ -26,7 +26,6 @@ import com.netflix.vms.transformer.hollowinput.VideoTypeMediaHollow;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -140,7 +139,9 @@ public class VideoHierarchyInitializer {
                         uniqueShowHierarchies.put(showHierarchy, canonicalHierarchy);
                     }
 
-                    showHierarchiesByCountry.put(countryCode, Collections.singleton(canonicalHierarchy));
+                    HashSet<VideoHierarchy> set = new HashSet<VideoHierarchy>();
+                    set.add(canonicalHierarchy);
+                    showHierarchiesByCountry.put(countryCode, set);
                 }
             }
         }

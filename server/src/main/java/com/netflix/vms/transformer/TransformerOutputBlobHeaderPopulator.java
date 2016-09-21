@@ -59,8 +59,8 @@ public class TransformerOutputBlobHeaderPopulator {
                                 + "PERSON_IDS:basic_passthrough(ArtworkBasicPassthrough).personIdStrs(STRING[])\n"
                                 + "SOURCE_MOVIE_ID:source_movie_id(PassthroughVideo).id(INT)\n"
                                 + "IDENTIFIERS:basic_passthrough(ArtworkBasicPassthrough).identifiers(STRING[])\n"
+                                + "ACQUISITION_SOURCE:acquisitionSource(AcquisitionSource).value(STRING)\n"
                         );
-                
     }
 
 }

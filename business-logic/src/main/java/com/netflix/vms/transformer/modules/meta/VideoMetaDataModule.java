@@ -8,6 +8,7 @@ import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_DATE;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_STATUS;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
+import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
@@ -49,7 +50,6 @@ import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoDateUtil;
 import com.netflix.vms.transformer.util.VideoSetTypeUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -235,7 +235,14 @@ public class VideoMetaDataModule {
 
             ListOfRightsWindowHollow windows = status._getRights()._getWindows();
             for (RightsWindowHollow window : windows) {
-                if (window._getStartDate() < ctx.getNowMillis() && window._getEndDate() > ctx.getNowMillis()) {
+                long startDate = window._getStartDate();
+                long endDate = window._getEndDate();
+                if(window._getOnHold()) {
+                    startDate += ONE_THOUSAND_YEARS;
+                    endDate += ONE_THOUSAND_YEARS;
+                }
+                
+                if (startDate < ctx.getNowMillis() && endDate > ctx.getNowMillis()) {
                     isInWindow = true;
                     break;
                 }

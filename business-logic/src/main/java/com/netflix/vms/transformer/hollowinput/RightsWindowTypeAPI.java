@@ -12,6 +12,7 @@ public class RightsWindowTypeAPI extends HollowObjectTypeAPI {
         super(api, typeDataAccess, new String[] {
             "startDate",
             "endDate",
+            "onHold",
             "contractIdsExt"
         });
         this.delegateLookupImpl = new RightsWindowDelegateLookupImpl(this);
@@ -59,10 +60,24 @@ public class RightsWindowTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public int getContractIdsExtOrdinal(int ordinal) {
+    public boolean getOnHold(int ordinal) {
         if(fieldIndex[2] == -1)
+            return missingDataHandler().handleBoolean("RightsWindow", ordinal, "onHold") == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[2]) == Boolean.TRUE;
+    }
+
+    public Boolean getOnHoldBoxed(int ordinal) {
+        if(fieldIndex[2] == -1)
+            return missingDataHandler().handleBoolean("RightsWindow", ordinal, "onHold");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[2]);
+    }
+
+
+
+    public int getContractIdsExtOrdinal(int ordinal) {
+        if(fieldIndex[3] == -1)
             return missingDataHandler().handleReferencedOrdinal("RightsWindow", ordinal, "contractIdsExt");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[2]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[3]);
     }
 
     public ListOfRightsWindowContractTypeAPI getContractIdsExtTypeAPI() {

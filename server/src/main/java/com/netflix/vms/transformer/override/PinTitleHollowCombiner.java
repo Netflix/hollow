@@ -3,6 +3,22 @@ package com.netflix.vms.transformer.override;
 import static com.netflix.vms.transformer.common.config.OutputTypeConfig.NamedCollectionHolder;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CyclePinnedTitles;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.netflix.hollow.HollowObjectSchema;
 import com.netflix.hollow.combine.HollowCombiner;
 import com.netflix.hollow.combine.HollowCombinerExcludePrimaryKeysCopyDirector;
@@ -37,21 +53,6 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.OutputTypeConfig;
 import com.netflix.vms.transformer.index.VMSOutputTypeIndexer;
 import com.netflix.vms.transformer.publish.workflow.IndexDuplicateChecker;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Custom Combiner to handle title override / pinning
@@ -196,17 +197,12 @@ public class PinTitleHollowCombiner {
         return output;
     }
 
-    /**
-     * Return override blob Id
-     */
-    public String combine() throws Exception {
+    public void combine() throws Exception {
         combiner.combine();
         combineNamedLists();
         writeNamedListsToOutput(output);
-        String id = PinTitleHelper.addBlobID(output, inputs);
-
+        PinTitleHelper.combineHeader(output, inputs);
         validateCombinedData(output);
-        return id;
     }
 
     // Validates the combined data to check for duplicates
@@ -217,8 +213,17 @@ public class PinTitleHollowCombiner {
         dupChecker.checkDuplicates();
 
         if (dupChecker.wasDupKeysDetected()) {
-            ctx.getLogger().error(CyclePinnedTitles, "Duplicate Keys detected in Core Type(s): {}", dupChecker.getResults());
-            throw new Exception("Duplicate Keys detected in Core Type(s): " + dupChecker.getResults());
+            Map<String, Collection<Object[]>> dups = dupChecker.getResults();
+
+            for(Map.Entry<String, Collection<Object[]>> dupEntry : dups.entrySet()) {
+                StringBuilder message = new StringBuilder("Duplicate keys detected in type " + dupEntry.getKey() + ": ");
+                for(Object[] key : dupEntry.getValue()) {
+                    message.append(Arrays.toString(key)).append(" ");
+                }
+                ctx.getLogger().error(CyclePinnedTitles, message.toString());
+            }
+
+            throw new Exception("Duplicate Keys detected in Core Type(s): " + dupChecker.getResults().keySet());
         }
     }
 

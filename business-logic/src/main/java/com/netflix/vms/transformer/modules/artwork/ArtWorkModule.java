@@ -321,7 +321,6 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             passThrough.group_id = passThroughString;
             setBasicPassThrough = true;
         }
-
         if (keyListValues.containsKey("AWARD_CAMPAIGNS")) {
             passThrough.awardCampaigns = keyListValues.get("AWARD_CAMPAIGNS");
             setBasicPassThrough = true;
@@ -350,6 +349,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         desc.source = sourcePassThrough;
         desc.file_seq = java.lang.Integer.valueOf(keyValues.get("file_seq"));
         desc.source_movie_id = getPassThroughVideo("SOURCE_MOVIE_ID", keyValues);
+        desc.acquisitionSource = getAcquisitionSource("ACQUISITION_SOURCE", keyValues);
     }
 
     private PassthroughVideo getPassThroughVideo(String key, HashMap<String, String> keyValues) {
@@ -361,21 +361,25 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     }
 
     private PassthroughString getPassThroughString(String key, HashMap<String, String> keyValues) {
-        PassthroughString passthroughString = new PassthroughString();
         String value = keyValues.get(key);
         if(value != null) {
-            passthroughString.value = value.toCharArray();
-            return passthroughString;
+            return new PassthroughString(value);
+        }
+        return null;
+    }
+
+    private AcquisitionSource getAcquisitionSource(String key, HashMap<String, String> keyValues) {
+        String value = keyValues.get(key);
+        if (value != null) {
+            return new AcquisitionSource(value);
         }
         return null;
     }
 
     private ArtworkSourceString getArtworkSourceString(String key, HashMap<String, String> keyValues) {
-        ArtworkSourceString passthroughString = new ArtworkSourceString();
         String value = keyValues.get(key);
         if(value != null) {
-            passthroughString.value = value.toCharArray();
-            return passthroughString;
+            return new ArtworkSourceString(value);
         }
         return null;
     }
@@ -474,7 +478,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     protected Set<Artwork> getArtworkSet(int entityId, Map<java.lang.Integer, Set<Artwork>> artMap) {
         Set<Artwork> artworkSet = artMap.get(entityId);
         if (artworkSet == null) {
-            artworkSet = new HashSet<>();
+            artworkSet = new LinkedHashSet<>();
             artMap.put(entityId, artworkSet);
         }
         return artworkSet;

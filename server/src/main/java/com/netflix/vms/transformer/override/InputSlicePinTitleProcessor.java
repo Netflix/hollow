@@ -1,5 +1,9 @@
 package com.netflix.vms.transformer.override;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.write.HollowWriteStateEngine;
@@ -11,10 +15,6 @@ import com.netflix.vms.transformer.common.slice.DataSlicer;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
 import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * Generates Title Override based on Input Slice
@@ -49,7 +49,7 @@ public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
             new SimpleTransformer(api, outputStateEngine, ctx).transform();
 
             String blobID = PinTitleHelper.createBlobID("i", inputDataVersion, topNodes);
-            writeStateEngine(outputStateEngine, localFile, blobID);
+            writeStateEngine(outputStateEngine, localFile, blobID, inputDataVersion, topNodes);
         }
 
         return readStateEngine(localFile);
@@ -64,7 +64,7 @@ public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
             HollowWriteStateEngine slicedStateEngine = slicer.sliceInputBlob(inputStateEngine);
 
             String blobID = PinTitleHelper.createBlobID("sliced_input", inputDataVersion, topNodes);
-            writeStateEngine(slicedStateEngine, slicedFile, blobID);
+            writeStateEngine(slicedStateEngine, slicedFile, blobID, inputDataVersion, topNodes);
             ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Sliced[INPUT] videoId={} from vip={}, version={}, duration={}", Arrays.toString(topNodes), vip, inputDataVersion, (System.currentTimeMillis() - start));
         }
 

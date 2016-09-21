@@ -5,6 +5,7 @@ public class AvailabilityWindow implements Cloneable {
 
     public Date startDate = null;
     public Date endDate = null;
+    public boolean onHold = false;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
@@ -18,6 +19,7 @@ public class AvailabilityWindow implements Cloneable {
         if(o.endDate == null) {
             if(endDate != null) return false;
         } else if(!o.endDate.equals(endDate)) return false;
+        if(onHold != o.onHold) return false;
         return true;
     }
 
@@ -25,6 +27,7 @@ public class AvailabilityWindow implements Cloneable {
         int hashCode = 1;
         hashCode = hashCode * 31 + (startDate == null ? 1237 : startDate.hashCode());
         hashCode = hashCode * 31 + (endDate == null ? 1237 : endDate.hashCode());
+        hashCode = hashCode * 31 + (onHold ? 1231 : 1237);
         return hashCode;
     }
 
@@ -32,6 +35,7 @@ public class AvailabilityWindow implements Cloneable {
         StringBuilder builder = new StringBuilder("AvailabilityWindow{");
         builder.append("startDate=").append(startDate);
         builder.append(",endDate=").append(endDate);
+        builder.append(",onHold=").append(onHold);
         builder.append("}");
         return builder.toString();
     }

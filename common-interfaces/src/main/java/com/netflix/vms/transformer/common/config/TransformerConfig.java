@@ -41,6 +41,9 @@ public interface TransformerConfig {
 
     @DefaultValue("0")
     int getMaxTolerableFailedTransformerHierarchies();
+    
+    // A comma-delimited list of top node IDs to drop on the floor prior to processing.
+    String getDropTopNodesOnFloor();
 
     String getOverrideFastlaneIds();
 

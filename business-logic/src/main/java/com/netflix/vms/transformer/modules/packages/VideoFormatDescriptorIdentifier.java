@@ -21,14 +21,12 @@ public class VideoFormatDescriptorIdentifier {
 
     private final CycleConstants cycleConstants;
     private final Set<Integer> ultraHDEncodingProfileIds;
-    private final Set<SuperHDIdentifier> validSuperHDIdentifiers;
     private final Set<TargetResolution> aspectRatioVideoFormatIdentifiers;
 
 
     public VideoFormatDescriptorIdentifier(VMSHollowInputAPI api, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
         this.cycleConstants = cycleConstants;
         this.ultraHDEncodingProfileIds = getUltraHDEncodingProfileIds(api, indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE_GROUP));
-        this.validSuperHDIdentifiers = getValidSuperHDIdentifiers();
         this.aspectRatioVideoFormatIdentifiers = getAspectRatioVideoFormatIdentifiers();
 
     }
@@ -53,6 +51,9 @@ public class VideoFormatDescriptorIdentifier {
     }
 
     public VideoFormatDescriptor selectVideoFormatDescriptor(int encodingProfileId, int bitrate, int height, int width, int targetHeight, int targetWidth) {
+        if(encodingProfileId == 214)
+            return cycleConstants.SUPER_HD;
+        
         if(ultraHDEncodingProfileIds.contains(Integer.valueOf(encodingProfileId)))
             return cycleConstants.ULTRA_HD;
 
@@ -76,9 +77,6 @@ public class VideoFormatDescriptorIdentifier {
         if(height <= 719)
             return cycleConstants.SD;
 
-        if(validSuperHDIdentifiers.contains(new SuperHDIdentifier(encodingProfileId, bitrate)))
-            return cycleConstants.SUPER_HD;
-
         return cycleConstants.HD;
     }
     
@@ -99,19 +97,6 @@ public class VideoFormatDescriptorIdentifier {
         }
 
         return ultraHDEncodingProfiles;
-    }
-
-    private Set<SuperHDIdentifier> getValidSuperHDIdentifiers() {
-        Set<SuperHDIdentifier> set = new HashSet<SuperHDIdentifier>();
-
-        set.add(new SuperHDIdentifier(214, 4300));
-        set.add(new SuperHDIdentifier(214, 4302));
-        set.add(new SuperHDIdentifier(67, 4300));
-        set.add(new SuperHDIdentifier(214, 5800));
-        set.add(new SuperHDIdentifier(214, 5802));
-        set.add(new SuperHDIdentifier(67, 5800));
-
-        return set;
     }
 
     ///TODO: This seems wrong.  What is the point of checking for these specific target resolutions?
