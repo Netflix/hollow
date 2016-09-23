@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.person;
 
+import com.netflix.vms.transformer.CycleConstants;
+
 import com.netflix.hollow.index.HollowHashIndex;
 import com.netflix.hollow.index.HollowHashIndexResult;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
@@ -33,7 +35,6 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -45,8 +46,8 @@ public class GlobalPersonModule extends AbstractTransformModule {
     private final HollowHashIndex moviePersonCharacterIndex;
     private final HollowHashIndex movieCharacterIndex;
 
-    public GlobalPersonModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
-        super(api, ctx, mapper);
+    public GlobalPersonModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+        super(api, ctx, cycleConstants, mapper);
         this.moviePersonCharacterIndex = indexer.getHashIndex(IndexSpec.MOVIE_CHARACTER_PERSON_MOVIES_BY_PERSON_ID);
         this.movieCharacterIndex = indexer.getHashIndex(IndexSpec.MOVIE_CHARACTER_PERSON_CHARACTERS_BY_PERSON_ID_AND_MOVIE_ID);
         this.personBioIndex = indexer.getPrimaryKeyIndex(IndexSpec.PERSON_BIO);

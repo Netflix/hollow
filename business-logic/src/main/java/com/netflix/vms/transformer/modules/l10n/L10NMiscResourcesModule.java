@@ -2,6 +2,8 @@ package com.netflix.vms.transformer.modules.l10n;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.*;
 
+import com.netflix.vms.transformer.CycleConstants;
+
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
@@ -23,15 +25,14 @@ import com.netflix.vms.transformer.modules.l10n.processor.PersonCharacterProcess
 import com.netflix.vms.transformer.modules.l10n.processor.PersonsProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.ShowMemberTypesProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.TurboCollectionsProcessor;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class L10NMiscResourcesModule extends AbstractTransformModule {
     private List<L10NMiscProcessor<?>> processorList = new ArrayList<>();
 
-    public L10NMiscResourcesModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
-        super(api, ctx, mapper);
+    public L10NMiscResourcesModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+        super(api, ctx, cycleConstants, mapper);
 
         processorList.add(new AltGenresProcessor(api, ctx, mapper));
         processorList.add(new AssetMetaDatasProcessor(api, ctx, mapper));

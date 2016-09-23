@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.modules.rollout;
 
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
@@ -38,7 +39,6 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
 import com.netflix.vms.transformer.util.OutputUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,8 +50,8 @@ import java.util.Map.Entry;
 
 public class RolloutVideoModule extends AbstractTransformModule {
 
-    public RolloutVideoModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
-        super(api, ctx, mapper);
+    public RolloutVideoModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+        super(api, ctx, cycleConstants, mapper);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class RolloutVideoModule extends AbstractTransformModule {
                         AvailabilityWindow w = new AvailabilityWindow();
                         RolloutPhaseWindowHollow inputPhaseWindow = entry.getValue();
                         copy(inputPhaseWindow, w);
-                        ISOCountry country = new ISOCountry(entry.getKey()._getValue());
+                        ISOCountry country = cycleConstants.getISOCountry(entry.getKey()._getValue());
                         phase.windowsMap.put(country, w);
 
                         List<RolloutPhaseWindow> phaseWindowList = summary.phaseWindowMap.get(country);

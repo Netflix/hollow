@@ -51,6 +51,7 @@ public class PackageDataModule {
 
     private final VMSHollowInputAPI api;
     private final HollowObjectMapper mapper;
+    private final CycleConstants cycleConstants;
 
     private final HollowHashIndex packagesByVideoIdx;
     private final HollowPrimaryKeyIndex deployablePackagesIdx;
@@ -65,6 +66,7 @@ public class PackageDataModule {
     public PackageDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper objectMapper, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
         this.api = api;
         this.mapper = objectMapper;
+        this.cycleConstants = cycleConstants;
         this.packagesByVideoIdx = indexer.getHashIndex(IndexSpec.PACKAGES_BY_VIDEO);
         this.deployablePackagesIdx = indexer.getPrimaryKeyIndex(IndexSpec.DEPLOYABLE_PACKAGES);
 
@@ -192,7 +194,7 @@ public class PackageDataModule {
             pkg.allDeployableCountries = new HashSet<ISOCountry>();
             DeployablePackagesHollow deployablePackages = api.getDeployablePackagesHollow(deployablePackagesOrdinal);
             for(ISOCountryHollow isoCountry : deployablePackages._getCountryCodes()) {
-                pkg.allDeployableCountries.add(new ISOCountry(isoCountry._getValue()));
+                pkg.allDeployableCountries.add(cycleConstants.getISOCountry(isoCountry._getValue()));
             }
         }
 

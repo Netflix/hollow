@@ -4,9 +4,7 @@ import java.util.Arrays;
 
 public class ISOCountry implements Cloneable {
 
-    public char[] id = null;
-
-    public ISOCountry() { }
+    public final char[] id;
 
     public ISOCountry(char[] value) {
         this.id = value;

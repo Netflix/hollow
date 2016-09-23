@@ -38,7 +38,6 @@ import com.netflix.vms.transformer.hollowinput.VideoGeneralTitleTypeHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
 import com.netflix.vms.transformer.hollowoutput.Hook;
 import com.netflix.vms.transformer.hollowoutput.HookType;
-import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.NFLocale;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VPerson;
@@ -333,7 +332,7 @@ public class VideoMetaDataModule {
 
             StringHollow origCountry = general._getOriginCountryCode();
             if(origCountry != null)
-                vmd.countryOfOrigin = new ISOCountry(origCountry._getValue());
+                vmd.countryOfOrigin = constants.getISOCountry(origCountry._getValue());
             vmd.countryOfOriginNameLocale = new NFLocale(general._getOriginalTitleBcpCode()._getValue().replace('-', '_'));
             StringHollow origLang = general._getOriginalLanguageBcpCode();
             if(origLang != null)

@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.mpl;
 
+import com.netflix.vms.transformer.CycleConstants;
+
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.DrmSystemIdentifiersHollow;
@@ -7,7 +9,6 @@ import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.DrmKeyString;
 import com.netflix.vms.transformer.hollowoutput.DrmSystem;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
-
 import java.util.HashMap;
 
 public class DrmSystemModule extends AbstractTransformModule {
@@ -16,8 +17,8 @@ public class DrmSystemModule extends AbstractTransformModule {
     private final DrmKeyString TRUE = new DrmKeyString("true");
     private final DrmKeyString FALSE = new DrmKeyString("false");
 
-    public DrmSystemModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
-        super(api, ctx, mapper);
+    public DrmSystemModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, HollowObjectMapper mapper) {
+        super(api, ctx, cycleConstants, mapper);
     }
 
     @Override

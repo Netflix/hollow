@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.l10n;
 
+import com.netflix.vms.transformer.CycleConstants;
+
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -12,7 +14,6 @@ import com.netflix.vms.transformer.modules.l10n.processor.LocalizedMetadataProce
 import com.netflix.vms.transformer.modules.l10n.processor.MoviesProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.StoriesSynopsesProcessor;
 import com.netflix.vms.transformer.modules.l10n.processor.VideoRatingsProcessor;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -22,8 +23,8 @@ import java.util.Set;
 public class L10NVideoResourcesModule extends AbstractTransformModule {
     private List<L10NVideoProcessor<?>> processorList = new ArrayList<>();
 
-    public L10NVideoResourcesModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
-        super(api, ctx, mapper);
+    public L10NVideoResourcesModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+        super(api, ctx, cycleConstants, mapper);
 
         processorList.add(new EpisodesProcessor(api, ctx, mapper, indexer));
         processorList.add(new MoviesProcessor(api, ctx, mapper, indexer));
