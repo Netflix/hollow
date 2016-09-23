@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.passthrough.mpl;
 
+import com.netflix.vms.transformer.CycleConstants;
+
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.StreamProfileGroupsHollow;
@@ -8,14 +10,13 @@ import com.netflix.vms.transformer.hollowinput.StreamProfileIdListHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.EncodingProfileGroup;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
-
 import java.util.Collection;
 import java.util.HashSet;
 
 public class EncodingProfileGroupModule extends AbstractTransformModule {
 
-    public EncodingProfileGroupModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
-        super(api, ctx, mapper);
+    public EncodingProfileGroupModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, HollowObjectMapper mapper) {
+        super(api, ctx, cycleConstants, mapper);
     }
 
     @Override

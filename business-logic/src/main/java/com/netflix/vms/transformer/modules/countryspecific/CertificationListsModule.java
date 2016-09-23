@@ -1,7 +1,8 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
-import java.util.Collections;
+import com.netflix.vms.transformer.CycleConstants;
 
+import java.util.Collections;
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.hollowinput.ConsolidatedCertSystemRatingHollow;
 import com.netflix.vms.transformer.hollowinput.ConsolidatedCertificationSystemsHollow;
@@ -16,7 +17,6 @@ import com.netflix.vms.transformer.hollowinput.VideoRatingAdvisoryIdHollow;
 import com.netflix.vms.transformer.hollowoutput.Certification;
 import com.netflix.vms.transformer.hollowoutput.CertificationSystem;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
-import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.MovieCertification;
 import com.netflix.vms.transformer.hollowoutput.MovieRatingReason;
 import com.netflix.vms.transformer.hollowoutput.Strings;
@@ -34,11 +34,14 @@ public class CertificationListsModule {
     private final HollowPrimaryKeyIndex videoRatingsIdx;
     private final HollowPrimaryKeyIndex certSystemIdx;
     private final HollowPrimaryKeyIndex certSystemRatingIdx;
+    
+    private final CycleConstants cycleConstants;
 
     private final Map<Integer, Map<String, List<Certification>>> perCountryCertificationLists;
 
-    public CertificationListsModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer) {
+    public CertificationListsModule(VMSHollowInputAPI api, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
         this.api = api;
+        this.cycleConstants = cycleConstants;
         this.videoRatingsIdx = indexer.getPrimaryKeyIndex(IndexSpec.CONSOLIDATED_VIDEO_RATINGS);
         this.certSystemIdx = indexer.getPrimaryKeyIndex(IndexSpec.CONSOLIDATED_CERT_SYSTEMS);
         this.certSystemRatingIdx = indexer.getPrimaryKeyIndex(IndexSpec.CERT_SYSTEM_RATING);
@@ -115,7 +118,7 @@ public class CertificationListsModule {
 
                         cert.certSystem = new CertificationSystem();
                         cert.certSystem.id = (int) certSystem._getCertificationSystemId();
-                        cert.certSystem.country = new ISOCountry(certSystem._getCountryCode()._getValue());
+                        cert.certSystem.country = cycleConstants.getISOCountry(certSystem._getCountryCode()._getValue());
                         StringHollow officialURL = certSystem._getOfficialURL();
                         if(officialURL != null)
                             cert.certSystem.officialURL = new Strings(officialURL._getValue());

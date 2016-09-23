@@ -156,7 +156,7 @@ public class ContractRestrictionModule {
                 }
 
                 if (!contractRestrictions.isEmpty())
-                    restrictions.put(new ISOCountry(status._getCountryCode()._getValue()), contractRestrictions);
+                    restrictions.put(cycleConstants.getISOCountry(status._getCountryCode()._getValue()), contractRestrictions);
 
                 statusOrdinal = iter.next();
             }

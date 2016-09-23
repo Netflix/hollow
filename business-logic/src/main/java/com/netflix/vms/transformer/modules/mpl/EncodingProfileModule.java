@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.mpl;
 
+import com.netflix.vms.transformer.CycleConstants;
+
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -15,7 +17,6 @@ import com.netflix.vms.transformer.hollowoutput.VideoDimensionsDescriptor;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,8 +31,8 @@ public class EncodingProfileModule extends AbstractTransformModule {
     private final HollowPrimaryKeyIndex protectionTypeIndex;
 
 
-    public EncodingProfileModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
-        super(api, ctx, mapper);
+    public EncodingProfileModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+        super(api, ctx, cycleConstants, mapper);
 
         this.protectionTypeIndex = indexer.getPrimaryKeyIndex(IndexSpec.PROTECTION_TYPES);
     }

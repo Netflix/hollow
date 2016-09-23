@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.modules.passthrough.beehive;
 
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.CharacterElementsHollow;
 import com.netflix.vms.transformer.hollowinput.CharacterHollow;
@@ -12,7 +13,6 @@ import com.netflix.vms.transformer.hollowoutput.Quote;
 import com.netflix.vms.transformer.hollowoutput.RolloutCharacter;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,8 +24,8 @@ import java.util.Iterator;
 @Deprecated
 public class RolloutCharacterModule extends AbstractTransformModule {
 
-    public RolloutCharacterModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
-        super(api, ctx, mapper);
+    public RolloutCharacterModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, HollowObjectMapper mapper) {
+        super(api, ctx, cycleConstants, mapper);
     }
 
     @Override

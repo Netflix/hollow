@@ -141,8 +141,8 @@ public class SimpleTransformer {
                 VideoMiscDataModule miscDataModule = new VideoMiscDataModule(api, indexer);
                 VideoImagesDataModule imagesDataModule = new VideoImagesDataModule(api, ctx, objectMapper, cycleConstants, indexer);
                 CountrySpecificDataModule countrySpecificModule = new CountrySpecificDataModule(api, ctx, objectMapper, cycleConstants, indexer);
-                VideoEpisodeCountryDecoratorModule countryDecoratorModule = new VideoEpisodeCountryDecoratorModule(api, objectMapper);
-                L10NVideoResourcesModule l10nVideoResourcesModule = new L10NVideoResourcesModule(api, ctx, objectMapper, indexer);
+                VideoEpisodeCountryDecoratorModule countryDecoratorModule = new VideoEpisodeCountryDecoratorModule(api, cycleConstants, objectMapper);
+                L10NVideoResourcesModule l10nVideoResourcesModule = new L10NVideoResourcesModule(api, ctx, cycleConstants, objectMapper, indexer);
 
                 int idx = processedCount.getAndIncrement();
                 while (idx < processGroups.size()) {
@@ -189,22 +189,22 @@ public class SimpleTransformer {
         // @formatter:off
         // Register Transform Modules
         List<TransformModule> moduleList = Arrays.<TransformModule>asList(
-                new DrmSystemModule(api, ctx, objectMapper),
-                new OriginServerModule(api, ctx, objectMapper, indexer),
-                new EncodingProfileModule(api, ctx, objectMapper, indexer),
-                new CacheDeploymentIntentModule(api, ctx, objectMapper),
-                new ArtworkTypeModule(api, ctx, objectMapper),
-                new ArtworkImageRecipeModule(api, ctx, objectMapper),
-                new EncodingProfileGroupModule(api, ctx, objectMapper),
-                new DefaultExtensionRecipeModule(api, ctx, objectMapper),
+                new DrmSystemModule(api, ctx, cycleConstants, objectMapper),
+                new OriginServerModule(api, ctx, cycleConstants, objectMapper, indexer),
+                new EncodingProfileModule(api, ctx, cycleConstants, objectMapper, indexer),
+                new CacheDeploymentIntentModule(api, ctx, cycleConstants, objectMapper),
+                new ArtworkTypeModule(api, ctx, cycleConstants, objectMapper),
+                new ArtworkImageRecipeModule(api, ctx, cycleConstants, objectMapper),
+                new EncodingProfileGroupModule(api, ctx, cycleConstants, objectMapper),
+                new DefaultExtensionRecipeModule(api, ctx, cycleConstants, objectMapper),
 
-                new L10NMiscResourcesModule(api, ctx, objectMapper, indexer),
-                new LanguageRightsModule(api, ctx, objectMapper, indexer),
-                new TopNVideoDataModule(api, ctx, objectMapper),
-                new RolloutCharacterModule(api, ctx, objectMapper),
-                new RolloutVideoModule(api, ctx, objectMapper, indexer),
-                new PersonImagesModule(api, ctx, objectMapper, cycleConstants, indexer),
-                new CharacterImagesModule(api, ctx, objectMapper, cycleConstants, indexer)
+                new L10NMiscResourcesModule(api, ctx, cycleConstants, objectMapper, indexer),
+                new LanguageRightsModule(api, ctx, cycleConstants, objectMapper, indexer),
+                new TopNVideoDataModule(api, ctx, cycleConstants, objectMapper),
+                new RolloutCharacterModule(api, ctx, cycleConstants, objectMapper),
+                new RolloutVideoModule(api, ctx, cycleConstants, objectMapper, indexer),
+                new PersonImagesModule(api, ctx, cycleConstants, objectMapper, indexer),
+                new CharacterImagesModule(api, ctx, cycleConstants, objectMapper, indexer)
                 );
 
         // @formatter:on
@@ -217,7 +217,7 @@ public class SimpleTransformer {
         }
 
         /// GlobalPersonModule is pulled out separately here because we will use the result in the NamedListCompletionModule
-        GlobalPersonModule globalPersonModule = new GlobalPersonModule(api, ctx, objectMapper, indexer);
+        GlobalPersonModule globalPersonModule = new GlobalPersonModule(api, ctx, cycleConstants, objectMapper, indexer);
         long tStart = System.currentTimeMillis();
         List<GlobalPerson> allGlobalPersonRecords = globalPersonModule.transformPersons();
         long tDuration = System.currentTimeMillis() - tStart;
@@ -228,7 +228,7 @@ public class SimpleTransformer {
         //// NamedListCompletionModule happens after all hierarchies are already processed -- now we have built the ThreadSafeBitSets corresponding
         //// to the NamedLists, and we can build the POJOs using those.
         tStart = System.currentTimeMillis();
-        NamedListCompletionModule namedListCompleter = new NamedListCompletionModule(videoNamedListModule, allGlobalPersonRecords, objectMapper);
+        NamedListCompletionModule namedListCompleter = new NamedListCompletionModule(videoNamedListModule, allGlobalPersonRecords, cycleConstants, objectMapper);
         namedListCompleter.transform();
         tDuration = System.currentTimeMillis() - tStart;
         ctx.getLogger().info(NonVideoSpecificTransformDuration, "Finished Transform for module={}, duration={}", namedListCompleter.getName(), tDuration);
@@ -267,7 +267,7 @@ public class SimpleTransformer {
         // Process Complete Video
         for(Map.Entry<String, Set<VideoCollectionsDataHierarchy>> countryHierarchyEntry : vcdByCountry.entrySet()) {
             String countryId = countryHierarchyEntry.getKey();
-            ISOCountry country = getCountry(countryId);
+            ISOCountry country = cycleConstants.getISOCountry(countryId);
 
             for(VideoCollectionsDataHierarchy hierarchy : countryHierarchyEntry.getValue()) {
                 VideoCollectionsData videoCollectionsData = hierarchy.getTopNode();
@@ -460,16 +460,6 @@ public class SimpleTransformer {
 
     private static boolean isGoLive(CompleteVideo completeVideo) {
         return completeVideo.facetData != null && completeVideo.facetData.videoMediaData != null && completeVideo.facetData.videoMediaData.isGoLive;
-    }
-
-    private Map<String, ISOCountry> countries = new HashMap<String, ISOCountry>();
-    private ISOCountry getCountry(String id) {
-        ISOCountry country = countries.get(id);
-        if(country == null) {
-            country = new ISOCountry(id);
-            countries.put(id, country);
-        }
-        return country;
     }
 
     private static Comparator<ISOCountry> countryComparator = new ISOCountryComparator();

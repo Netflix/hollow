@@ -1,5 +1,8 @@
 package com.netflix.vms.transformer;
 
+
+import com.netflix.vms.transformer.hollowoutput.ISOCountry;
+import java.util.concurrent.ConcurrentHashMap;
 import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.contract.ContractAsset;
 import com.netflix.vms.transformer.hollowoutput.ArtworkCdn;
@@ -55,12 +58,33 @@ public class CycleConstants {
     public final InputOrdinalResultCache<ContractAsset> rightsContractAssetCache;
     public final MultilanguageCountryDialectOrdinalAssigner dialectOrdinalAssigner = new MultilanguageCountryDialectOrdinalAssigner();
     
+    private final ConcurrentHashMap<String, ISOCountry> isoCountryMap = new ConcurrentHashMap<String, ISOCountry>();
+    
     
     public CycleConstants(HollowReadStateEngine inputStateEngine) {
         this.artworkDerivativeCache = new InputOrdinalResultCache<ArtworkDerivative>(inputStateEngine.getTypeState("ArtworkDerivative").maxOrdinal());
         this.artworkDerivativesCache = new InputOrdinalResultCache<ArtworkDerivatives>(inputStateEngine.getTypeState("ArtworkDerivativeSet").maxOrdinal());
         this.cdnListCache = new InputOrdinalResultCache<List<ArtworkCdn>>(inputStateEngine.getTypeState("ArtworkDerivativeSet").maxOrdinal());
         this.rightsContractAssetCache = new InputOrdinalResultCache<ContractAsset>(inputStateEngine.getTypeState("RightsContractAsset").maxOrdinal());
+    }
+    
+    public ISOCountry getISOCountry(String countryId) {
+        ISOCountry country = isoCountryMap.get(countryId);
+        if(country == null) {
+            String uppercaseCountry = countryId.toUpperCase();
+            
+            if(countryId.length() != 2 || uppercaseCountry.charAt(0) < 'A' || uppercaseCountry.charAt(0) > 'Z' ||
+                    uppercaseCountry.charAt(1) < 'A' || uppercaseCountry.charAt(1) > 'Z')
+                throw new IllegalArgumentException("The country code \"" + countryId + "\" is invalid.");
+                
+            
+            country = new ISOCountry(uppercaseCountry);
+            ISOCountry existingCountry = isoCountryMap.putIfAbsent(countryId, country);
+            if(existingCountry != null)
+                country = existingCountry;
+        }
+        
+        return country;
     }
 
     private static VideoFormatDescriptor videoFormatDescriptor(int id, String name, String description) {

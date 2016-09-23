@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.modules.countryspecific;
 import com.netflix.vms.transformer.hollowoutput.MulticatalogCountryLocaleData;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
-import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.MulticatalogCountryData;
 import java.util.Collections;
 import com.netflix.hollow.index.HollowHashIndex;
@@ -69,7 +68,7 @@ public class CountrySpecificDataModule {
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
         this.rolloutVideoTypeIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
 
-        this.certificationListsModule = new CertificationListsModule(api, indexer);
+        this.certificationListsModule = new CertificationListsModule(api, constants, indexer);
         this.availabilityWindowModule = new VMSAvailabilityWindowModule(api, ctx, constants, indexer);
     }
 
@@ -201,7 +200,7 @@ public class CountrySpecificDataModule {
                 MulticatalogCountryData countryData = data.get(videoId);
                 if(countryData == null) {
                     countryData = new MulticatalogCountryData();
-                    countryData.country = new ISOCountry(countryCode);
+                    countryData.country = constants.getISOCountry(countryCode);
                     countryData.videoId = new Video(videoId);
                     countryData.languageData = new HashMap<>();
                     data.put(videoId, countryData);

@@ -22,7 +22,7 @@ import java.util.Set;
 
 public class CharacterImagesModule extends ArtWorkModule{
 
-    public CharacterImagesModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
+    public CharacterImagesModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
         super("Character", api, ctx, mapper, cycleConstants, indexer);
     }
 
