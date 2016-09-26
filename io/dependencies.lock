@@ -2172,7 +2172,7 @@
             ]
         },
         "org.apache.kafka:kafka-clients": {
-            "locked": "0.9.0.2-nflx.7",
+            "locked": "0.9.0.2-nflx.10",
             "transitive": [
                 "com.netflix.suro:suro-kafka-producer"
             ]
@@ -4795,7 +4795,7 @@
             ]
         },
         "org.apache.kafka:kafka-clients": {
-            "locked": "0.9.0.2-nflx.7",
+            "locked": "0.9.0.2-nflx.10",
             "transitive": [
                 "com.netflix.suro:suro-kafka-producer"
             ]
@@ -7418,7 +7418,7 @@
             ]
         },
         "org.apache.kafka:kafka-clients": {
-            "locked": "0.9.0.2-nflx.7",
+            "locked": "0.9.0.2-nflx.10",
             "transitive": [
                 "com.netflix.suro:suro-kafka-producer"
             ]
@@ -10041,7 +10041,7 @@
             ]
         },
         "org.apache.kafka:kafka-clients": {
-            "locked": "0.9.0.2-nflx.7",
+            "locked": "0.9.0.2-nflx.10",
             "transitive": [
                 "com.netflix.suro:suro-kafka-producer"
             ]
@@ -12763,7 +12763,7 @@
             ]
         },
         "org.apache.kafka:kafka-clients": {
-            "locked": "0.9.0.2-nflx.7",
+            "locked": "0.9.0.2-nflx.10",
             "transitive": [
                 "com.netflix.suro:suro-kafka-producer"
             ]
@@ -15387,7 +15387,7 @@
             ]
         },
         "org.apache.kafka:kafka-clients": {
-            "locked": "0.9.0.2-nflx.7",
+            "locked": "0.9.0.2-nflx.10",
             "transitive": [
                 "com.netflix.suro:suro-kafka-producer"
             ]
@@ -18016,7 +18016,7 @@
             ]
         },
         "org.apache.kafka:kafka-clients": {
-            "locked": "0.9.0.2-nflx.7",
+            "locked": "0.9.0.2-nflx.10",
             "transitive": [
                 "com.netflix.suro:suro-kafka-producer"
             ]
@@ -20645,7 +20645,7 @@
             ]
         },
         "org.apache.kafka:kafka-clients": {
-            "locked": "0.9.0.2-nflx.7",
+            "locked": "0.9.0.2-nflx.10",
             "transitive": [
                 "com.netflix.suro:suro-kafka-producer"
             ]
@@ -23274,7 +23274,7 @@
             ]
         },
         "org.apache.kafka:kafka-clients": {
-            "locked": "0.9.0.2-nflx.7",
+            "locked": "0.9.0.2-nflx.10",
             "transitive": [
                 "com.netflix.suro:suro-kafka-producer"
             ]
