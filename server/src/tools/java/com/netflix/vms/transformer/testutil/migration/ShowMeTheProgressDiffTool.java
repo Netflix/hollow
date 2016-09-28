@@ -20,7 +20,7 @@ public class ShowMeTheProgressDiffTool {
         addTypeDiff(diff, "VideoEpisode_CountryList", "country.id", "item.deliverableVideo.value");
         addTypeDiff(diff, "PackageData", "id");
         addTypeDiff(diff, "NamedCollectionHolder", "country.id");
-        addTypeDiff(diff, "MulticatalogCountryData", "video.value", "country.id");
+        addTypeDiff(diff, "MulticatalogCountryData", "videoId.value", "country.id");
         addTypeDiff(diff, "EncodingProfile", "id");
         addTypeDiff(diff, "OriginServer", "nameStr");
         addTypeDiff(diff, "LanguageRights", "contractId", "videoId.value");

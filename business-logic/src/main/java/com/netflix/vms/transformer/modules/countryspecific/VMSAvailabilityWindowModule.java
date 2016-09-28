@@ -289,7 +289,7 @@ public class VMSAvailabilityWindowModule {
                                 long windowEndDate = window._getEndDate();
                                 long windowStartDate = window._getStartDate();
                                 if(isGoLive && windowEndDate > ctx.getNowMillis() && windowStartDate < ctx.getNowMillis()) {
-                                    rollup.newInWindowStartDate(windowStartDate);
+                                    rollup.newInWindowAvailabilityDate(windowStartDate);
                                     isInWindow = true;
                                 }
                                 
