@@ -124,7 +124,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.3",
+            "locked": "3.1.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -227,6 +227,37 @@
             "locked": "2.8.2",
             "transitive": [
                 "com.netflix.hystrix:hystrix-serialization"
+            ]
+        },
+        "com.github.jnr:jffi": {
+            "locked": "1.2.10",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "com.github.jnr:jnr-constants": {
+            "locked": "0.9.0",
+            "transitive": [
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-ffi": {
+            "locked": "2.0.7",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core",
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-posix": {
+            "locked": "3.0.27",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core"
+            ]
+        },
+        "com.github.jnr:jnr-x86asm": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -505,7 +536,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.32",
+            "locked": "1.33",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -2586,14 +2617,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.164",
+            "locked": "59.166",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.164",
+            "locked": "59.166",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -3117,7 +3148,36 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.github.jnr:jnr-ffi",
+                "com.netflix.governator:governator",
+                "org.ow2.asm:asm-tree"
+            ]
+        },
+        "org.ow2.asm:asm-analysis": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-tree": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi",
+                "org.ow2.asm:asm-analysis",
+                "org.ow2.asm:asm-commons",
+                "org.ow2.asm:asm-util"
+            ]
+        },
+        "org.ow2.asm:asm-util": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -3411,7 +3471,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.3",
+            "locked": "3.1.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -3514,6 +3574,37 @@
             "locked": "2.8.2",
             "transitive": [
                 "com.netflix.hystrix:hystrix-serialization"
+            ]
+        },
+        "com.github.jnr:jffi": {
+            "locked": "1.2.10",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "com.github.jnr:jnr-constants": {
+            "locked": "0.9.0",
+            "transitive": [
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-ffi": {
+            "locked": "2.0.7",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core",
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-posix": {
+            "locked": "3.0.27",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core"
+            ]
+        },
+        "com.github.jnr:jnr-x86asm": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -3792,7 +3883,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.32",
+            "locked": "1.33",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -5873,14 +5964,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.164",
+            "locked": "59.166",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.164",
+            "locked": "59.166",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -6404,7 +6495,36 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.github.jnr:jnr-ffi",
+                "com.netflix.governator:governator",
+                "org.ow2.asm:asm-tree"
+            ]
+        },
+        "org.ow2.asm:asm-analysis": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-tree": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi",
+                "org.ow2.asm:asm-analysis",
+                "org.ow2.asm:asm-commons",
+                "org.ow2.asm:asm-util"
+            ]
+        },
+        "org.ow2.asm:asm-util": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -6698,7 +6818,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.3",
+            "locked": "3.1.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -6801,6 +6921,37 @@
             "locked": "2.8.2",
             "transitive": [
                 "com.netflix.hystrix:hystrix-serialization"
+            ]
+        },
+        "com.github.jnr:jffi": {
+            "locked": "1.2.10",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "com.github.jnr:jnr-constants": {
+            "locked": "0.9.0",
+            "transitive": [
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-ffi": {
+            "locked": "2.0.7",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core",
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-posix": {
+            "locked": "3.0.27",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core"
+            ]
+        },
+        "com.github.jnr:jnr-x86asm": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -7079,7 +7230,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.32",
+            "locked": "1.33",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -9160,14 +9311,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.164",
+            "locked": "59.166",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.164",
+            "locked": "59.166",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -9691,7 +9842,36 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.github.jnr:jnr-ffi",
+                "com.netflix.governator:governator",
+                "org.ow2.asm:asm-tree"
+            ]
+        },
+        "org.ow2.asm:asm-analysis": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-tree": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi",
+                "org.ow2.asm:asm-analysis",
+                "org.ow2.asm:asm-commons",
+                "org.ow2.asm:asm-util"
+            ]
+        },
+        "org.ow2.asm:asm-util": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -9985,7 +10165,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.3",
+            "locked": "3.1.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -10088,6 +10268,37 @@
             "locked": "2.8.2",
             "transitive": [
                 "com.netflix.hystrix:hystrix-serialization"
+            ]
+        },
+        "com.github.jnr:jffi": {
+            "locked": "1.2.10",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "com.github.jnr:jnr-constants": {
+            "locked": "0.9.0",
+            "transitive": [
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-ffi": {
+            "locked": "2.0.7",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core",
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-posix": {
+            "locked": "3.0.27",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core"
+            ]
+        },
+        "com.github.jnr:jnr-x86asm": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -10366,7 +10577,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.32",
+            "locked": "1.33",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -12440,14 +12651,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.164",
+            "locked": "59.166",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.164",
+            "locked": "59.166",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -12940,7 +13151,36 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.github.jnr:jnr-ffi",
+                "com.netflix.governator:governator",
+                "org.ow2.asm:asm-tree"
+            ]
+        },
+        "org.ow2.asm:asm-analysis": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-tree": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi",
+                "org.ow2.asm:asm-analysis",
+                "org.ow2.asm:asm-commons",
+                "org.ow2.asm:asm-util"
+            ]
+        },
+        "org.ow2.asm:asm-util": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -13287,7 +13527,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.3",
+            "locked": "3.1.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -13390,6 +13630,37 @@
             "locked": "2.8.2",
             "transitive": [
                 "com.netflix.hystrix:hystrix-serialization"
+            ]
+        },
+        "com.github.jnr:jffi": {
+            "locked": "1.2.10",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "com.github.jnr:jnr-constants": {
+            "locked": "0.9.0",
+            "transitive": [
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-ffi": {
+            "locked": "2.0.7",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core",
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-posix": {
+            "locked": "3.0.27",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core"
+            ]
+        },
+        "com.github.jnr:jnr-x86asm": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -13668,7 +13939,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.32",
+            "locked": "1.33",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -15749,14 +16020,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.164",
+            "locked": "59.166",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.164",
+            "locked": "59.166",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -16280,7 +16551,36 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.github.jnr:jnr-ffi",
+                "com.netflix.governator:governator",
+                "org.ow2.asm:asm-tree"
+            ]
+        },
+        "org.ow2.asm:asm-analysis": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-tree": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi",
+                "org.ow2.asm:asm-analysis",
+                "org.ow2.asm:asm-commons",
+                "org.ow2.asm:asm-util"
+            ]
+        },
+        "org.ow2.asm:asm-util": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -17666,7 +17966,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.3",
+            "locked": "3.1.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -17769,6 +18069,37 @@
             "locked": "2.8.2",
             "transitive": [
                 "com.netflix.hystrix:hystrix-serialization"
+            ]
+        },
+        "com.github.jnr:jffi": {
+            "locked": "1.2.10",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "com.github.jnr:jnr-constants": {
+            "locked": "0.9.0",
+            "transitive": [
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-ffi": {
+            "locked": "2.0.7",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core",
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-posix": {
+            "locked": "3.0.27",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core"
+            ]
+        },
+        "com.github.jnr:jnr-x86asm": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -18047,7 +18378,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.32",
+            "locked": "1.33",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -20128,14 +20459,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.164",
+            "locked": "59.166",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.164",
+            "locked": "59.166",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -20659,7 +20990,36 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.github.jnr:jnr-ffi",
+                "com.netflix.governator:governator",
+                "org.ow2.asm:asm-tree"
+            ]
+        },
+        "org.ow2.asm:asm-analysis": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-tree": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi",
+                "org.ow2.asm:asm-analysis",
+                "org.ow2.asm:asm-commons",
+                "org.ow2.asm:asm-util"
+            ]
+        },
+        "org.ow2.asm:asm-util": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -20953,7 +21313,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.3",
+            "locked": "3.1.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -21056,6 +21416,37 @@
             "locked": "2.8.2",
             "transitive": [
                 "com.netflix.hystrix:hystrix-serialization"
+            ]
+        },
+        "com.github.jnr:jffi": {
+            "locked": "1.2.10",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "com.github.jnr:jnr-constants": {
+            "locked": "0.9.0",
+            "transitive": [
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-ffi": {
+            "locked": "2.0.7",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core",
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-posix": {
+            "locked": "3.0.27",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core"
+            ]
+        },
+        "com.github.jnr:jnr-x86asm": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -21334,7 +21725,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.32",
+            "locked": "1.33",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -23414,14 +23805,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.164",
+            "locked": "59.166",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.164",
+            "locked": "59.166",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -23914,7 +24305,36 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.github.jnr:jnr-ffi",
+                "com.netflix.governator:governator",
+                "org.ow2.asm:asm-tree"
+            ]
+        },
+        "org.ow2.asm:asm-analysis": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-tree": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi",
+                "org.ow2.asm:asm-analysis",
+                "org.ow2.asm:asm-commons",
+                "org.ow2.asm:asm-util"
+            ]
+        },
+        "org.ow2.asm:asm-util": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -24220,7 +24640,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.3",
+            "locked": "3.1.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -24330,6 +24750,37 @@
             "locked": "0.3.0",
             "transitive": [
                 "org.cassandraunit:cassandra-unit-shaded"
+            ]
+        },
+        "com.github.jnr:jffi": {
+            "locked": "1.2.10",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "com.github.jnr:jnr-constants": {
+            "locked": "0.9.0",
+            "transitive": [
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-ffi": {
+            "locked": "2.0.7",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core",
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-posix": {
+            "locked": "3.0.27",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core"
+            ]
+        },
+        "com.github.jnr:jnr-x86asm": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -24612,7 +25063,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.32",
+            "locked": "1.33",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -24620,13 +25071,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.21",
+            "locked": "1.22",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.32",
+            "locked": "1.33",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -26745,14 +27196,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.164",
+            "locked": "59.166",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.164",
+            "locked": "59.166",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -27315,7 +27766,36 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.github.jnr:jnr-ffi",
+                "com.netflix.governator:governator",
+                "org.ow2.asm:asm-tree"
+            ]
+        },
+        "org.ow2.asm:asm-analysis": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-tree": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi",
+                "org.ow2.asm:asm-analysis",
+                "org.ow2.asm:asm-commons",
+                "org.ow2.asm:asm-util"
+            ]
+        },
+        "org.ow2.asm:asm-util": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -27625,7 +28105,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.3",
+            "locked": "3.1.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -27735,6 +28215,37 @@
             "locked": "0.3.0",
             "transitive": [
                 "org.cassandraunit:cassandra-unit-shaded"
+            ]
+        },
+        "com.github.jnr:jffi": {
+            "locked": "1.2.10",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "com.github.jnr:jnr-constants": {
+            "locked": "0.9.0",
+            "transitive": [
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-ffi": {
+            "locked": "2.0.7",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core",
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-posix": {
+            "locked": "3.0.27",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core"
+            ]
+        },
+        "com.github.jnr:jnr-x86asm": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -28017,7 +28528,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.32",
+            "locked": "1.33",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -28025,13 +28536,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.21",
+            "locked": "1.22",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.32",
+            "locked": "1.33",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -30150,14 +30661,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.164",
+            "locked": "59.166",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.164",
+            "locked": "59.166",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -30720,7 +31231,36 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.github.jnr:jnr-ffi",
+                "com.netflix.governator:governator",
+                "org.ow2.asm:asm-tree"
+            ]
+        },
+        "org.ow2.asm:asm-analysis": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-tree": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi",
+                "org.ow2.asm:asm-analysis",
+                "org.ow2.asm:asm-commons",
+                "org.ow2.asm:asm-util"
+            ]
+        },
+        "org.ow2.asm:asm-util": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -31030,7 +31570,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.3",
+            "locked": "3.1.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -31140,6 +31680,37 @@
             "locked": "0.3.0",
             "transitive": [
                 "org.cassandraunit:cassandra-unit-shaded"
+            ]
+        },
+        "com.github.jnr:jffi": {
+            "locked": "1.2.10",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "com.github.jnr:jnr-constants": {
+            "locked": "0.9.0",
+            "transitive": [
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-ffi": {
+            "locked": "2.0.7",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core",
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-posix": {
+            "locked": "3.0.27",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core"
+            ]
+        },
+        "com.github.jnr:jnr-x86asm": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -31422,7 +31993,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.32",
+            "locked": "1.33",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -31430,13 +32001,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.21",
+            "locked": "1.22",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.32",
+            "locked": "1.33",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -33555,14 +34126,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.164",
+            "locked": "59.166",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.164",
+            "locked": "59.166",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -34125,7 +34696,36 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.github.jnr:jnr-ffi",
+                "com.netflix.governator:governator",
+                "org.ow2.asm:asm-tree"
+            ]
+        },
+        "org.ow2.asm:asm-analysis": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-tree": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi",
+                "org.ow2.asm:asm-analysis",
+                "org.ow2.asm:asm-commons",
+                "org.ow2.asm:asm-util"
+            ]
+        },
+        "org.ow2.asm:asm-util": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -34435,7 +35035,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.3",
+            "locked": "3.1.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -34545,6 +35145,37 @@
             "locked": "0.3.0",
             "transitive": [
                 "org.cassandraunit:cassandra-unit-shaded"
+            ]
+        },
+        "com.github.jnr:jffi": {
+            "locked": "1.2.10",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "com.github.jnr:jnr-constants": {
+            "locked": "0.9.0",
+            "transitive": [
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-ffi": {
+            "locked": "2.0.7",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core",
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-posix": {
+            "locked": "3.0.27",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core"
+            ]
+        },
+        "com.github.jnr:jnr-x86asm": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -34827,7 +35458,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.32",
+            "locked": "1.33",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -34835,13 +35466,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.21",
+            "locked": "1.22",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.32",
+            "locked": "1.33",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -36960,14 +37591,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.164",
+            "locked": "59.166",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.164",
+            "locked": "59.166",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -37530,7 +38161,36 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.github.jnr:jnr-ffi",
+                "com.netflix.governator:governator",
+                "org.ow2.asm:asm-tree"
+            ]
+        },
+        "org.ow2.asm:asm-analysis": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-tree": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi",
+                "org.ow2.asm:asm-analysis",
+                "org.ow2.asm:asm-commons",
+                "org.ow2.asm:asm-util"
+            ]
+        },
+        "org.ow2.asm:asm-util": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -37828,7 +38488,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.3",
+            "locked": "3.1.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -37931,6 +38591,37 @@
             "locked": "2.8.2",
             "transitive": [
                 "com.netflix.hystrix:hystrix-serialization"
+            ]
+        },
+        "com.github.jnr:jffi": {
+            "locked": "1.2.10",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "com.github.jnr:jnr-constants": {
+            "locked": "0.9.0",
+            "transitive": [
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-ffi": {
+            "locked": "2.0.7",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core",
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-posix": {
+            "locked": "3.0.27",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core"
+            ]
+        },
+        "com.github.jnr:jnr-x86asm": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -38210,7 +38901,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.32",
+            "locked": "1.33",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -40300,14 +40991,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.164",
+            "locked": "59.166",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.164",
+            "locked": "59.166",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -40838,7 +41529,36 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.github.jnr:jnr-ffi",
+                "com.netflix.governator:governator",
+                "org.ow2.asm:asm-tree"
+            ]
+        },
+        "org.ow2.asm:asm-analysis": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-tree": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi",
+                "org.ow2.asm:asm-analysis",
+                "org.ow2.asm:asm-commons",
+                "org.ow2.asm:asm-util"
+            ]
+        },
+        "org.ow2.asm:asm-util": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -41132,7 +41852,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.3",
+            "locked": "3.1.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -41235,6 +41955,37 @@
             "locked": "2.8.2",
             "transitive": [
                 "com.netflix.hystrix:hystrix-serialization"
+            ]
+        },
+        "com.github.jnr:jffi": {
+            "locked": "1.2.10",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "com.github.jnr:jnr-constants": {
+            "locked": "0.9.0",
+            "transitive": [
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-ffi": {
+            "locked": "2.0.7",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core",
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-posix": {
+            "locked": "3.0.27",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core"
+            ]
+        },
+        "com.github.jnr:jnr-x86asm": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -41514,7 +42265,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.32",
+            "locked": "1.33",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -43604,14 +44355,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.164",
+            "locked": "59.166",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.164",
+            "locked": "59.166",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -44142,7 +44893,36 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.github.jnr:jnr-ffi",
+                "com.netflix.governator:governator",
+                "org.ow2.asm:asm-tree"
+            ]
+        },
+        "org.ow2.asm:asm-analysis": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-tree": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi",
+                "org.ow2.asm:asm-analysis",
+                "org.ow2.asm:asm-commons",
+                "org.ow2.asm:asm-util"
+            ]
+        },
+        "org.ow2.asm:asm-util": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -44436,7 +45216,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.3",
+            "locked": "3.1.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -44539,6 +45319,37 @@
             "locked": "2.8.2",
             "transitive": [
                 "com.netflix.hystrix:hystrix-serialization"
+            ]
+        },
+        "com.github.jnr:jffi": {
+            "locked": "1.2.10",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "com.github.jnr:jnr-constants": {
+            "locked": "0.9.0",
+            "transitive": [
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-ffi": {
+            "locked": "2.0.7",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core",
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-posix": {
+            "locked": "3.0.27",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core"
+            ]
+        },
+        "com.github.jnr:jnr-x86asm": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -44818,7 +45629,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.32",
+            "locked": "1.33",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -46908,14 +47719,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.164",
+            "locked": "59.166",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.164",
+            "locked": "59.166",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -47446,7 +48257,36 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.github.jnr:jnr-ffi",
+                "com.netflix.governator:governator",
+                "org.ow2.asm:asm-tree"
+            ]
+        },
+        "org.ow2.asm:asm-analysis": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-tree": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi",
+                "org.ow2.asm:asm-analysis",
+                "org.ow2.asm:asm-commons",
+                "org.ow2.asm:asm-util"
+            ]
+        },
+        "org.ow2.asm:asm-util": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "org.picocontainer:picocontainer": {
@@ -47740,7 +48580,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.0.3",
+            "locked": "3.1.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -47843,6 +48683,37 @@
             "locked": "2.8.2",
             "transitive": [
                 "com.netflix.hystrix:hystrix-serialization"
+            ]
+        },
+        "com.github.jnr:jffi": {
+            "locked": "1.2.10",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "com.github.jnr:jnr-constants": {
+            "locked": "0.9.0",
+            "transitive": [
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-ffi": {
+            "locked": "2.0.7",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core",
+                "com.github.jnr:jnr-posix"
+            ]
+        },
+        "com.github.jnr:jnr-posix": {
+            "locked": "3.0.27",
+            "transitive": [
+                "com.datastax.cassandra:cassandra-driver-core"
+            ]
+        },
+        "com.github.jnr:jnr-x86asm": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
@@ -48122,7 +48993,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.32",
+            "locked": "1.33",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -50212,14 +51083,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.164",
+            "locked": "59.166",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.164",
+            "locked": "59.166",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -50750,7 +51621,36 @@
         "org.ow2.asm:asm": {
             "locked": "5.0.4",
             "transitive": [
-                "com.netflix.governator:governator"
+                "com.github.jnr:jnr-ffi",
+                "com.netflix.governator:governator",
+                "org.ow2.asm:asm-tree"
+            ]
+        },
+        "org.ow2.asm:asm-analysis": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
+            ]
+        },
+        "org.ow2.asm:asm-tree": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi",
+                "org.ow2.asm:asm-analysis",
+                "org.ow2.asm:asm-commons",
+                "org.ow2.asm:asm-util"
+            ]
+        },
+        "org.ow2.asm:asm-util": {
+            "locked": "5.0.3",
+            "transitive": [
+                "com.github.jnr:jnr-ffi"
             ]
         },
         "org.picocontainer:picocontainer": {
