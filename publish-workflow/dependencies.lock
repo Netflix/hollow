@@ -1106,7 +1106,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.10-platform",
+            "locked": "0.9.0.11-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -1881,7 +1881,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "23.1",
+            "locked": "24.9",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -4168,7 +4168,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.10-platform",
+            "locked": "0.9.0.11-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -4943,7 +4943,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "23.1",
+            "locked": "24.9",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -7230,7 +7230,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.10-platform",
+            "locked": "0.9.0.11-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -8005,7 +8005,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "23.1",
+            "locked": "24.9",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -10292,7 +10292,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.10-platform",
+            "locked": "0.9.0.11-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -11067,7 +11067,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "23.1",
+            "locked": "24.9",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -13453,7 +13453,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.10-platform",
+            "locked": "0.9.0.11-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -14228,7 +14228,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "23.1",
+            "locked": "24.9",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -16515,7 +16515,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.10-platform",
+            "locked": "0.9.0.11-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -17291,7 +17291,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "23.1",
+            "locked": "24.9",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -19583,7 +19583,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.10-platform",
+            "locked": "0.9.0.11-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -20359,7 +20359,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "23.1",
+            "locked": "24.9",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -22651,7 +22651,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.10-platform",
+            "locked": "0.9.0.11-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -23427,7 +23427,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "23.1",
+            "locked": "24.9",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -25719,7 +25719,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.10-platform",
+            "locked": "0.9.0.11-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -26495,7 +26495,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "23.1",
+            "locked": "24.9",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]

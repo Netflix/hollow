@@ -979,7 +979,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.10-platform",
+            "locked": "0.9.0.11-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -1671,7 +1671,7 @@
             "requested": "3.12"
         },
         "netflix:country-launch": {
-            "locked": "23.1",
+            "locked": "24.9",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -3629,7 +3629,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.10-platform",
+            "locked": "0.9.0.11-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -4321,7 +4321,7 @@
             "requested": "3.12"
         },
         "netflix:country-launch": {
-            "locked": "23.1",
+            "locked": "24.9",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -6279,7 +6279,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.10-platform",
+            "locked": "0.9.0.11-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -6971,7 +6971,7 @@
             "requested": "3.12"
         },
         "netflix:country-launch": {
-            "locked": "23.1",
+            "locked": "24.9",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -8929,7 +8929,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.10-platform",
+            "locked": "0.9.0.11-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -9621,7 +9621,7 @@
             "requested": "3.12"
         },
         "netflix:country-launch": {
-            "locked": "23.1",
+            "locked": "24.9",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -11678,7 +11678,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.10-platform",
+            "locked": "0.9.0.11-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -12370,7 +12370,7 @@
             "requested": "3.12"
         },
         "netflix:country-launch": {
-            "locked": "23.1",
+            "locked": "24.9",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -14328,7 +14328,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.10-platform",
+            "locked": "0.9.0.11-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -15021,7 +15021,7 @@
             "requested": "3.12"
         },
         "netflix:country-launch": {
-            "locked": "23.1",
+            "locked": "24.9",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -16984,7 +16984,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.10-platform",
+            "locked": "0.9.0.11-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -17677,7 +17677,7 @@
             "requested": "3.12"
         },
         "netflix:country-launch": {
-            "locked": "23.1",
+            "locked": "24.9",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -19640,7 +19640,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.10-platform",
+            "locked": "0.9.0.11-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -20333,7 +20333,7 @@
             "requested": "3.12"
         },
         "netflix:country-launch": {
-            "locked": "23.1",
+            "locked": "24.9",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -22296,7 +22296,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.10-platform",
+            "locked": "0.9.0.11-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -22989,7 +22989,7 @@
             "requested": "3.12"
         },
         "netflix:country-launch": {
-            "locked": "23.1",
+            "locked": "24.9",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
