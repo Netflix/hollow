@@ -75,10 +75,13 @@ public class StreamDataModule {
 
     private final VMSHollowInputAPI api;
 
+    private final CycleConstants cycleConstants;
+
     private final HollowObjectMapper objectMapper;
 
     public StreamDataModule(VMSHollowInputAPI api, CycleConstants cycleConstants, VMSTransformerIndexer indexer, HollowObjectMapper objectMapper, Map<Integer, Object> drmKeysByGroupId, Map<Integer, DrmInfo> drmInfoByGroupId) {
         this.api = api;
+        this.cycleConstants = cycleConstants;
         this.assetTypeDescriptorMap = getAssetTypeDescriptorMap();
         this.timedTextTypeDescriptorMap = getTimedTextTypeDescriptorMap();
         this.deploymentLabelBitsetOffsetMap = getDeploymentLabelBitsetOffsetMap();
@@ -172,7 +175,7 @@ public class StreamDataModule {
             if(cacheDeployedCountries != null) {
                 outputStream.streamDataDescriptor.cacheDeployedCountries = new HashSet<ISOCountry>();
                 for(ISOCountryHollow country : cacheDeployedCountries) {
-                    outputStream.streamDataDescriptor.cacheDeployedCountries.add(new ISOCountry(country._getValue()));
+                    outputStream.streamDataDescriptor.cacheDeployedCountries.add(cycleConstants.getISOCountry(country._getValue()));
                 }
             }
 

@@ -11,7 +11,6 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.ContractHollow;
 import com.netflix.vms.transformer.hollowinput.FlagsHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfRightsContractPackageHollow;
-import com.netflix.vms.transformer.hollowinput.ListOfRightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.RightsContractAssetHollow;
 import com.netflix.vms.transformer.hollowinput.RightsContractHollow;
 import com.netflix.vms.transformer.hollowinput.RightsContractPackageHollow;
@@ -51,7 +50,7 @@ import java.util.Set;
 public class VMSAvailabilityWindowModule {
     
     public static final long ONE_THOUSAND_YEARS = (1000L * 365L * 24L * 60L * 60L * 1000L);
-    
+
     private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
     private final VMSTransformerIndexer indexer;
@@ -129,15 +128,7 @@ public class VMSAvailabilityWindowModule {
         int bundledAssetsGroupId = 0; /// the contract ID for the highest package ID across all windows;
 
         List<RightsWindowHollow> sortedWindows = new ArrayList<RightsWindowHollow>(rights._getWindows());
-        Collections.sort(sortedWindows, new Comparator<RightsWindowHollow>() {
-            @Override
-            public int compare(RightsWindowHollow o1, RightsWindowHollow o2) {
-                long o1StartDate = o1._getOnHold() ? o1._getStartDate() + ONE_THOUSAND_YEARS : o1._getStartDate();
-                long o2StartDate = o2._getOnHold() ? o2._getStartDate() + ONE_THOUSAND_YEARS : o2._getStartDate();
-                
-                return Long.compare(o1StartDate, o2StartDate);
-            }
-        });
+        Collections.sort(sortedWindows, RIGHTS_WINDOW_COMPARATOR);
         
         ///TODO: simplify this logic.
         for (RightsWindowHollow window : sortedWindows) {
@@ -298,7 +289,7 @@ public class VMSAvailabilityWindowModule {
                                 long windowEndDate = window._getEndDate();
                                 long windowStartDate = window._getStartDate();
                                 if(isGoLive && windowEndDate > ctx.getNowMillis() && windowStartDate < ctx.getNowMillis()) {
-                                    rollup.newInWindowStartDate(windowStartDate);
+                                    rollup.newInWindowAvailabilityDate(windowStartDate);
                                     isInWindow = true;
                                 }
                                 
@@ -438,35 +429,29 @@ public class VMSAvailabilityWindowModule {
 
     // Return AvailabilityWindow from MediaData
     private List<VMSAvailabilityWindow> populateRolledUpWindowData(Integer videoId, CountrySpecificRollupValues rollup, RightsHollow rights, boolean isGoLive, boolean isMulticatalogRollup) {
-        ListOfRightsWindowHollow windows = rights._getWindows();
+        List<RightsWindowHollow> windows = new ArrayList<RightsWindowHollow>(rights._getWindows());
 
         boolean windowsEmpty = windows.isEmpty();
         
         if(!windowsEmpty) {
-            long minStartDate = Long.MAX_VALUE;
-            long maxEndDate = 0;
             boolean isInWindow = false;
-            boolean isOnHold = false;
 
             int maxContractId = Integer.MIN_VALUE;
+            
+            Collections.sort(windows, RIGHTS_WINDOW_COMPARATOR);
+            
+            List<VMSAvailabilityWindow> windowList = new ArrayList<VMSAvailabilityWindow>(windows.size());
 
             for (RightsWindowHollow window : windows) {
                 long startDate = window._getStartDate();
                 long endDate = window._getEndDate();
+                boolean isOnHold = window._getOnHold();
                 
                 if(window._getOnHold()) {
                     startDate += ONE_THOUSAND_YEARS;
                     endDate += ONE_THOUSAND_YEARS;
                 }
                 
-                if(startDate < minStartDate) {
-                    minStartDate = startDate;
-                    isOnHold = window._getOnHold();
-                }
-                
-                if(endDate > maxEndDate)
-                    maxEndDate = endDate;
-
                 if(startDate < ctx.getNowMillis() && endDate > ctx.getNowMillis())
                     isInWindow = true;
 
@@ -474,24 +459,19 @@ public class VMSAvailabilityWindowModule {
                     if((int)rightsWindowContract._getContractId() > maxContractId)
                         maxContractId = (int)rightsWindowContract._getContractId();
                 }
-            }
 
-            boolean includeWindow = true;
-            if(isMulticatalogRollup) {
-                DateWindow windowWithEpisodes = rollup.doShow() ? rollup.getValidShowWindow(minStartDate, maxEndDate) : rollup.getValidSeasonWindow(minStartDate, maxEndDate);
-                
-                if(windowWithEpisodes != null) {
-                    minStartDate = windowWithEpisodes.startDateTimestamp;
-                    maxEndDate = windowWithEpisodes.endDateTimestamp;
-                } else {
-                    includeWindow = false;
+                if(isMulticatalogRollup) {
+                    DateWindow windowWithEpisodes = rollup.doShow() ? rollup.getValidShowWindow(startDate, endDate) : rollup.getValidSeasonWindow(startDate, endDate);
+                    
+                    if(windowWithEpisodes != null) {
+                        startDate = windowWithEpisodes.startDateTimestamp;
+                        endDate = windowWithEpisodes.endDateTimestamp;
+                    } else continue;
                 }
-            }
-            
-            if(includeWindow) {
+                
                 VMSAvailabilityWindow outputWindow = new VMSAvailabilityWindow();
-                outputWindow.startDate = OutputUtil.getRoundedDate(minStartDate);
-                outputWindow.endDate = OutputUtil.getRoundedDate(maxEndDate);
+                outputWindow.startDate = OutputUtil.getRoundedDate(startDate);
+                outputWindow.endDate = OutputUtil.getRoundedDate(endDate);
                 outputWindow.onHold = isOnHold;
                 outputWindow.bundledAssetsGroupId = maxContractId; //rollup.getFirstEpisodeBundledAssetId();
     
@@ -528,8 +508,10 @@ public class VMSAvailabilityWindowModule {
                         outputContractInfo.videoPackageInfo.runtimeInSeconds = (int)runtime;
                 }
     
-                return Collections.singletonList(outputWindow);
+                windowList.add(outputWindow);
             }
+            
+            return windowList;
         }
         
         return Collections.emptyList();
@@ -607,4 +589,14 @@ public class VMSAvailabilityWindowModule {
         this.transformedPackageData = null;
         this.windowPackageContractInfoModule.reset();
     }
+    
+    private static final Comparator<RightsWindowHollow> RIGHTS_WINDOW_COMPARATOR = new Comparator<RightsWindowHollow>() {
+        @Override
+        public int compare(RightsWindowHollow o1, RightsWindowHollow o2) {
+            long o1StartDate = o1._getOnHold() ? o1._getStartDate() + ONE_THOUSAND_YEARS : o1._getStartDate();
+            long o2StartDate = o2._getOnHold() ? o2._getStartDate() + ONE_THOUSAND_YEARS : o2._getStartDate();
+            
+            return Long.compare(o1StartDate, o2StartDate);
+        }
+    };
 }

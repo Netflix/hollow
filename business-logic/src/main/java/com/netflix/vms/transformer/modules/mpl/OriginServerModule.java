@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.mpl;
 
+import com.netflix.vms.transformer.CycleConstants;
+
 import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -21,9 +23,9 @@ public class OriginServerModule extends AbstractTransformModule {
 
     private final HollowPrimaryKeyIndex storageGroupsIndex;
     private final HollowPrimaryKeyIndex cdnsIndex;
-
-    public OriginServerModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
-        super(api, ctx, mapper);
+    
+    public OriginServerModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+        super(api, ctx, cycleConstants, mapper);
         this.storageGroupsIndex = indexer.getPrimaryKeyIndex(IndexSpec.STORAGE_GROUPS);
         this.cdnsIndex = indexer.getPrimaryKeyIndex(IndexSpec.CDNS);
     }
@@ -61,7 +63,7 @@ public class OriginServerModule extends AbstractTransformModule {
         output.idStr = input._getId()._getValue().toCharArray();
 
         ISOCountryListHollow countries = input._getCountries();
-        output.countries = ISOCountryUtil.createList(countries);
+        output.countries = ISOCountryUtil.createList(countries, cycleConstants);
 
         return output;
     }

@@ -1,10 +1,16 @@
 package com.netflix.vms.transformer.startup;
 
+import static java.lang.String.join;
+
 import com.google.common.collect.Maps;
 import com.netflix.server.base.NFFilter;
 import com.netflix.vms.transformer.health.TransformerHealthStatusServlet;
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
+
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,10 +27,21 @@ public final class JerseyModule extends JerseyServletModule {
         Map<String, String> initParams = Maps.newHashMap();
         initParams.put("requestId.accept", "true");
         initParams.put("requestId.require", "true");
+        //initParams.put(ResourceConfig.FEATURE_DISABLE_WADL, "true");
+        //initParams.put(PackagesResourceConfig.PROPERTY_PACKAGES, join(";",
+        //        "com.sun.jersey",
+        //        "com.netflix.niws",
+        //        "com.netflix.vms.transformer.rest"));
         filter("/*").through(NFFilter.class, initParams);
 
         // This sets up Jersey to serve any found resources that start with the base path of "/REST/"
-        serve("/REST/*").with(GuiceContainer.class);
+        Map<String, String> containerParams = new HashMap<String, String>();
+        containerParams.put(ResourceConfig.FEATURE_DISABLE_WADL, "true");
+        containerParams.put(PackagesResourceConfig.PROPERTY_PACKAGES, join(";",
+                "com.sun.jersey",
+                "com.netflix.niws",
+                "com.netflix.vms.transformer.rest"));
+        serve("/REST/*").with(GuiceContainer.class, containerParams);
 
         // Set up the healthcheck endpoint to be set by the provided status servlet.
         serve("/healthcheck").with(TransformerHealthStatusServlet.class);

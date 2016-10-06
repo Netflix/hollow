@@ -11,7 +11,6 @@ import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowoutput.ContractRestriction;
-import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.LinkedHashSetOfStrings;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
 import com.netflix.vms.transformer.hollowoutput.PixelAspect;
@@ -24,7 +23,6 @@ import com.netflix.vms.transformer.hollowoutput.VideoResolution;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,6 +35,7 @@ public class WindowPackageContractInfoModule {
 
     private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
+    private final CycleConstants cycleConstants;
     private final HollowPrimaryKeyIndex packageIdx;
     private final HollowPrimaryKeyIndex streamProfileIdx;
     private final HollowPrimaryKeyIndex videoGeneralIdx;
@@ -49,6 +48,7 @@ public class WindowPackageContractInfoModule {
     public WindowPackageContractInfoModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
         this.api = api;
         this.ctx = ctx;
+        this.cycleConstants = cycleConstants;
 
         this.packageMomentDataModule = new PackageMomentDataModule(api, cycleConstants, indexer);
 
@@ -207,7 +207,7 @@ public class WindowPackageContractInfoModule {
 
 
     private Set<com.netflix.vms.transformer.hollowoutput.Long> findRelevantExcludedDownloadables(PackageData packageData, String country) {
-        Set<ContractRestriction> countryContractRestrictions = packageData.contractRestrictions.get(new ISOCountry(country));
+        Set<ContractRestriction> countryContractRestrictions = packageData.contractRestrictions.get(cycleConstants.getISOCountry(country));
 
         if(countryContractRestrictions == null)
             return null;

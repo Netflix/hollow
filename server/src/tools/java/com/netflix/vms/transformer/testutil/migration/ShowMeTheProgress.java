@@ -84,6 +84,8 @@ public class ShowMeTheProgress {
         filter.addFieldRecursive("CompleteVideoFacetData", "videoImages", outputSchemas);
         filter.addFieldRecursive("CompleteVideo", "countrySpecificData", outputSchemas);
 
+        filter.addTypeRecursive("MulticatalogCountryData", outputSchemas);
+
         filter.addTypeRecursive("PersonImages", outputSchemas);
         filter.addTypeRecursive("CharacterImages", outputSchemas);
         filter.addTypeRecursive("FallbackUSArtwork", outputSchemas);

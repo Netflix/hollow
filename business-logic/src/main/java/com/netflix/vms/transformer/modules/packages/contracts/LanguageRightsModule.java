@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.packages.contracts;
 
+import com.netflix.vms.transformer.CycleConstants;
+
 import com.netflix.config.utils.Pair;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -22,7 +24,6 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
 import com.netflix.vms.transformer.util.VideoContractUtil;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -31,8 +32,8 @@ public class LanguageRightsModule extends AbstractTransformModule {
     private final VMSHollowInputAPI api;
     private final VMSTransformerIndexer indexer;
 
-    public LanguageRightsModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
-        super(api, ctx, mapper);
+    public LanguageRightsModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+        super(api, ctx, cycleConstants, mapper);
         this.api = api;
         this.indexer = indexer;
     }
@@ -71,7 +72,7 @@ public class LanguageRightsModule extends AbstractTransformModule {
                 }
 
                 Map<com.netflix.vms.transformer.hollowoutput.Integer, LanguageRestrictions> lrMap = new HashMap<>();
-                langRights.languageRestrictionsMap.put(new ISOCountry(countryCode), lrMap);
+                langRights.languageRestrictionsMap.put(cycleConstants.getISOCountry(countryCode), lrMap);
 
                 for (DisallowedAssetBundleHollow bundle_ : disallowedBundleList_) {
                     LanguageRestrictions lr = new LanguageRestrictions();

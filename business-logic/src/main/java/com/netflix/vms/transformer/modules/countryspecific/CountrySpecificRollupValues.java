@@ -53,7 +53,7 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
     private DateWindowAggregator showWindowAggregator = new DateWindowAggregator();
     private DateWindowAggregator seasonWindowAggregator = new DateWindowAggregator();
     
-    private long maxInWindowStartDate = 0;
+    private long maxInWindowLaunchDate = 0;
     
     private boolean viewableFoundLocalAudio = false;
     private boolean seasonFoundLocalAudio = false;
@@ -61,6 +61,8 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
     private boolean showFoundLocalText = false;
     private boolean seasonFoundLocalText = false;
     private boolean viewableFoundLocalText = false;
+    
+    private long episodeLaunchDate = -1L;
     
     
     public void setSeasonSequenceNumber(int seasonSequenceNumber) {
@@ -106,7 +108,7 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         seasonSequenceNumberMap = new HashMap<>();
         showBundledAssetFromFirstAvailableEpisode = Integer.MIN_VALUE;
         showBundledAssetFromFirstUnavailableEpisode = Integer.MIN_VALUE;
-        maxInWindowStartDate = 0;
+        maxInWindowLaunchDate = 0;
         showFoundLocalAudio = false;
         showFoundLocalText = false;
         showWindowAggregator.reset();
@@ -115,6 +117,7 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
     public void resetViewable() {
         viewableFoundLocalAudio = false;
         viewableFoundLocalText = false;
+        episodeLaunchDate = -1L;
     }
 
     public void episodeFound() {
@@ -247,13 +250,21 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         seasonSeqNums.set(sequenceNumber);
     }
     
-    public void newInWindowStartDate(long startDate) {
-        if(startDate > maxInWindowStartDate)
-            maxInWindowStartDate = startDate;
+    public void newEpisodeLaunchDate(long launchDate) {
+        episodeLaunchDate = launchDate;
     }
     
-    public long getMaxInWindowStartDate() {
-        return maxInWindowStartDate;
+    public void newInWindowAvailabilityDate(long startDate) {
+        if(episodeLaunchDate != -1L) {
+            if(episodeLaunchDate > maxInWindowLaunchDate)
+                maxInWindowLaunchDate = episodeLaunchDate;
+        } else if(startDate > maxInWindowLaunchDate) {
+            maxInWindowLaunchDate = startDate;
+        }
+    }
+    
+    public long getMaxInWindowLaunchDate() {
+        return maxInWindowLaunchDate;
     }
 
     public int getFirstEpisodeBundledAssetId() {

@@ -36,15 +36,13 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     private final Map<String, ArtWorkImageRecipe> imageRecipeCache;
     private final Map<ArtworkCdn, ArtworkCdn> cdnLocationCache;
     
-    private final CycleConstants cycleConstants;
-
     private final boolean isEnableCdnDirectoryOptimization;
     private final int computedCdnFolderLen;
 
     private final Set<String> unknownArtworkImageTypes = new HashSet<String>();
 
     public ArtWorkModule(String entityType, VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
-        super(api, ctx, mapper);
+        super(api, ctx, cycleConstants, mapper);
         this.entityType = entityType;
         this.imageTypeIdx = indexer.getPrimaryKeyIndex(ARTWORK_IMAGE_FORMAT);
         this.recipeIdx = indexer.getPrimaryKeyIndex(ARTWORK_RECIPE);
@@ -55,8 +53,6 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         this.imageRecipeCache = new HashMap<String, ArtWorkImageRecipe>();
         this.cdnLocationCache = new HashMap<ArtworkCdn, ArtworkCdn>();
         
-        this.cycleConstants = cycleConstants;
-
         this.computedCdnFolderLen = ctx.getConfig().getComputedCdnFolderLength();
         this.isEnableCdnDirectoryOptimization = ctx.getConfig().isEnableCdnDirectoryOptimization();
     }

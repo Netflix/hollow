@@ -1,6 +1,19 @@
 package com.netflix.vms.transformer.namedlist;
 
 
+import com.netflix.hollow.bitsandbytes.ThreadSafeBitSet;
+import com.netflix.hollow.util.SimultaneousExecutor;
+import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.vms.transformer.CycleConstants;
+import com.netflix.vms.transformer.hollowoutput.Episode;
+import com.netflix.vms.transformer.hollowoutput.GlobalPerson;
+import com.netflix.vms.transformer.hollowoutput.NFResourceID;
+import com.netflix.vms.transformer.hollowoutput.NamedCollectionHolder;
+import com.netflix.vms.transformer.hollowoutput.PersonRole;
+import com.netflix.vms.transformer.hollowoutput.Strings;
+import com.netflix.vms.transformer.hollowoutput.VPerson;
+import com.netflix.vms.transformer.hollowoutput.Video;
+import com.netflix.vms.transformer.modules.TransformModule;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,29 +22,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.netflix.hollow.bitsandbytes.ThreadSafeBitSet;
-import com.netflix.hollow.util.SimultaneousExecutor;
-import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
-import com.netflix.vms.transformer.hollowoutput.Episode;
-import com.netflix.vms.transformer.hollowoutput.GlobalPerson;
-import com.netflix.vms.transformer.hollowoutput.ISOCountry;
-import com.netflix.vms.transformer.hollowoutput.NFResourceID;
-import com.netflix.vms.transformer.hollowoutput.NamedCollectionHolder;
-import com.netflix.vms.transformer.hollowoutput.PersonRole;
-import com.netflix.vms.transformer.hollowoutput.Strings;
-import com.netflix.vms.transformer.hollowoutput.VPerson;
-import com.netflix.vms.transformer.hollowoutput.Video;
-import com.netflix.vms.transformer.modules.TransformModule;
-
 public class NamedListCompletionModule implements TransformModule {
 
     private final VideoNamedListModule videoNamedLists;
     private final List<GlobalPerson> persons;
+    private final CycleConstants cycleConstants;
     private final HollowObjectMapper objectMapper;
-
-    public NamedListCompletionModule(VideoNamedListModule videoNamedLists, List<GlobalPerson> persons, HollowObjectMapper objectMapper) {
+    
+    public NamedListCompletionModule(VideoNamedListModule videoNamedLists, List<GlobalPerson> persons, CycleConstants cycleConstants, HollowObjectMapper objectMapper) {
         this.videoNamedLists = videoNamedLists;
         this.persons = persons;
+        this.cycleConstants = cycleConstants;
         this.objectMapper = objectMapper;
     }
 
@@ -54,7 +55,7 @@ public class NamedListCompletionModule implements TransformModule {
             executor.execute(() -> {
 
                 NamedCollectionHolder holder = new NamedCollectionHolder();
-                holder.country = new ISOCountry(country);
+                holder.country = cycleConstants.getISOCountry(country);
 
                 ///// VIDEO LISTS
                 holder.videoListMap = new HashMap<Strings, Set<Video>>();

@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.misc;
 
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.OutputTypeConfig;
 import com.netflix.vms.transformer.hollowinput.TopNAttributeHollow;
@@ -11,16 +12,13 @@ import com.netflix.vms.transformer.hollowoutput.Float;
 import com.netflix.vms.transformer.hollowoutput.Integer;
 import com.netflix.vms.transformer.hollowoutput.TopNVideoData;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
-
 import java.util.HashMap;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Map;
 
 public class TopNVideoDataModule extends AbstractTransformModule{
 
-    public TopNVideoDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper) {
-        super(api, ctx, mapper);
+    public TopNVideoDataModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, HollowObjectMapper mapper) {
+        super(api, ctx, cycleConstants, mapper);
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.modules.countryspecific;
 import com.netflix.vms.transformer.hollowoutput.MulticatalogCountryLocaleData;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
-import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.MulticatalogCountryData;
 import java.util.Collections;
 import com.netflix.hollow.index.HollowHashIndex;
@@ -69,7 +68,7 @@ public class CountrySpecificDataModule {
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
         this.rolloutVideoTypeIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
 
-        this.certificationListsModule = new CertificationListsModule(api, indexer);
+        this.certificationListsModule = new CertificationListsModule(api, constants, indexer);
         this.availabilityWindowModule = new VMSAvailabilityWindowModule(api, ctx, constants, indexer);
     }
 
@@ -194,6 +193,13 @@ public class CountrySpecificDataModule {
         if (statusOrdinal != -1) {
             StatusHollow status = api.getStatusHollow(statusOrdinal);
             
+            /// in order to calculate the hasNewContent flag, we need to know the latest in-window episode launch date for this hierarchy
+            if(rollup.doEpisode()) {
+                Long launchDate = getLaunchDateForLanguage(status, language);
+                if(launchDate != null)
+                    rollup.newEpisodeLaunchDate(launchDate);
+            }
+
             List<VMSAvailabilityWindow> availabilityWindows = availabilityWindowModule.calculateWindowData(videoId, countryCode, language, status, rollup, availabilityWindowModule.isGoLive(status));
             
             /// Check the generated windows against the main country window -- if not different, exclude the record.
@@ -201,7 +207,7 @@ public class CountrySpecificDataModule {
                 MulticatalogCountryData countryData = data.get(videoId);
                 if(countryData == null) {
                     countryData = new MulticatalogCountryData();
-                    countryData.country = new ISOCountry(countryCode);
+                    countryData.country = constants.getISOCountry(countryCode);
                     countryData.videoId = new Video(videoId);
                     countryData.languageData = new HashMap<>();
                     data.put(videoId, countryData);
@@ -209,7 +215,7 @@ public class CountrySpecificDataModule {
                 
                 MulticatalogCountryLocaleData result = new MulticatalogCountryLocaleData();
                 result.availabilityWindows = availabilityWindows;
-                result.hasNewContent = calculateHasNewContent(rollup.getMaxInWindowStartDate(), availabilityWindows);
+                result.hasNewContent = calculateHasNewContent(rollup.getMaxInWindowLaunchDate(), availabilityWindows);
                 result.hasLocalAudio = rollup.isFoundLocalAudio();
                 result.hasLocalText = rollup.isFoundLocalText();
                 if(rollup.doShow() && !isStandalone)
@@ -237,10 +243,10 @@ public class CountrySpecificDataModule {
         return false;
     }
     
-    private boolean calculateHasNewContent(long maxInWindowStartDate, List<VMSAvailabilityWindow> windows) {
+    private boolean calculateHasNewContent(long maxInWindowLaunchDate, List<VMSAvailabilityWindow> windows) {
         for(VMSAvailabilityWindow window : windows) {
             if(window.startDate.val <= ctx.getNowMillis()) {
-                return (ctx.getNowMillis() - window.startDate.val > THIRTY_DAYS) && (ctx.getNowMillis() - maxInWindowStartDate < THIRTY_DAYS);
+                return (ctx.getNowMillis() - window.startDate.val > THIRTY_DAYS) && (ctx.getNowMillis() - maxInWindowLaunchDate < THIRTY_DAYS);
             }
         }
         return false;
@@ -286,6 +292,26 @@ public class CountrySpecificDataModule {
         }
 
         return data.firstDisplayDate == null ? null : data.firstDisplayDate.val;
+    }
+    
+    private Long getLaunchDateForLanguage(StatusHollow status, String locale) {
+        FlagsHollow flags = status._getFlags();
+        MapOfFlagsFirstDisplayDatesHollow firstDisplayDatesByLocale = flags._getFirstDisplayDates();
+        if(firstDisplayDatesByLocale != null) {
+            for(Map.Entry<MapKeyHollow, DateHollow> entry : firstDisplayDatesByLocale.entrySet()) {
+                String loc = entry.getKey()._getValue();
+                if(loc.length() > 2)
+                    loc = loc.substring(0, 2);
+                if(loc.equals(locale))
+                    return entry.getValue()._getValue();
+            }
+        } else {
+            DateHollow firstDisplayDate = flags._getFirstDisplayDate();
+            if(firstDisplayDate != null)
+                return firstDisplayDate._getValue();
+        }
+        
+        return null;
     }
 
     private void populateMetaDataAvailabilityDate(long videoId, String countryCode, Long firstDisplayDate, List<VMSAvailabilityWindow> availabilityWindowList, CompleteVideoCountrySpecificData data) {
