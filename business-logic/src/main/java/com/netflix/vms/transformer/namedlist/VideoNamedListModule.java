@@ -174,7 +174,7 @@ public class VideoNamedListModule {
             if (isAvailableForED && isAvailableForUltraHDForCE)
                 addToList(VideoNamedListType.ED_CE_ULTRAHD_VIDEOS);
 
-            if(isAvailableForED && isAvailableForDownload)
+            if(isAvailableForED && isAvailableForDownload && isViewable)
                 addToList(VideoNamedListType.AVAILABLE_FOR_DOWNLOAD_VIDEOS);
             
             for(VideoSetType setType : video.facetData.videoMetaData.videoSetTypes) {
