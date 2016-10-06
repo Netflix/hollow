@@ -81,6 +81,7 @@ public class VideoNamedListModule {
         private boolean isAvailableIn3D;
         private boolean isAvailableForUltraHDForCE;
         private boolean isSupplemental;
+        private boolean isAvailableForDownload;
         private long currentAvailabilityDate;
         private final Calendar calendar = new GregorianCalendar();
         private final int currentYear;
@@ -173,6 +174,9 @@ public class VideoNamedListModule {
             if (isAvailableForED && isAvailableForUltraHDForCE)
                 addToList(VideoNamedListType.ED_CE_ULTRAHD_VIDEOS);
 
+            if(isAvailableForED && isAvailableForDownload)
+                addToList(VideoNamedListType.AVAILABLE_FOR_DOWNLOAD_VIDEOS);
+            
             for(VideoSetType setType : video.facetData.videoMetaData.videoSetTypes) {
                 if(setType == constants.PRESENT) {
                     addToList(VideoNamedListType.DEBUG_PRESENT_VIDEOS);
@@ -332,6 +336,7 @@ public class VideoNamedListModule {
             isAvailableForED = false;
             isAvailableIn3D = false;
             isAvailableForUltraHDForCE = false;
+            isAvailableForDownload = false;
             currentAvailabilityDate = 0;
 
             if(video.facetData.videoMediaData != null && video.facetData.videoMediaData.isGoLive) {
@@ -359,6 +364,7 @@ public class VideoNamedListModule {
 
                         if (maxPackageInfo != null && maxVideoContractInfo != null) {
                             isAvailableForUltraHDForCE = isUltraHD(maxPackageInfo.formats, maxVideoContractInfo.cupTokens, "CE");
+                            isAvailableForDownload = maxVideoContractInfo.isAvailableForDownload;
                         }
 
                         currentAvailabilityDate = window.startDate.val;
