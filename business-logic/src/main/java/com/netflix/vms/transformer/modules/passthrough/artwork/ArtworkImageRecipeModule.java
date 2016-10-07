@@ -18,14 +18,13 @@ public class ArtworkImageRecipeModule extends AbstractTransformModule {
 
     @Override
     public void transform() {
-        for(ArtworkRecipeHollow inRecipe : api.getAllArtworkRecipeHollow()) {
+        for (ArtworkRecipeHollow inRecipe : api.getAllArtworkRecipeHollow()) {
             ArtWorkImageRecipe outRecipe = new ArtWorkImageRecipe();
             outRecipe.recipeNameStr = inRecipe._getRecipeName()._getValue().toCharArray();
             outRecipe.extensionStr = inRecipe._getExtension()._getValue().toCharArray();
-            outRecipe.cdnFolderStr = inRecipe._getCdnFolder()._getValue().toCharArray();
-            StringHollow hostName = inRecipe._getHostName();
-            if(hostName != null && hostName._getValue() != null)
-                outRecipe.hostNameStr = hostName._getValue().toCharArray();
+            outRecipe.cdnFolderStr = inRecipe._getCdnFolder() != null ? inRecipe._getCdnFolder()._getValue().toCharArray() : null;
+            outRecipe.hostNameStr = inRecipe._getHostName() != null ? inRecipe._getHostName()._getValue().toCharArray() : null;
+          
             mapper.addObject(outRecipe);
         }
     }
