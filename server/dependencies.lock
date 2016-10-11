@@ -744,7 +744,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.5",
+            "locked": "1.5.6",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
@@ -4091,7 +4091,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.5",
+            "locked": "1.5.6",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
@@ -7438,7 +7438,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.5",
+            "locked": "1.5.6",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
@@ -10785,7 +10785,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.5",
+            "locked": "1.5.6",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
@@ -14147,7 +14147,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.5",
+            "locked": "1.5.6",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
@@ -17833,11 +17833,11 @@
     },
     "resolutionRules": {
         "com.netflix.nebula:gradle-resolution-rules": {
-            "locked": "0.33.0",
+            "locked": "0.34.0",
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
-            "locked": "0.15.0",
+            "locked": "0.16.0",
             "requested": "latest.release"
         }
     },
@@ -18586,7 +18586,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.5",
+            "locked": "1.5.6",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
@@ -21933,7 +21933,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.5",
+            "locked": "1.5.6",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
@@ -25285,7 +25285,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.5",
+            "locked": "1.5.6",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
@@ -28750,7 +28750,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.5",
+            "locked": "1.5.6",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
@@ -32215,7 +32215,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.5",
+            "locked": "1.5.6",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
@@ -35680,7 +35680,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.5",
+            "locked": "1.5.6",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
@@ -39109,7 +39109,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.5",
+            "locked": "1.5.6",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
@@ -42473,7 +42473,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.5",
+            "locked": "1.5.6",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
@@ -45837,7 +45837,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.5",
+            "locked": "1.5.6",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
@@ -49201,7 +49201,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.5",
+            "locked": "1.5.6",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
