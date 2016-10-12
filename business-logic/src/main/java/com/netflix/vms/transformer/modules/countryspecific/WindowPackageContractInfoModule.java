@@ -7,6 +7,8 @@ import com.netflix.vms.transformer.hollowinput.ContractHollow;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.RightsContractAssetHollow;
 import com.netflix.vms.transformer.hollowinput.RightsContractHollow;
+import com.netflix.vms.transformer.hollowinput.StreamProfileGroupsHollow;
+import com.netflix.vms.transformer.hollowinput.StreamProfileIdHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
@@ -27,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -39,10 +42,13 @@ public class WindowPackageContractInfoModule {
     private final HollowPrimaryKeyIndex packageIdx;
     private final HollowPrimaryKeyIndex streamProfileIdx;
     private final HollowPrimaryKeyIndex videoGeneralIdx;
-
+    
     private final PackageMomentDataModule packageMomentDataModule;
 
     private final Map<Integer, Strings> soundTypesMap;
+    private Map<Float, String> screenFormatCache = new HashMap<Float, String>();
+    private Set<Integer> fourKProfileIds = new HashSet<>();
+    private Set<Integer> hdrProfileIds= new HashSet<>();
     private final VideoPackageInfo FILTERED_VIDEO_PACKAGE_INFO;
 
     public WindowPackageContractInfoModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
@@ -55,9 +61,8 @@ public class WindowPackageContractInfoModule {
         this.packageIdx = indexer.getPrimaryKeyIndex(IndexSpec.PACKAGES);
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
-
         this.soundTypesMap = getSoundTypesMap();
-
+        populateEncodingProfileIdSets(api, indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE_GROUP));
         FILTERED_VIDEO_PACKAGE_INFO = newEmptyVideoPackageInfo();
     }
 
@@ -89,10 +94,17 @@ public class WindowPackageContractInfoModule {
         long longestRuntimeInSeconds = 0;
 
         for(StreamData streamData : packageData.streams) {
-            int streamProfileOrdinal = streamProfileIdx.getMatchingOrdinal((long) streamData.downloadDescriptor.encodingProfileId);  /// TODO: Map of encodingProfileID to encoding profile data.
+            int encodingProfileId = streamData.downloadDescriptor.encodingProfileId;
+            int streamProfileOrdinal = streamProfileIdx.getMatchingOrdinal((long) encodingProfileId);  /// TODO: Map of encodingProfileID to encoding profile data.
             StreamProfilesHollow profile = api.getStreamProfilesHollow(streamProfileOrdinal);
             String streamProfileType = profile._getProfileType()._getValue();
 
+            if(hdrProfileIds.contains(encodingProfileId)) {
+                info.videoPackageInfo.formats.add(cycleConstants.DOLBY_VISION);
+            }
+            if(fourKProfileIds.contains(encodingProfileId)) {
+                info.videoPackageInfo.formats.add(cycleConstants.FOUR_K);
+            }
 
             if("VIDEO".equals(streamProfileType) || "MUXED".equals(streamProfileType)) {
                 /// TODO: Why don't MUXED streams contribute to the package info's videoFormatDescriptors?
@@ -147,7 +159,26 @@ public class WindowPackageContractInfoModule {
         return info;
     }
 
-    private Map<Float, String> screenFormatCache = new HashMap<Float, String>();
+    private void populateEncodingProfileIdSets(VMSHollowInputAPI api, HollowPrimaryKeyIndex primaryKeyIndex) {
+
+        int ordinal = primaryKeyIndex.getMatchingOrdinal("DolbyVision");
+        if(ordinal != -1) {
+            StreamProfileGroupsHollow group = api.getStreamProfileGroupsHollow(ordinal);
+            List<StreamProfileIdHollow>idList = group._getStreamProfileIds();
+            for(StreamProfileIdHollow id : idList) {
+                hdrProfileIds.add(Integer.valueOf((int)id._getValue()));
+            }
+        }
+        
+        ordinal = primaryKeyIndex.getMatchingOrdinal("4K");
+        if(ordinal != -1) {
+            StreamProfileGroupsHollow group = api.getStreamProfileGroupsHollow(ordinal);
+            List<StreamProfileIdHollow>idList = group._getStreamProfileIds();
+            for(StreamProfileIdHollow id : idList) {
+                fourKProfileIds.add(Integer.valueOf((int)id._getValue()));
+            }
+        }
+    }
 
     private String getScreenFormat(Float screenFormat) {
         String formatStr = screenFormatCache.get(screenFormat);
