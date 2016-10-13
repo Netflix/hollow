@@ -72,9 +72,12 @@ function ServerCycleSummaryTab(dashboard) {
             } else if (purpose == "CacheSuccess") {
                 query.indexType = "vmsserver";
                 query.add("eventInfo.tag:TransformCycleSuccess");
+            } else if (purpose == "HideCycles") {
+                query.indexType = "vmsserver";
+                query.add("eventInfo.tag:HideCycleFromDashboard");
             } else if (purpose == "CycleInfo") {
                 query.indexType = "vmsserver";
-                query.add("eventInfo.tag:TransformCycleBegin").add("jarVersion").add("NOT%20HideCycleFromDashboard");
+                query.add("eventInfo.tag:TransformCycleBegin").add("jarVersion");
             } else if (purpose == "TopNodes") {
                 query.indexType = "vmsserver";
                 query.add("eventInfo.tag:TransformInfo").add("topNodes");
@@ -98,6 +101,7 @@ function ServerCycleSummaryTab(dashboard) {
         this.styleRowBackground = function(rowInfo, row, numRows) {
             this.cacheFailModel = refFn.cacheFailDAO.responseModel;
             this.s3FailModel = refFn.s3FailDAO.responseModel;
+            this.hideCycleModel = refFn.hideCycleDAO.responseModel;
             this.cacheSuccessModel = refFn.cacheSuccessDAO.responseModel;
             this.blobStatusArrayModel = refFn.blobPublishDAO.regexSourceModel.dataModel;
             this.stateEnginePublishModel = refFn.stateEnginePublishDAO.responseModel.dataModel;
@@ -117,6 +121,13 @@ function ServerCycleSummaryTab(dashboard) {
             var cycleSuccess = false;
             var cycleFail = false;
             var publishErrors = false;
+
+            if (this.hideCycleModel != null && this.hideCycleModel.rowFieldEquals("eventInfo.currentCycle", currCycle)) {
+                return {
+                    trow : "SKIP",
+                    tcols : ""
+                };
+            }
 
             if (this.cacheSuccessModel.rowFieldEquals("eventInfo.currentCycle", currCycle)) {
                 cycleSuccess = true;
@@ -270,13 +281,11 @@ function ServerCycleSummaryTab(dashboard) {
             searchFieldModelDAO.updateJsonFromSearch();
         };
 
-        this.cacheFailDAO = new FieldModelSearchDAO(null, refFn.getIndexSearchQuery("CacheFail", "eventInfo.currentCycle"), [ "eventInfo.currentCycle" ],
-                true);
-        this.cacheSuccessDAO = new FieldModelSearchDAO(null, refFn.getIndexSearchQuery("CacheSuccess", "eventInfo.currentCycle"),
-                [ "eventInfo.currentCycle" ], true);
+        this.cacheFailDAO = new FieldModelSearchDAO(null, refFn.getIndexSearchQuery("CacheFail", "eventInfo.currentCycle"), [ "eventInfo.currentCycle" ], true);
+        this.cacheSuccessDAO = new FieldModelSearchDAO(null, refFn.getIndexSearchQuery("CacheSuccess", "eventInfo.currentCycle"),[ "eventInfo.currentCycle" ], true);
         this.s3FailDAO = new FieldModelSearchDAO(null, refFn.getIndexSearchQuery("S3Errors", "eventInfo.currentCycle"), [ "eventInfo.currentCycle" ], true);
-        this.hollowPublishRegionDAO = new FieldModelSearchDAO(null, refFn.getIndexSearchQuery("hollowPublishRegion", "eventInfo.currentCycle,message"), 
-                ["eventInfo.currentCycle", "message"], true);
+        this.hideCycleDAO = new FieldModelSearchDAO(null, refFn.getIndexSearchQuery("HideCycles", "eventInfo.currentCycle"), [ "eventInfo.currentCycle" ], true);
+        this.hollowPublishRegionDAO = new FieldModelSearchDAO(null, refFn.getIndexSearchQuery("hollowPublishRegion", "eventInfo.currentCycle,message"), ["eventInfo.currentCycle", "message"], true);
         var s3PublishRegex = RegexParserMapper.prototype.getBlobPublishRegexInfo();
         var s3PublishRegexInfo = ResponseModelsFactory.prototype.getModel("RegexModel", {
             sourceField : "message",
@@ -301,6 +310,7 @@ function ServerCycleSummaryTab(dashboard) {
                 daoExecutor.add(refFn.topNodeCountDAO);
                 daoExecutor.add(refFn.s3FailDAO);
             }
+            daoExecutor.add(refFn.hideCycleDAO);
             daoExecutor.add(refFn.cacheFailDAO);
             daoExecutor.add(refFn.cacheSuccessDAO);
             daoExecutor.add(refFn.hollowPublishRegionDAO);
