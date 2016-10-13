@@ -223,6 +223,9 @@ function ClickableTableWidget(divId, tableId, fields, titles, clickableColumn, c
                 this.html += "<tr>";
             } else {
                 customAdditions = this.rowIndicatorFunc(tableRow, row, numRows);
+                if(customAdditions.trow == "SKIP") {
+                    continue;
+                }
                 this.html += customAdditions.trow;
             }
 
@@ -679,6 +682,7 @@ function IFrameWidget(parentDivId, iframeId, hostname, link) {
         }).appendTo(parentDivId);
 
         // add reload button to toolbar
+        /*
         var reloadBtnId = iframeWidget.iframeId + "-reload-btn";
         $('<button/>', {
             id : reloadBtnId,
@@ -686,13 +690,13 @@ function IFrameWidget(parentDivId, iframeId, hostname, link) {
         }).appendTo("#" + toolbarId);
 
         $("#" + reloadBtnId).button({
-            label : "iframe",
+            text: false,
             icons : {
                 primary : "ui-icon-refresh"
             }
         }).click(function() {
             iframeWidget.refresh();
-        });
+        }); */
 
         // create iframe
         $('<iframe/>', {
