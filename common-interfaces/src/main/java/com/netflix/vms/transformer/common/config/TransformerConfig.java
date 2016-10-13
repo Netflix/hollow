@@ -73,6 +73,10 @@ public interface TransformerConfig {
 
     @DefaultValue("10")
     int getCompactionHolePercentThreshold();
+    
+    @DefaultValue("{}")
+    String getConverterVipToKeybaseMap();
+
 
     //////////////// PUBLISH WORKFLOW ///////////////////
 

@@ -18,7 +18,7 @@ VipAddressHolder.prototype.getSummaryQuerySize = function() {
     if(vip.indexOf("_override") == -1) {
         return 720;
     }
-    return 2000;
+    return 3000;
 }
 
 UrlMapper.prototype.getIndexHost = function() {
