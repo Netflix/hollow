@@ -39,7 +39,7 @@ public class FilterToSmallDataSubset {
     @Before
     public void setUp() {
         slicer = new DataSlicerImpl().getSliceTask(TARGET_NUMBER_OF_TOPNODES, 
-        		                                    80097047);
+        		                                    80097047,70305883);
     }
     
     @Test

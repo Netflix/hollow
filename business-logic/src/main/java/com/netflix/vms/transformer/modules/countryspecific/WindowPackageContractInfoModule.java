@@ -100,7 +100,7 @@ public class WindowPackageContractInfoModule {
             String streamProfileType = profile._getProfileType()._getValue();
 
             if(hdrProfileIds.contains(encodingProfileId)) {
-                info.videoPackageInfo.formats.add(cycleConstants.DOLBY_VISION);
+                info.videoPackageInfo.formats.add(cycleConstants.HDR);
             }
             if(fourKProfileIds.contains(encodingProfileId)) {
                 info.videoPackageInfo.formats.add(cycleConstants.FOUR_K);
@@ -161,7 +161,7 @@ public class WindowPackageContractInfoModule {
 
     private void populateEncodingProfileIdSets(VMSHollowInputAPI api, HollowPrimaryKeyIndex primaryKeyIndex) {
 
-        int ordinal = primaryKeyIndex.getMatchingOrdinal("DolbyVision");
+        int ordinal = primaryKeyIndex.getMatchingOrdinal("HDR");
         if(ordinal != -1) {
             StreamProfileGroupsHollow group = api.getStreamProfileGroupsHollow(ordinal);
             List<StreamProfileIdHollow>idList = group._getStreamProfileIds();
