@@ -22,9 +22,13 @@ public class ArtworkImageRecipeModule extends AbstractTransformModule {
             ArtWorkImageRecipe outRecipe = new ArtWorkImageRecipe();
             outRecipe.recipeNameStr = inRecipe._getRecipeName()._getValue().toCharArray();
             outRecipe.extensionStr = inRecipe._getExtension()._getValue().toCharArray();
-            outRecipe.cdnFolderStr = inRecipe._getCdnFolder() != null ? inRecipe._getCdnFolder()._getValue().toCharArray() : null;
-            outRecipe.hostNameStr = inRecipe._getHostName() != null ? inRecipe._getHostName()._getValue().toCharArray() : null;
-          
+            if (inRecipe._getCdnFolder() != null && inRecipe._getCdnFolder()._getValue() != null) {
+                outRecipe.cdnFolderStr = inRecipe._getCdnFolder()._getValue().toCharArray();
+            }
+
+            if (inRecipe._getHostName() != null && inRecipe._getHostName()._getValue() != null) {
+                outRecipe.hostNameStr = inRecipe._getHostName()._getValue().toCharArray();
+            }
             mapper.addObject(outRecipe);
         }
     }
