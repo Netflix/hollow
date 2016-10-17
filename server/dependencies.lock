@@ -2684,7 +2684,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -6031,7 +6031,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -9378,7 +9378,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -12718,7 +12718,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -16087,7 +16087,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -17711,7 +17711,7 @@
             "requested": "1.2.4"
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "org.akhikhl.gretty:gretty-core"
             ]
@@ -20526,7 +20526,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -23872,7 +23872,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -27263,7 +27263,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -30728,7 +30728,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -34193,7 +34193,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -37658,7 +37658,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -41058,7 +41058,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -44422,7 +44422,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -47786,7 +47786,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -51150,7 +51150,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
