@@ -1967,7 +1967,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.185.0",
+            "locked": "1.186.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -5029,7 +5029,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.185.0",
+            "locked": "1.186.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -8091,7 +8091,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.185.0",
+            "locked": "1.186.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -11153,7 +11153,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.185.0",
+            "locked": "1.186.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -14314,7 +14314,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.185.0",
+            "locked": "1.186.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -17377,7 +17377,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.185.0",
+            "locked": "1.186.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -20445,7 +20445,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.185.0",
+            "locked": "1.186.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -23513,7 +23513,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.185.0",
+            "locked": "1.186.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -26581,7 +26581,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.185.0",
+            "locked": "1.186.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
