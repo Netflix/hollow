@@ -86,6 +86,7 @@ public class VideoCollectionsDataHierarchy {
         currentSeason.showParent = topNode;
         currentSeason.supplementalVideos = supplementalVideos;
         currentSeason.episodesForSeasonSequenceNumberMap = constants.EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
+        currentSeason.seasonSequenceNumber = sequenceNumber;
 
         addSupplementalVideoCollectionsData(supplementalVideos, null);
     }
@@ -143,6 +144,9 @@ public class VideoCollectionsDataHierarchy {
             supplementalVideoCollectionsData.showChildren = Collections.emptyList();
             supplementalVideoCollectionsData.seasonChildren = Collections.emptyList();
             supplementalVideoCollectionsData.supplementalVideos = Collections.emptyList();
+            if (suppVideo.sequenceNumber != java.lang.Integer.MIN_VALUE ) {
+                supplementalVideoCollectionsData.supplementalSequenceNumber = suppVideo.sequenceNumber;
+            }
             if(supplementalVideoParent == null)
                 supplementalVideoCollectionsData.supplementalVideoParents = currentSeasonVideo == null ? Collections.singletonList(topNode) : Arrays.asList(topNode, currentSeasonVideo);
             else

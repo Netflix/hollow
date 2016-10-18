@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import java.lang.*;
 import java.util.List;
 
 public class VideoCollectionsData implements Cloneable {
@@ -15,6 +16,8 @@ public class VideoCollectionsData implements Cloneable {
     public Video seasonParent = null;
     public Video topNode = null;
     public SortedMapOfIntegerToListOfVideoEpisode episodesForSeasonSequenceNumberMap = null;
+    public int seasonSequenceNumber = java.lang.Integer.MIN_VALUE;
+    public int supplementalSequenceNumber = java.lang.Integer.MIN_VALUE;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
