@@ -16,8 +16,8 @@ public class VideoCollectionsData implements Cloneable {
     public Video seasonParent = null;
     public Video topNode = null;
     public SortedMapOfIntegerToListOfVideoEpisode episodesForSeasonSequenceNumberMap = null;
-    public int seasonSequenceNumber = java.lang.Integer.MIN_VALUE;
-    public int supplementalSequenceNumber = java.lang.Integer.MIN_VALUE;
+    public int seasonSequenceNumber = -1;
+    public int supplementalSequenceNumber = -1;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
