@@ -56,14 +56,16 @@ public class PlaybackMonkeyTester {
         int currentTry = 0;
         List<ValuableVideo> videosToTest = new ArrayList<>(mostValuableChangedVideos);
         while (currentTry++ <= numOfTries) {
-            Map<ValuableVideo, Boolean> result = testVideoCountryKeys(logger, videosToTest);
+            Map<ValuableVideo, Boolean> resultMap = testVideoCountryKeys(logger, videosToTest);
 
-            List<ValuableVideo> failedVideos = new ArrayList<ValuableVideo>(result.size());
-            for (Entry<ValuableVideo, Boolean> entry : result.entrySet()) {
-                if (entry.getValue()) {
-                    playBackMonkeyResult.put(new VideoCountryKey(entry.getKey().getCountry(), entry.getKey().getVideoId()), entry.getValue());
+            List<ValuableVideo> failedVideos = new ArrayList<ValuableVideo>(resultMap.size());
+            for (Entry<ValuableVideo, Boolean> entry : resultMap.entrySet()) {
+                ValuableVideo valuableVideo = entry.getKey();
+				Boolean result = entry.getValue();
+				if (result) {
+                    playBackMonkeyResult.put(new VideoCountryKey(valuableVideo.getCountry(), valuableVideo.getVideoId()), result);
                 } else {
-                    failedVideos.add(entry.getKey());
+                    failedVideos.add(valuableVideo);
                 }
             }
             logger.info(PlaybackMonkey, "PBM run number: {}. Video sent: {}. Failed videos: {}.", currentTry, videosToTest.size(), failedVideos.size());
