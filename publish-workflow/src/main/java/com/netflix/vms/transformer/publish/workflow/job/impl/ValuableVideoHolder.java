@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ComparisonChain;
+import com.netflix.config.FastProperty;
 import com.netflix.type.ISOCountry;
 import com.netflix.type.NFCountry;
 import com.netflix.vms.generated.notemplate.FloatHollow;
@@ -22,16 +23,51 @@ import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 
 public class ValuableVideoHolder {
 	private final HollowBlobDataProvider hollowBlobDataProvider;
-	private final Map<Long, Set<VideoCountryKey>> mostValuableVideosToTestByCycle;
+	private final Map<Long, Set<ValuableVideo>> mostValuableVideosToTestByCycle;
 	private final Set<VideoCountryKey> pastFailedIDsToCheck = new HashSet<>();
+	
+	public static class ValuableVideo extends VideoCountryKey{
+	    private boolean isAvailableForDownload;
+	    
+        public boolean isAvailableForDownload() {
+            return isAvailableForDownload;
+        }
+        
+        public ValuableVideo(String country, int videoId, boolean isAvailableForDownload) {
+            super(country, videoId);
+            this.isAvailableForDownload = isAvailableForDownload;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = super.hashCode();
+            result = prime * result + (isAvailableForDownload ? 1231 : 1237);
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (!super.equals(obj))
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            ValuableVideo other = (ValuableVideo) obj;
+            if (isAvailableForDownload != other.isAvailableForDownload)
+                return false;
+            return true;
+        }
+	}
 
     public ValuableVideoHolder(final HollowBlobDataProvider hollowBlobDataProvider) {
         this.hollowBlobDataProvider = hollowBlobDataProvider;
-        this.mostValuableVideosToTestByCycle = new HashMap<Long, Set<VideoCountryKey>>();
+        this.mostValuableVideosToTestByCycle = new HashMap<Long, Set<ValuableVideo>>();
     }
     
-	public Set<VideoCountryKey> getMostValuableChangedVideos(PublishWorkflowContext ctx, long version) {
-		Set<VideoCountryKey> valuableVideos = mostValuableVideosToTestByCycle.get(version);
+	public Set<ValuableVideo> getMostValuableChangedVideos(PublishWorkflowContext ctx, long version) {
+		Set<ValuableVideo> valuableVideos = mostValuableVideosToTestByCycle.get(version);
 		if(valuableVideos == null){
 			valuableVideos = computeMostValuableChangedVideos(ctx, version);
 			mostValuableVideosToTestByCycle.put(version, valuableVideos);
@@ -49,7 +85,7 @@ public class ValuableVideoHolder {
 	 * @param version
 	 * @return
 	 */
-	private Set<VideoCountryKey> computeMostValuableChangedVideos(PublishWorkflowContext ctx, long version) {
+	private Set<ValuableVideo> computeMostValuableChangedVideos(PublishWorkflowContext ctx, long version) {
 		long start = System.currentTimeMillis();
 		String importantCountriesCSV = ctx.getConfig().getPlaybackMonkeyTestForCountries();
 		Set<String> importantCountriesToTest = new HashSet<String>(); 
@@ -59,13 +95,13 @@ public class ValuableVideoHolder {
 		}
 		int maxVideos = ctx.getConfig().getPlaybackMonkeyMaxTestVideosSize();
 
-		Set<VideoCountryKey> mostValueableVideosToTest = new HashSet<HollowBlobDataProvider.VideoCountryKey>(maxVideos);
+		Set<ValuableVideo> mostValueableVideosToTest = new HashSet<ValuableVideo>(maxVideos);
 
 		final Map<String, TopNVideoDataHollow> topnByCountry = hollowBlobDataProvider.getTopNData();
 
 		final Map<String, Set<Integer>> videosBasedOnPackageChanges = hollowBlobDataProvider.changedVideoCountryKeysBasedOnPackages();
 
-		final Map<String, Set<Integer>> videosBasedOnCompVideoChanges = hollowBlobDataProvider.changedVideoCountryKeysBasedOnCompleteVideos();
+		final Map<String, Map<Integer, Boolean>> videosBasedOnCompVideoChanges = hollowBlobDataProvider.changedVideoCountryKeysBasedOnCompleteVideos();
 
 		final int videosPerCountry = maxVideos/ (importantCountriesToTest.size());
 		
@@ -74,15 +110,15 @@ public class ValuableVideoHolder {
 		Map<String, Set<Integer>> excludedVideosByCountry = getExcludedVideosBycountry(ctx);
 
 		for (String countryId : importantCountriesToTest) {
-			Set<VideoCountryKey> valuedVideosForCountry = new HashSet<HollowBlobDataProvider.VideoCountryKey>(videosPerCountry);
+			Set<ValuableVideo> valuedVideosForCountry = new HashSet<ValuableVideo>(videosPerCountry);
 			
 			Set<Integer> videosWithPckgDataChange = videosBasedOnPackageChanges.get(countryId);
 			
-			Set<Integer> videosWithCompVideoChange = videosBasedOnCompVideoChanges.get(countryId);
+			Map<Integer, Boolean> videosWithCompVideoChange = videosBasedOnCompVideoChanges.get(countryId);
 			
 			if (videosWithPckgDataChange == null) videosWithPckgDataChange = Collections.emptySet();
 			
-			if(videosWithCompVideoChange == null) videosWithCompVideoChange = Collections.emptySet();
+			if(videosWithCompVideoChange == null) videosWithCompVideoChange = Collections.emptyMap();
 			
 			TopNVideoDataHollow topNForCountry = topnByCountry.get(countryId);
 			
@@ -96,13 +132,13 @@ public class ValuableVideoHolder {
 				
 				Map<Integer, Float> videoViewHours1Day = getVideoViewHours1DayFromHollow(topNForCountry._getVideoViewHrs1Day());
 				
-				List<Integer> sortedTopNVideos = getSortedTopNVideos(videoViewHours1Day, videosWithPckgDataChange, videosWithCompVideoChange);
+				List<Integer> sortedTopNVideos = getSortedTopNVideos(videoViewHours1Day, videosWithPckgDataChange, videosWithCompVideoChange.keySet());
 
 				int size = (videosPerCountry > sortedTopNVideos.size()) ? sortedTopNVideos.size() : videosPerCountry;
 				for (int i = 0; i < size; i++) {
 					Integer videoId = sortedTopNVideos.get(i);
 					if(!isExcluded(excludedVideosForCountry, videoId))
-						valuedVideosForCountry.add(new VideoCountryKey(countryId, videoId));
+						valuedVideosForCountry.add(new ValuableVideo(countryId, videoId, videosWithCompVideoChange.get(videoId)));
 				}
 				
 				// Add failed IDs from past cycle if they are not in exclusion list
@@ -110,8 +146,9 @@ public class ValuableVideoHolder {
 					ctx.getLogger().info(PlaybackMonkeyTestVideo, "Adding {} failed IDs for country {} if not in exclude list: [{}]",
 					        pastFailedIDsForCountry.size(), countryId, getVideoIDsForVideoCountryKeys(pastFailedIDsForCountry));
 					for(VideoCountryKey v: pastFailedIDsForCountry){
-						if(!isExcluded(excludedVideosForCountry, v.getVideoId()))
-							valuedVideosForCountry.add(v);
+						int videoId = v.getVideoId();
+						if(!isExcluded(excludedVideosForCountry, videoId))
+							valuedVideosForCountry.add(new ValuableVideo(v.getCountry(), videoId, videosWithCompVideoChange.get(videoId)));
 					}
 				}
 				
@@ -154,16 +191,16 @@ public class ValuableVideoHolder {
 	}
 	
     
-	@VisibleForTesting
-	Set<Integer> getVideoIDsForVideoCountryKeys(Set<VideoCountryKey> mostValueableVideosToTest) {
-		if(mostValueableVideosToTest  == null || mostValueableVideosToTest.isEmpty())
-			return Collections.emptySet();
-		Set<Integer> result = new HashSet<>(mostValueableVideosToTest.size());
-		for(VideoCountryKey v: mostValueableVideosToTest){
-			result.add(v.getVideoId());
-		}
-		return result;
-	}
+    @VisibleForTesting
+    Set<Integer> getVideoIDsForVideoCountryKeys(Set<? extends VideoCountryKey> videoCountryKeys) {
+        if(videoCountryKeys  == null || videoCountryKeys.isEmpty())
+            return Collections.emptySet();
+        Set<Integer> result = new HashSet<>(videoCountryKeys.size());
+        for(VideoCountryKey v: videoCountryKeys){
+            result.add(v.getVideoId());
+        }
+        return result;
+    }
 
 	private Map<String, Set<VideoCountryKey>> getPastFailedIDsByCountry() {
 		if(pastFailedIDsToCheck == null || pastFailedIDsToCheck.isEmpty())
@@ -180,7 +217,7 @@ public class ValuableVideoHolder {
 		return result;
 	}
 
-	public Map<String, Float> getViewShareOfVideos( Collection<VideoCountryKey> videoCountryKeys) {
+	public Map<String, Float> getViewShareOfVideos( Collection<? extends VideoCountryKey> videoCountryKeys) {
 		Map<String, Float> result = new HashMap<>();
 
 		if (videoCountryKeys == null || videoCountryKeys.isEmpty())

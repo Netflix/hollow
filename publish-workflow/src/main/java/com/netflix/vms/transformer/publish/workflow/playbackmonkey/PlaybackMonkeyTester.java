@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.codehaus.jackson.JsonProcessingException;
 
+import com.netflix.config.FastProperty;
 import com.netflix.hermes.exception.EntityNotFoundException;
 import com.netflix.hollow.util.SimultaneousExecutor;
 import com.netflix.niws.client.IClientResponse;
@@ -28,6 +29,7 @@ import com.netflix.playback.monkey.model.VideoTestDetails;
 import com.netflix.servo.monitor.DynamicCounter;
 import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
+import com.netflix.vms.transformer.publish.workflow.job.impl.ValuableVideoHolder.ValuableVideo;
 
 public class PlaybackMonkeyTester {
 
@@ -36,6 +38,8 @@ public class PlaybackMonkeyTester {
     public static final String INSTANCE_LIST_URL = "/REST/playback/monkey/system/instances/";
 
     private static final String PBM_REST_CLIENT_NAME = "vms-pbm-client";
+    
+	private static final FastProperty.BooleanProperty passDownloadFlag = new FastProperty.BooleanProperty("playback.monkey.passDownloadFlag", false);
 
     private final RestClient pbmRestClient;
 
@@ -43,21 +47,21 @@ public class PlaybackMonkeyTester {
         this.pbmRestClient = createClient();
     }
 
-    public Map<VideoCountryKey, Boolean> testVideoCountryKeysWithRetry(TaggingLogger logger, Set<VideoCountryKey> mostValuableChangedVideos, int numOfTries) throws Exception {
+    public Map<VideoCountryKey, Boolean> testVideoCountryKeysWithRetry(TaggingLogger logger, Set<ValuableVideo> mostValuableChangedVideos, int numOfTries) throws Exception {
         Map<VideoCountryKey, Boolean> playBackMonkeyResult = new HashMap<>(mostValuableChangedVideos.size());
-        for (VideoCountryKey key : mostValuableChangedVideos) {
-            playBackMonkeyResult.put(key, false);
+        for (ValuableVideo valuableVideo : mostValuableChangedVideos) {
+            playBackMonkeyResult.put(new VideoCountryKey(valuableVideo.getCountry(), valuableVideo.getVideoId()), false);
         }
 
         int currentTry = 0;
-        List<VideoCountryKey> videosToTest = new ArrayList<>(mostValuableChangedVideos);
+        List<ValuableVideo> videosToTest = new ArrayList<>(mostValuableChangedVideos);
         while (currentTry++ <= numOfTries) {
-            Map<VideoCountryKey, Boolean> result = testVideoCountryKeys(logger, videosToTest);
+            Map<ValuableVideo, Boolean> result = testVideoCountryKeys(logger, videosToTest);
 
-            List<VideoCountryKey> failedVideos = new ArrayList<VideoCountryKey>(result.size());
-            for (Entry<VideoCountryKey, Boolean> entry : result.entrySet()) {
+            List<ValuableVideo> failedVideos = new ArrayList<ValuableVideo>(result.size());
+            for (Entry<ValuableVideo, Boolean> entry : result.entrySet()) {
                 if (entry.getValue()) {
-                    playBackMonkeyResult.put(entry.getKey(), entry.getValue());
+                    playBackMonkeyResult.put(new VideoCountryKey(entry.getKey().getCountry(), entry.getKey().getVideoId()), entry.getValue());
                 } else {
                     failedVideos.add(entry.getKey());
                 }
@@ -77,7 +81,7 @@ public class PlaybackMonkeyTester {
      * com.netflix.videometadata.hollow.publish.workflow.playbackmonkey.DataTester
      * #testVideoCountryKeys(java.util.List)
      */
-    public Map<VideoCountryKey, Boolean> testVideoCountryKeys(TaggingLogger logger, List<VideoCountryKey> keys) throws Exception {
+    public Map<ValuableVideo, Boolean> testVideoCountryKeys(TaggingLogger logger, List<ValuableVideo> keys) throws Exception {
         final String[] testIds = new String[keys.size()];
         final boolean testCompleted[] = new boolean[keys.size()];
         final boolean testSuccess[] = new boolean[keys.size()];
@@ -93,7 +97,7 @@ public class PlaybackMonkeyTester {
                     // LOGGER.logf(ErrorCode.PlayBackMonkeyInfo,"threadNumber: %d keys.size(): %d ; testIds.length: %d ",
                     // threadNumber, keys.size(), testIds.length);
                     for (int i = threadNumber; i < keys.size(); i += numThreads) {
-                        VideoCountryKey key = keys.get(i);
+                        ValuableVideo key = keys.get(i);
                         try {
                             testIds[i] = initiateTest(key);
                             // System.out.println("Initiated test for : "+key);
@@ -167,7 +171,7 @@ public class PlaybackMonkeyTester {
 
         executor.awaitSuccessfulCompletion();
 
-        Map<VideoCountryKey, Boolean> testResults = new HashMap<VideoCountryKey, Boolean>();
+        Map<ValuableVideo, Boolean> testResults = new HashMap<ValuableVideo, Boolean>();
 
         for (int i = 0; i < keys.size(); i++)
             testResults.put(keys.get(i), testSuccess[i] ? Boolean.TRUE : Boolean.FALSE);
@@ -182,8 +186,11 @@ public class PlaybackMonkeyTester {
         return json.substring(json.indexOf('[') + 1, json.lastIndexOf(']')).trim().replaceAll("\"", "");
     }
 
-    private String initiateTest(VideoCountryKey key) throws Exception {
-        String url = INITATE_TEST_URL + key.getVideoId() + "?countryList=" + key.getCountry();
+    private String initiateTest(ValuableVideo valuableVideo) throws Exception {
+        String url = INITATE_TEST_URL + valuableVideo.getVideoId() + "?countryList=" + valuableVideo.getCountry();
+        if(passDownloadFlag.get()) {
+        	url += "?isAvailableForDownload=" + valuableVideo.isAvailableForDownload();
+        }
         String json = getResponseJson(pbmRestClient, new URI(url), null);
         json = json.substring(json.indexOf('[') + 1, json.lastIndexOf(']'));
         VideoTestDetails test = (VideoTestDetails) ParseUtil.deserialize(json, VideoTestDetails.class);
