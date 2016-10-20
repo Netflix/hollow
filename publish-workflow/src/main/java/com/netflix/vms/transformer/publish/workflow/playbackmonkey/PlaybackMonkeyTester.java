@@ -191,7 +191,7 @@ public class PlaybackMonkeyTester {
     private String initiateTest(ValuableVideo valuableVideo) throws Exception {
         String url = INITATE_TEST_URL + valuableVideo.getVideoId() + "?countryList=" + valuableVideo.getCountry();
         if(passDownloadFlag.get()) {
-        	url += "?isAvailableForDownload=" + valuableVideo.isAvailableForDownload();
+        	url += "&isAvailableForDownload=" + valuableVideo.isAvailableForDownload();
         }
         String json = getResponseJson(pbmRestClient, new URI(url), null);
         json = json.substring(json.indexOf('[') + 1, json.lastIndexOf(']'));
