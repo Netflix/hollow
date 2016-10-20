@@ -9,13 +9,19 @@ import java.util.Map.Entry;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ComparisonChain;
-import com.netflix.config.FastProperty;
+import com.netflix.hollow.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.read.engine.HollowReadStateEngine;
 import com.netflix.type.ISOCountry;
 import com.netflix.type.NFCountry;
+import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
 import com.netflix.vms.generated.notemplate.FloatHollow;
 import com.netflix.vms.generated.notemplate.IntegerHollow;
 import com.netflix.vms.generated.notemplate.MapOfIntegerToFloatHollow;
+import com.netflix.vms.generated.notemplate.MapOfIntegerToWindowPackageContractInfoHollow;
 import com.netflix.vms.generated.notemplate.TopNVideoDataHollow;
+import com.netflix.vms.generated.notemplate.VMSAvailabilityWindowHollow;
+import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
+import com.netflix.vms.generated.notemplate.WindowPackageContractInfoHollow;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
@@ -101,7 +107,7 @@ public class ValuableVideoHolder {
 
 		final Map<String, Set<Integer>> videosBasedOnPackageChanges = hollowBlobDataProvider.changedVideoCountryKeysBasedOnPackages();
 
-		final Map<String, Map<Integer, Boolean>> videosBasedOnCompVideoChanges = hollowBlobDataProvider.changedVideoCountryKeysBasedOnCompleteVideos();
+		final Map<String, Set<Integer>> videosBasedOnCompVideoChanges = hollowBlobDataProvider.changedVideoCountryKeysBasedOnCompleteVideos();
 
 		final int videosPerCountry = maxVideos/ (importantCountriesToTest.size());
 		
@@ -114,11 +120,11 @@ public class ValuableVideoHolder {
 			
 			Set<Integer> videosWithPckgDataChange = videosBasedOnPackageChanges.get(countryId);
 			
-			Map<Integer, Boolean> videosWithCompVideoChange = videosBasedOnCompVideoChanges.get(countryId);
+			Set<Integer> videosWithCompVideoChange = videosBasedOnCompVideoChanges.get(countryId);
 			
 			if (videosWithPckgDataChange == null) videosWithPckgDataChange = Collections.emptySet();
 			
-			if(videosWithCompVideoChange == null) videosWithCompVideoChange = Collections.emptyMap();
+			if(videosWithCompVideoChange == null) videosWithCompVideoChange = Collections.emptySet();
 			
 			TopNVideoDataHollow topNForCountry = topnByCountry.get(countryId);
 			
@@ -132,13 +138,14 @@ public class ValuableVideoHolder {
 				
 				Map<Integer, Float> videoViewHours1Day = getVideoViewHours1DayFromHollow(topNForCountry._getVideoViewHrs1Day());
 				
-				List<Integer> sortedTopNVideos = getSortedTopNVideos(videoViewHours1Day, videosWithPckgDataChange, videosWithCompVideoChange.keySet());
+				List<Integer> sortedTopNVideos = getSortedTopNVideos(videoViewHours1Day, videosWithPckgDataChange, videosWithCompVideoChange);
 
 				int size = (videosPerCountry > sortedTopNVideos.size()) ? sortedTopNVideos.size() : videosPerCountry;
 				for (int i = 0; i < size; i++) {
 					Integer videoId = sortedTopNVideos.get(i);
-					if(!isExcluded(excludedVideosForCountry, videoId))
-						valuedVideosForCountry.add(new ValuableVideo(countryId, videoId, videosWithCompVideoChange.get(videoId)));
+					if(!isExcluded(excludedVideosForCountry, videoId)) {
+						valuedVideosForCountry.add(new ValuableVideo(countryId, videoId, isAvailableForDownload(videoId, countryId)));
+					}
 				}
 				
 				// Add failed IDs from past cycle if they are not in exclusion list
@@ -147,8 +154,9 @@ public class ValuableVideoHolder {
 					        pastFailedIDsForCountry.size(), countryId, getVideoIDsForVideoCountryKeys(pastFailedIDsForCountry));
 					for(VideoCountryKey v: pastFailedIDsForCountry){
 						int videoId = v.getVideoId();
-						if(!isExcluded(excludedVideosForCountry, videoId))
-							valuedVideosForCountry.add(new ValuableVideo(v.getCountry(), videoId, videosWithCompVideoChange.get(videoId)));
+						if(!isExcluded(excludedVideosForCountry, videoId)) {
+							valuedVideosForCountry.add(new ValuableVideo(v.getCountry(), videoId, isAvailableForDownload(videoId, v.getCountry())));
+						}
 					}
 				}
 				
@@ -170,6 +178,55 @@ public class ValuableVideoHolder {
 		
 		return Collections.unmodifiableSet(mostValueableVideosToTest);
 	}
+	
+	private boolean isAvailableForDownload(int videoId, String countryId) {
+	   	HollowReadStateEngine stateEngine = hollowBlobDataProvider.getStateEngine();
+		VMSRawHollowAPI api = new VMSRawHollowAPI(stateEngine);
+	   	HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(stateEngine, "CompleteVideo", "id.value", "country.id");
+	   	int compVideoOrdinal = idx.getMatchingOrdinal(videoId, countryId);
+	   	if(compVideoOrdinal != -1) {
+		   	CompleteVideoHollow completeVideoHollow = api.getCompleteVideoHollow(compVideoOrdinal);
+		   	return isAvailableForDownload(completeVideoHollow);
+	   	}
+	   	return false;
+	}
+
+	private boolean isAvailableForDownload(CompleteVideoHollow cv) {
+	   	//Find the current or future window, then pick the contract info for highest package id.
+	   	for(VMSAvailabilityWindowHollow window : cv._getCountrySpecificData()._getMediaAvailabilityWindows()) {
+		   	if(isCurrentOrFutureWindow(window._getStartDate()._getVal(), window._getEndDate()._getVal())) {
+			   	MapOfIntegerToWindowPackageContractInfoHollow map = window._getWindowInfosByPackageId();
+               	Entry<IntegerHollow, WindowPackageContractInfoHollow> highestPackageEntry = getHighestPackageEntry(map);
+               	if(highestPackageEntry != null) {
+                   	return highestPackageEntry.getValue()._getVideoContractInfo()._getIsAvailableForDownload();
+               	}
+		   	}
+	   	}
+       	return false;
+    }
+
+    private Entry<IntegerHollow, WindowPackageContractInfoHollow> getHighestPackageEntry(
+    	    MapOfIntegerToWindowPackageContractInfoHollow map) {
+    	long highestPackageId = -1;
+       	Entry<IntegerHollow, WindowPackageContractInfoHollow> highestPackageEntry = null;
+       	for(Entry<IntegerHollow, WindowPackageContractInfoHollow> packageEntry : map.entrySet()) {
+           	int packageId = packageEntry.getValue()._getVideoPackageInfo()._getPackageId();
+           	if(packageId > highestPackageId) {
+               highestPackageEntry = packageEntry;
+		       highestPackageId = packageId;
+		   	}
+       	}
+       	return highestPackageEntry;
+    }
+    
+    public boolean isInWindow(final long startDate, final long endDate, final long timestamp) {
+    	return ((startDate <= timestamp) && (timestamp <= endDate));
+    }
+
+    public boolean isCurrentOrFutureWindow(final long startDate, final long endDate) {
+    	final long now = System.currentTimeMillis();
+        return isInWindow(startDate, endDate, now) || (now < startDate);
+    }	
 
 	private Map<Integer, Float> getVideoViewHours1DayFromHollow(MapOfIntegerToFloatHollow videoViewHrs1DayHollow) {
 		

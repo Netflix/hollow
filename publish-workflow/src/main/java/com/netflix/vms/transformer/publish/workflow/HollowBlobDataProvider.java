@@ -4,24 +4,6 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.BlobChecks
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CircuitBreaker;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.RollbackStateEngine;
 
-import com.netflix.hollow.read.engine.HollowBlobReader;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
-import com.netflix.hollow.read.engine.object.HollowObjectTypeReadState;
-import com.netflix.hollow.util.HashCodes;
-import com.netflix.hollow.util.HollowChecksum;
-import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
-import com.netflix.vms.generated.notemplate.ISOCountryHollow;
-import com.netflix.vms.generated.notemplate.IntegerHollow;
-import com.netflix.vms.generated.notemplate.MapOfIntegerToWindowPackageContractInfoHollow;
-import com.netflix.vms.generated.notemplate.PackageDataHollow;
-import com.netflix.vms.generated.notemplate.TopNVideoDataHollow;
-import com.netflix.vms.generated.notemplate.VMSAvailabilityWindowHollow;
-import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
-import com.netflix.vms.generated.notemplate.VideoHollow;
-import com.netflix.vms.generated.notemplate.WindowPackageContractInfoHollow;
-import com.netflix.vms.transformer.common.TransformerContext;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.BitSet;
@@ -30,8 +12,21 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+
+import com.netflix.hollow.read.engine.HollowBlobReader;
+import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
+import com.netflix.hollow.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.util.HashCodes;
+import com.netflix.hollow.util.HollowChecksum;
+import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
+import com.netflix.vms.generated.notemplate.ISOCountryHollow;
+import com.netflix.vms.generated.notemplate.PackageDataHollow;
+import com.netflix.vms.generated.notemplate.TopNVideoDataHollow;
+import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
+import com.netflix.vms.generated.notemplate.VideoHollow;
+import com.netflix.vms.transformer.common.TransformerContext;
 
 public class HollowBlobDataProvider {
     /* dependencies */
@@ -126,7 +121,7 @@ public class HollowBlobDataProvider {
         }
     }
 
-    public Map<String, Map<Integer, Boolean>> changedVideoCountryKeysBasedOnCompleteVideos() {
+    public Map<String, Set<Integer>> changedVideoCountryKeysBasedOnCompleteVideos() {
         HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) hollowReadStateEngine.getTypeState("CompleteVideo");
         PopulatedOrdinalListener completeVideoListener = typeState.getListener(PopulatedOrdinalListener.class);
         BitSet modifiedCompleteVideos = new BitSet(completeVideoListener.getPopulatedOrdinals().length());
@@ -137,7 +132,7 @@ public class HollowBlobDataProvider {
             return Collections.emptyMap();
 
         VMSRawHollowAPI api = new VMSRawHollowAPI(hollowReadStateEngine);
-        Map<String, Map<Integer, Boolean>> modifiedIds = new HashMap<>();
+        Map<String, Set<Integer>> modifiedIds = new HashMap<>();
 
         int ordinal = modifiedCompleteVideos.nextSetBit(0);
         while(ordinal != -1) {
@@ -146,12 +141,12 @@ public class HollowBlobDataProvider {
             int videoId = cv._getId()._getValue();
             String countryId = cv._getCountry()._getId();
 
-            Map<Integer, Boolean> map = modifiedIds.get(countryId);
-            if(map == null) {
-                map = new HashMap<>();
-                modifiedIds.put(countryId, map);
+            Set<Integer> videoIds = modifiedIds.get(countryId);
+            if(videoIds == null) {
+            	videoIds = new HashSet<>();
+                modifiedIds.put(countryId, videoIds);
             }
-            map.put(videoId, isAvailableForDownload(cv));
+            videoIds.add(videoId);
 
             ordinal = modifiedCompleteVideos.nextSetBit(ordinal + 1);
         }
@@ -159,44 +154,7 @@ public class HollowBlobDataProvider {
         return modifiedIds;
     }
 
-    private boolean isAvailableForDownload(CompleteVideoHollow cv) {
-    	//Find the current or future window, then pick the contract info for highest package id.
-        for(VMSAvailabilityWindowHollow window : cv._getCountrySpecificData()._getMediaAvailabilityWindows()) {
-            if(isCurrentOrFutureWindow(window._getStartDate()._getVal(), window._getEndDate()._getVal())) {
-                MapOfIntegerToWindowPackageContractInfoHollow map = window._getWindowInfosByPackageId();
-                Entry<IntegerHollow, WindowPackageContractInfoHollow> highestPackageEntry = getHighestPackageEntry(map);
-                if(highestPackageEntry != null) {
-                    return highestPackageEntry.getValue()._getVideoContractInfo()._getIsAvailableForDownload();
-                }
-            }
-        }
-        return false;
-    }
-
-    private Entry<IntegerHollow, WindowPackageContractInfoHollow> getHighestPackageEntry(
-    	    MapOfIntegerToWindowPackageContractInfoHollow map) {
-        long highestPackageId = -1;
-        Entry<IntegerHollow, WindowPackageContractInfoHollow> highestPackageEntry = null;
-        for(Entry<IntegerHollow, WindowPackageContractInfoHollow> packageEntry : map.entrySet()) {
-            int packageId = packageEntry.getValue()._getVideoPackageInfo()._getPackageId();
-            if(packageId > highestPackageId) {
-                highestPackageEntry = packageEntry;
-		        highestPackageId = packageId;
-		    }
-        }
-        return highestPackageEntry;
-    }
-    
-    public boolean isInWindow(final long startDate, final long endDate, final long timestamp) {
-        return ((startDate <= timestamp) && (timestamp <= endDate));
-    }
-
-    public boolean isCurrentOrFutureWindow(final long startDate, final long endDate) {
-        final long now = System.currentTimeMillis();
-        return isInWindow(startDate, endDate, now) || (now < startDate);
-    }
-    
-	public Map<String, Set<Integer>> changedVideoCountryKeysBasedOnPackages() {
+ 	public Map<String, Set<Integer>> changedVideoCountryKeysBasedOnPackages() {
 		HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) hollowReadStateEngine.getTypeState("PackageData");
 		PopulatedOrdinalListener packageListener = typeState.getListener(PopulatedOrdinalListener.class);
 		BitSet modifiedPackages = new BitSet(packageListener.getPopulatedOrdinals().length());
