@@ -91,7 +91,7 @@
             ]
         },
         "com.netflix.archaius:archaius-core": {
-            "locked": "0.7.4",
+            "locked": "0.7.5",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -271,11 +271,11 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.3",
+            "locked": "4.0.4",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "4.0.3",
+            "locked": "4.0.4",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -534,7 +534,7 @@
             ]
         },
         "com.netflix.archaius:archaius-core": {
-            "locked": "0.7.4",
+            "locked": "0.7.5",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -714,11 +714,11 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.3",
+            "locked": "4.0.4",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "4.0.3",
+            "locked": "4.0.4",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -977,7 +977,7 @@
             ]
         },
         "com.netflix.archaius:archaius-core": {
-            "locked": "0.7.4",
+            "locked": "0.7.5",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1157,11 +1157,11 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.3",
+            "locked": "4.0.4",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "4.0.3",
+            "locked": "4.0.4",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1420,7 +1420,7 @@
             ]
         },
         "com.netflix.archaius:archaius-core": {
-            "locked": "0.7.4",
+            "locked": "0.7.5",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1600,11 +1600,11 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.3",
+            "locked": "4.0.4",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "4.0.3",
+            "locked": "4.0.4",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1962,7 +1962,7 @@
             ]
         },
         "com.netflix.archaius:archaius-core": {
-            "locked": "0.7.4",
+            "locked": "0.7.5",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -2142,11 +2142,11 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.3",
+            "locked": "4.0.4",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "4.0.3",
+            "locked": "4.0.4",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -2405,7 +2405,7 @@
             ]
         },
         "com.netflix.archaius:archaius-core": {
-            "locked": "0.7.4",
+            "locked": "0.7.5",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -2586,11 +2586,11 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.3",
+            "locked": "4.0.4",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "4.0.3",
+            "locked": "4.0.4",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -2859,7 +2859,7 @@
             ]
         },
         "com.netflix.archaius:archaius-core": {
-            "locked": "0.7.4",
+            "locked": "0.7.5",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3040,11 +3040,11 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.3",
+            "locked": "4.0.4",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "4.0.3",
+            "locked": "4.0.4",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3313,7 +3313,7 @@
             ]
         },
         "com.netflix.archaius:archaius-core": {
-            "locked": "0.7.4",
+            "locked": "0.7.5",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3494,11 +3494,11 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.3",
+            "locked": "4.0.4",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "4.0.3",
+            "locked": "4.0.4",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3767,7 +3767,7 @@
             ]
         },
         "com.netflix.archaius:archaius-core": {
-            "locked": "0.7.4",
+            "locked": "0.7.5",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3948,11 +3948,11 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.3",
+            "locked": "4.0.4",
             "requested": "latest.release"
         },
         "netflix:server-context": {
-            "locked": "4.0.3",
+            "locked": "4.0.4",
             "transitive": [
                 "netflix:netflix-config"
             ]
