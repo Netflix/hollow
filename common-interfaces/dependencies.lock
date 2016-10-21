@@ -313,7 +313,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
@@ -756,7 +756,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
@@ -1199,7 +1199,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
@@ -1642,7 +1642,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
@@ -2184,7 +2184,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
@@ -2628,7 +2628,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
@@ -3082,7 +3082,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
@@ -3536,7 +3536,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
@@ -3990,7 +3990,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.4",
+            "locked": "3.5",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
