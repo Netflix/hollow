@@ -8,6 +8,7 @@ public class GlobalPerson implements Cloneable {
     public List<Integer> aliasesIds = null;
     public List<PersonRole> personRoles = null;
     public BirthDate birthDate = null;
+    public ExplicitDate deathDate = null;
     public List<Strings> spouses = null;
     public List<Strings> partners = null;
     public List<Video> topVideos = null;

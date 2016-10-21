@@ -15,6 +15,7 @@ public class PersonBioDelegateCachedImpl extends HollowObjectAbstractDelegate im
     private final int currentRelationshipOrdinal;
     private final Long personId;
     private final int birthDateOrdinal;
+    private final int deathDateOrdinal;
     private final int movieIdsOrdinal;
    private PersonBioTypeAPI typeAPI;
 
@@ -25,6 +26,7 @@ public class PersonBioDelegateCachedImpl extends HollowObjectAbstractDelegate im
         this.currentRelationshipOrdinal = typeAPI.getCurrentRelationshipOrdinal(ordinal);
         this.personId = typeAPI.getPersonIdBoxed(ordinal);
         this.birthDateOrdinal = typeAPI.getBirthDateOrdinal(ordinal);
+        this.deathDateOrdinal = typeAPI.getDeathDateOrdinal(ordinal);
         this.movieIdsOrdinal = typeAPI.getMovieIdsOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
@@ -55,6 +57,10 @@ public class PersonBioDelegateCachedImpl extends HollowObjectAbstractDelegate im
 
     public int getBirthDateOrdinal(int ordinal) {
         return birthDateOrdinal;
+    }
+
+    public int getDeathDateOrdinal(int ordinal) {
+        return deathDateOrdinal;
     }
 
     public int getMovieIdsOrdinal(int ordinal) {

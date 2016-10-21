@@ -16,6 +16,7 @@ public class PersonBioTypeAPI extends HollowObjectTypeAPI {
             "currentRelationship",
             "personId",
             "birthDate",
+            "deathDate",
             "movieIds"
         });
         this.delegateLookupImpl = new PersonBioDelegateLookupImpl(this);
@@ -92,10 +93,20 @@ public class PersonBioTypeAPI extends HollowObjectTypeAPI {
         return getAPI().getExplicitDateTypeAPI();
     }
 
-    public int getMovieIdsOrdinal(int ordinal) {
+    public int getDeathDateOrdinal(int ordinal) {
         if(fieldIndex[6] == -1)
-            return missingDataHandler().handleReferencedOrdinal("PersonBio", ordinal, "movieIds");
+            return missingDataHandler().handleReferencedOrdinal("PersonBio", ordinal, "deathDate");
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[6]);
+    }
+
+    public ExplicitDateTypeAPI getDeathDateTypeAPI() {
+        return getAPI().getExplicitDateTypeAPI();
+    }
+
+    public int getMovieIdsOrdinal(int ordinal) {
+        if(fieldIndex[7] == -1)
+            return missingDataHandler().handleReferencedOrdinal("PersonBio", ordinal, "movieIds");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[7]);
     }
 
     public ListOfVideoIdsTypeAPI getMovieIdsTypeAPI() {
