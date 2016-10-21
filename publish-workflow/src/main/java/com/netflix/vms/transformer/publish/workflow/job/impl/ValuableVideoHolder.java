@@ -33,7 +33,7 @@ public class ValuableVideoHolder {
 	private final Set<VideoCountryKey> pastFailedIDsToCheck = new HashSet<>();
 	
 	public static class ValuableVideo extends VideoCountryKey{
-	    private boolean isAvailableForDownload;
+	    private final boolean isAvailableForDownload;
 	    
         public boolean isAvailableForDownload() {
             return isAvailableForDownload;
@@ -164,7 +164,7 @@ public class ValuableVideoHolder {
 						"Picked {} valuable videos to test for country (including failed IDs and excluding excluded videos) {}: [{}]",
 						 valuedVideosForCountry.size(),
 						 countryId,
-						 getVideoIDsForVideoCountryKeys(valuedVideosForCountry));
+						 getValuableVideosForCountryAsString(valuedVideosForCountry));
 				ctx.getMetricRecorder().recordMetric(Metric.ViewShareCoveredByPBM, getViewShareOfVideos(valuedVideosForCountry).get(countryId), "country", countryId);
 			} else {
 				ctx.getLogger().warn(PlaybackMonkeyWarn, "For country {} topN videos are empty and so no videos were "
@@ -257,6 +257,20 @@ public class ValuableVideoHolder {
             result.add(v.getVideoId());
         }
         return result;
+    }
+    
+    String getValuableVideosForCountryAsString(Set<ValuableVideo> valuableVideos) {
+        if(valuableVideos  == null || valuableVideos.isEmpty())
+            return "";
+        Set<String> valuableVideosAStrings = new HashSet<>();
+        for(ValuableVideo v: valuableVideos){
+        	StringBuilder sb = new StringBuilder();
+        	sb.append(v.getVideoId());
+        	sb.append(":");
+        	sb.append(v.isAvailableForDownload());
+        	valuableVideosAStrings.add(sb.toString());
+        }
+        return String.join(",", valuableVideosAStrings);
     }
 
 	private Map<String, Set<VideoCountryKey>> getPastFailedIDsByCountry() {
