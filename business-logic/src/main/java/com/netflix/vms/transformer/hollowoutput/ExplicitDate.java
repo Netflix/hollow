@@ -7,6 +7,7 @@ public class ExplicitDate implements Cloneable {
     public Integer month = null;
     public Integer day = null;
 
+    @Override
     public boolean equals(Object other) {
         if(other == this)  return true;
         if(!(other instanceof ExplicitDate))
@@ -25,6 +26,7 @@ public class ExplicitDate implements Cloneable {
         return true;
     }
 
+    @Override
     public int hashCode() {
         int hashCode = 1;
         hashCode = hashCode * 31 + (year == null ? 1237 : year.hashCode());
@@ -33,15 +35,22 @@ public class ExplicitDate implements Cloneable {
         return hashCode;
     }
 
+    @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("BirthDate{");
-        builder.append("year=").append(year);
-        builder.append(",month=").append(month);
-        builder.append(",day=").append(day);
-        builder.append("}");
+        StringBuilder builder = new StringBuilder();
+        builder.append("ExplicitDate [year=");
+        builder.append(year);
+        builder.append(", month=");
+        builder.append(month);
+        builder.append(", day=");
+        builder.append(day);
+        builder.append(", __assigned_ordinal=");
+        builder.append(__assigned_ordinal);
+        builder.append("]");
         return builder.toString();
     }
 
+    @Override
     public ExplicitDate clone() {
         try {
             ExplicitDate clone = (ExplicitDate)super.clone();
