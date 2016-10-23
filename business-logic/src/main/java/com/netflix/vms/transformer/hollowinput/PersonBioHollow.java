@@ -53,6 +53,13 @@ public class PersonBioHollow extends HollowObject {
         return  api().getExplicitDateHollow(refOrdinal);
     }
 
+    public ExplicitDateHollow _getDeathDate() {
+        int refOrdinal = delegate().getDeathDateOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getExplicitDateHollow(refOrdinal);
+    }
+
     public ListOfVideoIdsHollow _getMovieIds() {
         int refOrdinal = delegate().getMovieIdsOrdinal(ordinal);
         if(refOrdinal == -1)

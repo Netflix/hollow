@@ -41,6 +41,10 @@ public class PersonBioDelegateLookupImpl extends HollowObjectAbstractDelegate im
         return typeAPI.getBirthDateOrdinal(ordinal);
     }
 
+    public int getDeathDateOrdinal(int ordinal) {
+        return typeAPI.getDeathDateOrdinal(ordinal);
+    }
+
     public int getMovieIdsOrdinal(int ordinal) {
         return typeAPI.getMovieIdsOrdinal(ordinal);
     }
