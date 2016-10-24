@@ -4,18 +4,6 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.BlobChecks
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CircuitBreaker;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.RollbackStateEngine;
 
-import com.netflix.hollow.read.engine.HollowBlobReader;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
-import com.netflix.hollow.read.engine.object.HollowObjectTypeReadState;
-import com.netflix.hollow.util.HashCodes;
-import com.netflix.hollow.util.HollowChecksum;
-import com.netflix.vms.generated.notemplate.ISOCountryHollow;
-import com.netflix.vms.generated.notemplate.PackageDataHollow;
-import com.netflix.vms.generated.notemplate.TopNVideoDataHollow;
-import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
-import com.netflix.vms.generated.notemplate.VideoHollow;
-import com.netflix.vms.transformer.common.TransformerContext;
 import java.io.File;
 import java.io.IOException;
 import java.util.BitSet;
@@ -25,6 +13,20 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import com.netflix.hollow.read.engine.HollowBlobReader;
+import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
+import com.netflix.hollow.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.util.HashCodes;
+import com.netflix.hollow.util.HollowChecksum;
+import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
+import com.netflix.vms.generated.notemplate.ISOCountryHollow;
+import com.netflix.vms.generated.notemplate.PackageDataHollow;
+import com.netflix.vms.generated.notemplate.TopNVideoDataHollow;
+import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
+import com.netflix.vms.generated.notemplate.VideoHollow;
+import com.netflix.vms.transformer.common.TransformerContext;
 
 public class HollowBlobDataProvider {
     /* dependencies */
@@ -129,30 +131,22 @@ public class HollowBlobDataProvider {
         if(modifiedCompleteVideos.cardinality() == 0 || modifiedCompleteVideos.cardinality() == completeVideoListener.getPopulatedOrdinals().cardinality())
             return Collections.emptyMap();
 
-        int countryOrdinalFieldIndex = typeState.getSchema().getPosition("country");
-        int videoIdFieldIndex = typeState.getSchema().getPosition("id");
-
-        HollowObjectTypeReadState countryState = (HollowObjectTypeReadState) hollowReadStateEngine.getTypeState("ISOCountry");
-        int countryIdFieldIndex = countryState.getSchema().getPosition("id");
-        String countryIds[] = new String[countryState.maxOrdinal() + 1];
-
+        VMSRawHollowAPI api = new VMSRawHollowAPI(hollowReadStateEngine);
         Map<String, Set<Integer>> modifiedIds = new HashMap<>();
 
         int ordinal = modifiedCompleteVideos.nextSetBit(0);
         while(ordinal != -1) {
-            int countryOrdinal = typeState.readOrdinal(ordinal, countryOrdinalFieldIndex);
-            int videoId = typeState.readInt(ordinal, videoIdFieldIndex);
-            String countryId = countryIds[countryOrdinal];
-            if(countryId == null) {
-                countryId = countryState.readString(countryOrdinal, countryIdFieldIndex);
-                countryIds[countryOrdinal] = countryId;
-            }
+            CompleteVideoHollow cv = api.getCompleteVideoHollow(ordinal);
+            
+            int videoId = cv._getId()._getValue();
+            String countryId = cv._getCountry()._getId();
 
-            Set<Integer> set = modifiedIds.get(countryId);
-            if(set == null)
-                set = new HashSet<>();
-            set.add(videoId);
-            modifiedIds.put(countryId, set);
+            Set<Integer> videoIds = modifiedIds.get(countryId);
+            if(videoIds == null) {
+            	videoIds = new HashSet<>();
+                modifiedIds.put(countryId, videoIds);
+            }
+            videoIds.add(videoId);
 
             ordinal = modifiedCompleteVideos.nextSetBit(ordinal + 1);
         }
@@ -160,7 +154,7 @@ public class HollowBlobDataProvider {
         return modifiedIds;
     }
 
-	public Map<String, Set<Integer>> changedVideoCountryKeysBasedOnPackages() {
+ 	public Map<String, Set<Integer>> changedVideoCountryKeysBasedOnPackages() {
 		HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) hollowReadStateEngine.getTypeState("PackageData");
 		PopulatedOrdinalListener packageListener = typeState.getListener(PopulatedOrdinalListener.class);
 		BitSet modifiedPackages = new BitSet(packageListener.getPopulatedOrdinals().length());
