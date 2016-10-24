@@ -140,11 +140,15 @@ public class ValuableVideoHolder {
 				
 				List<Integer> sortedTopNVideos = getSortedTopNVideos(videoViewHours1Day, videosWithPckgDataChange, videosWithCompVideoChange);
 
+		        HollowReadStateEngine stateEngine = hollowBlobDataProvider.getStateEngine();
+		        VMSRawHollowAPI api = new VMSRawHollowAPI(stateEngine);
+		        HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(stateEngine, "CompleteVideo", "id.value", "country.id");
+				
 				int size = (videosPerCountry > sortedTopNVideos.size()) ? sortedTopNVideos.size() : videosPerCountry;
 				for (int i = 0; i < size; i++) {
 					Integer videoId = sortedTopNVideos.get(i);
 					if(!isExcluded(excludedVideosForCountry, videoId)) {
-						valuedVideosForCountry.add(new ValuableVideo(countryId, videoId, isAvailableForDownload(videoId, countryId)));
+						valuedVideosForCountry.add(new ValuableVideo(countryId, videoId, isAvailableForDownload(videoId, countryId, idx, api)));
 					}
 				}
 				
@@ -155,7 +159,7 @@ public class ValuableVideoHolder {
 					for(VideoCountryKey v: pastFailedIDsForCountry){
 						int videoId = v.getVideoId();
 						if(!isExcluded(excludedVideosForCountry, videoId)) {
-							valuedVideosForCountry.add(new ValuableVideo(v.getCountry(), videoId, isAvailableForDownload(videoId, v.getCountry())));
+							valuedVideosForCountry.add(new ValuableVideo(v.getCountry(), videoId, isAvailableForDownload(videoId, v.getCountry(), idx, api)));
 						}
 					}
 				}
@@ -179,10 +183,7 @@ public class ValuableVideoHolder {
 		return Collections.unmodifiableSet(mostValueableVideosToTest);
 	}
 	
-	private boolean isAvailableForDownload(int videoId, String countryId) {
-	   	HollowReadStateEngine stateEngine = hollowBlobDataProvider.getStateEngine();
-		VMSRawHollowAPI api = new VMSRawHollowAPI(stateEngine);
-	   	HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(stateEngine, "CompleteVideo", "id.value", "country.id");
+	private boolean isAvailableForDownload(int videoId, String countryId, HollowPrimaryKeyIndex idx, VMSRawHollowAPI api) {
 	   	int compVideoOrdinal = idx.getMatchingOrdinal(videoId, countryId);
 	   	if(compVideoOrdinal != -1) {
 		   	CompleteVideoHollow completeVideoHollow = api.getCompleteVideoHollow(compVideoOrdinal);
