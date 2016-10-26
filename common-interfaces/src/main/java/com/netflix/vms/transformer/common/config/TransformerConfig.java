@@ -41,7 +41,7 @@ public interface TransformerConfig {
 
     @DefaultValue("0")
     int getMaxTolerableFailedTransformerHierarchies();
-    
+
     // A comma-delimited list of top node IDs to drop on the floor prior to processing.
     String getDropTopNodesOnFloor();
 
@@ -68,12 +68,15 @@ public interface TransformerConfig {
     @DefaultValue("false")
     boolean isCompactionEnabled();
 
+    @DefaultValue("false")
+    boolean isDefaultExtentionRecipeEnabled();
+
     @DefaultValue("2000000")
     long getCompactionHoleByteThreshold();
 
     @DefaultValue("10")
     int getCompactionHolePercentThreshold();
-    
+
     @DefaultValue("{}")
     String getConverterVipToKeybaseMap();
 

@@ -16,6 +16,8 @@ public class DefaultExtensionRecipeModule extends AbstractTransformModule {
 
     @Override
     public void transform() {
+        if (!ctx.getConfig().isDefaultExtentionRecipeEnabled()) return;
+
         for(DefaultExtensionRecipeHollow inExtRec : api.getAllDefaultExtensionRecipeHollow()) {
             DefaultExtensionRecipe outExtRec = new DefaultExtensionRecipe();
             outExtRec.extensionStr = inExtRec._getExtension()._getValue().toCharArray();
