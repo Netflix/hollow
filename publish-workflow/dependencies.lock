@@ -15794,6 +15794,7 @@
                 "netflix:streaming-metrics",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing",
+                "netflix:test-util",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.curator:curator-client",
@@ -15996,6 +15997,7 @@
                 "com.netflix.archaius:archaius2-commons-configuration",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.archaius:archaius2-persisted2",
+                "com.netflix.archaius:archaius2-test",
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.runtime:health-integrations"
             ]
@@ -16004,6 +16006,7 @@
             "locked": "2.1.10",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
+                "com.netflix.governator:governator-test-junit",
                 "com.netflix.runtime:health-guice",
                 "netflix:nf-archaius2"
             ]
@@ -16012,6 +16015,12 @@
             "locked": "2.1.10",
             "transitive": [
                 "netflix:nf-archaius2"
+            ]
+        },
+        "com.netflix.archaius:archaius2-test": {
+            "locked": "2.1.10",
+            "transitive": [
+                "com.netflix.governator:governator-test-junit"
             ]
         },
         "com.netflix.astyanax:astyanax": {
@@ -16147,6 +16156,7 @@
             "locked": "1.15.5",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
+                "com.netflix.governator:governator-test-junit",
                 "com.netflix.karyon:karyon-core",
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -16165,6 +16175,7 @@
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
+                "com.netflix.governator:governator-test-junit",
                 "com.netflix.runtime:health-core"
             ]
         },
@@ -16178,8 +16189,15 @@
             "locked": "1.15.5",
             "transitive": [
                 "com.netflix.governator:governator",
+                "com.netflix.governator:governator-test-junit",
                 "com.netflix.runtime:health-guice",
                 "netflix:nf-archaius2"
+            ]
+        },
+        "com.netflix.governator:governator-test-junit": {
+            "locked": "1.15.5",
+            "transitive": [
+                "netflix:nflibrary-junit-util"
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
@@ -17129,10 +17147,13 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.11",
+            "locked": "4.12",
             "requested": "4.11",
             "transitive": [
-                "com.thinkaurelius.thrift:thrift-server"
+                "com.netflix.archaius:archaius2-test",
+                "com.netflix.governator:governator-test-junit",
+                "com.thinkaurelius.thrift:thrift-server",
+                "netflix:nflibrary-junit-util"
             ]
         },
         "log4j:log4j": {
@@ -17175,7 +17196,8 @@
             "locked": "1.0",
             "transitive": [
                 "com.google.code.findbugs:annotations",
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:test-util"
             ]
         },
         "net.jpountz.lz4:lz4": {
@@ -17503,6 +17525,7 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.23",
             "transitive": [
+                "netflix:nflibrary-junit-util",
                 "netflix:platform-chukwaClient",
                 "netflix:platform-management"
             ]
@@ -17581,8 +17604,13 @@
                 "netflix:nf-archaius2-platform-bridge",
                 "netflix:nf-karyon-admin-plugins",
                 "netflix:nfi18n-core",
+                "netflix:nflibrary-junit-util",
                 "netflix:platform-management"
             ]
+        },
+        "netflix:nflibrary-junit-util": {
+            "locked": "4.0.4",
+            "requested": "latest.release"
         },
         "netflix:nfsso": {
             "locked": "1.52.0",
@@ -17862,6 +17890,18 @@
             "locked": "1.2",
             "transitive": [
                 "netflix:streaming-utilities"
+            ]
+        },
+        "netflix:test-labels": {
+            "locked": "1.614.0",
+            "transitive": [
+                "netflix:nflibrary-junit-util"
+            ]
+        },
+        "netflix:test-util": {
+            "locked": "1.12.0",
+            "transitive": [
+                "netflix:nflibrary-junit-util"
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
@@ -18241,6 +18281,7 @@
             "locked": "3.2.9",
             "transitive": [
                 "netflix:nflibrary",
+                "netflix:nflibrary-junit-util",
                 "org.apache.solr:solr-solrj"
             ]
         },
@@ -18262,6 +18303,12 @@
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:base-explorer"
+            ]
+        },
+        "org.functionaljava:functionaljava": {
+            "locked": "2.23",
+            "transitive": [
+                "netflix:test-util"
             ]
         },
         "org.hamcrest:hamcrest-core": {
@@ -18319,8 +18366,9 @@
             ]
         },
         "org.mockito:mockito-core": {
-            "locked": "1.8.5",
+            "locked": "1.10.19",
             "transitive": [
+                "com.netflix.governator:governator-test-junit",
                 "netflix:streaming-utilities-testing"
             ]
         },
@@ -18343,7 +18391,7 @@
             ]
         },
         "org.objenesis:objenesis": {
-            "locked": "1.0",
+            "locked": "2.1",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -18868,6 +18916,7 @@
                 "netflix:streaming-metrics",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing",
+                "netflix:test-util",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.curator:curator-client",
@@ -19070,6 +19119,7 @@
                 "com.netflix.archaius:archaius2-commons-configuration",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.archaius:archaius2-persisted2",
+                "com.netflix.archaius:archaius2-test",
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.runtime:health-integrations"
             ]
@@ -19078,6 +19128,7 @@
             "locked": "2.1.10",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
+                "com.netflix.governator:governator-test-junit",
                 "com.netflix.runtime:health-guice",
                 "netflix:nf-archaius2"
             ]
@@ -19086,6 +19137,12 @@
             "locked": "2.1.10",
             "transitive": [
                 "netflix:nf-archaius2"
+            ]
+        },
+        "com.netflix.archaius:archaius2-test": {
+            "locked": "2.1.10",
+            "transitive": [
+                "com.netflix.governator:governator-test-junit"
             ]
         },
         "com.netflix.astyanax:astyanax": {
@@ -19221,6 +19278,7 @@
             "locked": "1.15.5",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
+                "com.netflix.governator:governator-test-junit",
                 "com.netflix.karyon:karyon-core",
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -19239,6 +19297,7 @@
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
+                "com.netflix.governator:governator-test-junit",
                 "com.netflix.runtime:health-core"
             ]
         },
@@ -19252,8 +19311,15 @@
             "locked": "1.15.5",
             "transitive": [
                 "com.netflix.governator:governator",
+                "com.netflix.governator:governator-test-junit",
                 "com.netflix.runtime:health-guice",
                 "netflix:nf-archaius2"
+            ]
+        },
+        "com.netflix.governator:governator-test-junit": {
+            "locked": "1.15.5",
+            "transitive": [
+                "netflix:nflibrary-junit-util"
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
@@ -20203,10 +20269,13 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.11",
+            "locked": "4.12",
             "requested": "4.11",
             "transitive": [
-                "com.thinkaurelius.thrift:thrift-server"
+                "com.netflix.archaius:archaius2-test",
+                "com.netflix.governator:governator-test-junit",
+                "com.thinkaurelius.thrift:thrift-server",
+                "netflix:nflibrary-junit-util"
             ]
         },
         "log4j:log4j": {
@@ -20249,7 +20318,8 @@
             "locked": "1.0",
             "transitive": [
                 "com.google.code.findbugs:annotations",
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:test-util"
             ]
         },
         "net.jpountz.lz4:lz4": {
@@ -20577,6 +20647,7 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.23",
             "transitive": [
+                "netflix:nflibrary-junit-util",
                 "netflix:platform-chukwaClient",
                 "netflix:platform-management"
             ]
@@ -20655,8 +20726,13 @@
                 "netflix:nf-archaius2-platform-bridge",
                 "netflix:nf-karyon-admin-plugins",
                 "netflix:nfi18n-core",
+                "netflix:nflibrary-junit-util",
                 "netflix:platform-management"
             ]
+        },
+        "netflix:nflibrary-junit-util": {
+            "locked": "4.0.4",
+            "requested": "latest.release"
         },
         "netflix:nfsso": {
             "locked": "1.52.0",
@@ -20936,6 +21012,18 @@
             "locked": "1.2",
             "transitive": [
                 "netflix:streaming-utilities"
+            ]
+        },
+        "netflix:test-labels": {
+            "locked": "1.614.0",
+            "transitive": [
+                "netflix:nflibrary-junit-util"
+            ]
+        },
+        "netflix:test-util": {
+            "locked": "1.12.0",
+            "transitive": [
+                "netflix:nflibrary-junit-util"
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
@@ -21315,6 +21403,7 @@
             "locked": "3.2.9",
             "transitive": [
                 "netflix:nflibrary",
+                "netflix:nflibrary-junit-util",
                 "org.apache.solr:solr-solrj"
             ]
         },
@@ -21336,6 +21425,12 @@
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:base-explorer"
+            ]
+        },
+        "org.functionaljava:functionaljava": {
+            "locked": "2.23",
+            "transitive": [
+                "netflix:test-util"
             ]
         },
         "org.hamcrest:hamcrest-core": {
@@ -21393,8 +21488,9 @@
             ]
         },
         "org.mockito:mockito-core": {
-            "locked": "1.8.5",
+            "locked": "1.10.19",
             "transitive": [
+                "com.netflix.governator:governator-test-junit",
                 "netflix:streaming-utilities-testing"
             ]
         },
@@ -21417,7 +21513,7 @@
             ]
         },
         "org.objenesis:objenesis": {
-            "locked": "1.0",
+            "locked": "2.1",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -21942,6 +22038,7 @@
                 "netflix:streaming-metrics",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing",
+                "netflix:test-util",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.curator:curator-client",
@@ -22144,6 +22241,7 @@
                 "com.netflix.archaius:archaius2-commons-configuration",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.archaius:archaius2-persisted2",
+                "com.netflix.archaius:archaius2-test",
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.runtime:health-integrations"
             ]
@@ -22152,6 +22250,7 @@
             "locked": "2.1.10",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
+                "com.netflix.governator:governator-test-junit",
                 "com.netflix.runtime:health-guice",
                 "netflix:nf-archaius2"
             ]
@@ -22160,6 +22259,12 @@
             "locked": "2.1.10",
             "transitive": [
                 "netflix:nf-archaius2"
+            ]
+        },
+        "com.netflix.archaius:archaius2-test": {
+            "locked": "2.1.10",
+            "transitive": [
+                "com.netflix.governator:governator-test-junit"
             ]
         },
         "com.netflix.astyanax:astyanax": {
@@ -22295,6 +22400,7 @@
             "locked": "1.15.5",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
+                "com.netflix.governator:governator-test-junit",
                 "com.netflix.karyon:karyon-core",
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -22313,6 +22419,7 @@
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
+                "com.netflix.governator:governator-test-junit",
                 "com.netflix.runtime:health-core"
             ]
         },
@@ -22326,8 +22433,15 @@
             "locked": "1.15.5",
             "transitive": [
                 "com.netflix.governator:governator",
+                "com.netflix.governator:governator-test-junit",
                 "com.netflix.runtime:health-guice",
                 "netflix:nf-archaius2"
+            ]
+        },
+        "com.netflix.governator:governator-test-junit": {
+            "locked": "1.15.5",
+            "transitive": [
+                "netflix:nflibrary-junit-util"
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
@@ -23277,10 +23391,13 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.11",
+            "locked": "4.12",
             "requested": "4.11",
             "transitive": [
-                "com.thinkaurelius.thrift:thrift-server"
+                "com.netflix.archaius:archaius2-test",
+                "com.netflix.governator:governator-test-junit",
+                "com.thinkaurelius.thrift:thrift-server",
+                "netflix:nflibrary-junit-util"
             ]
         },
         "log4j:log4j": {
@@ -23323,7 +23440,8 @@
             "locked": "1.0",
             "transitive": [
                 "com.google.code.findbugs:annotations",
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:test-util"
             ]
         },
         "net.jpountz.lz4:lz4": {
@@ -23651,6 +23769,7 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.23",
             "transitive": [
+                "netflix:nflibrary-junit-util",
                 "netflix:platform-chukwaClient",
                 "netflix:platform-management"
             ]
@@ -23729,8 +23848,13 @@
                 "netflix:nf-archaius2-platform-bridge",
                 "netflix:nf-karyon-admin-plugins",
                 "netflix:nfi18n-core",
+                "netflix:nflibrary-junit-util",
                 "netflix:platform-management"
             ]
+        },
+        "netflix:nflibrary-junit-util": {
+            "locked": "4.0.4",
+            "requested": "latest.release"
         },
         "netflix:nfsso": {
             "locked": "1.52.0",
@@ -24010,6 +24134,18 @@
             "locked": "1.2",
             "transitive": [
                 "netflix:streaming-utilities"
+            ]
+        },
+        "netflix:test-labels": {
+            "locked": "1.614.0",
+            "transitive": [
+                "netflix:nflibrary-junit-util"
+            ]
+        },
+        "netflix:test-util": {
+            "locked": "1.12.0",
+            "transitive": [
+                "netflix:nflibrary-junit-util"
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
@@ -24389,6 +24525,7 @@
             "locked": "3.2.9",
             "transitive": [
                 "netflix:nflibrary",
+                "netflix:nflibrary-junit-util",
                 "org.apache.solr:solr-solrj"
             ]
         },
@@ -24410,6 +24547,12 @@
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:base-explorer"
+            ]
+        },
+        "org.functionaljava:functionaljava": {
+            "locked": "2.23",
+            "transitive": [
+                "netflix:test-util"
             ]
         },
         "org.hamcrest:hamcrest-core": {
@@ -24467,8 +24610,9 @@
             ]
         },
         "org.mockito:mockito-core": {
-            "locked": "1.8.5",
+            "locked": "1.10.19",
             "transitive": [
+                "com.netflix.governator:governator-test-junit",
                 "netflix:streaming-utilities-testing"
             ]
         },
@@ -24491,7 +24635,7 @@
             ]
         },
         "org.objenesis:objenesis": {
-            "locked": "1.0",
+            "locked": "2.1",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -25016,6 +25160,7 @@
                 "netflix:streaming-metrics",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing",
+                "netflix:test-util",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.curator:curator-client",
@@ -25218,6 +25363,7 @@
                 "com.netflix.archaius:archaius2-commons-configuration",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.archaius:archaius2-persisted2",
+                "com.netflix.archaius:archaius2-test",
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.runtime:health-integrations"
             ]
@@ -25226,6 +25372,7 @@
             "locked": "2.1.10",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
+                "com.netflix.governator:governator-test-junit",
                 "com.netflix.runtime:health-guice",
                 "netflix:nf-archaius2"
             ]
@@ -25234,6 +25381,12 @@
             "locked": "2.1.10",
             "transitive": [
                 "netflix:nf-archaius2"
+            ]
+        },
+        "com.netflix.archaius:archaius2-test": {
+            "locked": "2.1.10",
+            "transitive": [
+                "com.netflix.governator:governator-test-junit"
             ]
         },
         "com.netflix.astyanax:astyanax": {
@@ -25369,6 +25522,7 @@
             "locked": "1.15.5",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
+                "com.netflix.governator:governator-test-junit",
                 "com.netflix.karyon:karyon-core",
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -25387,6 +25541,7 @@
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
+                "com.netflix.governator:governator-test-junit",
                 "com.netflix.runtime:health-core"
             ]
         },
@@ -25400,8 +25555,15 @@
             "locked": "1.15.5",
             "transitive": [
                 "com.netflix.governator:governator",
+                "com.netflix.governator:governator-test-junit",
                 "com.netflix.runtime:health-guice",
                 "netflix:nf-archaius2"
+            ]
+        },
+        "com.netflix.governator:governator-test-junit": {
+            "locked": "1.15.5",
+            "transitive": [
+                "netflix:nflibrary-junit-util"
             ]
         },
         "com.netflix.hollow:netflix-hollow": {
@@ -26351,10 +26513,13 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.11",
+            "locked": "4.12",
             "requested": "4.11",
             "transitive": [
-                "com.thinkaurelius.thrift:thrift-server"
+                "com.netflix.archaius:archaius2-test",
+                "com.netflix.governator:governator-test-junit",
+                "com.thinkaurelius.thrift:thrift-server",
+                "netflix:nflibrary-junit-util"
             ]
         },
         "log4j:log4j": {
@@ -26397,7 +26562,8 @@
             "locked": "1.0",
             "transitive": [
                 "com.google.code.findbugs:annotations",
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:test-util"
             ]
         },
         "net.jpountz.lz4:lz4": {
@@ -26725,6 +26891,7 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.23",
             "transitive": [
+                "netflix:nflibrary-junit-util",
                 "netflix:platform-chukwaClient",
                 "netflix:platform-management"
             ]
@@ -26803,8 +26970,13 @@
                 "netflix:nf-archaius2-platform-bridge",
                 "netflix:nf-karyon-admin-plugins",
                 "netflix:nfi18n-core",
+                "netflix:nflibrary-junit-util",
                 "netflix:platform-management"
             ]
+        },
+        "netflix:nflibrary-junit-util": {
+            "locked": "4.0.4",
+            "requested": "latest.release"
         },
         "netflix:nfsso": {
             "locked": "1.52.0",
@@ -27084,6 +27256,18 @@
             "locked": "1.2",
             "transitive": [
                 "netflix:streaming-utilities"
+            ]
+        },
+        "netflix:test-labels": {
+            "locked": "1.614.0",
+            "transitive": [
+                "netflix:nflibrary-junit-util"
+            ]
+        },
+        "netflix:test-util": {
+            "locked": "1.12.0",
+            "transitive": [
+                "netflix:nflibrary-junit-util"
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
@@ -27463,6 +27647,7 @@
             "locked": "3.2.9",
             "transitive": [
                 "netflix:nflibrary",
+                "netflix:nflibrary-junit-util",
                 "org.apache.solr:solr-solrj"
             ]
         },
@@ -27484,6 +27669,12 @@
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.pytheas:pytheas-core",
                 "netflix:base-explorer"
+            ]
+        },
+        "org.functionaljava:functionaljava": {
+            "locked": "2.23",
+            "transitive": [
+                "netflix:test-util"
             ]
         },
         "org.hamcrest:hamcrest-core": {
@@ -27541,8 +27732,9 @@
             ]
         },
         "org.mockito:mockito-core": {
-            "locked": "1.8.5",
+            "locked": "1.10.19",
             "transitive": [
+                "com.netflix.governator:governator-test-junit",
                 "netflix:streaming-utilities-testing"
             ]
         },
@@ -27565,7 +27757,7 @@
             ]
         },
         "org.objenesis:objenesis": {
-            "locked": "1.0",
+            "locked": "2.1",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
