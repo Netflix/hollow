@@ -145,6 +145,9 @@ public class VideoCollectionsDataHierarchy {
             supplementalVideoCollectionsData.showChildren = Collections.emptyList();
             supplementalVideoCollectionsData.seasonChildren = Collections.emptyList();
             supplementalVideoCollectionsData.supplementalVideos = Collections.emptyList();
+            if (suppVideo.sequenceNumber != Integer.MIN_VALUE) {
+                supplementalVideoCollectionsData.seasonNumber = suppVideo.sequenceNumber;
+            }
             if (suppVideo.sequenceNumber != java.lang.Integer.MIN_VALUE && supplementalVideoCollectionsData.topNodeType == constants.SHOW) {
                 if (supplementalVideoCollectionsData.supplementalShowVideoParentIds == null) {
                     supplementalVideoCollectionsData.supplementalShowVideoParentIds = new ArrayList<>();
