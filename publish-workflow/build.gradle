@@ -12,6 +12,7 @@ dependencies {
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.assertj:assertj-core:3.3+'
+    testCompile "netflix:nflibrary-junit-util:latest.release"    
 }
 configurations {
   // exclude direct and transitive dependencies on platform
