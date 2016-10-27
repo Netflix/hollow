@@ -413,6 +413,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -445,6 +446,8 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.runtime:runtime-lifecycle",
                 "com.netflix.spectator:spectator-nflx-plugin",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
@@ -462,9 +465,10 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "2.6.1",
+            "locked": "3.0.2",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
+                "com.netflix.vms.events:vmsevents-proto-definition",
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
@@ -576,6 +580,9 @@
             "locked": "2.1.10",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -583,6 +590,7 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.10",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -735,6 +743,10 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -748,6 +760,9 @@
         "com.netflix.eureka:eureka-client-archaius2": {
             "locked": "1.6.0",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
             ]
         },
@@ -774,7 +789,9 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core",
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.governator:governator-archaius": {
@@ -974,6 +991,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-api",
                 "netflix:platform-chukwaClient"
             ]
         },
@@ -1001,6 +1019,26 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.ribbon:ribbon-loadbalancer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-common": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-consumer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-producer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -1211,6 +1249,55 @@
             "locked": "0.9.0.12-platform",
             "transitive": [
                 "netflix:platform-chukwaClient"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-api": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-core": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-proto-definition": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "netflix:mutation-stream-common"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
@@ -1528,6 +1615,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -1727,6 +1815,8 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -1878,6 +1968,7 @@
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.kafka:kafka-clients"
@@ -1937,19 +2028,20 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
                 "netflix:epic-plugin",
                 "netflix:metrics-explorer",
+                "netflix:mutation-stream-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -2128,12 +2220,6 @@
                 "netflix:mutation-stream-client"
             ]
         },
-        "netflix:json": {
-            "locked": "1.1.0",
-            "transitive": [
-                "netflix:mutation-stream-common"
-            ]
-        },
         "netflix:luna-safetynet": {
             "locked": "1.10",
             "transitive": [
@@ -2173,13 +2259,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -2329,7 +2416,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.9",
+            "locked": "0.3.10",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -2764,7 +2851,11 @@
         "org.apache.kafka:kafka-clients": {
             "locked": "0.9.0.2-nflx.10",
             "transitive": [
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
@@ -3758,6 +3849,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -3790,6 +3882,8 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.runtime:runtime-lifecycle",
                 "com.netflix.spectator:spectator-nflx-plugin",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
@@ -3807,9 +3901,10 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "2.6.1",
+            "locked": "3.0.2",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
+                "com.netflix.vms.events:vmsevents-proto-definition",
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
@@ -3921,6 +4016,9 @@
             "locked": "2.1.10",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -3928,6 +4026,7 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.10",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -4080,6 +4179,10 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -4093,6 +4196,9 @@
         "com.netflix.eureka:eureka-client-archaius2": {
             "locked": "1.6.0",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
             ]
         },
@@ -4119,7 +4225,9 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core",
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.governator:governator-archaius": {
@@ -4319,6 +4427,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-api",
                 "netflix:platform-chukwaClient"
             ]
         },
@@ -4346,6 +4455,26 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.ribbon:ribbon-loadbalancer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-common": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-consumer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-producer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -4556,6 +4685,55 @@
             "locked": "0.9.0.12-platform",
             "transitive": [
                 "netflix:platform-chukwaClient"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-api": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-core": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-proto-definition": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "netflix:mutation-stream-common"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
@@ -4873,6 +5051,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -5072,6 +5251,8 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -5223,6 +5404,7 @@
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.kafka:kafka-clients"
@@ -5282,19 +5464,20 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
                 "netflix:epic-plugin",
                 "netflix:metrics-explorer",
+                "netflix:mutation-stream-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -5473,12 +5656,6 @@
                 "netflix:mutation-stream-client"
             ]
         },
-        "netflix:json": {
-            "locked": "1.1.0",
-            "transitive": [
-                "netflix:mutation-stream-common"
-            ]
-        },
         "netflix:luna-safetynet": {
             "locked": "1.10",
             "transitive": [
@@ -5518,13 +5695,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -5674,7 +5852,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.9",
+            "locked": "0.3.10",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -6109,7 +6287,11 @@
         "org.apache.kafka:kafka-clients": {
             "locked": "0.9.0.2-nflx.10",
             "transitive": [
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
@@ -7103,6 +7285,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -7135,6 +7318,8 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.runtime:runtime-lifecycle",
                 "com.netflix.spectator:spectator-nflx-plugin",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
@@ -7152,9 +7337,10 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "2.6.1",
+            "locked": "3.0.2",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
+                "com.netflix.vms.events:vmsevents-proto-definition",
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
@@ -7266,6 +7452,9 @@
             "locked": "2.1.10",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -7273,6 +7462,7 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.10",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -7425,6 +7615,10 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -7438,6 +7632,9 @@
         "com.netflix.eureka:eureka-client-archaius2": {
             "locked": "1.6.0",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
             ]
         },
@@ -7464,7 +7661,9 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core",
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.governator:governator-archaius": {
@@ -7664,6 +7863,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-api",
                 "netflix:platform-chukwaClient"
             ]
         },
@@ -7691,6 +7891,26 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.ribbon:ribbon-loadbalancer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-common": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-consumer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-producer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -7901,6 +8121,55 @@
             "locked": "0.9.0.12-platform",
             "transitive": [
                 "netflix:platform-chukwaClient"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-api": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-core": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-proto-definition": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "netflix:mutation-stream-common"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
@@ -8218,6 +8487,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -8417,6 +8687,8 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -8568,6 +8840,7 @@
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.kafka:kafka-clients"
@@ -8627,19 +8900,20 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
                 "netflix:epic-plugin",
                 "netflix:metrics-explorer",
+                "netflix:mutation-stream-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -8818,12 +9092,6 @@
                 "netflix:mutation-stream-client"
             ]
         },
-        "netflix:json": {
-            "locked": "1.1.0",
-            "transitive": [
-                "netflix:mutation-stream-common"
-            ]
-        },
         "netflix:luna-safetynet": {
             "locked": "1.10",
             "transitive": [
@@ -8863,13 +9131,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -9019,7 +9288,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.9",
+            "locked": "0.3.10",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -9454,7 +9723,11 @@
         "org.apache.kafka:kafka-clients": {
             "locked": "0.9.0.2-nflx.10",
             "transitive": [
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
@@ -10448,6 +10721,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -10480,6 +10754,8 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.runtime:runtime-lifecycle",
                 "com.netflix.spectator:spectator-nflx-plugin",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
@@ -10497,9 +10773,10 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "2.6.1",
+            "locked": "3.0.2",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
+                "com.netflix.vms.events:vmsevents-proto-definition",
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
@@ -10611,6 +10888,9 @@
             "locked": "2.1.10",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -10618,6 +10898,7 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.10",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -10770,6 +11051,10 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -10783,6 +11068,9 @@
         "com.netflix.eureka:eureka-client-archaius2": {
             "locked": "1.6.0",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
             ]
         },
@@ -10809,7 +11097,9 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core",
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.governator:governator-archaius": {
@@ -11009,6 +11299,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-api",
                 "netflix:platform-chukwaClient"
             ]
         },
@@ -11036,6 +11327,26 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.ribbon:ribbon-loadbalancer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-common": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-consumer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-producer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -11246,6 +11557,55 @@
             "locked": "0.9.0.12-platform",
             "transitive": [
                 "netflix:platform-chukwaClient"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-api": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-core": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-proto-definition": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "netflix:mutation-stream-common"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
@@ -11563,6 +11923,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -11762,6 +12123,8 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -11906,6 +12269,7 @@
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.kafka:kafka-clients"
@@ -11965,19 +12329,20 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
                 "netflix:epic-plugin",
                 "netflix:metrics-explorer",
+                "netflix:mutation-stream-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -12156,12 +12521,6 @@
                 "netflix:mutation-stream-client"
             ]
         },
-        "netflix:json": {
-            "locked": "1.1.0",
-            "transitive": [
-                "netflix:mutation-stream-common"
-            ]
-        },
         "netflix:luna-safetynet": {
             "locked": "1.10",
             "transitive": [
@@ -12201,13 +12560,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -12357,7 +12717,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.9",
+            "locked": "0.3.10",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -12792,7 +13152,11 @@
         "org.apache.kafka:kafka-clients": {
             "locked": "0.9.0.2-nflx.10",
             "transitive": [
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
@@ -13808,6 +14172,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -13840,6 +14205,8 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.runtime:runtime-lifecycle",
                 "com.netflix.spectator:spectator-nflx-plugin",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
@@ -13857,9 +14224,10 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "2.6.1",
+            "locked": "3.0.2",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
+                "com.netflix.vms.events:vmsevents-proto-definition",
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
@@ -13971,6 +14339,9 @@
             "locked": "2.1.10",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -13978,6 +14349,7 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.10",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -14130,6 +14502,10 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -14143,6 +14519,9 @@
         "com.netflix.eureka:eureka-client-archaius2": {
             "locked": "1.6.0",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
             ]
         },
@@ -14169,7 +14548,9 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core",
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.governator:governator-archaius": {
@@ -14369,6 +14750,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-api",
                 "netflix:platform-chukwaClient"
             ]
         },
@@ -14396,6 +14778,26 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.ribbon:ribbon-loadbalancer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-common": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-consumer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-producer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -14606,6 +15008,55 @@
             "locked": "0.9.0.12-platform",
             "transitive": [
                 "netflix:platform-chukwaClient"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-api": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-core": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-proto-definition": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "netflix:mutation-stream-common"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
@@ -14923,6 +15374,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -15122,6 +15574,8 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -15273,6 +15727,7 @@
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.kafka:kafka-clients"
@@ -15332,19 +15787,20 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
                 "netflix:epic-plugin",
                 "netflix:metrics-explorer",
+                "netflix:mutation-stream-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -15523,12 +15979,6 @@
                 "netflix:mutation-stream-client"
             ]
         },
-        "netflix:json": {
-            "locked": "1.1.0",
-            "transitive": [
-                "netflix:mutation-stream-common"
-            ]
-        },
         "netflix:luna-safetynet": {
             "locked": "1.10",
             "transitive": [
@@ -15568,13 +16018,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -15724,7 +16175,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.9",
+            "locked": "0.3.10",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -16159,7 +16610,11 @@
         "org.apache.kafka:kafka-clients": {
             "locked": "0.9.0.2-nflx.10",
             "transitive": [
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
@@ -18245,6 +18700,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -18277,6 +18733,8 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.runtime:runtime-lifecycle",
                 "com.netflix.spectator:spectator-nflx-plugin",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
@@ -18294,9 +18752,10 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "2.6.1",
+            "locked": "3.0.2",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
+                "com.netflix.vms.events:vmsevents-proto-definition",
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
@@ -18408,6 +18867,9 @@
             "locked": "2.1.10",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -18415,6 +18877,7 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.10",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -18567,6 +19030,10 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -18580,6 +19047,9 @@
         "com.netflix.eureka:eureka-client-archaius2": {
             "locked": "1.6.0",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
             ]
         },
@@ -18606,7 +19076,9 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core",
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.governator:governator-archaius": {
@@ -18806,6 +19278,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-api",
                 "netflix:platform-chukwaClient"
             ]
         },
@@ -18833,6 +19306,26 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.ribbon:ribbon-loadbalancer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-common": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-consumer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-producer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -19043,6 +19536,55 @@
             "locked": "0.9.0.12-platform",
             "transitive": [
                 "netflix:platform-chukwaClient"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-api": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-core": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-proto-definition": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "netflix:mutation-stream-common"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
@@ -19360,6 +19902,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -19559,6 +20102,8 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -19710,6 +20255,7 @@
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.kafka:kafka-clients"
@@ -19769,19 +20315,20 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
                 "netflix:epic-plugin",
                 "netflix:metrics-explorer",
+                "netflix:mutation-stream-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -19960,12 +20507,6 @@
                 "netflix:mutation-stream-client"
             ]
         },
-        "netflix:json": {
-            "locked": "1.1.0",
-            "transitive": [
-                "netflix:mutation-stream-common"
-            ]
-        },
         "netflix:luna-safetynet": {
             "locked": "1.10",
             "transitive": [
@@ -20005,13 +20546,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -20161,7 +20703,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.9",
+            "locked": "0.3.10",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -20596,7 +21138,11 @@
         "org.apache.kafka:kafka-clients": {
             "locked": "0.9.0.2-nflx.10",
             "transitive": [
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
@@ -21590,6 +22136,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -21622,6 +22169,8 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.runtime:runtime-lifecycle",
                 "com.netflix.spectator:spectator-nflx-plugin",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
@@ -21639,9 +22188,10 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "2.6.1",
+            "locked": "3.0.2",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
+                "com.netflix.vms.events:vmsevents-proto-definition",
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
@@ -21753,6 +22303,9 @@
             "locked": "2.1.10",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -21760,6 +22313,7 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.10",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -21912,6 +22466,10 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -21925,6 +22483,9 @@
         "com.netflix.eureka:eureka-client-archaius2": {
             "locked": "1.6.0",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
             ]
         },
@@ -21951,7 +22512,9 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core",
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.governator:governator-archaius": {
@@ -22151,6 +22714,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-api",
                 "netflix:platform-chukwaClient"
             ]
         },
@@ -22178,6 +22742,26 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.ribbon:ribbon-loadbalancer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-common": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-consumer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-producer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -22388,6 +22972,55 @@
             "locked": "0.9.0.12-platform",
             "transitive": [
                 "netflix:platform-chukwaClient"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-api": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-core": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-proto-definition": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "netflix:mutation-stream-common"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
@@ -22705,6 +23338,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -22904,6 +23538,8 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -23054,6 +23690,7 @@
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.kafka:kafka-clients"
@@ -23113,19 +23750,20 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
                 "netflix:epic-plugin",
                 "netflix:metrics-explorer",
+                "netflix:mutation-stream-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -23304,12 +23942,6 @@
                 "netflix:mutation-stream-client"
             ]
         },
-        "netflix:json": {
-            "locked": "1.1.0",
-            "transitive": [
-                "netflix:mutation-stream-common"
-            ]
-        },
         "netflix:luna-safetynet": {
             "locked": "1.10",
             "transitive": [
@@ -23349,13 +23981,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -23505,7 +24138,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.9",
+            "locked": "0.3.10",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -23940,7 +24573,11 @@
         "org.apache.kafka:kafka-clients": {
             "locked": "0.9.0.2-nflx.10",
             "transitive": [
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
@@ -24923,6 +25560,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -24955,6 +25593,8 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.runtime:runtime-lifecycle",
                 "com.netflix.spectator:spectator-nflx-plugin",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
@@ -24972,9 +25612,10 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "2.6.1",
+            "locked": "3.0.2",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
+                "com.netflix.vms.events:vmsevents-proto-definition",
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
@@ -25103,6 +25744,9 @@
             "locked": "2.1.10",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -25110,6 +25754,7 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.10",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -25262,6 +25907,10 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -25275,6 +25924,9 @@
         "com.netflix.eureka:eureka-client-archaius2": {
             "locked": "1.6.0",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
             ]
         },
@@ -25301,7 +25953,9 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core",
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.governator:governator-archaius": {
@@ -25506,6 +26160,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-api",
                 "netflix:platform-chukwaClient"
             ]
         },
@@ -25533,6 +26188,26 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.ribbon:ribbon-loadbalancer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-common": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-consumer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-producer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -25746,6 +26421,55 @@
             "locked": "0.9.0.12-platform",
             "transitive": [
                 "netflix:platform-chukwaClient"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-api": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-core": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-proto-definition": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "netflix:mutation-stream-common"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
@@ -26070,6 +26794,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -26279,6 +27004,8 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -26440,6 +27167,7 @@
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.kafka:kafka-clients",
@@ -26501,19 +27229,20 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
                 "netflix:epic-plugin",
                 "netflix:metrics-explorer",
+                "netflix:mutation-stream-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -26692,12 +27421,6 @@
                 "netflix:mutation-stream-client"
             ]
         },
-        "netflix:json": {
-            "locked": "1.1.0",
-            "transitive": [
-                "netflix:mutation-stream-common"
-            ]
-        },
         "netflix:luna-safetynet": {
             "locked": "1.10",
             "transitive": [
@@ -26737,13 +27460,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -26894,7 +27618,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.9",
+            "locked": "0.3.10",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -27336,7 +28060,11 @@
         "org.apache.kafka:kafka-clients": {
             "locked": "0.9.0.2-nflx.10",
             "transitive": [
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
@@ -28386,6 +29114,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -28418,6 +29147,8 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.runtime:runtime-lifecycle",
                 "com.netflix.spectator:spectator-nflx-plugin",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
@@ -28435,9 +29166,10 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "2.6.1",
+            "locked": "3.0.2",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
+                "com.netflix.vms.events:vmsevents-proto-definition",
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
@@ -28566,6 +29298,9 @@
             "locked": "2.1.10",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -28573,6 +29308,7 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.10",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -28725,6 +29461,10 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -28738,6 +29478,9 @@
         "com.netflix.eureka:eureka-client-archaius2": {
             "locked": "1.6.0",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
             ]
         },
@@ -28764,7 +29507,9 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core",
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.governator:governator-archaius": {
@@ -28969,6 +29714,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-api",
                 "netflix:platform-chukwaClient"
             ]
         },
@@ -28996,6 +29742,26 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.ribbon:ribbon-loadbalancer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-common": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-consumer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-producer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -29209,6 +29975,55 @@
             "locked": "0.9.0.12-platform",
             "transitive": [
                 "netflix:platform-chukwaClient"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-api": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-core": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-proto-definition": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "netflix:mutation-stream-common"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
@@ -29533,6 +30348,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -29742,6 +30558,8 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -29903,6 +30721,7 @@
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.kafka:kafka-clients",
@@ -29964,19 +30783,20 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
                 "netflix:epic-plugin",
                 "netflix:metrics-explorer",
+                "netflix:mutation-stream-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -30155,12 +30975,6 @@
                 "netflix:mutation-stream-client"
             ]
         },
-        "netflix:json": {
-            "locked": "1.1.0",
-            "transitive": [
-                "netflix:mutation-stream-common"
-            ]
-        },
         "netflix:luna-safetynet": {
             "locked": "1.10",
             "transitive": [
@@ -30200,13 +31014,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -30357,7 +31172,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.9",
+            "locked": "0.3.10",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -30799,7 +31614,11 @@
         "org.apache.kafka:kafka-clients": {
             "locked": "0.9.0.2-nflx.10",
             "transitive": [
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
@@ -31849,6 +32668,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -31881,6 +32701,8 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.runtime:runtime-lifecycle",
                 "com.netflix.spectator:spectator-nflx-plugin",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
@@ -31898,9 +32720,10 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "2.6.1",
+            "locked": "3.0.2",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
+                "com.netflix.vms.events:vmsevents-proto-definition",
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
@@ -32029,6 +32852,9 @@
             "locked": "2.1.10",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -32036,6 +32862,7 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.10",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -32188,6 +33015,10 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -32201,6 +33032,9 @@
         "com.netflix.eureka:eureka-client-archaius2": {
             "locked": "1.6.0",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
             ]
         },
@@ -32227,7 +33061,9 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core",
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.governator:governator-archaius": {
@@ -32432,6 +33268,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-api",
                 "netflix:platform-chukwaClient"
             ]
         },
@@ -32459,6 +33296,26 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.ribbon:ribbon-loadbalancer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-common": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-consumer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-producer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -32672,6 +33529,55 @@
             "locked": "0.9.0.12-platform",
             "transitive": [
                 "netflix:platform-chukwaClient"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-api": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-core": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-proto-definition": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "netflix:mutation-stream-common"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
@@ -32996,6 +33902,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -33205,6 +34112,8 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -33366,6 +34275,7 @@
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.kafka:kafka-clients",
@@ -33427,19 +34337,20 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
                 "netflix:epic-plugin",
                 "netflix:metrics-explorer",
+                "netflix:mutation-stream-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -33618,12 +34529,6 @@
                 "netflix:mutation-stream-client"
             ]
         },
-        "netflix:json": {
-            "locked": "1.1.0",
-            "transitive": [
-                "netflix:mutation-stream-common"
-            ]
-        },
         "netflix:luna-safetynet": {
             "locked": "1.10",
             "transitive": [
@@ -33663,13 +34568,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -33820,7 +34726,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.9",
+            "locked": "0.3.10",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -34262,7 +35168,11 @@
         "org.apache.kafka:kafka-clients": {
             "locked": "0.9.0.2-nflx.10",
             "transitive": [
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
@@ -35312,6 +36222,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -35344,6 +36255,8 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.runtime:runtime-lifecycle",
                 "com.netflix.spectator:spectator-nflx-plugin",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
@@ -35361,9 +36274,10 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "2.6.1",
+            "locked": "3.0.2",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
+                "com.netflix.vms.events:vmsevents-proto-definition",
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
@@ -35492,6 +36406,9 @@
             "locked": "2.1.10",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -35499,6 +36416,7 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.10",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -35651,6 +36569,10 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -35664,6 +36586,9 @@
         "com.netflix.eureka:eureka-client-archaius2": {
             "locked": "1.6.0",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
             ]
         },
@@ -35690,7 +36615,9 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core",
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.governator:governator-archaius": {
@@ -35895,6 +36822,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-api",
                 "netflix:platform-chukwaClient"
             ]
         },
@@ -35922,6 +36850,26 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.ribbon:ribbon-loadbalancer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-common": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-consumer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-producer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -36135,6 +37083,55 @@
             "locked": "0.9.0.12-platform",
             "transitive": [
                 "netflix:platform-chukwaClient"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-api": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-core": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-proto-definition": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "netflix:mutation-stream-common"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
@@ -36459,6 +37456,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -36668,6 +37666,8 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -36829,6 +37829,7 @@
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.kafka:kafka-clients",
@@ -36890,19 +37891,20 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
                 "netflix:epic-plugin",
                 "netflix:metrics-explorer",
+                "netflix:mutation-stream-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -37081,12 +38083,6 @@
                 "netflix:mutation-stream-client"
             ]
         },
-        "netflix:json": {
-            "locked": "1.1.0",
-            "transitive": [
-                "netflix:mutation-stream-common"
-            ]
-        },
         "netflix:luna-safetynet": {
             "locked": "1.10",
             "transitive": [
@@ -37126,13 +38122,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -37283,7 +38280,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.9",
+            "locked": "0.3.10",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -37725,7 +38722,11 @@
         "org.apache.kafka:kafka-clients": {
             "locked": "0.9.0.2-nflx.10",
             "transitive": [
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
@@ -38756,6 +39757,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -38788,6 +39790,8 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.runtime:runtime-lifecycle",
                 "com.netflix.spectator:spectator-nflx-plugin",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
@@ -38805,9 +39809,10 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "2.6.1",
+            "locked": "3.0.2",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
+                "com.netflix.vms.events:vmsevents-proto-definition",
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
@@ -38919,6 +39924,9 @@
             "locked": "2.1.10",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -38926,6 +39934,7 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.10",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -39078,6 +40087,10 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -39091,6 +40104,9 @@
         "com.netflix.eureka:eureka-client-archaius2": {
             "locked": "1.6.0",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
             ]
         },
@@ -39117,7 +40133,9 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core",
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.governator:governator-archaius": {
@@ -39322,6 +40340,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-api",
                 "netflix:platform-chukwaClient"
             ]
         },
@@ -39349,6 +40368,26 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.ribbon:ribbon-loadbalancer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-common": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-consumer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-producer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -39559,6 +40598,55 @@
             "locked": "0.9.0.12-platform",
             "transitive": [
                 "netflix:platform-chukwaClient"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-api": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-core": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-proto-definition": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "netflix:mutation-stream-common"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
@@ -39879,6 +40967,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -40079,6 +41168,8 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -40230,6 +41321,7 @@
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.kafka:kafka-clients"
@@ -40289,19 +41381,20 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
                 "netflix:epic-plugin",
                 "netflix:metrics-explorer",
+                "netflix:mutation-stream-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -40480,12 +41573,6 @@
                 "netflix:mutation-stream-client"
             ]
         },
-        "netflix:json": {
-            "locked": "1.1.0",
-            "transitive": [
-                "netflix:mutation-stream-common"
-            ]
-        },
         "netflix:luna-safetynet": {
             "locked": "1.10",
             "transitive": [
@@ -40525,13 +41612,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -40681,7 +41769,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.9",
+            "locked": "0.3.10",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -41116,7 +42204,11 @@
         "org.apache.kafka:kafka-clients": {
             "locked": "0.9.0.2-nflx.10",
             "transitive": [
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
@@ -42118,6 +43210,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -42150,6 +43243,8 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.runtime:runtime-lifecycle",
                 "com.netflix.spectator:spectator-nflx-plugin",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
@@ -42167,9 +43262,10 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "2.6.1",
+            "locked": "3.0.2",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
+                "com.netflix.vms.events:vmsevents-proto-definition",
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
@@ -42281,6 +43377,9 @@
             "locked": "2.1.10",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -42288,6 +43387,7 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.10",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -42440,6 +43540,10 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -42453,6 +43557,9 @@
         "com.netflix.eureka:eureka-client-archaius2": {
             "locked": "1.6.0",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
             ]
         },
@@ -42479,7 +43586,9 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core",
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.governator:governator-archaius": {
@@ -42684,6 +43793,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-api",
                 "netflix:platform-chukwaClient"
             ]
         },
@@ -42711,6 +43821,26 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.ribbon:ribbon-loadbalancer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-common": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-consumer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-producer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -42921,6 +44051,55 @@
             "locked": "0.9.0.12-platform",
             "transitive": [
                 "netflix:platform-chukwaClient"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-api": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-core": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-proto-definition": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "netflix:mutation-stream-common"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
@@ -43241,6 +44420,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -43441,6 +44621,8 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -43592,6 +44774,7 @@
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.kafka:kafka-clients"
@@ -43651,19 +44834,20 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
                 "netflix:epic-plugin",
                 "netflix:metrics-explorer",
+                "netflix:mutation-stream-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -43842,12 +45026,6 @@
                 "netflix:mutation-stream-client"
             ]
         },
-        "netflix:json": {
-            "locked": "1.1.0",
-            "transitive": [
-                "netflix:mutation-stream-common"
-            ]
-        },
         "netflix:luna-safetynet": {
             "locked": "1.10",
             "transitive": [
@@ -43887,13 +45065,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -44043,7 +45222,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.9",
+            "locked": "0.3.10",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -44478,7 +45657,11 @@
         "org.apache.kafka:kafka-clients": {
             "locked": "0.9.0.2-nflx.10",
             "transitive": [
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
@@ -45480,6 +46663,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -45512,6 +46696,8 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.runtime:runtime-lifecycle",
                 "com.netflix.spectator:spectator-nflx-plugin",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
@@ -45529,9 +46715,10 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "2.6.1",
+            "locked": "3.0.2",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
+                "com.netflix.vms.events:vmsevents-proto-definition",
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
@@ -45643,6 +46830,9 @@
             "locked": "2.1.10",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -45650,6 +46840,7 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.10",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -45802,6 +46993,10 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -45815,6 +47010,9 @@
         "com.netflix.eureka:eureka-client-archaius2": {
             "locked": "1.6.0",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
             ]
         },
@@ -45841,7 +47039,9 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core",
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.governator:governator-archaius": {
@@ -46046,6 +47246,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-api",
                 "netflix:platform-chukwaClient"
             ]
         },
@@ -46073,6 +47274,26 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.ribbon:ribbon-loadbalancer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-common": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-consumer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-producer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -46283,6 +47504,55 @@
             "locked": "0.9.0.12-platform",
             "transitive": [
                 "netflix:platform-chukwaClient"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-api": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-core": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-proto-definition": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "netflix:mutation-stream-common"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
@@ -46603,6 +47873,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -46803,6 +48074,8 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -46954,6 +48227,7 @@
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.kafka:kafka-clients"
@@ -47013,19 +48287,20 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
                 "netflix:epic-plugin",
                 "netflix:metrics-explorer",
+                "netflix:mutation-stream-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -47204,12 +48479,6 @@
                 "netflix:mutation-stream-client"
             ]
         },
-        "netflix:json": {
-            "locked": "1.1.0",
-            "transitive": [
-                "netflix:mutation-stream-common"
-            ]
-        },
         "netflix:luna-safetynet": {
             "locked": "1.10",
             "transitive": [
@@ -47249,13 +48518,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -47405,7 +48675,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.9",
+            "locked": "0.3.10",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -47840,7 +49110,11 @@
         "org.apache.kafka:kafka-clients": {
             "locked": "0.9.0.2-nflx.10",
             "transitive": [
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
@@ -48842,6 +50116,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -48874,6 +50149,8 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.runtime:runtime-lifecycle",
                 "com.netflix.spectator:spectator-nflx-plugin",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
@@ -48891,9 +50168,10 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "2.6.1",
+            "locked": "3.0.2",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
+                "com.netflix.vms.events:vmsevents-proto-definition",
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
@@ -49005,6 +50283,9 @@
             "locked": "2.1.10",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -49012,6 +50293,7 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.1.10",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -49164,6 +50446,10 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -49177,6 +50463,9 @@
         "com.netflix.eureka:eureka-client-archaius2": {
             "locked": "1.6.0",
             "transitive": [
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
             ]
         },
@@ -49203,7 +50492,9 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
                 "com.netflix.runtime:health-core",
-                "com.netflix.runtime:runtime-lifecycle"
+                "com.netflix.runtime:runtime-lifecycle",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.governator:governator-archaius": {
@@ -49408,6 +50699,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-api",
                 "netflix:platform-chukwaClient"
             ]
         },
@@ -49435,6 +50727,26 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.ribbon:ribbon-loadbalancer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-common": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-consumer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.nfkafka:nfkafka-producer": {
+            "locked": "0.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -49645,6 +50957,55 @@
             "locked": "0.9.0.12-platform",
             "transitive": [
                 "netflix:platform-chukwaClient"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-api": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-core": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "com.netflix.vms.events:vmsevents-mutation-stream",
+                "netflix:mutation-stream-common"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
+            "locked": "7.1.1",
+            "transitive": [
+                "netflix:mutation-stream-client"
+            ]
+        },
+        "com.netflix.vms.events:vmsevents-proto-definition": {
+            "locked": "7.1.1",
+            "transitive": [
+                "com.netflix.vms.events:vmsevents-kafka",
+                "netflix:mutation-stream-common"
             ]
         },
         "com.netflix.vms.logging:vmslogging-api": {
@@ -49965,6 +51326,7 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:base-explorer",
                 "netflix:base-server",
                 "netflix:cryptexclient-standalone",
@@ -50165,6 +51527,8 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.runtime:health-core",
+                "com.netflix.vms.events:vmsevents-core",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
@@ -50316,6 +51680,7 @@
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql",
+                "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.kafka:kafka-clients"
@@ -50375,19 +51740,20 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
                 "netflix:epic-plugin",
                 "netflix:metrics-explorer",
+                "netflix:mutation-stream-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing"
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.2.0",
+            "locked": "2.3.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -50566,12 +51932,6 @@
                 "netflix:mutation-stream-client"
             ]
         },
-        "netflix:json": {
-            "locked": "1.1.0",
-            "transitive": [
-                "netflix:mutation-stream-common"
-            ]
-        },
         "netflix:luna-safetynet": {
             "locked": "1.10",
             "transitive": [
@@ -50611,13 +51971,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
+                "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "1.91",
+            "locked": "2.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -50767,7 +52128,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.9",
+            "locked": "0.3.10",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -51202,7 +52563,11 @@
         "org.apache.kafka:kafka-clients": {
             "locked": "0.9.0.2-nflx.10",
             "transitive": [
-                "com.netflix.suro:suro-kafka-producer"
+                "com.netflix.nfkafka:nfkafka-common",
+                "com.netflix.nfkafka:nfkafka-consumer",
+                "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-kafka-producer",
+                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
