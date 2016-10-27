@@ -204,7 +204,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.6",
+            "locked": "1.6.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.karyon:karyon-eureka",
@@ -212,13 +212,13 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.6",
+            "locked": "1.6.0",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -226,14 +226,14 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
@@ -603,14 +603,14 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.35",
+            "locked": "1.37",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -632,19 +632,19 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.7",
+            "locked": "0.3.9",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:server-context": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -1102,7 +1102,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.6",
+            "locked": "1.6.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.karyon:karyon-eureka",
@@ -1110,13 +1110,13 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.6",
+            "locked": "1.6.0",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -1124,14 +1124,14 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
@@ -1501,14 +1501,14 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.35",
+            "locked": "1.37",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -1530,19 +1530,19 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.7",
+            "locked": "0.3.9",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:server-context": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -2000,7 +2000,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.6",
+            "locked": "1.6.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.karyon:karyon-eureka",
@@ -2008,13 +2008,13 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.6",
+            "locked": "1.6.0",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -2022,14 +2022,14 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
@@ -2399,14 +2399,14 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.35",
+            "locked": "1.37",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -2428,19 +2428,19 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.7",
+            "locked": "0.3.9",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:server-context": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -2898,7 +2898,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.6",
+            "locked": "1.6.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.karyon:karyon-eureka",
@@ -2906,13 +2906,13 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.6",
+            "locked": "1.6.0",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -2920,14 +2920,14 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
@@ -3297,14 +3297,14 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.35",
+            "locked": "1.37",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -3326,19 +3326,19 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.7",
+            "locked": "0.3.9",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:server-context": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -3895,7 +3895,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.6",
+            "locked": "1.6.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.karyon:karyon-eureka",
@@ -3903,13 +3903,13 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.6",
+            "locked": "1.6.0",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -3917,14 +3917,14 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
@@ -4294,14 +4294,14 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.35",
+            "locked": "1.37",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -4323,19 +4323,19 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.7",
+            "locked": "0.3.9",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:server-context": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -4795,7 +4795,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.6",
+            "locked": "1.6.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.karyon:karyon-eureka",
@@ -4803,13 +4803,13 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.6",
+            "locked": "1.6.0",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -4817,14 +4817,14 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
@@ -5201,14 +5201,14 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.35",
+            "locked": "1.37",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -5230,19 +5230,19 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.7",
+            "locked": "0.3.9",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:server-context": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -5728,7 +5728,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.6",
+            "locked": "1.6.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.karyon:karyon-eureka",
@@ -5736,13 +5736,13 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.6",
+            "locked": "1.6.0",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -5750,14 +5750,14 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
@@ -6134,14 +6134,14 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.35",
+            "locked": "1.37",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -6163,19 +6163,19 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.7",
+            "locked": "0.3.9",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:server-context": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -6661,7 +6661,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.6",
+            "locked": "1.6.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.karyon:karyon-eureka",
@@ -6669,13 +6669,13 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.6",
+            "locked": "1.6.0",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -6683,14 +6683,14 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
@@ -7067,14 +7067,14 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.35",
+            "locked": "1.37",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -7096,19 +7096,19 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.7",
+            "locked": "0.3.9",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:server-context": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -7594,7 +7594,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.5.6",
+            "locked": "1.6.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.karyon:karyon-eureka",
@@ -7602,13 +7602,13 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.5.6",
+            "locked": "1.6.0",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -7616,14 +7616,14 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.5",
+            "locked": "1.15.6",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
@@ -8000,14 +8000,14 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.35",
+            "locked": "1.37",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -8029,19 +8029,19 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.3.7",
+            "locked": "0.3.9",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:server-context": {
-            "locked": "4.0.4",
+            "locked": "4.0.5",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
