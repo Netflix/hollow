@@ -38,9 +38,12 @@ import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.artwork.ArtWorkModule;
 import com.netflix.vms.transformer.util.NFLocaleUtil;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -69,6 +72,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
 
         Set<Integer> rollupMerchstillVideoIds = new HashSet<>();
         Set<String> rollupSourceFieldIds = new HashSet<>();
+        Set<String> merchstillSourceFieldIds = new HashSet<>();
 
         Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap = new HashMap<>();
 
@@ -79,7 +83,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
                 int videoArtworkOrdinal = iter.next();
                 while (videoArtworkOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
                     VideoArtworkHollow artworkHollowInput = api.getVideoArtworkHollow(videoArtworkOrdinal);
-                    String rollupSourceFileId = processArtwork(artworkHollowInput, countryArtworkMap);
+                    String rollupSourceFileId = processArtwork(artworkHollowInput, countryArtworkMap, merchstillSourceFieldIds);
                     if (rollupSourceFileId != null) {
                         rollupMerchstillVideoIds.add(videoId);
                         rollupSourceFieldIds.add(rollupSourceFileId);
@@ -89,7 +93,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
             }
         }
 
-        rollupMerchstills(rollupMerchstillVideoIds, rollupSourceFieldIds, showHierarchiesByCountry, countryArtworkMap);
+        rollupMerchstills(rollupMerchstillVideoIds, rollupSourceFieldIds, showHierarchiesByCountry, merchstillSourceFieldIds, countryArtworkMap);
 
         // Create VideoImages
         Map<String, Map<Integer, VideoImages>> countryImagesMap = new HashMap<>();
@@ -116,11 +120,9 @@ public class VideoImagesDataModule extends ArtWorkModule {
     }
 
     private void rollupMerchstills(Set<Integer> rollupMerchstillVideoIds /* in */, Set<String> rollupSourceFieldIds /* in */, Map<String, Set<VideoHierarchy>> showHierarchiesByCountry/* in */,
-            Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap /* out */) {
+            Set<String> merchstillSourceFieldIds /* in */, Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap /* out */) {
 
-        if (rollupMerchstillVideoIds.isEmpty()) {
-            return;
-        }
+        final int MIN_ROLLUP_SIZE = 4; // 3
 
         for (String countryCode : showHierarchiesByCountry.keySet()) {
             Map<Integer, Set<Artwork>> artworkMap = countryArtworkMap.get(countryCode);
@@ -136,6 +138,8 @@ public class VideoImagesDataModule extends ArtWorkModule {
                     showArtwork = new LinkedHashSet<>();
                     showAttached = false;
                 }
+                List<Artwork> showBackFillArtwork = new ArrayList<>();
+                int showMerchstillsCount = 0;
 
                 int episodeSeqNum = 0;
                 for (int iseason = 0; iseason < hierarchy.getSeasonIds().length; iseason++) {
@@ -147,26 +151,51 @@ public class VideoImagesDataModule extends ArtWorkModule {
                         seasonAttached = false;
                     }
 
+                    List<Artwork> seasonBackFillArtwork = new ArrayList<>();
+
                     for (int iepisode = 0; iepisode < hierarchy.getEpisodeIds()[iseason].length; iepisode++) {
                         episodeSeqNum++;
                         int episodeId = hierarchy.getEpisodeIds()[iseason][iepisode];
-                        if (rollupMerchstillVideoIds.contains(Integer.valueOf(episodeId))) {
-                            if (isAvailableForED(episodeId, countryCode)) {
-                                Set<Artwork> episodeArtwork = artworkMap.get(episodeId);
-                                if (episodeArtwork != null && !episodeArtwork.isEmpty()) {
-                                    for (Artwork artwork : episodeArtwork) {
-                                        String sourceFieldId =  artwork.sourceFileId == null ? null : new String(artwork.sourceFileId.value);
-                                        if (artwork.sourceFileId != null && rollupSourceFieldIds.contains(sourceFieldId)) {
-                                            Artwork seasonArt = artwork.clone();
-                                            Artwork showArt = artwork.clone();
-                                            seasonArt.seqNum = episodeSeqNum;
-                                            showArt.seqNum = episodeSeqNum;
-                                            seasonArtwork.add(seasonArt);
-                                            showArtwork.add(showArt);
+                        if (isAvailableForED(episodeId, countryCode)) {
+                            Set<Artwork> episodeArtwork = artworkMap.get(episodeId);
+
+                            if (episodeArtwork != null && !episodeArtwork.isEmpty()) {
+                                for (Artwork artwork : episodeArtwork) {
+                                    String sourceFieldId =  artwork.sourceFileId == null ? null : new String(artwork.sourceFileId.value);
+                                    if (rollupMerchstillVideoIds.contains(episodeId) && artwork.sourceFileId != null && rollupSourceFieldIds.contains(sourceFieldId)) {
+                                        Artwork seasonArt = artwork.clone();
+                                        Artwork showArt = artwork.clone();
+                                        showArt.seqNum = episodeSeqNum;
+                                        seasonArtwork.add(seasonArt);
+                                        showArtwork.add(showArt);
+                                        showMerchstillsCount++;
+                                    } else {  // artwork is not "rollup", potential backfill
+                                        if(artwork.sourceFileId != null && merchstillSourceFieldIds.contains(sourceFieldId)) {
+                                            if(seasonBackFillArtwork.size() < MIN_ROLLUP_SIZE) {
+                                                seasonBackFillArtwork.add(artwork.clone());
+                                            }
+                                            if(showBackFillArtwork.size() < MIN_ROLLUP_SIZE) {
+                                                showBackFillArtwork.add(artwork.clone());
+                                            }
                                         }
-                                    }
+                                    }// backfill
                                 }
                             }
+                        }
+                    }
+
+                    if(seasonArtwork.isEmpty() && seasonBackFillArtwork.isEmpty()) {
+                        // don't attach an empty map
+                    } else { // add backfill, if needed
+                        int max_seqNum = 0;
+                        for(Artwork seasonArt : seasonArtwork) {
+                            if(seasonArt.seqNum > max_seqNum) max_seqNum = seasonArt.seqNum;
+                        }
+                        int num_add = MIN_ROLLUP_SIZE - seasonArtwork.size();
+                        for(int iadd= 0; iadd < num_add && iadd < seasonBackFillArtwork.size(); iadd++) {
+                            Artwork seasonFallback = seasonBackFillArtwork.get(iadd);
+                            seasonFallback.seqNum = ++max_seqNum;
+                            seasonArtwork.add(seasonFallback); 
                         }
                     }
 
@@ -174,6 +203,22 @@ public class VideoImagesDataModule extends ArtWorkModule {
                         artworkMap.put(seasonId, seasonArtwork);
                     }
                 } // all seasons within a hierarchy
+
+                if(showArtwork.isEmpty() && showBackFillArtwork.isEmpty()) {
+                    // don't attach
+                } else { // add backfill, if needed
+                    int max_seqNum = 0;
+                    for(Artwork showArt : showArtwork) {
+                        if(showArt.seqNum > max_seqNum) max_seqNum = showArt.seqNum;
+                    }
+
+                    int num_add = MIN_ROLLUP_SIZE - showMerchstillsCount;
+                    for(int iadd= 0; iadd < num_add && iadd < showBackFillArtwork.size(); iadd++) {
+                        Artwork fallback = showBackFillArtwork.get(iadd);
+                        fallback.seqNum = ++max_seqNum;
+                        showArtwork.add(fallback); 
+                    }
+                }
 
                 if (!showAttached && !showArtwork.isEmpty()) {
                     artworkMap.put(topNodeId, showArtwork);
@@ -223,7 +268,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
         throw new UnsupportedOperationException("Use buildVideoImagesByCountry");
     }
 
-    private String processArtwork(VideoArtworkHollow artworkHollowInput, Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap) {
+    private String processArtwork(VideoArtworkHollow artworkHollowInput, Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap, Set<String> merchstillSourceFieldIds) {
         ArtworkLocaleListHollow locales = artworkHollowInput._getLocales();
         int entityId = (int) artworkHollowInput._getMovieId();
 
@@ -253,10 +298,14 @@ public class VideoImagesDataModule extends ArtWorkModule {
         }
 
         boolean isMerchstillRollup = false;
+        boolean isMerchStill = false;
         if (artworkHollowInput._getFileImageType() != null) {
-            isMerchstillRollup = (MERCH_STILL_TYPE.equals(artworkHollowInput._getFileImageType()._getValue()) && showLevel == true);
+            isMerchStill = MERCH_STILL_TYPE.equals(artworkHollowInput._getFileImageType()._getValue());
+            isMerchstillRollup = (isMerchStill && showLevel == true);
         }
-
+        if(isMerchStill) {
+            merchstillSourceFieldIds.add(sourceFileId);
+        }
         Artwork artwork = new Artwork();
 
         // Process list of derivatives
