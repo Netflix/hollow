@@ -166,6 +166,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
                                     if (rollupMerchstillVideoIds.contains(episodeId) && artwork.sourceFileId != null && rollupSourceFieldIds.contains(sourceFieldId)) {
                                         Artwork seasonArt = artwork.clone();
                                         Artwork showArt = artwork.clone();
+                                        seasonArt.seqNum = episodeSeqNum;
                                         showArt.seqNum = episodeSeqNum;
                                         seasonArtwork.add(seasonArt);
                                         showArtwork.add(showArt);
