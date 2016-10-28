@@ -152,6 +152,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
                     }
 
                     List<Artwork> seasonBackFillArtwork = new ArrayList<>();
+                    int seasonMerchstillsCount = 0;
 
                     for (int iepisode = 0; iepisode < hierarchy.getEpisodeIds()[iseason].length; iepisode++) {
                         episodeSeqNum++;
@@ -168,6 +169,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
                                         showArt.seqNum = episodeSeqNum;
                                         seasonArtwork.add(seasonArt);
                                         showArtwork.add(showArt);
+                                        seasonMerchstillsCount++;
                                         showMerchstillsCount++;
                                     } else {  // artwork is not "rollup", potential backfill
                                         if(artwork.sourceFileId != null && merchstillSourceFieldIds.contains(sourceFieldId)) {
@@ -191,7 +193,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
                         for(Artwork seasonArt : seasonArtwork) {
                             if(seasonArt.seqNum > max_seqNum) max_seqNum = seasonArt.seqNum;
                         }
-                        int num_add = MIN_ROLLUP_SIZE - seasonArtwork.size();
+                        int num_add = MIN_ROLLUP_SIZE - seasonMerchstillsCount;
                         for(int iadd= 0; iadd < num_add && iadd < seasonBackFillArtwork.size(); iadd++) {
                             Artwork seasonFallback = seasonBackFillArtwork.get(iadd);
                             seasonFallback.seqNum = ++max_seqNum;
