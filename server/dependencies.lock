@@ -2028,7 +2028,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -2041,7 +2041,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -5464,7 +5464,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -5477,7 +5477,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -8900,7 +8900,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -8913,7 +8913,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -12329,7 +12329,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -12342,7 +12342,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -15787,7 +15787,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -15800,7 +15800,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -18282,7 +18282,7 @@
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
-            "locked": "0.19.0",
+            "locked": "0.20.0",
             "requested": "latest.release"
         }
     },
@@ -20315,7 +20315,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -20328,7 +20328,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -23750,7 +23750,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -23763,7 +23763,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -27229,7 +27229,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -27242,7 +27242,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -30783,7 +30783,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -30796,7 +30796,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -34337,7 +34337,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -34350,7 +34350,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -37891,7 +37891,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -37904,7 +37904,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -41381,7 +41381,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -41394,7 +41394,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -44834,7 +44834,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -44847,7 +44847,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -48287,7 +48287,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -48300,7 +48300,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -51740,7 +51740,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -51753,7 +51753,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",

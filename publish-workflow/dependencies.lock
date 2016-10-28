@@ -1892,7 +1892,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:epic-plugin",
@@ -1904,7 +1904,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:streaming-metrics"
@@ -5055,7 +5055,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:epic-plugin",
@@ -5067,7 +5067,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:streaming-metrics"
@@ -8218,7 +8218,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:epic-plugin",
@@ -8230,7 +8230,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:streaming-metrics"
@@ -11381,7 +11381,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:epic-plugin",
@@ -11393,7 +11393,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:streaming-metrics"
@@ -12746,7 +12746,7 @@
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
-            "locked": "0.19.0",
+            "locked": "0.20.0",
             "requested": "latest.release"
         }
     },
@@ -14643,7 +14643,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:epic-plugin",
@@ -14655,7 +14655,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:streaming-metrics"
@@ -17829,7 +17829,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:epic-plugin",
@@ -17841,7 +17841,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:streaming-metrics"
@@ -21046,7 +21046,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:epic-plugin",
@@ -21058,7 +21058,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:streaming-metrics"
@@ -24263,7 +24263,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:epic-plugin",
@@ -24275,7 +24275,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:streaming-metrics"
@@ -27480,7 +27480,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:epic-plugin",
@@ -27492,7 +27492,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.3.0",
+            "locked": "2.4.0",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:streaming-metrics"
