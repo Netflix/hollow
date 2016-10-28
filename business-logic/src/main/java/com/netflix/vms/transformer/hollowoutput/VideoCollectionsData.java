@@ -17,10 +17,8 @@ public class VideoCollectionsData implements Cloneable {
     public Video seasonParent = null;
     public Video topNode = null;
     public SortedMapOfIntegerToListOfVideoEpisode episodesForSeasonSequenceNumberMap = null;
-    // if nodeType is SEASON/SUPP video, this value tells the current season/supplemental sequence number
+    // if nodeType is SEASON video, this value tells the season number
     public int seasonNumber = -1;
-    // these list holds the parent(currently only for type SHOW) video ids, if the nodeType is SUPPLEMENTAL
-    public List<Integer> supplementalShowVideoParentIds = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
