@@ -2065,7 +2065,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.186.0",
+            "locked": "1.187.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -2399,7 +2399,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.20",
+            "locked": "2.21",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -5228,7 +5228,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.186.0",
+            "locked": "1.187.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -5562,7 +5562,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.20",
+            "locked": "2.21",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -8391,7 +8391,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.186.0",
+            "locked": "1.187.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -8725,7 +8725,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.20",
+            "locked": "2.21",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -11554,7 +11554,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.186.0",
+            "locked": "1.187.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -11888,7 +11888,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.20",
+            "locked": "2.21",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -14816,7 +14816,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.186.0",
+            "locked": "1.187.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -15150,7 +15150,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.20",
+            "locked": "2.21",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -18002,7 +18002,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.186.0",
+            "locked": "1.187.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -18342,7 +18342,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.20",
+            "locked": "2.21",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -21219,7 +21219,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.186.0",
+            "locked": "1.187.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -21559,7 +21559,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.20",
+            "locked": "2.21",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -24436,7 +24436,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.186.0",
+            "locked": "1.187.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -24776,7 +24776,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.20",
+            "locked": "2.21",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -27653,7 +27653,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.186.0",
+            "locked": "1.187.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -27993,7 +27993,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.20",
+            "locked": "2.21",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
