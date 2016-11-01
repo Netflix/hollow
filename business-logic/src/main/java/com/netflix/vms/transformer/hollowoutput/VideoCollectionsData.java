@@ -17,7 +17,6 @@ public class VideoCollectionsData implements Cloneable {
     public Video seasonParent = null;
     public Video topNode = null;
     public SortedMapOfIntegerToListOfVideoEpisode episodesForSeasonSequenceNumberMap = null;
-    // if nodeType is SEASON video, this value tells the season number
     public int seasonNumber = -1;
 
     public boolean equals(Object other) {
@@ -59,6 +58,7 @@ public class VideoCollectionsData implements Cloneable {
         if(o.episodesForSeasonSequenceNumberMap == null) {
             if(episodesForSeasonSequenceNumberMap != null) return false;
         } else if(!o.episodesForSeasonSequenceNumberMap.equals(episodesForSeasonSequenceNumberMap)) return false;
+        if (o.seasonNumber != this.seasonNumber) return false;
         return true;
     }
 
@@ -91,6 +91,7 @@ public class VideoCollectionsData implements Cloneable {
         builder.append(",seasonParent=").append(seasonParent);
         builder.append(",topNode=").append(topNode);
         builder.append(",episodesForSeasonSequenceNumberMap=").append(episodesForSeasonSequenceNumberMap);
+        builder.append(",seasonNumber=").append(seasonNumber);
         builder.append("}");
         return builder.toString();
     }
