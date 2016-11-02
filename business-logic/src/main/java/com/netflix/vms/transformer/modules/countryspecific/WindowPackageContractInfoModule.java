@@ -20,6 +20,8 @@ import com.netflix.vms.transformer.hollowoutput.StreamData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoContractInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
+import com.netflix.vms.transformer.hollowoutput.VideoImage;
+import com.netflix.vms.transformer.hollowoutput.VideoMoment;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoResolution;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
@@ -141,6 +143,8 @@ public class WindowPackageContractInfoModule {
         info.videoPackageInfo.stillImagesMap = packageMomentData.stillImagesMap;
         info.videoPackageInfo.phoneSnacks = packageMomentData.phoneSnackMoments;
         info.videoPackageInfo.trickPlayMap = packageMomentData.trickPlayItemMap;
+        info.videoPackageInfo.startOffsetInSeconds = getOffset("Start", packageMomentData.stillImagesMap);
+        info.videoPackageInfo.startOffsetInSeconds = getOffset("Ending", packageMomentData.stillImagesMap);
 
         info.videoPackageInfo.screenFormats = new ArrayList<Strings>(screenFormats.size());
         for(String screenFormat : screenFormats) {
@@ -157,6 +161,28 @@ public class WindowPackageContractInfoModule {
         info.videoPackageInfo.runtimeInSeconds = (int) longestRuntimeInSeconds;
 
         return info;
+    }
+
+    /**
+     * Get start and end offset in seconds from video moments data.
+     * @param momentKey
+     * @param stillImageMap
+     * @return value in seconds, if value not available then default value is -1
+     */
+    private long getOffset(String momentKey, Map<Strings, List<VideoImage>> stillImageMap) {
+        long offset = -1;
+
+        if (stillImageMap.isEmpty() || stillImageMap == null) return offset;
+        List<VideoImage> videoImages = stillImageMap.get(momentKey);
+        if (videoImages == null || videoImages.isEmpty()) return offset;
+
+        VideoImage videoImage = videoImages.get(0);
+        if (videoImage == null || videoImage.videoMoment == null) return offset;
+
+        Long msOffset = videoImage.videoMoment.msOffset;
+        if (msOffset == null || msOffset.longValue() <= 0 ) return offset;
+
+        return msOffset.longValue() / 1000;
     }
 
     private void populateEncodingProfileIdSets(VMSHollowInputAPI api, HollowPrimaryKeyIndex primaryKeyIndex) {
