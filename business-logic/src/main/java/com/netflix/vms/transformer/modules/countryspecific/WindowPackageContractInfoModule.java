@@ -21,7 +21,6 @@ import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoContractInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoImage;
-import com.netflix.vms.transformer.hollowoutput.VideoMoment;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoResolution;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
@@ -143,8 +142,8 @@ public class WindowPackageContractInfoModule {
         info.videoPackageInfo.stillImagesMap = packageMomentData.stillImagesMap;
         info.videoPackageInfo.phoneSnacks = packageMomentData.phoneSnackMoments;
         info.videoPackageInfo.trickPlayMap = packageMomentData.trickPlayItemMap;
-        info.videoPackageInfo.startOffsetInSeconds = getOffset("Start", packageMomentData.stillImagesMap);
-        info.videoPackageInfo.startOffsetInSeconds = getOffset("Ending", packageMomentData.stillImagesMap);
+        info.videoPackageInfo.startMomentOffsetInSeconds = getOffset(VideoMomentModule.START_MOMENT_KEY, packageMomentData.stillImagesMap);
+        info.videoPackageInfo.endMomentOffsetInSeconds = getOffset(VideoMomentModule.END_MOMENT_KEY, packageMomentData.stillImagesMap);
 
         info.videoPackageInfo.screenFormats = new ArrayList<Strings>(screenFormats.size());
         for(String screenFormat : screenFormats) {
