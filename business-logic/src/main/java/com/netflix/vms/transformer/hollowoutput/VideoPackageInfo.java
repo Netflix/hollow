@@ -49,6 +49,8 @@ public class VideoPackageInfo implements Cloneable {
         if(o.trickPlayMap == null) {
             if(trickPlayMap != null) return false;
         } else if(!o.trickPlayMap.equals(trickPlayMap)) return false;
+        if (o.startMomentOffsetInSeconds!=this.startMomentOffsetInSeconds) return false;
+        if (o.endMomentOffsetInSeconds!=endMomentOffsetInSeconds) return false;
         return true;
     }
 
@@ -79,6 +81,8 @@ public class VideoPackageInfo implements Cloneable {
         builder.append(",stillImagesMap=").append(stillImagesMap);
         builder.append(",videoClipMap=").append(videoClipMap);
         builder.append(",trickPlayMap=").append(trickPlayMap);
+        builder.append(",startOffsetInSeconds=").append(startMomentOffsetInSeconds);
+        builder.append(",endOffsetInSeconds=").append(endMomentOffsetInSeconds);
         builder.append("}");
         return builder.toString();
     }
