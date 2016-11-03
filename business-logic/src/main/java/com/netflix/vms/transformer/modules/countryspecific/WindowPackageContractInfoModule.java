@@ -175,6 +175,7 @@ public class WindowPackageContractInfoModule {
         List<VideoImage> videoImages = stillImageMap.get(momentKey);
         if (videoImages == null || videoImages.isEmpty()) return offset;
 
+        // There is only 1 or 0 Start/End moments for the video, hence looking up the first VideoImage in list.
         VideoImage videoImage = videoImages.get(0);
         if (videoImage == null || videoImage.videoMoment == null) return offset;
 
