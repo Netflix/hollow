@@ -835,7 +835,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.25",
+            "locked": "1.26",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -2259,14 +2259,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -4271,7 +4271,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.25",
+            "locked": "1.26",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -5695,14 +5695,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -7707,7 +7707,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.25",
+            "locked": "1.26",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -9131,14 +9131,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -11143,7 +11143,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.25",
+            "locked": "1.26",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -12560,14 +12560,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -14594,7 +14594,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.25",
+            "locked": "1.26",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -16018,14 +16018,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -19122,7 +19122,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.25",
+            "locked": "1.26",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -20546,14 +20546,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -22558,7 +22558,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.25",
+            "locked": "1.26",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -23981,14 +23981,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -25999,7 +25999,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.25",
+            "locked": "1.26",
             "transitive": [
                 "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -27460,14 +27460,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -29553,7 +29553,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.25",
+            "locked": "1.26",
             "transitive": [
                 "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -31014,14 +31014,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -33107,7 +33107,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.25",
+            "locked": "1.26",
             "transitive": [
                 "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -34568,14 +34568,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -36661,7 +36661,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.25",
+            "locked": "1.26",
             "transitive": [
                 "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -38122,14 +38122,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -40179,7 +40179,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.25",
+            "locked": "1.26",
             "transitive": [
                 "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -41612,14 +41612,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -43632,7 +43632,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.25",
+            "locked": "1.26",
             "transitive": [
                 "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -45065,14 +45065,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -47085,7 +47085,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.25",
+            "locked": "1.26",
             "transitive": [
                 "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -48518,14 +48518,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -50538,7 +50538,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.25",
+            "locked": "1.26",
             "transitive": [
                 "com.netflix.hollow:netflix-hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -51971,14 +51971,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.3",
+            "locked": "2.0.4",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
