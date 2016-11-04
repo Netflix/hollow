@@ -11,6 +11,9 @@ import com.netflix.vms.transformer.hollowoutput.VideoMoment;
 
 public class VideoMomentModule {
 
+    public final static String START_MOMENT_KEY = "Start";
+    public final static String END_MOMENT_KEY = "Ending";
+
     /// extract to class
     public VideoMoment createVideoMoment(int packageId, PackageMomentHollow packageMoment, String momentType) {
         VideoMoment videoMoment = new VideoMoment();
