@@ -1164,7 +1164,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -1174,7 +1174,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -1182,31 +1182,31 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -2112,14 +2112,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -4327,7 +4327,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -4337,7 +4337,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -4345,31 +4345,31 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -5275,14 +5275,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -7490,7 +7490,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -7500,7 +7500,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -7508,31 +7508,31 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -8438,14 +8438,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -10653,7 +10653,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -10663,7 +10663,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -10671,31 +10671,31 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -11601,14 +11601,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -13915,7 +13915,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -13925,7 +13925,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -13933,31 +13933,31 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -14863,14 +14863,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -17096,7 +17096,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -17106,7 +17106,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -17114,31 +17114,31 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -18049,14 +18049,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -20313,7 +20313,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -20323,7 +20323,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -20331,31 +20331,31 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -21266,14 +21266,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -23530,7 +23530,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -23540,7 +23540,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -23548,31 +23548,31 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -24483,14 +24483,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -26747,7 +26747,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -26757,7 +26757,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -26765,31 +26765,31 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.5",
+            "locked": "7.1.6",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -27700,14 +27700,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
