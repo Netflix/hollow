@@ -168,7 +168,7 @@ public class WindowPackageContractInfoModule {
      * @param stillImageMap
      * @return value in seconds, if value not available then default value is -1
      */
-    private long getOffset(String momentKey, Map<Strings, List<VideoImage>> stillImageMap) {
+    private long getOffset(Strings momentKey, Map<Strings, List<VideoImage>> stillImageMap) {
         long offset = -1;
 
         if (stillImageMap.isEmpty() || stillImageMap == null) return offset;
