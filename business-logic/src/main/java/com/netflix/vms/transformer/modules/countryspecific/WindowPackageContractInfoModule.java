@@ -164,14 +164,15 @@ public class WindowPackageContractInfoModule {
 
     /**
      * Get start and end offset in seconds from video moments data.
+     *
      * @param momentKey
      * @param stillImageMap
      * @return value in seconds, if value not available then default value is -1
      */
-    private long getOffset(String momentKey, Map<Strings, List<VideoImage>> stillImageMap) {
+    private long getOffset(Strings momentKey, Map<Strings, List<VideoImage>> stillImageMap) {
         long offset = -1;
 
-        if (stillImageMap.isEmpty() || stillImageMap == null) return offset;
+        if (stillImageMap == null || stillImageMap.isEmpty()) return offset;
         List<VideoImage> videoImages = stillImageMap.get(momentKey);
         if (videoImages == null || videoImages.isEmpty()) return offset;
 
@@ -180,7 +181,7 @@ public class WindowPackageContractInfoModule {
         if (videoImage == null || videoImage.videoMoment == null) return offset;
 
         Long msOffset = videoImage.videoMoment.msOffset;
-        if (msOffset == null || msOffset.longValue() <= 0 ) return offset;
+        if (msOffset == null || msOffset.longValue() <= 0) return offset;
 
         return msOffset.longValue() / 1000;
     }
