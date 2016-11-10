@@ -16,8 +16,8 @@ public class VideoPackageInfo implements Cloneable {
     public Map<Strings, List<VideoImage>> stillImagesMap = null;
     public Map<Strings, List<VideoClip>> videoClipMap = null;
     public Map<TrickPlayType, TrickPlayItem> trickPlayMap = null;
-    public long startMomentOffsetInSeconds;
-    public long endMomentOffsetInSeconds;
+    public long startMomentOffsetInSeconds = -1;
+    public long endMomentOffsetInSeconds = -1;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
