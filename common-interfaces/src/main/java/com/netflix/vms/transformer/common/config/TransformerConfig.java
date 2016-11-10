@@ -68,9 +68,6 @@ public interface TransformerConfig {
     @DefaultValue("false")
     boolean isCompactionEnabled();
 
-    @DefaultValue("false")
-    boolean isDefaultExtentionRecipeEnabled();
-
     @DefaultValue("2000000")
     long getCompactionHoleByteThreshold();
 
