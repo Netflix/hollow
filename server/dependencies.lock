@@ -1091,34 +1091,34 @@
             ]
         },
         "com.netflix.runtime:health-api": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-core"
             ]
         },
         "com.netflix.runtime:health-core": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:health-integrations"
             ]
         },
         "com.netflix.runtime:health-guice": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.28",
+            "locked": "1.29",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -1188,6 +1188,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty-spectator",
+                "com.netflix.runtime:health-core",
                 "com.netflix.spectator:spectator-ext-gc",
                 "com.netflix.spectator:spectator-ext-jvm",
                 "com.netflix.spectator:spectator-ext-sandbox",
@@ -4529,34 +4530,34 @@
             ]
         },
         "com.netflix.runtime:health-api": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-core"
             ]
         },
         "com.netflix.runtime:health-core": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:health-integrations"
             ]
         },
         "com.netflix.runtime:health-guice": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.28",
+            "locked": "1.29",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -4626,6 +4627,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty-spectator",
+                "com.netflix.runtime:health-core",
                 "com.netflix.spectator:spectator-ext-gc",
                 "com.netflix.spectator:spectator-ext-jvm",
                 "com.netflix.spectator:spectator-ext-sandbox",
@@ -7967,34 +7969,34 @@
             ]
         },
         "com.netflix.runtime:health-api": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-core"
             ]
         },
         "com.netflix.runtime:health-core": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:health-integrations"
             ]
         },
         "com.netflix.runtime:health-guice": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.28",
+            "locked": "1.29",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -8064,6 +8066,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty-spectator",
+                "com.netflix.runtime:health-core",
                 "com.netflix.spectator:spectator-ext-gc",
                 "com.netflix.spectator:spectator-ext-jvm",
                 "com.netflix.spectator:spectator-ext-sandbox",
@@ -11405,34 +11408,34 @@
             ]
         },
         "com.netflix.runtime:health-api": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-core"
             ]
         },
         "com.netflix.runtime:health-core": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:health-integrations"
             ]
         },
         "com.netflix.runtime:health-guice": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.28",
+            "locked": "1.29",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -11502,6 +11505,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty-spectator",
+                "com.netflix.runtime:health-core",
                 "com.netflix.spectator:spectator-ext-gc",
                 "com.netflix.spectator:spectator-ext-jvm",
                 "com.netflix.spectator:spectator-ext-sandbox",
@@ -14858,34 +14862,34 @@
             ]
         },
         "com.netflix.runtime:health-api": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-core"
             ]
         },
         "com.netflix.runtime:health-core": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:health-integrations"
             ]
         },
         "com.netflix.runtime:health-guice": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.28",
+            "locked": "1.29",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -14955,6 +14959,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty-spectator",
+                "com.netflix.runtime:health-core",
                 "com.netflix.spectator:spectator-ext-gc",
                 "com.netflix.spectator:spectator-ext-jvm",
                 "com.netflix.spectator:spectator-ext-sandbox",
@@ -19388,34 +19393,34 @@
             ]
         },
         "com.netflix.runtime:health-api": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-core"
             ]
         },
         "com.netflix.runtime:health-core": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:health-integrations"
             ]
         },
         "com.netflix.runtime:health-guice": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.28",
+            "locked": "1.29",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -19485,6 +19490,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty-spectator",
+                "com.netflix.runtime:health-core",
                 "com.netflix.spectator:spectator-ext-gc",
                 "com.netflix.spectator:spectator-ext-jvm",
                 "com.netflix.spectator:spectator-ext-sandbox",
@@ -22826,34 +22832,34 @@
             ]
         },
         "com.netflix.runtime:health-api": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-core"
             ]
         },
         "com.netflix.runtime:health-core": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:health-integrations"
             ]
         },
         "com.netflix.runtime:health-guice": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.28",
+            "locked": "1.29",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -22923,6 +22929,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty-spectator",
+                "com.netflix.runtime:health-core",
                 "com.netflix.spectator:spectator-ext-gc",
                 "com.netflix.spectator:spectator-ext-jvm",
                 "com.netflix.spectator:spectator-ext-sandbox",
@@ -26274,34 +26281,34 @@
             ]
         },
         "com.netflix.runtime:health-api": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-core"
             ]
         },
         "com.netflix.runtime:health-core": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:health-integrations"
             ]
         },
         "com.netflix.runtime:health-guice": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.28",
+            "locked": "1.29",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -26374,6 +26381,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty-spectator",
+                "com.netflix.runtime:health-core",
                 "com.netflix.spectator:spectator-ext-gc",
                 "com.netflix.spectator:spectator-ext-jvm",
                 "com.netflix.spectator:spectator-ext-sandbox",
@@ -29830,34 +29838,34 @@
             ]
         },
         "com.netflix.runtime:health-api": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-core"
             ]
         },
         "com.netflix.runtime:health-core": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:health-integrations"
             ]
         },
         "com.netflix.runtime:health-guice": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.28",
+            "locked": "1.29",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -29930,6 +29938,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty-spectator",
+                "com.netflix.runtime:health-core",
                 "com.netflix.spectator:spectator-ext-gc",
                 "com.netflix.spectator:spectator-ext-jvm",
                 "com.netflix.spectator:spectator-ext-sandbox",
@@ -33386,34 +33395,34 @@
             ]
         },
         "com.netflix.runtime:health-api": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-core"
             ]
         },
         "com.netflix.runtime:health-core": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:health-integrations"
             ]
         },
         "com.netflix.runtime:health-guice": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.28",
+            "locked": "1.29",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -33486,6 +33495,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty-spectator",
+                "com.netflix.runtime:health-core",
                 "com.netflix.spectator:spectator-ext-gc",
                 "com.netflix.spectator:spectator-ext-jvm",
                 "com.netflix.spectator:spectator-ext-sandbox",
@@ -36942,34 +36952,34 @@
             ]
         },
         "com.netflix.runtime:health-api": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-core"
             ]
         },
         "com.netflix.runtime:health-core": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:health-integrations"
             ]
         },
         "com.netflix.runtime:health-guice": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.28",
+            "locked": "1.29",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -37042,6 +37052,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty-spectator",
+                "com.netflix.runtime:health-core",
                 "com.netflix.spectator:spectator-ext-gc",
                 "com.netflix.spectator:spectator-ext-jvm",
                 "com.netflix.spectator:spectator-ext-sandbox",
@@ -40462,34 +40473,34 @@
             ]
         },
         "com.netflix.runtime:health-api": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-core"
             ]
         },
         "com.netflix.runtime:health-core": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:health-integrations"
             ]
         },
         "com.netflix.runtime:health-guice": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.28",
+            "locked": "1.29",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -40559,6 +40570,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty-spectator",
+                "com.netflix.runtime:health-core",
                 "com.netflix.spectator:spectator-ext-gc",
                 "com.netflix.spectator:spectator-ext-jvm",
                 "com.netflix.spectator:spectator-ext-sandbox",
@@ -43917,34 +43929,34 @@
             ]
         },
         "com.netflix.runtime:health-api": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-core"
             ]
         },
         "com.netflix.runtime:health-core": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:health-integrations"
             ]
         },
         "com.netflix.runtime:health-guice": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.28",
+            "locked": "1.29",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -44014,6 +44026,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty-spectator",
+                "com.netflix.runtime:health-core",
                 "com.netflix.spectator:spectator-ext-gc",
                 "com.netflix.spectator:spectator-ext-jvm",
                 "com.netflix.spectator:spectator-ext-sandbox",
@@ -47372,34 +47385,34 @@
             ]
         },
         "com.netflix.runtime:health-api": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-core"
             ]
         },
         "com.netflix.runtime:health-core": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:health-integrations"
             ]
         },
         "com.netflix.runtime:health-guice": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.28",
+            "locked": "1.29",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -47469,6 +47482,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty-spectator",
+                "com.netflix.runtime:health-core",
                 "com.netflix.spectator:spectator-ext-gc",
                 "com.netflix.spectator:spectator-ext-jvm",
                 "com.netflix.spectator:spectator-ext-sandbox",
@@ -50827,34 +50841,34 @@
             ]
         },
         "com.netflix.runtime:health-api": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-core"
             ]
         },
         "com.netflix.runtime:health-core": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:health-integrations"
             ]
         },
         "com.netflix.runtime:health-guice": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:health-integrations": {
-            "locked": "1.1.1",
+            "locked": "1.1.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.28",
+            "locked": "1.29",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -50924,6 +50938,7 @@
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.iep-shadow:iepshadow-rxnetty-spectator",
+                "com.netflix.runtime:health-core",
                 "com.netflix.spectator:spectator-ext-gc",
                 "com.netflix.spectator:spectator-ext-jvm",
                 "com.netflix.spectator:spectator-ext-sandbox",
