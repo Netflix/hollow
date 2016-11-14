@@ -137,7 +137,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
@@ -150,7 +150,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
@@ -172,7 +172,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.amazonaws:jmespath-java",
@@ -194,7 +194,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.hystrix:hystrix-serialization",
@@ -202,7 +202,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin",
@@ -210,13 +210,13 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -224,7 +224,7 @@
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-afterburner": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.hystrix:hystrix-serialization"
             ]
@@ -2401,7 +2401,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.22",
+            "locked": "2.23",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -3302,7 +3302,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
@@ -3315,7 +3315,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
@@ -3337,7 +3337,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.amazonaws:jmespath-java",
@@ -3359,7 +3359,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.hystrix:hystrix-serialization",
@@ -3367,7 +3367,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin",
@@ -3375,13 +3375,13 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -3389,7 +3389,7 @@
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-afterburner": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.hystrix:hystrix-serialization"
             ]
@@ -5566,7 +5566,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.22",
+            "locked": "2.23",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -6467,7 +6467,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
@@ -6480,7 +6480,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
@@ -6502,7 +6502,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.amazonaws:jmespath-java",
@@ -6524,7 +6524,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.hystrix:hystrix-serialization",
@@ -6532,7 +6532,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin",
@@ -6540,13 +6540,13 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -6554,7 +6554,7 @@
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-afterburner": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.hystrix:hystrix-serialization"
             ]
@@ -8731,7 +8731,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.22",
+            "locked": "2.23",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -9632,7 +9632,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
@@ -9645,7 +9645,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
@@ -9667,7 +9667,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.amazonaws:jmespath-java",
@@ -9689,7 +9689,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.hystrix:hystrix-serialization",
@@ -9697,7 +9697,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin",
@@ -9705,13 +9705,13 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -9719,7 +9719,7 @@
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-afterburner": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.hystrix:hystrix-serialization"
             ]
@@ -11896,7 +11896,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.22",
+            "locked": "2.23",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -12896,7 +12896,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
@@ -12909,7 +12909,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
@@ -12931,7 +12931,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.amazonaws:jmespath-java",
@@ -12953,7 +12953,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.hystrix:hystrix-serialization",
@@ -12961,7 +12961,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin",
@@ -12969,13 +12969,13 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -12983,7 +12983,7 @@
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-afterburner": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.hystrix:hystrix-serialization"
             ]
@@ -15160,7 +15160,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.22",
+            "locked": "2.23",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -16061,7 +16061,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
@@ -16074,7 +16074,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
@@ -16096,7 +16096,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.amazonaws:jmespath-java",
@@ -16118,7 +16118,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.hystrix:hystrix-serialization",
@@ -16126,7 +16126,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin",
@@ -16134,13 +16134,13 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -16148,7 +16148,7 @@
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-afterburner": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.hystrix:hystrix-serialization"
             ]
@@ -18354,7 +18354,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.22",
+            "locked": "2.23",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -19280,7 +19280,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
@@ -19293,7 +19293,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
@@ -19315,7 +19315,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.amazonaws:jmespath-java",
@@ -19337,7 +19337,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.hystrix:hystrix-serialization",
@@ -19345,7 +19345,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin",
@@ -19353,13 +19353,13 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -19367,7 +19367,7 @@
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-afterburner": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.hystrix:hystrix-serialization"
             ]
@@ -21573,7 +21573,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.22",
+            "locked": "2.23",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -22499,7 +22499,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
@@ -22512,7 +22512,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
@@ -22534,7 +22534,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.amazonaws:jmespath-java",
@@ -22556,7 +22556,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.hystrix:hystrix-serialization",
@@ -22564,7 +22564,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin",
@@ -22572,13 +22572,13 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -22586,7 +22586,7 @@
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-afterburner": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.hystrix:hystrix-serialization"
             ]
@@ -24792,7 +24792,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.22",
+            "locked": "2.23",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -25718,7 +25718,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
@@ -25731,7 +25731,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
@@ -25753,7 +25753,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.amazonaws:jmespath-java",
@@ -25775,7 +25775,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.hystrix:hystrix-serialization",
@@ -25783,7 +25783,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin",
@@ -25791,13 +25791,13 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -25805,7 +25805,7 @@
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-afterburner": {
-            "locked": "2.7.5",
+            "locked": "2.8.3",
             "transitive": [
                 "com.netflix.hystrix:hystrix-serialization"
             ]
@@ -28011,7 +28011,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.22",
+            "locked": "2.23",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
