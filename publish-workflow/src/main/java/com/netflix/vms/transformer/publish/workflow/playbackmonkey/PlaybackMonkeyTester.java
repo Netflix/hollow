@@ -46,6 +46,21 @@ public class PlaybackMonkeyTester {
     public PlaybackMonkeyTester() {
         this.pbmRestClient = createClient();
     }
+    
+    public PlaybackMonkeyTester(RestClientManager restClientManager) {
+        this.pbmRestClient = createClient(restClientManager);
+    }
+
+    private RestClient createClient(RestClientManager restClientManager) {
+        if(pbmRestClient == null) {
+            try {
+                return restClientManager.registerRestClientUsingProperties(PBM_REST_CLIENT_NAME);
+            } catch (NIWSClientException e) {
+                e.printStackTrace();
+            }
+        }
+        return pbmRestClient;
+    }
 
     public Map<VideoCountryKey, Boolean> testVideoCountryKeysWithRetry(TaggingLogger logger, Set<ValuableVideo> mostValuableChangedVideos, int numOfTries) throws Exception {
         Map<VideoCountryKey, Boolean> playBackMonkeyResult = new HashMap<>(mostValuableChangedVideos.size());
@@ -207,7 +222,8 @@ public class PlaybackMonkeyTester {
 
     @SuppressWarnings("deprecation")
     private RestClient createClient() {
-        RestClient pbmRestClient = RestClientManager.getInstance().getClient(PBM_REST_CLIENT_NAME);
+        RestClientManager restClientManager = RestClientManager.getInstance();
+        RestClient pbmRestClient = restClientManager.getClient(PBM_REST_CLIENT_NAME);
         if (pbmRestClient == null) {
             try {
                 pbmRestClient = com.netflix.niws.client.RestClientFactory.registerRestClientUsingProperties(PBM_REST_CLIENT_NAME);

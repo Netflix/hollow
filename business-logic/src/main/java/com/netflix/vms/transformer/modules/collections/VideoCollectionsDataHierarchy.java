@@ -86,6 +86,7 @@ public class VideoCollectionsDataHierarchy {
         currentSeason.showParent = topNode;
         currentSeason.supplementalVideos = supplementalVideos;
         currentSeason.episodesForSeasonSequenceNumberMap = constants.EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
+        currentSeason.seasonNumber = sequenceNumber;
 
         addSupplementalVideoCollectionsData(supplementalVideos, null);
     }
