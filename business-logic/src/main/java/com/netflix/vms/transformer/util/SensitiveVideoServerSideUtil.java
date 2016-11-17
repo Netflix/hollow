@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.util;
 
 import com.netflix.vms.transformer.CycleConstants;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 
@@ -54,5 +55,9 @@ public class SensitiveVideoServerSideUtil {
         }
 
         return OutputUtil.getRoundedDate(minValue);
+    }
+
+    public static boolean isSensitiveMetaData(Date metadataAvailabilityDate, TransformerContext ctx) {
+        return metadataAvailabilityDate == null || metadataAvailabilityDate.val > ctx.getNowMillis();
     }
 }
