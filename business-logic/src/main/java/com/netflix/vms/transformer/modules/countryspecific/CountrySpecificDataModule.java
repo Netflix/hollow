@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class CountrySpecificDataModule {
-    
+
     private static final long THIRTY_DAYS = 30L * 24L * 60L * 60L * 1000L;
 
     private final VMSHollowInputAPI api;
@@ -80,12 +80,12 @@ public class CountrySpecificDataModule {
 
         for(Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
-            
+
             Map<Integer, CompleteVideoCountrySpecificData> countryMap = new HashMap<Integer, CompleteVideoCountrySpecificData>();
             allCountrySpecificDataMap.put(countryCode, countryMap);
 
             processCountrySpecificData(rollup, entry.getValue(), countryCode, countryMap);
-            
+
             Set<String> catalogLanguages = ctx.getOctoberSkyData().getCatalogLanguages(countryCode);
             if(catalogLanguages != null) {
                 processLocaleSpecificData(rollup, entry.getValue(), countryCode, catalogLanguages);
@@ -130,16 +130,16 @@ public class CountrySpecificDataModule {
             rollup.reset();
         }
     }
-    
+
     private void processLocaleSpecificData(CountrySpecificRollupValues rollup, Set<VideoHierarchy> hierarchies, String countryCode, Set<String> locales) {
         Map<Integer, MulticatalogCountryData> map = new HashMap<>();
-        
+
         for(String locale : locales) {
-        
+
             for(VideoHierarchy hierarchy : hierarchies) {
                 for(int i=0;i<hierarchy.getSeasonIds().length;i++) {
                     rollup.setSeasonSequenceNumber(hierarchy.getSeasonSequenceNumbers()[i]);
-    
+
                     for(int j=0;j<hierarchy.getEpisodeIds()[i].length;j++) {
                         int videoId = hierarchy.getEpisodeIds()[i][j];
                         rollup.resetViewable();
@@ -148,27 +148,27 @@ public class CountrySpecificDataModule {
                         rollup.setDoEpisode(false);
                         rollup.episodeFound();
                     }
-    
+
                     rollup.setDoSeason(true);
                     convertLocale(hierarchy.getSeasonIds()[i], false, countryCode, locale, rollup, map);
                     rollup.setDoSeason(false);
                     rollup.resetSeason();
                 }
-    
+
                 rollup.setDoShow(true);
                 convertLocale(hierarchy.getTopNodeId(), hierarchy.isStandalone(), countryCode, locale, rollup, map);
                 rollup.setDoShow(false);
                 rollup.resetShow();
-    
+
                 for(int i=0;i<hierarchy.getSupplementalIds().length;i++) {
                     rollup.resetViewable();
                     convertLocale(hierarchy.getSupplementalIds()[i], false, countryCode, locale, rollup, map);
                 }
-    
+
                 rollup.reset();
             }
         }
-        
+
         for(Map.Entry<Integer, MulticatalogCountryData> entry : map.entrySet()) {
             mapper.addObject(entry.getValue());
         }
@@ -181,18 +181,18 @@ public class CountrySpecificDataModule {
         certificationListsModule.populateCertificationLists(videoId, countryCode, data);
 
         if(rollup.doShow() && isTopNodeGoLive(videoId, countryCode))
-            data.dateWindowWiseSeasonSequenceNumberMap = new SortedMapOfDateWindowToListOfInteger(rollup.getDateWindowWiseSeasonSequenceNumbers()); 
+            data.dateWindowWiseSeasonSequenceNumberMap = new SortedMapOfDateWindowToListOfInteger(rollup.getDateWindowWiseSeasonSequenceNumbers());
         else
             data.dateWindowWiseSeasonSequenceNumberMap = constants.EMPTY_DATE_WINDOW_SEASON_SEQ_MAP;
 
         countryMap.put(videoId, data);
     }
-    
+
     private void convertLocale(Integer videoId, boolean isStandalone, String countryCode, String language, CountrySpecificRollupValues rollup, Map<Integer, MulticatalogCountryData> data) {
         int statusOrdinal = videoStatusIdx.getMatchingOrdinal(videoId.longValue(), countryCode);
         if (statusOrdinal != -1) {
             StatusHollow status = api.getStatusHollow(statusOrdinal);
-            
+
             /// in order to calculate the hasNewContent flag, we need to know the latest in-window episode launch date for this hierarchy
             if(rollup.doEpisode()) {
                 Long launchDate = getLaunchDateForLanguage(status, language);
@@ -201,40 +201,40 @@ public class CountrySpecificDataModule {
             }
 
             List<VMSAvailabilityWindow> availabilityWindows = availabilityWindowModule.calculateWindowData(videoId, countryCode, language, status, rollup, availabilityWindowModule.isGoLive(status));
-            
+
             /// Check the generated windows against the main country window -- if not different, exclude the record.
             ///if(!availabilityWindows.equals(baseData.mediaAvailabilityWindows)) {
-                MulticatalogCountryData countryData = data.get(videoId);
-                if(countryData == null) {
-                    countryData = new MulticatalogCountryData();
-                    countryData.country = constants.getISOCountry(countryCode);
-                    countryData.videoId = new Video(videoId);
-                    countryData.languageData = new HashMap<>();
-                    data.put(videoId, countryData);
-                }
-                
-                MulticatalogCountryLocaleData result = new MulticatalogCountryLocaleData();
-                result.availabilityWindows = availabilityWindows;
-                result.hasNewContent = calculateHasNewContent(rollup.getMaxInWindowLaunchDate(), availabilityWindows);
-                result.hasLocalAudio = rollup.isFoundLocalAudio();
-                result.hasLocalText = rollup.isFoundLocalText();
-                if(rollup.doShow() && !isStandalone)
-                    result.isSearchOnly = calculateSearchOnly(availabilityWindows);
-                
-                if(rollup.doShow() && isTopNodeGoLive(videoId, countryCode))
-                    result.dateWindowWiseSeasonSequenceNumberMap = new SortedMapOfDateWindowToListOfInteger(rollup.getDateWindowWiseSeasonSequenceNumbers()); 
-                else
-                    result.dateWindowWiseSeasonSequenceNumberMap = constants.EMPTY_DATE_WINDOW_SEASON_SEQ_MAP;
-                
-                countryData.languageData.put(new NFLocale(language), result);
+            MulticatalogCountryData countryData = data.get(videoId);
+            if(countryData == null) {
+                countryData = new MulticatalogCountryData();
+                countryData.country = constants.getISOCountry(countryCode);
+                countryData.videoId = new Video(videoId);
+                countryData.languageData = new HashMap<>();
+                data.put(videoId, countryData);
+            }
+
+            MulticatalogCountryLocaleData result = new MulticatalogCountryLocaleData();
+            result.availabilityWindows = availabilityWindows;
+            result.hasNewContent = calculateHasNewContent(rollup.getMaxInWindowLaunchDate(), availabilityWindows);
+            result.hasLocalAudio = rollup.isFoundLocalAudio();
+            result.hasLocalText = rollup.isFoundLocalText();
+            if(rollup.doShow() && !isStandalone)
+                result.isSearchOnly = calculateSearchOnly(availabilityWindows);
+
+            if(rollup.doShow() && isTopNodeGoLive(videoId, countryCode))
+                result.dateWindowWiseSeasonSequenceNumberMap = new SortedMapOfDateWindowToListOfInteger(rollup.getDateWindowWiseSeasonSequenceNumbers());
+            else
+                result.dateWindowWiseSeasonSequenceNumberMap = constants.EMPTY_DATE_WINDOW_SEASON_SEQ_MAP;
+
+            countryData.languageData.put(new NFLocale(language), result);
             ///}
         }
     }
-    
+
     private boolean calculateSearchOnly(List<VMSAvailabilityWindow> windows) {
         if(windows == null)
             return false;
-        
+
         for(VMSAvailabilityWindow window : windows) {
             if(window.startDate.val <= ctx.getNowMillis() && window.endDate.val > ctx.getNowMillis()) {
                 return ((window.endDate.val - ctx.getNowMillis()) < THIRTY_DAYS);
@@ -242,7 +242,7 @@ public class CountrySpecificDataModule {
         }
         return false;
     }
-    
+
     private boolean calculateHasNewContent(long maxInWindowLaunchDate, List<VMSAvailabilityWindow> windows) {
         for(VMSAvailabilityWindow window : windows) {
             if(window.startDate.val <= ctx.getNowMillis()) {
@@ -293,7 +293,7 @@ public class CountrySpecificDataModule {
 
         return data.firstDisplayDate == null ? null : data.firstDisplayDate.val;
     }
-    
+
     private Long getLaunchDateForLanguage(StatusHollow status, String locale) {
         FlagsHollow flags = status._getFlags();
         MapOfFlagsFirstDisplayDatesHollow firstDisplayDatesByLocale = flags._getFirstDisplayDates();
@@ -310,7 +310,7 @@ public class CountrySpecificDataModule {
             if(firstDisplayDate != null)
                 return firstDisplayDate._getValue();
         }
-        
+
         return null;
     }
 
@@ -325,6 +325,7 @@ public class CountrySpecificDataModule {
 
         Set<VideoSetType> videoSetTypes = VideoSetTypeUtil.computeSetTypes(videoId, countryCode, api, ctx, constants, indexer);
         data.metadataAvailabilityDate = SensitiveVideoServerSideUtil.getMetadataAvailabilityDate(videoSetTypes, firstDisplayDate, firstPhaseStartDate, availabilityDate, prePromoDays, metadataReleaseDays, constants);
+        data.isSensitiveMetaData = SensitiveVideoServerSideUtil.isSensitiveMetaData(data.metadataAvailabilityDate, ctx);
     }
 
     private WindowPackageContractInfo getWindowPackageContractInfo(VMSAvailabilityWindow window) {
