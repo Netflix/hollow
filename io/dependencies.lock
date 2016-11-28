@@ -603,7 +603,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -619,7 +619,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
@@ -629,13 +629,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.runtime:health-guice",
@@ -1037,7 +1037,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -1047,7 +1047,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -1055,31 +1055,31 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -1870,14 +1870,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.6",
+            "locked": "2.1.1",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.6",
+            "locked": "2.1.1",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -3358,7 +3358,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -3374,7 +3374,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
@@ -3384,13 +3384,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.runtime:health-guice",
@@ -3792,7 +3792,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -3802,7 +3802,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -3810,31 +3810,31 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -4625,14 +4625,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.6",
+            "locked": "2.1.1",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.6",
+            "locked": "2.1.1",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -6113,7 +6113,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -6129,7 +6129,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
@@ -6139,13 +6139,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.runtime:health-guice",
@@ -6547,7 +6547,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -6557,7 +6557,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -6565,31 +6565,31 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -7380,14 +7380,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.6",
+            "locked": "2.1.1",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.6",
+            "locked": "2.1.1",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -8868,7 +8868,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -8884,7 +8884,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
@@ -8894,13 +8894,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.runtime:health-guice",
@@ -9302,7 +9302,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -9312,7 +9312,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -9320,31 +9320,31 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -10135,14 +10135,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.6",
+            "locked": "2.1.1",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.6",
+            "locked": "2.1.1",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -11110,7 +11110,7 @@
     },
     "resolutionRules": {
         "com.netflix.nebula:gradle-resolution-rules": {
-            "locked": "0.37.0",
+            "locked": "0.40.0",
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
@@ -11722,7 +11722,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -11738,7 +11738,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
@@ -11748,13 +11748,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.runtime:health-guice",
@@ -12156,7 +12156,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -12166,7 +12166,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -12174,31 +12174,31 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -12989,14 +12989,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.6",
+            "locked": "2.1.1",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.6",
+            "locked": "2.1.1",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -14477,7 +14477,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -14493,7 +14493,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
@@ -14503,13 +14503,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.runtime:health-guice",
@@ -14911,7 +14911,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -14921,7 +14921,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -14929,31 +14929,31 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -15745,14 +15745,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.6",
+            "locked": "2.1.1",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.6",
+            "locked": "2.1.1",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -17238,7 +17238,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -17254,7 +17254,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
@@ -17264,13 +17264,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.runtime:health-guice",
@@ -17672,7 +17672,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -17682,7 +17682,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -17690,31 +17690,31 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -18506,14 +18506,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.6",
+            "locked": "2.1.1",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.6",
+            "locked": "2.1.1",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -19999,7 +19999,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -20015,7 +20015,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
@@ -20025,13 +20025,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.runtime:health-guice",
@@ -20433,7 +20433,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -20443,7 +20443,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -20451,31 +20451,31 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -21267,14 +21267,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.6",
+            "locked": "2.1.1",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.6",
+            "locked": "2.1.1",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -22760,7 +22760,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -22776,7 +22776,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
@@ -22786,13 +22786,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.7",
+            "locked": "1.15.9",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.runtime:health-guice",
@@ -23194,7 +23194,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -23204,7 +23204,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -23212,31 +23212,31 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.8",
+            "locked": "7.1.10",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -24028,14 +24028,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.0.6",
+            "locked": "2.1.1",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.0.6",
+            "locked": "2.1.1",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]

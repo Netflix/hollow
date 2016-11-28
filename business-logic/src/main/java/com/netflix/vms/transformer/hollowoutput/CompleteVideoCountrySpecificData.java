@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class CompleteVideoCountrySpecificData implements Cloneable {
 
+    public boolean isSensitiveMetaData = false;
     public Date metadataAvailabilityDate = null;
     public Date firstDisplayDate = null;
     public Map<NFLocale, Date> firstDisplayDateByLocale = null;
@@ -13,6 +14,7 @@ public class CompleteVideoCountrySpecificData implements Cloneable {
     public List<VMSAvailabilityWindow> mediaAvailabilityWindows = null;
     public List<VMSAvailabilityWindow> imagesAvailabilityWindows = null;
 
+    @Override
     public boolean equals(Object other) {
         if(other == this)  return true;
         if(!(other instanceof CompleteVideoCountrySpecificData))
@@ -43,6 +45,7 @@ public class CompleteVideoCountrySpecificData implements Cloneable {
         return true;
     }
 
+    @Override
     public int hashCode() {
         int hashCode = 1;
         hashCode = hashCode * 31 + (metadataAvailabilityDate == null ? 1237 : metadataAvailabilityDate.hashCode());
@@ -55,6 +58,7 @@ public class CompleteVideoCountrySpecificData implements Cloneable {
         return hashCode;
     }
 
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder("CompleteVideoCountrySpecificData{");
         builder.append("metadataAvailabilityDate=").append(metadataAvailabilityDate);
@@ -68,6 +72,7 @@ public class CompleteVideoCountrySpecificData implements Cloneable {
         return builder.toString();
     }
 
+    @Override
     public CompleteVideoCountrySpecificData clone() {
         try {
             CompleteVideoCountrySpecificData clone = (CompleteVideoCountrySpecificData)super.clone();
