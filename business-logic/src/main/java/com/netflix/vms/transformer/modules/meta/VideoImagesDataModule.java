@@ -83,7 +83,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
                 int videoArtworkOrdinal = iter.next();
                 while (videoArtworkOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
                     VideoArtworkHollow artworkHollowInput = api.getVideoArtworkHollow(videoArtworkOrdinal);
-                    String rollupSourceFileId = processArtwork(artworkHollowInput, countryArtworkMap, merchstillSourceFieldIds);
+                    String rollupSourceFileId = processArtwork(showHierarchiesByCountry.keySet(), artworkHollowInput, countryArtworkMap, merchstillSourceFieldIds);
                     if (rollupSourceFileId != null) {
                         rollupMerchstillVideoIds.add(videoId);
                         rollupSourceFieldIds.add(rollupSourceFileId);
@@ -271,9 +271,10 @@ public class VideoImagesDataModule extends ArtWorkModule {
         throw new UnsupportedOperationException("Use buildVideoImagesByCountry");
     }
 
-    private String processArtwork(VideoArtworkHollow artworkHollowInput, Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap, Set<String> merchstillSourceFieldIds) {
+    private String processArtwork(Set<String> countrySet, VideoArtworkHollow artworkHollowInput, Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap, Set<String> merchstillSourceFieldIds) {
         ArtworkLocaleListHollow locales = artworkHollowInput._getLocales();
         int entityId = (int) artworkHollowInput._getMovieId();
+        int videoId = entityId;
 
         Set<ArtworkLocaleHollow> localeSet = getLocalTerritories(locales);
         if (localeSet.isEmpty()) {
@@ -334,16 +335,31 @@ public class VideoImagesDataModule extends ArtWorkModule {
             }
         }
 
-        // Support Country based data
-        for (ArtworkLocaleHollow localeHollow : localeSet) {
+        // upstream to populate locales in Q1 2017, till then bypass the ArtworkLocale
+        if(isMerchStill) {
             Artwork localeArtwork = artwork.clone();
-            localeArtwork.locale = NFLocaleUtil.createNFLocale(localeHollow._getBcp47Code()._getValue());
-            localeArtwork.effectiveDate = localeHollow._getEffectiveDate()._getValue();
-            
-            for (String countryCode : getCountryCodes(localeHollow)) {
-                Map<Integer, Set<Artwork>> artMap = getArtworkMap(countryCode, countryArtworkMap);
-                Set<Artwork> artworkSet = getArtworkSet(entityId, artMap);
-                artworkSet.add(localeArtwork);
+            localeArtwork.locale = NFLocaleUtil.createNFLocale("en");
+            localeArtwork.effectiveDate = 0L;
+
+            for(String countryCode : countrySet) {
+                if(isAvailableForED(videoId, countryCode)) {
+                    Map<Integer, Set<Artwork>> artMap = getArtworkMap(countryCode, countryArtworkMap);
+                    Set<Artwork> artworkSet = getArtworkSet(entityId, artMap);
+                    artworkSet.add(localeArtwork);
+                }
+            }
+        } else {
+            // Support Country based data
+            for (ArtworkLocaleHollow localeHollow : localeSet) {
+                Artwork localeArtwork = artwork.clone();
+                localeArtwork.locale = NFLocaleUtil.createNFLocale(localeHollow._getBcp47Code()._getValue());
+                localeArtwork.effectiveDate = localeHollow._getEffectiveDate()._getValue();
+                
+                for (String countryCode : getCountryCodes(localeHollow)) {
+                    Map<Integer, Set<Artwork>> artMap = getArtworkMap(countryCode, countryArtworkMap);
+                    Set<Artwork> artworkSet = getArtworkSet(entityId, artMap);
+                    artworkSet.add(localeArtwork);
+                }
             }
         }
 
