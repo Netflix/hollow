@@ -2340,7 +2340,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.53",
+            "locked": "2.55",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -5725,7 +5725,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.53",
+            "locked": "2.55",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -9110,7 +9110,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.53",
+            "locked": "2.55",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -12488,7 +12488,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.53",
+            "locked": "2.55",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -15895,7 +15895,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.53",
+            "locked": "2.55",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -20372,7 +20372,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.53",
+            "locked": "2.55",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -23756,7 +23756,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.53",
+            "locked": "2.55",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -27184,7 +27184,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.53",
+            "locked": "2.55",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -30687,7 +30687,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.53",
+            "locked": "2.55",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -34190,7 +34190,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.53",
+            "locked": "2.55",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -37693,7 +37693,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.53",
+            "locked": "2.55",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -41132,7 +41132,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.53",
+            "locked": "2.55",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -44534,7 +44534,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.53",
+            "locked": "2.55",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -47936,7 +47936,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.53",
+            "locked": "2.55",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -51338,7 +51338,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.53",
+            "locked": "2.55",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
