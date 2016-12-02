@@ -15,6 +15,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoNodeType;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
+import com.netflix.vms.transformer.util.SensitiveVideoServerSideUtil;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -200,8 +201,7 @@ public class VideoNamedListModule {
                 }
             }
 
-            boolean isSensitive = video.countrySpecificData.metadataAvailabilityDate == null || video.countrySpecificData.metadataAvailabilityDate.val > ctx.getNowMillis();
-
+            boolean isSensitive = SensitiveVideoServerSideUtil.isSensitiveMetaData(video.countrySpecificData.metadataAvailabilityDate, ctx);
             if(isSensitive)
                 addToList(VideoNamedListType.SENSITIVE_VIDEOS);
 
