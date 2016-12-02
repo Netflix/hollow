@@ -10,46 +10,31 @@ public class VideoImages implements Cloneable {
     public Map<ArtWorkImageTypeEntry, Set<ArtWorkImageFormatEntry>> artworkFormatsByType = null;
     public List<SchedulePhaseInfo> imageAvailabilityWindows = null;
 
-    @Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		VideoImages other = (VideoImages) obj;
-		if (artworkFormatsByType == null) {
-			if (other.artworkFormatsByType != null)
-				return false;
-		} else if (!artworkFormatsByType.equals(other.artworkFormatsByType))
-			return false;
-		if (artworks == null) {
-			if (other.artworks != null)
-				return false;
-		} else if (!artworks.equals(other.artworks))
-			return false;
-		if (imageAvailabilityWindows == null) {
-			if (other.imageAvailabilityWindows != null)
-				return false;
-		} else if (!imageAvailabilityWindows.equals(other.imageAvailabilityWindows))
-			return false;
+    public boolean equals(Object other) {
+        if(other == this)  return true;
+        if(!(other instanceof VideoImages))
+        	return false;
+        
+        VideoImages o = (VideoImages) other;
+        if(o.artworks == null) {
+            if(artworks != null) return false;
+        } else if(!o.artworks.equals(artworks)) return false;
+        if(o.artworkFormatsByType == null) {
+            if(artworkFormatsByType != null) return false;
+        } else if(!o.artworkFormatsByType.equals(artworkFormatsByType)) return false;
+        if(o.imageAvailabilityWindows == null) {
+            if(imageAvailabilityWindows != null) return false;
+        } else if(!o.imageAvailabilityWindows.equals(imageAvailabilityWindows)) return false;
 		return true;
 	}
 
     @Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime
-				* result
-				+ ((artworkFormatsByType == null) ? 0 : artworkFormatsByType
-						.hashCode());
-		result = prime * result
-				+ ((artworks == null) ? 0 : artworks.hashCode());
-		result = prime * result
-				+ ((imageAvailabilityWindows == null) ? 0 : imageAvailabilityWindows.hashCode());
-		return result;
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (artworks == null ? 1237 : artworks.hashCode());
+        hashCode = hashCode * 31 + (artworkFormatsByType == null ? 1237 : artworkFormatsByType.hashCode());
+        hashCode = hashCode * 31 + (imageAvailabilityWindows == null ? 1237 : imageAvailabilityWindows.hashCode());
+        return hashCode;
 	}
 
     @Override
