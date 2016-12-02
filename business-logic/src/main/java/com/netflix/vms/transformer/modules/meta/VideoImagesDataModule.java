@@ -1,7 +1,9 @@
 package com.netflix.vms.transformer.modules.meta;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidImagesTerritoryCode;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidPhaseTagForArtwork;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingRolloutForArtwork;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
 import com.netflix.hollow.index.HollowHashIndex;
@@ -343,7 +345,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
         if(window == null){
         	// Indicates image has tags but the tags are not valid
         	// Could be error or eventual consistency condition
-        	ctx.getLogger().error(InvalidPhaseTagForArtwork, "Phase tag associated with artwork is undefined with id={}; data will be dropped.", sourceFileId);
+        	ctx.getLogger().warn(InvalidPhaseTagForArtwork, "Phase tag associated with artwork is undefined with id={}; data will be dropped.", sourceFileId);
         	return null;
         }
         
@@ -445,7 +447,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
         	if(rolloutSourceFileIds == null || !rolloutSourceFileIds.contains(sourceFileId)){
     			// But no corresponding rollout for the image in this country. 
     			// To err on side of not leaking a rollout image, drop this image for the country.
-        		ctx.getLogger().error(MissingRolloutForArtwork, "Rollout exclusive image has no valid rollout with id={}; data will be dropped.", sourceFileId);
+        		ctx.getLogger().warn(MissingRolloutForArtwork, "Rollout exclusive image has no valid rollout with id={}; data will be dropped.", sourceFileId);
     			return null;
     		}
         } 

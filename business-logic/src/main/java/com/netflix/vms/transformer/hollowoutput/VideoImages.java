@@ -54,9 +54,12 @@ public class VideoImages implements Cloneable {
 
     @Override
 	public String toString() {
-		return "VideoImages [artworks=" + artworks + ", artworkFormatsByType="
-				+ artworkFormatsByType + ", artworksWithPhaseDates="
-				+ "]";
+        StringBuilder builder = new StringBuilder("VideoImages{");
+        builder.append("artworks=").append(artworks);
+        builder.append(",artworkFormatsByType=").append(artworkFormatsByType);
+        builder.append(",imageAvailabilityWindows=").append(imageAvailabilityWindows);
+        builder.append("}");
+        return builder.toString();
 	}
 
     public VideoImages clone() {
