@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Data Modeling - Hollow (Netflix OSS)</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Data Modeling";
+    var mkdocs_page_input_path = "data-modeling.md";
+    var mkdocs_page_url = "/data-modeling/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search" style="background-color:#000000">
+        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#000000;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">Introduction</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../quick-start/">Quick Start</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../getting-started/">Getting Started</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../interacting-with-a-dataset/">Interacting with a Hollow Dataset</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-ingestion/">Data Ingestion</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">Data Modeling</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#schema-types">Schema Types</a></li>
+                
+                    <li><a class="toctree-l4" href="#object-schemas">Object Schemas</a></li>
+                
+                    <li><a class="toctree-l4" href="#list-schemas">List Schemas</a></li>
+                
+                    <li><a class="toctree-l4" href="#set-schemas">Set Schemas</a></li>
+                
+                    <li><a class="toctree-l4" href="#map-schemas">Map Schemas</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#hash-keys">Hash Keys</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#circular-references">Circular References</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#inlined-vs-referenced-fields">Inlined vs Referenced Fields</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#grouping-associated-fields">Grouping Associated Fields</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#maintaining-backwards-compatibility">Maintaining Backwards Compatibility</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#movieactor-example">Movie/Actor Example</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../producer-consumer/">Producers and Consumers</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../tooling/">Tooling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../advanced-topics/">Advanced Topics</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../glossary/">Glossary</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../community/">Community</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../acknowledgements/">Acknowledgements</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../license/">License</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" style="background:#000000" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Hollow (Netflix OSS)</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Data Modeling</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="http://gitter.im/Netflix/hollow" class="icon fa-comment"> Gitter</a>
+      
+        <a href="https://github.com/Netflix/hollow"
+          class="icon icon-github"> GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="schema-types">Schema Types</h1>
+<p>Hollow records are strongly typed.  The structure of each type is defined by a schema.  A schema will be one of the following:</p>
+<ul>
+<li><code>Object</code>: A fixed set of strongly typed fields.</li>
+<li><code>List</code>: An ordered collection of references to records of a specific type.</li>
+<li><code>Set</code>: An unordered collection of references to records of a specific type.  </li>
+<li><code>Map</code>: A key/value mapping between references to records of a specific key type and records of a specific value type.</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Schemas Define the Data Model</p>
+<p>A hollow dataset is comprised of one or more data <em>types</em>.  The <em>data model</em> for a dataset is defined by the schemas describing those types.</p>
+</div>
+<h3 id="object-schemas">Object Schemas</h3>
+<p><code>Object</code> schemas have one or more fields.  Each field is one of the following types:</p>
+<ul>
+<li><code>INT</code>: An integer value up to 32-bits.</li>
+<li><code>LONG</code>: An integer value up to 64-bits</li>
+<li><code>FLOAT</code>: A 32-bit floating-point value</li>
+<li><code>DOUBLE</code>: A 64-bit floating-point value</li>
+<li><code>BOOLEAN</code>: <code>true</code> or <code>false</code></li>
+<li><code>STRING</code>: An array of characters.  </li>
+<li><code>BYTES</code>: An array of bytes.  </li>
+<li><code>REFERENCE</code>: A reference to another specific type.  The referenced type must be defined by the schema.</li>
+</ul>
+<p>Additionally, an <code>Object</code> schema may optionally specify a primary key, which can be used as a default indexing mechanism in many of the tools provided with Hollow.</p>
+<p>On consumers, <code>INT</code> and <code>LONG</code> fields are each represented by a number of bits exactly sufficient to represent the maximum value for the field across all records.  <code>FLOAT</code>, <code>DOUBLE</code>, and <code>BOOLEAN</code> fields are represented by 32, 64, and 2 bits, respectively.  <code>STRING</code> and <code>BYTES</code> fields use a variable number of bytes for each record.  <code>REFERENCE</code> fields encode the <em>ordinal</em> of referenced records, and are represented by a number of bits exactly sufficient to encode the maximum ordinal of the referenced type.</p>
+<div class="admonition hint">
+<p class="admonition-title">Designing for Efficiency</p>
+<p>Try to model your data such that there aren't any outlier values for <code>INT</code> and <code>LONG</code> fields.  Also, avoid <code>FLOAT</code> and <code>DOUBLE</code> fields where possible, since these field types are relatively expensive.</p>
+</div>
+<h3 id="list-schemas">List Schemas</h3>
+<p>A <code>List</code> schema indicates a record type which is an ordered collection of <code>REFERENCE</code> fields.  Each record will have a variable number of references.  The referenced type must be defined by the schema, and all references in all records will encode only the <em>ordinals</em> of the referenced records as the values for these references.</p>
+<h3 id="set-schemas">Set Schemas</h3>
+<p>A <code>Set</code> schema indicates a record type which is an unordered collection of <code>REFERENCE</code> fields.  Each record will have a variable number of references, and the referenced type must be defined by the schema.  Within a single set record, each reference must be unique.  </p>
+<p>References in <code>Set</code> records can be hashed by some specific element fields for O(1) retrieval.  In order to enable this feature, a <code>Set</code> schema will define an optional <em>hash key</em>, which defines how its elements are hashed/indexed.</p>
+<h3 id="map-schemas">Map Schemas</h3>
+<p>A <code>Map</code> schema indicates a record type which is an unordered collection of pairs of <code>REFERENCE</code> fields, used to represent a key/value mapping.  Each record will have a variable number of key/value pairs.  Both the key reference type and the value reference type must be defined by the schema.  The key reference type does not have to be the same as the value reference type.  Within a single map record, each key reference must be unique.  </p>
+<p>Entries in <code>Map</code> records can be hashed by some specific key fields for O(1) retrieval of the keys, values, and/or entries.  In order to enable this feature, a <code>Map</code> schema will define an optional <em>hash key</em>, which defines how its entries are hashed/indexed.</p>
+<h1 id="hash-keys">Hash Keys</h1>
+<p>Each <code>Map</code> and <code>Set</code> schema may optionally define a <em>hash key</em>.  A <em>hash key</em> specifies one or more user-defined fields used to hash entries into the collection.  When a hash key is defined on a <code>Set</code>, each set record becomes like a primary key index; records in the set can be efficiently retrieved by matching the specified <em>hash key</em> fields.  Similarly, when a hash key is defined on a <code>Map</code>, each map record becomes like an index over the keys in the key/value pairs contained in the map record.</p>
+<p>If using the <code>HollowObjectMapper</code>, hash keys will be automatically selected if an element or key type contain a single non-reference field.  Addionally, if a <code>Set</code> or <code>Map</code> references <code>Object</code> elements with a defined <em>primary key</em>, then the <em>hash key</em> will default to the <em>primary key</em> of the element type.  </p>
+<p>Alternatively, <em>hash keys</em> can be explicitly defined using the <code>@HollowHashKey</code> annotation in POJOs for <code>Set</code> schemas by specifying one or more fields from the element type, or for <code>Map</code> schemas by specifying one or more fields from the key type:</p>
+<pre><code class="java">public class Movie {
+    long id;
+    String title;
+    @HollowHashKey(fields=&quot;actorId&quot;)
+    Set&lt;Actor&gt; actors;
+
+    ...
+}
+</code></pre>
+
+<p>The consumers, via the generated API, will have the ability to retrieve elements from <code>Set</code> records by the <em>hash key</em>:</p>
+<pre><code class="java">MovieHollow movie = api.getMovieHollow(ordinal);
+HollowSet&lt;ActorHollow&gt; actors = movie._getActors();
+ActorHollow actor = actors.findElement(104);
+
+System.out.println(&quot;Actor with ID 104: &quot; + actor._getActorName()._getValue());
+</code></pre>
+
+<p>The consumers will have the ability to retrieve keys, values, and entries from the map by the <em>hash key</em>:</p>
+<pre><code class="java">MovieHollow movie = api.getMovieHollow(ordinal);
+HollowMap&lt;ActorHollow, CharacterHollow&gt; actors = movie._getActors();
+
+ActorHollow actor = actors.findKey(104);
+CharacteroHollow character = actors.findValue(104);
+/// alternatively: Map.Entry&lt;ActorHollow, CharacterHollow&gt; entry = actors.findEntry(104);
+
+System.out.println(&quot;Actor with ID 104: &quot; + actor._getActorName()._getValue() + 
+         &quot; played character &quot; + character._getCharacterName()._getValue());
+</code></pre>
+
+<p>We can define more than one field in the <code>@HollowHashKey</code> declaration if our key spans multiple fields.  Each field may be multiple levels deep in a hierarchical data model, expressed via dot notation (e.g. <code>actorName.value</code>).</p>
+<h1 id="circular-references">Circular References</h1>
+<p>Circular references are not allowed in Hollow.  A type may not reference itself, either directly or transitively.</p>
+<h1 id="inlined-vs-referenced-fields">Inlined vs Referenced Fields</h1>
+<p>While modeling data, a choice sometimes must be made whether to define an Object field as a non-reference type (e.g. <code>STRING</code>), or as a <code>REFERENCE</code> to a separate type which has a single <code>STRING</code> field.  Consider the following type:</p>
+<pre><code>Award {
+    String awardName;
+    long movieId;
+    long actorId;
+}
+</code></pre>
+
+<p>In this case, imagine <code>awardName</code> is something like “Best Supporting Actress”.  Over the years, many such awards will be given, so we’ll have a lot of records which share that value.  If we use a <code>STRING</code> field, then that character string will be repeated for every such award record.  However, if we reference a separate record type, all such awards will reference the same record with that value.  If the <code>awardName</code> values have a lot of repetition, then this can result in a significant savings.</p>
+<div class="admonition hint">
+<p class="admonition-title">Deduplication</p>
+<p>Record deduplication happens automatically at the <em>record</em> granularity in Hollow.  Try to model your data such that when there is a lot of repetition in records, the repetitive fields are encapsulated into their own types.</p>
+</div>
+<p>To consider the opposite case, let’s examine the <code>Actor</code> type:</p>
+<pre><code>Actor {
+    long id;
+    String actorName;
+}
+</code></pre>
+
+<p>The <code>actorName</code> is unlikely to be repeated often.  In this case, if we reference a separate record type, we have to retain roughly the same number of character strings, plus, we need to retain references to those records.  In this case, we end up saving space by using a <code>STRING</code> field instead of a reference to a separate type.</p>
+<div class="admonition warning">
+<p class="admonition-title">Reference Costs</p>
+<p>A <code>REFERENCE</code> field isn't free, and therefore we shouldn't necessarily try to encapsulate fields inside their own record types where we won't benefit from deduplication.  These fields should instead be <em>inlined</em>.</p>
+</div>
+<p>We refer to fields which are defined with native Hollow types as <em>inlined</em> fields, and fields which are defined as references to types with a single field as <em>referenced</em> fields.</p>
+<p>In order to be very efficient, referenced fields sometimes need to be <em>namespaced</em> so that fields with like values may use the same type, but referenced fields of the same type elsewhere in the data model use different types.  For example, consider our Award type again, but this time, we’ll reference a type called <code>AwardName</code>, instead of <code>String</code>:</p>
+<pre><code>Award {
+    AwardName awardName;
+    long movieId;
+    long actorId;
+}
+
+
+AwardName {
+    string value;
+}
+</code></pre>
+
+<p>Other types in our data model which reference award names can reuse the <code>AwardName</code> type.  Other referenced string fields in our data model, which are unrelated to award names, should use different types corresponding to the semantics of their values.  </p>
+<p>Namespacing fields appropriately saves space because references to types with a lower cardinality use fewer bits than references to types with a higher cardinality.  The reason for this can be gleaned from the <a href="../advanced-topics/#in-memory-data-layout">In-Memory Data Layout</a> topic underneath the <a href="../advanced-topics/">Advanced Topics</a> section.</p>
+<div class="admonition note">
+<p class="admonition-title">Namespacing Reduces Reference Costs</p>
+<p>Using an appropriately <em>namespaced</em> type reduces the heap footprint of <code>REFERENCE</code> fields.</p>
+</div>
+<h1 id="grouping-associated-fields">Grouping Associated Fields</h1>
+<p>Referencing fields can save space because the same field values do not have to be repeated for every record in which they occur.  Similarly, we can group fields which have covarying values, and pull these out from larger objects as their own types.  For example, imagine we started with a <code>Movie</code> record which included the following fields:</p>
+<pre><code>Movie {
+    long id;
+    String title;
+    String maturityRating;
+    String advisories;
+}
+</code></pre>
+
+<p>We might notice that the <code>maturityRating</code> and <code>advisories</code> fields vary together, and are often the repeated across many Movies.  We can pull out a separate type for these fields:</p>
+<pre><code>Movie {
+    long id;
+    String title;
+    MaturityRating maturityRating;
+}
+
+MaturityRating {
+    string rating;
+    string advisories;
+}
+</code></pre>
+
+<p>We could have referenced these fields separately.  If we had done so, each <code>Movie</code> record, of which there are probably many, would have had to contain two separate references for these fields.  Instead, by recognizing that these fields were associated and pulling them together, space is saved because each <code>Movie</code> record now only contains one reference for this data.</p>
+<h1 id="maintaining-backwards-compatibility">Maintaining Backwards Compatibility</h1>
+<p>A data model will evolve over time.  The following operations will not impact the interoperability between existing clients and new data:</p>
+<ul>
+<li>Adding a new type</li>
+<li>Removing an existing type</li>
+<li>Adding a new field to an existing type</li>
+<li>Removing an existing field from an existing type.</li>
+</ul>
+<p>When adding new fields or types, existing generated client APIs will ignore the new fields, and all of the fields which existed at the time of API generation will still be visible using the same methods.  When removing fields, existing generated client APIs will see null values if the methods corresponding to the removed fields are called.  When removing types, existing generated client APIs will see removed types as having no records.</p>
+<p>It is not backwards compatible to change the type of an existing field.  The client behavior when calling a method corresponding to a field with a changed type is undefined.</p>
+<p>Backwards compatibility often has a lot to do with the use case and semantics of the data. Hollow will always behave in the stated way for evolving data models, but it’s possible that consumers require a field which starts returning null once it gets removed.  For this reason, additional caution should be exercised when removing types and fields.</p>
+<h1 id="movieactor-example">Movie/Actor Example</h1>
+<p>Let's examine the <code>Movie</code> / <code>Actor</code> data model from our Getting Started Guide:</p>
+<pre><code class="java">public class Movie {
+    long id;
+    String title;
+    int releaseYear;
+    List&lt;Actor&gt; actors;
+
+    public Movie(long id, String title, int year, List&lt;Actor&gt; actors) {
+        this.id = id;
+        this.title = title;
+        this.releaseYear = year;
+        this.actors = actors;
+    }
+}
+
+public class Actor {
+    long actorId;
+    String actorName;
+
+    public Actor(long actorId, String actorName) {
+        this.actorId = actorId;
+        this.actorName = actorName;
+    }
+}
+</code></pre>
+
+<p>There are four type schemas in this data model:  <code>Movie</code>, <code>ListOfActor</code>, <code>Actor</code>, and <code>String</code>.</p>
+<p>Upon observing the <code>Movie</code> and <code>Actor</code> classes, the <code>HollowObjectMapper</code> will add a type for each into its <code>HollowWriteStateEngine</code>, each with an <code>Object</code> schema type.  Each of these references a <code>String</code> field.  Just as in Java, a <code>String</code> references a separate <code>Object</code>, and the <code>HollowObjectMapper</code> will add an <code>Object</code> schema for a type named <code>String</code> to assign to these references.</p>
+<div class="admonition note">
+<p class="admonition-title">Inlined Strings in the HollowObjectMapper</p>
+<p>To define an inlined String with the <code>HollowObjectMapper</code>, define string references as <code>char[]</code>.</p>
+</div>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../producer-consumer/" class="btn btn-neutral float-right" title="Producers and Consumers">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../data-ingestion/" class="btn btn-neutral" title="Data Ingestion"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/Netflix/hollow" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../data-ingestion/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../producer-consumer/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>

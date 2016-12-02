@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Advanced Topics - Hollow (Netflix OSS)</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Advanced Topics";
+    var mkdocs_page_input_path = "advanced-topics.md";
+    var mkdocs_page_url = "/advanced-topics/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search" style="background-color:#000000">
+        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#000000;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">Introduction</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../quick-start/">Quick Start</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../getting-started/">Getting Started</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../interacting-with-a-dataset/">Interacting with a Hollow Dataset</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-ingestion/">Data Ingestion</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-modeling/">Data Modeling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../producer-consumer/">Producers and Consumers</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../tooling/">Tooling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">Advanced Topics</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#schema-parser">Schema Parser</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#low-level-input-api">Low Level Input API</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#determining-populated-ordinals">Determining Populated Ordinals</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#caching">Caching</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#hollow-heap-effects">Hollow Heap Effects</a></li>
+                
+                    <li><a class="toctree-l4" href="#double-snapshots">Double Snapshots</a></li>
+                
+                    <li><a class="toctree-l4" href="#object-longevity">Object Longevity</a></li>
+                
+                    <li><a class="toctree-l4" href="#memory-pooling">Memory Pooling</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#delta-based-producer-input">Delta-Based Producer Input</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#in-memory-data-layout">In-Memory Data Layout</a></li>
+                
+                    <li><a class="toctree-l4" href="#object-layout">Object Layout</a></li>
+                
+                    <li><a class="toctree-l4" href="#list-layout">List Layout</a></li>
+                
+                    <li><a class="toctree-l4" href="#set-layout">Set Layout</a></li>
+                
+                    <li><a class="toctree-l4" href="#map-layout">Map Layout</a></li>
+                
+                    <li><a class="toctree-l4" href="#primary-key-index-layout">Primary Key Index Layout</a></li>
+                
+                    <li><a class="toctree-l4" href="#hash-index-layout">Hash Index Layout</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../glossary/">Glossary</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../community/">Community</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../acknowledgements/">Acknowledgements</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../license/">License</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" style="background:#000000" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Hollow (Netflix OSS)</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Advanced Topics</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="http://gitter.im/Netflix/hollow" class="icon fa-comment"> Gitter</a>
+      
+        <a href="https://github.com/Netflix/hollow"
+          class="icon icon-github"> GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="schema-parser">Schema Parser</h1>
+<p>Hollow schemas can be serialized as Java Strings.  Calling <code>toString()</code> on a <code>HollowSchema</code> will produce a human-readable representation of the schema.  The following shows the String representations of all of the schemas from our <code>Movie</code>/<code>Actor</code> example data model:</p>
+<pre><code>Movie {
+    long id;
+    int releaseYear;
+    String title;
+    ListOfActor actors;
+}
+
+ListOfActor List&lt;Actor&gt;;
+
+Actor {
+    long id;
+    String actorName;
+}
+
+String {
+    string id;
+}
+</code></pre>
+
+<p>These representations can be parsed using the <code>HollowSchemaParser</code>, and in turn can be used to initialize the state of a <code>HollowWriteStateEngine</code>:</p>
+<pre><code class="java">String allSchemas = /// a String containing all schemas
+
+List&lt;HollowSchema&gt; schemas = 
+             HollowSchemaParser.parseCollectionOfSchemas(allSchemas);
+
+HollowWriteStateEngine initializedWriteEngine = 
+             HollowWriteStateCreator.createWithSchemas(schemas);
+</code></pre>
+
+<div class="admonition hint">
+<p class="admonition-title">Guiding Data Ingestion with a Data Model</p>
+<p>For a generic data ingestion mechanism, loading the schemas from a text representation comes in handy.  For example, the <a href="../data-ingestion/#json-to-hollow-adapter">JSON to Hollow adapter</a> requires a <code>HollowWriteStateEngine</code> which is preinitialized with a data model.  The data model can be configured in a text file, and loaded with the <code>HollowSchemaParser</code>.</p>
+</div>
+<p>Object schema definitions take the following form:</p>
+<pre><code>ObjectTypeName {
+   FieldType1 fieldName1;
+   FieldType2 fieldName2;
+   ...
+   FieldTypeN fieldNameN;
+}
+</code></pre>
+
+<p>Object schemas may define any of the following field types: <code>int</code>, <code>long</code>, <code>float</code>, <code>double</code>, <code>boolean</code>, <code>string</code>, <code>bytes</code>.  If a field has a type other than these, the field will be interpreted as a <code>REFERENCE</code> to another type of that name.</p>
+<div class="admonition warning">
+<p class="admonition-title">Lowercase Field Type Declarations</p>
+<p>Note that the declarations for each of the inline field types are all lowercase (including <code>string</code>).  An uppercase letter in any of these types will be interpreted as a <code>REFERENCE</code> field to a separate type.</p>
+</div>
+<p><code>List</code>, <code>Set</code>, and <code>Map</code> types use the following notation:</p>
+<ul>
+<li><code>ListTypeName List&lt;ElementTypeName&gt;;</code></li>
+<li><code>SetTypeName Set&lt;ElementTypeName&gt;;</code></li>
+<li><code>MapTypeName Map&lt;KeyTypeName, ValueTypeName&gt;</code></li>
+</ul>
+<p>Elements, keys, and values in collection record types cannot be inlined.  Whitespace is unimportant when parsing schema definitions.</p>
+<h1 id="low-level-input-api">Low Level Input API</h1>
+<p>Although Hollow includes a few ready-made data ingestion utilities, other data ingestion utilities can be created.  Adding data into Hollow starts with a <code>HollowWriteStateEngine</code>.  We need to initialize a type state for each schema in our data model:</p>
+<pre><code class="java">HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+
+HollowObjectSchema movieSchema = new HollowObjectSchema(&quot;Movie&quot;, 3);
+movieSchema.addField(&quot;id&quot;, FieldType.LONG);
+movieSchema.addField(&quot;title&quot;, FieldType.REFERENCE, &quot;String&quot;);
+movieSchema.addField(&quot;releaseYear&quot;, FieldType.INT);
+
+HollowObjectTypeWriteState movieState = new HollowObjectTypeWriteState(movieSchema);
+
+writeEngine.addTypeState(typeState);
+</code></pre>
+
+<p>Once we’ve initialized our type states, we can add data into our state engine using HollowWriteRecords:</p>
+<pre><code class="java">HollowObjectSchema stringSchema = /// the String schema
+HollowObjectSchema movieSchema = /// the Movie schema
+
+HollowObjectWriteRecord titleRec = new HollowObjectWriteRecord(stringSchema);
+HollowObjectWriteRecord movieRec = new HollowObjectWriteRecord(movieSchema);
+
+titleRec.setString(&quot;value&quot;, &quot;The Matrix&quot;);
+
+int titleOrdinal = writeEngine.addObject(&quot;String&quot;, titleRec);
+
+movieRec.setLong(&quot;id&quot;, 1);
+movieRec.setReference(&quot;title&quot;, titleOrdinal);
+movieRec.setInt(&quot;releaseYear&quot;, 1999);
+
+writeEngine.addObject(&quot;Movie&quot;, movieRec);
+</code></pre>
+
+<p>Note that referenced records must be added prior to referencing records in order to obtain the referenced ordinals.</p>
+<div class="admonition tip">
+<p class="admonition-title">Reusing HollowWriteRecords</p>
+<p><code>HollowWriteRecord</code>s can be reused -- just be sure to call <code>reset()</code> before populating data from the next record.</p>
+</div>
+<p>Each schema type has its own <code>HollowTypeWriteState</code> and <code>HollowWriteRecord</code> implementation:</p>
+<pre><code class="java">HollowObjectSchema objectSchema = /// an Object schema
+HollowListSchema listSchema = /// a List schema
+HollowSetSchema setSchema = /// a Set schema
+HollowMapSchema mapSchema = /// a Map schema
+
+HollowObjectTypeWriteState objectTypeState = new HollowObjectTypeWriteState(objectSchema);
+HollowListTypeWriteState listTypeState = new HollowListTypeWriteState(listSchema);
+HollowSetTypeWriteState setTypeState = new HollowSetTypeWriteState(setSchema);
+HollowMapTypeWritestate mapTypeState = new HollowMapTypeWriteState(mapSchema);
+
+HollowObjectWriteRecord objectRec = new HollowObjectWriteRecord(objectSchema);
+HollowListWriteRecord listRec = new HollowListWriteRecord();
+HollowSetWriteRecord setRec = new HollowSetWriteRecord();
+HollowMapWriteRecord mapRec = new HollowMapWriteRecord();
+</code></pre>
+
+<p>Using this API, it is possible to create a generic data ingestion mechanism from <em>any</em> type of input source. </p>
+<h1 id="determining-populated-ordinals">Determining Populated Ordinals</h1>
+<p>Many lower-level operations require knowledge of the currently populated ordinals (i.e. those which are not holes), or knowledge of ordinals which were populated in state prior to the last delta application.  We can determine this from any <em>type state</em> in a <code>HollowReadStateEngine</code>.  Both of these are useful, for example, if consumers wish to inspect exactly what has changed.</p>
+<p>Each <code>HollowTypeReadState</code> underneath a <code>HollowReadStateEngine</code> contains the methods <code>getPopulatedOrdinals()</code> and <code>getPreviousOrdinals()</code>.  Each of these methods returns a <code>java.util.BitSet</code>.  The contents of returned <code>BitSet</code>s may be inspected, but should never be modified.</p>
+<h1 id="caching">Caching</h1>
+<p>Although a lot of effort has gone into minimizing the cost to read Hollow data, there is still inevitably a performance difference between accessing a field in a POJO and accessing a field in Hollow.  In general, this will not be a performance bottleneck, but in some rare cases the performance of tight inner loops may suffer on consumers.  </p>
+<p>When there is a type with a low cardinality, we can instantiate and cache a POJO implementation for each ordinal, which can be used by consumers in tight inner loops.  This is accomplished by simply passing a <code>Set&lt;String&gt;</code> as the second constructor argument when instantiating a custom-generated Hollow API.  The elements in the Set should be the types to cache.</p>
+<div class="admonition danger">
+<p class="admonition-title">Avoid Premature Optimization</p>
+<p>Caching should be used judiciously.  In all but the tightest of loops, caching will be unnecessary, and can even be detrimental to performance for types with a large cardinality.</p>
+</div>
+<h1 id="hollow-heap-effects">Hollow Heap Effects</h1>
+<h2 id="double-snapshots">Double Snapshots</h2>
+<p>At times, a new state may be produced to which there is no available delta from the previous state.  When this <em>broken delta chain</em> scenario occurs, consumers will by default attempt to load a snapshot to the latest state.  If a consumer loads a snapshot when it currently has a state loaded for the same dataset, we call this a <em>double snapshot</em>.  Double snapshots result in a doubling of the heap usage of your dataset.  This is because Hollow assumes that consumers may be actively using the current state, and it therefore must retain the current state to provide data while the next state is loaded.  Only after the next state is fully loaded can the old state be dropped.</p>
+<p>If using the <a href="../producer-consumer/#consumer-framework"><code>Hollow Client</code></a>, you can configure consumers to never attempt a double snapshot.  This is accomplished with a custom <code>HollowClientMemoryConfig</code>.  In this case, you should check for 'stuck' clients in a <code>HollowUpdateListener</code>, so that you may take the appropriate operational action.</p>
+<p>If a dataset is large, double snapshots should be avoided for performance reasons.  Double snapshots can be entirely avoided by <a href="../producer-consumer/#restoring-at-startup">restoring</a> a <code>HollowWriteStateEngine</code> at producer initialization time, and, if necessary, using the <a href="../tooling/#patching"><code>HollowStateDeltaPatcher</code></a> to operationally fill lost or missing deltas in the event an unforeseen issue occurs.  </p>
+<h2 id="object-longevity">Object Longevity</h2>
+<p>A Hollow object returned from a generated API contains a reference to the Hollow data store, and an ordinal.  For this reason, if a reference to a Hollow object is retained by the consumer for an extended period of time, and the underlying record changes unexpected results may begin to be returned from these references.  We call Hollow objects which were obtained from a no longer current state stale references.</p>
+<p>It is best practice to <strong>never</strong> cache Hollow objects.  However, if it somehow <em>cannot</em> be guaranteed that Hollow Objects will never be cached at the consumer, and guaranteed protection against accidentally cached objects is necessary, then <em>object longevity</em> can be enabled.</p>
+<p>With object longevity, Hollow objects will, after an update, be backed by a reserved copy of the data at the time the reference was created.  This guarantees that even if a reference is held for a long time, it will continue to return the same data when interrogated.</p>
+<p>When object longevity is defined, Two durations are defined: </p>
+<ul>
+<li>a grace period, and </li>
+<li>a usage detection period.  </li>
+</ul>
+<p>The grace period is defined by its duration, in milliseconds, after a reference becomes stale.  During the grace period, usage of stale references is acceptable.  The usage detection period is defined by its duration, in milliseconds, after the grace period has expired.  During the usage detection period, usage of stale references is unexpected, but will not result in failed interrogations of Hollow objects.  After the usage detection period expires, data will be dropped if no usage was detected in the usage detection period.  If stale references are interrogated <em>after</em> their backing data is dropped, then Exceptions will be thrown.</p>
+<p>The <code>HollowClientMemoryConfig</code>, injected into the <code>HollowClient</code> constructor, contains a few methods which are used to configure object longevity behavior:</p>
+<ul>
+<li><code>boolean enableLongLivedObjectSupport()</code>: Whether or not object longevity is enabled.</li>
+<li><code>long gracePeriodMillis()</code>: If object longevity is enabled, this returns the number of milliseconds before the usage of stale objects gets flagged.</li>
+<li><code>long usageDetectionPeriodMillis()</code>: If long-lived object support is enabled, this defines the number of milliseconds, after the grace period, during which data is still available in stale references, but usage will be flagged.</li>
+<li><code>boolean dropDataAutomatically()</code>: Returns whether or not to drop data behind stale references after the grace period + usage detection period has elapsed, as long as no usage was detected during the usage detection period.  This can be used to avoid memory leaks when long lived object support is enabled and stale references are cached, but unused.</li>
+<li><code>boolean forceDropData()</code>: Returns whether or not to drop data behind stale references after the grace period + usage detection period has elapsed, even if usage was detected during the usage detection period.  This can be used to avoid memory leaks when long lived object support is enabled and stale references are cached and used.</li>
+</ul>
+<p>Your implementation of the <code>HollowClientMemoryConfig</code> may be backed by a dynamic configuration and safely change on live running consumers.  For example, <code>forceDropData()</code> may be operationally useful for boxes that are exhibiting memory leaks due to non-critical cached Hollow objects.</p>
+<div class="admonition hint">
+<p class="admonition-title">How It Works</p>
+<p>When enabled, object longevity is achieved using the <code>HollowHistory</code> data structure, which results in a minimal heap overhead. </p>
+</div>
+<h2 id="memory-pooling">Memory Pooling</h2>
+<p>Hollow pools and reuses memory to minimize GC effects while updating data.  This pool of memory is kept arrays on the heap.  Each array in the pool has a fixed length.  When a long array or a byte array is required in Hollow, it will stitch together pooled array segments as a <code>SegmentedByteArray</code> or <code>SegmentedLongArray</code>.  These classes encapsulate the details of treating segmented arrays as contiguous ranges of values.</p>
+<h1 id="delta-based-producer-input">Delta-Based Producer Input</h1>
+<p><a href="../producer-consumer/#the-producer-cycle">The Producer Cycle</a> section in this documentation describes a Hollow producer which every so often reads the entire dataset from some source of truth, adds it to a <code>HollowWriteStateEngine</code>, then produces a delta based on the differences in the dataset since the last cycle.  It is possible, however, that a producer may <em>receive</em> an incoming stream of events which directly indicate the changes to a dataset, obviating the need to scan through the entire source of truth and re-add the entire dataset on each cycle.</p>
+<p>If desired, a <code>HollowWriteStateEngine</code>’s state can be explicitly modified, rather than recreated, each cycle.  We start such a cycle by re-adding all of the records from the previous cycle to the state engine:</p>
+<pre><code class="java">HollowWriteStateEngine writeEngine = /// the state engine
+
+writeEngine.prepareForNextCycle();
+writeEngine.addAllObjectsFromPreviousCycle();
+</code></pre>
+
+<p>We’ll also need an indexed <code>HollowReadStateEngine</code>, which is updated in lock-step with the <code>HollowWriteStateEngine</code>.  The index can be used to retrieve the ordinals of records to be replaced.  These ordinals can be removed from the <code>HollowWriteStateEngine</code>:</p>
+<pre><code class="java">HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
+HollowPrimaryKeyIndex idx = 
+                       new HollowPrimaryKeyIndex(readEngine, &quot;Movie&quot;, &quot;id&quot;);
+
+HollowTypeWriteState movieTypeState = writeEngine.getTypeState(&quot;Movie&quot;);
+
+List&lt;MovieUpdateEvent&gt; eventBatch = /// a batch of events
+
+for(MovieUpdateEvent event : eventBatch) {
+    int oldOrdinal = idx.getMatchingOrdinal(event.getMovie().getId());
+    movieTypeState.removeOrdinalFromThisCycle(oldOrdinal);
+    mapper.addObject(event.getMovie());
+}
+</code></pre>
+
+<div class="admonition danger">
+<p class="admonition-title">Watch out for Duplicates</p>
+<p>Be careful, this process assumes that no two events will have the same movie ID in the same cycle.  You'll want to dedup the <code>eventBatch</code>.</p>
+</div>
+<p>This process may leave orphaned records around, since the call to <code>removeOrdinalFromThisCycle()</code> doesn’t remove any referenced records.  To solve this, the <a href="../tooling/#transitive-set-traverser"><code>TransitiveSetTraverser</code></a> can be used:</p>
+<pre><code class="java">List&lt;MovieUpdateEvent&gt; eventBatch = /// a batch of events
+
+/// find the Movie ordinals to remove
+BitSet removedMovieOrdinals = new BitSet();
+for(MovieUpdateEvent event : eventBatch) {
+    int oldOrdinal = idx.getMatchingOrdinal(event.getMovie().getId());
+    removedMovieOrdinals.set(oldOrdinal);
+}
+
+/// initially the removal selection includes just Movies
+Map&lt;String, BitSet&gt; removeRecords = new HashMap&lt;&gt;();
+removeRecords.put(&quot;Movie&quot;, removedMovieOrdinals);
+
+/// expand the selection to include any records referenced by selected Movies
+TransitiveSetTraverser.addTransitiveMatches(readEngine, removeRecords);
+/// but don't include records which are also referenced by unselected movies
+TransitiveSetTraverser.removeReferencedOutsideClosure(readEngine, removeRecords);
+
+/// remove everything in the selection
+for(Map.Entry&lt;String, BitSet&gt; entry : removeRecords) {
+    HollowTypeWriteState typeState = writeEngine.getTypeState(entry.getKey());
+    int removeOrdinal = entry.getValue().nextSetBit(0);
+    while(removeOrdinal != -1) {
+        typeState.removeOrdinalFromThisCycle(removeOrdinal);
+        removeOrdinal = entry.getValue().nextSetBit(removeOrdinal + 1);
+    }
+}
+</code></pre>
+
+<p>In the above code, each of the <code>Movie</code> ordinals to be replaced are added to a <code>BitSet</code>.  Then, the <code>TransitiveSetTraverser</code> is used to expand the collection of selected records by adding any records referenced by the selected <code>Movies</code>.  Then, the <code>TransitiveSetTraverser</code> is again used to deselect any child records which are also referenced by other Movies which were not selected for removal.  Finally, the selection is actually removed from the <code>HollowWriteStateEngine</code>.</p>
+<h1 id="in-memory-data-layout">In-Memory Data Layout</h1>
+<p>Each record in Hollow begins with a fixed-length number of bits.  At the lowest level, these bits are held in long arrays using the class <code>FixedLengthElementArray</code>.  This class allows for storage and retrieval of fixed-length data in a range of bits.  For example, if a <code>FixedLengthElementArray</code> was queried for the 6-bit value starting at bit 7 in the following example range of bits:</p>
+<p><img alt="Bit String" src="../img/memlayout-bitstring.png" /></p>
+<p>The value <code>100100</code> in binary, or <code>36</code> in base 10, would be returned.</p>
+<h3 id="object-layout">Object Layout</h3>
+<p>An <code>OBJECT</code> record is a fixed set of strongly typed fields.  Each field is represented by a fixed-length number of bits.  Each record is represented by a fixed length number of bits equal to the sum of the bits required to represent each fields.  For each type, all fields of all records are packed into a single <code>FixedLengthElementArray</code>.  No bookkeeping data structures are required to locate a record -- the start bit for each record can is located by simply multiplying the number of bits per record times the record’s ordinal.</p>
+<p><img alt="Object Layout" src="../img/memlayout-object.png" /></p>
+<p>The number of bits used to represent a field which is one of the types (<code>INT</code>, <code>LONG</code>, <code>REFERENCE</code>) is exactly equal to the number of bits required to represent the maximum value contained in the field across all records.  The values for <code>INT</code> and <code>LONG</code> fields are represented using zig-zag encoding, so that smaller absolute values require fewer bits.  The values for <code>REFERENCE</code> fields are encoded as the referenced record’s ordinal, which along with the referenced type (from the schema) is sufficient to identify and locate the referenced record.</p>
+<p>32 bits are used to represent a <code>FLOAT</code>, and 64 bits are used to represent a <code>DOUBLE</code>.</p>
+<p><code>STRING</code> and <code>BYTES</code> fields each get a separate byte array, into which the values for all records are packed.  The fixed-length value in these fields are offsets into the field’s byte array where the record’s value ends.  In order to determine the begin byte for the record with ordinal n, the offset encoded into the record with ordinal (n-1) is read.  The number of fixed length bits used to represent the offsets is exactly equal to the number of number of bits required to represent the maximum offset, plus one.</p>
+<p>Each field type may be assigned a null value.  For <code>INT</code>, <code>LONG</code>, and <code>REFERENCE</code> fields, null is encoded as a value with all ones.  For <code>FLOAT</code> and <code>DOUBLE</code> fields, null is encoded as special bit sequences.  For <code>STRING</code> and <code>BYTES</code> fields, null is encoded by setting a designated null bit at the beginning of each field, followed by the end offset of the last populated value for that field.</p>
+<h3 id="list-layout">List Layout</h3>
+<p>A <code>LIST</code> is an ordered collection of records of a specific type.  <code>LIST</code> types are represented with two FixedLengthElementArrays.  We can refer to these arrays as the <em>offset array</em> and the <em>element array</em>.</p>
+<p>Each <code>LIST</code> type contains a single <em>element array</em> into which the references to elements for all records are packed.  References are encoded as the ordinals of the element records, which is sufficient to identify and locate the record.  Each reference is represented using a fixed number of bits equal to the number of bits required to represent the maximum referenced ordinal across all records.  Each record is represented with a contiguous range of elements in the <em>element array</em>.  </p>
+<p>The <em>offset array</em> contains fixed-length offsets into the element array where the record’s elements end.  In order to determine the begin element for the record with ordinal n, the end value for the element (n-1) is read.  </p>
+<p><img alt="List Layout" src="../img/memlayout-list.png" /></p>
+<p>Elements in a <code>LIST</code> record may not be null.</p>
+<h3 id="set-layout">Set Layout</h3>
+<p>A <code>SET</code> is an unordered collection of records of a specific type.  The records for <code>SET</code> elements are hashed into an open-addressed hash table.  <code>SET</code> types are represented with two <code>FixedLengthElementArrays</code>.  We can refer to these arrays as the <em>offset array</em> and the <em>bucket array</em>.</p>
+<p>Each <code>SET</code> element contains a single <em>bucket array</em> into which the references to elements for all records are packed.  Each record is represented with a contiguous range of buckets in the <em>bucket array</em>.  The range of buckets for each record will contain an open-addressed hash table, with a linear probing hash collision resolution strategy.  The number of buckets for each record will be a power of two, and will be large enough such that all elements for the record will fit into those buckets with a load factor no greater than 70%.  Each bucket is represented using a fixed number of bits equal to the number of bits required to represent the maximum referenced ordinal across all records.  A populated bucket is encoded as the ordinal of the referenced record in that bucket.  To represent empty buckets, a sentinel value equal to all ones in binary is reserved.</p>
+<p>The <em>offset array</em> contains two fixed-length fields per record:  the size of the set, and the offset to the bucket where the record’s data ends.  Each of these fields is encoded using a fixed number of bits equal to the number of bits required to represent the field’s maximum value across all records.</p>
+<p><img alt="Set Layout" src="../img/memlayout-set.png" /></p>
+<p>Elements in a <code>SET</code> record may not be null.</p>
+<h3 id="map-layout">Map Layout</h3>
+<p>A <code>MAP</code> is an unordered collection of key/value pairs, where each key is a specific type, and each value type is a specific type.  The records for MAP elements are hashed into an open-addressed hash table.  <code>MAP</code> types are represented with two <code>FixedLengthElementArrays</code>.  We can refer to these arrays as the <em>offset array</em> and the <em>bucket array</em>.</p>
+<p>Each <code>MAP</code> type contains a single bucket array into which the references to keys and values for all records are packed.  Each record is represented with a contiguous range of buckets in the <em>bucket array</em>.  The range of buckets for each record will contain an open-addressed hash table, with a linear probing hash collision resolution strategy.  The number of buckets for each record will be a power of two, and will be large enough such that all key/value pairs for the record will fit into those buckets with a load factor no greater than 70%.  Each bucket is represented using a fixed number of bits equal to the number of bits required to represent the maximum referenced key ordinal, plus the number of bits required to represent the maximum referenced value ordinal.  A populated bucket contains two fixed length fields: the first field contains the ordinal of the referenced key, and the second field contains the ordinal of the referenced value.  Empty buckets are represented with a key field containing a reserved sentinel value equal to all ones in binary.</p>
+<p>The <em>offset array</em> contains two fixed-length fields per record:  the size of the map, and the offset to the bucket where the record’s data ends.  Each of these fields is encoded using a fixed number of bits equal to the number of bits required to represent the field’s maximum value across all records.</p>
+<p><img alt="Map Layout" src="../img/memlayout-map.png" /></p>
+<p>A <code>MAP</code> cannot contain null keys or values.</p>
+<h3 id="primary-key-index-layout">Primary Key Index Layout</h3>
+<p>A primary key index is a single <code>FixedLengthElementArray</code>, which represents an open-addressed hash table of pointers to records of the given type.  The hash of each record is derived based on the fields designated in the primary key.  Each bucket in the hash table is represented using a fixed number of bits equal to the number of bits required to represent the maximum ordinal of the indexed type.  A populated bucket is encoded as the ordinal of the referenced record in that bucket.  To represent empty buckets, a sentinel value equal to all ones in binary is reserved.</p>
+<p>When queried with a key, the index will hash the key, look in the corresponding bucket to find the ordinal of a record which also hashes to this key, then compare the referenced record’s key to the query.  When a matching record is found, the ordinal at that bucket is returned as the match.  Collisions are resolved with linear probing.  If after linear probing an empty bucket is encountered, no such record exists in the dataset.</p>
+<h3 id="hash-index-layout">Hash Index Layout</h3>
+<p>A hash index is uses two <code>FixedLengthElementArrays</code>.  These arrays can be referred to as the <em>match array</em> and the <em>select array</em>.  The <em>match array</em> is an open-addressed hash table and contains buckets.  Like a primary key index, the match array does not re-encode the values of keys.  Instead, it retains pointers to existing records which may be used to retrieve the hashed keys.</p>
+<p>Unlike a primary key index, it may not be sufficient to retain a single pointer to the indexed type and extract the hashed key from that record -- each record in a hash index may match multiple keys.  Instead, we retain 1-n pointers.  Each pointer will indicate a record through which one or more of the key fields may be unambiguously retrieved.  If multiple key fields may be unambiguously traversed to via a single type, then only a single pointer for the field group will be retained per bucket.  </p>
+<p>Consider a scenario in which a hash index is used to index Movies by the nationalities and birth year of actors.  For the key <code>[“British”, 1972]</code>, the corresponding entry in the match array may contain a pointer to the <code>Actor</code> record for Idris Elba.  Although the record points to a specific <code>Actor</code>, the matching records for this entry will contain movies starring any British Actor born in 1972.</p>
+<p>Each pointer field in the match array bucket references a specific type, and is encoded as the ordinal to which the bucket refers.  Each is represented using a fixed number of bits equal to the maximum ordinal in the referenced type.</p>
+<p>In addition to pointers which allow us to look up the matching key, each bucket in the <em>match array</em> includes the number of matching records, and an offset into the <em>select array</em>.  The <em>select array</em> contains lists of ordinals to matching records.</p>
+<p>When queried with a key, the index will hash the key, then look to the corresponding bucket in the <em>match array</em>.  The match pointers are used to compare the queried key with the matching key.  If a match is found, then the corresponding entries in the select array are returned as a <code>HollowHashIndexResult</code>.  Collisions are resolved with linear probing.  If after linear probing an empty bucket is encountered in the match array, no such record exists in the dataset.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../glossary/" class="btn btn-neutral float-right" title="Glossary">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../tooling/" class="btn btn-neutral" title="Tooling"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/Netflix/hollow" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../tooling/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../glossary/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Interacting with a Hollow Dataset - Hollow (Netflix OSS)</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Interacting with a Hollow Dataset";
+    var mkdocs_page_input_path = "interacting-with-a-dataset.md";
+    var mkdocs_page_url = "/interacting-with-a-dataset/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search" style="background-color:#000000">
+        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#000000;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">Introduction</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../quick-start/">Quick Start</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../getting-started/">Getting Started</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">Interacting with a Hollow Dataset</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#generated-object-api">Generated Object API</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#generated-type-api">Generated Type API</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#generic-object-api">Generic Object API</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-ingestion/">Data Ingestion</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-modeling/">Data Modeling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../producer-consumer/">Producers and Consumers</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../tooling/">Tooling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../advanced-topics/">Advanced Topics</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../glossary/">Glossary</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../community/">Community</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../acknowledgements/">Acknowledgements</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../license/">License</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" style="background:#000000" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Hollow (Netflix OSS)</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Interacting with a Hollow Dataset</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="http://gitter.im/Netflix/hollow" class="icon fa-comment"> Gitter</a>
+      
+        <a href="https://github.com/Netflix/hollow"
+          class="icon icon-github"> GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="generated-object-api">Generated Object API</h1>
+<p>Each of the examples provided thus far have focused on interaction with the Hollow data set via the generated Hollow Objects API.  Interacting with this API starts with an ordinal (likely obtained from a <code>HollowPrimaryKeyIndex</code>):</p>
+<pre><code class="java">int movieOrdinal = movieIdx.getMatchingOrdinal(6);
+
+MovieHollow movie = movieApi.getMovieHollow(movieOrdinal);
+
+for(ActorHollow actor : movie._getActors()) {
+    System.out.println(&quot;Starring &quot; + actor._getActorName()._getValue());
+}
+</code></pre>
+
+<p><em>Hollow Objects</em> are instantiated at the time they are requested.  Each Hollow Object references a single record of a specific type, and holds two things:</p>
+<ul>
+<li>A reference to the Hollow data store for the type</li>
+<li>An ordinal</li>
+</ul>
+<p>A Hollow Object contains methods to retrieve each of its type's fields in the data model from which the API was generated.  Each field retrieval method is prefixed with an underscore.  Each time a field retrieval method is called on a Hollow Object, the data is retrieved directly from the Hollow data store.</p>
+<div class="admonition note">
+<p class="admonition-title">Hollow Objects are 'hollow'</p>
+<p>The name Hollow is derived from the fact that these objects are 'hollow' -- they <em>appear</em> to contain field accessors, but those are just facades which access the underlying data store.</p>
+</div>
+<h1 id="generated-type-api">Generated Type API</h1>
+<p>At times, using the Hollow Object API can result in a high rate of Object allocation.  All generated Hollow APIs also provide a way to interact with the data without creating Objects.  This is accomplished by using record ordinals to query the data store directly.  For example:</p>
+<pre><code class="java">MovieTypeAPI movieTypeAPI = movieAPI.getMovieTypeAPI();
+ListOfActorTypeAPI listOfActorTypeAPI = movieAPI.getListOfActorTypeAPI();
+ActorTypeAPI actorTypeAPI = movieAPI.getActorTypeAPI();
+StringTypeAPI stringTypeAPI = movieAPI.getStringTypeAPI();
+
+int movieOrdinal = movieIdx.getMatchingOrdinal(6);
+int listOfActorsOrdinal = movieTypeAPI.getActors(movieOrdinal);
+
+int numActors = listOfActorTypeAPI.size(listOfActorsOrdinal);
+
+for(int i=0; i&lt;numActors; i++) {
+   int actorOrdinal = 
+                 listOfActorTypeAPI.getElementOrdinal(listOfActorsOrdinal, i);
+   int stringOrdinal = actorTypeAPI.getActorNameOrdinal(actorOrdinal);
+   System.out.println(&quot;Starring &quot; + stringAPI.getValue(stringOrdinal));
+}
+</code></pre>
+
+<p>In extremely tight loops, it may be more efficient to use the Type API rather than the Object API.</p>
+<div class="admonition warning">
+<p class="admonition-title">Avoid Premature Optimization</p>
+<p>In all but the tightest, most frequently executed loops, usage of the Type API will be unnecessary.  Its usage should be applied judiciously, since the pattern can be more difficult to maintain.</p>
+</div>
+<h1 id="generic-object-api">Generic Object API</h1>
+<p>Hollow also includes a generic Hollow Object API which, if sufficient for consumers, obviates the need to provide generated code:</p>
+<pre><code class="java">int movieOrdinal = movieIdx.getMatchingOrdinal(1);
+
+GenericHollowObject movie = new GenericHollowObject(readEngine, &quot;Movie&quot;, movieOrdinal);
+
+String title = movie.getObject(&quot;title&quot;).getString(&quot;value&quot;);
+
+for(GenericHollowObject actor : movie.getList(&quot;actors&quot;).objects()) {
+    String actorName = actor.getObject(&quot;actorName&quot;).getString(&quot;value&quot;);
+    System.out.println(&quot;Starring &quot; + actorName);
+}
+</code></pre>
+
+<p>Working with the Generic Object API can become cumbersome — unlike a generated Hollow API, the IDE type assist cannot provide a guide to the data model.  However, for simple data models and explorational tasks the Generic Object API can be useful.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../data-ingestion/" class="btn btn-neutral float-right" title="Data Ingestion">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../getting-started/" class="btn btn-neutral" title="Getting Started"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/Netflix/hollow" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../getting-started/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../data-ingestion/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>

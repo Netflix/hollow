@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Quick Start - Hollow (Netflix OSS)</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Quick Start";
+    var mkdocs_page_input_path = "quick-start.md";
+    var mkdocs_page_url = "/quick-start/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search" style="background-color:#000000">
+        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#000000;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">Introduction</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">Quick Start</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#running-the-demo">Running the Demo</a></li>
+                
+                    <li><a class="toctree-l4" href="#clone-the-reference-implementation">Clone the Reference Implementation</a></li>
+                
+                    <li><a class="toctree-l4" href="#import-into-your-ide">Import into your IDE</a></li>
+                
+                    <li><a class="toctree-l4" href="#start-a-producer">Start a Producer</a></li>
+                
+                    <li><a class="toctree-l4" href="#start-a-consumer">Start a Consumer</a></li>
+                
+                    <li><a class="toctree-l4" href="#inspecting-the-data">Inspecting the Data</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#plugging-in-infrastructure">Plugging in Infrastructure</a></li>
+                
+                    <li><a class="toctree-l4" href="#create-a-user">Create a User</a></li>
+                
+                    <li><a class="toctree-l4" href="#assign-permissions-to-user">Assign Permissions To User</a></li>
+                
+                    <li><a class="toctree-l4" href="#create-an-s3-bucket">Create an S3 Bucket</a></li>
+                
+                    <li><a class="toctree-l4" href="#plug-the-producer-into-s3">Plug the Producer into S3</a></li>
+                
+                    <li><a class="toctree-l4" href="#plug-the-consumer-into-s3">Plug the Consumer into S3</a></li>
+                
+                    <li><a class="toctree-l4" href="#a-better-announcement-infrastructure">A Better Announcement Infrastructure</a></li>
+                
+                    <li><a class="toctree-l4" href="#plug-the-producer-into-dynamodb">Plug the Producer into DynamoDB</a></li>
+                
+                    <li><a class="toctree-l4" href="#plug-the-consumer-into-dynamodb">Plug the Consumer into DynamoDB</a></li>
+                
+                    <li><a class="toctree-l4" href="#plug-in-your-data-model">Plug In Your Data Model</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../getting-started/">Getting Started</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../interacting-with-a-dataset/">Interacting with a Hollow Dataset</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-ingestion/">Data Ingestion</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-modeling/">Data Modeling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../producer-consumer/">Producers and Consumers</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../tooling/">Tooling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../advanced-topics/">Advanced Topics</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../glossary/">Glossary</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../community/">Community</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../acknowledgements/">Acknowledgements</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../license/">License</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" style="background:#000000" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Hollow (Netflix OSS)</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Quick Start</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="http://gitter.im/Netflix/hollow" class="icon fa-comment"> Gitter</a>
+      
+        <a href="https://github.com/Netflix/hollow"
+          class="icon icon-github"> GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p>Hollow has an available <em>reference implementation</em>, which is designed to get you up and running with a demo in minutes.  Then, we'll walk through swapping in a fully functional, production scalable, AWS-based infrastructure implementation in about an hour.</p>
+<p>The reference implementation is a great starting point to integrate Hollow for your use case; it contains a simple mocked-up data model, which you can easily modify to suit your needs.</p>
+<div class="admonition hint">
+<p class="admonition-title">Learn by Doing</p>
+<p>This <strong>Quick Start Guide</strong> is placed at the beginning of the documentation as a starting point for those who prefer to "learn by doing".  If you'd prefer to gain a greater understanding of how everything fits together prior to jumping in, skip ahead to the <a href="../getting-started/">Getting Started</a> guide, but do come back later.  </p>
+</div>
+<h1 id="running-the-demo">Running the Demo</h1>
+<h4 id="clone-the-reference-implementation">Clone the Reference Implementation</h4>
+<p>Start by cloning the <a href="https://github.com/Netflix/hollow-reference-implementation">netflix-hollow-reference-implementation</a> repo on GitHub:</p>
+<pre><code>git clone https://github.com/Netflix/netflix-hollow-reference-implementation.git
+</code></pre>
+
+<h3 id="import-into-your-ide">Import into your IDE</h3>
+<p>Import the project into your IDE.  This project ships with both a <code>build.gradle</code> file and a <code>pom.xml</code> file, so you can either use a gradle plugin or a standard maven plugin to import the dependencies.</p>
+<div class="admonition note">
+<p class="admonition-title">Dependencies in Hollow</p>
+<p>The core Hollow jar does not require or include <em>any</em> third party dependencies.  The dependencies in the <em>reference implementation</em> are required for infrastructure demonstration purposes.</p>
+</div>
+<h3 id="start-a-producer">Start a Producer</h3>
+<p>The class <code>com.netflix.hollow.example.Producer</code> contains a main method.  Run it.  This will be our data <em>producer</em>, and will write data to a directory <em>publish-dir</em> underneath the temp directory.</p>
+<p>You should see output like this:</p>
+<pre><code>I AM THE PRODUCER.  I WILL PUBLISH TO /tmp/publish-dir
+ATTEMPTING TO RESTORE PRIOR STATE...
+RESTORE NOT AVAILABLE
+Beginning cycle 20161110185218001
+Beginning cycle 20161110185228002
+Beginning cycle 20161110185238003
+</code></pre>
+
+<p>And you should have a folder <code>/tmp/publish-dir</code> with contents like this:</p>
+<pre><code>    17 announced.version
+   370 delta-20161110185218001-20161110185228002
+   604 delta-20161110185228002-20161110185238003
+   385 reversedelta-20161110185228002-20161110185218001
+   551 reversedelta-20161110185238003-20161110185228002
+597567 snapshot-20161110185218001
+597688 snapshot-20161110185228002
+597813 snapshot-20161110185238003
+</code></pre>
+
+<h3 id="start-a-consumer">Start a Consumer</h3>
+<p>The class <code>com.netflix.hollow.example.Consumer</code> also contains a main method.  Run it.  This will be our data <em>consumer</em>, and will read data from the directory <em>publish-dir</em> underneath the temp directory.  </p>
+<p>You should see output like this:</p>
+<pre><code>I AM THE CONSUMER.  I WILL READ FROM /tmp/publish-dir
+SNAPSHOT COMPLETED IN 45ms
+TYPES: [Actor, Movie, SetOfActor, String]
+DELTA COMPLETED IN 20ms
+TYPES: [Movie, SetOfActor, String]
+SNAPSHOT COMPLETED IN 1ms
+TYPES: [Actor, Movie]
+DELTA COMPLETED IN 12ms
+TYPES: [Actor, Movie, SetOfActor, String]
+DELTA COMPLETED IN 0ms
+TYPES: [Movie]
+
+</code></pre>
+
+<h3 id="inspecting-the-data">Inspecting the Data</h3>
+<p>That's it!  You now have a producer, which is reading data from a data source and publishing Hollow data to <code>/tmp/publish-dir</code>, and a consumer which is reading that data and keeping its internal state up to date.  Let's take a look at what the data actually looks like, and how it's changing over time.  The consumer started a <em>history</em> server, so open up a browser and visit <a href="http://localhost:7777">http://localhost:7777</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Fake Data</p>
+<p>In this demo case, there is no data source.  Instead, the producer is manufacturing some randomized fake data on the first cycle, and making some minor random modifications to that data for each cycle.  Inspect the package <code>com.netflix.hollow.example.producer.datamodel</code> to see the mock data model and how it is randomized.</p>
+</div>
+<h1 id="plugging-in-infrastructure">Plugging in Infrastructure</h1>
+<p>The demo we have so far is fully functional, but writing to and reading from a local disk directory is probably not realistic for a production implementation.  In the following few sections, we'll actually set up a simple AWS-based infrastructure which could easily scale to any production deployment.</p>
+<div class="admonition warning">
+<p class="admonition-title">Using AWS</p>
+<p>This demonstration uses AWS because it is accessible to anyone, easy to set up, and extremely reliable.  In order to proceed, you'll need <a href="http://aws.amazon.com">an AWS account</a>, which is free to sign up for -- you only pay for the services you use.</p>
+<p>Even if you're not able to use the prescribed AWS-based infrastructure, running through the following steps will be useful to gain an understanding of how to swap in different infrastructure implementations for use with Hollow.</p>
+</div>
+<h3 id="create-a-user">Create a User</h3>
+<p>Once you've logged into your AWS account, select <strong>Identity &amp; Access Management</strong> from the AWS console:</p>
+<p><img alt="Select IAM" src="../img/aws-select-iam.png" /></p>
+<p>Select <strong>Users</strong>, then <strong>Create New Users</strong>.  Enter a name in the first box (e.g. <em>HollowReference</em>).</p>
+<p><img alt="Create a User" src="../img/aws-create-user.png" /></p>
+<p>Make sure the checkbox to <strong>Generate an access key for each user</strong> is selected.  Click <strong>Create</strong> in the bottom right corner of the screen.</p>
+<p>On the next page, Click <strong>Show User Security Credentials</strong>.  Here you'll see an <code>Access Key ID</code> and a <code>Secret Access Key</code>.  Copy both of these strings and set them off to the side, we'll need them soon.</p>
+<h3 id="assign-permissions-to-user">Assign Permissions To User</h3>
+<p>We'll need <em>S3</em> and <em>DynamoDB</em> access for this user.  Back on the <strong>Identity &amp; Access Management: Users</strong> page, select the user we just created.  Under the <strong>Permissions</strong> tab, select <strong>Attach Policy</strong>:</p>
+<p><img alt="Attach Policy" src="../img/aws-attach-policy.png" /></p>
+<p>For now, let's give this user full access to S3.  Select the policy named <strong>AmazonS3FullAccess</strong>:</p>
+<p><img alt="S3 Full Access" src="../img/aws-s3-full-access.png" /></p>
+<p>Click <strong>Attach Policy</strong> in the bottom right corner of the screen.</p>
+<p>Repeat these steps to add the policy <strong>AmazonDynamoDBFullAccess</strong> to this user.</p>
+<h3 id="create-an-s3-bucket">Create an S3 Bucket</h3>
+<p>Back on the AWS console landing page, select S3:</p>
+<p><img alt="Select S3" src="../img/aws-select-s3.png" /></p>
+<p>Click <strong>Create Bucket</strong>, then create a bucket.  Select a unique name for your bucket.  Your bucket can be in any region, here we're using the <em>US Standard</em> region:</p>
+<p><img alt="Create Bucket" src="../img/aws-create-s3-bucket.png" /></p>
+<p>Click <strong>Create</strong>.</p>
+<h3 id="plug-the-producer-into-s3">Plug the Producer into S3</h3>
+<p>Now that we've set up our user and our S3 bucket, we can plug the producer into S3.  Open up the <code>Producer</code> class in the Hollow reference implementation project.  Modify the <code>main</code> method: swap the <code>Publisher</code> and <code>Announcer</code> implementations as follows, replacing <code>zzz-hollow-reference-implementation</code> with the bucket name you chose in the prior step:</p>
+<pre><code class="java">AWSCredentials credentials = 
+                new BasicAWSCredentials(&quot;&lt;Access Key ID&gt;&quot;, &quot;&lt;Secret Access Key&gt;&quot;);
+
+Publisher publisher = 
+                new S3Publisher(credentials, &quot;zzz-hollow-reference-implementation&quot;, &quot;demo&quot;);
+Announcer announcer = 
+                new S3Announcer(credentials, &quot;zzz-hollow-reference-implementation&quot;, &quot;demo&quot;);
+
+Producer producer = new Producer(publisher, announcer);
+</code></pre>
+
+<p>Start the producer.  After a few cycles, inspect the <code>demo</code> folder in your S3 bucket to see what the producer is writing.</p>
+<div class="admonition warning">
+<p class="admonition-title">Watch your AWS Usage</p>
+<p>The AWS meter is running.  Leaving this version of the producer running overnight could run up an AWS bill.  Shut the demo down once you're done!</p>
+</div>
+<div class="admonition danger">
+<p class="admonition-title">Clean Up After Yourself</p>
+<p>If you do ultimately choose to use S3 as your <em>blob storage</em> infrastructure, be aware that this implementation does not automatically clean up data for you, which can result in increasing AWS bills.  You should have a cleanup strategy, which can be as simple as adding a <strong>Lifecycle Rule</strong> to your bucket which will, for example, delete old data after 30 days.</p>
+</div>
+<h3 id="plug-the-consumer-into-s3">Plug the Consumer into S3</h3>
+<p>Now that our producer is writing data into S3, we need our consumers to read that data.  Open up the <code>Consumer</code> class in the Hollow reference implementation project.  Modify the <code>main</code> method: swap the <code>HollowBlobRetriever</code> and <code>HollowAnnouncementWatcher</code> implementations as follows, replacing <code>zzz-hollow-reference-implementation</code> with the bucket name you chose in the prior step:</p>
+<pre><code class="java">AWSCredentials credentials = 
+                new BasicAWSCredentials(&quot;&lt;Access Key ID&gt;&quot;, &quot;&lt;Secret Access Key&gt;&quot;);
+
+HollowBlobRetriever blobRetriever = 
+        new S3BlobRetriever(credentials, &quot;zzz-hollow-reference-implementation&quot;, &quot;demo&quot;);
+HollowAnnouncementWatcher announcementWatcher = 
+        new S3AnnouncementWatcher(credentials, &quot;zzz-hollow-reference-implementation&quot;, &quot;demo&quot;);
+
+Consumer consumer = new Consumer(blobRetriever, announcementWatcher);
+
+</code></pre>
+
+<p>Start the consumer.  You'll see the same output from the demo step, except now the Hollow input data is coming from S3.  </p>
+<p>At this point, we have a fully distributed infrastructure.  You can start the producer on one machine, and start a consumer on many other machines, anywhere in the world.  Each of the consumers will update in lock-step each time the producer publishes changes.</p>
+<div class="admonition warning">
+<p class="admonition-title">Address already in use Exception</p>
+<p>Note that the <code>Consumer</code> attempts to start a <em>history</em> server on port 7777.  Because of this, only one <code>Consumer</code> can be running on a single machine at one time.  If you get a <code>java.net.BindException</code>, shut down the other <code>Consumer</code> and try again.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Publishing Closer to the Consumer</p>
+<p>Our implementation currently publishes to a single S3 bucket.  This is OK, but S3 buckets reside in specific AWS regions, and it is often beneficial to publish data closer to your consumers.  For example, if you have some consumers in the AWS region <strong>US Standard</strong>, and some in the region <strong>Sydney</strong>, then it makes sense to simultaneously publish to one bucket in each region, and have consumers read from the bucket closest to them.</p>
+</div>
+<h3 id="a-better-announcement-infrastructure">A Better Announcement Infrastructure</h3>
+<p>Our distributed infrastructure thus far leverages S3 for both a <em>blob store</em> mechanism, and an <em>announcement</em> mechanism.  Although S3 is perfectly suitable for blob storage, it's less well suited for announcement.  Instead, we can leverage DynamoDB for the announcement infrastructure, and achieve both improved scalability and better economics.</p>
+<p>First, we need to create a DynamoDB table.  Back on the AWS console landing page, select DynamoDB:</p>
+<p><img alt="Select DynamoDB" src="../img/aws-select-dynamodb.png" /></p>
+<p>Select <strong>Create table</strong> and enter a Table name (e.g. <em>HollowAnnouncement</em>) and use <em>namespace</em> as the <strong>Partition key</strong>:</p>
+<p><img alt="Create DynamoDB Table" src="../img/aws-dynamodb-create-table.png" /></p>
+<p>Select <strong>Create</strong>.</p>
+<h3 id="plug-the-producer-into-dynamodb">Plug the Producer into DynamoDB</h3>
+<p>Now that we've set up our DynamoDB table, let's swap it into our producer as our announcement mechanism.  Go back to the <code>Producer</code> class and modify the <code>main</code> method, swapping the <code>Announcer</code> implementation as follows:</p>
+<pre><code class="java">Announcer announcer = new DynamoDBAnnouncer(credentials, &quot;HollowAnnouncement&quot;, &quot;demo&quot;);
+</code></pre>
+
+<p>Start the producer.  After at least one cycle, you'll be able to scan the table and see a record indicating the currently announced version for our <code>demo</code> namespace:</p>
+<p><img alt="Scan DynamoDB Table" src="../img/aws-dynamodb-scan-table.png" /></p>
+<h3 id="plug-the-consumer-into-dynamodb">Plug the Consumer into DynamoDB</h3>
+<p>Now that our producer is announcing to DynamoDB, of course our consumer needs to look there for update directions.  Go back to the <code>Consumer</code> class and modify the <code>main</code> method, swapping the <code>HollowAnnouncementWatcher</code> implementation as follows:</p>
+<pre><code class="java">HollowAnnouncementWatcher announcementWatcher = 
+            new DynamoDBAnnouncementWatcher(credentials, &quot;HollowAnnouncement&quot;, &quot;demo&quot;);
+</code></pre>
+
+<p>Run the consumer.  You'll see the same output from prior steps, except now the Hollow input data is coming from S3, and the state version announcement is read from DynamoDB.</p>
+<div class="admonition note">
+<p class="admonition-title">Pinning The State</p>
+<p>The provided <code>DynamoDBAnnouncementWatcher</code> can be <em>pinned</em>.  If the announcement item in DynamoDB contains a field <code>pin_version</code>, then the consumer will go to the version indicated in that field, instead of the version the producer announces.  See <a href="../producer-consumer/#pinning-consumers">Pinning Consumers</a> for more details about pinning data.</p>
+</div>
+<h3 id="plug-in-your-data-model">Plug In Your Data Model</h3>
+<p>Congratulations!  You now have a living, breathing, fully production scalable implementation of Hollow in your hands.  All that's left to do is substitute your data model for the example provided.  The data model can be defined, as in this example, with a set of POJO classes.  Take this starting point and make it your own -- remove the classes underneath <code>com.netflix.hollow.example.producer.datamodel</code> and replace them with your data model.</p>
+<div class="admonition hint">
+<p class="admonition-title">Modeling Data with POJOs</p>
+<p>The <a href="../data-ingestion/#hollowobjectmapper"><code>HollowObjectMapper</code></a> section of this document provides details about how to convert your POJO data model into Hollow.</p>
+</div>
+<p>Continue on to the <a href="../getting-started/">Getting Started</a> guide to learn more about how the fundamental pieces of Hollow fit together, how to create a consumer API custom-tailored to your data model, and how to index your data for easy, efficient retrieval by consumers.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../getting-started/" class="btn btn-neutral float-right" title="Getting Started">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href=".." class="btn btn-neutral" title="Introduction"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/Netflix/hollow" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../getting-started/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>

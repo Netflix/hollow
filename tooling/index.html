@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Tooling - Hollow (Netflix OSS)</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Tooling";
+    var mkdocs_page_input_path = "tooling.md";
+    var mkdocs_page_url = "/tooling/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search" style="background-color:#000000">
+        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#000000;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">Introduction</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../quick-start/">Quick Start</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../getting-started/">Getting Started</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../interacting-with-a-dataset/">Interacting with a Hollow Dataset</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-ingestion/">Data Ingestion</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-modeling/">Data Modeling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../producer-consumer/">Producers and Consumers</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">Tooling</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#insight-tools">Insight Tools</a></li>
+                
+                    <li><a class="toctree-l4" href="#history-tool">History tool</a></li>
+                
+                    <li><a class="toctree-l4" href="#diff-tool">Diff Tool</a></li>
+                
+                    <li><a class="toctree-l4" href="#heap-usage-analysis">Heap Usage Analysis</a></li>
+                
+                    <li><a class="toctree-l4" href="#usage-tracking">Usage Tracking</a></li>
+                
+                    <li><a class="toctree-l4" href="#transitive-set-traverser">Transitive Set Traverser</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#dataset-manipulation-tools">Dataset Manipulation Tools</a></li>
+                
+                    <li><a class="toctree-l4" href="#filtering">Filtering</a></li>
+                
+                    <li><a class="toctree-l4" href="#combining">Combining</a></li>
+                
+                    <li><a class="toctree-l4" href="#splitting">Splitting</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#state-manipulation-tools">State Manipulation Tools</a></li>
+                
+                    <li><a class="toctree-l4" href="#patching">Patching</a></li>
+                
+                    <li><a class="toctree-l4" href="#compacting">Compacting</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#indexing-querying">Indexing / Querying</a></li>
+                
+                    <li><a class="toctree-l4" href="#primary-keys">Primary Keys</a></li>
+                
+                    <li><a class="toctree-l4" href="#hash-indexes">Hash Indexes</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../advanced-topics/">Advanced Topics</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../glossary/">Glossary</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../community/">Community</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../acknowledgements/">Acknowledgements</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../license/">License</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" style="background:#000000" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Hollow (Netflix OSS)</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Tooling</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="http://gitter.im/Netflix/hollow" class="icon fa-comment"> Gitter</a>
+      
+        <a href="https://github.com/Netflix/hollow"
+          class="icon icon-github"> GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p>This section describes the usage of some of the tooling which ships with Hollow, but the tools described here are by no means a comprehensive accounting of the things you can do with your data once it's Hollow.  We hope that you'll find it straightforward to use the basic building blocks provided by the Hollow framework in different ways to create new tooling — and then contribute back any tools which you develop for your use case and find useful.</p>
+<h1 id="insight-tools">Insight Tools</h1>
+<h2 id="history-tool">History tool</h2>
+<p>Hollow provides the ability to retain, in memory, the changes in a dataset over many states, and to easily access historical data.  This is accomplished via the  <code>HollowHistory</code> class:</p>
+<pre><code class="java">public HollowHistory(HollowReadStateEngine initialHollowStateEngine, 
+                     long initialVersion, 
+                     int maxHistoricalStatesToKeep)
+</code></pre>
+
+<div class="admonition note">
+<p class="admonition-title">State Versioning</p>
+<p>The <code>initialVersion</code> parameter above should be a unique value identifying the state.</p>
+</div>
+<p>The <code>HollowHistory</code> should be configured with the primary keys of records for which we are interested in tracking history.  For example, using our <code>Movie</code>/<code>Actor</code> example from the Getting Started guide, we may specify the following configuration:</p>
+<pre><code class="java">HollowHistory history = new HollowHistory(readEngine, 1, 1000);
+HollowHistoryKeyIndex historyIdx = history.getKeyIndex();
+
+historyIdx.addTypeIndex(&quot;Movie&quot;, &quot;id&quot;);
+historyIdx.indexTypeField(&quot;Movie&quot;, &quot;id&quot;);
+
+historyIdx.addTypeIndex(&quot;Actor&quot;, &quot;actorId&quot;);
+</code></pre>
+
+<p>Notice there are two types of calls available to the <code>HollowHistoryKeyIndex</code>:</p>
+<ul>
+<li>The <code>addTypeIndex()</code> call specifies the primary key for a type which we want to be able to view historical changes over time.  Primary keys may be defined over multiple fields.  The final parameter in the <code>addTypeIndex()</code> call is a vararg.  </li>
+<li>The <code>indexTypeField()</code> call specifies an individual primary key field over which we want to be able to <em>search</em> for historical changes over time.</li>
+</ul>
+<div class="admonition hint">
+<p class="admonition-title">Primary Keys</p>
+<p>The <code>HollowHistory</code> will, by default, automatically configure any primary keys which are defined in the <code>Object</code> schemas of your dataset.  However, the calls to <code>indexTypeField()</code> will not be automatically configured.</p>
+</div>
+<p>Once instantiated and configured, the <code>HollowHistory</code> should be notified each time the state engine is transitioned via the <code>deltaOccurred(long newVersion)</code> method.  The <code>HollowHistory</code> will track the entire dataset for each state which through which the state engine is transitioned.  </p>
+<p>This historical data is maintained by retaining and indexing all of the changes for the delta chain in memory.  Because only changes over time are retained, rather than complete states, a great length of history can often be held in memory.</p>
+<p>Hollow includes a ready-made UI which can be applied to a <code>HollowHistory</code> for any dataset.  The included UI clearly displays the changes which occur between adjacent states as the state engine transitions through a delta chain.  This will allow users to quickly realize all of the benefits of indexed, historical data retention at their fingertips.  </p>
+<p>The <code>HollowHistoryUI</code> class in the <em>hollow-diff-ui</em> project is instantiated using a <code>HollowHistory</code> and a base URL path.  Incoming requests should be sent to the handle method:</p>
+<pre><code class="java">public boolean handle(String target, 
+                      HttpServletRequest req, 
+                      HttpServletResponse resp) throws IOException
+</code></pre>
+
+<p>The <code>HollowHistoryUI</code> can be used in the context of an existing web container, or can be invoked via the included <code>HollowHistoryUIServer</code>, which uses the Jetty HTTP Servlet Server:</p>
+<pre><code class="java">HollowHistory history = /// set up the history;
+
+HollowHistoryUI ui = new HollowHistoryUI(&quot;&quot;, history);
+HollowHistoryUIServer server = new HollowHistoryUIServer(ui, 8080);
+
+server.start();
+server.join();
+</code></pre>
+
+<p>While the above code is running, you can point a browser to <em>http://localhost:8080</em> to explore the history.</p>
+<p>Right out of the box, the history tool provides the ability to get a bird’s eye view of all of the changes a dataset goes through over time, while simultaneously allowing for specific queries to see exactly how individual records change as the dataset transitions between states.  The history tool has proven to be enormously beneficial when investigating data issues in production scenarios.  When something looks incorrect, it’s easy to pinpoint exactly what changed when, which can vastly expedite data corrections and eliminate hours of potential detective work.</p>
+<h2 id="diff-tool">Diff Tool</h2>
+<p>Just as the Hollow history tool UI makes the differences between any two <em>adjacent</em> states in a delta chain readily accessible, the Hollow diff tool is used to investigate the differences between any two <em>arbitrary</em> data states, even those which may exist in different delta chains. </p>
+<p>This is especially useful as a step in a regular release cadence, as the differences between data states produced, for example, in a test environment and production environment can be evaluated at a glance.  Sometimes, unintended consequences of code updates may be discovered this way, which prevents production issues before they happen.</p>
+<p>Initiating a diff between two data states is accomplished by loading both states into separate <code>HollowReadStateEngines</code> in memory, and then instantiating a <code>HollowDiff</code> and configuring it with the primary keys of types to diff.  For our <code>Movie</code>/<code>Actor</code> example:</p>
+<pre><code class="java">HollowReadStateEngine testData = /// load test data
+HollowReadStateEngine prodData = /// load test data
+
+HollowDiff diff = new HollowDiff(testData, prodData);
+diff.addTypeDiff(&quot;Movie&quot;, &quot;id&quot;);
+diff.addTypeDiff(&quot;Actor&quot;, &quot;actorId&quot;);
+
+diff.calculateDiffs();
+</code></pre>
+
+<p>A diff is calculated by matching records of the same type based on defined primary keys.  The unmatched records in both states are tracked, and detailed differences between field values in matching pairs are also tracked.</p>
+<div class="admonition hint">
+<p class="admonition-title">Primary Keys</p>
+<p>The <code>HollowDiff</code> will, by default, automatically configure any primary keys which are defined in the <code>Object</code> schemas of your dataset. </p>
+</div>
+<p>Hollow includes a ready-made UI which can be applied to a <code>HollowDiff</code>.    The <code>HollowDiffUI</code> class can be used in the context of an existing web container, or can be invoked via the <code>HollowDiffUIServer</code>, which uses the Jetty HTTP Servlet Server:</p>
+<pre><code class="java">HollowDiff diff = /// build the diff
+
+HollowDiffUIServer server = new HollowDiffUIServer(8080);
+server.start();
+
+server.addDiff(&quot;diff&quot;, diff);
+
+server.join();
+</code></pre>
+
+<p>While the above code is running, you can point a browser to <em>http://localhost:8080</em> to explore the diff.</p>
+<h2 id="heap-usage-analysis">Heap Usage Analysis</h2>
+<p>One of the most important considerations when dealing with in-memory datasets is the heap utilization of that dataset on consumer machines.  Hollow provides a number of methods to analyze this metric.</p>
+<p>Given a loaded <code>HollowReadStateEngine</code>, it is possible to iterate over each type and gather statistics about its approximate heap usage.  This is done in the following example:</p>
+<pre><code class="java">HollowReadStateEngine stateEngine = /// a populated state engine
+
+long totalApproximateHeapFootprint = 0;
+
+for(HollowTypeReadState typeState : stateEngine.getTypeStates()) {
+    String typeName = typeState.getSchema().getName();
+    long heapCost = typeState.getApproximateHeapFootprintInBytes();
+    System.out.println(typeName + &quot;: &quot; + heapCost);
+    totalApproximateHeapFootprint += heapCost;
+}
+
+System.out.println(&quot;TOTAL: &quot; + totalApproximateHeapFootprint);
+</code></pre>
+
+<p>As shown above, information can be gathered about the total heap footprint, and also about the heap footprint of individual types.  This information can be helpful in identifying optimization targets.  This technique can also be used to identify how the heap cost of individual types changes over time, which can provide early warning signs about optimizations which should be targeted proactively.</p>
+<h2 id="usage-tracking">Usage Tracking</h2>
+<p>Hollow tracks usage, which can be investigated at runtime.  By default, this functionality is turned off, but it can be enabled by injecting a HollowSamplingDirector into a Hollow API in a running instance.  You can use the TimeSliceSamplingDirector implementation, which will by default record every access which happens during 1ms out of every second:</p>
+<pre><code class="java">MovieAPI api = /// a custom-generated API
+
+TimeSliceSamplingDirector samplingDirector = new TimeSliceSamplingDirector();
+samplingDirector.startSampling();
+
+api.setSamplingDirector(samplingDirector);
+</code></pre>
+
+<p>Once this is enabled, and some time has passed for samples to be gathered, the results can be collected for analysis:</p>
+<pre><code class="java">for(SampleResult result : api.getAccessSampleResults()) {
+    if(result.getNumSamples() &gt; 0)
+        System.out.println(result.getIdentifier() + &quot;: &quot; + 
+                                                  result.getNumSamples());
+}
+</code></pre>
+
+<h2 id="transitive-set-traverser">Transitive Set Traverser</h2>
+<p>The <code>TransitiveSetTraverser</code> can be used to find children and parent references for a selected set of records.  We start with an initial set of selected records by ordinal, represented with a <code>Map&lt;String, BitSet&gt;</code>.  Entries in this map will indicate a type, plus the ordinals of the selected records:</p>
+<pre><code class="java">Map&lt;String, BitSet&gt; selection = new HashMap&lt;String, BitSet&gt;();
+
+/// select the movies with IDs 1 and 6.
+BitSet selectedMovies = new BitSet();
+selectedMovies.set(movieIdx.getMatchingOrdinal(1));
+selectedMovies.set(movieIdx.getMatchingOrdinal(6));
+
+selection.put(&quot;Movie&quot;, movies);
+</code></pre>
+
+<p>We can add the references, and the <em>transitive references</em> of our selection.  After the following call returns, our selection will be augmented with these matches:</p>
+<pre><code class="java">TransitiveSetTraverser.addTransitiveMatches(readEngine, selection);
+</code></pre>
+
+<div class="admonition note">
+<p class="admonition-title">Transitive References</p>
+<p>If A references B, and B references C, then A transitively references C</p>
+</div>
+<p>Given a selection, we can also add any records which reference anything in the selection.  This is essentially the opposite operation as above; it can be said that <code>addTransitiveMatches</code> traverses down, while <code>addReferencingOutsideClosure</code> traverses up.  After the following call returns, our selection will be augmented with this selection:</p>
+<pre><code class="java">TransitiveSetTraverser.removedReferencedOutsideClosure(readEngine, selection);
+</code></pre>
+
+<h1 id="dataset-manipulation-tools">Dataset Manipulation Tools</h1>
+<h2 id="filtering">Filtering</h2>
+<p>Sometimes, a dataset will be of interest to multiple different types of consumers, but not all consumers may be interested in all aspects of a dataset.  In these cases, it’s possible to omit certain types and fields from a client’s view of the data.  This is typically done to tailor a consumer’s heap footprint and startup time costs based on their data needs.</p>
+<p>Using our <code>Movie</code>/<code>Actor</code> example above, if there was a consumer which was interested in <code>Movie</code> records, but not <code>Actor</code> records, that consumer might construct a consumer-side data filter configuration in the following way:</p>
+<pre><code class="java">HollowFilterConfig config = new HollowFilterConfig(true);
+config.addField(&quot;Movie&quot;, &quot;actors&quot;);
+config.addType(&quot;ListOfActor&quot;);
+config.addType(&quot;Actor&quot;);
+</code></pre>
+
+<p>The boolean <code>true</code> parameter in the constructor above indicates that this is an exclusion filter.  We could accomplish the same goal using an inclusion filter:</p>
+<pre><code class="java">HollowFilterConfig config = new HollowFilterConfig(false);
+config.addField(&quot;Movie&quot;, &quot;id&quot;);
+config.addField(&quot;Movie&quot;, &quot;title&quot;);
+config.addField(&quot;Movie&quot;, &quot;releaseYear&quot;);
+config.addType(&quot;String&quot;);
+</code></pre>
+
+<p>The difference between these two configurations is how the filter behaves as new types and fields are added to the data model.  The exclusion filter will not exclude them by default, whereas the inclusion filter will.</p>
+<p>A filter configuration is applied to a state engine at read time:</p>
+<pre><code class="java">HollowBlobReader reader = /// a blob reader
+InputStream stream = /// a stream of the snapshot
+HollowFilterConfig config = /// the filter configuration
+
+reader.readSnapshot(inputStream, filter);
+</code></pre>
+
+<h2 id="combining">Combining</h2>
+<p>The <code>HollowCombiner</code> is used to copy data from one or more copies of hollow datasets in <code>HollowReadStateEngine</code>s into a single <code>HollowWriteStateEngine</code>.  If each of the inputs contain the same data model, the following is sufficient to combine them:</p>
+<pre><code class="java">HollowReadStateEngine input1 = /// an input
+HollowReadStateEngine input2 = /// another input
+
+HollowCombiner combiner = new HollowCombiner(input1, input2);
+combiner.combine();
+
+HollowWriteStateEngine combined = combiner.getCombinedStateEngine();
+</code></pre>
+
+<p>By default, the combiner will copy all records from all types from the inputs to the output.  We can direct the combiner to exclude certain records from copying using a <code>HollowCombinerCopyDirector</code>.  The interface for a <code>HollowCombinerCopyDirector</code> allows for making decisions about copying individual records during a combine operation by implementing the following method:</p>
+<pre><code class="java">public boolean shouldCopy(HollowTypeReadState typeState, int ordinal);
+</code></pre>
+
+<p>If this method returns false, then the copier will not attempt to directly copy the matching record.  However, if the matching record is referenced via another record for which this method returns true, then it will still be copied regardless of the return value of this method.</p>
+<p>The most broadly useful provided implementation of the <code>HollowCombinerCopyDirector</code> is the <code>HollowCombinerExcludePrimaryKeysCopyDirector</code>, which can be used to specify record exclusions by primary key.  For example, if we wanted to create a copy of a state engine with the <code>Movie</code> records with ids 100 and 125 excluded:</p>
+<pre><code class="java">HollowReadStateEngine input = /// an input
+HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(input, &quot;Movie&quot;, &quot;id&quot;);
+
+HollowCombinerExcludePrimaryKeysCopyDirector director = 
+                          new HollowCombinerExcludePrimaryKeysCopyDirector();
+
+director.excludeKey(idx, 100);
+director.excludeKey(idx, 125);
+
+HollowCombiner combiner = new HollowCombiner(director, input);
+combiner.combine();
+
+HollowWriteStateEngine result = combiner.getCombineStateEngine();
+</code></pre>
+
+<p>It’s possible that while combining two inputs, both may have a record of the same type with the same primary key.  This violation of the uniqueness constraint of a primary key can be avoided by informing the combiner of the primary keys in a data model prior to the combine operation:</p>
+<pre><code class="java">HollowCombiner combiner = new HollowCombiner(input1, input2);
+
+combiner.setPrimaryKeys(
+        new PrimaryKey(&quot;Movie&quot;, &quot;id&quot;),
+        new PrimaryKey(&quot;Actor&quot;, &quot;actorId&quot;)
+);
+
+combiner.combine();
+</code></pre>
+
+<p>If multiple records exist in the inputs matching a single value for any of the supplied primary keys, then only one such record will be copied to the output.  The specific record which is copied will be the record from the input was supplied earliest in the constructor of the <code>HollowCombiner</code>.  Further, if any record references another record which was omitted because it would have been duplicate based on this rule, then that reference is remapped in the output state to the matching record which was chosen to be included.</p>
+<h2 id="splitting">Splitting</h2>
+<p>A single dataset can be sharded into multiple datasets using a <code>HollowSplitter</code>.  The <code>HollowSplitter</code> takes a <code>HollowSplitterCopyDirector</code>, which indicates:</p>
+<ul>
+<li><em>top level</em> types to split,</li>
+<li>the number of shards to create, and </li>
+<li>which shard to send individual records.</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Top Level Types</p>
+<p>Top level types are those which are not referenced by any other types.  In our <code>Movie</code>/<code>Actor</code> example, <code>Movie</code> is a top-level type, but <code>Actor</code> is not.</p>
+</div>
+<p>Two default implementations of <code>HollowSplitterCopyDirector</code> are available: </p>
+<ul>
+<li><code>HollowSplitterOrdinalCopyDirector</code></li>
+<li><code>HollowSplitterPrimaryKeyCopyDirector</code>.  </li>
+</ul>
+<p>These directors will split top-level types among a specified number of shards either by ordinals or primary keys, respectively.  When splitting by ordinal, a record with a specific primary key may jump between shards when it is modified, while with the primary key director a specific primary key will consistently hash to the same shard.</p>
+<p>Our <code>Movie</code>/<code>Actor</code> example may use the splitter to split a dataset into four shards with the following invocation:</p>
+<pre><code class="java">HollowReadStateEngine stateEngine = /// a state engine
+
+HollowSplitterCopyDirector director = 
+                            new HollowSplitterOrdinalCopyDirector(4, &quot;Movie&quot;);
+
+HollowSplitter splitter = new HollowSplitter(director, stateEngine);
+splitter.split();
+
+
+for(int i=0; i&lt;4; i++) {
+    HollowWriteStateEngine shard = splitter.getOutputShardStateEngine(i);
+}
+</code></pre>
+
+<h1 id="state-manipulation-tools">State Manipulation Tools</h1>
+<h2 id="patching">Patching</h2>
+<p>Using the <code>HollowWriteStateEngine</code>’s restore capability, it’s possible to produce deltas forever, so that consumers never have to load a snapshot after initialization.  However, if environmental hiccups cause a producer to fail to publish a delta, or if a delta is lost, or if it’s desired to publish a delta between non-adjacent states, then the <code>HollowStateDeltaPatcher</code> may be used to produce deltas between two arbitrary states within the same delta chain.</p>
+<p>The <code>HollowStateDeltaPatcher</code> must produce <em>two</em> delta transitions to create a transition between arbitrary states.  This is because non-adjacent states may have different records occupying the same ordinals.  Since no ordinal may be removed and added in adjacent states, the state patcher must create an intermediate state in which modified records do not share any ordinals.</p>
+<p>See the <code>HollowStateDeltaPatcher</code> javadocs for usage details.</p>
+<h2 id="compacting">Compacting</h2>
+<p>It is possible to produce delta chains which extend over many thousands of states.  If during this delta chain an especially large delta happens for a specific type, it’s possible that many ordinal holes will be present in that type.  If over time multiple types go through especially large deltas, this can have an impact on a dataset’s heap footprint.</p>
+<p>To reclaim heap space occupied by ordinal holes, the <code>HollowCompactor</code> may be used to move records off of the high end of the ordinal space into these holes.  This is accomplished by producing deltas which only include removals and additions of identical records allocated to more optimal ordinals.  See the <code>HollowCompactor</code> javadocs for usage details.</p>
+<h1 id="indexing-querying">Indexing / Querying</h1>
+<h2 id="primary-keys">Primary Keys</h2>
+<p>In our <code>Movie</code>/<code>Actor</code> example from the Getting Started guide, we saw that we can easily create a <code>HollowPrimaryKeyIndex</code> which will allow us to query for <code>Movie</code> records by id:</p>
+<pre><code class="java">HollowPrimaryKeyIndex idx = 
+                      new HollowPrimaryKeyIndex(readEngine, &quot;Movie&quot;, &quot;id&quot;);
+idx.listenForDeltaUpdates();
+</code></pre>
+
+<p>In that example, the primary key was defined for <code>Movie</code> as its <code>id</code> field.  A primary key can also be defined over multiple and/or hierarchical fields.  Imagine that <code>Movie</code> additionally had a <code>country</code> field defined in its schema, and that across countries, <code>Movie</code> <code>id</code>s may be duplicated, but that there will never exist two <code>Movie</code> records with the same id and country:</p>
+<pre><code class="java">public class Movie {
+    long id;
+    Country country;
+    String title;
+    int releaseYear;
+}
+
+
+public class Country {
+    String id;
+    String name;
+}
+</code></pre>
+
+<p>A <code>HollowPrimaryKeyIndex</code> can be defined with a primary key consisting of both fields:</p>
+<pre><code class="java">HollowPrimaryKeyIndex idx = 
+            new HollowPrimaryKeyIndex(readEngine, &quot;Movie&quot;, &quot;id&quot;, &quot;country.id.value&quot;);
+idx.listenForDeltaUpdates();
+</code></pre>
+
+<p>And to query for a <code>Movie</code> based on its id and country:</p>
+<pre><code class="java">int movieOrdinal = idx.getMatchingOrdinal(2, &quot;US&quot;);
+if(movieOrdinal != -1) {
+    MovieHollow movie = movieApi.getMovieHollow(movieOrdinal);
+    System.out.println(&quot;Found Movie: &quot; + movie._getTitle()._getValue());
+}
+</code></pre>
+
+<p>Notice that <code>Movie</code>’s country field in the above example is actually a <code>REFERENCE</code> field.  The defined key includes the id of the movie, and the value of the id String of the referenced country.  We denote this traversal using dot notation in the primary key definition.  The field definitions can be multiple references deep.</p>
+<p>The requirement for a primary key definition is that no duplicates should exist for the defined combination of fields.  If this rule is violated, an arbitrary match will be returned for queries when multiple matches exist.  </p>
+<div class="admonition note">
+<p class="admonition-title">Primary Key Violations</p>
+<p>Violations of the "no duplicate" primary key rule can be detected using the <code>getDuplicateKeys()</code> method on a <code>HollowPrimaryKeyIndex</code>, which returns a <code>Collection&lt;Object[]&gt;</code>.  If no duplicate keys exist, the returned Collection will be empty.  If they do, the returned values will indicate the keys for which duplicate records exist.</p>
+</div>
+<p>If a <code>HollowPrimaryKeyIndex</code> will be retained for a long duration, they should be kept updated as deltas are applied to the underlying <code>HollowReadStateEngine</code>.  This is accomplished with a single call after instantiation to the <code>listenForDeltaUpdates()</code> method. </p>
+<div class="admonition warning">
+<p class="admonition-title">Detaching Primary Key Indexes</p>
+<p>If <code>listenForDeltaUpdates()</code> is called on a primary key index, then it cannot be garbage collected.  If you intend to drop an index which is listening for updates, first call <code>detachFromDeltaUpdates()</code> to prevent a memory leak.</p>
+</div>
+<p>Indexes which are listening for delta updates are updated after a dataset is updated.  In the brief interim time between when a dataset is updated and the index is updated, the index will point to the <em>ghost records</em> located at tombstoned ordinals.  This helps guarantee that all in-flight operations will observe correct data.</p>
+<h2 id="hash-indexes">Hash Indexes</h2>
+<p>It is sometimes desirable to index records by fields other than primary keys.  The <code>HollowHashIndex</code> allows for indexing records by fields or combinations of fields for which values may match multiple records, and records may match multiple values.</p>
+<p>In our <code>Movie</code>/<code>Actor</code> example, we may want to index movies by their starring actors:</p>
+<pre><code class="java">HollowHashIndex idx = 
+            new HollowHashIndex(readEngine, &quot;Movie&quot;, &quot;&quot;, &quot;actors.element.id&quot;);
+</code></pre>
+
+<p>The <code>HollowHashIndex</code> expects in its constructor arguments a query start type, a select field, and a set of match fields.  The constructor arguments above indicate that queries will start with the <code>Movie</code> type, select the root of the query (indicated by the empty string), and match the id of any <code>Actor</code> record in the actors list.</p>
+<p>To query this index:</p>
+<pre><code class="java">HollowHashIndexResult result = idx.findMatches(102);
+
+if(result != null) {
+    System.out.println(&quot;Found matches: &quot; + result.numResults());
+
+    HollowOrdinalIterator iter = result.iterator();
+    int matchedOrdinal = iter.next();
+    while(matchedOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+        MovieHollow movie = api.getMovieHollow(matchedOrdinal);
+        System.out.println(&quot;Starred in: &quot; + movie._getTitle()._getValue());
+        matchedOrdinal = iter.next();
+    }
+}
+</code></pre>
+
+<p>Alternatively, if the data model included the nationality of Actors, and we needed to index Actors by nationality and the titles of movies in which they starred:</p>
+<pre><code class="java">HollowHashIndex idx = 
+            new HollowHashIndex(readEngine, &quot;Movie&quot;, &quot;actors.element&quot;,
+                                            &quot;title.value&quot;,
+                                            &quot;actors.element.nationality.id&quot;);
+</code></pre>
+
+<p>In this case, the query start type is still <code>Movie</code>, but we’re selecting related <code>Actors</code>.  Matches are selected based on the <code>Movie</code>’s title, and the actor’s nationality.  Using this index, one can query for Brazilian actors who starred in movies titled “Narcos”:</p>
+<pre><code class="java">HollowHashIndexResult result = idx.findMatches(&quot;Narcos&quot;, &quot;BR&quot;);
+
+if(result != null) {
+    HollowOrdinalIterator iter = result.iterator();
+    int matchedOrdinal = iter.next();
+    while(matchedOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+        ActorHollow actor = api.getMovieHollow(matchedOrdinal);
+        System.out.println(&quot;Matched actor: &quot; + 
+                                      actor._getActorName()._getValue());
+        matchedOrdinal = iter.next();
+    }
+}
+</code></pre>
+
+<p>The <code>HollowHashIndex</code> does not yet have a facility for listening for delta updates.  If an index is necessary across multiple states, currently the index must be recreated on each update.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../advanced-topics/" class="btn btn-neutral float-right" title="Advanced Topics">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../producer-consumer/" class="btn btn-neutral" title="Producers and Consumers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/Netflix/hollow" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../producer-consumer/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../advanced-topics/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>

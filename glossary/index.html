@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Glossary - Hollow (Netflix OSS)</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Glossary";
+    var mkdocs_page_input_path = "glossary.md";
+    var mkdocs_page_url = "/glossary/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search" style="background-color:#000000">
+        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#000000;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">Introduction</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../quick-start/">Quick Start</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../getting-started/">Getting Started</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../interacting-with-a-dataset/">Interacting with a Hollow Dataset</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-ingestion/">Data Ingestion</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-modeling/">Data Modeling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../producer-consumer/">Producers and Consumers</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../tooling/">Tooling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../advanced-topics/">Advanced Topics</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">Glossary</a>
+        
+            <ul>
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../community/">Community</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../acknowledgements/">Acknowledgements</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../license/">License</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" style="background:#000000" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Hollow (Netflix OSS)</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Glossary</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="http://gitter.im/Netflix/hollow" class="icon fa-comment"> Gitter</a>
+      
+        <a href="https://github.com/Netflix/hollow"
+          class="icon icon-github"> GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p><em>adjacent state</em></p>
+<blockquote>
+<p>If state <code>A</code> is connected via a single delta to state <code>B</code>, then <code>A</code> and <code>B</code> are adjacent to each other.</p>
+</blockquote>
+<p><em>announce</em></p>
+<blockquote>
+<p>After the blobs for a state have been published to a blob store by a producer, the state must be <em>announced</em> to consumers.  The announcement signals to consumers that they should transition to the announced state.</p>
+</blockquote>
+<p><em>blob</em></p>
+<blockquote>
+<p>A blob is a file used by consumers to update their dataset.  A blob will be either a snapshot, delta, or reverse delta</p>
+</blockquote>
+<p><em>blob store</em></p>
+<blockquote>
+<p>A blob store is a file store to which blobs can be published by a producer and retrieved by a consumer. </p>
+</blockquote>
+<p><em>broken delta chain</em></p>
+<blockquote>
+<p>When a blob namespace contains a state which is not adjacent to any prior states, the delta chain is said to be broken.  In this scenario, consumers may need to load a double snapshot.</p>
+</blockquote>
+<p><em>consumer</em></p>
+<blockquote>
+<p>One of many machines on which a dataset is made accessible.  Consumers are updated in lock-step based on the actions of the producer.</p>
+</blockquote>
+<p><em>cycle</em></p>
+<blockquote>
+<p>A producer runs in an infinite loop.  Each exection of the loop is called a cycle.  Each cycle produces a single data state.</p>
+</blockquote>
+<p><em>data model</em></p>
+<blockquote>
+<p>A data model defines the structure of a dataset.  It is specified with a set of schemas.</p>
+</blockquote>
+<p><em>data state</em></p>
+<blockquote>
+<p>A dataset changes over time.  The timeline for a changing dataset can be broken down into discrete data states, each of which is a complete snapshot of the data at a particular point in time.</p>
+</blockquote>
+<p><em>deduplication</em></p>
+<blockquote>
+<p>Two records which have identical data in Hollow will be consolidated into a single record.  Any references to duplicate records will be mapped to the canonical one when a dataset is represented with Hollow.</p>
+</blockquote>
+<p><em>delta</em></p>
+<blockquote>
+<p>A set of encoded instructions to transition from one data state to an adjacent state.  Deltas are encoded as a set of ordinals to remove and a set of ordinals to add, along with the accompanying data to add.  'Delta' may refer specifically to a transition between an earlier state and a later state, contrasted with 'reverse delta', which specifically refers to a transition between a later state and an earlier state.</p>
+</blockquote>
+<p><em>delta chain</em></p>
+<blockquote>
+<p>A series of states which are all connected via contiguous deltas.</p>
+</blockquote>
+<p><em>diff</em></p>
+<blockquote>
+<p>A comprehensive accounting for the differences between two data states.</p>
+</blockquote>
+<p><em>double snapshot</em></p>
+<blockquote>
+<p>When a consumer already has an initialized state and an announcement signals to move to a new state for which a path of deltas is not available, the consumer may transition to that state via a snapshot.  In this scenario two full copies of the dataset must be loaded in memory.</p>
+</blockquote>
+<p><em>field</em></p>
+<blockquote>
+<p>A single value encoded inside of a Hollow record.</p>
+</blockquote>
+<p><em>hash key</em></p>
+<blockquote>
+<p>A user-defined specification of one or more fields used to hash elements into a set or entries into a map.</p>
+</blockquote>
+<p><em>ingestion</em></p>
+<blockquote>
+<p>Gathering data from a source of truth and importing it into Hollow.</p>
+</blockquote>
+<p><em>inline</em></p>
+<blockquote>
+<p>A field for which the value is encoded directly into a record, as opposed to referenced via another record.</p>
+</blockquote>
+<p><em>namespace (blobs)</em></p>
+<blockquote>
+<p>An addressable, logical separation of both published artifacts in a blob store and announcement location.  Used to allow multiple publishers to communicate on separate channels to specific groups of consumers.</p>
+</blockquote>
+<p><em>namespace (references)</em></p>
+<blockquote>
+<p>The deliberate creation of a type to hold a specific referenced field's data in order to reduce the cardinality of the referenced records.</p>
+</blockquote>
+<p><em>object longevity</em></p>
+<blockquote>
+<p>A technique used to ensure that stale references to Hollow Objects always return the same data they did initially upon creation.  Configured via the <code>HollowObjectMemoryConfig</code>.</p>
+</blockquote>
+<p><em>ordinal</em></p>
+<blockquote>
+<p>An integer value uniquely identifying a record within a type.  Because records are represented with a fixed-length number of bits, the only necessary information to locate a record in memory is the record's type and ordinal.  Ordinals are automatically assigned by Hollow, and are recycled as records are removed and added.  Consequently, they lie in the range of 0-n, where n is generally not much larger than the total number of records for the type.</p>
+</blockquote>
+<p><em>patch (states)</em></p>
+<blockquote>
+<p>Creating a series of two deltas between states in a delta chain.</p>
+</blockquote>
+<p><em>pinning</em></p>
+<blockquote>
+<p>Overriding the state version announcement from the producer, to force clients to go back to or stay at an older state.</p>
+</blockquote>
+<p><em>primary key</em></p>
+<blockquote>
+<p>A user-defined specification of one or more fields used to uniquely identify a record within a type.</p>
+</blockquote>
+<p><em>producer</em></p>
+<blockquote>
+<p>A single machine that retrieves all data from a source of truth and produces a delta chain.</p>
+</blockquote>
+<p><em>publish</em></p>
+<blockquote>
+<p>Writing blobs to a blob store.</p>
+</blockquote>
+<p><em>read state engine</em></p>
+<blockquote>
+<p>A <code>HollowReadStateEngine</code>, the root handle to a Hollow dataset as a consumer.</p>
+</blockquote>
+<p><em>record</em></p>
+<blockquote>
+<p>A strongly-typed collection of fields or references, the structure of which is specified by a schema.</p>
+</blockquote>
+<p><em>reference</em></p>
+<blockquote>
+<p>A field type which indicates a pointer to another field.  Can also refer to the technique of pulling out a specific field into a record type of its own to deliberately allow Hollow to deduplicate the values.</p>
+</blockquote>
+<p><em>restore</em></p>
+<blockquote>
+<p>Initializing a <code>HollowWriteStateEngine</code> with data from a previously produced state so that a delta may be created during a producer's first cycle.</p>
+</blockquote>
+<p><em>reverse delta</em></p>
+<blockquote>
+<p>A delta from a later state to an earlier state.  Generally used during pinning scenarios.</p>
+</blockquote>
+<p><em>schema</em></p>
+<blockquote>
+<p>Metadata about a Hollow type which defines the structure of the records.</p>
+</blockquote>
+<p><em>snapshot</em></p>
+<blockquote>
+<p>A blob type which contains a serialization of all of the records in a type.  Consumed during initialization, and possibly in a broken delta chain scenario.</p>
+</blockquote>
+<p><em>state</em></p>
+<blockquote>
+<p>See <em>data state</em>.</p>
+</blockquote>
+<p><em>state version</em></p>
+<blockquote>
+<p>A unique identifier for a state.  Should by monotonically increasing as time passes.</p>
+</blockquote>
+<p><em>state engine</em></p>
+<blockquote>
+<p>Both the producer and consumers handle datasets with a state engine.  A state engine can be transitioned between data states.  A producer uses a <em>write state engine</em> and a consumer uses a <em>read state engine</em></p>
+</blockquote>
+<p><em>type</em></p>
+<blockquote>
+<p>A collection of records all conforming to a specific schema.</p>
+</blockquote>
+<p><em>write state engine</em></p>
+<blockquote>
+<p>A <code>HollowWriteStateEngine</code>, the root handle to a Hollow dataset as a consumer.</p>
+</blockquote>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../community/" class="btn btn-neutral float-right" title="Community">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../advanced-topics/" class="btn btn-neutral" title="Advanced Topics"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/Netflix/hollow" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../advanced-topics/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../community/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>

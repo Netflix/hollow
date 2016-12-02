@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="None">
+  
+  <link rel="shortcut icon" href="./img/favicon.ico">
+  <title>Introduction - Hollow (Netflix OSS)</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="./css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="./css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="./css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Introduction";
+    var mkdocs_page_input_path = "index.md";
+    var mkdocs_page_url = "/";
+  </script>
+  
+  <script src="./js/jquery-2.1.1.min.js"></script>
+  <script src="./js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="./js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search" style="background-color:#000000">
+        <a href="." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#000000;border:0;padding:0" class="cornerlogo" src="./img/corner-logo.png"/></a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href=".">Introduction</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#the-problem">The Problem</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#the-solution">The Solution</a></li>
+                
+                    <li><a class="toctree-l4" href="#agility">Agility</a></li>
+                
+                    <li><a class="toctree-l4" href="#performance">Performance</a></li>
+                
+                    <li><a class="toctree-l4" href="#stability">Stability</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="quick-start/">Quick Start</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="getting-started/">Getting Started</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="interacting-with-a-dataset/">Interacting with a Hollow Dataset</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="data-ingestion/">Data Ingestion</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="data-modeling/">Data Modeling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="producer-consumer/">Producers and Consumers</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="tooling/">Tooling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="advanced-topics/">Advanced Topics</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="glossary/">Glossary</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="community/">Community</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="acknowledgements/">Acknowledgements</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="license/">License</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" style="background:#000000" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href=".">Hollow (Netflix OSS)</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Introduction</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="http://gitter.im/Netflix/hollow" class="icon fa-comment"> Gitter</a>
+      
+        <a href="https://github.com/Netflix/hollow"
+          class="icon icon-github"> GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p><center><img alt="Logo" src="./img/logo.png" /></center></p>
+<h1 id="the-problem">The Problem</h1>
+<p>Software engineers often encounter problems which require the dissemination of small or moderately sized data sets which don’t fit the label “big data”.  To solve these problems, we often send the data to an RDBMS or nosql data store and query it at runtime, or serialize the data as json or xml, distribute it, and keep a local copy on each consumer.</p>
+<p>Scaling each of these solutions presents different challenges.  Sending the data to an RDBMS, nosql data store, or even a memcached cluster may allow your dataset to grow indefinitely large, but there are limitations on the latency and frequency with which you can interact with that dataset.  Serializing and keeping a local copy (if in RAM) can allow many orders of magnitude lower latency and higher frequency access, but this approach has many scaling challenges:</p>
+<ul>
+<li>The dataset size is limited by available RAM.</li>
+<li>The full dataset may need to be re-downloaded each time it is updated.</li>
+<li>Updating the dataset may require significant CPU resources or impact GC behavior.</li>
+</ul>
+<p>Netflix, serving many billions of personalized requests each day, has a few use cases for which the latency of a remote datastore would be highly undesirable given the frequency with which those datasets are accessed.</p>
+<h1 id="the-solution">The Solution</h1>
+<p>Netflix Hollow is a java library and comprehensive toolset for harnessing small to moderately sized in-memory datasets which are disseminated from a single producer to many consumers for read-only access.  Hollow aggressively addresses the scaling challenges of in-memory datasets, and is built with servers busily serving requests at or near maximum capacity in mind.</p>
+<p>Due to its performance characteristics, Hollow shifts the scale in terms of appropriate dataset sizes for an in-memory solution.  Datasets for which such liberation may never previously have been considered can be candidates for Hollow.  </p>
+<div class="admonition hint">
+<p class="admonition-title">Small to Medium Datasets</p>
+<p>Hollow may be entirely appropriate for datasets which, if represented with json or XML, might require in excess of 100GB.  A good rule of thumb in 2017: KB, MB, and often GB, but not TB or PB.</p>
+</div>
+<p>Hollow simultaneously targets three goals:</p>
+<ul>
+<li>Maximum development agility</li>
+<li>Highly optimized performance and resource management</li>
+<li>Extreme stability and reliability</li>
+</ul>
+<h2 id="agility">Agility</h2>
+<p>Hollow provides the capability to automatically generate a custom API based on a specific data model, so that consumers can intuitively interact with the data, with the benefit of IDE code completion.</p>
+<p>Hollow provides insight tools, which will help users understand their dataset, and how it changes over time, more deeply than ever before:</p>
+<ul>
+<li>Comprehensive change history</li>
+<li>Diffing entire datasets between arbitrary states</li>
+<li>Heap usage analysis</li>
+<li>Usage tracking</li>
+</ul>
+<p>The toolset available for working with Hollow datasets allows for a surprising variety of operations to be performed with ease, including:</p>
+<ul>
+<li>Indexing / Querying for individual records in a dataset</li>
+<li>Splitting / Combining entire datasets in many different ways</li>
+<li>Filtering individual record types at the consumer to reduce heap footprint</li>
+</ul>
+<h2 id="performance">Performance</h2>
+<p>Hollow is hyper-optimized with a few performance metrics at top-of-mind:</p>
+<ul>
+<li>Heap footprint</li>
+<li>Computational cost of access</li>
+<li>GC impact of updates</li>
+<li>Computational cost of updates</li>
+<li>Network cost of updates</li>
+</ul>
+<p>Over time, Hollow automatically calculates the changes in a dataset on the producer.  Instead of retransmitting the entire snapshot of the data for each update, only the changes are disseminated to consumers to keep them up to date.</p>
+<p>On consumers, Hollow keeps a compact encoding of the dataset in RAM.  This representation is optimized for both minimizing heap footprint and minimizing access CPU cost.  To retain and keep the dataset updated, Hollow pools and reuses heap memory to avoid GC tenuring.</p>
+<h2 id="stability">Stability</h2>
+<p>Hollow has been battle-hardened over more than two years of continuous use at Netflix.  Hollow is used to represent crucial datasets, essential to the fulfillment of the Netflix experience, on servers answering live customer requests.  So although Hollow goes to extraordinary lengths to squeeze every last bit of performance out of servers’ hardware, enormous attention to detail has gone into solidifying this foundational piece of our infrastructure.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="quick-start/" class="btn btn-neutral float-right" title="Quick Start">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/Netflix/hollow" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+      
+        <span style="margin-left: 15px"><a href="quick-start/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="./js/theme.js"></script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 0.16.0
+Build Date UTC : 2016-12-02 19:25:21
+-->

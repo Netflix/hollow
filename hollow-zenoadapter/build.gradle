@@ -1,9 +1,0 @@
-apply plugin: 'java'
- 
-dependencies {
-    compile project(':hollow')
-
-    compile 'com.netflix.zeno:netflix-zeno:2.22.3'
-
-    testCompile 'junit:junit:4.11'
-}

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Producers and Consumers - Hollow (Netflix OSS)</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Producers and Consumers";
+    var mkdocs_page_input_path = "producer-consumer.md";
+    var mkdocs_page_url = "/producer-consumer/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search" style="background-color:#000000">
+        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#000000;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">Introduction</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../quick-start/">Quick Start</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../getting-started/">Getting Started</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../interacting-with-a-dataset/">Interacting with a Hollow Dataset</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-ingestion/">Data Ingestion</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-modeling/">Data Modeling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">Producers and Consumers</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#the-producer-cycle">The Producer Cycle</a></li>
+                
+                    <li><a class="toctree-l4" href="#storing-the-blobs">Storing the Blobs</a></li>
+                
+                    <li><a class="toctree-l4" href="#announcing-the-state">Announcing the State</a></li>
+                
+                    <li><a class="toctree-l4" href="#restoring-at-startup">Restoring At Startup</a></li>
+                
+                    <li><a class="toctree-l4" href="#rolling-back">Rolling Back</a></li>
+                
+                    <li><a class="toctree-l4" href="#validating-data">Validating Data</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#consumer-framework">Consumer Framework</a></li>
+                
+                    <li><a class="toctree-l4" href="#pinning-consumers">Pinning Consumers</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#blob-namespaces">Blob Namespaces</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../tooling/">Tooling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../advanced-topics/">Advanced Topics</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../glossary/">Glossary</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../community/">Community</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../acknowledgements/">Acknowledgements</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../license/">License</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" style="background:#000000" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Hollow (Netflix OSS)</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Producers and Consumers</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="http://gitter.im/Netflix/hollow" class="icon fa-comment"> Gitter</a>
+      
+        <a href="https://github.com/Netflix/hollow"
+          class="icon icon-github"> GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p>Hollow provides the mechanism for maintaining the state of data, serializing data, reading and accessing data, and a comprehensive set of tooling for manipulating and investigating data.  </p>
+<p>Hollow does <em>not</em> provide or specify the infrastructure for actually disseminating the produced blobs from the producer to the consumers.  This section will describe the infrastructure needed for a usual production deployment of Hollow.  It’s entirely possible to wield the Hollow framework in ways which differ from the usage described here.  </p>
+<h1 id="the-producer-cycle">The Producer Cycle</h1>
+<p>Generally, a producer runs a repeating <em>cycle</em>.  During each cycle, the producer goes through two distinct phases:</p>
+<ol>
+<li>Adding all of the data for a state to a <code>HollowWriteStateEngine</code></li>
+<li>Writing <em>blobs</em> from a <code>HollowWriteStateEngine</code></li>
+</ol>
+<p>To transition back and forth between these phases, two method calls on the <code>HollowWriteStateEngine</code> are used.  To transition to the first phase, <code>prepareForNextCycle()</code> must be called.  To transition to the second phase, <code>prepareForWrite()</code> must be called.</p>
+<p>Each new generated state is assigned a unique, monotonically increasing 64-bit identifier.  State identifiers impose an ordering over states.  Later states have greater identifiers than earlier states.  The identifier is used to both identify the state and index the blobs in the published blob store.  </p>
+<div class="admonition note">
+<p class="admonition-title">State Identifiers</p>
+<p>Tip: it is useful to derive these identifiers based on the current timestamp.</p>
+</div>
+<p>At the end of each cycle, the producer publishes up to three types of blobs for the resulting state -- a snapshot, a delta, and a <em>reverse delta</em>.</p>
+<div class="admonition hint">
+<p class="admonition-title">Reverse Deltas</p>
+<p>Just as a delta transitions between an earlier state and an adjacent later state, a reverse delta transitions between a later state and an earlier adjacent state.  A reverse delta is created by simply calling <code>writeReverseDelta(OutputStream)</code> on a <code>HollowBlobWriter</code>.</p>
+</div>
+<h2 id="storing-the-blobs">Storing the Blobs</h2>
+<p>Blobs are published to a file store which is accessible by consumers.  From this blob store, consumers must be able to query for and retrieve blobs in the following ways:</p>
+<ul>
+<li><strong>Snapshots</strong>: Must be queryable based on the state identifier.  If a blob store is queried for a snapshot with an identifier which does not exist, the snapshot with the greatest identifier prior to the queried identifier should be retrieved.</li>
+<li><strong>Deltas</strong>: Must be queryable based on the state identifier <strong>to which</strong> a delta should be applied.</li>
+<li><strong>Reverse Deltas</strong>: Must be queryable based on the state identifier <strong>to which</strong> a reverse delta should be applied.</li>
+</ul>
+<h2 id="announcing-the-state">Announcing the State</h2>
+<p>Once the necessary transitions to bring clients up to date have been written to the blob store, the availability of the state must be <em>announced</em> to clients.  This simply means that a centralized location must be maintained and updated by the producer which indicates the version of the currently available state.  </p>
+<p>When this announced state is updated, usually it is desirable to have consumers realize this update as quickly as possible.  This can be accomplished either via a push notification to all consumers, or via frequent polling by consumers.</p>
+<h2 id="restoring-at-startup">Restoring At Startup</h2>
+<p>The examples of writing blobs thus far have assumed that the same <code>HollowWriteStateEngine</code> is held in memory for the duration of a dataset’s delta chain.  However, this isn’t always possible; the producer will need to be restarted from time to time due to deployment or other operational circumstances.</p>
+<p>In order to produce a delta between states produced by one <code>HollowWriteStateEngine</code> and another, the producer can <em>restore</em> the prior state upon restart, which will allow a delta and reverse delta to be produced:</p>
+<pre><code class="java">HollowReadStateEngine readEngine = /// the most recent state
+
+HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+
+
+/// initialize the data model
+HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
+mapper.initialize(Movie.class);
+
+writeEngine.restoreFrom(readEngine);
+</code></pre>
+
+<p>Once we have <em>restored</em> the prior state, we can produce a delta from our producer's first cycle.  The delta will be applicable to any consumers which are on the state from which we restored.  </p>
+<p>Note that prior to restore, a <code>HollowWriteStateEngine</code> must be initialized with the schemas for its data model.  This is because the restore operation does not require that schemas exactly match between the restored state and the new state; it is legal to add or remove types and fields.</p>
+<p>When a delta is produced from a restored state after schemas have been updated, records for which all of the common fields between both schemas are unchanged will be assigned to the same ordinal and will be considered unmodified. If multiple such record pairs exist, the records to be considered unmodified will be selected arbitrarily among those pairs.</p>
+<div class="admonition hint">
+<p class="admonition-title">Initializing Before Restore</p>
+<p>A <code>HollowWriteStateEngine</code>'s data model may be initialized:</p>
+<ul>
+<li>via the <code>HollowObjectMapper</code> by calling <code>initTypeState()</code> with all top-level classes</li>
+<li>via a set of schemas <a href="../advanced-topics/#schema-parser">loaded from a text file</a> using the <code>HollowSchemaParser</code> and <code>HollowWriteStateCreator</code></li>
+</ul>
+</div>
+<h2 id="rolling-back">Rolling Back</h2>
+<p>While producing a new state, it is possible to roll back a <code>HollowWriteStateEngine</code> to the previous time <code>prepareForNextCycle()</code> was called:</p>
+<pre><code class="java">public void runTheCycle(HollowWriteStateEngine writeEngine) {
+    writeEngine.prepareForNextCycle();
+    try {
+        addAllData(writeEngine);
+    } catch(Throwable unexpected) {
+        writeEngine.resetToLastPrepareForNextCycle();
+    }
+}
+</code></pre>
+
+<p>When this method is called, it’s as if none of the additions/removals since the last call to <code>prepareForNextCycle()</code> ever happened.  This action is available right up until the next call to <code>prepareForNextCycle()</code> is called.</p>
+<p>It’s best practice to wrap the code which adds data to a state engine with a try/catch block shown above.  This will cover any scenario in which a producer runs into an unexpected Exception due to an unforeseen bug in the code.  </p>
+<h2 id="validating-data">Validating Data</h2>
+<p>It likely makes sense to perform some basic <em>validation</em> on your produced data states before announcing them to clients.  This usually takes the form of loading the data into a <code>HollowReadStateEngine</code> on the producer, then gathering and checking some heuristics-based metrics on the data before announcement.  These validation rules will be specific to the semantics of the dataset.  If a problem is detected, send an alert and roll back the write engine, rather than announcing.  This way a delta may be produced from the previous good state.  </p>
+<h1 id="consumer-framework">Consumer Framework</h1>
+<p>Data consumers keep their local copy of a dataset current by ensuring that their state engine is always at the latest <em>announced</em> data state. Consumers can arrive at a particular data state in a couple of different ways:</p>
+<ul>
+<li>At initialization time, they will load a snapshot, which is an entire copy of the dataset to be forklifted into memory.</li>
+<li>After initialization time, they will keep their local copy of the dataset current by applying delta transitions, which are the differences between adjacent data states.</li>
+</ul>
+<p>The <code>HollowClient</code> encapsulates the details of initializing and keeping a dataset up to date.  In order to accomplish this task, a few infrastructure hooks must be injected:</p>
+<pre><code class="java">public HollowClient(HollowBlobRetriever blobRetriever,
+                    HollowAnnouncementWatcher announcementWatcher,
+                    HollowUpdateListener updateListener,
+                    HollowAPIFactory apiFactory,
+                    HollowObjectHashCodeFinder hashCodeFinder,
+                    HollowClientMemoryConfig memoryConfig)
+</code></pre>
+
+<p>Let's examine each the injected hooks to the <code>HollowClient</code>:</p>
+<ul>
+<li><code>HollowBlobRetriever</code>: The interface to the blob store.  This is the only hook for which a custom implementation is required.  Each of the other hooks have default implementations which may be used.</li>
+<li><code>HollowAnnouncementWatcher</code>: Provides an interface to the state announcement mechanism.  Often, announcement polling logic is encapsulated inside implementations.</li>
+<li><code>HollowUpdateListener</code>: Provides hooks so that actions may be taken during and after updates (e.g. indexing).</li>
+<li><code>HollowAPIFactory</code>: Allows users to specify a custom-generated Hollow API to use.</li>
+<li><code>HollowClientMemoryConfig</code>: Defines advanced settings related to object longevity and double snapshots.</li>
+</ul>
+<p>Each time the identifier of the currently announced state changes, <code>triggerRefresh()</code> should be called on the <code>HollowClient</code>.  This will bring the data up to date.</p>
+<h2 id="pinning-consumers">Pinning Consumers</h2>
+<p>Mistakes happen.  What's important is that we can recover from them quickly.  If you accidentally publish bad data, you should be able to revert those changes quickly.  If you give your <code>HollowAnnouncementWatcher</code> implementation an alternate location to read the announcement from, which <em>overrides</em> the announcement from the consumer, then you can use this to quickly force clients to go back to any arbitrary state in the past.  We call setting a state version in this alternate location <em>pinning</em> the consumers.</p>
+<p>Implementing a pinning mechanism is extremely useful and highly recommended.  You can operationally reverse data issues immediately upon discovery, so that symptoms go away while you diagnose exactly what went wrong.  This can save an enormous amount of stress and money.</p>
+<div class="admonition danger">
+<p class="admonition-title">Unpinning</p>
+<p>If you've pinned consumers due to a data issue, it's probably not desirable to simply 'unpin' them after the root cause is addressed.  Instead, restart the producer and instruct it to <a href="#restoring-at-startup">restore</a> from the pinned state.  It should then produce a delta which skips over all of the bad states.  Only unpin after the delta from the pinned version to a bad version is overwritten with a delta from the pinned version to the good version.</p>
+</div>
+<h1 id="blob-namespaces">Blob Namespaces</h1>
+<p>Every so often, it may be required to make changes to the data model which is incompatible with prior versions.  In this case, an older producer, which produces the older data model, should run in parallel with the newer producer, producing the newer, incompatible data model. </p>
+<div class="admonition warning">
+<p class="admonition-title">Incompatible Data Model Changes</p>
+<p>For details about changes which are and are not backwards compatible, see <a href="../data-modeling/#maintaining-backwards-compatibility">Maintaining Backwards Compatibility</a></p>
+</div>
+<p>Each producer should write its blobs to a different <em>namespace</em>, so that older consumers can read from the old data model, and newer consumers can read from the newer data model.  This will result in parallel delta chains created in these separate namespaces.  Once all consumers are upgraded and reading from the newer data model, the older producer can be shut down.</p>
+<p>The method of namespacing will vary with the chosen data persistence technology.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../tooling/" class="btn btn-neutral float-right" title="Tooling">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../data-modeling/" class="btn btn-neutral" title="Data Modeling"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/Netflix/hollow" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../data-modeling/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../tooling/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>

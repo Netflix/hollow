@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Data Ingestion - Hollow (Netflix OSS)</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Data Ingestion";
+    var mkdocs_page_input_path = "data-ingestion.md";
+    var mkdocs_page_url = "/data-ingestion/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search" style="background-color:#000000">
+        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#000000;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">Introduction</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../quick-start/">Quick Start</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../getting-started/">Getting Started</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../interacting-with-a-dataset/">Interacting with a Hollow Dataset</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">Data Ingestion</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#hollowobjectmapper">HollowObjectMapper</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#json-to-hollow-adapter">JSON to Hollow Adapter</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#zeno-to-hollow-adapter">Zeno to Hollow Adapter</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-modeling/">Data Modeling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../producer-consumer/">Producers and Consumers</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../tooling/">Tooling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../advanced-topics/">Advanced Topics</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../glossary/">Glossary</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../community/">Community</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../acknowledgements/">Acknowledgements</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../license/">License</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" style="background:#000000" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Hollow (Netflix OSS)</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Data Ingestion</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="http://gitter.im/Netflix/hollow" class="icon fa-comment"> Gitter</a>
+      
+        <a href="https://github.com/Netflix/hollow"
+          class="icon icon-github"> GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p>Hollow includes a few ready-made data ingestion mechanisms.  Additionally, custom data ingestion mechanisms can be created relatively easily using the <a href="../advanced-topics/#low-level-input-api">Low Level Input API</a>.</p>
+<h1 id="hollowobjectmapper">HollowObjectMapper</h1>
+<p>The <code>HollowObjectMapper</code> will add POJOs into a <code>HollowWriteStateEngine</code>:</p>
+<pre><code class="java">HollowWriteStateEngine engine = /// a state engine
+HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
+
+for(Movie movie : movies)
+    writeEngine.add(movie);
+</code></pre>
+
+<p>The <code>HollowObjectMapper</code> can also be used to initialize the data model of a <code>HollowWriteStateEngine</code> without adding any actual data:</p>
+<pre><code class="java">HollowWriteStateEngine engine = /// a state engine
+HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
+
+mapper.initializeTypeState(Movie.class);
+mapper.initializeTypeState(Show.class);
+</code></pre>
+
+<p>The schemas will be assumed based on the field and type names in the POJOs.  Any referenced types will also be traversed and included in the derived data model.  The name of a type may be explicitly defined as something other than the class name using the <code>@HollowTypeName</code> annotation.</p>
+<p>If an integer field named <code>__assigned_ordinal</code> is defined in POJOs, the <code>HollowObjectMapper</code> will use this field to memoize the assigned ordinal for instances.  Upon addition of an object which already has this value memoized, the <code>HollowObjectMapper</code> will short-circuit retrieving the assigned ordinal.  The field should be initialized to -1.  The field may be, but does not have to be, private and/or final.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If the <code>__assigned_ordinal</code> optimization is used, and field values inside POJOs with this optimization are modified subsequent to their addition to a state engine, then the subsequent modifications will be ignored and any references to these POJOs will always point to the <em>originally</em> added record.</p>
+<p>Additionally, if this optimization is used then POJOs should not be reused between cycles.</p>
+</div>
+<p>The following example <code>Award</code> class will reference a type <code>AwardName</code>, which will contain a single string value.  The class will also employ the <code>__assigned_ordinal</code> shortcut:</p>
+<pre><code class="java">public class Award {
+    long id;
+
+    @HollowTypeName(name=&quot;AwardName&quot;)
+    String name;
+
+    private final int __assigned_ordinal = -1;
+}
+</code></pre>
+
+<div class="admonition hint">
+<p class="admonition-title">Thread Safety</p>
+<p>The <code>HollowObjectMapper</code> is thread-safe; multiple threads may add Objects at the same time.</p>
+</div>
+<h1 id="json-to-hollow-adapter">JSON to Hollow Adapter</h1>
+<p>The project <em>hollow-jsonadapter</em> contains a component which will automatically parse json into a <code>HollowWriteStateEngine</code>.  The expected format of the json will be defined by the schemas in the <code>HollowWriteStateEngine</code>.  The data model must be pre-initialized.  See the <a href="../advanced-topics/#schema-parser">Schema Parser</a> topic in this document for an easy way to configure the schemas with a text document.</p>
+<p>The <code>HollowJsonAdapter</code> class is used to populate records of a single type from a json file.  A single record:</p>
+<pre><code class="json">{ 
+  &quot;id&quot;: 1,
+  &quot;releaseYear&quot;: 1999,
+  &quot;actors&quot;: [
+     {
+        &quot;id&quot;: 101,
+        &quot;actorName&quot;: &quot;Keanu Reeves&quot;
+     },
+     {
+        &quot;id&quot;: 102,
+        &quot;actorName&quot;: &quot;Laurence Fishburne&quot;
+     }
+  ]
+}
+</code></pre>
+
+<p>Can be parsed with the following code:</p>
+<pre><code class="java">String json = /// the record above
+
+HollowJsonAdapter jsonAdapter = new HollowJsonAdapter(writeEngine, &quot;Movie&quot;);
+
+jsonAdapter.processRecord(json);
+</code></pre>
+
+<p>If a field defined in the schema is not encountered in the json data, the value will be null in the corresponding Hollow record.  If a field is encountered in the json data which is not defined in the schema, the field will be ignored.</p>
+<p>A large number of records in a single file can also be processed:</p>
+<pre><code class="java">Reader reader = /// a reader for the json file 
+
+HollowJsonAdapter jsonAdapter = new HollowJsonAdapter(writeEngine, &quot;Movie&quot;);
+
+jsonAdapter.populate(reader);
+</code></pre>
+
+<p>When processing an entire file, it is expected that the file contains only a single json array of records of the expected type.  The records will be processed in parallel.</p>
+<h1 id="zeno-to-hollow-adapter">Zeno to Hollow Adapter</h1>
+<p>The project <em>hollow-zenoadapter</em> has an adapter which can be used with Hollow’s predecessor, Zeno.  We used this as part of our migration path from Zeno to Hollow, and it is provided for current users of Zeno who would like to migrate to Hollow as well.  Start with the <em>HollowStateEngineCreator</em>.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../data-modeling/" class="btn btn-neutral float-right" title="Data Modeling">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../interacting-with-a-dataset/" class="btn btn-neutral" title="Interacting with a Hollow Dataset"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/Netflix/hollow" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../interacting-with-a-dataset/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../data-modeling/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>
