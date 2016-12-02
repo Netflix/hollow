@@ -5,6 +5,7 @@ import java.util.List;
 public class Artwork implements Cloneable {
 
     public Strings sourceFileId = null;
+    public int sourceVideoId = -1;
     public long effectiveDate = java.lang.Long.MIN_VALUE;
     public NFLocale locale = null;
     public int seqNum = java.lang.Integer.MIN_VALUE;
@@ -18,6 +19,8 @@ public class Artwork implements Cloneable {
     public ArtworkMerchStillPackageData merchstillsPackageData = null;
     public int file_seq = java.lang.Integer.MIN_VALUE;
     public AcquisitionSource acquisitionSource = null;
+    public boolean isRolloutExclusive = false;
+    public SchedulePhaseInfo	availabilityWindow = null;
 
     public String toString() {
         StringBuilder builder = new StringBuilder("Artwork{");
@@ -35,6 +38,8 @@ public class Artwork implements Cloneable {
         builder.append(",file_seq=").append(file_seq);
         builder.append(",merchstillsPackage=").append(merchstillsPackageData);
         builder.append(",acquisitionSource=").append(acquisitionSource);
+        builder.append(",availabilityWindows=").append(availabilityWindow);
+        builder.append(",isRolloutExclusive=").append(isRolloutExclusive);
         builder.append("}");
         return builder.toString();
     }

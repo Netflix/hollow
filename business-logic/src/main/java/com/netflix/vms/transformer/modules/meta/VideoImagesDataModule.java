@@ -24,6 +24,11 @@ import com.netflix.vms.transformer.hollowinput.ListOfRightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.LocaleTerritoryCodeHollow;
 import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
 import com.netflix.vms.transformer.hollowinput.RightsWindowHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkSourceFileIdHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutPhaseElementsHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutPhaseHollow;
 import com.netflix.vms.transformer.hollowinput.SingleValuePassthroughMapHollow;
 import com.netflix.vms.transformer.hollowinput.StatusHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
@@ -32,25 +37,31 @@ import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoArtworkHollow;
 import com.netflix.vms.transformer.hollowoutput.Artwork;
 import com.netflix.vms.transformer.hollowoutput.ArtworkMerchStillPackageData;
+import com.netflix.vms.transformer.hollowoutput.SchedulePhaseInfo;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoImages;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.artwork.ArtWorkModule;
 import com.netflix.vms.transformer.util.NFLocaleUtil;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 public class VideoImagesDataModule extends ArtWorkModule {
-    private final HollowHashIndex videoArtworkIndex;
+    public class PhaseTags {
+
+	}
+
+	private final HollowHashIndex videoArtworkIndex;
     private final HollowPrimaryKeyIndex damMerchStillsIdx;
     private final HollowPrimaryKeyIndex videoStatusIdx;
+	private HollowHashIndex rolloutIndex;
 
     private final static String MERCH_STILL_TYPE = "MERCH_STILL";
 
@@ -60,6 +71,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
         this.videoArtworkIndex = indexer.getHashIndex(IndexSpec.ARTWORK_BY_VIDEO_ID);
         this.damMerchStillsIdx = indexer.getPrimaryKeyIndex(IndexSpec.DAM_MERCHSTILLS);
         this.videoStatusIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_STATUS);
+        this.rolloutIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
     }
 
     public Map<String, Map<Integer, VideoImages>> buildVideoImagesByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
@@ -78,12 +90,14 @@ public class VideoImagesDataModule extends ArtWorkModule {
 
         for (Integer videoId : ids) {
             HollowHashIndexResult matches = videoArtworkIndex.findMatches((long) videoId);
+            //HollowHashIndexResult rolloutInput = getRolloutInput(videoId);
             if (matches != null) {
+            	Map<String, Set<String>> rolloutImagesByCountry = getRolloutImagesByCountry(showHierarchiesByCountry);
                 HollowOrdinalIterator iter = matches.iterator();
                 int videoArtworkOrdinal = iter.next();
                 while (videoArtworkOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
                     VideoArtworkHollow artworkHollowInput = api.getVideoArtworkHollow(videoArtworkOrdinal);
-                    String rollupSourceFileId = processArtwork(artworkHollowInput, countryArtworkMap, merchstillSourceFieldIds);
+                    String rollupSourceFileId = processArtwork(artworkHollowInput, countryArtworkMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry);
                     if (rollupSourceFileId != null) {
                         rollupMerchstillVideoIds.add(videoId);
                         rollupSourceFieldIds.add(rollupSourceFileId);
@@ -119,7 +133,47 @@ public class VideoImagesDataModule extends ArtWorkModule {
         return countryImagesMap;
     }
 
-    private void rollupMerchstills(Set<Integer> rollupMerchstillVideoIds /* in */, Set<String> rollupSourceFieldIds /* in */, Map<String, Set<VideoHierarchy>> showHierarchiesByCountry/* in */,
+    private Map<String, Set<String>> getRolloutImagesByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
+    	
+    	Map<String, Set<String>> countryToListOfSourceFileIds = new HashMap<String, Set<String>>();
+    	for(Entry<String, Set<VideoHierarchy>> countryVideoHierarchyEntry: showHierarchiesByCountry.entrySet()){
+    		
+    		Set<String> setOfSourceFileIdsForCountry = new HashSet<>();
+    		countryToListOfSourceFileIds.put(countryVideoHierarchyEntry.getKey(), setOfSourceFileIdsForCountry);
+    		
+    		for(VideoHierarchy vh: countryVideoHierarchyEntry.getValue()){
+    			int topNodeId = vh.getTopNodeId();
+    			HollowHashIndexResult rolloutMatches = rolloutIndex.findMatches(topNodeId, "DISPLAY_PAGE");
+    			
+    			if(rolloutMatches == null)
+    				continue;
+    			
+    	        HollowOrdinalIterator iter = rolloutMatches.iterator();
+    	        int rolloutOrdinal = iter.next();
+				while (rolloutOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+					RolloutHollow rollout = api.getRolloutHollow(rolloutOrdinal);
+					for(RolloutPhaseHollow phase: rollout._getPhases()){
+						
+						RolloutPhaseElementsHollow elements = phase._getElements();
+						if(elements == null)
+							continue; 
+						
+						RolloutPhaseArtworkHollow artwork = elements._getArtwork();
+						if(artwork == null)
+							continue;
+						for(RolloutPhaseArtworkSourceFileIdHollow sourcefileIdHollow: artwork._getSourceFileIds()){
+							String sourceFileId = sourcefileIdHollow._getValue()._getValue();
+							setOfSourceFileIdsForCountry.add(sourceFileId);
+						}
+					}
+					rolloutOrdinal = iter.next();
+				}
+    		}
+    	}
+    	return countryToListOfSourceFileIds;
+	}
+
+	private void rollupMerchstills(Set<Integer> rollupMerchstillVideoIds /* in */, Set<String> rollupSourceFieldIds /* in */, Map<String, Set<VideoHierarchy>> showHierarchiesByCountry/* in */,
             Set<String> merchstillSourceFieldIds /* in */, Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap /* out */) {
 
         final int MIN_ROLLUP_SIZE = 4; // 3
@@ -271,7 +325,8 @@ public class VideoImagesDataModule extends ArtWorkModule {
         throw new UnsupportedOperationException("Use buildVideoImagesByCountry");
     }
 
-    private String processArtwork(VideoArtworkHollow artworkHollowInput, Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap, Set<String> merchstillSourceFieldIds) {
+    private String processArtwork(VideoArtworkHollow artworkHollowInput, Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap, Set<String> merchstillSourceFieldIds, 
+    		Map<String, Set<String>> rolloutImagesByCountry, Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
         ArtworkLocaleListHollow locales = artworkHollowInput._getLocales();
         int entityId = (int) artworkHollowInput._getMovieId();
 
@@ -283,6 +338,15 @@ public class VideoImagesDataModule extends ArtWorkModule {
         String sourceFileId = artworkHollowInput._getSourceFileId()._getValue();
         int ordinalPriority = (int) artworkHollowInput._getOrdinalPriority();
         int seqNum = (int) artworkHollowInput._getSeqNum();
+        
+        SchedulePhaseInfo window = getScheduleInfo(artworkHollowInput);
+        if(window == null){
+        	// Indicates image has tags but the tags are not valid
+        	// Could be error or eventual consistency condition
+        	ctx.getLogger().error(InvalidPhaseTagForArtwork, "Phase tag associated with artwork is undefined with id={}; data will be dropped.", sourceFileId);
+        	return null;
+        }
+        
         ArtworkAttributesHollow attributes = artworkHollowInput._getAttributes();
         ArtworkDerivativeSetHollow inputDerivatives = artworkHollowInput._getDerivatives();
 
@@ -318,6 +382,9 @@ public class VideoImagesDataModule extends ArtWorkModule {
         artwork.seqNum = seqNum;
         artwork.ordinalPriority = ordinalPriority;
         fillPassThroughData(artwork, attributes);
+        artwork.availabilityWindow = window;
+        artwork.isRolloutExclusive = false; // TODO: artworkHollowInput._getIsRolloutExclusive();
+        artwork.sourceVideoId = entityId;
 
         int ordinal = damMerchStillsIdx.getMatchingOrdinal(sourceFileId);
         if (ordinal != -1) {
@@ -336,21 +403,121 @@ public class VideoImagesDataModule extends ArtWorkModule {
 
         // Support Country based data
         for (ArtworkLocaleHollow localeHollow : localeSet) {
-            Artwork localeArtwork = artwork.clone();
-            localeArtwork.locale = NFLocaleUtil.createNFLocale(localeHollow._getBcp47Code()._getValue());
-            localeArtwork.effectiveDate = localeHollow._getEffectiveDate()._getValue();
+        	Artwork localeArtworkIsRolloutAsInput = artwork.clone();
+            Artwork localeArtworkIsRolloutOppositeToInput = artwork.clone();
+            localeArtworkIsRolloutOppositeToInput.isRolloutExclusive = !localeArtworkIsRolloutAsInput.isRolloutExclusive;
+
+            localeArtworkIsRolloutAsInput.locale = NFLocaleUtil.createNFLocale(localeHollow._getBcp47Code()._getValue());
+            localeArtworkIsRolloutAsInput.effectiveDate = localeHollow._getEffectiveDate()._getValue();
             
             for (String countryCode : getCountryCodes(localeHollow)) {
                 Map<Integer, Set<Artwork>> artMap = getArtworkMap(countryCode, countryArtworkMap);
-                Set<Artwork> artworkSet = getArtworkSet(entityId, artMap);
-                artworkSet.add(localeArtwork);
+                
+                if(isMerchStill){
+                	// Leave merch stills alone
+                	Set<Artwork> artworkSet = getArtworkSet(entityId, artMap);
+                	artworkSet.add(localeArtworkIsRolloutAsInput);
+                } else {
+                	// For non-merch still images do the following
+                	// 1) Filter any rollout images without rollout
+                	// 2) Mark all rollout images as rollout
+                	// 3) Roll-up all images is to topNode with source video to indicate to which video the image was associated to in input.
+	                for(VideoHierarchy showHierarchy: showHierarchiesByCountry.get(countryCode)){
+		                Set<Artwork> artworkSet = getArtworkSet(showHierarchy.getTopNodeId(), artMap);
+		                Artwork updatedArtwork = pickArtworkBasedOnRolloutInfo(localeArtworkIsRolloutAsInput, localeArtworkIsRolloutOppositeToInput, rolloutImagesByCountry.get(countryCode));
+		                
+		                // If pickArtworkBasedOnRolloutInfo return null based on roll-out: we drop the image for the country. 
+		                // Look at pickArtworkBasedOnRolloutInfo method for details. Logging of dropped IDs is in pickArtworkBasedOnRolloutInfo.
+		                if(updatedArtwork != null)
+		                	artworkSet.add(updatedArtwork);
+	                }
+                }
             }
         }
 
         return isMerchstillRollup ? sourceFileId : null;
     }
 
-    protected Map<Integer, Set<Artwork>> getArtworkMap(String countryCode, Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap) {
+	private Artwork pickArtworkBasedOnRolloutInfo(Artwork localeArtworkIsRolloutAsInput, Artwork localeArtworkIsRolloutOppositeToInput, Set<String> rolloutSourceFileIds) {
+        Strings sourceFileId = localeArtworkIsRolloutAsInput.sourceFileId;
+		if(localeArtworkIsRolloutAsInput.isRolloutExclusive){
+        	// Upstream says this is a rollout image
+        	if(rolloutSourceFileIds == null || !rolloutSourceFileIds.contains(sourceFileId)){
+    			// But no corresponding rollout for the image in this country. 
+    			// To err on side of not leaking a rollout image, drop this image for the country.
+        		ctx.getLogger().error(MissingRolloutForArtwork, "Rollout exclusive image has no valid rollout with id={}; data will be dropped.", sourceFileId);
+    			return null;
+    		}
+        } 
+        // localeArtworkIsRolloutAsInput.isRolloutExclusive == false
+        if(rolloutSourceFileIds != null && rolloutSourceFileIds.contains(sourceFileId)){
+        	// Upstream did not tell us that this source file id was rollout exclusive but the image is in roll-out.
+        	// To err on side of caution mark it rollout exclusive to ensure this image is not returned without proper rollout window.
+        	return(localeArtworkIsRolloutOppositeToInput);
+        }
+		return localeArtworkIsRolloutAsInput;
+	}
+
+	private SchedulePhaseInfo getScheduleInfo(VideoArtworkHollow artworkHollowInput /*
+    	, MasterScheduleHollow masterScheduleHollowInput, OverrideScheduleHollow overrideScheduleHollowInput,
+    	AbsoluteScheduleHollow absoluteScheduleHollowInput*/) {
+		Set<PhaseTags> phaseTags = getPhaseTags(artworkHollowInput);
+		SchedulePhaseInfo window = null;
+		if(phaseTags == null){
+			// No tags: indicates launch images
+			window = new SchedulePhaseInfo();
+			window.start = 0l;
+			window.end = Long.MIN_VALUE;
+		}
+    	/*
+    	// Process Overrides by video or by dates
+    	Set<PhaseTags> phaseTags = artworkHollowInput._getPhaseTags();
+		Set<ImageAvailabilityWindow> result = new HashSet<ImageAvailabilityWindow>(phaseTags.size());
+    	for (PhaseTags tag: phaseTags){
+    		String phase = tag.getPhaseTag();
+    		String schedule = tag.getSchedule();
+    		Long offset = masterScheduleHollowInput.get(schedule).get(phase);
+    		overrideOffset // Override schedule: get any video based overrides for given tag
+    		absoluteSchedule// Absolute schedule: get any dates based on video tag from absolute schedule
+    		
+			if(offset == null && overrideOffset == null &&  absoluteSchedule == null){
+				continue;
+			} 
+			
+			if(window == null){
+				window = new SchedulePhaseInfo();
+				window.isAutomatedImg = false;
+			}
+			// If absolute tag, ignore other tags
+			if(absoluteSchedule != null){
+    			window.start = absoluteSchedule.getStart();
+    			window.end = absoluteSchedule.getEnd();
+    			window.isFixed = true;
+    			window.isAutomatedImg = absoluteSchedule.isSmoky;
+    			break;
+    		}
+
+			// Prefer earliest tag (example: pre-promo is -30 days and promo is -7. 
+			// If window.start had -7 then replace it with -30. 
+			// NOTE: This might have to change in future where multiple windows have to propagate down to NIL for some use case.
+			// For now there is no use case which will use multiple windows.
+			if(window.start > phase.getOffset()){
+	    		window.start = phase.getOffset();
+	    		window.end = Long.MIN_VALUE; // indicates null or eternity.
+	    		window.isFixed = false;
+    		}
+    	}
+    	
+    	*/
+		return window;
+	}
+
+	private Set<PhaseTags> getPhaseTags(VideoArtworkHollow artworkHollowInput) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	protected Map<Integer, Set<Artwork>> getArtworkMap(String countryCode, Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap) {
         Map<Integer, Set<Artwork>> artMap = countryArtworkMap.get(countryCode);
         if (artMap == null) {
             artMap = new HashMap<>();
