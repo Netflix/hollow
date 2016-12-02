@@ -2,6 +2,8 @@
 
 # Hollow
 
+[![Join the chat at https://gitter.im/Netflix/hollow](https://badges.gitter.im/Netflix/hollow.svg)](https://gitter.im/Netflix/hollow?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Hollow is a java library and comprehensive toolset for harnessing small to moderately sized in-memory datasets which are disseminated from a single producer to many consumers for read-only access.  [Read more](http://techblog.netflix.com/2016/12/netflixoss-announcing-hollow.html).
 
 Documentation is available at [http://hollow.how](http://hollow.how).  
