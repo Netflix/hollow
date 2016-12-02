@@ -1,12 +1,6 @@
-rootProject.name = 'hollow'
+rootProject.name = 'hollow-root'
 
 include 'hollow'
 include 'hollow-diff-ui'
 include 'hollow-jsonadapter'
 include 'hollow-zenoadapter'
-
-project(':hollow').name = 'hollow'
-project(':hollow-diff-ui').name = 'hollow-diff-ui'
-project(':hollow-jsonadapter').name = 'hollow-jsonadapter'
-project(':hollow-zenoadapter').name = 'hollow-zenoadapter'
-
