@@ -8,6 +8,8 @@ plugins {
  
 subprojects {
   apply plugin: 'nebula.netflixoss'
+
+  group = 'com.netflix.hollow'
  
   repositories {
     jcenter()
