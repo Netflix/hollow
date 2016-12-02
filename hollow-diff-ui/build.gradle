@@ -1,0 +1,12 @@
+apply plugin: 'java'
+ 
+dependencies {
+    compile project(':hollow')
+    compile 'org.eclipse.jetty:jetty-server:9.3.0.M1'
+    compile 'org.apache.velocity:velocity:1.7'
+    compile 'commons-codec:commons-codec:1.8'
+    compile 'commons-io:commons-io:2.3'
+    compile 'com.google.code.gson:gson:2.8.0'
+
+    testCompile 'junit:junit:4.11'
+}

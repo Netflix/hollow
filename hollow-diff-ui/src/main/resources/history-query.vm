@@ -1,0 +1,116 @@
+#**
+ *  Copyright 2016 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+*#
+
+<b>Historical results for search query: "$query"</b>
+
+<table border="1">
+    <tr>
+        <th>Data Version</th>
+        <th>Changed Elements</th>
+    </tr>
+    #foreach($stateQueryMatches in $stateQueryMatchesList)
+        <tr>
+            <td><a href="$basePath/state?version=$stateQueryMatches.getStateVersion()">$stateQueryMatches.getDateDisplayString() $stateQueryMatches.getStateVersion()</a></td>
+            <td>
+                <table width="100%">
+                #foreach($typeMatches in $stateQueryMatches.getTypeMatches())
+                    <tr><td colspan="2"><b><i>$typeMatches.getType()</i></b></td></tr>
+                    #if(!$typeMatches.getModifiedRecords().isEmpty())
+                    #set( $count = 0 )
+                    <tr>
+                        <td valign="top">
+                            <b>Modified:</b>
+                        </td>
+                        <td><table width="100%">
+                            #foreach($recordDiff in $typeMatches.getModifiedRecords())
+                                #if($count == 5000)
+                                    <tr><td colspan="5" align="center"><b>(TRUNCATED AFTER 5000 RECORDS)</b></td></tr>
+                                    #break
+                                #elseif($count % 5 == 0)
+                                    <tr>
+                                #end
+                                <td><a href="$basePath/historicalObject?version=$stateQueryMatches.getStateVersion()&type=$typeMatches.getType()&keyOrdinal=$recordDiff.getKeyOrdinal()">$recordDiff.getIdentifierString()</a></td>
+                                #set($count = $count + 1)
+                                #if($count % 5 == 0)
+                                </tr>
+                                #end
+                            #end
+                            #if($count % 5 != 0)
+                                </tr>
+                            #end
+                        </table></td>
+                    </tr>
+                    #end
+                    
+                    #if(!$typeMatches.getAddedRecords().isEmpty())
+                    #set( $count = 0 )
+                    <tr>
+                        <td valign="top">
+                            <b>Added:</b>
+                        </td>
+                        <td><table width="100%">
+                            #foreach($recordDiff in $typeMatches.getAddedRecords())
+                                #if($count == 5000)
+                                    <tr><td colspan="5" align="center"><b>(TRUNCATED AFTER 5000 RECORDS)</b></td></tr>
+                                    #break
+                                #elseif($count % 5 == 0)
+                                    <tr>
+                                #end
+                                <td><a href="$basePath/historicalObject?version=$stateQueryMatches.getStateVersion()&type=$typeMatches.getType()&keyOrdinal=$recordDiff.getKeyOrdinal()">$recordDiff.getIdentifierString()</a></td>
+                                #set($count = $count + 1)
+                                #if($count % 5 == 0)
+                                </tr>
+                                #end
+                            #end
+                            #if($count % 5 != 0)
+                                </tr>
+                            #end
+                        </table></td>
+                    </tr>
+                    #end
+                    
+                    #if(!$typeMatches.getRemovedRecords().isEmpty())
+                    #set( $count = 0 )
+                    <tr>
+                        <td valign="top">
+                            <b>Removed:</b>
+                        </td>
+                        <td><table width="100%">
+                            #foreach($recordDiff in $typeMatches.getRemovedRecords())
+                                #if($count == 5000)
+                                    <tr><td colspan="5" align="center"><b>(TRUNCATED AFTER 5000 RECORDS)</b></td></tr>
+                                    #break
+                                #elseif($count % 5 == 0)
+                                    <tr>
+                                #end
+                                <td><a href="$basePath/historicalObject?version=$stateQueryMatches.getStateVersion()&type=$typeMatches.getType()&keyOrdinal=$recordDiff.getKeyOrdinal()">$recordDiff.getIdentifierString()</a></td>
+                                #set($count = $count + 1)
+                                #if($count % 5 == 0)
+                                </tr>
+                                #end
+                            #end
+                            #if($count % 5 != 0)
+                                </tr>
+                            #end
+                        </table></td>
+                    </tr>
+                    #end
+                #end
+                </table>
+            </td>
+        </tr>
+    #end
+    

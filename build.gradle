@@ -1,0 +1,15 @@
+buildscript {
+  repositories { jcenter() }
+}
+ 
+plugins {
+  id 'nebula.netflixoss' version '3.5.2'
+}
+ 
+subprojects {
+  apply plugin: 'nebula.netflixoss'
+ 
+  repositories {
+    jcenter()
+  }
+}

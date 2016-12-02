@@ -1,0 +1,104 @@
+#**
+ *  Copyright 2016 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+*#
+
+
+Extra in $fromBlobName : $typeDiff.getUnmatchedOrdinalsInFrom().size() <br/>
+Extra in $toBlobName : $typeDiff.getUnmatchedOrdinalsInTo().size() <br/>
+Total in $fromBlobName : $typeDiff.getTotalItemsInFromState() <br/>
+Total in $toBlobName : $typeDiff.getTotalItemsInToState() <br/>
+Total Diff Objects: $numObjectsDiff <br/>
+Number of Fields With Diffs: $typeDiff.getFieldDiffs().size() <br/>
+
+<p/>
+
+<h3>Field Diffs  
+#if($showFields)
+    (<a href="$path/typediff?type=$typeDiff.getTypeName()&showFields=false">hide</a>)
+#else
+    (<a href="$path/typediff?type=$typeDiff.getTypeName()&showFields=true">show</a>)
+#end
+</h3>
+
+#if($showFields)
+    #foreach($fieldDiff in $fieldDiffs)
+    
+        <a href="$path/fielddiff?type=$fieldDiff.getTypeName()&fieldIdx=$fieldDiff.getTypeFieldIndex()">
+            $fieldDiff.getDisplayName()
+        </a> 
+        
+        ($fieldDiff.getNumDiffObjects() / $fieldDiff.getNumTotalObjectPairs()) ($fieldDiff.getDiffScore())<br/>
+    
+    #end
+#end
+
+<a name="objectDiffs" />
+<h3>Object Diffs</h3>
+
+#foreach($objectPairScore in $objectScorePairs)
+    <a href="$path/objectdiff?type=$typeDiff.getTypeName()&fromOrdinal=$objectPairScore.getFromOrdinal()&toOrdinal=$objectPairScore.getToOrdinal()">
+        $objectPairScore.getDisplayKey() ($objectPairScore.getDiffScore())    
+    </a><br/>
+#end
+
+#if($previousDiffPairPageBeginIdx)
+    <a href="$path/typediff?type=$typeDiff.getTypeName()&diffPairBeginIdx=$previousDiffPairPageBeginIdx#objectDiffs">&lt;&lt; Previous</a>
+#end
+#if($nextDiffPairPageBeginIdx)
+    <a href="$path/typediff?type=$typeDiff.getTypeName()&diffPairBeginIdx=$nextDiffPairPageBeginIdx#objectDiffs">Next &gt;&gt;</a>
+#end
+
+<a name="unmatchedObjects" />
+<h3>Unmatched Objects</h3>
+
+<table border="1" cellpadding="5">
+    <tr>
+        <th>Unmatched in $fromBlobName ($typeDiff.getUnmatchedOrdinalsInFrom().size())</th>
+        <th>Unmatched in $toBlobName ($typeDiff.getUnmatchedOrdinalsInTo().size())</th>
+    </tr>
+    
+    <tr>
+        <td>
+            #foreach($object in $unmatchedFromObjects)
+                <a href="$path/objectdiff?type=$typeDiff.getTypeName()&fromOrdinal=$object.getOrdinal()&toOrdinal=-1">
+                    $object.getDisplayKey()
+                </a><br/>           
+            #end
+            #if($previousUnmatchedFromPageBeginIdx)
+                <a href="$path/typediff?type=$typeDiff.getTypeName()&unmatchedFromBeginIdx=$previousUnmatchedFromPageBeginIdx#unmatchedObjects">&lt;&lt; Previous</a>
+            #end
+            #if($nextUnmatchedFromPageBeginIdx)
+                <a href="$path/typediff?type=$typeDiff.getTypeName()&unmatchedFromBeginIdx=$nextUnmatchedFromPageBeginIdx#unmatchedObjects">Next &gt;&gt;</a>
+            #end
+        </td>
+        
+        <td>
+            #foreach($object in $unmatchedToObjects)
+                <a href="$path/objectdiff?type=$typeDiff.getTypeName()&fromOrdinal=-1&toOrdinal=$object.getOrdinal()">
+                    $object.getDisplayKey()
+                </a><br/>        
+            #end
+            #if($previousUnmatchedToPageBeginIdx)
+                <a href="$path/typediff?type=$typeDiff.getTypeName()&unmatchedToBeginIdx=$previousUnmatchedToPageBeginIdx#unmatchedObjects">&lt;&lt; Previous</a>
+            #end
+            #if($nextUnmatchedToPageBeginIdx)
+                <a href="$path/typediff?type=$typeDiff.getTypeName()&unmatchedToBeginIdx=$nextUnmatchedToPageBeginIdx#unmatchedObjects">Next &gt;&gt;</a>
+            #end
+        </td>
+    </tr>
+</table>
+
+
+
