@@ -32,7 +32,7 @@ public class PrimaryKeyValueHasher {
     /**
      * Create a new hasher.
      *  
-     * @param primaryKey The primary key spec
+     * @param key The primary key spec
      * @param dataset The dataset to retrieve data from
      */
     public PrimaryKeyValueHasher(PrimaryKey key, HollowDataset dataset) {

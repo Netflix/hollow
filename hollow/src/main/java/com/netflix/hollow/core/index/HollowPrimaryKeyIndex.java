@@ -143,9 +143,6 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
      * Query an index with a single specified field.  The returned value with be the ordinal of the matching record.
      * <p>
      * Use a generated API or the Generic Object API to use the returned ordinal. 
-     * 
-     * @param key
-     * @return
      */
     public int getMatchingOrdinal(Object key) {
         if(fieldPathIndexes.length != 1 || hashTable.bitsPerElement == 0)
@@ -177,9 +174,6 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
      * Query an index with two specified fields.  The returned value with be the ordinal of the matching record.
      * <p>
      * Use a generated API or the Generic Object API to use the returned ordinal. 
-     * 
-     * @param key
-     * @return
      */
     public int getMatchingOrdinal(Object key1, Object key2) {
         if(fieldPathIndexes.length != 2 || hashTable.bitsPerElement == 0)
@@ -212,9 +206,6 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
      * Query an index with three specified fields.  The returned value with be the ordinal of the matching record.
      * <p>
      * Use a generated API or the Generic Object API to use the returned ordinal. 
-     * 
-     * @param key
-     * @return
      */
     public int getMatchingOrdinal(Object key1, Object key2, Object key3) {
         if(fieldPathIndexes.length != 3 || hashTable.bitsPerElement == 0)
@@ -248,9 +239,6 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
      * Query an index with four or more specified fields.  The returned value with be the ordinal of the matching record.
      * <p>
      * Use a generated API or the Generic Object API to use the returned ordinal. 
-     * 
-     * @param key
-     * @return
      */
     public int getMatchingOrdinal(Object... keys) {
         if(fieldPathIndexes.length != keys.length || hashTable.bitsPerElement == 0)

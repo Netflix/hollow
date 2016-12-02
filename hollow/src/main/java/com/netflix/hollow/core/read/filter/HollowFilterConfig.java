@@ -107,7 +107,7 @@ public class HollowFilterConfig {
      * 
      * 
      * @param type A type from the data model.
-     * @param schemas A map of typeName -> schema including all schemas for this data model.
+     * @param schemas A map of typeName to schema including all schemas for this data model.
      */
     public void addTypeRecursive(String type, Map<String, HollowSchema> schemas) {
         addType(type);
@@ -165,7 +165,7 @@ public class HollowFilterConfig {
      * 
      * @param type The OBJECT type from the data model
      * @param objectField The field in the specified type to either include or exclude.
-     * @param schemas A map of typeName -> schema including all schemas for this data model.
+     * @param schemas A map of typeName to schema including all schemas for this data model.
      */
     public void addFieldRecursive(String type, String objectField, Map<String, HollowSchema> schemas) {
         addField(type, objectField);

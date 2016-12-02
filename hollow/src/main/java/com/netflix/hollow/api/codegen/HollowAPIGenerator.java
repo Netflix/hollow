@@ -81,7 +81,7 @@ public class HollowAPIGenerator {
      * @param apiClassname the class name of the generated implementation of {@link HollowAPI}
      * @param packageName the package name under which all generated classes will be placed
      * @param dataset a HollowStateEngine containing the schemas which define the data model.
-     * @param parameterizeAllClassNames if true, all methods which return a Hollow Object will be parameterized.  This is useful when 
+     * @param parameterizeSpecificTypeNames methods with matching names which return a Hollow Object will be parameterized.  This is useful when 
      *                               alternate implementations are desired for some types.
      */
     public HollowAPIGenerator(String apiClassname, String packageName, HollowDataset dataset, Set<String> parameterizeSpecificTypeNames) {
@@ -89,13 +89,6 @@ public class HollowAPIGenerator {
     }
     
     
-    /**
-     * @param apiClassname the class name of the generated implementation of {@link HollowAPI}
-     * @param packageName the package name under which all generated classes will be placed
-     * @param dataset a HollowStateEngine containing the schemas which define the data model.
-     * @param parameterizeAllClassNames if true, all methods which return a Hollow Object will be parameterized.  This is useful when 
-     *                               alternate implementations are desired for some types.
-     */
     private HollowAPIGenerator(String apiClassname, String packageName, HollowDataset dataset, Set<String> parameterizedTypes, boolean parameterizeAllClassNames) {
         this.apiClassname = apiClassname;
         this.packageName = packageName;

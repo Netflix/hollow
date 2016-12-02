@@ -42,13 +42,13 @@ import java.util.Map;
 
 /**
  * The TransitiveSetTraverser can be used to find children and parent references for a selected set of records.  
- * A selection is represented with a Map<String, BitSet>, where each key in the map represents a type, and the corresponding BitSet
+ * A selection is represented with a Map&lt;String, BitSet&gt;, where each key in the map represents a type, and the corresponding BitSet
  * represents the ordinals of the selected records.  
  * Entries in this Map will indicate a type, plus the ordinals of the selected records:
  * <p>
  * <pre>
  * {@code
- * Map<String, BitSet> selection = new HashMap<String, BitSet>();
+ * Map&lt;String, BitSet&gt; selection = new HashMap&lt;String, BitSet&gt;();
  *  
  * /// select the movies with ordinals 1 and 4.
  * BitSet selectedMovies = new BitSet();

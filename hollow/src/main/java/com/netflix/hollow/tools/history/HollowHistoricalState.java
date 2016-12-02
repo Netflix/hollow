@@ -17,8 +17,9 @@
  */
 package com.netflix.hollow.tools.history;
 
-import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateKeyOrdinalMapping;
+import com.netflix.hollow.tools.history.keyindex.HollowHistoryKeyIndex;
 
+import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateKeyOrdinalMapping;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import java.util.Map;
 
