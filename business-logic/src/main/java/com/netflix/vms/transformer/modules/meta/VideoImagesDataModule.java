@@ -144,7 +144,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
     		countryToListOfSourceFileIds.put(countryVideoHierarchyEntry.getKey(), setOfSourceFileIdsForCountry);
     		
     		for(VideoHierarchy vh: countryVideoHierarchyEntry.getValue()){
-    			int topNodeId = vh.getTopNodeId();
+    			long topNodeId = vh.getTopNodeId();
     			HollowHashIndexResult rolloutMatches = rolloutIndex.findMatches(topNodeId, "DISPLAY_PAGE");
     			
     			if(rolloutMatches == null)
@@ -433,8 +433,9 @@ public class VideoImagesDataModule extends ArtWorkModule {
                 	// 1) Filter any rollout images without rollout
                 	// 2) Mark all rollout images as rollout
                 	// 3) Roll-up all images is to topNode with source video to indicate to which video the image was associated to in input.
-	                for(VideoHierarchy showHierarchy: showHierarchiesByCountry.get(countryCode)){
-		                Set<Artwork> artworkSet = getArtworkSet(showHierarchy.getTopNodeId(), artMap);
+                    Set<Integer> topNodes = getTopNodes(showHierarchiesByCountry, countryCode, entityId);
+	                for(int topNode: topNodes){
+		                Set<Artwork> artworkSet = getArtworkSet(topNode, artMap);
 		                Artwork updatedArtwork = pickArtworkBasedOnRolloutInfo(localeArtworkIsRolloutAsInput, localeArtworkIsRolloutOppositeToInput, rolloutImagesByCountry.get(countryCode));
 		                
 		                // If pickArtworkBasedOnRolloutInfo return null based on roll-out: we drop the image for the country. 
@@ -448,6 +449,18 @@ public class VideoImagesDataModule extends ArtWorkModule {
 
         return isMerchstillRollup ? sourceFileId : null;
     }
+
+	private Set<Integer> getTopNodes(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, String countryCode, int entityId) {
+		Set<Integer> topNodes = new HashSet<>();
+		// More than one hierarchy is possible for a video has different hierarchies in different countries
+		Set<VideoHierarchy> hierarchies = showHierarchiesByCountry.get(countryCode);
+		if(hierarchies != null){
+			for(VideoHierarchy vh: hierarchies){
+				topNodes.add(vh.getTopNodeId());
+			}
+		}
+		return topNodes;
+	}
 
 	private Artwork pickArtworkBasedOnRolloutInfo(Artwork localeArtworkIsRolloutAsInput, Artwork localeArtworkIsRolloutOppositeToInput, Set<String> rolloutSourceFileIds) {
         Strings sourceFileId = localeArtworkIsRolloutAsInput.sourceFileId;
