@@ -1,20 +1,22 @@
 package com.netflix.hollow.diff.ui;
 
-import com.netflix.hollow.HollowObjectSchema;
-import com.netflix.hollow.HollowObjectSchema.FieldType;
-import com.netflix.hollow.history.HollowHistory;
-import com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer;
-import com.netflix.hollow.read.engine.HollowBlobReader;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.write.HollowBlobWriter;
-import com.netflix.hollow.write.HollowObjectTypeWriteState;
-import com.netflix.hollow.write.HollowObjectWriteRecord;
-import com.netflix.hollow.write.HollowTypeWriteState;
-import com.netflix.hollow.write.HollowWriteStateEngine;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+
 import org.junit.Test;
+
+import com.netflix.hollow.core.read.engine.HollowBlobReader;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.write.HollowBlobWriter;
+import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
+import com.netflix.hollow.core.write.HollowObjectWriteRecord;
+import com.netflix.hollow.core.write.HollowTypeWriteState;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer;
+import com.netflix.hollow.tools.history.HollowHistory;
 
 public class HistoryUITest {
 
