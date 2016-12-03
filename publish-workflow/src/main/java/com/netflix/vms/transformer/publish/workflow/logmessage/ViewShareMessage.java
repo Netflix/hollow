@@ -22,11 +22,11 @@ public class ViewShareMessage {
     private void build(String countryId, String videoIds, Float missingViewShare, Float threshold) {
         msgBuilder.put("countryId", countryId);
         if (videoIds != null)
-            msgBuilder.put("videoIds=", videoIds);
+            msgBuilder.put("videoIds", videoIds);
         if (missingViewShare != null)
-            msgBuilder.put("missingViewShare=", missingViewShare);
+            msgBuilder.put("missingViewShare", missingViewShare);
         if (threshold != null)
-            msgBuilder.put("threshold=", threshold);
+            msgBuilder.put("threshold", threshold);
     }
 
     private String getVideoIdsAsString(Collection<Integer> videoIds) {
