@@ -135,6 +135,8 @@
                 
                     <li><a class="toctree-l4" href="#dependencies">Dependencies</a></li>
                 
+                    <li><a class="toctree-l4" href="#sunmiscunsafe">sun.misc.Unsafe</a></li>
+                
             
             </ul>
         
@@ -206,6 +208,8 @@
 <h2 id="dependencies">Dependencies</h2>
 <p>The core project <em>hollow</em> should have zero <code>compile</code> dependencies, and should only depend on one library (jUnit) as a <code>test</code> dependency.  We believe this provides long-term stability for users, reduces licensing concerns, and eliminates the possibility that <em>other</em> project dependencies will be compiled against incompatible versions of dependent libraries.</p>
 <p>If you would like to make a contribution which requires a third-party dependency, please contact us before proceeding so we can discuss the appropriate location for the addition.</p>
+<h2 id="sunmiscunsafe">sun.misc.Unsafe</h2>
+<p>The core project <em>hollow</em> utilizes <code>sun.misc.Unsafe</code>. Your IDE may treat this as an error. See <a href="https://github.com/Netflix/hollow/issues/5">Issue #5</a> for how to compile without errors.</p>
               
             </div>
           </div>
