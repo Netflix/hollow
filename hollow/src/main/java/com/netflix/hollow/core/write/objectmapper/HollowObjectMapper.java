@@ -36,7 +36,7 @@ public class HollowObjectMapper {
     private AtomicInteger unassignedTypeCounter = new AtomicInteger(0);
 
     private boolean ignoreListOrdering = false;
-    private boolean useDefaultHashKeys = false;
+    private boolean useDefaultHashKeys = true;
 
     public HollowObjectMapper(HollowWriteStateEngine stateEngine) {
         this.stateEngine = stateEngine;
