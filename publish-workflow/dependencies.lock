@@ -685,7 +685,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.6.0",
+            "locked": "1.6.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -712,7 +712,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.6.0",
+            "locked": "1.6.1",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-common",
                 "com.netflix.nfkafka:nfkafka-consumer",
@@ -3822,7 +3822,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.6.0",
+            "locked": "1.6.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -3849,7 +3849,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.6.0",
+            "locked": "1.6.1",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-common",
                 "com.netflix.nfkafka:nfkafka-consumer",
@@ -6959,7 +6959,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.6.0",
+            "locked": "1.6.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -6986,7 +6986,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.6.0",
+            "locked": "1.6.1",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-common",
                 "com.netflix.nfkafka:nfkafka-consumer",
@@ -10096,7 +10096,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.6.0",
+            "locked": "1.6.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -10123,7 +10123,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.6.0",
+            "locked": "1.6.1",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-common",
                 "com.netflix.nfkafka:nfkafka-consumer",
@@ -13332,7 +13332,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.6.0",
+            "locked": "1.6.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -13359,7 +13359,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.6.0",
+            "locked": "1.6.1",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-common",
                 "com.netflix.nfkafka:nfkafka-consumer",
@@ -16478,7 +16478,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.6.0",
+            "locked": "1.6.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -16505,7 +16505,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.6.0",
+            "locked": "1.6.1",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-common",
                 "com.netflix.nfkafka:nfkafka-consumer",
@@ -19669,7 +19669,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.6.0",
+            "locked": "1.6.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -19696,7 +19696,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.6.0",
+            "locked": "1.6.1",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-common",
                 "com.netflix.nfkafka:nfkafka-consumer",
@@ -22860,7 +22860,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.6.0",
+            "locked": "1.6.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -22887,7 +22887,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.6.0",
+            "locked": "1.6.1",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-common",
                 "com.netflix.nfkafka:nfkafka-consumer",
@@ -26051,7 +26051,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.6.0",
+            "locked": "1.6.1",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -26078,7 +26078,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.6.0",
+            "locked": "1.6.1",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-common",
                 "com.netflix.nfkafka:nfkafka-consumer",
