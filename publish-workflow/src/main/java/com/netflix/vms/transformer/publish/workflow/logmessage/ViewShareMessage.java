@@ -1,9 +1,10 @@
 package com.netflix.vms.transformer.publish.workflow.logmessage;
 
-import com.netflix.vms.transformer.common.MessageBuilder;
-import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
 import java.util.Collection;
 import java.util.List;
+
+import com.netflix.vms.transformer.common.MessageBuilder;
+import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
 
 public class ViewShareMessage {
     private final MessageBuilder msgBuilder;
@@ -21,11 +22,11 @@ public class ViewShareMessage {
     private void build(String countryId, String videoIds, Float missingViewShare, Float threshold) {
         msgBuilder.put("countryId", countryId);
         if (videoIds != null)
-            msgBuilder.put("videoIds=", videoIds);
+            msgBuilder.put("videoIds", videoIds);
         if (missingViewShare != null)
-            msgBuilder.put("missingViewShare=", missingViewShare);
+            msgBuilder.put("missingViewShare", missingViewShare);
         if (threshold != null)
-            msgBuilder.put("threshold=", threshold);
+            msgBuilder.put("threshold", threshold);
     }
 
     private String getVideoIdsAsString(Collection<Integer> videoIds) {
@@ -47,17 +48,15 @@ public class ViewShareMessage {
         buffer.append('[');
         int index = 0;
         for (VideoCountryKey videoCountry : videoIds) {
-            if (index != 0)
-                buffer.append(", ");
             if (country.equals(videoCountry.getCountry())) {
+                if (index++ != 0) buffer.append(", ");
                 buffer.append(videoCountry.getVideoId());
             }
-            index++;
         }
         buffer.append(']');
         return buffer.toString();
     }
-    
+
     @Override
     public String toString() {
         return msgBuilder.toString();

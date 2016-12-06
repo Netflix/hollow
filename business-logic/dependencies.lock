@@ -804,6 +804,10 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "org.mockito:mockito-all": {
+            "locked": "1.10.19",
+            "requested": "latest.release"
+        },
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
             "transitive": [
@@ -1701,6 +1705,10 @@
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
             ]
+        },
+        "org.mockito:mockito-all": {
+            "locked": "1.10.19",
+            "requested": "latest.release"
         },
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
@@ -2600,6 +2608,10 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "org.mockito:mockito-all": {
+            "locked": "1.10.19",
+            "requested": "latest.release"
+        },
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
             "transitive": [
@@ -3497,6 +3509,10 @@
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
             ]
+        },
+        "org.mockito:mockito-all": {
+            "locked": "1.10.19",
+            "requested": "latest.release"
         },
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
@@ -4495,6 +4511,10 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "org.mockito:mockito-all": {
+            "locked": "1.10.19",
+            "requested": "latest.release"
+        },
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
             "transitive": [
@@ -5417,6 +5437,10 @@
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
             ]
+        },
+        "org.mockito:mockito-all": {
+            "locked": "1.10.19",
+            "requested": "latest.release"
         },
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
@@ -6351,6 +6375,10 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "org.mockito:mockito-all": {
+            "locked": "1.10.19",
+            "requested": "latest.release"
+        },
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
             "transitive": [
@@ -7284,6 +7312,10 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "org.mockito:mockito-all": {
+            "locked": "1.10.19",
+            "requested": "latest.release"
+        },
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
             "transitive": [
@@ -8216,6 +8248,10 @@
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
             ]
+        },
+        "org.mockito:mockito-all": {
+            "locked": "1.10.19",
+            "requested": "latest.release"
         },
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
