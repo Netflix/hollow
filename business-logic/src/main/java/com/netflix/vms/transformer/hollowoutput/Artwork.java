@@ -20,7 +20,7 @@ public class Artwork implements Cloneable {
     public int file_seq = java.lang.Integer.MIN_VALUE;
     public AcquisitionSource acquisitionSource = null;
     public boolean isRolloutExclusive = false;
-    public SchedulePhaseInfo	availabilityWindow = null;
+    public SchedulePhaseInfo schedulePhaseInfo = null;
 
     public String toString() {
         StringBuilder builder = new StringBuilder("Artwork{");
@@ -38,7 +38,7 @@ public class Artwork implements Cloneable {
         builder.append(",file_seq=").append(file_seq);
         builder.append(",merchstillsPackage=").append(merchstillsPackageData);
         builder.append(",acquisitionSource=").append(acquisitionSource);
-        builder.append(",availabilityWindows=").append(availabilityWindow);
+        builder.append(",availabilityWindows=").append(schedulePhaseInfo);
         builder.append(",isRolloutExclusive=").append(isRolloutExclusive);
         builder.append("}");
         return builder.toString();

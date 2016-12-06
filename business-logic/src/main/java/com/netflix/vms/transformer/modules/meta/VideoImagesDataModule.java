@@ -141,7 +141,8 @@ public class VideoImagesDataModule extends ArtWorkModule {
     	for(Entry<String, Set<VideoHierarchy>> countryVideoHierarchyEntry: showHierarchiesByCountry.entrySet()){
     		
     		Set<String> setOfSourceFileIdsForCountry = new HashSet<>();
-    		countryToListOfSourceFileIds.put(countryVideoHierarchyEntry.getKey(), setOfSourceFileIdsForCountry);
+    		String country = countryVideoHierarchyEntry.getKey();
+			countryToListOfSourceFileIds.put(country, setOfSourceFileIdsForCountry);
     		
     		for(VideoHierarchy vh: countryVideoHierarchyEntry.getValue()){
     			long topNodeId = vh.getTopNodeId();
@@ -154,6 +155,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
     	        int rolloutOrdinal = iter.next();
 				while (rolloutOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
 					RolloutHollow rollout = api.getRolloutHollow(rolloutOrdinal);
+						
 					for(RolloutPhaseHollow phase: rollout._getPhases()){
 						
 						RolloutPhaseElementsHollow elements = phase._getElements();
@@ -385,7 +387,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
         artwork.seqNum = seqNum;
         artwork.ordinalPriority = ordinalPriority;
         fillPassThroughData(artwork, attributes);
-        artwork.availabilityWindow = window;
+        artwork.schedulePhaseInfo = window;
         artwork.isRolloutExclusive = false; // TODO: artworkHollowInput._getIsRolloutExclusive();
         artwork.sourceVideoId = entityId;
 
@@ -421,11 +423,11 @@ public class VideoImagesDataModule extends ArtWorkModule {
             // Support Country based data
             for (ArtworkLocaleHollow localeHollow : localeSet) {
             	Artwork localeArtworkIsRolloutAsInput = artwork.clone();
-                Artwork localeArtworkIsRolloutOppositeToInput = artwork.clone();
-                localeArtworkIsRolloutOppositeToInput.isRolloutExclusive = !localeArtworkIsRolloutAsInput.isRolloutExclusive;
-                
                 localeArtworkIsRolloutAsInput.locale = NFLocaleUtil.createNFLocale(localeHollow._getBcp47Code()._getValue());
                 localeArtworkIsRolloutAsInput.effectiveDate = localeHollow._getEffectiveDate()._getValue();
+                
+                Artwork localeArtworkIsRolloutOppositeToInput = localeArtworkIsRolloutAsInput.clone();
+                localeArtworkIsRolloutOppositeToInput.isRolloutExclusive = !localeArtworkIsRolloutAsInput.isRolloutExclusive;
                 
                 for (String countryCode : getCountryCodes(localeHollow)) {
                     Map<Integer, Set<Artwork>> artMap = getArtworkMap(countryCode, countryArtworkMap);
@@ -436,7 +438,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
                     Set<Integer> topNodes = getTopNodes(showHierarchiesByCountry, countryCode, entityId);
 	                for(int topNode: topNodes){
 		                Set<Artwork> artworkSet = getArtworkSet(topNode, artMap);
-		                Artwork updatedArtwork = pickArtworkBasedOnRolloutInfo(localeArtworkIsRolloutAsInput, localeArtworkIsRolloutOppositeToInput, rolloutImagesByCountry.get(countryCode));
+		                Artwork updatedArtwork = pickArtworkBasedOnRolloutInfo(localeArtworkIsRolloutAsInput, localeArtworkIsRolloutOppositeToInput, rolloutImagesByCountry.get(countryCode), sourceFileId);
 		                
 		                // If pickArtworkBasedOnRolloutInfo return null based on roll-out: we drop the image for the country. 
 		                // Look at pickArtworkBasedOnRolloutInfo method for details. Logging of dropped IDs is in pickArtworkBasedOnRolloutInfo.
@@ -462,8 +464,7 @@ public class VideoImagesDataModule extends ArtWorkModule {
 		return topNodes;
 	}
 
-	private Artwork pickArtworkBasedOnRolloutInfo(Artwork localeArtworkIsRolloutAsInput, Artwork localeArtworkIsRolloutOppositeToInput, Set<String> rolloutSourceFileIds) {
-        Strings sourceFileId = localeArtworkIsRolloutAsInput.sourceFileId;
+	private Artwork pickArtworkBasedOnRolloutInfo(Artwork localeArtworkIsRolloutAsInput, Artwork localeArtworkIsRolloutOppositeToInput, Set<String> rolloutSourceFileIds, String sourceFileId) {
 		if(localeArtworkIsRolloutAsInput.isRolloutExclusive){
         	// Upstream says this is a rollout image
         	if(rolloutSourceFileIds == null || !rolloutSourceFileIds.contains(sourceFileId)){
