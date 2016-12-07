@@ -4,7 +4,7 @@ import static com.netflix.vms.transformer.index.IndexSpec.CSM_REVIEW;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_AWARD;
 import static com.netflix.vms.transformer.index.IndexSpec.VMS_AWARD;
 
-import com.netflix.hollow.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.hollowinput.CSMReviewHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;

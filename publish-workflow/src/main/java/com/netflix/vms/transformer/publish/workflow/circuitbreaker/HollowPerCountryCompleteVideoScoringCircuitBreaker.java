@@ -1,8 +1,8 @@
 package com.netflix.vms.transformer.publish.workflow.circuitbreaker;
 
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.read.engine.HollowTypeReadState;
-import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
 import com.netflix.vms.generated.notemplate.ISOCountryHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;

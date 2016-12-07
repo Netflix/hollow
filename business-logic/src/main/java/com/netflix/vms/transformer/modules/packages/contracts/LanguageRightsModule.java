@@ -1,9 +1,8 @@
 package com.netflix.vms.transformer.modules.packages.contracts;
 
-import com.netflix.vms.transformer.CycleConstants;
-
 import com.netflix.config.utils.Pair;
-import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
+import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.OutputTypeConfig;
 import com.netflix.vms.transformer.hollowinput.ContractHollow;

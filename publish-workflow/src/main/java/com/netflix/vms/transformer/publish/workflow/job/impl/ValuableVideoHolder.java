@@ -4,13 +4,10 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.PlaybackMo
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.PlaybackMonkeyTestVideo;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.PlaybackMonkeyWarn;
 
-import java.util.*;
-import java.util.Map.Entry;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ComparisonChain;
-import com.netflix.hollow.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.type.ISOCountry;
 import com.netflix.type.NFCountry;
 import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
@@ -26,6 +23,16 @@ import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class ValuableVideoHolder {
 	private final HollowBlobDataProvider hollowBlobDataProvider;

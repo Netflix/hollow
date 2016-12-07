@@ -16,13 +16,12 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.WritingBlo
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WroteBlob;
 
 import com.google.gson.Gson;
-
 import com.netflix.aws.file.FileStore;
-import com.netflix.hollow.client.HollowClient;
-import com.netflix.hollow.compact.HollowCompactor;
-import com.netflix.hollow.read.customapi.HollowAPI;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.write.HollowBlobWriter;
+import com.netflix.hollow.api.client.HollowClient;
+import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.write.HollowBlobWriter;
+import com.netflix.hollow.tools.compact.HollowCompactor;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.common.VersionMinter;

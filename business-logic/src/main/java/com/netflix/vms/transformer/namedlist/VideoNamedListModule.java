@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.namedlist;
 
-import com.netflix.hollow.bitsandbytes.ThreadSafeBitSet;
-import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.core.memory.ThreadSafeBitSet;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
@@ -16,7 +16,6 @@ import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.util.SensitiveVideoServerSideUtil;
-
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;

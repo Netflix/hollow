@@ -1,10 +1,10 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.hollow.index.HollowHashIndex;
-import com.netflix.hollow.index.HollowHashIndexResult;
-import com.netflix.hollow.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
-import com.netflix.hollow.util.IntList;
+import com.netflix.hollow.core.index.HollowHashIndex;
+import com.netflix.hollow.core.index.HollowHashIndexResult;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.util.IntList;
 import com.netflix.vms.transformer.VideoHierarchyGrouper.VideoHierarchyGroup;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.EpisodeHollow;
@@ -25,7 +25,6 @@ import com.netflix.vms.transformer.hollowinput.VideoTypeHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeMediaHollow;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

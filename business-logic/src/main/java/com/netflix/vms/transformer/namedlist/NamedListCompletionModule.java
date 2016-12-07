@@ -1,9 +1,9 @@
 package com.netflix.vms.transformer.namedlist;
 
 
-import com.netflix.hollow.bitsandbytes.ThreadSafeBitSet;
-import com.netflix.hollow.util.SimultaneousExecutor;
-import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.core.memory.ThreadSafeBitSet;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.hollowoutput.Episode;
 import com.netflix.vms.transformer.hollowoutput.GlobalPerson;

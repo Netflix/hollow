@@ -1,11 +1,10 @@
 package com.netflix.vms.transformer.index;
 
-import com.netflix.hollow.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.read.engine.HollowTypeReadState;
-import com.netflix.hollow.util.SimultaneousExecutor;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.vms.transformer.common.config.OutputTypeConfig;
-
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
