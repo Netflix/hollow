@@ -17,6 +17,7 @@ public class VideoArtworkDelegateCachedImpl extends HollowObjectAbstractDelegate
     private final int attributesOrdinal;
     private final Long ordinalPriority;
     private final int fileImageTypeOrdinal;
+    private final int phaseTagsOrdinal;
    private VideoArtworkTypeAPI typeAPI;
 
     public VideoArtworkDelegateCachedImpl(VideoArtworkTypeAPI typeAPI, int ordinal) {
@@ -28,6 +29,7 @@ public class VideoArtworkDelegateCachedImpl extends HollowObjectAbstractDelegate
         this.attributesOrdinal = typeAPI.getAttributesOrdinal(ordinal);
         this.ordinalPriority = typeAPI.getOrdinalPriorityBoxed(ordinal);
         this.fileImageTypeOrdinal = typeAPI.getFileImageTypeOrdinal(ordinal);
+        this.phaseTagsOrdinal = typeAPI.getPhaseTagsOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -73,6 +75,10 @@ public class VideoArtworkDelegateCachedImpl extends HollowObjectAbstractDelegate
 
     public int getFileImageTypeOrdinal(int ordinal) {
         return fileImageTypeOrdinal;
+    }
+
+    public int getPhaseTagsOrdinal(int ordinal) {
+        return phaseTagsOrdinal;
     }
 
     @Override
