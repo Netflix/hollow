@@ -57,12 +57,8 @@ public class VideoArtworkDelegateLookupImpl extends HollowObjectAbstractDelegate
         return typeAPI.getFileImageTypeOrdinal(ordinal);
     }
 
-    public int getPhaseTagsOrdinal(int ordinal) {
-        return typeAPI.getPhaseTagsOrdinal(ordinal);
-    }
-
-    public int getScheduleIdOrdinal(int ordinal) {
-        return typeAPI.getScheduleIdOrdinal(ordinal);
+    public int getPhaseTagListOrdinal(int ordinal) {
+        return typeAPI.getPhaseTagListOrdinal(ordinal);
     }
 
     public VideoArtworkTypeAPI getTypeAPI() {
