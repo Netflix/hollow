@@ -18,7 +18,8 @@ public class VideoArtworkTypeAPI extends HollowObjectTypeAPI {
             "attributes",
             "ordinalPriority",
             "fileImageType",
-            "phaseTags"
+            "phaseTags",
+            "scheduleId"
         });
         this.delegateLookupImpl = new VideoArtworkDelegateLookupImpl(this);
     }
@@ -144,6 +145,16 @@ public class VideoArtworkTypeAPI extends HollowObjectTypeAPI {
 
     public SetOfStringTypeAPI getPhaseTagsTypeAPI() {
         return getAPI().getSetOfStringTypeAPI();
+    }
+
+    public int getScheduleIdOrdinal(int ordinal) {
+        if(fieldIndex[9] == -1)
+            return missingDataHandler().handleReferencedOrdinal("VideoArtwork", ordinal, "scheduleId");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[9]);
+    }
+
+    public StringTypeAPI getScheduleIdTypeAPI() {
+        return getAPI().getStringTypeAPI();
     }
 
     public VideoArtworkDelegateLookupImpl getDelegateLookupImpl() {

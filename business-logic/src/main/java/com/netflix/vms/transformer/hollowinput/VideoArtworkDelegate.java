@@ -30,6 +30,8 @@ public interface VideoArtworkDelegate extends HollowObjectDelegate {
 
     public int getPhaseTagsOrdinal(int ordinal);
 
+    public int getScheduleIdOrdinal(int ordinal);
+
     public VideoArtworkTypeAPI getTypeAPI();
 
 }

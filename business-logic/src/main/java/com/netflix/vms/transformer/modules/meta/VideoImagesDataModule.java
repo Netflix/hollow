@@ -2,11 +2,14 @@ package com.netflix.vms.transformer.modules.meta;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidImagesTerritoryCode;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidPhaseTagForArtwork;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.MarkedPoisonState;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingRolloutForArtwork;
 import com.netflix.vms.transformer.hollowinput.AbsoluteScheduleHollow;
 import com.netflix.vms.transformer.hollowinput.MasterScheduleHollow;
 import com.netflix.vms.transformer.hollowinput.OverrideScheduleHollow;
+import com.netflix.vms.transformer.hollowinput.SetOfStringTypeAPI;
+import com.netflix.vms.transformer.hollowinput.StringTypeAPI;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
 import com.netflix.hollow.index.HollowHashIndex;
@@ -61,14 +64,16 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabilityChecker {
-    public class PhaseTags {
-
-	}
 
 	private final HollowHashIndex videoArtworkIndex;
     private final HollowPrimaryKeyIndex damMerchStillsIdx;
     private final HollowPrimaryKeyIndex videoStatusIdx;
 	private HollowHashIndex rolloutIndex;
+
+	private HollowPrimaryKeyIndex videoTypeIndex;
+	private HollowPrimaryKeyIndex overrideScheduleIndex;
+	private HollowHashIndex masterScheduleIndex;
+	private HollowHashIndex absoluteScheduleIndex;
 
     private final static String MERCH_STILL_TYPE = "MERCH_STILL";
     private final int MIN_ROLLUP_SIZE = 4; // 3
@@ -80,6 +85,12 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         this.damMerchStillsIdx = indexer.getPrimaryKeyIndex(IndexSpec.DAM_MERCHSTILLS);
         this.videoStatusIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_STATUS);
         this.rolloutIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
+
+        videoTypeIndex = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_TYPE);
+        overrideScheduleIndex = indexer.getPrimaryKeyIndex(IndexSpec.OVERRIDE_SCHEDULE_BY_VIDEO_ID);
+        masterScheduleIndex = indexer.getHashIndex(IndexSpec.MASTER_SCHEDULE_BY_TAG_SHOW);
+        absoluteScheduleIndex = indexer.getHashIndex(IndexSpec.ABSOLUTE_SCHEDULE_BY_VIDEO_ID_TAG);
+
         ctx.getLogger().info(TransformerLogTag.TransformInfo, "MerchStill descSorting=" + ctx.getConfig().isMerchstillsSortedDescending() + ", edEpisode=" + ctx.getConfig().isMerchstillEpisodeLiveCheckEnabled());
     }
 
@@ -491,7 +502,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         int ordinalPriority = (int) artworkHollowInput._getOrdinalPriority();
         int seqNum = (int) artworkHollowInput._getSeqNum();
 
-        SchedulePhaseInfo window = getScheduleInfo(artworkHollowInput);
+        SchedulePhaseInfo window = getScheduleInfo(artworkHollowInput, videoId);
         if(window == null){
         	// Indicates image has tags but the tags are not valid
         	// Could be error or eventual consistency condition
@@ -634,62 +645,89 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
 		return localeArtworkIsRolloutAsInput;
 	}
 
-    private SchedulePhaseInfo getScheduleInfo(VideoArtworkHollow artworkHollowInput, MasterScheduleHollow masterScheduleHollowInput, OverrideScheduleHollow overrideScheduleHollowInput,
-                                              AbsoluteScheduleHollow absoluteScheduleHollowInput) {
-        Set<PhaseTags> phaseTags = getPhaseTags(artworkHollowInput);
-        SchedulePhaseInfo window = null;
-        if (phaseTags == null) {
+    private SchedulePhaseInfo getScheduleInfo(VideoArtworkHollow videoArtworkHollow, int videoId) {
+        Set<String> phaseTags = getPhaseTags(videoArtworkHollow);
+        String scheduleId = videoArtworkHollow._getScheduleId()._getValue();
+        if (scheduleId == null) {
+            return null;// this indicates error and the image is dropped.
+        }
+
+        SchedulePhaseInfo window = new SchedulePhaseInfo();
+        if (phaseTags == null || phaseTags.size() == 0) {
             // No tags: indicates launch images
-            window = new SchedulePhaseInfo();
-            window.start = 0l;
-            window.end = Long.MIN_VALUE;
+            return window;
         }
 
-        // Process Overrides by video or by dates
-        Set<PhaseTags> phaseTags = artworkHollowInput._get;
-        Set<ImageAva> result = new HashSet<ImageAvailabilityWindow>(phaseTags.size());
-        for (PhaseTags tag : phaseTags) {
-            String phase = tag.getPhaseTag();
-            String schedule = tag.getSchedule();
-            Long offset = masterScheduleHollowInput.get(schedule).get(phase);
-            overrideOffset // Override schedule: get any video based overrides for given tag
-                    absoluteSchedule// Absolute schedule: get any dates based on video tag from absolute schedule
+        boolean isDefault = true;
+        for (String tag : phaseTags) {
 
-            if (offset == null && overrideOffset == null && absoluteSchedule == null) {
-                continue;
+            HollowHashIndexResult result = absoluteScheduleIndex.findMatches(videoId, tag);
+            if (result.numResults() == 1) {
+                // absolute schedule present, get dates from this schedule and return the phase info window
+                // ignore all other tags
+                int absoluteOrdinal = result.iterator().next();
+                AbsoluteScheduleHollow absoluteScheduleHollow = api.getAbsoluteScheduleHollow(absoluteOrdinal);
+                window.start = absoluteScheduleHollow._getStartDate();
+                window.end = absoluteScheduleHollow._getEndDate();
+                // todo ask upstream to include this in feed data as an attribute
+                if (tag.equals("isSmoky")) {
+                    window.isAutomatedImg = true;
+                }
+                return window;
             }
 
-            if (window == null) {
-                window = new SchedulePhaseInfo();
-                window.isAutomatedImg = false;
-            }
-            // If absolute tag, ignore other tags
-            if (absoluteSchedule != null) {
-                window.start = absoluteSchedule.getStart();
-                window.end = absoluteSchedule.getEnd();
-                window.isFixed = true;
-                window.isAutomatedImg = absoluteSchedule.isSmoky;
-                break;
+            long startOffset = 0L;
+
+            // get master schedule
+            HollowHashIndexResult masterScheduleResult = masterScheduleIndex.findMatches(videoId, scheduleId);
+            if (masterScheduleResult.numResults() == 1) {
+                int masterScheduleOrdinal = masterScheduleResult.iterator().next();
+                startOffset = api.getMasterScheduleHollow(masterScheduleOrdinal)._getAvailabilityOffset();
+            } else {
+                // log the error only 1 result expected
             }
 
-            // Prefer earliest tag (example: pre-promo is -30 days and promo is -7.
-            // If window.start had -7 then replace it with -30.
-            // NOTE: This might have to change in future where multiple windows have to propagate down to NIL for some use case.
-            // For now there is no use case which will use multiple windows.
-            if (window.start > phase.getOffset()) {
-                window.start = phase.getOffset();
-                window.end = Long.MIN_VALUE; // indicates null or eternity.
-                window.isFixed = false;
+            // check override schedule
+            int overrideOrdinal = overrideScheduleIndex.getMatchingOrdinal(videoId);
+            if (overrideOrdinal != -1) {
+                startOffset = api.getOverrideScheduleHollow(overrideOrdinal)._getAvailabilityOffset();
+            } else {
+                // todo log the error only 1 result expected.
+            }
+
+            // if window.start is not default value, get the earliest start date
+            if (!isDefault) {
+                // take the earliest offset
+                if (window.start > 0 && startOffset < 0) {
+                    // case: window.start is + 3 and startOffset is -3
+                    window.start = startOffset;
+                } else if (window.start > 0 && startOffset > 0) {
+                    // case: window.start is +3 and startOffset is +30
+                    window.start = window.start > startOffset ? startOffset : window.start;
+                } else if (window.start < 0 && startOffset < 0) {
+                    // case: window.start is -7 and startOffset is -30
+                    window.start = window.start > startOffset ? startOffset : window.start;
+                }
+            } else {
+                window.start = startOffset;
+                isDefault = false;
             }
         }
-
         return window;
     }
 
-	private Set<PhaseTags> getPhaseTags(VideoArtworkHollow artworkHollowInput) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    private Set<String> getPhaseTags(VideoArtworkHollow artworkHollowInput) {
+        Set<String> phaseTags = new HashSet<>();
+        SetOfStringTypeAPI setOfStringTypeAPI = artworkHollowInput._getPhaseTags().typeApi();
+        StringTypeAPI stringTypeAPI = setOfStringTypeAPI.getElementAPI();
+        HollowOrdinalIterator iterator = setOfStringTypeAPI.getDelegateLookupImpl().iterator(artworkHollowInput.getOrdinal());
+        int elementOrdinal = iterator.next();
+        while (elementOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+            phaseTags.add(stringTypeAPI.getValue(elementOrdinal));
+
+        }
+        return phaseTags;
+    }
 
 	protected Map<Integer, Set<Artwork>> getArtworkMap(String countryCode, Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap) {
         Map<Integer, Set<Artwork>> artMap = countryArtworkMap.get(countryCode);
