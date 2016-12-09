@@ -135,6 +135,7 @@ public class RestoreWriteStateEngineChangingSchemaTest extends AbstractStateEngi
             roundTripDelta();
             Assert.fail("Should have thrown Exception when attempting to produce a delta!");
         } catch(IllegalStateException expected) {
+            Assert.assertTrue(expected.getMessage().contains("TypeA"));
         }
 
 

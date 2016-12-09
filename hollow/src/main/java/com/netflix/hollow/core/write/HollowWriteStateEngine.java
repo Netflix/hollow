@@ -18,7 +18,6 @@
 package com.netflix.hollow.core.write;
 
 import com.netflix.hollow.core.util.SimultaneousExecutor;
-
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.util.DefaultHashCodeFinder;
 import com.netflix.hollow.core.util.HollowWriteStateCreator;
@@ -267,18 +266,21 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         return restoredStates != null;
     }
     
-    public boolean canProduceDelta() {
+    void ensureAllNecessaryStatesRestored() {
         if(!isRestored())
-            return true;
+            return;
+        
+        List<String> unrestoredStates = new ArrayList<String>();
         
         for(HollowTypeWriteState typeState : orderedTypeStates) {
             if(restoredStates.contains(typeState.getSchema().getName())) {
                 if(!typeState.isRestored())
-                    return false;
+                    unrestoredStates.add(typeState.getSchema().getName());
             }
         }
         
-        return true;
+        if(!unrestoredStates.isEmpty())
+            throw new IllegalStateException("When state engine was restored, not all necessary states were present!  Unrestored states: " + unrestoredStates);
     }
 
     public List<HollowTypeWriteState> getOrderedTypeStates() {

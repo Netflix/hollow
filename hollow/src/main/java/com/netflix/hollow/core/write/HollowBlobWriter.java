@@ -85,8 +85,8 @@ public class HollowBlobWriter {
     public void writeDelta(OutputStream os) throws IOException {
         stateEngine.prepareForWrite();
         
-        if(!stateEngine.canProduceDelta())
-            throw new IllegalStateException("When state engine was restored, not all necessary states were present!");
+        if(stateEngine.isRestored())
+            stateEngine.ensureAllNecessaryStatesRestored();
 
         DataOutputStream dos = new DataOutputStream(os);
         writeHeader(dos, false);
@@ -94,7 +94,6 @@ public class HollowBlobWriter {
         VarInt.writeVInt(dos, numChangedTypes());
 
         SimultaneousExecutor executor = new SimultaneousExecutor();
-
 
         for(final HollowTypeWriteState typeState : stateEngine.getOrderedTypeStates()) {
             executor.execute(new Runnable() {
@@ -130,8 +129,8 @@ public class HollowBlobWriter {
     public void writeReverseDelta(OutputStream os) throws IOException {
         stateEngine.prepareForWrite();
         
-        if(!stateEngine.canProduceDelta())
-            throw new IllegalStateException("When state engine was restored, not all necessary states were present!");
+        if(stateEngine.isRestored())
+            stateEngine.ensureAllNecessaryStatesRestored();
 
         DataOutputStream dos = new DataOutputStream(os);
         writeHeader(dos, true);
