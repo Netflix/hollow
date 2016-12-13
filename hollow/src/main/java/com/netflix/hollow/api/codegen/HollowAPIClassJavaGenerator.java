@@ -24,15 +24,6 @@ import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.lowercase
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 
 import com.netflix.hollow.api.custom.HollowAPI;
-
-import com.netflix.hollow.core.util.AllHollowRecordCollection;
-import com.netflix.hollow.core.schema.HollowSchemaSorter;
-import com.netflix.hollow.core.schema.HollowListSchema;
-import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.schema.HollowSetSchema;
-import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.api.objects.provider.HollowFactory;
 import com.netflix.hollow.api.objects.provider.HollowObjectCacheProvider;
 import com.netflix.hollow.api.objects.provider.HollowObjectFactoryProvider;
@@ -40,6 +31,7 @@ import com.netflix.hollow.api.objects.provider.HollowObjectProvider;
 import com.netflix.hollow.api.sampling.HollowObjectCreationSampler;
 import com.netflix.hollow.api.sampling.HollowSamplingDirector;
 import com.netflix.hollow.api.sampling.SampleResult;
+import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
@@ -50,6 +42,9 @@ import com.netflix.hollow.core.read.dataaccess.missing.HollowListMissingDataAcce
 import com.netflix.hollow.core.read.dataaccess.missing.HollowMapMissingDataAccess;
 import com.netflix.hollow.core.read.dataaccess.missing.HollowObjectMissingDataAccess;
 import com.netflix.hollow.core.read.dataaccess.missing.HollowSetMissingDataAccess;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.schema.HollowSchemaSorter;
+import com.netflix.hollow.core.util.AllHollowRecordCollection;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -60,9 +55,6 @@ import java.util.Set;
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
  * 
  * @see HollowAPIGenerator
- * 
- * @author dkoszewnik
- *
  */
 public class HollowAPIClassJavaGenerator implements HollowJavaFileGenerator {
 
@@ -120,7 +112,7 @@ public class HollowAPIClassJavaGenerator implements HollowJavaFileGenerator {
 
 
         builder.append("\n@SuppressWarnings(\"all\")\n");
-        builder.append("\npublic class ").append(className).append(" extends HollowAPI {\n\n");
+        builder.append("public class ").append(className).append(" extends HollowAPI {\n\n");
 
         builder.append("    private final HollowObjectCreationSampler objectCreationSampler;\n\n");
 
@@ -247,15 +239,18 @@ public class HollowAPIClassJavaGenerator implements HollowJavaFileGenerator {
     }
 
     private String schemaType(HollowSchema schema) {
-        if(schema instanceof HollowObjectSchema)
+        switch(schema.getSchemaType()) {
+        case OBJECT:
             return "Object";
-        if(schema instanceof HollowMapSchema)
-            return "Map";
-        if(schema instanceof HollowSetSchema)
-            return "Set";
-        if(schema instanceof HollowListSchema)
+        case LIST:
             return "List";
-        throw new IllegalArgumentException();
+        case SET:
+            return "Set";
+        case MAP:
+            return "Map";
+        default:
+            throw new IllegalArgumentException();
+        }
     }
 
 }
