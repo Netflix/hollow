@@ -653,7 +653,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
 
         PhaseTagListHollow phaseTagListHollow = videoArtworkHollow._getPhaseTagList();
         if (phaseTagListHollow == null) {
-            return null;
+            return new SchedulePhaseInfo();
         }
         SchedulePhaseInfo window = null;
         boolean isDefault = true;
@@ -717,7 +717,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                     } else if (window.start < 0 && startOffset < 0) {
                         // case: window.start is -7 and startOffset is -30
                         window.start = window.start > startOffset ? startOffset : window.start;
-                    }
+                    } // case window.start < 0 and startOffset > 0, then do not change the value for window.start
                 } else {
                     window.start = startOffset;
                     isDefault = false;
