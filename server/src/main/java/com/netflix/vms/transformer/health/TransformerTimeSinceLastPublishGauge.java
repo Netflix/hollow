@@ -12,7 +12,7 @@ public class TransformerTimeSinceLastPublishGauge {
         this.lastPublishTime = System.currentTimeMillis();
     }
     
-    @Monitor(name="vms.transformer.timeSinceLastPublish", type=GAUGE)
+    @Monitor(name="vms.transformer.TimeSinceLastPublish", type=GAUGE)
     public long getTimeSinceLastPublish() {
         return System.currentTimeMillis() - lastPublishTime;
     }
