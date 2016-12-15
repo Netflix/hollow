@@ -651,15 +651,17 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
 
     private SchedulePhaseInfo getScheduleInfo(VideoArtworkHollow videoArtworkHollow, int videoId) {
 
-        PhaseTagListHollow phaseTagListHollow = videoArtworkHollow._getPhaseTagList();
-        if (phaseTagListHollow == null) {
-            return new SchedulePhaseInfo();
-        }
         SchedulePhaseInfo window = null;
-        boolean isDefault = true;
+        PhaseTagListHollow phaseTagListHollow = videoArtworkHollow._getPhaseTagList();
+        if (phaseTagListHollow == null) return window;
 
         HollowOrdinalIterator iterator = phaseTagListHollow.typeApi().getOrdinalIterator(phaseTagListHollow.getOrdinal());
         int phaseTagOrdinal = iterator.next();
+        // no phase tag/ empty list, return default schedule
+        if (phaseTagOrdinal == HollowOrdinalIterator.NO_MORE_ORDINALS) {
+            return new SchedulePhaseInfo();
+        }
+
         while (phaseTagOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
 
             PhaseTagHollow phaseTagHollow = phaseTagListHollow.instantiateElement(phaseTagOrdinal);
@@ -668,69 +670,42 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
 
             // if null then drop this one
             if (tag != null && scheduleId != null) {
-
-                if (window == null) {
-                    window = new SchedulePhaseInfo();
-                }
-
+                // check absolute schedule
                 HollowHashIndexResult result = absoluteScheduleIndex.findMatches(videoId, tag);
                 if (result.numResults() == 1) {
+                    if (window == null) window = new SchedulePhaseInfo();
                     // absolute schedule present, get dates from this schedule and return info ignoring other tags
                     int absoluteOrdinal = result.iterator().next();
                     AbsoluteScheduleHollow absoluteScheduleHollow = api.getAbsoluteScheduleHollow(absoluteOrdinal);
                     window.start = absoluteScheduleHollow._getStartDate();
                     window.end = absoluteScheduleHollow._getEndDate();
+                    window.isOffset = true;
                     // todo use the attribute in feed
-                    if (tag.equals("isSmoky")) {
-                        window.isAutomatedImg = true;
-                    }
+                    if (tag.equals("isSmoky")) window.isAutomatedImg = true;
                     return window;
                 }
 
-                long startOffset = 0L;
+                // check override schedule
+                int overrideOrdinal = overrideScheduleIndex.getMatchingOrdinal(videoId, tag);
+                if (overrideOrdinal != -1) {
+                    if (window == null) window = new SchedulePhaseInfo();
+                    window.start = api.getOverrideScheduleHollow(overrideOrdinal)._getAvailabilityOffset();
+                    window.isOffset = true;
+                    return window;// todo check with Art on this behavior
+                }
 
                 // get master schedule
-                HollowHashIndexResult masterScheduleResult = masterScheduleIndex.findMatches(videoId, scheduleId);
-                if (masterScheduleResult.numResults() == 1) {
+                HollowHashIndexResult masterScheduleResult = masterScheduleIndex.findMatches(tag, scheduleId);
+                if (masterScheduleResult.numResults() >= 1) {
                     int masterScheduleOrdinal = masterScheduleResult.iterator().next();
-                    startOffset = api.getMasterScheduleHollow(masterScheduleOrdinal)._getAvailabilityOffset();
-                } else {
-                    ctx.getLogger().warn(InvalidPhaseTagForArtwork,
-                            "Found multiple matches in master schedule numResults={} for videoId={} and scheduleId={}",
-                            masterScheduleResult.numResults(), videoId, scheduleId);
-                }
-
-                // check override schedule
-                int overrideOrdinal = overrideScheduleIndex.getMatchingOrdinal(videoId);
-                if (overrideOrdinal != -1) {
-                    startOffset = api.getOverrideScheduleHollow(overrideOrdinal)._getAvailabilityOffset();
-                }
-
-                // if window.start is not default value, get the earliest start date
-                if (!isDefault) {
-                    // take the earliest offset
-                    if (window.start > 0 && startOffset < 0) {
-                        // case: window.start is + 3 and startOffset is -3
-                        window.start = startOffset;
-                    } else if (window.start > 0 && startOffset > 0) {
-                        // case: window.start is +3 and startOffset is +30
-                        window.start = window.start > startOffset ? startOffset : window.start;
-                    } else if (window.start < 0 && startOffset < 0) {
-                        // case: window.start is -7 and startOffset is -30
-                        window.start = window.start > startOffset ? startOffset : window.start;
-                    } // case window.start < 0 and startOffset > 0, then do not change the value for window.start
-                } else {
-                    window.start = startOffset;
-                    isDefault = false;
+                    long startOffset = api.getMasterScheduleHollow(masterScheduleOrdinal)._getAvailabilityOffset();
+                    if (window == null) window = new SchedulePhaseInfo();
+                    window.isOffset = true;
+                    // take the earliest start date
+                    if (window.start > startOffset) window.start = startOffset;
                 }
             }
-
         }
-        if (window == null) {
-            // empty phaseTags list
-            return new SchedulePhaseInfo();
-        }
-
         return window;
     }
 

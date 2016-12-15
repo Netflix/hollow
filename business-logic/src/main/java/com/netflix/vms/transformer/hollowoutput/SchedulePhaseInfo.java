@@ -4,7 +4,7 @@ public class SchedulePhaseInfo {
 	public long start = 0L;
 	public long end = java.lang.Long.MIN_VALUE;
 	public boolean isOffset = true;
-	public boolean isAutomatedImg = true;
+	public boolean isAutomatedImg = false;
 	
 	@Override
 	public int hashCode() {
