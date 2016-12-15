@@ -666,6 +666,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
             String tag = phaseTagHollow._getPhaseTag()._getValue();
             String scheduleId = phaseTagHollow._getScheduleId()._getValue();
 
+            // if null then drop this one
             if (tag != null && scheduleId != null) {
 
                 if (window == null) {
@@ -679,7 +680,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                     AbsoluteScheduleHollow absoluteScheduleHollow = api.getAbsoluteScheduleHollow(absoluteOrdinal);
                     window.start = absoluteScheduleHollow._getStartDate();
                     window.end = absoluteScheduleHollow._getEndDate();
-                    // todo ask upstream to include this in feed data as an attribute
+                    // todo use the attribute in feed
                     if (tag.equals("isSmoky")) {
                         window.isAutomatedImg = true;
                     }
@@ -694,15 +695,15 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                     int masterScheduleOrdinal = masterScheduleResult.iterator().next();
                     startOffset = api.getMasterScheduleHollow(masterScheduleOrdinal)._getAvailabilityOffset();
                 } else {
-                    // todo log the error only 1 result expected
+                    ctx.getLogger().warn(InvalidPhaseTagForArtwork,
+                            "Found multiple matches in master schedule numResults={} for videoId={} and scheduleId={}",
+                            masterScheduleResult.numResults(), videoId, scheduleId);
                 }
 
                 // check override schedule
                 int overrideOrdinal = overrideScheduleIndex.getMatchingOrdinal(videoId);
                 if (overrideOrdinal != -1) {
                     startOffset = api.getOverrideScheduleHollow(overrideOrdinal)._getAvailabilityOffset();
-                } else {
-                    // todo log the error only 1 result expected.
                 }
 
                 // if window.start is not default value, get the earliest start date
@@ -725,6 +726,11 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
             }
 
         }
+        if (window == null) {
+            // empty phaseTags list
+            return new SchedulePhaseInfo();
+        }
+
         return window;
     }
 

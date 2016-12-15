@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 public class SchedulePhaseInfo {
-	public long start = 0l;
+	public long start = 0L;
 	public long end = java.lang.Long.MIN_VALUE;
 	public boolean isOffset = true;
 	public boolean isAutomatedImg = true;
