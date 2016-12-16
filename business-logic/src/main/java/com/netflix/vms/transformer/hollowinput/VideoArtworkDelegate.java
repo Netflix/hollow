@@ -30,6 +30,10 @@ public interface VideoArtworkDelegate extends HollowObjectDelegate {
 
     public int getPhaseTagListOrdinal(int ordinal);
 
+    public boolean getIsSmoky(int ordinal);
+
+    public Boolean getIsSmokyBoxed(int ordinal);
+
     public VideoArtworkTypeAPI getTypeAPI();
 
 }

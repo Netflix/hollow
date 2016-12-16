@@ -18,7 +18,8 @@ public class VideoArtworkTypeAPI extends HollowObjectTypeAPI {
             "attributes",
             "ordinalPriority",
             "fileImageType",
-            "phaseTagList"
+            "phaseTagList",
+            "isSmoky"
         });
         this.delegateLookupImpl = new VideoArtworkDelegateLookupImpl(this);
     }
@@ -145,6 +146,20 @@ public class VideoArtworkTypeAPI extends HollowObjectTypeAPI {
     public PhaseTagListTypeAPI getPhaseTagListTypeAPI() {
         return getAPI().getPhaseTagListTypeAPI();
     }
+
+    public boolean getIsSmoky(int ordinal) {
+        if(fieldIndex[9] == -1)
+            return missingDataHandler().handleBoolean("VideoArtwork", ordinal, "isSmoky") == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[9]) == Boolean.TRUE;
+    }
+
+    public Boolean getIsSmokyBoxed(int ordinal) {
+        if(fieldIndex[9] == -1)
+            return missingDataHandler().handleBoolean("VideoArtwork", ordinal, "isSmoky");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[9]);
+    }
+
+
 
     public VideoArtworkDelegateLookupImpl getDelegateLookupImpl() {
         return delegateLookupImpl;

@@ -76,6 +76,14 @@ public class VideoArtworkHollow extends HollowObject {
         return  api().getPhaseTagListHollow(refOrdinal);
     }
 
+    public boolean _getIsSmoky() {
+        return delegate().getIsSmoky(ordinal);
+    }
+
+    public Boolean _getIsSmokyBoxed() {
+        return delegate().getIsSmokyBoxed(ordinal);
+    }
+
     public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }

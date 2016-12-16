@@ -61,6 +61,14 @@ public class VideoArtworkDelegateLookupImpl extends HollowObjectAbstractDelegate
         return typeAPI.getPhaseTagListOrdinal(ordinal);
     }
 
+    public boolean getIsSmoky(int ordinal) {
+        return typeAPI.getIsSmoky(ordinal);
+    }
+
+    public Boolean getIsSmokyBoxed(int ordinal) {
+        return typeAPI.getIsSmokyBoxed(ordinal);
+    }
+
     public VideoArtworkTypeAPI getTypeAPI() {
         return typeAPI;
     }
