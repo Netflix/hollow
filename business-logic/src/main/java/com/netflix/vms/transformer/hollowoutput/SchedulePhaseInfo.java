@@ -3,15 +3,23 @@ package com.netflix.vms.transformer.hollowoutput;
 public class SchedulePhaseInfo {
 	public long start = 0L;
 	public long end = java.lang.Long.MIN_VALUE;
-	public boolean isOffset = true;
+	public boolean isAbsolute = false;
 	public boolean isAutomatedImg = false;
-	
+
+	public SchedulePhaseInfo() {
+
+	}
+
+	public SchedulePhaseInfo(boolean isAutomatedImg) {
+		this.isAutomatedImg = isAutomatedImg;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (int) (end ^ (end >>> 32));
-		result = prime * result + (isOffset ? 1231 : 1237);
+		result = prime * result + (isAbsolute ? 1231 : 1237);
 		result = prime * result + (int) (start ^ (start >>> 32));
 		return result;
 	}
@@ -26,7 +34,7 @@ public class SchedulePhaseInfo {
 		SchedulePhaseInfo other = (SchedulePhaseInfo) obj;
 		if (end != other.end)
 			return false;
-		if (isOffset != other.isOffset)
+		if (isAbsolute != other.isAbsolute)
 			return false;
 		if (start != other.start)
 			return false;

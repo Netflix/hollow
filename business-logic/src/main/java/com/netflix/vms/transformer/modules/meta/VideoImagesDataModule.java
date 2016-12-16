@@ -654,6 +654,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         SchedulePhaseInfo window = null;
         PhaseTagListHollow phaseTagListHollow = videoArtworkHollow._getPhaseTagList();
         if (phaseTagListHollow == null) return window;
+        boolean isSmoky = videoArtworkHollow._getIsSmoky();
 
         HollowOrdinalIterator iterator = phaseTagListHollow.typeApi().getOrdinalIterator(phaseTagListHollow.getOrdinal());
         int phaseTagOrdinal = iterator.next();
@@ -673,24 +674,21 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                 // check absolute schedule
                 HollowHashIndexResult result = absoluteScheduleIndex.findMatches(videoId, tag);
                 if (result.numResults() == 1) {
-                    if (window == null) window = new SchedulePhaseInfo();
+                    if (window == null) window = new SchedulePhaseInfo(isSmoky);
                     // absolute schedule present, get dates from this schedule and return info ignoring other tags
                     int absoluteOrdinal = result.iterator().next();
                     AbsoluteScheduleHollow absoluteScheduleHollow = api.getAbsoluteScheduleHollow(absoluteOrdinal);
                     window.start = absoluteScheduleHollow._getStartDate();
                     window.end = absoluteScheduleHollow._getEndDate();
-                    window.isOffset = true;
-                    // todo use the attribute in feed
-                    if (tag.equals("isSmoky")) window.isAutomatedImg = true;
+                    window.isAbsolute = true;
                     return window;
                 }
 
                 // check override schedule
                 int overrideOrdinal = overrideScheduleIndex.getMatchingOrdinal(videoId, tag);
                 if (overrideOrdinal != -1) {
-                    if (window == null) window = new SchedulePhaseInfo();
+                    if (window == null) window = new SchedulePhaseInfo(isSmoky);
                     window.start = api.getOverrideScheduleHollow(overrideOrdinal)._getAvailabilityOffset();
-                    window.isOffset = true;
                     return window;// todo check with Art on this behavior
                 }
 
@@ -699,8 +697,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                 if (masterScheduleResult.numResults() >= 1) {
                     int masterScheduleOrdinal = masterScheduleResult.iterator().next();
                     long startOffset = api.getMasterScheduleHollow(masterScheduleOrdinal)._getAvailabilityOffset();
-                    if (window == null) window = new SchedulePhaseInfo();
-                    window.isOffset = true;
+                    if (window == null) window = new SchedulePhaseInfo(isSmoky);
                     // take the earliest start date
                     if (window.start > startOffset) window.start = startOffset;
                 }
