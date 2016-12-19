@@ -2,18 +2,11 @@ package com.netflix.vms.transformer.modules.meta;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidImagesTerritoryCode;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidPhaseTagForArtwork;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.MarkedPoisonState;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingRolloutForArtwork;
 import com.netflix.vms.transformer.hollowinput.AbsoluteScheduleHollow;
-import com.netflix.vms.transformer.hollowinput.MasterScheduleHollow;
-import com.netflix.vms.transformer.hollowinput.OverrideScheduleHollow;
 import com.netflix.vms.transformer.hollowinput.PhaseTagHollow;
 import com.netflix.vms.transformer.hollowinput.PhaseTagListHollow;
-import com.netflix.vms.transformer.hollowinput.PhaseTagListTypeAPI;
-import com.netflix.vms.transformer.hollowinput.PhaseTagTypeAPI;
-import com.netflix.vms.transformer.hollowinput.SetOfStringTypeAPI;
-import com.netflix.vms.transformer.hollowinput.StringTypeAPI;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
 import com.netflix.hollow.index.HollowHashIndex;
@@ -684,22 +677,28 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                     return window;
                 }
 
-                // check override schedule
+                Long startOffset = null;
+                // check override schedule for the given tag.
                 int overrideOrdinal = overrideScheduleIndex.getMatchingOrdinal(videoId, tag);
                 if (overrideOrdinal != -1) {
-                    if (window == null) window = new SchedulePhaseInfo(isSmoky);
-                    window.start = api.getOverrideScheduleHollow(overrideOrdinal)._getAvailabilityOffset();
-                    return window;// todo check with Art on this behavior
+                    startOffset = api.getOverrideScheduleHollow(overrideOrdinal)._getAvailabilityOffset();
+                } else {
+                    // get master schedule if no override schedule exists for the given tag
+                    HollowHashIndexResult masterScheduleResult = masterScheduleIndex.findMatches(tag, scheduleId);
+                    if (masterScheduleResult.numResults() >= 1) {
+                        int masterScheduleOrdinal = masterScheduleResult.iterator().next();
+                        startOffset = api.getMasterScheduleHollow(masterScheduleOrdinal)._getAvailabilityOffset();
+                    }
                 }
 
-                // get master schedule
-                HollowHashIndexResult masterScheduleResult = masterScheduleIndex.findMatches(tag, scheduleId);
-                if (masterScheduleResult.numResults() >= 1) {
-                    int masterScheduleOrdinal = masterScheduleResult.iterator().next();
-                    long startOffset = api.getMasterScheduleHollow(masterScheduleOrdinal)._getAvailabilityOffset();
-                    if (window == null) window = new SchedulePhaseInfo(isSmoky);
-                    // take the earliest start date
-                    if (window.start > startOffset) window.start = startOffset;
+                // offset is found in schedule and window is null, initialize window
+                if (window == null && startOffset != null) {
+                    window = new SchedulePhaseInfo(isSmoky);
+                }
+
+                // if window is not null then take the earliest offset.
+                if (window != null && window.start > startOffset) {
+                    window.start = startOffset;
                 }
             }
         }
