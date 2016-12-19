@@ -500,12 +500,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         int seqNum = (int) artworkHollowInput._getSeqNum();
 
         SchedulePhaseInfo window = getScheduleInfo(artworkHollowInput, videoId);
-        if(window == null){
-        	// Indicates image has tags but the tags are not valid
-        	// Could be error or eventual consistency condition
-        	ctx.getLogger().warn(InvalidPhaseTagForArtwork, "Phase tag associated with artwork is undefined with id={}; data will be dropped.", sourceFileId);
-        	return null;
-        }
+        if (window == null) return null;
 
         ArtworkAttributesHollow attributes = artworkHollowInput._getAttributes();
         ArtworkDerivativeSetHollow inputDerivatives = artworkHollowInput._getDerivatives();
@@ -645,8 +640,13 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
     private SchedulePhaseInfo getScheduleInfo(VideoArtworkHollow videoArtworkHollow, int videoId) {
 
         SchedulePhaseInfo window = null;
-        PhaseTagListHollow phaseTagListHollow = videoArtworkHollow._getPhaseTagList();
-        if (phaseTagListHollow == null) return window;
+        PhaseTagListHollow phaseTagListHollow = videoArtworkHollow._getPhaseTags();
+        if (phaseTagListHollow == null) {
+            String sourceFileId = videoArtworkHollow._getSourceFileId()._getValue();
+            ctx.getLogger().warn(InvalidPhaseTagForArtwork, "PhaseTagList is null in VideoArtwork for videoId={} sourceFileId={} " +
+                    "returning null, data will be dropped", videoId, sourceFileId);
+            return window;
+        }
         boolean isSmoky = videoArtworkHollow._getIsSmoky();
 
         HollowOrdinalIterator iterator = phaseTagListHollow.typeApi().getOrdinalIterator(phaseTagListHollow.getOrdinal());

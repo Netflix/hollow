@@ -17,7 +17,7 @@ public class VideoArtworkDelegateCachedImpl extends HollowObjectAbstractDelegate
     private final int attributesOrdinal;
     private final Long ordinalPriority;
     private final int fileImageTypeOrdinal;
-    private final int phaseTagListOrdinal;
+    private final int phaseTagsOrdinal;
     private final Boolean isSmoky;
    private VideoArtworkTypeAPI typeAPI;
 
@@ -30,7 +30,7 @@ public class VideoArtworkDelegateCachedImpl extends HollowObjectAbstractDelegate
         this.attributesOrdinal = typeAPI.getAttributesOrdinal(ordinal);
         this.ordinalPriority = typeAPI.getOrdinalPriorityBoxed(ordinal);
         this.fileImageTypeOrdinal = typeAPI.getFileImageTypeOrdinal(ordinal);
-        this.phaseTagListOrdinal = typeAPI.getPhaseTagListOrdinal(ordinal);
+        this.phaseTagsOrdinal = typeAPI.getPhaseTagsOrdinal(ordinal);
         this.isSmoky = typeAPI.getIsSmokyBoxed(ordinal);
         this.typeAPI = typeAPI;
     }
@@ -79,8 +79,8 @@ public class VideoArtworkDelegateCachedImpl extends HollowObjectAbstractDelegate
         return fileImageTypeOrdinal;
     }
 
-    public int getPhaseTagListOrdinal(int ordinal) {
-        return phaseTagListOrdinal;
+    public int getPhaseTagsOrdinal(int ordinal) {
+        return phaseTagsOrdinal;
     }
 
     public boolean getIsSmoky(int ordinal) {

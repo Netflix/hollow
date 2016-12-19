@@ -69,8 +69,8 @@ public class VideoArtworkHollow extends HollowObject {
         return  api().getStringHollow(refOrdinal);
     }
 
-    public PhaseTagListHollow _getPhaseTagList() {
-        int refOrdinal = delegate().getPhaseTagListOrdinal(ordinal);
+    public PhaseTagListHollow _getPhaseTags() {
+        int refOrdinal = delegate().getPhaseTagsOrdinal(ordinal);
         if(refOrdinal == -1)
             return null;
         return  api().getPhaseTagListHollow(refOrdinal);
