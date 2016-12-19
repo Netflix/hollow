@@ -691,14 +691,12 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                     }
                 }
 
-                // offset is found in schedule and window is null, initialize window
-                if (window == null && startOffset != null) {
-                    window = new SchedulePhaseInfo(isSmoky);
-                }
-
-                // if window is not null then take the earliest offset.
-                if (window != null && window.start > startOffset) {
-                    window.start = startOffset;
+                // if offset is present, then initialize window if null and take the earliest offset.
+                if (startOffset != null) {
+                    if (window == null) window = new SchedulePhaseInfo(isSmoky);
+                    if (window.start > startOffset) window.start = startOffset;
+                } else {
+                    ctx.getLogger().warn(TransformerLogTag.InvalidPhaseTagForArtwork, "No offsets found for videoId={} tag={} and scheduleId={}", videoId, tag, scheduleId);
                 }
             }
         }

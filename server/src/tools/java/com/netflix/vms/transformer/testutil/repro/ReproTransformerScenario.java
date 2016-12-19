@@ -9,11 +9,11 @@ import org.junit.Test;
 
 public class ReproTransformerScenario {
 
-    private static final String LOCAL_BLOB_STORE = "/space/local-input-blob-store";
+    private static final String LOCAL_BLOB_STORE = "/Users/ksatiya/local-input-blob-store";
 
     @Test
     public void repro() throws Throwable {
-        TransformerScenario scenario = new TransformerScenario(LOCAL_BLOB_STORE, "berlin", 20161130123809799L, 80065658);
+        TransformerScenario scenario = new TransformerScenario(LOCAL_BLOB_STORE, "vmsdev_imgSchedule", 20161215210836204L, 80152826, 80152831);
 
         VMSTransformerWriteStateEngine transformedStateEngine = scenario.repro();
 
