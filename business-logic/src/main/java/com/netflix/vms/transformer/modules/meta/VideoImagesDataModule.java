@@ -665,8 +665,8 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
             // if null then drop this one
             if (tag != null && scheduleId != null) {
                 // check absolute schedule
-                HollowHashIndexResult result = absoluteScheduleIndex.findMatches(videoId, tag);
-                if (result.numResults() == 1) {
+                HollowHashIndexResult result = absoluteScheduleIndex.findMatches((long) videoId, tag);
+                if (result != null && result.numResults() == 1) {
                     if (window == null) window = new SchedulePhaseInfo(isSmoky);
                     // absolute schedule present, get dates from this schedule and return info ignoring other tags
                     int absoluteOrdinal = result.iterator().next();
@@ -679,7 +679,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
 
                 Long startOffset = null;
                 // check override schedule for the given tag.
-                int overrideOrdinal = overrideScheduleIndex.getMatchingOrdinal(videoId, tag);
+                int overrideOrdinal = overrideScheduleIndex.getMatchingOrdinal((long) videoId, tag);
                 if (overrideOrdinal != -1) {
                     startOffset = api.getOverrideScheduleHollow(overrideOrdinal)._getAvailabilityOffset();
                 } else {

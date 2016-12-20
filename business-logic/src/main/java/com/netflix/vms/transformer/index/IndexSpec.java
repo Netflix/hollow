@@ -51,8 +51,8 @@ public enum IndexSpec {
 
     //Image Schedules
     OVERRIDE_SCHEDULE_BY_VIDEO_ID(PRIMARY_KEY, "OverrideSchedule", "movieId", "phaseTag"),
-    MASTER_SCHEDULE_BY_TAG_SHOW(HASH, "MasterSchedule", "phaseTag", "scheduleId"),
-    ABSOLUTE_SCHEDULE_BY_VIDEO_ID_TAG(HASH, "AbsoluteSchedule", "movieId", "phaseTag");
+    MASTER_SCHEDULE_BY_TAG_SHOW(HASH, "MasterSchedule", "", "phaseTag", "scheduleId"),
+    ABSOLUTE_SCHEDULE_BY_VIDEO_ID_TAG(HASH, "AbsoluteSchedule", "", "movieId", "phaseTag");
 
 
     private final IndexType indexType;
