@@ -11,9 +11,6 @@ dependencies {
     testCompile 'junit:junit:4.11'
     testCompile 'org.assertj:assertj-core:3.3+'
     testCompile 'org.reflections:reflections:0.9.9-RC2'
-    testCompile 'org.powermock:powermock-module-junit4:latest.release'
-    testCompile 'org.powermock:powermock-api-mockito:latest.release'
-
 }
 
 configurations {
