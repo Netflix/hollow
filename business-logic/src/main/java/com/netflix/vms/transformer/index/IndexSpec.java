@@ -50,7 +50,7 @@ public enum IndexSpec {
     MOVIE_CHARACTER_PERSON_CHARACTERS_BY_PERSON_ID_AND_MOVIE_ID(HASH, "MovieCharacterPerson", "characters.element", "characters.element.personId", "movieId"),
 
     //Image Schedules
-    OVERRIDE_SCHEDULE_BY_VIDEO_ID(PRIMARY_KEY, "OverrideSchedule", "movieId", "phaseTag"),
+    OVERRIDE_SCHEDULE_BY_VIDEO_ID(HASH, "OverrideSchedule", "", "movieId", "phaseTag"),
     MASTER_SCHEDULE_BY_TAG_SHOW(HASH, "MasterSchedule", "", "phaseTag", "scheduleId"),
     ABSOLUTE_SCHEDULE_BY_VIDEO_ID_TAG(HASH, "AbsoluteSchedule", "", "movieId", "phaseTag");
 

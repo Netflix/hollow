@@ -68,7 +68,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
 	private HollowHashIndex rolloutIndex;
 
 	private HollowPrimaryKeyIndex videoTypeIndex;
-	private HollowPrimaryKeyIndex overrideScheduleIndex;
+	private HollowHashIndex overrideScheduleIndex;
 	private HollowHashIndex masterScheduleIndex;
 	private HollowHashIndex absoluteScheduleIndex;
 
@@ -84,11 +84,25 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         this.rolloutIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
 
         videoTypeIndex = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_TYPE);
-        overrideScheduleIndex = indexer.getPrimaryKeyIndex(IndexSpec.OVERRIDE_SCHEDULE_BY_VIDEO_ID);
+        overrideScheduleIndex = indexer.getHashIndex(IndexSpec.OVERRIDE_SCHEDULE_BY_VIDEO_ID);
         masterScheduleIndex = indexer.getHashIndex(IndexSpec.MASTER_SCHEDULE_BY_TAG_SHOW);
         absoluteScheduleIndex = indexer.getHashIndex(IndexSpec.ABSOLUTE_SCHEDULE_BY_VIDEO_ID_TAG);
 
         ctx.getLogger().info(TransformerLogTag.TransformInfo, "MerchStill descSorting=" + ctx.getConfig().isMerchstillsSortedDescending() + ", edEpisode=" + ctx.getConfig().isMerchstillEpisodeLiveCheckEnabled());
+    }
+
+    // constructor only for test purposes
+    VideoImagesDataModule(TransformerContext context, HollowHashIndex overrideIndex, HollowHashIndex masterIndex,
+                                 HollowHashIndex absoluteIndex, VMSHollowInputAPI api, HollowObjectMapper mapper, CycleConstants cycleConstants,
+                                 VMSTransformerIndexer indexer) {
+        super("Video", api, context, mapper, cycleConstants, indexer);
+        this.overrideScheduleIndex = overrideIndex;
+        this.masterScheduleIndex = masterIndex;
+        this.absoluteScheduleIndex = absoluteIndex;
+
+        this.videoArtworkIndex = null;
+        this.damMerchStillsIdx = null;
+        this.videoStatusIdx = null;
     }
 
     public Map<String, Map<Integer, VideoImages>> buildVideoImagesByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
@@ -637,7 +651,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
 		return localeArtworkIsRolloutAsInput;
 	}
 
-    private SchedulePhaseInfo getScheduleInfo(VideoArtworkHollow videoArtworkHollow, int videoId) {
+    SchedulePhaseInfo getScheduleInfo(VideoArtworkHollow videoArtworkHollow, int videoId) {
 
         SchedulePhaseInfo window = null;
         PhaseTagListHollow phaseTagListHollow = videoArtworkHollow._getPhaseTags();
@@ -666,7 +680,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
             if (tag != null && scheduleId != null) {
                 // check absolute schedule
                 HollowHashIndexResult result = absoluteScheduleIndex.findMatches((long) videoId, tag);
-                if (result != null && result.numResults() == 1) {
+                if (result != null && result.numResults() >= 1) {
                     if (window == null) window = new SchedulePhaseInfo(isSmoky);
                     // absolute schedule present, get dates from this schedule and return info ignoring other tags
                     int absoluteOrdinal = result.iterator().next();
@@ -679,13 +693,14 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
 
                 Long startOffset = null;
                 // check override schedule for the given tag.
-                int overrideOrdinal = overrideScheduleIndex.getMatchingOrdinal((long) videoId, tag);
-                if (overrideOrdinal != -1) {
+                HollowHashIndexResult indexResult = overrideScheduleIndex.findMatches((long) videoId, tag);
+                if (indexResult != null && indexResult.numResults() >= 1) {
+                    int overrideOrdinal = indexResult.iterator().next();
                     startOffset = api.getOverrideScheduleHollow(overrideOrdinal)._getAvailabilityOffset();
                 } else {
                     // get master schedule if no override schedule exists for the given tag
                     HollowHashIndexResult masterScheduleResult = masterScheduleIndex.findMatches(tag, scheduleId);
-                    if (masterScheduleResult.numResults() >= 1) {
+                    if (masterScheduleResult != null && masterScheduleResult.numResults() >= 1) {
                         int masterScheduleOrdinal = masterScheduleResult.iterator().next();
                         startOffset = api.getMasterScheduleHollow(masterScheduleOrdinal)._getAvailabilityOffset();
                     }
@@ -699,6 +714,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                     ctx.getLogger().warn(TransformerLogTag.InvalidPhaseTagForArtwork, "No offsets found for videoId={} tag={} and scheduleId={}", videoId, tag, scheduleId);
                 }
             }
+            phaseTagOrdinal = iterator.next();
         }
         return window;
     }
