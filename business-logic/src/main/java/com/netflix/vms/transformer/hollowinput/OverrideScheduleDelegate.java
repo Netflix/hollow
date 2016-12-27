@@ -10,9 +10,7 @@ public interface OverrideScheduleDelegate extends HollowObjectDelegate {
 
     public Long getMovieIdBoxed(int ordinal);
 
-    public String getPhaseTag(int ordinal);
-
-    public boolean isPhaseTagEqual(int ordinal, String testValue);
+    public int getPhaseTagOrdinal(int ordinal);
 
     public long getAvailabilityOffset(int ordinal);
 

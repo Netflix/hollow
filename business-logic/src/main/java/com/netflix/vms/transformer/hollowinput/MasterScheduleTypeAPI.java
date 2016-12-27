@@ -19,17 +19,14 @@ public class MasterScheduleTypeAPI extends HollowObjectTypeAPI {
         this.delegateLookupImpl = new MasterScheduleDelegateLookupImpl(this);
     }
 
-    public String getMovieType(int ordinal) {
+    public int getMovieTypeOrdinal(int ordinal) {
         if(fieldIndex[0] == -1)
-            return missingDataHandler().handleString("MasterSchedule", ordinal, "movieType");
-        boxedFieldAccessSampler.recordFieldAccess(fieldIndex[0]);
-        return getTypeDataAccess().readString(ordinal, fieldIndex[0]);
+            return missingDataHandler().handleReferencedOrdinal("MasterSchedule", ordinal, "movieType");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[0]);
     }
 
-    public boolean isMovieTypeEqual(int ordinal, String testValue) {
-        if(fieldIndex[0] == -1)
-            return missingDataHandler().handleStringEquals("MasterSchedule", ordinal, "movieType", testValue);
-        return getTypeDataAccess().isStringFieldEqual(ordinal, fieldIndex[0], testValue);
+    public StringTypeAPI getMovieTypeTypeAPI() {
+        return getAPI().getStringTypeAPI();
     }
 
     public long getVersionId(int ordinal) {
@@ -53,30 +50,24 @@ public class MasterScheduleTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public String getScheduleId(int ordinal) {
+    public int getScheduleIdOrdinal(int ordinal) {
         if(fieldIndex[2] == -1)
-            return missingDataHandler().handleString("MasterSchedule", ordinal, "scheduleId");
-        boxedFieldAccessSampler.recordFieldAccess(fieldIndex[2]);
-        return getTypeDataAccess().readString(ordinal, fieldIndex[2]);
+            return missingDataHandler().handleReferencedOrdinal("MasterSchedule", ordinal, "scheduleId");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[2]);
     }
 
-    public boolean isScheduleIdEqual(int ordinal, String testValue) {
-        if(fieldIndex[2] == -1)
-            return missingDataHandler().handleStringEquals("MasterSchedule", ordinal, "scheduleId", testValue);
-        return getTypeDataAccess().isStringFieldEqual(ordinal, fieldIndex[2], testValue);
+    public StringTypeAPI getScheduleIdTypeAPI() {
+        return getAPI().getStringTypeAPI();
     }
 
-    public String getPhaseTag(int ordinal) {
+    public int getPhaseTagOrdinal(int ordinal) {
         if(fieldIndex[3] == -1)
-            return missingDataHandler().handleString("MasterSchedule", ordinal, "phaseTag");
-        boxedFieldAccessSampler.recordFieldAccess(fieldIndex[3]);
-        return getTypeDataAccess().readString(ordinal, fieldIndex[3]);
+            return missingDataHandler().handleReferencedOrdinal("MasterSchedule", ordinal, "phaseTag");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[3]);
     }
 
-    public boolean isPhaseTagEqual(int ordinal, String testValue) {
-        if(fieldIndex[3] == -1)
-            return missingDataHandler().handleStringEquals("MasterSchedule", ordinal, "phaseTag", testValue);
-        return getTypeDataAccess().isStringFieldEqual(ordinal, fieldIndex[3], testValue);
+    public StringTypeAPI getPhaseTagTypeAPI() {
+        return getAPI().getStringTypeAPI();
     }
 
     public long getAvailabilityOffset(int ordinal) {

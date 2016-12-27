@@ -13,12 +13,8 @@ public class MasterScheduleDelegateLookupImpl extends HollowObjectAbstractDelega
         this.typeAPI = typeAPI;
     }
 
-    public String getMovieType(int ordinal) {
-        return typeAPI.getMovieType(ordinal);
-    }
-
-    public boolean isMovieTypeEqual(int ordinal, String testValue) {
-        return typeAPI.isMovieTypeEqual(ordinal, testValue);
+    public int getMovieTypeOrdinal(int ordinal) {
+        return typeAPI.getMovieTypeOrdinal(ordinal);
     }
 
     public long getVersionId(int ordinal) {
@@ -29,20 +25,12 @@ public class MasterScheduleDelegateLookupImpl extends HollowObjectAbstractDelega
         return typeAPI.getVersionIdBoxed(ordinal);
     }
 
-    public String getScheduleId(int ordinal) {
-        return typeAPI.getScheduleId(ordinal);
+    public int getScheduleIdOrdinal(int ordinal) {
+        return typeAPI.getScheduleIdOrdinal(ordinal);
     }
 
-    public boolean isScheduleIdEqual(int ordinal, String testValue) {
-        return typeAPI.isScheduleIdEqual(ordinal, testValue);
-    }
-
-    public String getPhaseTag(int ordinal) {
-        return typeAPI.getPhaseTag(ordinal);
-    }
-
-    public boolean isPhaseTagEqual(int ordinal, String testValue) {
-        return typeAPI.isPhaseTagEqual(ordinal, testValue);
+    public int getPhaseTagOrdinal(int ordinal) {
+        return typeAPI.getPhaseTagOrdinal(ordinal);
     }
 
     public long getAvailabilityOffset(int ordinal) {

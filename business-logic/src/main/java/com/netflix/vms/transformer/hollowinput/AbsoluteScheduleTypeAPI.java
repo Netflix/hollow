@@ -39,17 +39,14 @@ public class AbsoluteScheduleTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public String getPhaseTag(int ordinal) {
+    public int getPhaseTagOrdinal(int ordinal) {
         if(fieldIndex[1] == -1)
-            return missingDataHandler().handleString("AbsoluteSchedule", ordinal, "phaseTag");
-        boxedFieldAccessSampler.recordFieldAccess(fieldIndex[1]);
-        return getTypeDataAccess().readString(ordinal, fieldIndex[1]);
+            return missingDataHandler().handleReferencedOrdinal("AbsoluteSchedule", ordinal, "phaseTag");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[1]);
     }
 
-    public boolean isPhaseTagEqual(int ordinal, String testValue) {
-        if(fieldIndex[1] == -1)
-            return missingDataHandler().handleStringEquals("AbsoluteSchedule", ordinal, "phaseTag", testValue);
-        return getTypeDataAccess().isStringFieldEqual(ordinal, fieldIndex[1], testValue);
+    public StringTypeAPI getPhaseTagTypeAPI() {
+        return getAPI().getStringTypeAPI();
     }
 
     public long getStartDate(int ordinal) {

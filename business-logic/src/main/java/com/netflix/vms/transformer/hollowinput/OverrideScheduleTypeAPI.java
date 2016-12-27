@@ -38,17 +38,14 @@ public class OverrideScheduleTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public String getPhaseTag(int ordinal) {
+    public int getPhaseTagOrdinal(int ordinal) {
         if(fieldIndex[1] == -1)
-            return missingDataHandler().handleString("OverrideSchedule", ordinal, "phaseTag");
-        boxedFieldAccessSampler.recordFieldAccess(fieldIndex[1]);
-        return getTypeDataAccess().readString(ordinal, fieldIndex[1]);
+            return missingDataHandler().handleReferencedOrdinal("OverrideSchedule", ordinal, "phaseTag");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[1]);
     }
 
-    public boolean isPhaseTagEqual(int ordinal, String testValue) {
-        if(fieldIndex[1] == -1)
-            return missingDataHandler().handleStringEquals("OverrideSchedule", ordinal, "phaseTag", testValue);
-        return getTypeDataAccess().isStringFieldEqual(ordinal, fieldIndex[1], testValue);
+    public StringTypeAPI getPhaseTagTypeAPI() {
+        return getAPI().getStringTypeAPI();
     }
 
     public long getAvailabilityOffset(int ordinal) {

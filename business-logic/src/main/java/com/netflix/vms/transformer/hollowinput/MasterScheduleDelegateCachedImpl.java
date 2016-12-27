@@ -9,30 +9,24 @@ import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 @SuppressWarnings("all")
 public class MasterScheduleDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, MasterScheduleDelegate {
 
-    private final String movieType;
+    private final int movieTypeOrdinal;
     private final Long versionId;
-    private final String scheduleId;
-    private final String phaseTag;
+    private final int scheduleIdOrdinal;
+    private final int phaseTagOrdinal;
     private final Long availabilityOffset;
    private MasterScheduleTypeAPI typeAPI;
 
     public MasterScheduleDelegateCachedImpl(MasterScheduleTypeAPI typeAPI, int ordinal) {
-        this.movieType = typeAPI.getMovieType(ordinal);
+        this.movieTypeOrdinal = typeAPI.getMovieTypeOrdinal(ordinal);
         this.versionId = typeAPI.getVersionIdBoxed(ordinal);
-        this.scheduleId = typeAPI.getScheduleId(ordinal);
-        this.phaseTag = typeAPI.getPhaseTag(ordinal);
+        this.scheduleIdOrdinal = typeAPI.getScheduleIdOrdinal(ordinal);
+        this.phaseTagOrdinal = typeAPI.getPhaseTagOrdinal(ordinal);
         this.availabilityOffset = typeAPI.getAvailabilityOffsetBoxed(ordinal);
         this.typeAPI = typeAPI;
     }
 
-    public String getMovieType(int ordinal) {
-        return movieType;
-    }
-
-    public boolean isMovieTypeEqual(int ordinal, String testValue) {
-        if(testValue == null)
-            return movieType == null;
-        return testValue.equals(movieType);
+    public int getMovieTypeOrdinal(int ordinal) {
+        return movieTypeOrdinal;
     }
 
     public long getVersionId(int ordinal) {
@@ -43,24 +37,12 @@ public class MasterScheduleDelegateCachedImpl extends HollowObjectAbstractDelega
         return versionId;
     }
 
-    public String getScheduleId(int ordinal) {
-        return scheduleId;
+    public int getScheduleIdOrdinal(int ordinal) {
+        return scheduleIdOrdinal;
     }
 
-    public boolean isScheduleIdEqual(int ordinal, String testValue) {
-        if(testValue == null)
-            return scheduleId == null;
-        return testValue.equals(scheduleId);
-    }
-
-    public String getPhaseTag(int ordinal) {
-        return phaseTag;
-    }
-
-    public boolean isPhaseTagEqual(int ordinal, String testValue) {
-        if(testValue == null)
-            return phaseTag == null;
-        return testValue.equals(phaseTag);
+    public int getPhaseTagOrdinal(int ordinal) {
+        return phaseTagOrdinal;
     }
 
     public long getAvailabilityOffset(int ordinal) {

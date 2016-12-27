@@ -552,7 +552,9 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         artwork.ordinalPriority = ordinalPriority;
         fillPassThroughData(artwork, attributes);
         artwork.schedulePhaseInfo = window;
-        artwork.isRolloutExclusive = false; // TODO: artworkHollowInput._getIsRolloutExclusive();
+        // get ArtworkAttributes and read ROLLOUt_EXCLUSIVE from ArtworkAttributes
+        ArtworkAttributesHollow artworkAttributesHollow = artworkHollowInput._getAttributes();
+        artwork.isRolloutExclusive = artworkAttributesHollow._getROLLOUT_EXCLUSIVE();
         artwork.sourceVideoId = entityId;
 
         int ordinal = damMerchStillsIdx.getMatchingOrdinal(sourceFileId);

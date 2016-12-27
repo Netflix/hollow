@@ -17,6 +17,14 @@ public class ArtworkAttributesHollow extends HollowObject {
         return  api().getPassthroughDataHollow(refOrdinal);
     }
 
+    public boolean _getROLLOUT_EXCLUSIVE() {
+        return delegate().getROLLOUT_EXCLUSIVE(ordinal);
+    }
+
+    public Boolean _getROLLOUT_EXCLUSIVEBoxed() {
+        return delegate().getROLLOUT_EXCLUSIVEBoxed(ordinal);
+    }
+
     public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }

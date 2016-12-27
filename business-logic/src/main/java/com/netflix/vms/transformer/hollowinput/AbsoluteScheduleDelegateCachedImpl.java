@@ -10,14 +10,14 @@ import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 public class AbsoluteScheduleDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, AbsoluteScheduleDelegate {
 
     private final Long movieId;
-    private final String phaseTag;
+    private final int phaseTagOrdinal;
     private final Long startDate;
     private final Long endDate;
    private AbsoluteScheduleTypeAPI typeAPI;
 
     public AbsoluteScheduleDelegateCachedImpl(AbsoluteScheduleTypeAPI typeAPI, int ordinal) {
         this.movieId = typeAPI.getMovieIdBoxed(ordinal);
-        this.phaseTag = typeAPI.getPhaseTag(ordinal);
+        this.phaseTagOrdinal = typeAPI.getPhaseTagOrdinal(ordinal);
         this.startDate = typeAPI.getStartDateBoxed(ordinal);
         this.endDate = typeAPI.getEndDateBoxed(ordinal);
         this.typeAPI = typeAPI;
@@ -31,14 +31,8 @@ public class AbsoluteScheduleDelegateCachedImpl extends HollowObjectAbstractDele
         return movieId;
     }
 
-    public String getPhaseTag(int ordinal) {
-        return phaseTag;
-    }
-
-    public boolean isPhaseTagEqual(int ordinal, String testValue) {
-        if(testValue == null)
-            return phaseTag == null;
-        return testValue.equals(phaseTag);
+    public int getPhaseTagOrdinal(int ordinal) {
+        return phaseTagOrdinal;
     }
 
     public long getStartDate(int ordinal) {

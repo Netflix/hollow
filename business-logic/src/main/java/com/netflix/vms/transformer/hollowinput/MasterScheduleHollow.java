@@ -10,12 +10,11 @@ public class MasterScheduleHollow extends HollowObject {
         super(delegate, ordinal);
     }
 
-    public String _getMovieType() {
-        return delegate().getMovieType(ordinal);
-    }
-
-    public boolean _isMovieTypeEqual(String testValue) {
-        return delegate().isMovieTypeEqual(ordinal, testValue);
+    public StringHollow _getMovieType() {
+        int refOrdinal = delegate().getMovieTypeOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getStringHollow(refOrdinal);
     }
 
     public long _getVersionId() {
@@ -26,20 +25,18 @@ public class MasterScheduleHollow extends HollowObject {
         return delegate().getVersionIdBoxed(ordinal);
     }
 
-    public String _getScheduleId() {
-        return delegate().getScheduleId(ordinal);
+    public StringHollow _getScheduleId() {
+        int refOrdinal = delegate().getScheduleIdOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getStringHollow(refOrdinal);
     }
 
-    public boolean _isScheduleIdEqual(String testValue) {
-        return delegate().isScheduleIdEqual(ordinal, testValue);
-    }
-
-    public String _getPhaseTag() {
-        return delegate().getPhaseTag(ordinal);
-    }
-
-    public boolean _isPhaseTagEqual(String testValue) {
-        return delegate().isPhaseTagEqual(ordinal, testValue);
+    public StringHollow _getPhaseTag() {
+        int refOrdinal = delegate().getPhaseTagOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getStringHollow(refOrdinal);
     }
 
     public long _getAvailabilityOffset() {

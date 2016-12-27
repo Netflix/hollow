@@ -21,12 +21,8 @@ public class OverrideScheduleDelegateLookupImpl extends HollowObjectAbstractDele
         return typeAPI.getMovieIdBoxed(ordinal);
     }
 
-    public String getPhaseTag(int ordinal) {
-        return typeAPI.getPhaseTag(ordinal);
-    }
-
-    public boolean isPhaseTagEqual(int ordinal, String testValue) {
-        return typeAPI.isPhaseTagEqual(ordinal, testValue);
+    public int getPhaseTagOrdinal(int ordinal) {
+        return typeAPI.getPhaseTagOrdinal(ordinal);
     }
 
     public long getAvailabilityOffset(int ordinal) {

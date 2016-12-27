@@ -18,12 +18,11 @@ public class AbsoluteScheduleHollow extends HollowObject {
         return delegate().getMovieIdBoxed(ordinal);
     }
 
-    public String _getPhaseTag() {
-        return delegate().getPhaseTag(ordinal);
-    }
-
-    public boolean _isPhaseTagEqual(String testValue) {
-        return delegate().isPhaseTagEqual(ordinal, testValue);
+    public StringHollow _getPhaseTag() {
+        int refOrdinal = delegate().getPhaseTagOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getStringHollow(refOrdinal);
     }
 
     public long _getStartDate() {

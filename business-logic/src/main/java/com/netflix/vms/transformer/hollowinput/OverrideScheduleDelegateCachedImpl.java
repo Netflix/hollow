@@ -10,13 +10,13 @@ import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
 public class OverrideScheduleDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, OverrideScheduleDelegate {
 
     private final Long movieId;
-    private final String phaseTag;
+    private final int phaseTagOrdinal;
     private final Long availabilityOffset;
    private OverrideScheduleTypeAPI typeAPI;
 
     public OverrideScheduleDelegateCachedImpl(OverrideScheduleTypeAPI typeAPI, int ordinal) {
         this.movieId = typeAPI.getMovieIdBoxed(ordinal);
-        this.phaseTag = typeAPI.getPhaseTag(ordinal);
+        this.phaseTagOrdinal = typeAPI.getPhaseTagOrdinal(ordinal);
         this.availabilityOffset = typeAPI.getAvailabilityOffsetBoxed(ordinal);
         this.typeAPI = typeAPI;
     }
@@ -29,14 +29,8 @@ public class OverrideScheduleDelegateCachedImpl extends HollowObjectAbstractDele
         return movieId;
     }
 
-    public String getPhaseTag(int ordinal) {
-        return phaseTag;
-    }
-
-    public boolean isPhaseTagEqual(int ordinal, String testValue) {
-        if(testValue == null)
-            return phaseTag == null;
-        return testValue.equals(phaseTag);
+    public int getPhaseTagOrdinal(int ordinal) {
+        return phaseTagOrdinal;
     }
 
     public long getAvailabilityOffset(int ordinal) {

@@ -10,7 +10,8 @@ public class ArtworkAttributesTypeAPI extends HollowObjectTypeAPI {
 
     ArtworkAttributesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
-            "passthrough"
+            "passthrough",
+            "ROLLOUT_EXCLUSIVE"
         });
         this.delegateLookupImpl = new ArtworkAttributesDelegateLookupImpl(this);
     }
@@ -24,6 +25,20 @@ public class ArtworkAttributesTypeAPI extends HollowObjectTypeAPI {
     public PassthroughDataTypeAPI getPassthroughTypeAPI() {
         return getAPI().getPassthroughDataTypeAPI();
     }
+
+    public boolean getROLLOUT_EXCLUSIVE(int ordinal) {
+        if(fieldIndex[1] == -1)
+            return missingDataHandler().handleBoolean("ArtworkAttributes", ordinal, "ROLLOUT_EXCLUSIVE") == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[1]) == Boolean.TRUE;
+    }
+
+    public Boolean getROLLOUT_EXCLUSIVEBoxed(int ordinal) {
+        if(fieldIndex[1] == -1)
+            return missingDataHandler().handleBoolean("ArtworkAttributes", ordinal, "ROLLOUT_EXCLUSIVE");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[1]);
+    }
+
+
 
     public ArtworkAttributesDelegateLookupImpl getDelegateLookupImpl() {
         return delegateLookupImpl;
