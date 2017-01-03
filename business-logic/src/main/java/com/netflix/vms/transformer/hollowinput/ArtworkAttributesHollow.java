@@ -17,12 +17,12 @@ public class ArtworkAttributesHollow extends HollowObject {
         return  api().getPassthroughDataHollow(refOrdinal);
     }
 
-    public boolean _getROLLOUT_EXCLUSIVE() {
+    public String _getROLLOUT_EXCLUSIVE() {
         return delegate().getROLLOUT_EXCLUSIVE(ordinal);
     }
 
-    public Boolean _getROLLOUT_EXCLUSIVEBoxed() {
-        return delegate().getROLLOUT_EXCLUSIVEBoxed(ordinal);
+    public boolean _isROLLOUT_EXCLUSIVEEqual(String testValue) {
+        return delegate().isROLLOUT_EXCLUSIVEEqual(ordinal, testValue);
     }
 
     public VMSHollowInputAPI api() {

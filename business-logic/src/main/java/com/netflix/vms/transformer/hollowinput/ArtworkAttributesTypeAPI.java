@@ -26,19 +26,18 @@ public class ArtworkAttributesTypeAPI extends HollowObjectTypeAPI {
         return getAPI().getPassthroughDataTypeAPI();
     }
 
-    public boolean getROLLOUT_EXCLUSIVE(int ordinal) {
+    public String getROLLOUT_EXCLUSIVE(int ordinal) {
         if(fieldIndex[1] == -1)
-            return missingDataHandler().handleBoolean("ArtworkAttributes", ordinal, "ROLLOUT_EXCLUSIVE") == Boolean.TRUE;
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[1]) == Boolean.TRUE;
+            return missingDataHandler().handleString("ArtworkAttributes", ordinal, "ROLLOUT_EXCLUSIVE");
+        boxedFieldAccessSampler.recordFieldAccess(fieldIndex[1]);
+        return getTypeDataAccess().readString(ordinal, fieldIndex[1]);
     }
 
-    public Boolean getROLLOUT_EXCLUSIVEBoxed(int ordinal) {
+    public boolean isROLLOUT_EXCLUSIVEEqual(int ordinal, String testValue) {
         if(fieldIndex[1] == -1)
-            return missingDataHandler().handleBoolean("ArtworkAttributes", ordinal, "ROLLOUT_EXCLUSIVE");
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[1]);
+            return missingDataHandler().handleStringEquals("ArtworkAttributes", ordinal, "ROLLOUT_EXCLUSIVE", testValue);
+        return getTypeDataAccess().isStringFieldEqual(ordinal, fieldIndex[1], testValue);
     }
-
-
 
     public ArtworkAttributesDelegateLookupImpl getDelegateLookupImpl() {
         return delegateLookupImpl;

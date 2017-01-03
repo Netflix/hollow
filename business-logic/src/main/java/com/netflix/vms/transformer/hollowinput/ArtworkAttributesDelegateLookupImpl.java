@@ -17,12 +17,12 @@ public class ArtworkAttributesDelegateLookupImpl extends HollowObjectAbstractDel
         return typeAPI.getPassthroughOrdinal(ordinal);
     }
 
-    public boolean getROLLOUT_EXCLUSIVE(int ordinal) {
+    public String getROLLOUT_EXCLUSIVE(int ordinal) {
         return typeAPI.getROLLOUT_EXCLUSIVE(ordinal);
     }
 
-    public Boolean getROLLOUT_EXCLUSIVEBoxed(int ordinal) {
-        return typeAPI.getROLLOUT_EXCLUSIVEBoxed(ordinal);
+    public boolean isROLLOUT_EXCLUSIVEEqual(int ordinal, String testValue) {
+        return typeAPI.isROLLOUT_EXCLUSIVEEqual(ordinal, testValue);
     }
 
     public ArtworkAttributesTypeAPI getTypeAPI() {

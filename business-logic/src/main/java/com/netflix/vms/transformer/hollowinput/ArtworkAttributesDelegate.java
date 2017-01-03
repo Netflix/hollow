@@ -8,9 +8,9 @@ public interface ArtworkAttributesDelegate extends HollowObjectDelegate {
 
     public int getPassthroughOrdinal(int ordinal);
 
-    public boolean getROLLOUT_EXCLUSIVE(int ordinal);
+    public String getROLLOUT_EXCLUSIVE(int ordinal);
 
-    public Boolean getROLLOUT_EXCLUSIVEBoxed(int ordinal);
+    public boolean isROLLOUT_EXCLUSIVEEqual(int ordinal, String testValue);
 
     public ArtworkAttributesTypeAPI getTypeAPI();
 
