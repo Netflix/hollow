@@ -48,7 +48,7 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
     private final String className;
     private final String classNameSuffix;
     private final String packageName;
-
+    private final boolean memoizeOrdinal;
     private final Set<Class<?>> importClasses;
 
     public HollowPOJOClassGenerator(HollowStateEngine stateEngine, HollowObjectSchema schema, String packageName) {
@@ -56,14 +56,20 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
     }
 
     public HollowPOJOClassGenerator(HollowStateEngine stateEngine, HollowObjectSchema schema, String packageName, String classNameSuffix) {
+        this(stateEngine, schema, packageName, classNameSuffix, false);
+    }
+    
+    public HollowPOJOClassGenerator(HollowStateEngine stateEngine, HollowObjectSchema schema, String packageName, 
+    		String classNameSuffix, boolean memoizeOrdinal) {
         this.stateEngine = stateEngine;
         this.schema = schema;
         this.packageName = packageName;
         this.classNameSuffix = classNameSuffix;
         this.className = buildClassName(schema.getName(), classNameSuffix);
         this.importClasses = new HashSet<Class<?>>();
+        this.memoizeOrdinal = memoizeOrdinal;
     }
-
+    
     private static String buildClassName(String name, String suffix) {
         if (suffix == null) return name;
         return name + suffix;
@@ -193,13 +199,19 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
 
         classBodyBuilder.append("    public ").append(getClassName()).append(" clone() {\n");
         classBodyBuilder.append("        try {\n");
-        classBodyBuilder.append("            ").append(getClassName()).append(" clone = (" + getClassName() + ")super.clone();\n");
-        classBodyBuilder.append("            clone.__assigned_ordinal = -1;\n");
+        classBodyBuilder.append("            ").append(getClassName())
+            .append(" clone = (" + getClassName() + ")super.clone();\n");
+        if (memoizeOrdinal) {
+            classBodyBuilder.append("            clone.__assigned_ordinal = -1;\n");
+        }
         classBodyBuilder.append("            return clone;\n");
-        classBodyBuilder.append("        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }\n");
+        classBodyBuilder
+                .append("        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }\n");
         classBodyBuilder.append("    }\n\n");
 
-        classBodyBuilder.append("    private int __assigned_ordinal = -1;\n");
+        if (memoizeOrdinal) {
+            classBodyBuilder.append("    private int __assigned_ordinal = -1;\n");
+        }
 
         classBodyBuilder.append("}");
 
