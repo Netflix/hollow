@@ -625,7 +625,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                         countrySchedulePhaseMap.put(countryCode, new HashMap<>());
                     }
                     Map<Integer, List<SchedulePhaseInfo>> videoSchedulePhaseMap = countrySchedulePhaseMap.get(countryCode);
-                    videoSchedulePhaseMap.put(videoId, schedulePhaseInfoList);
+                    videoSchedulePhaseMap.put(videoId, schedulePhaseInfoList);// note overriding if video repeats
 
                 	// For non-merch still images do the following
                 	// 1) Filter any rollout images without rollout
@@ -640,6 +640,17 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
 		                // Look at pickArtworkBasedOnRolloutInfo method for details. Logging of dropped IDs is in pickArtworkBasedOnRolloutInfo.
 		                if(updatedArtwork != null)
 		                	artworkSet.add(updatedArtwork);
+
+		                // add schedule information in top nodes
+                        if (!countrySchedulePhaseMap.containsKey(countryCode)) {
+                            countrySchedulePhaseMap.put(countryCode, new HashMap<>());
+                        }
+                        videoSchedulePhaseMap = countrySchedulePhaseMap.get(countryCode);
+                        if (!videoSchedulePhaseMap.containsKey(videoId)) {
+                            videoSchedulePhaseMap.put(videoId, new ArrayList<>());
+                        }
+                        List<SchedulePhaseInfo> scheduleList = videoSchedulePhaseMap.get(videoId);
+                        scheduleList.addAll(schedulePhaseInfoList);
 	                }
                 }
             }
