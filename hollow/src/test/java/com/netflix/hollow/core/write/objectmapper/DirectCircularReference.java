@@ -1,7 +1,5 @@
 package com.netflix.hollow.core.write.objectmapper;
 
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Sample type that represents a direct circular reference between 2 classes.
@@ -9,13 +7,10 @@ import java.util.List;
 public class DirectCircularReference {
 
     private final String name;
-    private final List<DirectCircularReference> children;
+    private final DirectCircularReference child;
 
-    public DirectCircularReference(String name) {
-        this(name, Collections.<DirectCircularReference>emptyList());
-    }
-    public DirectCircularReference(String name, List<DirectCircularReference> children) {
+    public DirectCircularReference(String name, DirectCircularReference child) {
         this.name = name;
-        this.children = children;
+        this.child = child;
     }
 }

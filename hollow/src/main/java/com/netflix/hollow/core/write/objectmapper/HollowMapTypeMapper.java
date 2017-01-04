@@ -26,7 +26,9 @@ import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.Set;
 
 public class HollowMapTypeMapper extends HollowTypeMapper {
 
@@ -38,9 +40,9 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
     private HollowTypeMapper keyMapper;
     private HollowTypeMapper valueMapper;
 
-    public HollowMapTypeMapper(HollowObjectMapper parentMapper, ParameterizedType type, String declaredName, String[] hashKeyFieldPaths, HollowWriteStateEngine stateEngine, boolean useDefaultHashKeys) {
-        this.keyMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[0], null, null);
-        this.valueMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[1], null, null);
+    public HollowMapTypeMapper(HollowObjectMapper parentMapper, ParameterizedType type, String declaredName, String[] hashKeyFieldPaths, HollowWriteStateEngine stateEngine, boolean useDefaultHashKeys, Set<Type> visited) {
+        this.keyMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[0], null, null, visited);
+        this.valueMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[1], null, null, visited);
         String typeName = declaredName != null ? declaredName : getDefaultTypeName(type);
         
         if(hashKeyFieldPaths == null && useDefaultHashKeys && (keyMapper instanceof HollowObjectTypeMapper))

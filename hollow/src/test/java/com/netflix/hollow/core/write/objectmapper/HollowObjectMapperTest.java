@@ -76,17 +76,44 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         Assert.assertEquals(3, subObj.getInt("val2"));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testMappingCircularReference() throws IOException {
-        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.initializeTypeState(DirectCircularReference.class);
+        assertExpectedFailureMappingType(DirectCircularReference.class, "child");
     }
-    @Test(expected = IllegalStateException.class)
-    public void testMappingDeeperCircularReference() throws IOException {
-        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.initializeTypeState(IndirectCircularReference.TypeE.class);
+    @Test
+    public void testMappingCircularReferenceList() throws IOException {
+        assertExpectedFailureMappingType(DirectListCircularReference.class, "children");
+    }
+    @Test
+    public void testMappingCircularReferenceSet() throws IOException {
+        assertExpectedFailureMappingType(DirectSetCircularReference.class, "children");
+    }
+    @Test
+    public void testMappingCircularReferenceMap() throws IOException {
+        assertExpectedFailureMappingType(DirectMapCircularReference.class, "children");
+    }
+    @Test
+    public void testMappingIndirectircularReference() throws IOException {
+        assertExpectedFailureMappingType(IndirectCircularReference.TypeE.class, "f");
     }
 
+    /**
+     * Convenience method for experimenting with {@link HollowObjectMapper#initializeTypeState(Class)}
+     * on classes we know should fail due to circular references, confirming the exception message is correct.
+     *
+     * @param clazz class to initialize
+     * @param fieldName the name of the field that should trip the circular reference detection
+     */
+    protected void assertExpectedFailureMappingType(Class<?> clazz, String fieldName) {
+        final String expected = clazz.getSimpleName() + "." + fieldName;
+        try {
+            HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+            mapper.initializeTypeState(clazz);
+        } catch (IllegalStateException e) {
+
+            Assert.assertTrue(String.format("missing expected fieldname %s in the message, was %s", expected, e.getMessage()), e.getMessage().contains(expected));
+        }
+    }
     private Map<String, List<Integer>> map(Object... keyValues) {
         Map<String, List<Integer>> map = new HashMap<String, List<Integer>>();
         int i = 0;
