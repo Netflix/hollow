@@ -642,15 +642,15 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
 		                	artworkSet.add(updatedArtwork);
 
 		                // add schedule information in top nodes
-                        if (!countrySchedulePhaseMap.containsKey(countryCode)) {
-                            countrySchedulePhaseMap.put(countryCode, new HashMap<>());
-                        }
-                        videoSchedulePhaseMap = countrySchedulePhaseMap.get(countryCode);
-                        if (!videoSchedulePhaseMap.containsKey(videoId)) {
-                            videoSchedulePhaseMap.put(videoId, new ArrayList<>());
-                        }
-                        List<SchedulePhaseInfo> scheduleList = videoSchedulePhaseMap.get(videoId);
-                        scheduleList.addAll(schedulePhaseInfoList);
+//                        if (!countrySchedulePhaseMap.containsKey(countryCode)) {
+//                            countrySchedulePhaseMap.put(countryCode, new HashMap<>());
+//                        }
+//                        videoSchedulePhaseMap = countrySchedulePhaseMap.get(countryCode);
+//                        if (!videoSchedulePhaseMap.containsKey(topNode)) {
+//                            videoSchedulePhaseMap.put(topNode, new ArrayList<>());
+//                        }
+//                        List<SchedulePhaseInfo> scheduleList = videoSchedulePhaseMap.get(topNode);
+//                        scheduleList.addAll(schedulePhaseInfoList);
 	                }
                 }
             }
@@ -677,7 +677,8 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         	if(rolloutSourceFileIds == null || !rolloutSourceFileIds.contains(sourceFileId)){
     			// But no corresponding rollout for the image in this country.
     			// To err on side of not leaking a rollout image, drop this image for the country.
-        		ctx.getLogger().warn(MissingRolloutForArtwork, "Rollout exclusive image has no valid rollout with id={}; data will be dropped.", sourceFileId);
+                // not logging for now since there are way too many log messages.
+        		//ctx.getLogger().warn(MissingRolloutForArtwork, "Rollout exclusive image has no valid rollout with id={}; data will be dropped.", sourceFileId);
     			return null;
     		}
         }
@@ -728,7 +729,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                     schedulePhaseInfos.add(window);
                 }
 
-                // check master schedule todo if override exists then should check master?
+                // master schedule
                 HollowHashIndexResult masterScheduleResult = masterScheduleIndex.findMatches(tag, scheduleId);
                 if (masterScheduleResult != null && masterScheduleResult.numResults() >= 1) {
                     int masterScheduleOrdinal = masterScheduleResult.iterator().next();
