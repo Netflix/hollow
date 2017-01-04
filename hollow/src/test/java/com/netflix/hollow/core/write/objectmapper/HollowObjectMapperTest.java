@@ -23,7 +23,6 @@ import com.netflix.hollow.tools.stringifier.HollowRecordJsonStringifier;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.PrimaryKey;
-import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -77,6 +76,17 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         Assert.assertEquals(3, subObj.getInt("val2"));
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void testMappingCircularReference() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.initializeTypeState(DirectCircularReference.class);
+    }
+    @Test(expected = IllegalStateException.class)
+    public void testMappingDeeperCircularReference() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.initializeTypeState(IndirectCircularReference.TypeE.class);
+    }
+
     private Map<String, List<Integer>> map(Object... keyValues) {
         Map<String, List<Integer>> map = new HashMap<String, List<Integer>>();
         int i = 0;
@@ -127,6 +137,7 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
             this.val2 = val2;
         }
     }
+
 
 
 }

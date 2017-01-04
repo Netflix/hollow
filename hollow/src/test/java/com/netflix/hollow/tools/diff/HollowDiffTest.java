@@ -74,14 +74,14 @@ public class HollowDiffTest {
         typeCSchema.addField("c1", FieldType.LONG);
         typeCSchema.addField("c2", FieldType.BOOLEAN);
 
-        typeDSchema = new HollowObjectSchema("TypeD", 3, "d1", "d2");
+        typeDSchema = new HollowObjectSchema("DirectCircularReference", 3, "d1", "d2");
         typeDSchema.addField("d1", FieldType.FLOAT);
         typeDSchema.addField("d2", FieldType.DOUBLE);
         typeDSchema.addField("d3", FieldType.BYTES);
 
         listOfTypeCSchema = new HollowListSchema("ListOfTypeC", "TypeC");
-        setOfTypeDSchema = new HollowSetSchema("SetOfTypeD", "TypeD");
-        mapOfTypeCToTypeDSchema = new HollowMapSchema("MapOfTypeCToTypeD", "TypeC", "TypeD");
+        setOfTypeDSchema = new HollowSetSchema("SetOfTypeD", "DirectCircularReference");
+        mapOfTypeCToTypeDSchema = new HollowMapSchema("MapOfTypeCToTypeD", "TypeC", "DirectCircularReference");
     }
 
     @Test
@@ -215,7 +215,7 @@ public class HollowDiffTest {
 
         Assert.assertEquals(1, diff.getTypeDiffs().size());
 
-        HollowTypeDiff typeDDiff = diff.getTypeDiff("TypeD");
+        HollowTypeDiff typeDDiff = diff.getTypeDiff("DirectCircularReference");
         Assert.assertNotNull(typeDDiff);
 
         HollowDiffMatcher matcher = typeDDiff.getMatcher();
@@ -335,7 +335,7 @@ public class HollowDiffTest {
         rec.setFloat("d1", typeD.d1);
         rec.setDouble("d2", typeD.d2);
         rec.setBytes("d3", typeD.d3);
-        return stateEngine.add("TypeD", rec);
+        return stateEngine.add("DirectCircularReference", rec);
     }
 
     private TypeCRec[] cList(TypeCRec... cs) {

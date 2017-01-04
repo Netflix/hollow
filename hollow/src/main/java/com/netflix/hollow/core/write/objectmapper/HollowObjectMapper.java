@@ -21,6 +21,7 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Map;
 import java.util.Set;

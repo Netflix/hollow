@@ -30,14 +30,21 @@ import java.lang.reflect.Type;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import sun.misc.Unsafe;
 
 @SuppressWarnings("restriction")
 public class HollowObjectTypeMapper extends HollowTypeMapper {
 
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
-
+    private static final ThreadLocal<Set<Class<?>>> visitedClasses = new ThreadLocal<Set<Class<?>>>() {
+        @Override
+        protected Set<Class<?>> initialValue() {
+            return new HashSet<>();
+        }
+    };
     private final HollowObjectMapper parentMapper;
 
     private final String typeName;
@@ -152,6 +159,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
     }
 
     private class MappedField {
+
         private final String fieldName;
         private final long fieldOffset;
         private final Type type;
@@ -188,7 +196,14 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 fieldType = FieldType.STRING;
             } else {
                 fieldType = FieldType.REFERENCE;
-                subTypeMapper = parentMapper.getTypeMapper(type, typeNameAnnotation != null ? typeNameAnnotation.name() : null, hashKeyAnnotation != null ? hashKeyAnnotation.fields() : null);
+                if(!visitedClasses.get().contains(f.getType())) {
+                    // guard recursion: track visited classes in a threadlocal so we can detect circular references as we recurse
+                    visitedClasses.get().add(f.getType());
+                    subTypeMapper = parentMapper.getTypeMapper(type, typeNameAnnotation != null ? typeNameAnnotation.name() : null, hashKeyAnnotation != null ? hashKeyAnnotation.fields() : null);
+                    visitedClasses.get().remove(f.getType());
+                } else {
+                    throw new IllegalStateException("circular reference detected on field " + f + "; this type of relationship is not supported");
+                }
             }
 
             this.subTypeMapper = subTypeMapper;
