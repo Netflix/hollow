@@ -66,14 +66,18 @@ public class HollowObjectMapper {
     }
 
     HollowTypeMapper getTypeMapper(Type type, String declaredName, String[] hashKeyFieldPaths) {
-        return getTypeMapper(type, declaredName, hashKeyFieldPaths, new HashSet<Type>());
+        return getTypeMapper(type, declaredName, hashKeyFieldPaths, null);
     }
+    
     HollowTypeMapper getTypeMapper(Type type, String declaredName, String[] hashKeyFieldPaths, Set<Type> visited) {
         String typeName = declaredName != null ? declaredName : HollowObjectTypeMapper.getDefaultTypeName(type);
 
         HollowTypeMapper typeMapper = typeMappers.get(typeName);
 
         if(typeMapper == null) {
+            
+            if(visited == null)
+                visited = new HashSet<Type>();
 
             if(type instanceof ParameterizedType) {
                 ParameterizedType parameterizedType = (ParameterizedType)type;
