@@ -30,14 +30,15 @@ import java.lang.reflect.Type;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import sun.misc.Unsafe;
 
 @SuppressWarnings("restriction")
 public class HollowObjectTypeMapper extends HollowTypeMapper {
 
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
-
     private final HollowObjectMapper parentMapper;
 
     private final String typeName;
@@ -49,7 +50,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
 
     private final List<MappedField> mappedFields;
 
-    public HollowObjectTypeMapper(HollowObjectMapper parentMapper, Class<?> clazz, String declaredTypeName) {
+    public HollowObjectTypeMapper(HollowObjectMapper parentMapper, Class<?> clazz, String declaredTypeName, Set<Type> visited) {
         this.parentMapper = parentMapper;
         this.clazz = clazz;
         this.typeName = declaredTypeName != null ? declaredTypeName : getDefaultTypeName(clazz);
@@ -66,7 +67,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
 
             for(int i=0;i<declaredFields.length;i++) {
                 if(!Modifier.isStatic(declaredFields[i].getModifiers()) && !"__assigned_ordinal".equals(declaredFields[i].getName())) {
-                    mappedFields.add(new MappedField(declaredFields[i]));
+                    mappedFields.add(new MappedField(declaredFields[i], visited));
                 }
             }
 
@@ -152,6 +153,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
     }
 
     private class MappedField {
+
         private final String fieldName;
         private final long fieldOffset;
         private final Type type;
@@ -162,6 +164,9 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         private final boolean isEnumNameField;
 
         private MappedField(Field f) {
+            this(f, new HashSet<Type>());
+        }
+        private MappedField(Field f, Set<Type> visitedTypes) {
             this.fieldOffset = unsafe.objectFieldOffset(f);
             this.fieldName = f.getName();
             this.type = f.getGenericType();
@@ -188,7 +193,14 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 fieldType = FieldType.STRING;
             } else {
                 fieldType = FieldType.REFERENCE;
-                subTypeMapper = parentMapper.getTypeMapper(type, typeNameAnnotation != null ? typeNameAnnotation.name() : null, hashKeyAnnotation != null ? hashKeyAnnotation.fields() : null);
+                if(visitedTypes.contains(this.type)){
+                    throw new IllegalStateException("circular reference detected on field " + f + "; this type of relationship is not supported");
+                }
+                // guard recursion here
+                visitedTypes.add(this.type);
+                subTypeMapper = parentMapper.getTypeMapper(type, typeNameAnnotation != null ? typeNameAnnotation.name() : null, hashKeyAnnotation != null ? hashKeyAnnotation.fields() : null, visitedTypes);
+                // once we've safely returned from a leaf node in recursion, we can remove this MappedField's type
+                visitedTypes.remove(this.type);
             }
 
             this.subTypeMapper = subTypeMapper;
