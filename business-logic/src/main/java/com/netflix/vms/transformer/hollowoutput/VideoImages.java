@@ -8,7 +8,7 @@ public class VideoImages implements Cloneable {
 
     public Map<Strings, List<Artwork>> artworks = null;
     public Map<ArtWorkImageTypeEntry, Set<ArtWorkImageFormatEntry>> artworkFormatsByType = null;
-    public List<SchedulePhaseInfo> imageAvailabilityWindows = null;
+    public Set<SchedulePhaseInfo> imageAvailabilityWindows = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

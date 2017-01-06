@@ -5,41 +5,37 @@ public class SchedulePhaseInfo {
 	public long end = java.lang.Long.MIN_VALUE;
 	public boolean isAbsolute = false;
 	public boolean isAutomatedImg = false;
+	public int sourceVideoId = -1;
 
-	public SchedulePhaseInfo() {
-
+	public SchedulePhaseInfo(int sourceVideoId) {
+		this.sourceVideoId = sourceVideoId;
 	}
 
-	public SchedulePhaseInfo(boolean isAutomatedImg) {
+	public SchedulePhaseInfo(boolean isAutomatedImg, int sourceVideoId) {
 		this.isAutomatedImg = isAutomatedImg;
+		this.sourceVideoId = sourceVideoId;
+	}
+
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof SchedulePhaseInfo)) return false;
+
+		SchedulePhaseInfo that = (SchedulePhaseInfo) o;
+
+		if (start != that.start) return false;
+		if (end != that.end) return false;
+		if (isAbsolute != that.isAbsolute) return false;
+		return isAutomatedImg == that.isAutomatedImg;
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (end ^ (end >>> 32));
-		result = prime * result + (isAbsolute ? 1231 : 1237);
-		result = prime * result + (int) (start ^ (start >>> 32));
+		int result = (int) (start ^ (start >>> 32));
+		result = 31 * result + (int) (end ^ (end >>> 32));
+		result = 31 * result + (isAbsolute ? 1 : 0);
+		result = 31 * result + (isAutomatedImg ? 1 : 0);
 		return result;
 	}
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		SchedulePhaseInfo other = (SchedulePhaseInfo) obj;
-		if (end != other.end)
-			return false;
-		if (isAbsolute != other.isAbsolute)
-			return false;
-		if (start != other.start)
-			return false;
-		return true;
-	}
-	
-	
 }

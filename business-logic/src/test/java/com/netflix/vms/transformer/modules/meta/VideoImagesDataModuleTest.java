@@ -31,6 +31,8 @@ import static org.mockito.Mockito.when;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import java.util.Set;
+
 /**
  *
  */
@@ -172,7 +174,8 @@ public class VideoImagesDataModuleTest {
     @Test
     public void testGetScheduleInfoNullPhaseTagList() {
         when(videoArtworkHollow._getPhaseTags()).thenReturn(null);
-        SchedulePhaseInfo info = videoImagesDataModule.getScheduleInfo(videoArtworkHollow, videoId);
+        Set<SchedulePhaseInfo> schedulePhaseInfoSet = videoImagesDataModule.getAllScheduleInfo(videoArtworkHollow, videoId);
+        SchedulePhaseInfo info = videoImagesDataModule.getEarliestScheduleInfo(schedulePhaseInfoSet, videoId);
         Assert.assertNull(info);
     }
 
@@ -182,7 +185,9 @@ public class VideoImagesDataModuleTest {
     @Test
     public void testGetScheduleInfoEmptyList() {
         mockListIterator(listIterator, 0);
-        SchedulePhaseInfo schedulePhaseInfo = videoImagesDataModule.getScheduleInfo(videoArtworkHollow, videoId);
+        Set<SchedulePhaseInfo> schedulePhaseInfoSet = videoImagesDataModule.getAllScheduleInfo(videoArtworkHollow, videoId);
+        SchedulePhaseInfo schedulePhaseInfo = videoImagesDataModule.getEarliestScheduleInfo(schedulePhaseInfoSet, videoId);
+
         verifySchedulePhaseInfo(schedulePhaseInfo, 0L, Long.MIN_VALUE, false, false);
     }
 
@@ -204,7 +209,8 @@ public class VideoImagesDataModuleTest {
         when(overrideIndex.findMatches(anyLong(), anyString())).thenReturn(null);
         when(absoluteIndex.findMatches(anyLong(), anyString())).thenReturn(null);
 
-        SchedulePhaseInfo schedulePhaseInfo = videoImagesDataModule.getScheduleInfo(videoArtworkHollow, videoId);
+        Set<SchedulePhaseInfo> schedulePhaseInfoSet = videoImagesDataModule.getAllScheduleInfo(videoArtworkHollow, videoId);
+        SchedulePhaseInfo schedulePhaseInfo = videoImagesDataModule.getEarliestScheduleInfo(schedulePhaseInfoSet, videoId);
         Assert.assertNull(schedulePhaseInfo);
     }
 
@@ -238,7 +244,8 @@ public class VideoImagesDataModuleTest {
         when(api.getMasterScheduleHollow(eq(1))).thenReturn(masterScheduleHollow1);
         when(api.getMasterScheduleHollow(eq(2))).thenReturn(masterScheduleHollow2);
 
-        SchedulePhaseInfo schedulePhaseInfo = videoImagesDataModule.getScheduleInfo(videoArtworkHollow, videoId);
+        Set<SchedulePhaseInfo> schedulePhaseInfoSet = videoImagesDataModule.getAllScheduleInfo(videoArtworkHollow, videoId);
+        SchedulePhaseInfo schedulePhaseInfo = videoImagesDataModule.getEarliestScheduleInfo(schedulePhaseInfoSet, videoId);
         verifySchedulePhaseInfo(schedulePhaseInfo, -200L, Long.MIN_VALUE, false, false);
     }
 
@@ -248,7 +255,7 @@ public class VideoImagesDataModuleTest {
     @Test
     public void testGetSchedulePhaseInfoAbsoluteSchedule() {
 
-        mockListIterator(listIterator, 2);
+        mockListIterator(listIterator, 1);
 
         PhaseTagHollow phaseTagHollow = getPhaseTag(promoTag, scheduleId);
         when(api.getPhaseTagHollow(1)).thenReturn(phaseTagHollow);
@@ -265,7 +272,9 @@ public class VideoImagesDataModuleTest {
         AbsoluteScheduleHollow absoluteScheduleHollow = getAbsoluteScheduleHollow(-10L, 200L);
         when(api.getAbsoluteScheduleHollow(eq(1))).thenReturn(absoluteScheduleHollow);
 
-        SchedulePhaseInfo schedulePhaseInfo = videoImagesDataModule.getScheduleInfo(videoArtworkHollow, videoId);
+        Set<SchedulePhaseInfo> schedulePhaseInfoSet = videoImagesDataModule.getAllScheduleInfo(videoArtworkHollow, videoId);
+        SchedulePhaseInfo schedulePhaseInfo = videoImagesDataModule.getEarliestScheduleInfo(schedulePhaseInfoSet, videoId);
+
         verifySchedulePhaseInfo(schedulePhaseInfo, -10, 200L, true, false);
     }
 
@@ -302,7 +311,9 @@ public class VideoImagesDataModuleTest {
         OverrideScheduleHollow overrideScheduleHollow = getOverrideScheduleHollow(-2L);
         when(api.getOverrideScheduleHollow(eq(2))).thenReturn(overrideScheduleHollow);
 
-        SchedulePhaseInfo schedulePhaseInfo = videoImagesDataModule.getScheduleInfo(videoArtworkHollow, videoId);
+        Set<SchedulePhaseInfo> schedulePhaseInfoSet = videoImagesDataModule.getAllScheduleInfo(videoArtworkHollow, videoId);
+        SchedulePhaseInfo schedulePhaseInfo = videoImagesDataModule.getEarliestScheduleInfo(schedulePhaseInfoSet, videoId);
+
         verifySchedulePhaseInfo(schedulePhaseInfo, -2L, Long.MIN_VALUE, false, false);
     }
 }
