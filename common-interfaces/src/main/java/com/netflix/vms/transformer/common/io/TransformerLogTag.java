@@ -36,6 +36,7 @@ public enum TransformerLogTag implements LogTag {
     LanguageRightsError,
     InvalidPhaseTagForArtwork,
     MissingRolloutForArtwork,
+    MissingTopNodeForImages,
 
     //// TRANSFORMATION MISC ////
 

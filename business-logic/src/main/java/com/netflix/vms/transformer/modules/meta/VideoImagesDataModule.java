@@ -4,9 +4,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidIma
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidPhaseTagForArtwork;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingRolloutForArtwork;
-import com.netflix.vms.transformer.hollowinput.AbsoluteScheduleHollow;
-import com.netflix.vms.transformer.hollowinput.PhaseTagHollow;
-import com.netflix.vms.transformer.hollowinput.PhaseTagListHollow;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingTopNodeForImages;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
 import com.netflix.hollow.index.HollowHashIndex;
@@ -18,6 +16,7 @@ import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
+import com.netflix.vms.transformer.hollowinput.AbsoluteScheduleHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeSetHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
@@ -28,6 +27,8 @@ import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfRightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.LocaleTerritoryCodeHollow;
 import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
+import com.netflix.vms.transformer.hollowinput.PhaseTagHollow;
+import com.netflix.vms.transformer.hollowinput.PhaseTagListHollow;
 import com.netflix.vms.transformer.hollowinput.RightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkHollow;
@@ -636,6 +637,12 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                 	// 2) Mark all rollout images as rollout
                 	// 3) Roll-up all images is to topNode with source video to indicate to which video the image was associated to in input.
                     Set<Integer> topNodes = getTopNodes(showHierarchiesByCountry, countryCode, entityId);
+                    if(topNodes == null || topNodes.isEmpty()){
+                    	ctx.getLogger().error(MissingTopNodeForImages, "Missing top node(s) for id={} and country={}; Images cannot be added to topNode.", entityId, countryCode);
+                        Set<Artwork> artworkSet = getArtworkSet(entityId, artMap);
+                        artworkSet.add(localeArtworkIsRolloutAsInput);
+                    }
+                    
                     for (int topNode : topNodes) {
                         Set<Artwork> artworkSet = getArtworkSet(topNode, artMap);
                         Artwork updatedArtwork = pickArtworkBasedOnRolloutInfo(localeArtworkIsRolloutAsInput, localeArtworkIsRolloutOppositeToInput, rolloutImagesByCountry.get(countryCode), sourceFileId);
@@ -678,7 +685,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
     			// But no corresponding rollout for the image in this country.
     			// To err on side of not leaking a rollout image, drop this image for the country.
                 // not logging for now since there are way too many log messages.
-        		//ctx.getLogger().warn(MissingRolloutForArtwork, "Rollout exclusive image has no valid rollout with id={}; data will be dropped.", sourceFileId);
+        		ctx.getLogger().warn(MissingRolloutForArtwork, "Rollout exclusive image has no valid rollout with id={}; data will be dropped.", sourceFileId);
     			return null;
     		}
         }
