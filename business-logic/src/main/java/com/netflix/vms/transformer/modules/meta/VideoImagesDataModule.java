@@ -458,6 +458,8 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
             merchstillSourceFieldIds.add(sourceFileId);
         }
         Artwork artwork = new Artwork();
+        artwork.videoId = videoId;
+        artwork.hasShowLevelTag = showLevel;
 
         // Process list of derivatives
         processDerivativesAndCdnList(entityId, sourceFileId, inputDerivatives, artwork);
