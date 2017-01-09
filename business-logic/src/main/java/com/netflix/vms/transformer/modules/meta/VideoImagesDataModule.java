@@ -703,7 +703,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
      * @param videoArtworkHollow
      * @param videoId
      * @return Null if phase tags list is null or no matching schedule is present for given phase tag.
-     * Else a set of schedule information. Note empty set is returned when there phase tag list is empty.
+     * Else a set of schedule information. Note empty set is never returned.
      */
     Set<SchedulePhaseInfo> getAllScheduleInfo(VideoArtworkHollow videoArtworkHollow, int videoId) {
         Set<SchedulePhaseInfo> schedulePhaseInfos = null;
@@ -714,7 +714,11 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         HollowOrdinalIterator iterator = phaseTagListHollow.typeApi().getOrdinalIterator(phaseTagListHollow.getOrdinal());
         int phaseTagOrdinal = iterator.next();
         if (phaseTagOrdinal == HollowOrdinalIterator.NO_MORE_ORDINALS) {
-            return new HashSet<>();
+            // adding a default window for no phase tags.
+            SchedulePhaseInfo defaultWindow = new SchedulePhaseInfo(isSmoky, videoId);
+            schedulePhaseInfos = new HashSet<>();
+            schedulePhaseInfos.add(defaultWindow);
+            return schedulePhaseInfos;
         }
 
         while (phaseTagOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
@@ -797,8 +801,6 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
     SchedulePhaseInfo getEarliestScheduleInfo(Set<SchedulePhaseInfo> schedulePhaseInfoSet, int videoId) {
         // this set is empty if phase tag list is null. Check method getAllScheduleInfo
         if (schedulePhaseInfoSet == null) return null;
-        // if empty set if present, then it means phase tags list is empty and return default window.
-        if (schedulePhaseInfoSet.isEmpty()) return new SchedulePhaseInfo(videoId);
 
         SchedulePhaseInfo window = null;
         for (SchedulePhaseInfo schedulePhaseInfo : schedulePhaseInfoSet) {

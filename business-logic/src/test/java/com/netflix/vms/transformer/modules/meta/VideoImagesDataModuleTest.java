@@ -53,7 +53,6 @@ public class VideoImagesDataModuleTest {
     private String scheduleId;
     private String promoTag;
     private String prePromoTag;
-    private String sourceFileId;
 
     private TransformerContext context;
     private TransformerConfig config;
@@ -74,7 +73,6 @@ public class VideoImagesDataModuleTest {
         this.scheduleId = "testSchedule";
         this.prePromoTag = "PRE_PROMO";
         this.promoTag = "PROMO";
-        this.sourceFileId = "testSourceFileId";
 
         this.context = mock(TransformerContext.class);
         this.config = mock(TransformerConfig.class);
@@ -166,6 +164,7 @@ public class VideoImagesDataModuleTest {
         Assert.assertEquals(end, schedulePhaseInfo.end);
         Assert.assertEquals(isAbsolute, schedulePhaseInfo.isAbsolute);
         Assert.assertEquals(isAutomated, schedulePhaseInfo.isAutomatedImg);
+        Assert.assertEquals(videoId, schedulePhaseInfo.sourceVideoId);
     }
 
     /**
@@ -189,6 +188,7 @@ public class VideoImagesDataModuleTest {
         SchedulePhaseInfo schedulePhaseInfo = videoImagesDataModule.getEarliestScheduleInfo(schedulePhaseInfoSet, videoId);
 
         verifySchedulePhaseInfo(schedulePhaseInfo, 0L, Long.MIN_VALUE, false, false);
+        Assert.assertTrue(schedulePhaseInfoSet.size() == 1);
     }
 
     /**
@@ -210,6 +210,7 @@ public class VideoImagesDataModuleTest {
         when(absoluteIndex.findMatches(anyLong(), anyString())).thenReturn(null);
 
         Set<SchedulePhaseInfo> schedulePhaseInfoSet = videoImagesDataModule.getAllScheduleInfo(videoArtworkHollow, videoId);
+        Assert.assertNull(schedulePhaseInfoSet);
         SchedulePhaseInfo schedulePhaseInfo = videoImagesDataModule.getEarliestScheduleInfo(schedulePhaseInfoSet, videoId);
         Assert.assertNull(schedulePhaseInfo);
     }
@@ -245,6 +246,7 @@ public class VideoImagesDataModuleTest {
         when(api.getMasterScheduleHollow(eq(2))).thenReturn(masterScheduleHollow2);
 
         Set<SchedulePhaseInfo> schedulePhaseInfoSet = videoImagesDataModule.getAllScheduleInfo(videoArtworkHollow, videoId);
+        Assert.assertTrue(schedulePhaseInfoSet.size() == 2);// since we hve two phase tags
         SchedulePhaseInfo schedulePhaseInfo = videoImagesDataModule.getEarliestScheduleInfo(schedulePhaseInfoSet, videoId);
         verifySchedulePhaseInfo(schedulePhaseInfo, -200L, Long.MIN_VALUE, false, false);
     }
@@ -273,6 +275,7 @@ public class VideoImagesDataModuleTest {
         when(api.getAbsoluteScheduleHollow(eq(1))).thenReturn(absoluteScheduleHollow);
 
         Set<SchedulePhaseInfo> schedulePhaseInfoSet = videoImagesDataModule.getAllScheduleInfo(videoArtworkHollow, videoId);
+        Assert.assertTrue(schedulePhaseInfoSet.size() == 1);
         SchedulePhaseInfo schedulePhaseInfo = videoImagesDataModule.getEarliestScheduleInfo(schedulePhaseInfoSet, videoId);
 
         verifySchedulePhaseInfo(schedulePhaseInfo, -10, 200L, true, false);
@@ -288,6 +291,7 @@ public class VideoImagesDataModuleTest {
 
         PhaseTagHollow promoPhaseTagHollow = getPhaseTag(promoTag, scheduleId);
         PhaseTagHollow prePromoPhaseTagHollow = getPhaseTag(prePromoTag, scheduleId);
+
         when(api.getPhaseTagHollow(eq(1))).thenReturn(promoPhaseTagHollow);
         when(api.getPhaseTagHollow(eq(2))).thenReturn(prePromoPhaseTagHollow);
 
@@ -312,6 +316,7 @@ public class VideoImagesDataModuleTest {
         when(api.getOverrideScheduleHollow(eq(2))).thenReturn(overrideScheduleHollow);
 
         Set<SchedulePhaseInfo> schedulePhaseInfoSet = videoImagesDataModule.getAllScheduleInfo(videoArtworkHollow, videoId);
+        Assert.assertTrue(schedulePhaseInfoSet.size() == 2);
         SchedulePhaseInfo schedulePhaseInfo = videoImagesDataModule.getEarliestScheduleInfo(schedulePhaseInfoSet, videoId);
 
         verifySchedulePhaseInfo(schedulePhaseInfo, -2L, Long.MIN_VALUE, false, false);
