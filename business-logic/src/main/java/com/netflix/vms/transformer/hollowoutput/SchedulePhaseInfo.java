@@ -16,7 +16,6 @@ public class SchedulePhaseInfo {
 		this.sourceVideoId = sourceVideoId;
 	}
 
-
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -27,7 +26,8 @@ public class SchedulePhaseInfo {
 		if (start != that.start) return false;
 		if (end != that.end) return false;
 		if (isAbsolute != that.isAbsolute) return false;
-		return isAutomatedImg == that.isAutomatedImg;
+		if (isAutomatedImg != that.isAutomatedImg) return false;
+		return sourceVideoId == that.sourceVideoId;
 	}
 
 	@Override
@@ -36,6 +36,7 @@ public class SchedulePhaseInfo {
 		result = 31 * result + (int) (end ^ (end >>> 32));
 		result = 31 * result + (isAbsolute ? 1 : 0);
 		result = 31 * result + (isAutomatedImg ? 1 : 0);
+		result = 31 * result + sourceVideoId;
 		return result;
 	}
 }
