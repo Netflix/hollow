@@ -33,6 +33,7 @@ import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
@@ -51,6 +52,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
     private final HollowObjectTypeReadState typeState;
     private final int[][] fieldPathIndexes;
     private final FieldType[] fieldTypes;
+    private final PrimaryKey primaryKey;
     private final HollowPrimaryKeyValueDeriver keyDeriver;
 
     private final ArraySegmentRecycler memoryRecycler;
@@ -82,6 +84,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
     public HollowPrimaryKeyIndex(HollowReadStateEngine stateEngine, PrimaryKey primaryKey, ArraySegmentRecycler memoryRecycler, BitSet specificOrdinalsToIndex) {
         if (primaryKey==null) throw new IllegalArgumentException("primaryKey can't not be null");
 
+        this.primaryKey = primaryKey;
         this.typeState = (HollowObjectTypeReadState) stateEngine.getTypeState(primaryKey.getType());
         this.fieldPathIndexes = new int[primaryKey.numFields()][];
         this.fieldTypes = new FieldType[primaryKey.numFields()];
@@ -137,6 +140,14 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
 
     public HollowObjectTypeReadState getTypeState() {
         return typeState;
+    }
+
+    public PrimaryKey getPrimaryKey() {
+        return primaryKey;
+    }
+
+    public List<FieldType> getFieldTypes() {
+        return Arrays.asList(fieldTypes);
     }
 
     /**

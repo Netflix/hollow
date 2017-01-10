@@ -104,8 +104,10 @@ public class HollowAPIGenerator {
 
     public void generateFiles(File directory) throws IOException {
         HollowAPIClassJavaGenerator apiClassGenerator = new HollowAPIClassJavaGenerator(packageName, apiClassname, dataset, parameterizeClassNames);
+        HollowAPIFactoryJavaGenerator apiFactoryGenerator = new HollowAPIFactoryJavaGenerator(packageName, apiClassname);
 
         generateFile(directory, apiClassGenerator);
+        generateFile(directory, apiFactoryGenerator);
 
         generateFilesForHollowSchemas(directory);
     }
