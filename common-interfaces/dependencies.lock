@@ -110,9 +110,9 @@
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
-        "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.27",
-            "requested": "latest.release"
+        "com.netflix.hollow:hollow": {
+            "locked": "2.0.3",
+            "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
             "locked": "0.12.7",
@@ -553,9 +553,9 @@
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
-        "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.27",
-            "requested": "latest.release"
+        "com.netflix.hollow:hollow": {
+            "locked": "2.0.3",
+            "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
             "locked": "0.12.7",
@@ -996,9 +996,9 @@
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
-        "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.27",
-            "requested": "latest.release"
+        "com.netflix.hollow:hollow": {
+            "locked": "2.0.3",
+            "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
             "locked": "0.12.7",
@@ -1439,9 +1439,9 @@
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
-        "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.27",
-            "requested": "latest.release"
+        "com.netflix.hollow:hollow": {
+            "locked": "2.0.3",
+            "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
             "locked": "0.12.7",
@@ -1981,9 +1981,9 @@
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
-        "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.27",
-            "requested": "latest.release"
+        "com.netflix.hollow:hollow": {
+            "locked": "2.0.3",
+            "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
             "locked": "0.12.7",
@@ -2424,9 +2424,9 @@
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
-        "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.27",
-            "requested": "latest.release"
+        "com.netflix.hollow:hollow": {
+            "locked": "2.0.3",
+            "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
             "locked": "0.12.7",
@@ -2878,9 +2878,9 @@
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
-        "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.27",
-            "requested": "latest.release"
+        "com.netflix.hollow:hollow": {
+            "locked": "2.0.3",
+            "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
             "locked": "0.12.7",
@@ -3332,9 +3332,9 @@
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
-        "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.27",
-            "requested": "latest.release"
+        "com.netflix.hollow:hollow": {
+            "locked": "2.0.3",
+            "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
             "locked": "0.12.7",
@@ -3786,9 +3786,9 @@
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
-        "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.27",
-            "requested": "latest.release"
+        "com.netflix.hollow:hollow": {
+            "locked": "2.0.3",
+            "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
             "locked": "0.12.7",

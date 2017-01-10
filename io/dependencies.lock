@@ -633,8 +633,8 @@
                 "netflix:nf-archaius2"
             ]
         },
-        "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.27",
+        "com.netflix.hollow:hollow": {
+            "locked": "2.0.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -3379,8 +3379,8 @@
                 "netflix:nf-archaius2"
             ]
         },
-        "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.27",
+        "com.netflix.hollow:hollow": {
+            "locked": "2.0.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -6125,8 +6125,8 @@
                 "netflix:nf-archaius2"
             ]
         },
-        "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.27",
+        "com.netflix.hollow:hollow": {
+            "locked": "2.0.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -8871,8 +8871,8 @@
                 "netflix:nf-archaius2"
             ]
         },
-        "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.27",
+        "com.netflix.hollow:hollow": {
+            "locked": "2.0.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -11716,8 +11716,8 @@
                 "netflix:nf-archaius2"
             ]
         },
-        "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.27",
+        "com.netflix.hollow:hollow": {
+            "locked": "2.0.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -14462,8 +14462,8 @@
                 "netflix:nf-archaius2"
             ]
         },
-        "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.27",
+        "com.netflix.hollow:hollow": {
+            "locked": "2.0.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -17214,8 +17214,8 @@
                 "netflix:nf-archaius2"
             ]
         },
-        "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.27",
+        "com.netflix.hollow:hollow": {
+            "locked": "2.0.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -19966,8 +19966,8 @@
                 "netflix:nf-archaius2"
             ]
         },
-        "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.27",
+        "com.netflix.hollow:hollow": {
+            "locked": "2.0.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -22718,8 +22718,8 @@
                 "netflix:nf-archaius2"
             ]
         },
-        "com.netflix.hollow:netflix-hollow": {
-            "locked": "1.27",
+        "com.netflix.hollow:hollow": {
+            "locked": "2.0.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
