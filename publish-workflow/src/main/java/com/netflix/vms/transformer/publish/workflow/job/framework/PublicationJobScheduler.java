@@ -1,10 +1,9 @@
 package com.netflix.vms.transformer.publish.workflow.job.framework;
 
-import java.util.concurrent.ThreadPoolExecutor;
-
-import com.netflix.hollow.util.SimultaneousExecutor;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class PublicationJobScheduler {
 

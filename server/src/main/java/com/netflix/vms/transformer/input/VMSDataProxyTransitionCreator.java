@@ -1,9 +1,8 @@
 package com.netflix.vms.transformer.input;
 
+import com.netflix.hollow.api.client.HollowBlob;
+import com.netflix.hollow.api.client.HollowBlobRetriever;
 import com.netflix.vms.transformer.common.KeybaseBuilder;
-
-import com.netflix.hollow.client.HollowTransitionCreator;
-import com.netflix.hollow.client.HollowUpdateTransition;
 import com.netflix.vms.transformer.http.HttpHelper;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -13,7 +12,7 @@ import java.util.TimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class VMSDataProxyTransitionCreator implements HollowTransitionCreator {
+public class VMSDataProxyTransitionCreator implements HollowBlobRetriever {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(VMSDataProxyTransitionCreator.class);
 
@@ -34,7 +33,7 @@ public class VMSDataProxyTransitionCreator implements HollowTransitionCreator {
     }
 
     @Override
-    public HollowUpdateTransition createSnapshotTransition(long desiredVersion) {
+    public HollowBlob retrieveSnapshotBlob(long desiredVersion) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
             dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -56,7 +55,7 @@ public class VMSDataProxyTransitionCreator implements HollowTransitionCreator {
     }
 
     @Override
-    public HollowUpdateTransition createDeltaTransition(long currentVersion) {
+    public HollowBlob retrieveDeltaBlob(long currentVersion) {
         try {
             String url = baseProxyURL + "/filestore-attribute?"
                     + "keybase=" + keybaseBuilder.getDeltaKeybase()
@@ -77,7 +76,7 @@ public class VMSDataProxyTransitionCreator implements HollowTransitionCreator {
     }
 
     @Override
-    public HollowUpdateTransition createReverseDeltaTransition(long currentVersion) {
+    public HollowBlob retrieveReverseDeltaBlob(long currentVersion) {
         return null;
     }
 

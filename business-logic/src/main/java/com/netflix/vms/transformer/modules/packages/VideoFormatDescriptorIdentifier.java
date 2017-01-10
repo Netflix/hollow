@@ -1,8 +1,7 @@
 package com.netflix.vms.transformer.modules.packages;
 
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
-
-import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
 import com.netflix.vms.transformer.hollowinput.StreamDimensionsHollow;
 import com.netflix.vms.transformer.hollowinput.StreamNonImageInfoHollow;

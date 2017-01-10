@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.modules.l10n.processor;
 
-import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
 import com.netflix.vms.transformer.hollowinput.MapOfTranslatedTextHollow;
@@ -11,7 +11,6 @@ import com.netflix.vms.transformer.hollowoutput.L10NResources;
 import com.netflix.vms.transformer.hollowoutput.L10NStrings;
 import com.netflix.vms.transformer.hollowoutput.NFLocale;
 import com.netflix.vms.transformer.util.NFLocaleUtil;
-
 import java.util.HashMap;
 import java.util.Map;
 

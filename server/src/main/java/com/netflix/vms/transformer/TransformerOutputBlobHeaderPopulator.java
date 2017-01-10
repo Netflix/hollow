@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.hollow.client.HollowClient;
-import com.netflix.hollow.write.HollowWriteStateEngine;
+import com.netflix.hollow.api.client.HollowClient;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.publish.workflow.job.impl.BlobMetaDataUtil;
 import java.util.Map;

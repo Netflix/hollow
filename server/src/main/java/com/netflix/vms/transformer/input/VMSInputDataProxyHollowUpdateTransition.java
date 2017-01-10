@@ -1,18 +1,18 @@
 package com.netflix.vms.transformer.input;
 
-import com.netflix.vms.transformer.io.LZ4VMSInputStream;
-import java.io.FileInputStream;
-import net.jpountz.lz4.LZ4BlockInputStream;
-import java.io.OutputStream;
-import java.io.FileOutputStream;
-import java.io.File;
-import org.apache.commons.io.IOUtils;
+import com.netflix.hollow.api.client.HollowBlob;
 import com.netflix.vms.transformer.http.HttpHelper;
+import com.netflix.vms.transformer.io.LZ4VMSInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import com.netflix.hollow.client.HollowUpdateTransition;
+import java.io.OutputStream;
+import net.jpountz.lz4.LZ4BlockInputStream;
+import org.apache.commons.io.IOUtils;
 
-public class VMSInputDataProxyHollowUpdateTransition extends HollowUpdateTransition {
+public class VMSInputDataProxyHollowUpdateTransition extends HollowBlob {
 
     private final String baseProxyURL;
     private final String keybase;

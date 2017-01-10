@@ -1,10 +1,7 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.vms.transformer.hollowoutput.MulticatalogCountryData;
-
-import com.netflix.vms.transformer.hollowoutput.TopNVideoData;
-import com.netflix.hollow.write.HollowWriteStateEngine;
-import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageFormatEntry;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageRecipe;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageTypeEntry;
@@ -23,11 +20,13 @@ import com.netflix.vms.transformer.hollowoutput.GlobalPerson;
 import com.netflix.vms.transformer.hollowoutput.GlobalVideo;
 import com.netflix.vms.transformer.hollowoutput.L10NResources;
 import com.netflix.vms.transformer.hollowoutput.LanguageRights;
+import com.netflix.vms.transformer.hollowoutput.MulticatalogCountryData;
 import com.netflix.vms.transformer.hollowoutput.NamedCollectionHolder;
 import com.netflix.vms.transformer.hollowoutput.OriginServer;
 import com.netflix.vms.transformer.hollowoutput.PersonImages;
 import com.netflix.vms.transformer.hollowoutput.RolloutCharacter;
 import com.netflix.vms.transformer.hollowoutput.RolloutVideo;
+import com.netflix.vms.transformer.hollowoutput.TopNVideoData;
 import com.netflix.vms.transformer.hollowoutput.VideoEpisode_CountryList;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
 import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
@@ -42,6 +41,7 @@ public class VMSTransformerWriteStateEngine extends HollowWriteStateEngine {
 
     private void initializeTopLevelTypeStates() {
         HollowObjectMapper mapper = new HollowObjectMapper(this);
+        mapper.doNotUseDefaultHashKeys();
 
         ///TODO: When we do the "Unified Primary Key Definitions", then these need to be discovered based on those.
         

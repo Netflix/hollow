@@ -78,7 +78,7 @@ dependencies {
     testCompile 'junit:junit:latest.release'
     testCompile 'org.mockito:mockito-all:latest.release'
     testCompile 'org.assertj:assertj-core:3.3.0'
-    testCompile 'com.netflix.hollow:netflix-hollow-diff-ui:latest.release'
+    testCompile 'com.netflix.hollow:hollow-diff-ui:2.+'
 
     // Cassandra Aeneas unit test kit.
     testCompile "com.netflix.aeneas:aeneas-test:latest.release"
@@ -86,7 +86,7 @@ dependencies {
     toolsCompile configurations.compile
     toolsRuntime configurations.runtime
 
-    toolsCompile 'com.netflix.hollow:netflix-hollow-diff-ui:latest.release'
+    toolsCompile 'com.netflix.hollow:hollow-diff-ui:2.x'
 }
 
 configurations {

@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer.common.config;
 
-import com.netflix.hollow.index.key.PrimaryKey;
-
+import com.netflix.hollow.core.index.key.PrimaryKey;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;

@@ -1,9 +1,8 @@
 package com.netflix.vms.transformer.hollowinput;
 
-import com.netflix.hollow.objects.HollowMap;
-import com.netflix.hollow.HollowMapSchema;
-import com.netflix.hollow.objects.delegate.HollowMapDelegate;
-import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
+import com.netflix.hollow.api.objects.HollowMap;
+import com.netflix.hollow.api.objects.delegate.HollowMapDelegate;
+import com.netflix.hollow.api.objects.generic.GenericHollowRecordHelper;
 
 @SuppressWarnings("all")
 public class MapOfTranslatedTextHollow extends HollowMap<MapKeyHollow, TranslatedTextValueHollow> {

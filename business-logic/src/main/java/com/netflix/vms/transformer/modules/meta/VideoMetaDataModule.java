@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.modules.meta;
 
-import static com.netflix.hollow.read.iterator.HollowOrdinalIterator.NO_MORE_ORDINALS;
+import static com.netflix.hollow.core.read.iterator.HollowOrdinalIterator.NO_MORE_ORDINALS;
 import static com.netflix.vms.transformer.index.IndexSpec.L10N_STORIES_SYNOPSES;
 import static com.netflix.vms.transformer.index.IndexSpec.PERSONS_BY_VIDEO_ID;
 import static com.netflix.vms.transformer.index.IndexSpec.PERSON_ROLES_BY_VIDEO_ID;
@@ -9,11 +9,10 @@ import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_STATUS;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
-
-import com.netflix.hollow.index.HollowHashIndex;
-import com.netflix.hollow.index.HollowHashIndexResult;
-import com.netflix.hollow.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.index.HollowHashIndex;
+import com.netflix.hollow.core.index.HollowHashIndexResult;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;

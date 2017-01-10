@@ -1,9 +1,7 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
-
-import java.util.Collections;
-import com.netflix.hollow.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.hollowinput.ConsolidatedCertSystemRatingHollow;
 import com.netflix.vms.transformer.hollowinput.ConsolidatedCertificationSystemsHollow;
 import com.netflix.vms.transformer.hollowinput.ConsolidatedVideoCountryRatingHollow;
@@ -24,6 +22,7 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

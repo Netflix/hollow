@@ -1,19 +1,17 @@
 package com.netflix.vms.transformer.override;
 
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.vms.transformer.SimpleTransformerContext;
+import com.netflix.vms.transformer.input.VMSInputDataClient;
+import com.netflix.vms.transformer.override.PinTitleManager.PinTitleProcessorJob;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.vms.transformer.SimpleTransformerContext;
-import com.netflix.vms.transformer.input.VMSInputDataClient;
-import com.netflix.vms.transformer.override.PinTitleManager.PinTitleProcessorJob;
 
 public class PinTitleManagerTest {
     private static final String BASE_PROXY = VMSInputDataClient.TEST_PROXY_URL;

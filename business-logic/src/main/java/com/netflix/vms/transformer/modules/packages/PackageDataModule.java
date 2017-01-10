@@ -1,10 +1,10 @@
 package com.netflix.vms.transformer.modules.packages;
 
-import com.netflix.hollow.index.HollowHashIndex;
-import com.netflix.hollow.index.HollowHashIndexResult;
-import com.netflix.hollow.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
-import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.core.index.HollowHashIndex;
+import com.netflix.hollow.core.index.HollowHashIndexResult;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;

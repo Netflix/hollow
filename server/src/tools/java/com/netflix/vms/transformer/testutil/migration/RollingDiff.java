@@ -4,14 +4,13 @@ import static com.netflix.vms.transformer.input.VMSInputDataClient.PROD_PROXY_UR
 
 import com.netflix.config.NetflixConfiguration.EnvironmentEnum;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.hollow.HollowBlobHeader;
-import com.netflix.hollow.read.engine.HollowBlobHeaderReader;
+import com.netflix.hollow.core.HollowBlobHeader;
+import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.videometadata.util.HttpHelper;
 import com.netflix.vms.transformer.fastproperties.PersistedPropertiesUtil;
 import com.netflix.vms.transformer.input.VMSInputDataKeybaseBuilder;
 import com.netflix.vms.transformer.io.LZ4VMSInputStream;
 import com.netflix.vms.transformer.util.HollowBlobKeybaseBuilder;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -19,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
