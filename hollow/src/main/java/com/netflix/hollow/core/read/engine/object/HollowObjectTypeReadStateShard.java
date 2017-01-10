@@ -1,0 +1,427 @@
+package com.netflix.hollow.core.read.engine.object;
+
+import com.netflix.hollow.core.memory.ByteData;
+import com.netflix.hollow.core.memory.encoding.HashCodes;
+import com.netflix.hollow.core.memory.encoding.VarInt;
+import com.netflix.hollow.core.memory.encoding.ZigZag;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.write.HollowObjectWriteRecord;
+import com.netflix.hollow.tools.checksum.HollowChecksum;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.List;
+
+class HollowObjectTypeReadStateShard {
+
+    private HollowObjectTypeDataElements currentData;
+    private volatile HollowObjectTypeDataElements currentDataVolatile;
+
+    private final HollowObjectSchema schema;
+    
+    HollowObjectTypeReadStateShard(HollowObjectSchema schema) {
+        this.schema = schema;
+    }
+
+    public boolean isNull(int ordinal, int fieldIndex) {
+        HollowObjectTypeDataElements currentData;
+        long fixedLengthValue;
+
+        do {
+            currentData = this.currentData;
+
+            long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
+            int numBitsForField = currentData.bitsPerField[fieldIndex];
+
+            fixedLengthValue = numBitsForField <= 56 ?
+                    currentData.fixedLengthData.getElementValue(bitOffset, numBitsForField)
+                    : currentData.fixedLengthData.getLargeElementValue(bitOffset, numBitsForField);
+        } while(readWasUnsafe(currentData));
+
+        switch(schema.getFieldType(fieldIndex)) {
+        case BYTES:
+        case STRING:
+            int numBits = currentData.bitsPerField[fieldIndex];
+            return (fixedLengthValue & (1 << (numBits - 1))) != 0;
+        case FLOAT:
+            return (int)fixedLengthValue == HollowObjectWriteRecord.NULL_FLOAT_BITS;
+        case DOUBLE:
+            return fixedLengthValue == HollowObjectWriteRecord.NULL_DOUBLE_BITS;
+        default:
+            return fixedLengthValue == currentData.nullValueForField[fieldIndex];
+        }
+    }
+
+    public int readOrdinal(int ordinal, int fieldIndex) {
+        HollowObjectTypeDataElements currentData;
+        long refOrdinal;
+
+        do {
+            currentData = this.currentData;
+            refOrdinal = readFixedLengthFieldValue(currentData, ordinal, fieldIndex);
+        } while(readWasUnsafe(currentData));
+
+        if(refOrdinal == currentData.nullValueForField[fieldIndex])
+            return -1;
+        return (int)refOrdinal;
+    }
+
+    public int readInt(int ordinal, int fieldIndex) {
+        HollowObjectTypeDataElements currentData;
+        long value;
+
+        do {
+            currentData = this.currentData;
+            value = readFixedLengthFieldValue(currentData, ordinal, fieldIndex);
+        } while(readWasUnsafe(currentData));
+
+        if(value == currentData.nullValueForField[fieldIndex])
+            return Integer.MIN_VALUE;
+        return ZigZag.decodeInt((int)value);
+    }
+
+    public float readFloat(int ordinal, int fieldIndex) {
+        HollowObjectTypeDataElements currentData;
+        int value;
+
+        do {
+            currentData = this.currentData;
+            value = (int)readFixedLengthFieldValue(currentData, ordinal, fieldIndex);
+        } while(readWasUnsafe(currentData));
+
+        if(value == HollowObjectWriteRecord.NULL_FLOAT_BITS)
+            return Float.NaN;
+        return Float.intBitsToFloat(value);
+    }
+
+    public double readDouble(int ordinal, int fieldIndex) {
+        HollowObjectTypeDataElements currentData;
+        long value;
+
+        do {
+            currentData = this.currentData;
+            long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
+            value = currentData.fixedLengthData.getLargeElementValue(bitOffset, 64, -1L);
+        } while(readWasUnsafe(currentData));
+
+        if(value == HollowObjectWriteRecord.NULL_DOUBLE_BITS)
+            return Double.NaN;
+        return Double.longBitsToDouble(value);
+    }
+
+    public long readLong(int ordinal, int fieldIndex) {
+        HollowObjectTypeDataElements currentData;
+        long value;
+
+        do {
+            currentData = this.currentData;
+            long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
+            int numBitsForField = currentData.bitsPerField[fieldIndex];
+            value = currentData.fixedLengthData.getLargeElementValue(bitOffset, numBitsForField);
+        } while(readWasUnsafe(currentData));
+
+        if(value == currentData.nullValueForField[fieldIndex])
+            return Long.MIN_VALUE;
+        return ZigZag.decodeLong(value);
+    }
+
+    public Boolean readBoolean(int ordinal, int fieldIndex) {
+        HollowObjectTypeDataElements currentData;
+        long value;
+
+        do {
+            currentData = this.currentData;
+            value = readFixedLengthFieldValue(currentData, ordinal, fieldIndex);
+        } while(readWasUnsafe(currentData));
+
+        if(value == currentData.nullValueForField[fieldIndex])
+            return null;
+        return value == 1 ? Boolean.TRUE : Boolean.FALSE;
+    }
+
+    private long readFixedLengthFieldValue(HollowObjectTypeDataElements currentData, int ordinal, int fieldIndex) {
+        long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
+        int numBitsForField = currentData.bitsPerField[fieldIndex];
+
+        long value = currentData.fixedLengthData.getElementValue(bitOffset, numBitsForField);
+
+        return value;
+    }
+
+    public byte[] readBytes(int ordinal, int fieldIndex) {
+        HollowObjectTypeDataElements currentData;
+        byte[] result;
+
+        do {
+            int numBitsForField;
+            long endByte;
+            long startByte;
+
+            do {
+                currentData = this.currentData;
+
+                numBitsForField = currentData.bitsPerField[fieldIndex];
+                long currentBitOffset = fieldOffset(currentData, ordinal, fieldIndex);
+                endByte = currentData.fixedLengthData.getElementValue(currentBitOffset, numBitsForField);
+                startByte = ordinal != 0 ? currentData.fixedLengthData.getElementValue(currentBitOffset - currentData.bitsPerRecord, numBitsForField) : 0;
+            } while(readWasUnsafe(currentData));
+
+            if((endByte & (1L << numBitsForField - 1)) != 0)
+                return null;
+
+            startByte &= (1L << numBitsForField - 1) - 1;
+
+            int length = (int)(endByte - startByte);
+            result = new byte[length];
+            for(int i=0;i<length;i++)
+                result[i] = currentData.varLengthData[fieldIndex].get(startByte + i);
+
+        } while(readWasUnsafe(currentData));
+
+        return result;
+    }
+
+    public String readString(int ordinal, int fieldIndex) {
+        HollowObjectTypeDataElements currentData;
+        String result;
+
+        do {
+            int numBitsForField;
+            long endByte;
+            long startByte;
+
+            do {
+                currentData = this.currentData;
+
+                numBitsForField = currentData.bitsPerField[fieldIndex];
+                long currentBitOffset = fieldOffset(currentData, ordinal, fieldIndex);
+                endByte = currentData.fixedLengthData.getElementValue(currentBitOffset, numBitsForField);
+                startByte = ordinal != 0 ? currentData.fixedLengthData.getElementValue(currentBitOffset - currentData.bitsPerRecord, numBitsForField) : 0;
+            } while(readWasUnsafe(currentData));
+
+            if((endByte & (1L << numBitsForField - 1)) != 0)
+                return null;
+
+            startByte &= (1L << numBitsForField - 1) - 1;
+
+            int length = (int)(endByte - startByte);
+
+            result = readString(currentData.varLengthData[fieldIndex], startByte, length);
+        } while(readWasUnsafe(currentData));
+
+        return result;
+    }
+
+    public boolean isStringFieldEqual(int ordinal, int fieldIndex, String testValue) {
+        HollowObjectTypeDataElements currentData;
+        boolean result;
+
+        do {
+            int numBitsForField;
+            long endByte;
+            long startByte;
+
+            do {
+                currentData = this.currentData;
+
+                numBitsForField = currentData.bitsPerField[fieldIndex];
+
+                long currentBitOffset = fieldOffset(currentData, ordinal, fieldIndex);
+                endByte = currentData.fixedLengthData.getElementValue(currentBitOffset, numBitsForField);
+                startByte = ordinal != 0 ? currentData.fixedLengthData.getElementValue(currentBitOffset - currentData.bitsPerRecord, numBitsForField) : 0;
+            } while(readWasUnsafe(currentData));
+
+            if((endByte & (1L << numBitsForField - 1)) != 0)
+                return testValue == null;
+            if(testValue == null)
+                return false;
+
+            startByte &= (1L << numBitsForField - 1) - 1;
+
+            int length = (int)(endByte - startByte);
+
+            result = testStringEquality(currentData.varLengthData[fieldIndex], startByte, length, testValue);
+        } while(readWasUnsafe(currentData));
+
+        return result;
+    }
+
+    public int findVarLengthFieldHashCode(int ordinal, int fieldIndex) {
+        HollowObjectTypeDataElements currentData;
+        int hashCode;
+        do {
+            int numBitsForField;
+            long endByte;
+            long startByte;
+
+            do {
+                currentData = this.currentData;
+
+                numBitsForField = currentData.bitsPerField[fieldIndex];
+                long currentBitOffset = fieldOffset(currentData, ordinal, fieldIndex);
+                endByte = currentData.fixedLengthData.getElementValue(currentBitOffset, numBitsForField);
+                startByte = ordinal != 0 ? currentData.fixedLengthData.getElementValue(currentBitOffset - currentData.bitsPerRecord, numBitsForField) : 0;
+            } while(readWasUnsafe(currentData));
+
+            if((endByte & (1L << numBitsForField - 1)) != 0)
+                return -1;
+
+            startByte &= (1L << numBitsForField - 1) - 1;
+
+            int length = (int)(endByte - startByte);
+
+            hashCode = HashCodes.hashCode(currentData.varLengthData[fieldIndex], startByte, length);
+        } while(readWasUnsafe(currentData));
+
+        return hashCode;
+    }
+
+    /**
+     * Warning:  Not thread-safe.  Should only be called within the update thread.
+     */
+    public int bitsRequiredForField(String fieldName) {
+        int fieldIndex = schema.getPosition(fieldName);
+        return fieldIndex == -1 ? 0 : currentData.bitsPerField[fieldIndex];
+    }
+
+    private long fieldOffset(HollowObjectTypeDataElements currentData, int ordinal, int fieldIndex) {
+        return ((long)currentData.bitsPerRecord * ordinal) + currentData.bitOffsetPerField[fieldIndex];
+    }
+
+    /**
+     * Decode a String as a series of VarInts, one per character.<p>
+     *
+     * @param str
+     * @param out
+     * @return
+     */
+    private static final ThreadLocal<char[]> chararr = new ThreadLocal<char[]>();
+
+    private String readString(ByteData data, long position, int length) {
+        long endPosition = position + length;
+
+        char chararr[] = getCharArray();
+
+        if(length > chararr.length)
+            chararr = new char[length];
+
+        int count = 0;
+
+        while(position < endPosition) {
+            int c = VarInt.readVInt(data, position);
+            chararr[count++] = (char)c;
+            position += VarInt.sizeOfVInt(c);
+        }
+
+        // The number of chars may be fewer than the number of bytes in the serialized data
+        return new String(chararr, 0, count);
+    }
+
+    private boolean testStringEquality(ByteData data, long position, int length, String testValue) {
+        if(length < testValue.length()) // can't check exact length here; the length argument is in bytes, which is equal to or greater than the number of characters.
+            return false;
+
+        long endPosition = position + length;
+
+        int count = 0;
+
+        while(position < endPosition && count < testValue.length()) {
+            int c = VarInt.readVInt(data, position);
+            if(testValue.charAt(count++) != (char)c)
+                return false;
+            position += VarInt.sizeOfVInt(c);
+        }
+
+        // The number of chars may be fewer than the number of bytes in the serialized data
+        return position == endPosition && count == testValue.length();
+    }
+
+    private char[] getCharArray() {
+        char ch[] = chararr.get();
+        if(ch == null) {
+            ch = new char[100];
+            chararr.set(ch);
+        }
+        return ch;
+    }
+
+    protected void invalidate() {
+        setCurrentData(null);
+    }
+
+    HollowObjectTypeDataElements currentDataElements() {
+        return currentData;
+    }
+
+    private boolean readWasUnsafe(HollowObjectTypeDataElements data) {
+        return data != currentDataVolatile;
+    }
+
+    void setCurrentData(HollowObjectTypeDataElements data) {
+        this.currentData = data;
+        this.currentDataVolatile = data;
+    }
+
+    protected void applyToChecksum(HollowChecksum checksum, HollowSchema withSchema, BitSet populatedOrdinals, int shardNumber, int numShards) {
+        if(!(withSchema instanceof HollowObjectSchema))
+            throw new IllegalArgumentException("HollowObjectTypeReadState can only calculate checksum with a HollowObjectSchema: " + schema.getName());
+
+        HollowObjectSchema commonSchema = schema.findCommonSchema((HollowObjectSchema)withSchema);
+
+        List<String> commonFieldNames = new ArrayList<String>();
+        for(int i=0;i<commonSchema.numFields();i++)
+            commonFieldNames.add(commonSchema.getFieldName(i));
+        Collections.sort(commonFieldNames);
+        
+        int fieldIndexes[] = new int[commonFieldNames.size()];
+        for(int i=0;i<commonFieldNames.size();i++) {
+            fieldIndexes[i] = schema.getPosition(commonFieldNames.get(i));
+        }
+        
+        int ordinal = populatedOrdinals.nextSetBit(0);
+        while(ordinal != -1) {
+            if((ordinal & (numShards - 1)) == shardNumber) {
+                int translatedOrdinal = ordinal / numShards;
+                checksum.applyInt(ordinal);
+                for(int i=0;i<fieldIndexes.length;i++) {
+                    int fieldIdx = fieldIndexes[i];
+                    if(!schema.getFieldType(fieldIdx).isVariableLength()) {
+                        long bitOffset = fieldOffset(currentData, translatedOrdinal, fieldIdx);
+                        int numBitsForField = currentData.bitsPerField[fieldIdx];
+                        long fixedLengthValue = numBitsForField <= 56 ?
+                                currentData.fixedLengthData.getElementValue(bitOffset, numBitsForField)
+                                : currentData.fixedLengthData.getLargeElementValue(bitOffset, numBitsForField);
+    
+                        if(fixedLengthValue == currentData.nullValueForField[fieldIdx])
+                            checksum.applyInt(Integer.MAX_VALUE);
+                        else
+                            checksum.applyLong(fixedLengthValue);
+                    } else {
+                        checksum.applyInt(findVarLengthFieldHashCode(translatedOrdinal, fieldIdx));
+                    }
+                }
+            }
+
+            ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
+        }
+    }
+
+    public long getApproximateHeapFootprintInBytes() {
+        long bitsPerFixedLengthData = (long)currentData.bitsPerRecord * (currentData.maxOrdinal + 1);
+        
+        long requiredBytes = bitsPerFixedLengthData / 8;
+        
+        for(int i=0;i<currentData.varLengthData.length;i++) {
+            if(currentData.varLengthData[i] != null)
+                requiredBytes += currentData.varLengthData[i].size();
+        }
+        
+        return requiredBytes;
+    }
+    
+    public long getApproximateHoleCostInBytes(BitSet populatedOrdinals) {
+        return ((long)(populatedOrdinals.length() - populatedOrdinals.cardinality()) * (long)currentData.bitsPerRecord) / 8; 
+    }
+
+}

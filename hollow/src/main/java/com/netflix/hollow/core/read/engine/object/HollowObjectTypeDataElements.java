@@ -160,28 +160,33 @@ public class HollowObjectTypeDataElements {
         }
     }
 
-    static void discardFromStream(DataInputStream dis, HollowObjectSchema schema, boolean isDelta) throws IOException {
-        VarInt.readVInt(dis); // max ordinal
+    static void discardFromStream(DataInputStream dis, HollowObjectSchema schema, int numShards, boolean isDelta) throws IOException {
+        if(numShards > 1)
+            VarInt.readVInt(dis); // max ordinal
+        
+        for(int i=0;i<numShards;i++) {
+            VarInt.readVInt(dis); // max ordinal
 
-        if(isDelta) {
-            /// addition/removal ordinals
-            GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(dis);
-            GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(dis);
-        }
-
-        /// field statistics
-        for(int i=0;i<schema.numFields();i++) {
-            VarInt.readVInt(dis);
-        }
-
-        /// fixed length data
-        FixedLengthElementArray.discardFrom(dis);
-
-        /// variable length data
-        for(int i=0;i<schema.numFields();i++) {
-            long numBytesInVarLengthData = VarInt.readVLong(dis);
-            while(numBytesInVarLengthData > 0) {
-                numBytesInVarLengthData -= dis.skip(numBytesInVarLengthData);
+            if(isDelta) {
+                /// addition/removal ordinals
+                GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(dis);
+                GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(dis);
+            }
+    
+            /// field statistics
+            for(int j=0;j<schema.numFields();j++) {
+                VarInt.readVInt(dis);
+            }
+    
+            /// fixed length data
+            FixedLengthElementArray.discardFrom(dis);
+    
+            /// variable length data
+            for(int j=0;j<schema.numFields();j++) {
+                long numBytesInVarLengthData = VarInt.readVLong(dis);
+                while(numBytesInVarLengthData > 0) {
+                    numBytesInVarLengthData -= dis.skip(numBytesInVarLengthData);
+                }
             }
         }
     }

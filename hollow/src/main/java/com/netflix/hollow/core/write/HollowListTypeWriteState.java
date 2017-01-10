@@ -47,7 +47,7 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
     private ByteDataBuffer deltaRemovedOrdinals;
 
     public HollowListTypeWriteState(HollowListSchema schema) {
-        super(schema);
+        super(schema, 1);
     }
 
     @Override

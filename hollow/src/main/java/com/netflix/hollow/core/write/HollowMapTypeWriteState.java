@@ -50,7 +50,7 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
     private ByteDataBuffer deltaRemovedOrdinals;
 
     public HollowMapTypeWriteState(HollowMapSchema schema) {
-        super(schema);
+        super(schema, 1);
     }
 
     @Override

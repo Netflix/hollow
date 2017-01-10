@@ -17,8 +17,6 @@
  */
 package com.netflix.hollow.core.read.engine;
 
-import static com.netflix.hollow.core.HollowBlobHeader.HOLLOW_BLOB_OLD_FORMAT_VERSION_HEADER;
-
 import com.netflix.hollow.core.memory.encoding.VarInt;
 
 import com.netflix.hollow.core.schema.HollowListSchema;
@@ -160,16 +158,15 @@ public class HollowBlobReader {
     private String readTypeStateSnapshot(DataInputStream is, HollowBlobHeader header, HollowFilterConfig filter) throws IOException {
         HollowSchema schema = HollowSchema.readFrom(is);
 
-        if(header.getBlobFormatVersion() != HOLLOW_BLOB_OLD_FORMAT_VERSION_HEADER)
-            skipForwardsCompatibilityBytes(is);
-
+        int numShards = readNumShards(is);
+        
         if(schema instanceof HollowObjectSchema) {
             if(!filter.doesIncludeType(schema.getName())) {
-                HollowObjectTypeReadState.discardSnapshot(is, (HollowObjectSchema)schema);
+                HollowObjectTypeReadState.discardSnapshot(is, (HollowObjectSchema)schema, numShards);
             } else {
                 HollowObjectSchema unfilteredSchema = (HollowObjectSchema)schema;
                 HollowObjectSchema filteredSchema = unfilteredSchema.filterSchema(filter);
-                populateTypeStateSnapshot(is, new HollowObjectTypeReadState(stateEngine, filteredSchema, unfilteredSchema));
+                populateTypeStateSnapshot(is, new HollowObjectTypeReadState(stateEngine, filteredSchema, unfilteredSchema, numShards));
             }
         } else if (schema instanceof HollowListSchema) {
             if(!filter.doesIncludeType(schema.getName())) {
@@ -202,8 +199,7 @@ public class HollowBlobReader {
     private String readTypeStateDelta(DataInputStream is, HollowBlobHeader header) throws IOException {
         HollowSchema schema = HollowSchema.readFrom(is);
 
-        if(header.getBlobFormatVersion() != HOLLOW_BLOB_OLD_FORMAT_VERSION_HEADER)
-            skipForwardsCompatibilityBytes(is);
+        readNumShards(is);
 
         HollowTypeReadState typeState = stateEngine.getTypeState(schema.getName());
         if(typeState != null) {
@@ -215,6 +211,17 @@ public class HollowBlobReader {
         return schema.getName();
     }
 
+    private int readNumShards(DataInputStream is) throws IOException {
+        int backwardsCompatibilityBytes = VarInt.readVInt(is);
+        
+        if(backwardsCompatibilityBytes == 0)
+            return 1;  /// produced by a version of hollow prior to 2.1.0, always only 1 shard.
+        
+        skipForwardsCompatibilityBytes(is);
+        
+        return VarInt.readVInt(is);
+    }
+        
     private void skipForwardsCompatibilityBytes(DataInputStream is) throws IOException {
         int bytesToSkip = VarInt.readVInt(is);
         while(bytesToSkip > 0) {
@@ -228,7 +235,7 @@ public class HollowBlobReader {
 
     private void discardDelta(DataInputStream dis, HollowSchema schema) throws IOException {
         if(schema instanceof HollowObjectSchema)
-            HollowObjectTypeReadState.discardDelta(dis, (HollowObjectSchema)schema);
+            HollowObjectTypeReadState.discardDelta(dis, (HollowObjectSchema)schema, 1);
         else if(schema instanceof HollowListSchema)
             HollowListTypeReadState.discardDelta(dis);
         else if(schema instanceof HollowSetSchema)

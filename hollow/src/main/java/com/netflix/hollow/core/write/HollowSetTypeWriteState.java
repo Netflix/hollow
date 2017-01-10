@@ -49,7 +49,7 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
     private ByteDataBuffer removedOrdinals;
 
     public HollowSetTypeWriteState(HollowSetSchema schema) {
-        super(schema);
+        super(schema, 1);
     }
 
     @Override

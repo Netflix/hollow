@@ -147,12 +147,12 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
         return stateEngine;
     }
 
-    protected void notifyListenerAboutDeltaChanges(GapEncodedVariableLengthIntegerReader removals, GapEncodedVariableLengthIntegerReader additions) {
+    protected void notifyListenerAboutDeltaChanges(GapEncodedVariableLengthIntegerReader removals, GapEncodedVariableLengthIntegerReader additions, int shardNumber, int numShards) {
         for(HollowTypeStateListener stateListener : stateListeners) {
             removals.reset();
             int removedOrdinal = removals.nextElement();
             while(removedOrdinal < Integer.MAX_VALUE) {
-                stateListener.removedOrdinal(removedOrdinal);
+                stateListener.removedOrdinal((removedOrdinal * numShards) + shardNumber);
                 removals.advance();
                 removedOrdinal = removals.nextElement();
             }
@@ -160,7 +160,7 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
             additions.reset();
             int addedOrdinal = additions.nextElement();
             while(addedOrdinal < Integer.MAX_VALUE) {
-                stateListener.addedOrdinal(addedOrdinal);
+                stateListener.addedOrdinal((addedOrdinal * numShards) + shardNumber);
                 additions.advance();
                 addedOrdinal = additions.nextElement();
             }

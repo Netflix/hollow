@@ -76,7 +76,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
         nextData.applyDelta(currentData, deltaData);
         HollowMapTypeDataElements oldData = currentData;
         setCurrentData(nextData);
-        notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions);
+        notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, 0, 1);
         deltaData.destroy();
         oldData.destroy();
     }

@@ -41,7 +41,7 @@ public class HollowBlobHeaderReader {
         DataInputStream dis = new DataInputStream(is);
 
         int headerVersion = dis.readInt();
-        if(headerVersion != HollowBlobHeader.HOLLOW_BLOB_VERSION_HEADER && headerVersion != HollowBlobHeader.HOLLOW_BLOB_OLD_FORMAT_VERSION_HEADER) {
+        if(headerVersion != HollowBlobHeader.HOLLOW_BLOB_VERSION_HEADER) {
             throw new IOException("The HollowBlob you are trying to read is incompatible.  "
                     + "The expected Hollow blob version was " + HollowBlobHeader.HOLLOW_BLOB_VERSION_HEADER + " but the actual version was " + headerVersion);
         }

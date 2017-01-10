@@ -72,7 +72,7 @@ public class HollowBlobWriter {
             HollowSchema schema = typeState.getSchema();
             schema.writeTo(dos);
 
-            VarInt.writeVInt(dos, 0); /// forwards-compatibility, can write number of bytes for older readers to skip here.
+            writeNumShards(dos, typeState.getNumShards());
 
             typeState.writeSnapshot(dos);
         }
@@ -115,7 +115,7 @@ public class HollowBlobWriter {
                 HollowSchema schema = typeState.getSchema();
                 schema.writeTo(dos);
 
-                VarInt.writeVInt(dos, 0); /// forwards-compatibility, can write number of bytes for older readers to skip here.
+                writeNumShards(dos, typeState.getNumShards());
 
                 typeState.writeDelta(dos);
             }
@@ -159,7 +159,7 @@ public class HollowBlobWriter {
                 HollowSchema schema = typeState.getSchema();
                 schema.writeTo(dos);
 
-                VarInt.writeVInt(dos, 0); /// forwards-compatibility, can write number of bytes for older readers to skip here.
+                writeNumShards(dos, typeState.getNumShards());
 
                 typeState.writeReverseDelta(dos);
             }
@@ -177,6 +177,15 @@ public class HollowBlobWriter {
         }
 
         return changedTypes;
+    }
+    
+    private void writeNumShards(DataOutputStream dos, int numShards) throws IOException {
+        VarInt.writeVInt(dos, 1 + VarInt.sizeOfVInt(numShards)); /// pre 2.1.0 forwards compatibility:
+                                                                 /// skip new forwards-compatibility and num shards
+        
+        VarInt.writeVInt(dos, 0); /// 2.1.0 forwards-compatibility, can write number of bytes for older readers to skip here.
+        
+        VarInt.writeVInt(dos, numShards);
     }
 
     private void writeHeader(DataOutputStream os, boolean isReverseDelta) throws IOException {

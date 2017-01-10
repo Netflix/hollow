@@ -77,7 +77,7 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
         nextData.applyDelta(currentData, deltaData);
         HollowSetTypeDataElements oldData = currentData;
         setCurrentData(nextData);
-        notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions);
+        notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, 0, 1);
         deltaData.destroy();
         oldData.destroy();
     }
