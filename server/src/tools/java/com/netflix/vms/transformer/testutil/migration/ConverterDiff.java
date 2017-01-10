@@ -57,7 +57,7 @@ public class ConverterDiff {
     @Ignore
     public void self() throws Exception {
         String name = "self";
-        HollowReadStateEngine from = slice(name, "vmsdev_noeventlegacy", 20161017213128210L);
+        HollowReadStateEngine from = slice(name, "muon_ami_16524801_v015", 20161017213128210L);
         server.addDiff(name, createDiff(from, from));
     }
 
@@ -65,55 +65,17 @@ public class ConverterDiff {
     @Ignore
     public void chain() throws Exception {
         String name = "chain";
-        //        HollowReadStateEngine from = slice(name, "vmsdev_noeventlegacy", 20161017213128210L);
-        //        HollowReadStateEngine to = slice(name, "vmsdev_noeventlegacy", 20161018174952323L);
-
-        // vms.vmsdev_noeventlegacy-snapshot-20161020174756408
-        HollowReadStateEngine from = slice(name, "vmsdev_noeventlegacy", 20161020174756408L);
-        // vms.vmsdev_noeventlegacy-delta-20161020174756408-20161020175423070
-        //      HollowReadStateEngine to = slice(name, "vmsdev_noeventlegacy", 20161020175423070L);
-        // vms.vmsdev_noeventlegacy-delta-20161020190029915-20161020190459781
-        HollowReadStateEngine to = slice(name, "vmsdev_noeventlegacy", 20161020190459781L);
+        HollowReadStateEngine from = slice(name, "muon_ami_16524801_v015", 20161020174756408L);
+        HollowReadStateEngine to = slice(name, "muon", 20161020190459781L);
 
         server.addDiff(name, createDiff(from, to));
     }
 
     @Test
-    @Ignore
-    public void noevent() throws Exception {
-        String name = "noevent";
-        HollowReadStateEngine from = slice(name, "vmsdev_noeventlegacy", 20161018174952323L);
-        HollowReadStateEngine to = slice(name, "vmsdev_noevent", 20161018173711447L);
-        server.addDiff(name, createDiff(from, to));
-    }
-    
-    @Test
-    @Ignore
-    public void rds() throws Exception {
-        String name = "rds";
-        HollowReadStateEngine from = slice(name, "vmsdev_rdslegacy", 20161019213744931L);
-        HollowReadStateEngine to = slice(name, "vmsdev_rdscompat", 20161019213144165L);
-        server.addDiff(name, createDiff(from, to));
-    }
-
-    @Test
-    public void dualread() throws Exception {
-        String name = "dualread";
-        HollowReadStateEngine from = slice(name, "vmsdev_rdslegacy", 20161019213744931L);
-        HollowReadStateEngine to = slice(name, "vmsdev_dualread", 20161019214233544L);
-        server.addDiff(name, createDiff(from, to));
-    }
-
-    @Test
-    @Ignore
-    public void kafka() throws Exception {
-        String name = "kafka";
-        // vms.vmsdev_rdslegacy-snapshot-20161019203939554
-        HollowReadStateEngine from = slice(name, "vmsdev_rdslegacy", 20161019203939554L);
-        // FIXME: timt: why wasn't there a snapshot on roughly the same cadence as the others?
-        // vms.vmsdev_kafkaonly-delta-20161019213632733-20161019214638423
-        // vms.vmsdev_kafkaonly-snapshot-20161019204151107
-        HollowReadStateEngine to = slice(name, "vmsdev_kafkaonly", 20161019204151107L);
+    public void peakBitrate() throws Exception {
+        String name = "bitrate";
+        HollowReadStateEngine from = slice(name, "muon_ami_16524801_v015", 20170110010155816L);
+        HollowReadStateEngine to = slice(name, "pr46", 20170110010157830L);
         server.addDiff(name, createDiff(from, to));
     }
 
