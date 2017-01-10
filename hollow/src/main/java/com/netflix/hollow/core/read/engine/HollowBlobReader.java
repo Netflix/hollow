@@ -199,13 +199,13 @@ public class HollowBlobReader {
     private String readTypeStateDelta(DataInputStream is, HollowBlobHeader header) throws IOException {
         HollowSchema schema = HollowSchema.readFrom(is);
 
-        readNumShards(is);
+        int numShards = readNumShards(is);
 
         HollowTypeReadState typeState = stateEngine.getTypeState(schema.getName());
         if(typeState != null) {
             typeState.applyDelta(is, schema, stateEngine.getMemoryRecycler());
         } else {
-            discardDelta(is, schema);
+            discardDelta(is, schema, numShards);
         }
         
         return schema.getName();
@@ -233,9 +233,9 @@ public class HollowBlobReader {
     }
 
 
-    private void discardDelta(DataInputStream dis, HollowSchema schema) throws IOException {
+    private void discardDelta(DataInputStream dis, HollowSchema schema, int numShards) throws IOException {
         if(schema instanceof HollowObjectSchema)
-            HollowObjectTypeReadState.discardDelta(dis, (HollowObjectSchema)schema, 1);
+            HollowObjectTypeReadState.discardDelta(dis, (HollowObjectSchema)schema, numShards);
         else if(schema instanceof HollowListSchema)
             HollowListTypeReadState.discardDelta(dis);
         else if(schema instanceof HollowSetSchema)

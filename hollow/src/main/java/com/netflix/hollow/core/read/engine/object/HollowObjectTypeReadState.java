@@ -278,7 +278,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 	    BitSet populatedOrdinals = getPopulatedOrdinals();
 
 	    for(int i=0;i<shards.length;i++)
-	        totalApproximateHoleCostInBytes += shards[i].getApproximateHoleCostInBytes(populatedOrdinals);
+	        totalApproximateHoleCostInBytes += shards[i].getApproximateHoleCostInBytes(populatedOrdinals, i, shards.length);
         
 	    return totalApproximateHoleCostInBytes;
 	}

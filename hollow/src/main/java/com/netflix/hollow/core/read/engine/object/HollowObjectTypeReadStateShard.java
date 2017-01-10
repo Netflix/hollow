@@ -1,3 +1,20 @@
+/*
+ *
+ *  Copyright 2016 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
 package com.netflix.hollow.core.read.engine.object;
 
 import com.netflix.hollow.core.memory.ByteData;
@@ -420,8 +437,18 @@ class HollowObjectTypeReadStateShard {
         return requiredBytes;
     }
     
-    public long getApproximateHoleCostInBytes(BitSet populatedOrdinals) {
-        return ((long)(populatedOrdinals.length() - populatedOrdinals.cardinality()) * (long)currentData.bitsPerRecord) / 8; 
+    public long getApproximateHoleCostInBytes(BitSet populatedOrdinals, int shardNumber, int numShards) {
+        long holeBits = 0;
+        
+        int holeOrdinal = populatedOrdinals.nextClearBit(0);
+        while(holeOrdinal <= currentData.maxOrdinal) {
+            if((holeOrdinal & (numShards - 1)) == shardNumber)
+                holeBits += currentData.bitsPerRecord;
+            
+            holeOrdinal = populatedOrdinals.nextClearBit(holeOrdinal + 1);
+        }
+        
+        return (holeBits * (long)currentData.bitsPerRecord) / 8;
     }
-
+    
 }

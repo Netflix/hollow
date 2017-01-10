@@ -72,6 +72,11 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         fieldStats = new FieldStatistics(getSchema());
 
         int maxOrdinal = ordinalMap.maxOrdinal();
+        
+        maxShardOrdinal = new int[numShards];
+        int minOrdinalsPerShard = (maxOrdinal + 1) / numShards; 
+        for(int i=0;i<numShards;i++)
+            maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minOrdinalsPerShard : minOrdinalsPerShard - 1;
 
         for(int i=0;i<=maxOrdinal;i++) {
             discoverObjectFieldStatisticsForRecord(fieldStats, i);
@@ -154,15 +159,11 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         maxOrdinal = ordinalMap.maxOrdinal();
         int numBitsPerRecord = fieldStats.getNumBitsPerRecord();
         
-        maxShardOrdinal = new int[numShards];
         fixedLengthLongArray = new FixedLengthElementArray[numShards];
         varLengthByteArrays = new ByteDataBuffer[numShards][];
         recordBitOffset = new long[numShards];
         
-        int minOrdinalsPerShard = (maxOrdinal + 1) / numShards; 
-
         for(int i=0;i<numShards;i++) {
-            maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minOrdinalsPerShard : minOrdinalsPerShard - 1;
             fixedLengthLongArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numBitsPerRecord * (maxShardOrdinal[i] + 1));
             varLengthByteArrays[i] = new ByteDataBuffer[getSchema().numFields()];
         }
@@ -196,7 +197,6 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         /// Populated bits
         currentCyclePopulated.serializeBitsTo(os);
         
-        maxShardOrdinal = null;
         fixedLengthLongArray = null;
         varLengthByteArrays = null;
         recordBitOffset = null;
@@ -253,7 +253,6 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
         ThreadSafeBitSet deltaAdditions = toCyclePopulated.andNot(fromCyclePopulated);
 
-        maxShardOrdinal = new int[numShards];
         fixedLengthLongArray = new FixedLengthElementArray[numShards];
         deltaAddedOrdinals = new ByteDataBuffer[numShards];
         deltaRemovedOrdinals = new ByteDataBuffer[numShards];
@@ -269,10 +268,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
             addedOrdinal = deltaAdditions.nextSetBit(addedOrdinal + 1);
         }
         
-        int minOrdinalsPerShard = (maxOrdinal + 1) / numShards; 
-
         for(int i=0;i<numShards;i++) {
-            maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minOrdinalsPerShard : minOrdinalsPerShard - 1;
             fixedLengthLongArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numAddedRecordsInShard[i] * numBitsPerRecord);
             deltaAddedOrdinals[i] = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
             deltaRemovedOrdinals[i] = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
@@ -310,7 +306,6 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
             }
         }
         
-        maxShardOrdinal = null;
         fixedLengthLongArray = null;
         varLengthByteArrays = null;
         deltaAddedOrdinals = null;
