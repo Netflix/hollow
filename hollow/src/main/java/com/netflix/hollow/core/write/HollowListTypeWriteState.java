@@ -49,7 +49,7 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
     private ByteDataBuffer deltaRemovedOrdinals[];
 
     public HollowListTypeWriteState(HollowListSchema schema) {
-        this(schema, 4);
+        this(schema, 1);
     }
     
     public HollowListTypeWriteState(HollowListSchema schema, int numShards) {

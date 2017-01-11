@@ -136,15 +136,15 @@ public class HollowObjectDeltaHistoricalStateCreator {
 
     private void copyRecord(int ordinal) {
         int shard = ordinal & shardNumberMask;
-        int translatedOrdinal = ordinal >> shardOrdinalShift; 
+        int shardOrdinal = ordinal >> shardOrdinalShift; 
 
         for(int i=0;i<historicalDataElements.schema.numFields();i++) {
             if(historicalDataElements.varLengthData[i] == null) {
-                long value = stateEngineDataElements[shard].fixedLengthData.getLargeElementValue(((long)translatedOrdinal * stateEngineDataElements[shard].bitsPerRecord) + stateEngineDataElements[shard].bitOffsetPerField[i], stateEngineDataElements[shard].bitsPerField[i]);
+                long value = stateEngineDataElements[shard].fixedLengthData.getLargeElementValue(((long)shardOrdinal * stateEngineDataElements[shard].bitsPerRecord) + stateEngineDataElements[shard].bitOffsetPerField[i], stateEngineDataElements[shard].bitsPerField[i]);
                 historicalDataElements.fixedLengthData.setElementValue(((long)nextOrdinal * historicalDataElements.bitsPerRecord) + historicalDataElements.bitOffsetPerField[i], historicalDataElements.bitsPerField[i], value);
             } else {
-                long fromStartByte = varLengthStartByte(shard, translatedOrdinal, i);
-                long fromEndByte = varLengthEndByte(shard, translatedOrdinal, i);
+                long fromStartByte = varLengthStartByte(shard, shardOrdinal, i);
+                long fromEndByte = varLengthEndByte(shard, shardOrdinal, i);
                 long size = fromEndByte - fromStartByte;
 
                 historicalDataElements.fixedLengthData.setElementValue(((long)nextOrdinal * historicalDataElements.bitsPerRecord) + historicalDataElements.bitOffsetPerField[i], historicalDataElements.bitsPerField[i], currentWriteVarLengthDataPointers[i] + size);

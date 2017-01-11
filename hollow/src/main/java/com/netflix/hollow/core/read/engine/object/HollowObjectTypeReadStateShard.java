@@ -363,7 +363,7 @@ class HollowObjectTypeReadStateShard {
         return ch;
     }
 
-    protected void invalidate() {
+    void invalidate() {
         setCurrentData(null);
     }
 
