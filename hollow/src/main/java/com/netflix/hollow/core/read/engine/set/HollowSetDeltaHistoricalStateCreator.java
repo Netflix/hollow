@@ -19,7 +19,6 @@ package com.netflix.hollow.core.read.engine.set;
 
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
-
 import com.netflix.hollow.core.util.RemovedOrdinalIterator;
 import com.netflix.hollow.core.util.IntMap;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
@@ -34,9 +33,12 @@ import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 public class HollowSetDeltaHistoricalStateCreator {
 
     private final HollowSetTypeReadState typeState;
-    private final HollowSetTypeDataElements stateEngineDataElements;
+    private final HollowSetTypeDataElements stateEngineDataElements[];
     private final HollowSetTypeDataElements historicalDataElements;
     private final RemovedOrdinalIterator iter;
+    
+    private final int shardNumberMask;
+    private final int shardOrdinalShift;
 
     private IntMap ordinalMapping;
     private int nextOrdinal;
@@ -47,6 +49,8 @@ public class HollowSetDeltaHistoricalStateCreator {
         this.stateEngineDataElements = typeState.currentDataElements();
         this.historicalDataElements = new HollowSetTypeDataElements(WastefulRecycler.DEFAULT_INSTANCE);
         this.iter = new RemovedOrdinalIterator(typeState.getListener(PopulatedOrdinalListener.class));
+        this.shardNumberMask = stateEngineDataElements.length - 1;
+        this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(stateEngineDataElements.length);
     }
 
     public void populateHistory() {
@@ -71,7 +75,7 @@ public class HollowSetDeltaHistoricalStateCreator {
     }
 
     public HollowSetTypeReadState createHistoricalTypeReadState() {
-        HollowSetTypeReadState historicalTypeState = new HollowSetTypeReadState(null, typeState.getSchema());
+        HollowSetTypeReadState historicalTypeState = new HollowSetTypeReadState(null, typeState.getSchema(), 1);
         historicalTypeState.setCurrentData(historicalDataElements);
         return historicalTypeState;
     }
@@ -96,25 +100,28 @@ public class HollowSetDeltaHistoricalStateCreator {
         historicalDataElements.bitsPerSetPointer = 64 - Long.numberOfLeadingZeros(totalBucketCount);
         historicalDataElements.bitsPerSetSizeValue = 64 - Long.numberOfLeadingZeros(maxSize);
         historicalDataElements.bitsPerFixedLengthSetPortion = historicalDataElements.bitsPerSetPointer + historicalDataElements.bitsPerSetSizeValue;
-        historicalDataElements.bitsPerElement = stateEngineDataElements.bitsPerElement;
-        historicalDataElements.emptyBucketValue = stateEngineDataElements.emptyBucketValue;
+        historicalDataElements.bitsPerElement = stateEngineDataElements[0].bitsPerElement;
+        historicalDataElements.emptyBucketValue = stateEngineDataElements[0].emptyBucketValue;
         historicalDataElements.totalNumberOfBuckets = totalBucketCount;
 
         ordinalMapping = new IntMap(removedEntryCount);
     }
 
     private void copyRecord(int ordinal) {
+        int shard = ordinal & shardNumberMask;
+        int shardOrdinal = ordinal >> shardOrdinalShift; 
+        
         long bitsPerBucket = historicalDataElements.bitsPerElement;
         long size = typeState.size(ordinal);
 
-        long fromStartBucket = ordinal == 0 ? 0 : stateEngineDataElements.setPointerAndSizeArray.getElementValue((long)(ordinal - 1) * stateEngineDataElements.bitsPerFixedLengthSetPortion, stateEngineDataElements.bitsPerSetPointer);
-        long fromEndBucket = stateEngineDataElements.setPointerAndSizeArray.getElementValue((long)ordinal * stateEngineDataElements.bitsPerFixedLengthSetPortion, stateEngineDataElements.bitsPerSetPointer);
+        long fromStartBucket = shardOrdinal == 0 ? 0 : stateEngineDataElements[shard].setPointerAndSizeArray.getElementValue((long)(shardOrdinal - 1) * stateEngineDataElements[shard].bitsPerFixedLengthSetPortion, stateEngineDataElements[shard].bitsPerSetPointer);
+        long fromEndBucket = stateEngineDataElements[shard].setPointerAndSizeArray.getElementValue((long)shardOrdinal * stateEngineDataElements[shard].bitsPerFixedLengthSetPortion, stateEngineDataElements[shard].bitsPerSetPointer);
         long numBuckets = fromEndBucket - fromStartBucket;
 
         historicalDataElements.setPointerAndSizeArray.setElementValue((long)nextOrdinal * historicalDataElements.bitsPerFixedLengthSetPortion, historicalDataElements.bitsPerSetPointer, nextStartBucket + numBuckets);
         historicalDataElements.setPointerAndSizeArray.setElementValue((long)(nextOrdinal * historicalDataElements.bitsPerFixedLengthSetPortion) + historicalDataElements.bitsPerSetPointer, historicalDataElements.bitsPerSetSizeValue, size);
 
-        historicalDataElements.elementArray.copyBits(stateEngineDataElements.elementArray, fromStartBucket * bitsPerBucket, nextStartBucket * bitsPerBucket, numBuckets * bitsPerBucket);
+        historicalDataElements.elementArray.copyBits(stateEngineDataElements[shard].elementArray, fromStartBucket * bitsPerBucket, nextStartBucket * bitsPerBucket, numBuckets * bitsPerBucket);
 
         nextOrdinal++;
         nextStartBucket += numBuckets;

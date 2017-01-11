@@ -75,7 +75,7 @@ public class HollowSetTest extends AbstractStateEngineTest {
 
         HollowSetTypeReadState typeState = (HollowSetTypeReadState) readStateEngine.getTypeState("TestSet");
 
-        Assert.assertEquals(0, typeState.size(1));
+        Assert.assertEquals(1, typeState.size(0));
         Assert.assertEquals(0, typeState.maxOrdinal());
 
         HollowOrdinalIterator iter = typeState.ordinalIterator(0);

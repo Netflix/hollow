@@ -146,7 +146,7 @@ public class FilteredHollowBlobWriter {
                         copyListState(delta, dis, streamsOnly(streamsWithType), numShards);
                 } else if(schema instanceof HollowSetSchema) {
                     if(streamsWithType.length == 0)
-                        HollowSetTypeReadState.discardType(dis, delta);
+                        HollowSetTypeReadState.discardType(dis, numShards, delta);
                     else
                         copySetState(delta, dis, streamsOnly(streamsWithType), numShards);
                 } else if(schema instanceof HollowMapSchema) {

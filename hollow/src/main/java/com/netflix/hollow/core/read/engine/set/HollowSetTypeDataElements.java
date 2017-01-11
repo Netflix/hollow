@@ -83,24 +83,29 @@ public class HollowSetTypeDataElements {
         elementArray = FixedLengthElementArray.deserializeFrom(dis, memoryRecycler);
     }
 
-    static void discardFromStream(DataInputStream dis, boolean isDelta) throws IOException {
-        VarInt.readVInt(dis); // max ordinal
-
-        if(isDelta) {
-            /// addition/removal ordinals
-            GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(dis);
-            GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(dis);
+    static void discardFromStream(DataInputStream dis, int numShards, boolean isDelta) throws IOException {
+        if(numShards > 1)
+            VarInt.readVInt(dis); // max ordinal
+        
+        for(int i=0;i<numShards;i++) {
+            VarInt.readVInt(dis); // max ordinal
+    
+            if(isDelta) {
+                /// addition/removal ordinals
+                GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(dis);
+                GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(dis);
+            }
+    
+            /// statistics
+            VarInt.readVInt(dis);
+            VarInt.readVInt(dis);
+            VarInt.readVInt(dis);
+            VarInt.readVLong(dis);
+    
+            /// fixed-length data
+            FixedLengthElementArray.discardFrom(dis);
+            FixedLengthElementArray.discardFrom(dis);
         }
-
-        /// statistics
-        VarInt.readVInt(dis);
-        VarInt.readVInt(dis);
-        VarInt.readVInt(dis);
-        VarInt.readVLong(dis);
-
-        /// fixed-length data
-        FixedLengthElementArray.discardFrom(dis);
-        FixedLengthElementArray.discardFrom(dis);
     }
 
     public void applyDelta(HollowSetTypeDataElements fromData, HollowSetTypeDataElements deltaData) {
