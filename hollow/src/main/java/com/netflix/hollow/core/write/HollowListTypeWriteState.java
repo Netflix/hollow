@@ -33,7 +33,6 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
     /// statistics required for writing fixed length list data
     private int bitsPerListPointer;
     private int bitsPerElement;
-    private long totalOfListSizes;
     private long shardTotalOfListSizes[];
 
     /// data required for writing snapshot or delta
@@ -64,8 +63,6 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
     @Override
     public void prepareForWrite() {
         super.prepareForWrite();
-
-        totalOfListSizes = 0;
 
         gatherStatistics();
     }
@@ -98,14 +95,19 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
                     pointer += VarInt.sizeOfVInt(elementOrdinal);
                 }
 
-                totalOfListSizes += size;
                 shardTotalOfListSizes[i & (numShards-1)] += size;
             }
+        }
+        
+        long maxShardTotalOfListSizes = 0;
+        for(int i=0;i<numShards;i++) {
+            if(shardTotalOfListSizes[i] > maxShardTotalOfListSizes)
+                maxShardTotalOfListSizes = shardTotalOfListSizes[i];
         }
 
         bitsPerElement = maxElementOrdinal == 0 ? 1 : 64 - Long.numberOfLeadingZeros(maxElementOrdinal);
 
-        bitsPerListPointer = totalOfListSizes == 0 ? 1 : 64 - Long.numberOfLeadingZeros(totalOfListSizes);
+        bitsPerListPointer = maxShardTotalOfListSizes == 0 ? 1 : 64 - Long.numberOfLeadingZeros(maxShardTotalOfListSizes);
     }
 
     @Override
