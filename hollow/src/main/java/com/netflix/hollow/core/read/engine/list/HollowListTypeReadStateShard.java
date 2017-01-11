@@ -103,7 +103,7 @@ class HollowListTypeReadStateShard {
                 int shardOrdinal = ordinal / numShards;
                 int size = size(shardOrdinal);
     
-                checksum.applyInt(shardOrdinal);
+                checksum.applyInt(ordinal);
                 for(int i=0;i<size;i++)
                     checksum.applyInt(getElementOrdinal(shardOrdinal, i));
             }
@@ -130,6 +130,6 @@ class HollowListTypeReadStateShard {
             holeOrdinal = populatedOrdinals.nextClearBit(holeOrdinal + 1);
         }
         
-        return (holeBits * (long)currentData.bitsPerListPointer) / 8;
+        return holeBits / 8;
     }
 }

@@ -399,12 +399,12 @@ class HollowObjectTypeReadStateShard {
         int ordinal = populatedOrdinals.nextSetBit(0);
         while(ordinal != -1) {
             if((ordinal & (numShards - 1)) == shardNumber) {
-                int translatedOrdinal = ordinal / numShards;
+                int shardOrdinal = ordinal / numShards;
                 checksum.applyInt(ordinal);
                 for(int i=0;i<fieldIndexes.length;i++) {
                     int fieldIdx = fieldIndexes[i];
                     if(!schema.getFieldType(fieldIdx).isVariableLength()) {
-                        long bitOffset = fieldOffset(currentData, translatedOrdinal, fieldIdx);
+                        long bitOffset = fieldOffset(currentData, shardOrdinal, fieldIdx);
                         int numBitsForField = currentData.bitsPerField[fieldIdx];
                         long fixedLengthValue = numBitsForField <= 56 ?
                                 currentData.fixedLengthData.getElementValue(bitOffset, numBitsForField)
@@ -415,7 +415,7 @@ class HollowObjectTypeReadStateShard {
                         else
                             checksum.applyLong(fixedLengthValue);
                     } else {
-                        checksum.applyInt(findVarLengthFieldHashCode(translatedOrdinal, fieldIdx));
+                        checksum.applyInt(findVarLengthFieldHashCode(shardOrdinal, fieldIdx));
                     }
                 }
             }
@@ -448,7 +448,7 @@ class HollowObjectTypeReadStateShard {
             holeOrdinal = populatedOrdinals.nextClearBit(holeOrdinal + 1);
         }
         
-        return (holeBits * (long)currentData.bitsPerRecord) / 8;
+        return holeBits / 8;
     }
     
 }
