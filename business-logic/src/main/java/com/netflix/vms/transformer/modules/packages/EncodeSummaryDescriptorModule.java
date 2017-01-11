@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.modules.packages;
 
-import com.netflix.hollow.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
@@ -13,7 +13,6 @@ import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.TimedTextTypeDescriptor;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;

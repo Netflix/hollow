@@ -1,12 +1,11 @@
 package com.netflix.vms.transformer.publish.workflow.circuitbreaker;
 
-import java.util.Arrays;
-
-import java.util.Collection;
-import java.util.Map;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.publish.workflow.IndexDuplicateChecker;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
 
 public class DuplicateDetectionCircuitBreaker extends HollowCircuitBreaker {
 

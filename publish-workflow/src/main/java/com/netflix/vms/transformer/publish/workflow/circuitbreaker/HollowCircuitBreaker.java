@@ -5,7 +5,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.CircuitBre
 
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.astyanax.connectionpool.exceptions.NotFoundException;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import java.util.ArrayList;

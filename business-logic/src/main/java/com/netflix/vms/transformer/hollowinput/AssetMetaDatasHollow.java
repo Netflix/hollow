@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowinput;
 
-import com.netflix.hollow.objects.HollowObject;
-import com.netflix.hollow.HollowObjectSchema;
+import com.netflix.hollow.api.objects.HollowObject;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 @SuppressWarnings("all")
 public class AssetMetaDatasHollow extends HollowObject {

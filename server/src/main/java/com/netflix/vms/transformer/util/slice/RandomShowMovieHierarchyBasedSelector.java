@@ -1,11 +1,11 @@
 package com.netflix.vms.transformer.util.slice;
 
-import com.netflix.hollow.index.HollowHashIndex;
-import com.netflix.hollow.index.HollowHashIndexResult;
-import com.netflix.hollow.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
-import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.index.HollowHashIndex;
+import com.netflix.hollow.core.index.HollowHashIndexResult;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.vms.transformer.VideoNodeType;
 import com.netflix.vms.transformer.hollowinput.EpisodeHollow;
 import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
@@ -14,7 +14,6 @@ import com.netflix.vms.transformer.hollowinput.ShowSeasonEpisodeHollow;
 import com.netflix.vms.transformer.hollowinput.SupplementalsHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
-
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Random;

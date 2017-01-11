@@ -7,11 +7,11 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingRol
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingTopNodeForImages;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
-import com.netflix.hollow.index.HollowHashIndex;
-import com.netflix.hollow.index.HollowHashIndexResult;
-import com.netflix.hollow.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
-import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.core.index.HollowHashIndex;
+import com.netflix.hollow.core.index.HollowHashIndexResult;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -55,6 +55,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -652,12 +653,12 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                         if (updatedArtwork != null)
                             artworkSet.add(updatedArtwork);
 
-                        // add schedule windows in top nodes
-                        if (!videoSchedulePhaseMap.containsKey(topNode)) {
-                            videoSchedulePhaseMap.put(topNode, new HashSet<>());
-                        }
-                        scheduleSet = videoSchedulePhaseMap.get(topNode);
-                        scheduleSet.addAll(schedulePhaseInfoSet);
+                        // roll up schedule windows in top nodes
+//                        if (!videoSchedulePhaseMap.containsKey(topNode)) {
+//                            videoSchedulePhaseMap.put(topNode, new HashSet<>());
+//                        }
+//                        scheduleSet = videoSchedulePhaseMap.get(topNode);
+//                        scheduleSet.addAll(schedulePhaseInfoSet);
                     }
                 }
             }
@@ -711,9 +712,9 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         if (checkPhaseTagList(phaseTagListHollow, videoArtworkHollow, videoId) == null) return null;
         boolean isSmoky = videoArtworkHollow._getIsSmoky();
 
-        HollowOrdinalIterator iterator = phaseTagListHollow.typeApi().getOrdinalIterator(phaseTagListHollow.getOrdinal());
-        int phaseTagOrdinal = iterator.next();
-        if (phaseTagOrdinal == HollowOrdinalIterator.NO_MORE_ORDINALS) {
+        Iterator<PhaseTagHollow> iterator = phaseTagListHollow.iterator();
+
+        if (!iterator.hasNext()) {
             // adding a default window for no phase tags.
             SchedulePhaseInfo defaultWindow = new SchedulePhaseInfo(isSmoky, videoId);
             schedulePhaseInfos = new HashSet<>();
@@ -721,9 +722,9 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
             return schedulePhaseInfos;
         }
 
-        while (phaseTagOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+        while (iterator.hasNext()) {
 
-            PhaseTagHollow phaseTagHollow = phaseTagListHollow.instantiateElement(phaseTagOrdinal);
+            PhaseTagHollow phaseTagHollow = iterator.next();
             String tag = phaseTagHollow._getPhaseTag()._getValue();
             String scheduleId = phaseTagHollow._getScheduleId()._getValue();
 
@@ -751,8 +752,6 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                 }
 
             }
-
-            phaseTagOrdinal = iterator.next();
         }
 
         return schedulePhaseInfos;

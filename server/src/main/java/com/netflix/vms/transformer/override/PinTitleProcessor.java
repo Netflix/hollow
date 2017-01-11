@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.override;
 
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
 public interface PinTitleProcessor {
 

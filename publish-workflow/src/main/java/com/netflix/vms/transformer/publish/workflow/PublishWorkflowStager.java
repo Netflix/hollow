@@ -1,8 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow;
 
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.publish.status.CycleStatusFuture;
-
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
 
 public interface PublishWorkflowStager {
 	

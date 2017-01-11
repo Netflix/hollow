@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.testutil.repro;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.util.StateEngineRoundTripper;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;

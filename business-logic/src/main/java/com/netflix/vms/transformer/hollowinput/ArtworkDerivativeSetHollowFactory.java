@@ -1,9 +1,9 @@
 package com.netflix.vms.transformer.hollowinput;
 
-import com.netflix.hollow.objects.provider.HollowFactory;
-import com.netflix.hollow.read.dataaccess.HollowTypeDataAccess;
-import com.netflix.hollow.read.customapi.HollowTypeAPI;
-import com.netflix.hollow.objects.delegate.HollowSetCachedDelegate;
+import com.netflix.hollow.api.objects.provider.HollowFactory;
+import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
+import com.netflix.hollow.api.custom.HollowTypeAPI;
+import com.netflix.hollow.api.objects.delegate.HollowSetCachedDelegate;
 
 @SuppressWarnings("all")
 public class ArtworkDerivativeSetHollowFactory<T extends ArtworkDerivativeSetHollow> extends HollowFactory<T> {

@@ -1,12 +1,11 @@
 package com.netflix.vms.transformer.testutil.migration;
 
-import com.netflix.vms.transformer.SimpleTransformerContext;
-
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
+import com.netflix.hollow.core.read.engine.HollowBlobReader;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.SimpleTransformer;
+import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
-import com.netflix.hollow.read.engine.HollowBlobReader;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.util.memory.WastefulRecycler;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import java.io.FileInputStream;
 import java.io.IOException;

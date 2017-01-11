@@ -1,9 +1,9 @@
 package com.netflix.vms.transformer.hollowinput;
 
-import com.netflix.hollow.objects.HollowList;
-import com.netflix.hollow.HollowListSchema;
-import com.netflix.hollow.objects.delegate.HollowListDelegate;
-import com.netflix.hollow.objects.generic.GenericHollowRecordHelper;
+import com.netflix.hollow.api.objects.HollowList;
+import com.netflix.hollow.core.schema.HollowListSchema;
+import com.netflix.hollow.api.objects.delegate.HollowListDelegate;
+import com.netflix.hollow.api.objects.generic.GenericHollowRecordHelper;
 
 @SuppressWarnings("all")
 public class ListOfRightsContractPackageHollow extends HollowList<RightsContractPackageHollow> {

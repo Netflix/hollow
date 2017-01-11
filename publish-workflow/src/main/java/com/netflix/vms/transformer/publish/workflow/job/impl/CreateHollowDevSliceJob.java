@@ -3,12 +3,13 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 import static com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper.TransformerColumnFamily.DEV_SLICE_TOPNODE_IDS;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CreateDevSlice;
 
+import com.netflix.hollow.core.util.IntList;
+
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.aws.db.ItemAttribute;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.hollow.util.IntList;
-import com.netflix.hollow.write.HollowBlobWriter;
-import com.netflix.hollow.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.HollowBlobWriter;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.videometadata.s3.HollowBlobKeybaseBuilder;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
 import com.netflix.vms.transformer.common.slice.DataSlicer;

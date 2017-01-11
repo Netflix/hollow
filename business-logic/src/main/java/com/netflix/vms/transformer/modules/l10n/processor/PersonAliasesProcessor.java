@@ -1,11 +1,10 @@
 package com.netflix.vms.transformer.modules.l10n.processor;
 
-import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.PersonAliasesHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.modules.l10n.L10nResourceIdLookup;
-
 import java.util.Collection;
 
 public class PersonAliasesProcessor extends AbstractL10NMiscProcessor<PersonAliasesHollow> {

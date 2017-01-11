@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.input;
 
 import com.netflix.aws.file.FileStore;
-import com.netflix.hollow.client.HollowClient;
+import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.vms.transformer.util.HollowBlobKeybaseBuilder;
 
 public class VMSOutputDataClient extends HollowClient {

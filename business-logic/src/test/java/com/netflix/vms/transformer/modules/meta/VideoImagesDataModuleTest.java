@@ -1,10 +1,9 @@
 package com.netflix.vms.transformer.modules.meta;
 
-import com.netflix.hollow.index.HollowHashIndex;
-import com.netflix.hollow.index.HollowHashIndexResult;
-import com.netflix.hollow.objects.delegate.HollowListDelegate;
-import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
-import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.core.index.HollowHashIndex;
+import com.netflix.hollow.core.index.HollowHashIndexResult;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -31,10 +30,14 @@ import static org.mockito.Mockito.when;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Test for VideoImagesDataModule. Unit tests for asset schedules.
  */
 public class VideoImagesDataModuleTest {
 
@@ -47,6 +50,7 @@ public class VideoImagesDataModuleTest {
     private VideoArtworkHollow videoArtworkHollow;
     private PhaseTagListTypeAPI listTypeAPI;
     private PhaseTagListHollow listHollow;
+    private Iterator<PhaseTagHollow> iterator;
     private HollowOrdinalIterator listIterator;
 
     private int videoId;
@@ -62,38 +66,33 @@ public class VideoImagesDataModuleTest {
 
     @Before
     public void setup() {
+        // mock stuff
         api = mock(VMSHollowInputAPI.class);
-        this.overrideIndex = mock(HollowHashIndex.class);
-        this.absoluteIndex = mock(HollowHashIndex.class);
-        this.masterIndex = mock(HollowHashIndex.class);
+        overrideIndex = mock(HollowHashIndex.class);
+        absoluteIndex = mock(HollowHashIndex.class);
+        masterIndex = mock(HollowHashIndex.class);
 
-        this.videoArtworkHollow = mock(VideoArtworkHollow.class);
+        videoId = 1;
+        scheduleId = "testSchedule";
+        prePromoTag = "PRE_PROMO";
+        promoTag = "PROMO";
 
-        this.videoId = 1;
-        this.scheduleId = "testSchedule";
-        this.prePromoTag = "PRE_PROMO";
-        this.promoTag = "PROMO";
+        context = mock(TransformerContext.class);
+        config = mock(TransformerConfig.class);
+        logger = mock(TaggingLogger.class);
 
-        this.context = mock(TransformerContext.class);
-        this.config = mock(TransformerConfig.class);
-        this.logger = mock(TaggingLogger.class);
+        videoArtworkHollow = mock(VideoArtworkHollow.class);
+        listHollow = mock(PhaseTagListHollow.class);
+        listTypeAPI = mock(PhaseTagListTypeAPI.class);
+        listIterator = mock(HollowOrdinalIterator.class);
+        iterator = mock(Iterator.class);
 
+        //mock calls
         when(context.getConfig()).thenReturn(config);
         when(context.getLogger()).thenReturn(logger);
 
-        this.videoImagesDataModule = new VideoImagesDataModule(context, overrideIndex, masterIndex, absoluteIndex,
-                api, mock(HollowObjectMapper.class), mock(CycleConstants.class),
-                mock(VMSTransformerIndexer.class));
-
-        //mock phaseTagList from VideoArtwork
-        HollowListDelegate hollowListDelegate = mock(HollowListDelegate.class);
-        listHollow = new PhaseTagListHollow(hollowListDelegate, 1);
-        listTypeAPI = mock(PhaseTagListTypeAPI.class);
-        listIterator = mock(HollowOrdinalIterator.class);
-
         when(listTypeAPI.getOrdinalIterator(1)).thenReturn(listIterator);
-        when(hollowListDelegate.getTypeAPI()).thenReturn(listTypeAPI);
-        when(listTypeAPI.getAPI()).thenReturn(api);
+        when(listHollow.iterator()).thenReturn(iterator);
 
         //mock videoArtwork
         when(videoArtworkHollow._getPhaseTags()).thenReturn(listHollow);
@@ -101,6 +100,11 @@ public class VideoImagesDataModuleTest {
         StringHollow stringHollow = mock(StringHollow.class);
         when(videoArtworkHollow._getSourceFileId()).thenReturn(stringHollow);
         when(stringHollow._getValue()).thenReturn("testSourceFileId");
+
+        // create instance to test
+        this.videoImagesDataModule = new VideoImagesDataModule(context, overrideIndex, masterIndex, absoluteIndex,
+                api, mock(HollowObjectMapper.class), mock(CycleConstants.class),
+                mock(VMSTransformerIndexer.class));
 
     }
 
@@ -115,17 +119,36 @@ public class VideoImagesDataModuleTest {
         return phaseTagHollow;
     }
 
-    private void mockListIterator(HollowOrdinalIterator listIterator, int validResults) {
-        when(listIterator.next()).thenAnswer(new Answer<Integer>() {
+    private void mockIterator(Iterator<PhaseTagHollow> iterator, int validResults, List<PhaseTagHollow> phaseTags) {
+        mockIterator(iterator, validResults, phaseTags, false);
+    }
+
+    private void mockIterator(Iterator<PhaseTagHollow> iterator, int validResults, List<PhaseTagHollow> phaseTags, boolean emptyList) {
+        when(iterator.next()).thenAnswer(new Answer<PhaseTagHollow>() {
             private int count = 0;
 
             @Override
-            public Integer answer(InvocationOnMock invocation) throws Throwable {
+            public PhaseTagHollow answer(InvocationOnMock invocation) throws Throwable {
                 if (count < validResults) {
+                    PhaseTagHollow phaseTagHollow = phaseTags.get(count);
                     count++;
-                    return count;
+                    return phaseTagHollow;
                 }
-                return HollowOrdinalIterator.NO_MORE_ORDINALS;
+                return null;
+            }
+        });
+        when(iterator.hasNext()).thenAnswer(new Answer<Boolean>() {
+            private int count = 0;
+
+            @Override
+            public Boolean answer(InvocationOnMock invocation) throws Throwable {
+                // hasNext is called once before the while loop to check it iterator has items to iterate
+                if (emptyList) return false;
+                if (count <= validResults) {
+                    count++;
+                    return true;
+                }
+                return false;
             }
         });
     }
@@ -183,7 +206,7 @@ public class VideoImagesDataModuleTest {
      */
     @Test
     public void testGetScheduleInfoEmptyList() {
-        mockListIterator(listIterator, 0);
+        mockIterator(iterator, 0, Collections.emptyList(), true);
         Set<SchedulePhaseInfo> schedulePhaseInfoSet = videoImagesDataModule.getAllScheduleInfo(videoArtworkHollow, videoId);
         SchedulePhaseInfo schedulePhaseInfo = videoImagesDataModule.getEarliestScheduleInfo(schedulePhaseInfoSet, videoId);
 
@@ -196,13 +219,14 @@ public class VideoImagesDataModuleTest {
      */
     @Test
     public void testGetSchedulePhaseInfoNoSchedule() {
-        mockListIterator(listIterator, 2);
 
         // mock phaseTag returned from videoArtwork
+        List<PhaseTagHollow> phaseTags = new ArrayList<>();
         PhaseTagHollow phaseTagHollow = getPhaseTag(promoTag, scheduleId);
         PhaseTagHollow phaseTagHollow1 = getPhaseTag(prePromoTag, scheduleId);
-        when(api.getPhaseTagHollow(eq(1))).thenReturn(phaseTagHollow);
-        when(api.getPhaseTagHollow(eq(2))).thenReturn(phaseTagHollow1);
+        phaseTags.add(phaseTagHollow);
+        phaseTags.add(phaseTagHollow1);
+        mockIterator(iterator, 2, phaseTags);
 
         // tag does not belong to any of the schedule
         when(masterIndex.findMatches(anyString(), anyString())).thenReturn(null);
@@ -221,13 +245,14 @@ public class VideoImagesDataModuleTest {
     @Test
     public void testGetSchedulePhaseInfoMasterSchedule() {
 
-        mockListIterator(listIterator, 2);
-
         // mock phaseTag returned from videoArtwork
         PhaseTagHollow phaseTagHollow = getPhaseTag(promoTag, scheduleId);
         PhaseTagHollow phaseTagHollow1 = getPhaseTag(prePromoTag, scheduleId);
-        when(api.getPhaseTagHollow(eq(1))).thenReturn(phaseTagHollow);
-        when(api.getPhaseTagHollow(eq(2))).thenReturn(phaseTagHollow1);
+        List<PhaseTagHollow> phaseTags = new ArrayList<>();
+        phaseTags.add(phaseTagHollow);
+        phaseTags.add(phaseTagHollow1);
+        mockIterator(iterator, 2, phaseTags);
+
 
         // mock override and absolute index
         when(absoluteIndex.findMatches(eq((long) videoId), eq(promoTag))).thenReturn(null);
@@ -257,10 +282,10 @@ public class VideoImagesDataModuleTest {
     @Test
     public void testGetSchedulePhaseInfoAbsoluteSchedule() {
 
-        mockListIterator(listIterator, 1);
-
         PhaseTagHollow phaseTagHollow = getPhaseTag(promoTag, scheduleId);
-        when(api.getPhaseTagHollow(1)).thenReturn(phaseTagHollow);
+        List<PhaseTagHollow> phaseTags = new ArrayList<>();
+        phaseTags.add(phaseTagHollow);
+        mockIterator(iterator, 1, phaseTags);
 
         // mock override and master index
         when(masterIndex.findMatches(eq(promoTag), eq(scheduleId))).thenReturn(null);
@@ -287,13 +312,12 @@ public class VideoImagesDataModuleTest {
     @Test
     public void testGetSchedulePhaseInfoMasterAndOverrideSchedule() {
 
-        mockListIterator(listIterator, 2);
-
         PhaseTagHollow promoPhaseTagHollow = getPhaseTag(promoTag, scheduleId);
         PhaseTagHollow prePromoPhaseTagHollow = getPhaseTag(prePromoTag, scheduleId);
-
-        when(api.getPhaseTagHollow(eq(1))).thenReturn(promoPhaseTagHollow);
-        when(api.getPhaseTagHollow(eq(2))).thenReturn(prePromoPhaseTagHollow);
+        List<PhaseTagHollow> phaseTags = new ArrayList<>();
+        phaseTags.add(promoPhaseTagHollow);
+        phaseTags.add(prePromoPhaseTagHollow);
+        mockIterator(iterator, 2, phaseTags);
 
         // mock absolute index
         when(absoluteIndex.findMatches(anyLong(), anyString())).thenReturn(null);

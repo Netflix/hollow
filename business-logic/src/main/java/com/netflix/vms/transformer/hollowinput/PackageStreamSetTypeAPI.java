@@ -1,9 +1,9 @@
 package com.netflix.vms.transformer.hollowinput;
 
-import com.netflix.hollow.read.customapi.HollowSetTypeAPI;
+import com.netflix.hollow.api.custom.HollowSetTypeAPI;
 
-import com.netflix.hollow.read.dataaccess.HollowSetTypeDataAccess;
-import com.netflix.hollow.objects.delegate.HollowSetLookupDelegate;
+import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
+import com.netflix.hollow.api.objects.delegate.HollowSetLookupDelegate;
 
 @SuppressWarnings("all")
 public class PackageStreamSetTypeAPI extends HollowSetTypeAPI {
