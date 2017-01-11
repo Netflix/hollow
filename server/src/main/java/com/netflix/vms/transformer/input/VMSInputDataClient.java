@@ -1,15 +1,14 @@
 package com.netflix.vms.transformer.input;
 
-import com.netflix.hollow.sampling.DisabledSamplingDirector;
-
 import com.netflix.aws.file.FileStore;
-import com.netflix.hollow.client.HollowAPIFactory;
-import com.netflix.hollow.client.HollowClient;
-import com.netflix.hollow.client.HollowClientMemoryConfig;
-import com.netflix.hollow.client.HollowUpdateListener;
-import com.netflix.hollow.read.customapi.HollowAPI;
-import com.netflix.hollow.read.dataaccess.HollowDataAccess;
-import com.netflix.hollow.util.DefaultHashCodeFinder;
+import com.netflix.hollow.api.client.HollowAPIFactory;
+import com.netflix.hollow.api.client.HollowClient;
+import com.netflix.hollow.api.client.HollowClientMemoryConfig;
+import com.netflix.hollow.api.client.HollowUpdateListener;
+import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.api.sampling.DisabledSamplingDirector;
+import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
+import com.netflix.hollow.core.util.DefaultHashCodeFinder;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import java.util.Collections;
 

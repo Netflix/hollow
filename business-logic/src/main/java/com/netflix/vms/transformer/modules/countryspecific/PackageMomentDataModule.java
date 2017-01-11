@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
-import com.netflix.hollow.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.hollowinput.CdnDeploymentHollow;
 import com.netflix.vms.transformer.hollowinput.DownloadableIdHollow;

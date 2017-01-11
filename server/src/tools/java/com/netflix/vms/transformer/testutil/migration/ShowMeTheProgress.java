@@ -1,20 +1,19 @@
 package com.netflix.vms.transformer.testutil.migration;
 
-import com.netflix.hollow.HollowBlobHeader;
-import com.netflix.hollow.HollowSchema;
-import com.netflix.hollow.filter.HollowFilterConfig;
-import com.netflix.hollow.read.engine.HollowBlobHeaderReader;
-import com.netflix.hollow.read.engine.HollowBlobReader;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.util.memory.WastefulRecycler;
-import com.netflix.hollow.write.HollowBlobWriter;
-import com.netflix.hollow.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.HollowBlobHeader;
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
+import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
+import com.netflix.hollow.core.read.engine.HollowBlobReader;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.filter.HollowFilterConfig;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.write.HollowBlobWriter;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.io.LZ4VMSInputStream;
-
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -26,10 +25,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
-
-import org.junit.Test;
-
 import net.jpountz.lz4.LZ4BlockInputStream;
+import org.junit.Test;
 
 public class ShowMeTheProgress {
 

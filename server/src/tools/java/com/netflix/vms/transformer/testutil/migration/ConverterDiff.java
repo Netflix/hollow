@@ -1,6 +1,16 @@
 package com.netflix.vms.transformer.testutil.migration;
 
 import static java.lang.String.format;
+
+import com.netflix.hollow.core.read.engine.HollowBlobReader;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.write.HollowBlobWriter;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.diff.ui.jetty.HollowDiffUIServer;
+import com.netflix.hollow.tools.diff.HollowDiff;
+import com.netflix.vms.transformer.common.slice.DataSlicer;
+import com.netflix.vms.transformer.input.VMSInputDataClient;
+import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -8,25 +18,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
+import net.jpountz.lz4.LZ4BlockInputStream;
+import net.jpountz.lz4.LZ4BlockOutputStream;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import com.netflix.hollow.diff.HollowDiff;
-import com.netflix.hollow.diff.ui.jetty.HollowDiffUIServer;
-import com.netflix.hollow.read.engine.HollowBlobReader;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.write.HollowBlobWriter;
-import com.netflix.hollow.write.HollowWriteStateEngine;
-import com.netflix.vms.transformer.common.slice.DataSlicer;
-import com.netflix.vms.transformer.input.VMSInputDataClient;
-import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
-
-import net.jpountz.lz4.LZ4BlockInputStream;
-import net.jpountz.lz4.LZ4BlockOutputStream;
 
 
 public class ConverterDiff {

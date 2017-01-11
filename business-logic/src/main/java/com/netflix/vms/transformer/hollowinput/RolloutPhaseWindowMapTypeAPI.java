@@ -1,9 +1,8 @@
 package com.netflix.vms.transformer.hollowinput;
 
-import com.netflix.hollow.read.customapi.HollowMapTypeAPI;
-
-import com.netflix.hollow.read.dataaccess.HollowMapTypeDataAccess;
-import com.netflix.hollow.objects.delegate.HollowMapLookupDelegate;
+import com.netflix.hollow.api.custom.HollowMapTypeAPI;
+import com.netflix.hollow.api.objects.delegate.HollowMapLookupDelegate;
+import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
 
 @SuppressWarnings("all")
 public class RolloutPhaseWindowMapTypeAPI extends HollowMapTypeAPI {

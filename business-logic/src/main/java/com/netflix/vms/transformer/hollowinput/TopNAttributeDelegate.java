@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.hollowinput;
 
-import com.netflix.hollow.objects.delegate.HollowObjectDelegate;
+import com.netflix.hollow.api.objects.delegate.HollowObjectDelegate;
 
 
 @SuppressWarnings("all")
