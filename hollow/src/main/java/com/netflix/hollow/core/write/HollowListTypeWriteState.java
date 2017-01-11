@@ -34,20 +34,26 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
     private int bitsPerListPointer;
     private int bitsPerElement;
     private long totalOfListSizes;
+    private long shardTotalOfListSizes[];
 
     /// data required for writing snapshot or delta
     private int maxOrdinal;
-    private FixedLengthElementArray listPointerArray;
-    private FixedLengthElementArray elementArray;
+    private int maxShardOrdinal[];
+    private FixedLengthElementArray listPointerArray[];
+    private FixedLengthElementArray elementArray[];
 
     /// additional data required for writing delta
-    private int numListsInDelta;
-    private long numElementsInDelta;
-    private ByteDataBuffer deltaAddedOrdinals;
-    private ByteDataBuffer deltaRemovedOrdinals;
+    private int numListsInDelta[];
+    private long numElementsInDelta[];
+    private ByteDataBuffer deltaAddedOrdinals[];
+    private ByteDataBuffer deltaRemovedOrdinals[];
 
     public HollowListTypeWriteState(HollowListSchema schema) {
-        super(schema, 1);
+        this(schema, 4);
+    }
+    
+    public HollowListTypeWriteState(HollowListSchema schema, int numShards) {
+        super(schema, numShards);
     }
 
     @Override
@@ -68,7 +74,15 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
         int maxElementOrdinal = 0;
 
         int maxOrdinal = ordinalMap.maxOrdinal();
+
+        maxShardOrdinal = new int[numShards];
+        int minOrdinalsPerShard = (maxOrdinal + 1) / numShards; 
+        for(int i=0;i<numShards;i++)
+            maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minOrdinalsPerShard : minOrdinalsPerShard - 1;
+        
         ByteData data = ordinalMap.getByteData().getUnderlyingArray();
+        
+        shardTotalOfListSizes = new long[numShards];
 
         for(int i=0;i<=maxOrdinal;i++) {
             if(currentCyclePopulated.get(i) || previousCyclePopulated.get(i)) {
@@ -85,6 +99,7 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
                 }
 
                 totalOfListSizes += size;
+                shardTotalOfListSizes[i & (numShards-1)] += size;
             }
         }
 
@@ -96,17 +111,26 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
     @Override
     public void calculateSnapshot() {
         maxOrdinal = ordinalMap.maxOrdinal();
+        
+        listPointerArray = new FixedLengthElementArray[numShards];
+        elementArray = new FixedLengthElementArray[numShards];
 
-        listPointerArray = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)bitsPerListPointer * (maxOrdinal + 1));
-        elementArray = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)bitsPerElement * totalOfListSizes);
+        for(int i=0;i<numShards;i++) {
+            listPointerArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)bitsPerListPointer * (maxShardOrdinal[i] + 1));
+            elementArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)bitsPerElement * shardTotalOfListSizes[i]);
+        }
 
         ByteData data = ordinalMap.getByteData().getUnderlyingArray();
 
-        int elementCounter = 0;
+        int elementCounter[] = new int[numShards];
+        int shardMask = numShards - 1;
 
-        for(int i=0;i<=maxOrdinal;i++) {
-            if(currentCyclePopulated.get(i)) {
-                long readPointer = ordinalMap.getPointerForData(i);
+        for(int ordinal=0;ordinal<=maxOrdinal;ordinal++) {
+            int shardNumber = ordinal & shardMask;
+            int shardOrdinal = ordinal / numShards;
+            
+            if(currentCyclePopulated.get(ordinal)) {
+                long readPointer = ordinalMap.getPointerForData(ordinal);
 
                 int size = VarInt.readVInt(data, readPointer);
                 readPointer += VarInt.sizeOfVInt(size);
@@ -114,44 +138,57 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
                 for(int j=0;j<size;j++) {
                     int elementOrdinal = VarInt.readVInt(data, readPointer);
                     readPointer += VarInt.sizeOfVInt(elementOrdinal);
-                    elementArray.setElementValue((long)bitsPerElement * elementCounter, bitsPerElement, elementOrdinal);
-                    elementCounter++;
+                    elementArray[shardNumber].setElementValue((long)bitsPerElement * elementCounter[shardNumber], bitsPerElement, elementOrdinal);
+                    elementCounter[shardNumber]++;
                 }
             }
 
-            listPointerArray.setElementValue((long)bitsPerListPointer * i, bitsPerListPointer, elementCounter);
+            listPointerArray[shardNumber].setElementValue((long)bitsPerListPointer * shardOrdinal, bitsPerListPointer, elementCounter[shardNumber]);
         }
     }
 
     @Override
     public void writeSnapshot(DataOutputStream os) throws IOException {
-        /// 1) max ordinal
-        VarInt.writeVInt(os, maxOrdinal);
-
-        /// 2) statistics
-        VarInt.writeVInt(os, bitsPerListPointer);
-        VarInt.writeVInt(os, bitsPerElement);
-        VarInt.writeVLong(os, totalOfListSizes);
-
-        /// 3) list pointer array
-        int numListPointerLongs = maxOrdinal == -1 ? 0 : (int)((((long)(maxOrdinal + 1) * bitsPerListPointer) - 1) / 64) + 1;
-        VarInt.writeVInt(os, numListPointerLongs);
-        for(int i=0;i<numListPointerLongs;i++) {
-            os.writeLong(listPointerArray.get(i));
+        if(numShards == 1) {
+            writeSnapshotShard(os, 0);
+        } else {
+            /// overall max ordinal
+            VarInt.writeVInt(os, maxOrdinal);
+            
+            for(int i=0;i<numShards;i++) {
+                writeSnapshotShard(os, i);
+            }
         }
-
-        /// 4) element array
-        int numElementLongs = totalOfListSizes == 0 ? 0 : (int)(((totalOfListSizes * bitsPerElement) - 1) / 64) + 1;
-        VarInt.writeVInt(os, numElementLongs);
-        for(int i=0;i<numElementLongs;i++) {
-            os.writeLong(elementArray.get(i));
-        }
-
-        /// 5) Populated bits
+        
+        /// Populated bits
         currentCyclePopulated.serializeBitsTo(os);
 
         listPointerArray = null;
         elementArray = null;
+    }
+        
+    private void writeSnapshotShard(DataOutputStream os, int shardNumber) throws IOException {
+        /// 1) shard max ordinal
+        VarInt.writeVInt(os, maxShardOrdinal[shardNumber]);
+
+        /// 2) statistics
+        VarInt.writeVInt(os, bitsPerListPointer);
+        VarInt.writeVInt(os, bitsPerElement);
+        VarInt.writeVLong(os, shardTotalOfListSizes[shardNumber]);
+
+        /// 3) list pointer array
+        int numListPointerLongs = maxShardOrdinal[shardNumber] == -1 ? 0 : (int)((((long)(maxShardOrdinal[shardNumber] + 1) * bitsPerListPointer) - 1) / 64) + 1;
+        VarInt.writeVInt(os, numListPointerLongs);
+        for(int i=0;i<numListPointerLongs;i++) {
+            os.writeLong(listPointerArray[shardNumber].get(i));
+        }
+
+        /// 4) element array
+        int numElementLongs = shardTotalOfListSizes[shardNumber] == 0 ? 0 : (int)(((shardTotalOfListSizes[shardNumber] * bitsPerElement) - 1) / 64) + 1;
+        VarInt.writeVInt(os, numElementLongs);
+        for(int i=0;i<numElementLongs;i++) {
+            os.writeLong(elementArray[shardNumber].get(i));
+        }
     }
 
     @Override
@@ -177,79 +214,82 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
     private void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated) {
         maxOrdinal = ordinalMap.maxOrdinal();
 
+        numListsInDelta = new int[numShards];
+        numElementsInDelta = new long[numShards];
+        
+        listPointerArray = new FixedLengthElementArray[numShards];
+        elementArray = new FixedLengthElementArray[numShards];
+        deltaAddedOrdinals = new ByteDataBuffer[numShards];
+        deltaRemovedOrdinals = new ByteDataBuffer[numShards];
+        
         ThreadSafeBitSet deltaAdditions = toCyclePopulated.andNot(fromCyclePopulated);
-        numListsInDelta = deltaAdditions.cardinality();
-        numElementsInDelta = calculateNumElementsInDelta(maxOrdinal, deltaAdditions);
-
-        listPointerArray = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numListsInDelta * bitsPerListPointer);
-        elementArray = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, numElementsInDelta * bitsPerElement);
-        deltaAddedOrdinals = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
-        deltaRemovedOrdinals = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
+        
+        int shardMask = numShards - 1;
+        
+        int addedOrdinal = deltaAdditions.nextSetBit(0);
+        while(addedOrdinal != -1) {
+            numListsInDelta[addedOrdinal & shardMask]++;
+            long readPointer = ordinalMap.getPointerForData(addedOrdinal);
+            numElementsInDelta[addedOrdinal & shardMask] += VarInt.readVInt(ordinalMap.getByteData().getUnderlyingArray(), readPointer);
+            
+            addedOrdinal = deltaAdditions.nextSetBit(addedOrdinal + 1);
+        }
+        
+        for(int i=0;i<numShards;i++) {
+            listPointerArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numListsInDelta[i] * bitsPerListPointer);
+            elementArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, numElementsInDelta[i] * bitsPerElement);
+            deltaAddedOrdinals[i] = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
+            deltaRemovedOrdinals[i] = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
+        }
 
         ByteData data = ordinalMap.getByteData().getUnderlyingArray();
 
-        int listCounter = 0;
-        int elementCounter = 0;
+        int listCounter[] = new int[numShards];
+        long elementCounter[] = new long[numShards];
 
-        int previousRemovedOrdinal = 0;
-        int previousAddedOrdinal = 0;
+        int previousRemovedOrdinal[] = new int[numShards];
+        int previousAddedOrdinal[] = new int[numShards];
 
-
-        for(int i=0;i<=maxOrdinal;i++) {
-            if(toCyclePopulated.get(i) && !fromCyclePopulated.get(i)) {
-                long readPointer = ordinalMap.getPointerForData(i);
+        for(int ordinal=0;ordinal<=maxOrdinal;ordinal++) {
+            int shardNumber = ordinal & shardMask;
+            if(deltaAdditions.get(ordinal)) {
+                long readPointer = ordinalMap.getPointerForData(ordinal);
 
                 int size = VarInt.readVInt(data, readPointer);
                 readPointer += VarInt.sizeOfVInt(size);
 
-                listPointerArray.setElementValue((long)bitsPerListPointer * listCounter, bitsPerListPointer, elementCounter + size);
+                listPointerArray[shardNumber].setElementValue((long)bitsPerListPointer * listCounter[shardNumber], bitsPerListPointer, elementCounter[shardNumber] + size);
 
                 for(int j=0;j<size;j++) {
                     int elementOrdinal = VarInt.readVInt(data, readPointer);
                     readPointer += VarInt.sizeOfVInt(elementOrdinal);
-                    elementArray.setElementValue((long)bitsPerElement * elementCounter, bitsPerElement, elementOrdinal);
-                    elementCounter++;
+                    elementArray[shardNumber].setElementValue((long)bitsPerElement * elementCounter[shardNumber], bitsPerElement, elementOrdinal);
+                    elementCounter[shardNumber]++;
                 }
 
-                listCounter++;
+                listCounter[shardNumber]++;
 
-                VarInt.writeVInt(deltaAddedOrdinals, i - previousAddedOrdinal);
-                previousAddedOrdinal = i;
-            } else if(fromCyclePopulated.get(i) && !toCyclePopulated.get(i)) {
-                VarInt.writeVInt(deltaRemovedOrdinals, i - previousRemovedOrdinal);
-                previousRemovedOrdinal = i;
+                int shardOrdinal = ordinal / numShards;
+                VarInt.writeVInt(deltaAddedOrdinals[shardNumber], shardOrdinal - previousAddedOrdinal[shardNumber]);
+                previousAddedOrdinal[shardNumber] = shardOrdinal;
+            } else if(fromCyclePopulated.get(ordinal) && !toCyclePopulated.get(ordinal)) {
+                int shardOrdinal = ordinal / numShards;
+                VarInt.writeVInt(deltaRemovedOrdinals[shardNumber], shardOrdinal - previousRemovedOrdinal[shardNumber]);
+                previousRemovedOrdinal[shardNumber] = shardOrdinal;
             }
         }
     }
 
     public void writeCalculatedDelta(DataOutputStream os) throws IOException {
-
-        /// 1) max ordinal
-        VarInt.writeVInt(os, maxOrdinal);
-
-        /// 2) removal / addition ordinals.
-        VarInt.writeVLong(os, deltaRemovedOrdinals.length());
-        deltaRemovedOrdinals.getUnderlyingArray().writeTo(os, 0, deltaRemovedOrdinals.length());
-        VarInt.writeVLong(os, deltaAddedOrdinals.length());
-        deltaAddedOrdinals.getUnderlyingArray().writeTo(os, 0, deltaAddedOrdinals.length());
-
-        /// 3) statistics
-        VarInt.writeVInt(os, bitsPerListPointer);
-        VarInt.writeVInt(os, bitsPerElement);
-        VarInt.writeVLong(os, totalOfListSizes);
-
-        /// 4) list pointer array
-        int numListPointerLongs = numListsInDelta == 0 ? 0 : (int)((((long)numListsInDelta * bitsPerListPointer) - 1) / 64) + 1;
-        VarInt.writeVInt(os, numListPointerLongs);
-        for(int i=0;i<numListPointerLongs;i++) {
-            os.writeLong(listPointerArray.get(i));
-        }
-
-        /// 5) element array
-        int numElementLongs = numElementsInDelta == 0 ? 0 : (int)(((numElementsInDelta * bitsPerElement) - 1) / 64) + 1;
-        VarInt.writeVInt(os, numElementLongs);
-        for(int i=0;i<numElementLongs;i++) {
-            os.writeLong(elementArray.get(i));
+        if(numShards == 1) {
+            writeCalculatedDeltaShard(os, 0);
+        } else {
+            /// overall max ordinal
+            VarInt.writeVInt(os, maxOrdinal);
+            
+            for(int i=0;i<numShards;i++) {
+                writeCalculatedDeltaShard(os, i);
+            }
         }
 
         listPointerArray = null;
@@ -258,17 +298,35 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
         deltaRemovedOrdinals = null;
     }
 
-    private long calculateNumElementsInDelta(int maxOrdinal, ThreadSafeBitSet deltaAdditions) {
-        long totalNumberOfElements = 0;
 
-        for(int i=0;i<=maxOrdinal;i++) {
-            if(deltaAdditions.get(i)) {
-                long readPointer = ordinalMap.getPointerForData(i);
-                totalNumberOfElements += VarInt.readVInt(ordinalMap.getByteData().getUnderlyingArray(), readPointer);
-            }
+    public void writeCalculatedDeltaShard(DataOutputStream os, int shardNumber) throws IOException {
+        /// 1) max shard ordinal
+        VarInt.writeVInt(os, maxShardOrdinal[shardNumber]);
+
+        /// 2) removal / addition ordinals.
+        VarInt.writeVLong(os, deltaRemovedOrdinals[shardNumber].length());
+        deltaRemovedOrdinals[shardNumber].getUnderlyingArray().writeTo(os, 0, deltaRemovedOrdinals[shardNumber].length());
+        VarInt.writeVLong(os, deltaAddedOrdinals[shardNumber].length());
+        deltaAddedOrdinals[shardNumber].getUnderlyingArray().writeTo(os, 0, deltaAddedOrdinals[shardNumber].length());
+
+        /// 3) statistics
+        VarInt.writeVInt(os, bitsPerListPointer);
+        VarInt.writeVInt(os, bitsPerElement);
+        VarInt.writeVLong(os, shardTotalOfListSizes[shardNumber]);
+
+        /// 4) list pointer array
+        int numListPointerLongs = numListsInDelta[shardNumber] == 0 ? 0 : (int)((((long)numListsInDelta[shardNumber] * bitsPerListPointer) - 1) / 64) + 1;
+        VarInt.writeVInt(os, numListPointerLongs);
+        for(int i=0;i<numListPointerLongs;i++) {
+            os.writeLong(listPointerArray[shardNumber].get(i));
         }
 
-        return totalNumberOfElements;
+        /// 5) element array
+        int numElementLongs = numElementsInDelta[shardNumber] == 0 ? 0 : (int)(((numElementsInDelta[shardNumber] * bitsPerElement) - 1) / 64) + 1;
+        VarInt.writeVInt(os, numElementLongs);
+        for(int i=0;i<numElementLongs;i++) {
+            os.writeLong(elementArray[shardNumber].get(i));
+        }
     }
 
 }
