@@ -45,7 +45,7 @@ public class Artwork implements Cloneable {
         builder.append(",hasShowLevelTag=").append(hasShowLevelTag);
         builder.append("}");
         return builder.toString();
-    }gradlew
+    }
 
     public Artwork clone() {
         try {
