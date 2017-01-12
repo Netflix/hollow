@@ -17,15 +17,14 @@
  */
 package com.netflix.hollow.core.write;
 
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
-import com.netflix.hollow.core.memory.encoding.HashCodes;
-import com.netflix.hollow.core.memory.encoding.VarInt;
-
-import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.ByteDataBuffer;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
+import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
+import com.netflix.hollow.core.memory.encoding.HashCodes;
+import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
+import com.netflix.hollow.core.schema.HollowSetSchema;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
@@ -46,8 +45,8 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
     /// additional data required for writing delta
     private int numSetsInDelta[];
     private long numBucketsInDelta[];
-    private ByteDataBuffer addedOrdinals[];
-    private ByteDataBuffer removedOrdinals[];
+    private ByteDataBuffer deltaAddedOrdinals[];
+    private ByteDataBuffer deltaRemovedOrdinals[];
 
     public HollowSetTypeWriteState(HollowSetSchema schema) {
         this(schema, 1);
@@ -211,7 +210,7 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         elementArray = null;
     }
     
-    public void writeSnapshotShard(DataOutputStream os, int shardNumber) throws IOException {
+    private void writeSnapshotShard(DataOutputStream os, int shardNumber) throws IOException {
         int bitsPerSetFixedLengthPortion = bitsPerSetSizeValue + bitsPerSetPointer;
 
         /// 1) max ordinal
@@ -266,8 +265,8 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         numBucketsInDelta = new long[numShards];
         setPointersAndSizesArray = new FixedLengthElementArray[numShards];
         elementArray = new FixedLengthElementArray[numShards];
-        addedOrdinals = new ByteDataBuffer[numShards];
-        removedOrdinals = new ByteDataBuffer[numShards];
+        deltaAddedOrdinals = new ByteDataBuffer[numShards];
+        deltaRemovedOrdinals = new ByteDataBuffer[numShards];
 
         ThreadSafeBitSet deltaAdditions = toCyclePopulated.andNot(fromCyclePopulated);
         
@@ -286,14 +285,14 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         for(int i=0;i<numShards;i++) {
             setPointersAndSizesArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numSetsInDelta[i] * bitsPerSetFixedLengthPortion);
             elementArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numBucketsInDelta[i] * bitsPerElement);
-            addedOrdinals[i] = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
-            removedOrdinals[i] = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
+            deltaAddedOrdinals[i] = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
+            deltaRemovedOrdinals[i] = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
         }
 
         ByteData data = ordinalMap.getByteData().getUnderlyingArray();
 
-        int bucketCounter[] = new int[numShards];
         int setCounter[] = new int[numShards];
+        long bucketCounter[] = new long[numShards];
         int previousRemovedOrdinal[] = new int[numShards];
         int previousAddedOrdinal[] = new int[numShards];
 
@@ -346,17 +345,17 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
                 setCounter[shardNumber]++;
 
                 int shardOrdinal = ordinal / numShards;
-                VarInt.writeVInt(addedOrdinals[shardNumber], shardOrdinal - previousAddedOrdinal[shardNumber]);
+                VarInt.writeVInt(deltaAddedOrdinals[shardNumber], shardOrdinal - previousAddedOrdinal[shardNumber]);
                 previousAddedOrdinal[shardNumber] = shardOrdinal;
             } else if(fromCyclePopulated.get(ordinal) && !toCyclePopulated.get(ordinal)) {
                 int shardOrdinal = ordinal / numShards;
-                VarInt.writeVInt(removedOrdinals[shardNumber], shardOrdinal - previousRemovedOrdinal[shardNumber]);
+                VarInt.writeVInt(deltaRemovedOrdinals[shardNumber], shardOrdinal - previousRemovedOrdinal[shardNumber]);
                 previousRemovedOrdinal[shardNumber] = shardOrdinal;
             }
         }
     }
 
-    public void writeCalculatedDelta(DataOutputStream os) throws IOException {
+    private void writeCalculatedDelta(DataOutputStream os) throws IOException {
         if(numShards == 1) {
             writeCalculatedDeltaShard(os, 0);
         } else {
@@ -370,11 +369,11 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         
         setPointersAndSizesArray = null;
         elementArray = null;
-        addedOrdinals = null;
-        removedOrdinals = null;
+        deltaAddedOrdinals = null;
+        deltaRemovedOrdinals = null;
     }
     
-    public void writeCalculatedDeltaShard(DataOutputStream os, int shardNumber) throws IOException {
+    private void writeCalculatedDeltaShard(DataOutputStream os, int shardNumber) throws IOException {
         
         int bitsPerSetFixedLengthPortion = bitsPerSetSizeValue + bitsPerSetPointer;
 
@@ -382,10 +381,10 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         VarInt.writeVInt(os, maxShardOrdinal[shardNumber]);
 
         /// 2) removal / addition ordinals.
-        VarInt.writeVLong(os, removedOrdinals[shardNumber].length());
-        removedOrdinals[shardNumber].getUnderlyingArray().writeTo(os, 0, removedOrdinals[shardNumber].length());
-        VarInt.writeVLong(os, addedOrdinals[shardNumber].length());
-        addedOrdinals[shardNumber].getUnderlyingArray().writeTo(os, 0, addedOrdinals[shardNumber].length());
+        VarInt.writeVLong(os, deltaRemovedOrdinals[shardNumber].length());
+        deltaRemovedOrdinals[shardNumber].getUnderlyingArray().writeTo(os, 0, deltaRemovedOrdinals[shardNumber].length());
+        VarInt.writeVLong(os, deltaAddedOrdinals[shardNumber].length());
+        deltaAddedOrdinals[shardNumber].getUnderlyingArray().writeTo(os, 0, deltaAddedOrdinals[shardNumber].length());
 
         /// 3) statistics
         VarInt.writeVInt(os, bitsPerSetPointer);

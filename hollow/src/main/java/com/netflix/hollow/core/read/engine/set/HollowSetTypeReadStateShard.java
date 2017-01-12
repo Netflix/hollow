@@ -6,7 +6,7 @@ import com.netflix.hollow.core.read.engine.SetMapKeyHasher;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.util.BitSet;
 
-public class HollowSetTypeReadStateShard {
+class HollowSetTypeReadStateShard {
 
     private HollowSetTypeDataElements currentData;
     private volatile HollowSetTypeDataElements currentDataVolatile;
@@ -193,6 +193,4 @@ public class HollowSetTypeReadStateShard {
     public void setKeyDeriver(HollowPrimaryKeyValueDeriver keyDeriver) {
         this.keyDeriver = keyDeriver;
     }
-    
-
 }

@@ -17,14 +17,13 @@
  */
 package com.netflix.hollow.core.write;
 
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
-import com.netflix.hollow.core.memory.encoding.VarInt;
-
-import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.ByteDataBuffer;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
+import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
+import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
+import com.netflix.hollow.core.schema.HollowListSchema;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
@@ -248,7 +247,6 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
 
         int listCounter[] = new int[numShards];
         long elementCounter[] = new long[numShards];
-
         int previousRemovedOrdinal[] = new int[numShards];
         int previousAddedOrdinal[] = new int[numShards];
 
@@ -282,7 +280,7 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
         }
     }
 
-    public void writeCalculatedDelta(DataOutputStream os) throws IOException {
+    private void writeCalculatedDelta(DataOutputStream os) throws IOException {
         if(numShards == 1) {
             writeCalculatedDeltaShard(os, 0);
         } else {
@@ -301,7 +299,7 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
     }
 
 
-    public void writeCalculatedDeltaShard(DataOutputStream os, int shardNumber) throws IOException {
+    private void writeCalculatedDeltaShard(DataOutputStream os, int shardNumber) throws IOException {
         /// 1) max shard ordinal
         VarInt.writeVInt(os, maxShardOrdinal[shardNumber]);
 
