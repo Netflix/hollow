@@ -182,9 +182,9 @@ public class HollowBlobReader {
             }
         } else if(schema instanceof HollowMapSchema) {
             if(!filter.doesIncludeType(schema.getName())) {
-                HollowMapTypeReadState.discardSnapshot(is);
+                HollowMapTypeReadState.discardSnapshot(is, numShards);
             } else {
-                populateTypeStateSnapshot(is, new HollowMapTypeReadState(stateEngine, (HollowMapSchema)schema));
+                populateTypeStateSnapshot(is, new HollowMapTypeReadState(stateEngine, (HollowMapSchema)schema, numShards));
             }
         }
         
@@ -241,7 +241,7 @@ public class HollowBlobReader {
         else if(schema instanceof HollowSetSchema)
             HollowSetTypeReadState.discardDelta(dis, numShards);
         else if(schema instanceof HollowMapSchema)
-            HollowMapTypeReadState.discardDelta(dis);
+            HollowMapTypeReadState.discardDelta(dis, numShards);
     }
 
 }
