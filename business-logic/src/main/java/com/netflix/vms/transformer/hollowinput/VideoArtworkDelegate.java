@@ -34,6 +34,10 @@ public interface VideoArtworkDelegate extends HollowObjectDelegate {
 
     public Boolean getIsSmokyBoxed(int ordinal);
 
+    public boolean getRolloutExclusive(int ordinal);
+
+    public Boolean getRolloutExclusiveBoxed(int ordinal);
+
     public VideoArtworkTypeAPI getTypeAPI();
 
 }

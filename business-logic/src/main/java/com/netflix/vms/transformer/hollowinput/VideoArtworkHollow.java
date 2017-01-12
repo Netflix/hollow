@@ -84,6 +84,14 @@ public class VideoArtworkHollow extends HollowObject {
         return delegate().getIsSmokyBoxed(ordinal);
     }
 
+    public boolean _getRolloutExclusive() {
+        return delegate().getRolloutExclusive(ordinal);
+    }
+
+    public Boolean _getRolloutExclusiveBoxed() {
+        return delegate().getRolloutExclusiveBoxed(ordinal);
+    }
+
     public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }

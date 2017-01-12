@@ -69,6 +69,14 @@ public class VideoArtworkDelegateLookupImpl extends HollowObjectAbstractDelegate
         return typeAPI.getIsSmokyBoxed(ordinal);
     }
 
+    public boolean getRolloutExclusive(int ordinal) {
+        return typeAPI.getRolloutExclusive(ordinal);
+    }
+
+    public Boolean getRolloutExclusiveBoxed(int ordinal) {
+        return typeAPI.getRolloutExclusiveBoxed(ordinal);
+    }
+
     public VideoArtworkTypeAPI getTypeAPI() {
         return typeAPI;
     }

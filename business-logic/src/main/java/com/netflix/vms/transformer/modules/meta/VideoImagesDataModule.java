@@ -570,14 +570,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         artwork.ordinalPriority = ordinalPriority;
         fillPassThroughData(artwork, attributes);
         artwork.schedulePhaseInfo = window;
-        // get ArtworkAttributes and read ROLLOUt_EXCLUSIVE from ArtworkAttributes
-        ArtworkAttributesHollow artworkAttributesHollow = artworkHollowInput._getAttributes();
-        String isRolloutExclusive = artworkAttributesHollow._getROLLOUT_EXCLUSIVE();
-        if (isRolloutExclusive == null || isRolloutExclusive.equals("false")) {
-            artwork.isRolloutExclusive = false;
-        } else {
-            artwork.isRolloutExclusive = true;
-        }
+        artwork.isRolloutExclusive = artworkHollowInput._getRolloutExclusive();
 
         int ordinal = damMerchStillsIdx.getMatchingOrdinal(sourceFileId);
         if (ordinal != -1) {
@@ -656,11 +649,11 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                             artworkSet.add(updatedArtwork);
 
                         // roll up schedule windows in top nodes
-//                        if (!videoSchedulePhaseMap.containsKey(topNode)) {
-//                            videoSchedulePhaseMap.put(topNode, new HashSet<>());
-//                        }
-//                        scheduleSet = videoSchedulePhaseMap.get(topNode);
-//                        scheduleSet.addAll(schedulePhaseInfoSet);
+                        if (!videoSchedulePhaseMap.containsKey(topNode)) {
+                            videoSchedulePhaseMap.put(topNode, new HashSet<>());
+                        }
+                        scheduleSet = videoSchedulePhaseMap.get(topNode);
+                        scheduleSet.addAll(schedulePhaseInfoSet);
                     }
                 }
             }
