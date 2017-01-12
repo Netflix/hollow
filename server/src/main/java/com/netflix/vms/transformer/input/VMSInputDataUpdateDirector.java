@@ -2,9 +2,9 @@ package com.netflix.vms.transformer.input;
 
 import com.netflix.aws.file.FileAccessItem;
 import com.netflix.aws.file.FileStore;
-import com.netflix.hollow.client.HollowClientUpdateDirector;
+import com.netflix.hollow.api.client.HollowAnnouncementWatcher;
 
-public class VMSInputDataUpdateDirector extends HollowClientUpdateDirector {
+public class VMSInputDataUpdateDirector extends HollowAnnouncementWatcher {
 
     private final FileStore fileStore;
     private final VMSInputDataKeybaseBuilder keybaseBuilder;

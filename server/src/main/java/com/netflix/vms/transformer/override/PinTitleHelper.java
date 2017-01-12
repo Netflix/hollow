@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.override;
 
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
 
 public class PinTitleHelper {
     public static final String BLOB_ID = "BLOB_ID";

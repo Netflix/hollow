@@ -1,11 +1,10 @@
 package com.netflix.vms.transformer.namedlist;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.hollowoutput.Episode;
 import com.netflix.vms.transformer.hollowoutput.Video;
+import java.util.HashMap;
+import java.util.Map;
 
 public class VideoOrdinalTracker {
 

@@ -1,15 +1,10 @@
 package com.netflix.vms.transformer.modules.person;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
-import com.netflix.hollow.index.HollowHashIndex;
-import com.netflix.hollow.index.HollowHashIndexResult;
-import com.netflix.hollow.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
-import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.core.index.HollowHashIndex;
+import com.netflix.hollow.core.index.HollowHashIndexResult;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.OutputTypeConfig;
@@ -40,6 +35,10 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 public class GlobalPersonModule extends AbstractTransformModule {
 

@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-import com.netflix.hollow.write.objectmapper.NullablePrimitiveBoolean;
-
+import com.netflix.hollow.core.write.objectmapper.NullablePrimitiveBoolean;
 import java.util.List;
 
 public class ArtworkBasicPassthrough implements Cloneable {

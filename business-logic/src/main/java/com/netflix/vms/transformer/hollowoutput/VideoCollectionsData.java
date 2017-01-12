@@ -1,7 +1,5 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-import java.lang.*;
-import java.lang.Integer;
 import java.util.List;
 
 public class VideoCollectionsData implements Cloneable {

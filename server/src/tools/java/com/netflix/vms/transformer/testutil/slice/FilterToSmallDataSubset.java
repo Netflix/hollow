@@ -1,14 +1,13 @@
 package com.netflix.vms.transformer.testutil.slice;
 
 
-import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
-
-import com.netflix.hollow.read.engine.HollowBlobReader;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.write.HollowBlobWriter;
-import com.netflix.hollow.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.read.engine.HollowBlobReader;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.write.HollowBlobWriter;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.common.slice.DataSlicer;
 import com.netflix.vms.transformer.io.LZ4VMSInputStream;
+import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

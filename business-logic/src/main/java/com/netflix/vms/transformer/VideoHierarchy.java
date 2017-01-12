@@ -1,11 +1,10 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.hollow.util.HashCodes;
-import com.netflix.hollow.util.IntList;
+import com.netflix.hollow.core.memory.encoding.HashCodes;
+import com.netflix.hollow.core.util.IntList;
 import com.netflix.vms.transformer.hollowinput.EpisodeHollow;
 import com.netflix.vms.transformer.hollowinput.SeasonHollow;
 import com.netflix.vms.transformer.hollowinput.ShowSeasonEpisodeHollow;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

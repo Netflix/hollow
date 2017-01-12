@@ -1,11 +1,10 @@
 package com.netflix.vms.transformer.input;
 
+import com.netflix.hollow.api.client.HollowAnnouncementWatcher;
 import com.netflix.vms.transformer.common.KeybaseBuilder;
-
-import com.netflix.hollow.client.HollowClientUpdateDirector;
 import com.netflix.vms.transformer.http.HttpHelper;
 
-public class VMSInputDataProxyUpdateDirector extends HollowClientUpdateDirector {
+public class VMSInputDataProxyUpdateDirector extends HollowAnnouncementWatcher {
 
     private final String proxyURL;
     private final KeybaseBuilder keybaseBuilder;

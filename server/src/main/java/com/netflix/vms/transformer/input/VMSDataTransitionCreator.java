@@ -1,18 +1,17 @@
 package com.netflix.vms.transformer.input;
 
-import com.netflix.vms.transformer.common.KeybaseBuilder;
-
 import com.netflix.aws.file.FileAccessItem;
 import com.netflix.aws.file.FileStore;
-import com.netflix.hollow.client.HollowTransitionCreator;
-import com.netflix.hollow.client.HollowUpdateTransition;
+import com.netflix.hollow.api.client.HollowBlob;
+import com.netflix.hollow.api.client.HollowBlobRetriever;
+import com.netflix.vms.transformer.common.KeybaseBuilder;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class VMSDataTransitionCreator implements HollowTransitionCreator {
+public class VMSDataTransitionCreator implements HollowBlobRetriever {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(VMSDataTransitionCreator.class);
 
@@ -31,7 +30,7 @@ public class VMSDataTransitionCreator implements HollowTransitionCreator {
     }
 
     @Override
-    public HollowUpdateTransition createSnapshotTransition(long desiredVersion) {
+    public HollowBlob retrieveSnapshotBlob(long desiredVersion) {
         TransitionResult result = new TransitionResult();
         String snapshotKeybase = keybaseBuilder.getSnapshotKeybase();
 
@@ -93,7 +92,7 @@ public class VMSDataTransitionCreator implements HollowTransitionCreator {
     }
 
     @Override
-    public HollowUpdateTransition createDeltaTransition(long currentVersion) {
+    public HollowBlob retrieveDeltaBlob(long currentVersion) {
         int retryCount = 0;
         while(retryCount < 3) {
             retryCount++;
@@ -112,7 +111,7 @@ public class VMSDataTransitionCreator implements HollowTransitionCreator {
     }
 
     @Override
-    public HollowUpdateTransition createReverseDeltaTransition(long currentVersion) {
+    public HollowBlob retrieveReverseDeltaBlob(long currentVersion) {
         return null;
     }
 
@@ -122,7 +121,7 @@ public class VMSDataTransitionCreator implements HollowTransitionCreator {
     }
 
     private class TransitionResult {
-        HollowUpdateTransition transition = null;
+        HollowBlob transition = null;
     }
 
 }

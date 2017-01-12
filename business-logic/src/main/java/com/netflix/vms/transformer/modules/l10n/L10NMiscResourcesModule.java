@@ -1,10 +1,9 @@
 package com.netflix.vms.transformer.modules.l10n;
 
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.*;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.L10NProcessing;
 
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
-
-import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;

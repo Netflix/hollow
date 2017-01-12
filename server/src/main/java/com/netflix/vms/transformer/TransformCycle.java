@@ -15,18 +15,19 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformC
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WritingBlobsFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WroteBlob;
 
+import com.netflix.servo.monitor.Monitors;
 import com.google.gson.Gson;
-
 import com.netflix.aws.file.FileStore;
-import com.netflix.hollow.client.HollowClient;
-import com.netflix.hollow.compact.HollowCompactor;
-import com.netflix.hollow.read.customapi.HollowAPI;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.write.HollowBlobWriter;
+import com.netflix.hollow.api.client.HollowClient;
+import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.write.HollowBlobWriter;
+import com.netflix.hollow.tools.compact.HollowCompactor;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.common.VersionMinter;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
+import com.netflix.vms.transformer.health.TransformerTimeSinceLastPublishGauge;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.FollowVipPin;
 import com.netflix.vms.transformer.input.FollowVipPinExtractor;
@@ -64,6 +65,7 @@ public class TransformCycle {
     private final FileStore filestore;
     private final String converterVip;
     private final PinTitleManager pinTitleMgr;
+    private final TransformerTimeSinceLastPublishGauge timeSinceLastPublishGauge;
 
     private long previousCycleNumber = Long.MIN_VALUE;
     private long currentCycleNumber = Long.MIN_VALUE;
@@ -87,6 +89,8 @@ public class TransformCycle {
         this.versionMinter = new SequenceVersionMinter();
         this.followVipPinExtractor = new FollowVipPinExtractor(fileStore);
         this.pinTitleMgr = new PinTitleManager(fileStore, ctx);
+        this.timeSinceLastPublishGauge = new TransformerTimeSinceLastPublishGauge();
+        Monitors.registerObject(timeSinceLastPublishGauge);
     }
 
     public void restore(VMSOutputDataClient restoreFrom) {
@@ -309,6 +313,7 @@ public class TransformCycle {
 
     private void endCycleSuccessfully() {
         incrementSuccessCounter();
+        timeSinceLastPublishGauge.notifyPublishSuccess();
         previousCycleNumber = currentCycleNumber;
     }
 

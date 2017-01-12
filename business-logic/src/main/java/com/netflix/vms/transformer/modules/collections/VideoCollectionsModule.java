@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.modules.collections;
 
-import com.netflix.hollow.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;

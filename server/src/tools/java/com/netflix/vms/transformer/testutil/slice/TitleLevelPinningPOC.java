@@ -2,28 +2,12 @@ package com.netflix.vms.transformer.testutil.slice;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CyclePinnedTitles;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.junit.Assert;
-import org.junit.Test;
-
-import com.netflix.hollow.read.engine.HollowBlobReader;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.util.memory.WastefulRecycler;
-import com.netflix.hollow.write.HollowBlobWriter;
-import com.netflix.hollow.write.HollowTypeWriteState;
-import com.netflix.hollow.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
+import com.netflix.hollow.core.read.engine.HollowBlobReader;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.write.HollowBlobWriter;
+import com.netflix.hollow.core.write.HollowTypeWriteState;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.vms.generated.notemplate.GlobalVideoHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
 import com.netflix.vms.transformer.SimpleTransformer;
@@ -38,8 +22,22 @@ import com.netflix.vms.transformer.override.PinTitleManager;
 import com.netflix.vms.transformer.publish.workflow.IndexDuplicateChecker;
 import com.netflix.vms.transformer.testutil.migration.ShowMeTheProgressDiffTool;
 import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TitleLevelPinningPOC {
     private static final String BASE_PROXY = VMSInputDataClient.TEST_PROXY_URL;

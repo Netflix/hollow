@@ -1,22 +1,20 @@
 package com.netflix.vms.transformer.input;
 
+import com.netflix.aws.S3.S3Object;
+import com.netflix.aws.file.FileAccessItem;
+import com.netflix.aws.file.FileStore;
+import com.netflix.hollow.api.client.HollowBlob;
+import com.netflix.vms.transformer.io.LZ4VMSInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Random;
-
+import net.jpountz.lz4.LZ4BlockInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.netflix.aws.S3.S3Object;
-import com.netflix.aws.file.FileAccessItem;
-import com.netflix.aws.file.FileStore;
-import com.netflix.hollow.client.HollowUpdateTransition;
-import com.netflix.vms.transformer.io.LZ4VMSInputStream;
-import net.jpountz.lz4.LZ4BlockInputStream;
-
-public class FileStoreHollowUpdateTransition extends HollowUpdateTransition {
+public class FileStoreHollowUpdateTransition extends HollowBlob {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileStoreHollowUpdateTransition.class);
 
     private static final int NUM_RETRIES = 3;

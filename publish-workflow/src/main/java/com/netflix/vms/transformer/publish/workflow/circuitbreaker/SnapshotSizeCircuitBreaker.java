@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.publish.workflow.circuitbreaker;
 
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 
