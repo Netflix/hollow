@@ -40,9 +40,9 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
     private HollowTypeMapper keyMapper;
     private HollowTypeMapper valueMapper;
 
-    public HollowMapTypeMapper(HollowObjectMapper parentMapper, ParameterizedType type, String declaredName, String[] hashKeyFieldPaths, HollowWriteStateEngine stateEngine, boolean useDefaultHashKeys, Set<Type> visited) {
-        this.keyMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[0], null, null, visited);
-        this.valueMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[1], null, null, visited);
+    public HollowMapTypeMapper(HollowObjectMapper parentMapper, ParameterizedType type, String declaredName, String[] hashKeyFieldPaths, int numShards, HollowWriteStateEngine stateEngine, boolean useDefaultHashKeys, Set<Type> visited) {
+        this.keyMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[0], null, null, 1, visited);
+        this.valueMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[1], null, null, 1, visited);
         String typeName = declaredName != null ? declaredName : getDefaultTypeName(type);
         
         if(hashKeyFieldPaths == null && useDefaultHashKeys && (keyMapper instanceof HollowObjectTypeMapper))
@@ -52,7 +52,7 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
         this.hashCodeFinder = stateEngine.getHashCodeFinder();
 
         HollowMapTypeWriteState typeState = (HollowMapTypeWriteState) parentMapper.getStateEngine().getTypeState(typeName);
-        this.writeState = typeState != null ? typeState : new HollowMapTypeWriteState(schema);
+        this.writeState = typeState != null ? typeState : new HollowMapTypeWriteState(schema, numShards);
     }
 
     @Override
