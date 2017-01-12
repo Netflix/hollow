@@ -17,6 +17,14 @@ public class VideoStreamInfoHollow extends HollowObject {
         return delegate().getVideoBitrateKBPSBoxed(ordinal);
     }
 
+    public int _getVideoPeakBitrateKBPS() {
+        return delegate().getVideoPeakBitrateKBPS(ordinal);
+    }
+
+    public Integer _getVideoPeakBitrateKBPSBoxed() {
+        return delegate().getVideoPeakBitrateKBPSBoxed(ordinal);
+    }
+
     public long _getDashHeaderSize() {
         return delegate().getDashHeaderSize(ordinal);
     }

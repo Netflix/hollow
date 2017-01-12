@@ -10,6 +10,10 @@ public interface VideoStreamInfoDelegate extends HollowObjectDelegate {
 
     public Integer getVideoBitrateKBPSBoxed(int ordinal);
 
+    public int getVideoPeakBitrateKBPS(int ordinal);
+
+    public Integer getVideoPeakBitrateKBPSBoxed(int ordinal);
+
     public long getDashHeaderSize(int ordinal);
 
     public Long getDashHeaderSizeBoxed(int ordinal);

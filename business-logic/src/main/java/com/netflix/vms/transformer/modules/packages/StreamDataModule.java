@@ -251,9 +251,11 @@ public class StreamDataModule {
             int targetHeight = inputStreamDimensions._getTargetHeightInPixels();
             int targetWidth = inputStreamDimensions._getTargetWidthInPixels();
             int bitrate = inputVideoStreamInfo._getVideoBitrateKBPS();
+            int peakBitrate = inputVideoStreamInfo._getVideoPeakBitrateKBPS();
 
             outputStream.downloadDescriptor.videoFormatDescriptor = videoFormatIdentifier.selectVideoFormatDescriptor(encodingProfileId, bitrate, height, width, targetHeight, targetWidth);
             outputStream.streamDataDescriptor.bitrate = bitrate;
+            outputStream.streamDataDescriptor.peakBitrate = peakBitrate;
 
             if(targetHeight != Integer.MIN_VALUE && targetWidth != Integer.MIN_VALUE) {
                 outputStream.streamDataDescriptor.targetDimensions = new TargetDimensions();
@@ -294,12 +296,16 @@ public class StreamDataModule {
         if(inputAudioStreamInfo != null) {
             if(inputAudioStreamInfo._getAudioLanguageCode() != null)
                 outputStream.downloadDescriptor.audioLanguageBcp47code = new Strings(inputAudioStreamInfo._getAudioLanguageCode()._getValue());
-            if(outputStream.streamDataDescriptor.bitrate == Integer.MIN_VALUE)
+            if(outputStream.streamDataDescriptor.bitrate == Integer.MIN_VALUE) {
                 outputStream.streamDataDescriptor.bitrate = inputAudioStreamInfo._getAudioBitrateKBPS();
+                outputStream.streamDataDescriptor.peakBitrate = Integer.MIN_VALUE;
+            }
         }
 
         if(outputStream.streamDataDescriptor.bitrate == Integer.MIN_VALUE)
             outputStream.streamDataDescriptor.bitrate = 0;
+        if(outputStream.streamDataDescriptor.peakBitrate == Integer.MIN_VALUE)
+            outputStream.streamDataDescriptor.peakBitrate = 0;
 
         if(inputTextStreamInfo != null) {
             if(inputTextStreamInfo._getTextLanguageCode() != null)
