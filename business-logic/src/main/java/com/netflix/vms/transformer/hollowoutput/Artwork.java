@@ -18,7 +18,7 @@ public class Artwork implements Cloneable {
     public ArtworkMerchStillPackageData merchstillsPackageData = null;
     public int file_seq = java.lang.Integer.MIN_VALUE;
     public AcquisitionSource acquisitionSource = null;
-    public int videoId = java.lang.Integer.MIN_VALUE;
+    public int sourceVideoId = java.lang.Integer.MIN_VALUE;
     public boolean hasShowLevelTag = false;
 
     public String toString() {
@@ -37,7 +37,7 @@ public class Artwork implements Cloneable {
         builder.append(",file_seq=").append(file_seq);
         builder.append(",merchstillsPackage=").append(merchstillsPackageData);
         builder.append(",acquisitionSource=").append(acquisitionSource);
-        builder.append(",videoId=").append(videoId);
+        builder.append(",sourceVideoId=").append(sourceVideoId);
         builder.append(",hasShowLevelTag=").append(hasShowLevelTag);
         builder.append("}");
         return builder.toString();
