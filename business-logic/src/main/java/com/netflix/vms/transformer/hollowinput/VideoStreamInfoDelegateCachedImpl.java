@@ -1,15 +1,16 @@
 package com.netflix.vms.transformer.hollowinput;
 
-import com.netflix.hollow.objects.delegate.HollowObjectAbstractDelegate;
-import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
-import com.netflix.hollow.HollowObjectSchema;
-import com.netflix.hollow.read.customapi.HollowTypeAPI;
-import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
+import com.netflix.hollow.api.objects.delegate.HollowObjectAbstractDelegate;
+import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.api.custom.HollowTypeAPI;
+import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 
 @SuppressWarnings("all")
 public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, VideoStreamInfoDelegate {
 
     private final Integer videoBitrateKBPS;
+    private final Integer videoPeakBitrateKBPS;
     private final Long dashHeaderSize;
     private final Long dashMediaStartByteOffset;
     private final Long vmafScore;
@@ -19,6 +20,7 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
 
     public VideoStreamInfoDelegateCachedImpl(VideoStreamInfoTypeAPI typeAPI, int ordinal) {
         this.videoBitrateKBPS = typeAPI.getVideoBitrateKBPSBoxed(ordinal);
+        this.videoPeakBitrateKBPS = typeAPI.getVideoPeakBitrateKBPSBoxed(ordinal);
         this.dashHeaderSize = typeAPI.getDashHeaderSizeBoxed(ordinal);
         this.dashMediaStartByteOffset = typeAPI.getDashMediaStartByteOffsetBoxed(ordinal);
         this.vmafScore = typeAPI.getVmafScoreBoxed(ordinal);
@@ -33,6 +35,14 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
 
     public Integer getVideoBitrateKBPSBoxed(int ordinal) {
         return videoBitrateKBPS;
+    }
+
+    public int getVideoPeakBitrateKBPS(int ordinal) {
+        return videoPeakBitrateKBPS.intValue();
+    }
+
+    public Integer getVideoPeakBitrateKBPSBoxed(int ordinal) {
+        return videoPeakBitrateKBPS;
     }
 
     public long getDashHeaderSize(int ordinal) {

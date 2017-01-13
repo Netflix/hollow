@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.hollowinput;
 
-import com.netflix.hollow.objects.delegate.HollowObjectDelegate;
+import com.netflix.hollow.api.objects.delegate.HollowObjectDelegate;
 
 
 @SuppressWarnings("all")
@@ -9,6 +9,10 @@ public interface VideoStreamInfoDelegate extends HollowObjectDelegate {
     public int getVideoBitrateKBPS(int ordinal);
 
     public Integer getVideoBitrateKBPSBoxed(int ordinal);
+
+    public int getVideoPeakBitrateKBPS(int ordinal);
+
+    public Integer getVideoPeakBitrateKBPSBoxed(int ordinal);
 
     public long getDashHeaderSize(int ordinal);
 

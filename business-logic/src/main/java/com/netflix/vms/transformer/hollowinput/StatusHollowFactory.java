@@ -1,8 +1,8 @@
 package com.netflix.vms.transformer.hollowinput;
 
-import com.netflix.hollow.objects.provider.HollowFactory;
-import com.netflix.hollow.read.dataaccess.HollowTypeDataAccess;
-import com.netflix.hollow.read.customapi.HollowTypeAPI;
+import com.netflix.hollow.api.objects.provider.HollowFactory;
+import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
+import com.netflix.hollow.api.custom.HollowTypeAPI;
 
 @SuppressWarnings("all")
 public class StatusHollowFactory<T extends StatusHollow> extends HollowFactory<T> {

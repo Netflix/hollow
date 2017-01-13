@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowinput;
 
-import com.netflix.hollow.objects.HollowObject;
-import com.netflix.hollow.HollowObjectSchema;
+import com.netflix.hollow.api.objects.HollowObject;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 @SuppressWarnings("all")
 public class VideoArtworkHollow extends HollowObject {
@@ -82,6 +82,14 @@ public class VideoArtworkHollow extends HollowObject {
 
     public Boolean _getIsSmokyBoxed() {
         return delegate().getIsSmokyBoxed(ordinal);
+    }
+
+    public boolean _getRolloutExclusive() {
+        return delegate().getRolloutExclusive(ordinal);
+    }
+
+    public Boolean _getRolloutExclusiveBoxed() {
+        return delegate().getRolloutExclusiveBoxed(ordinal);
     }
 
     public VMSHollowInputAPI api() {

@@ -1,10 +1,9 @@
 package com.netflix.vms.transformer.testutil.migration;
 
-import com.netflix.hollow.diff.HollowDiff;
-import com.netflix.hollow.diff.HollowTypeDiff;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.diff.ui.jetty.HollowDiffUIServer;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-
+import com.netflix.hollow.tools.diff.HollowDiff;
+import com.netflix.hollow.tools.diff.HollowTypeDiff;
 import java.util.Random;
 
 public class ShowMeTheProgressDiffTool {

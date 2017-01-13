@@ -1,13 +1,13 @@
 package com.netflix.vms.transformer.util.slice;
 
-import com.netflix.hollow.combine.HollowCombiner;
-import com.netflix.hollow.combine.HollowCombinerIncludeOrdinalsCopyDirector;
-import com.netflix.hollow.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.index.traversal.HollowIndexerValueTraverser;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.read.engine.PopulatedOrdinalListener;
-import com.netflix.hollow.write.HollowWriteStateEngine;
-import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.index.traversal.HollowIndexerValueTraverser;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.tools.combine.HollowCombiner;
+import com.netflix.hollow.tools.combine.HollowCombinerIncludeOrdinalsCopyDirector;
 import com.netflix.vms.generated.notemplate.EpisodeHollow;
 import com.netflix.vms.generated.notemplate.GlobalPersonHollow;
 import com.netflix.vms.generated.notemplate.L10NResourcesHollow;
@@ -181,6 +181,7 @@ public class DataSlicerImpl implements DataSlicer {
 
         private void addFilteredNamedLists(HollowReadStateEngine readStateEngine, VMSRawHollowAPI api, HollowWriteStateEngine writeStateEngine, Set<Integer> includedVideoIds) {
             HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+            mapper.doNotUseDefaultHashKeys();
 
             HollowPrimaryKeyIndex globalPersonIdx = new HollowPrimaryKeyIndex(readStateEngine, "GlobalPerson", "id");
 

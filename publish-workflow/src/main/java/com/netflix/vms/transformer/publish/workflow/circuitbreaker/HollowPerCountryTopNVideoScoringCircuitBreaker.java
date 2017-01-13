@@ -2,12 +2,8 @@ package com.netflix.vms.transformer.publish.workflow.circuitbreaker;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CircuitBreaker;
 
-import java.util.HashSet;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import com.netflix.hollow.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
 import com.netflix.vms.generated.notemplate.FloatHollow;
 import com.netflix.vms.generated.notemplate.IntegerHollow;
@@ -17,6 +13,9 @@ import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.logmessage.ViewShareMessage;
+import java.util.HashSet;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public abstract class HollowPerCountryTopNVideoScoringCircuitBreaker extends HollowFixedBaseLineCountrySpecificCircuitBreaker {
 

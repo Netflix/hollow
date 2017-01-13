@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowinput;
 
-import com.netflix.hollow.read.customapi.HollowObjectTypeAPI;
-import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.api.custom.HollowObjectTypeAPI;
+import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 
 @SuppressWarnings("all")
 public class ArtworkAttributesTypeAPI extends HollowObjectTypeAPI {
@@ -10,8 +10,7 @@ public class ArtworkAttributesTypeAPI extends HollowObjectTypeAPI {
 
     ArtworkAttributesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
-            "passthrough",
-            "ROLLOUT_EXCLUSIVE"
+            "passthrough"
         });
         this.delegateLookupImpl = new ArtworkAttributesDelegateLookupImpl(this);
     }
@@ -24,19 +23,6 @@ public class ArtworkAttributesTypeAPI extends HollowObjectTypeAPI {
 
     public PassthroughDataTypeAPI getPassthroughTypeAPI() {
         return getAPI().getPassthroughDataTypeAPI();
-    }
-
-    public String getROLLOUT_EXCLUSIVE(int ordinal) {
-        if(fieldIndex[1] == -1)
-            return missingDataHandler().handleString("ArtworkAttributes", ordinal, "ROLLOUT_EXCLUSIVE");
-        boxedFieldAccessSampler.recordFieldAccess(fieldIndex[1]);
-        return getTypeDataAccess().readString(ordinal, fieldIndex[1]);
-    }
-
-    public boolean isROLLOUT_EXCLUSIVEEqual(int ordinal, String testValue) {
-        if(fieldIndex[1] == -1)
-            return missingDataHandler().handleStringEquals("ArtworkAttributes", ordinal, "ROLLOUT_EXCLUSIVE", testValue);
-        return getTypeDataAccess().isStringFieldEqual(ordinal, fieldIndex[1], testValue);
     }
 
     public ArtworkAttributesDelegateLookupImpl getDelegateLookupImpl() {

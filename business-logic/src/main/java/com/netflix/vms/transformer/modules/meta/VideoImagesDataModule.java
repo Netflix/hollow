@@ -6,11 +6,11 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLoc
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingRolloutForArtwork;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
-import com.netflix.hollow.index.HollowHashIndex;
-import com.netflix.hollow.index.HollowHashIndexResult;
-import com.netflix.hollow.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.read.iterator.HollowOrdinalIterator;
-import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.core.index.HollowHashIndex;
+import com.netflix.hollow.core.index.HollowHashIndexResult;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -54,6 +54,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -557,6 +558,8 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
             merchstillSourceFieldIds.add(sourceFileId);
         }
         Artwork artwork = new Artwork();
+        artwork.sourceVideoId = videoId;
+        artwork.hasShowLevelTag = showLevel;
 
         // Process list of derivatives
         processDerivativesAndCdnList(entityId, sourceFileId, inputDerivatives, artwork);
@@ -566,14 +569,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         artwork.ordinalPriority = ordinalPriority;
         fillPassThroughData(artwork, attributes);
         artwork.schedulePhaseInfo = window;
-        // get ArtworkAttributes and read ROLLOUt_EXCLUSIVE from ArtworkAttributes
-        ArtworkAttributesHollow artworkAttributesHollow = artworkHollowInput._getAttributes();
-        String isRolloutExclusive = artworkAttributesHollow._getROLLOUT_EXCLUSIVE();
-        if (isRolloutExclusive == null || isRolloutExclusive.equals("false")) {
-            artwork.isRolloutExclusive = false;
-        } else {
-            artwork.isRolloutExclusive = true;
-        }
+        artwork.isRolloutExclusive = artworkHollowInput._getRolloutExclusive();
 
         int ordinal = damMerchStillsIdx.getMatchingOrdinal(sourceFileId);
         if (ordinal != -1) {
@@ -650,7 +646,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                         if (updatedArtwork != null)
                             artworkSet.add(updatedArtwork);
 
-                        // add schedule windows in top nodes
+                        // roll up schedule windows in top nodes
                         if (!videoSchedulePhaseMap.containsKey(topNode)) {
                             videoSchedulePhaseMap.put(topNode, new HashSet<>());
                         }
@@ -709,9 +705,9 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         if (checkPhaseTagList(phaseTagListHollow, videoArtworkHollow, videoId) == null) return null;
         boolean isSmoky = videoArtworkHollow._getIsSmoky();
 
-        HollowOrdinalIterator iterator = phaseTagListHollow.typeApi().getOrdinalIterator(phaseTagListHollow.getOrdinal());
-        int phaseTagOrdinal = iterator.next();
-        if (phaseTagOrdinal == HollowOrdinalIterator.NO_MORE_ORDINALS) {
+        Iterator<PhaseTagHollow> iterator = phaseTagListHollow.iterator();
+
+        if (!iterator.hasNext()) {
             // adding a default window for no phase tags.
             SchedulePhaseInfo defaultWindow = new SchedulePhaseInfo(isSmoky, videoId);
             schedulePhaseInfos = new HashSet<>();
@@ -719,9 +715,9 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
             return schedulePhaseInfos;
         }
 
-        while (phaseTagOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+        while (iterator.hasNext()) {
 
-            PhaseTagHollow phaseTagHollow = phaseTagListHollow.instantiateElement(phaseTagOrdinal);
+            PhaseTagHollow phaseTagHollow = iterator.next();
             String tag = phaseTagHollow._getPhaseTag()._getValue();
             String scheduleId = phaseTagHollow._getScheduleId()._getValue();
 
@@ -749,8 +745,6 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                 }
 
             }
-
-            phaseTagOrdinal = iterator.next();
         }
 
         return schedulePhaseInfos;

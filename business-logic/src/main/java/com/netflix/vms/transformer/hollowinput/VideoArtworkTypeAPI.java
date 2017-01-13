@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowinput;
 
-import com.netflix.hollow.read.customapi.HollowObjectTypeAPI;
-import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.api.custom.HollowObjectTypeAPI;
+import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 
 @SuppressWarnings("all")
 public class VideoArtworkTypeAPI extends HollowObjectTypeAPI {
@@ -19,7 +19,8 @@ public class VideoArtworkTypeAPI extends HollowObjectTypeAPI {
             "ordinalPriority",
             "fileImageType",
             "phaseTags",
-            "isSmoky"
+            "isSmoky",
+            "rolloutExclusive"
         });
         this.delegateLookupImpl = new VideoArtworkDelegateLookupImpl(this);
     }
@@ -157,6 +158,20 @@ public class VideoArtworkTypeAPI extends HollowObjectTypeAPI {
         if(fieldIndex[9] == -1)
             return missingDataHandler().handleBoolean("VideoArtwork", ordinal, "isSmoky");
         return getTypeDataAccess().readBoolean(ordinal, fieldIndex[9]);
+    }
+
+
+
+    public boolean getRolloutExclusive(int ordinal) {
+        if(fieldIndex[10] == -1)
+            return missingDataHandler().handleBoolean("VideoArtwork", ordinal, "rolloutExclusive") == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[10]) == Boolean.TRUE;
+    }
+
+    public Boolean getRolloutExclusiveBoxed(int ordinal) {
+        if(fieldIndex[10] == -1)
+            return missingDataHandler().handleBoolean("VideoArtwork", ordinal, "rolloutExclusive");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[10]);
     }
 
 

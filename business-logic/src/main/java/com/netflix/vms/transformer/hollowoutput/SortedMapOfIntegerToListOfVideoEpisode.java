@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-import com.netflix.hollow.write.objectmapper.HollowTypeName;
+import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import java.util.List;
 import java.util.Map;
 

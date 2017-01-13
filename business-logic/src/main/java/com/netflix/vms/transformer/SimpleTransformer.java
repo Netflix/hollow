@@ -5,12 +5,12 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.Individual
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.NonVideoSpecificTransformDuration;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformInfo;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformProgress;
-
-import com.netflix.hollow.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.util.SimultaneousExecutor;
-import com.netflix.hollow.write.HollowWriteStateEngine;
-import com.netflix.hollow.write.objectmapper.HollowObjectMapper;
+import com.netflix.vms.transformer.common.io.TransformerLogTag;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.VideoHierarchyGrouper.VideoHierarchyGroup;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.CharacterListHollow;
@@ -59,7 +59,6 @@ import com.netflix.vms.transformer.modules.packages.PackageDataModule;
 import com.netflix.vms.transformer.modules.packages.contracts.LanguageRightsModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkImageRecipeModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkTypeModule;
-import com.netflix.vms.transformer.modules.passthrough.artwork.DefaultExtensionRecipeModule;
 import com.netflix.vms.transformer.modules.passthrough.beehive.RolloutCharacterModule;
 import com.netflix.vms.transformer.modules.passthrough.mpl.EncodingProfileGroupModule;
 import com.netflix.vms.transformer.modules.person.GlobalPersonModule;
@@ -67,7 +66,6 @@ import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
 import com.netflix.vms.transformer.namedlist.NamedListCompletionModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule.VideoNamedListPopulator;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -118,6 +116,7 @@ public class SimpleTransformer {
         final VideoHierarchyInitializer hierarchyInitializer = new VideoHierarchyInitializer(api, indexer, ctx);
 
         final HollowObjectMapper objectMapper = new HollowObjectMapper(writeStateEngine);
+        objectMapper.doNotUseDefaultHashKeys();
 
         SimultaneousExecutor executor = new SimultaneousExecutor();
 
@@ -196,7 +195,6 @@ public class SimpleTransformer {
                 new ArtworkTypeModule(api, ctx, cycleConstants, objectMapper),
                 new ArtworkImageRecipeModule(api, ctx, cycleConstants, objectMapper),
                 new EncodingProfileGroupModule(api, ctx, cycleConstants, objectMapper),
-                new DefaultExtensionRecipeModule(api, ctx, cycleConstants, objectMapper),
 
                 new L10NMiscResourcesModule(api, ctx, cycleConstants, objectMapper, indexer),
                 new LanguageRightsModule(api, ctx, cycleConstants, objectMapper, indexer),

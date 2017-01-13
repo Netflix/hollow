@@ -1,10 +1,10 @@
 package com.netflix.vms.transformer.hollowinput;
 
-import com.netflix.hollow.objects.delegate.HollowObjectAbstractDelegate;
-import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
-import com.netflix.hollow.HollowObjectSchema;
-import com.netflix.hollow.read.customapi.HollowTypeAPI;
-import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
+import com.netflix.hollow.api.objects.delegate.HollowObjectAbstractDelegate;
+import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.api.custom.HollowTypeAPI;
+import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 
 @SuppressWarnings("all")
 public class VideoArtworkDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, VideoArtworkDelegate {
@@ -19,6 +19,7 @@ public class VideoArtworkDelegateCachedImpl extends HollowObjectAbstractDelegate
     private final int fileImageTypeOrdinal;
     private final int phaseTagsOrdinal;
     private final Boolean isSmoky;
+    private final Boolean rolloutExclusive;
    private VideoArtworkTypeAPI typeAPI;
 
     public VideoArtworkDelegateCachedImpl(VideoArtworkTypeAPI typeAPI, int ordinal) {
@@ -32,6 +33,7 @@ public class VideoArtworkDelegateCachedImpl extends HollowObjectAbstractDelegate
         this.fileImageTypeOrdinal = typeAPI.getFileImageTypeOrdinal(ordinal);
         this.phaseTagsOrdinal = typeAPI.getPhaseTagsOrdinal(ordinal);
         this.isSmoky = typeAPI.getIsSmokyBoxed(ordinal);
+        this.rolloutExclusive = typeAPI.getRolloutExclusiveBoxed(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -89,6 +91,14 @@ public class VideoArtworkDelegateCachedImpl extends HollowObjectAbstractDelegate
 
     public Boolean getIsSmokyBoxed(int ordinal) {
         return isSmoky;
+    }
+
+    public boolean getRolloutExclusive(int ordinal) {
+        return rolloutExclusive.booleanValue();
+    }
+
+    public Boolean getRolloutExclusiveBoxed(int ordinal) {
+        return rolloutExclusive;
     }
 
     @Override

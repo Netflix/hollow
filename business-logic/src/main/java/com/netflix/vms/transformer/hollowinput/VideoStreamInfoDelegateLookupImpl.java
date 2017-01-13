@@ -1,8 +1,8 @@
 package com.netflix.vms.transformer.hollowinput;
 
-import com.netflix.hollow.objects.delegate.HollowObjectAbstractDelegate;
-import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
-import com.netflix.hollow.HollowObjectSchema;
+import com.netflix.hollow.api.objects.delegate.HollowObjectAbstractDelegate;
+import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 @SuppressWarnings("all")
 public class VideoStreamInfoDelegateLookupImpl extends HollowObjectAbstractDelegate implements VideoStreamInfoDelegate {
@@ -19,6 +19,14 @@ public class VideoStreamInfoDelegateLookupImpl extends HollowObjectAbstractDeleg
 
     public Integer getVideoBitrateKBPSBoxed(int ordinal) {
         return typeAPI.getVideoBitrateKBPSBoxed(ordinal);
+    }
+
+    public int getVideoPeakBitrateKBPS(int ordinal) {
+        return typeAPI.getVideoPeakBitrateKBPS(ordinal);
+    }
+
+    public Integer getVideoPeakBitrateKBPSBoxed(int ordinal) {
+        return typeAPI.getVideoPeakBitrateKBPSBoxed(ordinal);
     }
 
     public long getDashHeaderSize(int ordinal) {

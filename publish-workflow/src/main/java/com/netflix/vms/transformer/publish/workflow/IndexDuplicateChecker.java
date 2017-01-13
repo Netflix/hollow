@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow;
 
-import com.netflix.hollow.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.common.config.OutputTypeConfig;
 import java.util.Collection;
 import java.util.HashMap;

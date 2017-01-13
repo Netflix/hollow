@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.hollowinput;
 
-import com.netflix.hollow.objects.delegate.HollowObjectDelegate;
+import com.netflix.hollow.api.objects.delegate.HollowObjectDelegate;
 
 
 @SuppressWarnings("all")
@@ -33,6 +33,10 @@ public interface VideoArtworkDelegate extends HollowObjectDelegate {
     public boolean getIsSmoky(int ordinal);
 
     public Boolean getIsSmokyBoxed(int ordinal);
+
+    public boolean getRolloutExclusive(int ordinal);
+
+    public Boolean getRolloutExclusiveBoxed(int ordinal);
 
     public VideoArtworkTypeAPI getTypeAPI();
 

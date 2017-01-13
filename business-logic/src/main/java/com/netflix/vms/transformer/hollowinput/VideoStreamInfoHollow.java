@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.hollowinput;
 
-import com.netflix.hollow.objects.HollowObject;
-import com.netflix.hollow.HollowObjectSchema;
+import com.netflix.hollow.api.objects.HollowObject;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 @SuppressWarnings("all")
 public class VideoStreamInfoHollow extends HollowObject {
@@ -16,6 +16,14 @@ public class VideoStreamInfoHollow extends HollowObject {
 
     public Integer _getVideoBitrateKBPSBoxed() {
         return delegate().getVideoBitrateKBPSBoxed(ordinal);
+    }
+
+    public int _getVideoPeakBitrateKBPS() {
+        return delegate().getVideoPeakBitrateKBPS(ordinal);
+    }
+
+    public Integer _getVideoPeakBitrateKBPSBoxed() {
+        return delegate().getVideoPeakBitrateKBPSBoxed(ordinal);
     }
 
     public long _getDashHeaderSize() {

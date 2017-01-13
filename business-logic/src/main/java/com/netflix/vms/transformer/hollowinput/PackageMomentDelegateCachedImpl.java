@@ -1,10 +1,10 @@
 package com.netflix.vms.transformer.hollowinput;
 
-import com.netflix.hollow.objects.delegate.HollowObjectAbstractDelegate;
-import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
-import com.netflix.hollow.HollowObjectSchema;
-import com.netflix.hollow.read.customapi.HollowTypeAPI;
-import com.netflix.hollow.objects.delegate.HollowCachedDelegate;
+import com.netflix.hollow.api.objects.delegate.HollowObjectAbstractDelegate;
+import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.api.custom.HollowTypeAPI;
+import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 
 @SuppressWarnings("all")
 public class PackageMomentDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, PackageMomentDelegate {

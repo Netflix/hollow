@@ -1,8 +1,8 @@
 package com.netflix.vms.transformer.hollowinput;
 
-import com.netflix.hollow.objects.delegate.HollowObjectAbstractDelegate;
-import com.netflix.hollow.read.dataaccess.HollowObjectTypeDataAccess;
-import com.netflix.hollow.HollowObjectSchema;
+import com.netflix.hollow.api.objects.delegate.HollowObjectAbstractDelegate;
+import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 @SuppressWarnings("all")
 public class VideoArtworkDelegateLookupImpl extends HollowObjectAbstractDelegate implements VideoArtworkDelegate {
@@ -67,6 +67,14 @@ public class VideoArtworkDelegateLookupImpl extends HollowObjectAbstractDelegate
 
     public Boolean getIsSmokyBoxed(int ordinal) {
         return typeAPI.getIsSmokyBoxed(ordinal);
+    }
+
+    public boolean getRolloutExclusive(int ordinal) {
+        return typeAPI.getRolloutExclusive(ordinal);
+    }
+
+    public Boolean getRolloutExclusiveBoxed(int ordinal) {
+        return typeAPI.getRolloutExclusiveBoxed(ordinal);
     }
 
     public VideoArtworkTypeAPI getTypeAPI() {

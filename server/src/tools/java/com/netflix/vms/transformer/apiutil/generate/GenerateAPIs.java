@@ -2,20 +2,18 @@ package com.netflix.vms.transformer.apiutil.generate;
 
 import static java.lang.System.getenv;
 
+import com.netflix.hollow.api.codegen.HollowAPIGenerator;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.schema.HollowSchemaParser;
+import com.netflix.hollow.core.util.HollowWriteStateCreator;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
-
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-
-import com.netflix.hollow.HollowSchema;
-import com.netflix.hollow.codegen.HollowAPIGenerator;
-import com.netflix.hollow.util.HollowSchemaParser;
-import com.netflix.hollow.util.HollowWriteStateCreator;
-import com.netflix.hollow.write.HollowWriteStateEngine;
 
 public class GenerateAPIs {
 

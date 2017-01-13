@@ -20,6 +20,8 @@ public class Artwork implements Cloneable {
     public AcquisitionSource acquisitionSource = null;
     public boolean isRolloutExclusive = false;
     public SchedulePhaseInfo schedulePhaseInfo = null;
+    public int sourceVideoId = java.lang.Integer.MIN_VALUE;
+    public boolean hasShowLevelTag = false;
 
     public String toString() {
         StringBuilder builder = new StringBuilder("Artwork{");
@@ -39,6 +41,8 @@ public class Artwork implements Cloneable {
         builder.append(",acquisitionSource=").append(acquisitionSource);
         builder.append(",availabilityWindows=").append(schedulePhaseInfo);
         builder.append(",isRolloutExclusive=").append(isRolloutExclusive);
+        builder.append(",sourceVideoId=").append(sourceVideoId);
+        builder.append(",hasShowLevelTag=").append(hasShowLevelTag);
         builder.append("}");
         return builder.toString();
     }

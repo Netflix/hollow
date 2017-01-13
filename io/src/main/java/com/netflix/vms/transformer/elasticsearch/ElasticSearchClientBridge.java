@@ -4,7 +4,7 @@ import com.google.common.collect.Sets;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import com.netflix.discovery.shared.Application;
-import com.netflix.hollow.util.SimultaneousExecutor;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import java.net.InetSocketAddress;
 import java.util.Collections;
