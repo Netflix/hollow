@@ -113,6 +113,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
             deltaData.destroy();
             oldData.destroy();
+            stateEngine.getMemoryRecycler().swap();
         }
         
         if(shards.length == 1)

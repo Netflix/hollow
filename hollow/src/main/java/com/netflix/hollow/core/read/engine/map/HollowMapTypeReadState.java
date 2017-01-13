@@ -105,6 +105,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
             notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
             deltaData.destroy();
             oldData.destroy();
+            stateEngine.getMemoryRecycler().swap();
         }
         
         if(shards.length == 1)
