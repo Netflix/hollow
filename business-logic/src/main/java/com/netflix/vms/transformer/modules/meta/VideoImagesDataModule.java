@@ -4,7 +4,6 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidIma
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidPhaseTagForArtwork;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingRolloutForArtwork;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingTopNodeForImages;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
 import com.netflix.hollow.index.HollowHashIndex;
@@ -638,7 +637,6 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                 	// 3) Roll-up all images is to topNode with source video to indicate to which video the image was associated to in input.
                     Set<Integer> topNodes = getTopNodes(showHierarchiesByCountry, countryCode, entityId);
                     if(topNodes == null || topNodes.isEmpty()){
-                    	ctx.getLogger().error(MissingTopNodeForImages, "Missing top node(s) for id={} and country={}; Images cannot be added to topNode.", entityId, countryCode);
                         Set<Artwork> artworkSet = getArtworkSet(entityId, artMap);
                         artworkSet.add(localeArtworkIsRolloutAsInput);
                     }
