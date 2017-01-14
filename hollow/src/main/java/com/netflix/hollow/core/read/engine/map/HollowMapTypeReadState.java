@@ -300,4 +300,9 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
             shards[i].setKeyDeriver(keyDeriver);
     }
 
+    @Override
+    public int numShards() {
+        return shards.length;
+    }
+
 }

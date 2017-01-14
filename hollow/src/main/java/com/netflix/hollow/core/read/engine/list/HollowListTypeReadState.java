@@ -225,4 +225,9 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
         return totalApproximateHoleCostInBytes;
     }
 
+    @Override
+    public int numShards() {
+        return shards.length;
+    }
+
 }

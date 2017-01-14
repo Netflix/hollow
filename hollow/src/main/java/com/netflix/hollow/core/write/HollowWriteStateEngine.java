@@ -118,6 +118,13 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     public void restoreFrom(HollowReadStateEngine readStateEngine) {
         if(!readStateEngine.isListenToAllPopulatedOrdinals())
             throw new IllegalStateException("The specified HollowReadStateEngine must be listening for all populated ordinals!");
+
+        for(HollowTypeReadState readState : readStateEngine.getTypeStates()) {
+            String typeName = readState.getSchema().getName();
+            HollowTypeWriteState writeState = writeStates.get(typeName);
+            if(writeState != null && writeState.getNumShards() != readState.numShards())
+                throw new IllegalStateException("The specified HollowReadStateEngine does not have the same number of shards as this state engine for type " + typeName);
+        }
         
         restoredStates = new ArrayList<String>();
 

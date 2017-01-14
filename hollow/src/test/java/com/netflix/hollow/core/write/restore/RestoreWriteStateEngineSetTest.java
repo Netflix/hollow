@@ -18,11 +18,11 @@
 package com.netflix.hollow.core.write.restore;
 
 import com.netflix.hollow.core.AbstractStateEngineTest;
-
+import com.netflix.hollow.core.read.engine.set.HollowSetTypeReadState;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.write.HollowSetTypeWriteState;
 import com.netflix.hollow.core.write.HollowSetWriteRecord;
-import com.netflix.hollow.core.read.engine.set.HollowSetTypeReadState;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -69,6 +69,20 @@ public class RestoreWriteStateEngineSetTest extends AbstractStateEngineTest {
         roundTripDelta();
 
         Assert.assertEquals(3, readStateEngine.getTypeState("TestSet").maxOrdinal());
+    }
+
+    @Test
+    public void restoreFailsIfShardConfigurationChanges() throws IOException {
+        roundTripSnapshot();
+        
+        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
+        HollowSetTypeWriteState misconfiguredTypeState = new HollowSetTypeWriteState(new HollowSetSchema("TestSet", "TestObject"), 16);
+        writeStateEngine.addTypeState(misconfiguredTypeState);
+
+        try {
+            writeStateEngine.restoreFrom(readStateEngine);
+            Assert.fail("Should have thrown IllegalStateException because shard configuration has changed");
+        } catch(IllegalStateException expected) { }
     }
 
     private void addRecord(int... ordinals) {

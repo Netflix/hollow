@@ -289,5 +289,10 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 	        throw new UnsupportedOperationException("Cannot directly set data on sharded type state");
 	    shards[0].setCurrentData(data);
 	}
+
+    @Override
+    public int numShards() {
+        return shards.length;
+    }
 	
 }

@@ -18,11 +18,11 @@
 package com.netflix.hollow.core.write.restore;
 
 import com.netflix.hollow.core.AbstractStateEngineTest;
-
+import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.write.HollowMapTypeWriteState;
 import com.netflix.hollow.core.write.HollowMapWriteRecord;
-import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -75,6 +75,20 @@ public class RestoreWriteStateEngineMapTest extends AbstractStateEngineTest {
         assertMap(0, 634, 54732); /// now, since all maps were removed, we can recycle the ordinal "0", even though it was a "ghost" in the last cycle.
         assertMap(1, 1, 2, 3, 4);  /// even though 1, 2, 3 had an equivalent map in the previous cycle at ordinal "4", it is now assigned to recycled ordinal "1".
 
+    }
+    
+    @Test
+    public void restoreFailsIfShardConfigurationChanges() throws IOException {
+        roundTripSnapshot();
+        
+        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
+        HollowMapTypeWriteState misconfiguredTypeState = new HollowMapTypeWriteState(new HollowMapSchema("TestMap", "TestKey", "TestValue"), 16);
+        writeStateEngine.addTypeState(misconfiguredTypeState);
+
+        try {
+            writeStateEngine.restoreFrom(readStateEngine);
+            Assert.fail("Should have thrown IllegalStateException because shard configuration has changed");
+        } catch(IllegalStateException expected) { }
     }
 
     private void addRecord(int... ordinals) {

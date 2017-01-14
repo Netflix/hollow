@@ -272,4 +272,9 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
 	        shards[i].setKeyDeriver(keyDeriver);
 	}
 
+    @Override
+    public int numShards() {
+        return shards.length;
+    }
+
 }
