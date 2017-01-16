@@ -2485,11 +2485,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.191",
+            "locked": "59.193",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.191",
+            "locked": "59.193",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -5610,11 +5610,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.191",
+            "locked": "59.193",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.191",
+            "locked": "59.193",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -8735,11 +8735,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.191",
+            "locked": "59.193",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.191",
+            "locked": "59.193",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -11860,11 +11860,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.191",
+            "locked": "59.193",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.191",
+            "locked": "59.193",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -12594,7 +12594,7 @@
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
-            "locked": "0.27.0",
+            "locked": "0.27.3",
             "requested": "latest.release"
         }
     },
@@ -15084,11 +15084,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.191",
+            "locked": "59.193",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.191",
+            "locked": "59.193",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -18250,11 +18250,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.191",
+            "locked": "59.193",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.191",
+            "locked": "59.193",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -21429,11 +21429,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.191",
+            "locked": "59.193",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.191",
+            "locked": "59.193",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -24608,11 +24608,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.191",
+            "locked": "59.193",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.191",
+            "locked": "59.193",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -27787,11 +27787,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.191",
+            "locked": "59.193",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.191",
+            "locked": "59.193",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
