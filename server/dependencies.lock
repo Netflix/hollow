@@ -824,7 +824,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -4212,7 +4212,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -7600,7 +7600,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -10988,7 +10988,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -14391,7 +14391,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -18871,7 +18871,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -22259,7 +22259,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -25652,7 +25652,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -25662,7 +25662,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -29155,7 +29155,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -29165,7 +29165,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -32658,7 +32658,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -32668,7 +32668,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -36161,7 +36161,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -36171,7 +36171,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -39628,7 +39628,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -39638,7 +39638,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -43033,7 +43033,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -43043,7 +43043,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -46438,7 +46438,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -46448,7 +46448,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -49843,7 +49843,7 @@
             "requested": "1.12.15"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -49853,7 +49853,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.0.4",
+            "locked": "2.0.5",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
