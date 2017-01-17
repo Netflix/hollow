@@ -112,7 +112,7 @@ public class HollowObjectMapper {
         return unassignedTypeCounter.getAndIncrement();
     }
 
-    HollowWriteStateEngine getStateEngine() {
+    public HollowWriteStateEngine getStateEngine() {
         return stateEngine;
     }
 
