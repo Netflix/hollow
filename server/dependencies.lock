@@ -3151,15 +3151,10 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
-        "org.mockito:mockito-all": {
+        "org.mockito:mockito-core": {
             "locked": "1.10.19",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic"
-            ]
-        },
-        "org.mockito:mockito-core": {
-            "locked": "1.8.5",
-            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:streaming-utilities-testing"
             ]
         },
@@ -3182,7 +3177,7 @@
             ]
         },
         "org.objenesis:objenesis": {
-            "locked": "1.0",
+            "locked": "2.1",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -6539,15 +6534,10 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
-        "org.mockito:mockito-all": {
+        "org.mockito:mockito-core": {
             "locked": "1.10.19",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic"
-            ]
-        },
-        "org.mockito:mockito-core": {
-            "locked": "1.8.5",
-            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:streaming-utilities-testing"
             ]
         },
@@ -6570,7 +6560,7 @@
             ]
         },
         "org.objenesis:objenesis": {
-            "locked": "1.0",
+            "locked": "2.1",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -9927,15 +9917,10 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
-        "org.mockito:mockito-all": {
+        "org.mockito:mockito-core": {
             "locked": "1.10.19",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic"
-            ]
-        },
-        "org.mockito:mockito-core": {
-            "locked": "1.8.5",
-            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:streaming-utilities-testing"
             ]
         },
@@ -9958,7 +9943,7 @@
             ]
         },
         "org.objenesis:objenesis": {
-            "locked": "1.0",
+            "locked": "2.1",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -13277,15 +13262,10 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
-        "org.mockito:mockito-all": {
+        "org.mockito:mockito-core": {
             "locked": "1.10.19",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic"
-            ]
-        },
-        "org.mockito:mockito-core": {
-            "locked": "1.8.5",
-            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:streaming-utilities-testing"
             ]
         },
@@ -13308,7 +13288,7 @@
             ]
         },
         "org.objenesis:objenesis": {
-            "locked": "1.0",
+            "locked": "2.1",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -16718,15 +16698,10 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
-        "org.mockito:mockito-all": {
+        "org.mockito:mockito-core": {
             "locked": "1.10.19",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic"
-            ]
-        },
-        "org.mockito:mockito-core": {
-            "locked": "1.8.5",
-            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:streaming-utilities-testing"
             ]
         },
@@ -16749,7 +16724,7 @@
             ]
         },
         "org.objenesis:objenesis": {
-            "locked": "1.0",
+            "locked": "2.1",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -18042,7 +18017,7 @@
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
-            "locked": "0.28.0",
+            "locked": "0.29.0",
             "requested": "latest.release"
         }
     },
@@ -21198,15 +21173,10 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
-        "org.mockito:mockito-all": {
+        "org.mockito:mockito-core": {
             "locked": "1.10.19",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic"
-            ]
-        },
-        "org.mockito:mockito-core": {
-            "locked": "1.8.5",
-            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:streaming-utilities-testing"
             ]
         },
@@ -21229,7 +21199,7 @@
             ]
         },
         "org.objenesis:objenesis": {
-            "locked": "1.0",
+            "locked": "2.1",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -24554,15 +24524,10 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
-        "org.mockito:mockito-all": {
+        "org.mockito:mockito-core": {
             "locked": "1.10.19",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic"
-            ]
-        },
-        "org.mockito:mockito-core": {
-            "locked": "1.8.5",
-            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:streaming-utilities-testing"
             ]
         },
@@ -24585,7 +24550,7 @@
             ]
         },
         "org.objenesis:objenesis": {
-            "locked": "1.0",
+            "locked": "2.1",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -28053,15 +28018,13 @@
             ]
         },
         "org.mockito:mockito-all": {
-            "locked": "1.10.19",
-            "requested": "latest.release",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic"
-            ]
+            "project": true,
+            "requested": "latest.release"
         },
         "org.mockito:mockito-core": {
-            "locked": "1.8.5",
+            "locked": "1.10.19",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:streaming-utilities-testing"
             ]
         },
@@ -28084,7 +28047,7 @@
             ]
         },
         "org.objenesis:objenesis": {
-            "locked": "1.0",
+            "locked": "2.1",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -31556,15 +31519,13 @@
             ]
         },
         "org.mockito:mockito-all": {
-            "locked": "1.10.19",
-            "requested": "latest.release",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic"
-            ]
+            "project": true,
+            "requested": "latest.release"
         },
         "org.mockito:mockito-core": {
-            "locked": "1.8.5",
+            "locked": "1.10.19",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:streaming-utilities-testing"
             ]
         },
@@ -31587,7 +31548,7 @@
             ]
         },
         "org.objenesis:objenesis": {
-            "locked": "1.0",
+            "locked": "2.1",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -35059,15 +35020,13 @@
             ]
         },
         "org.mockito:mockito-all": {
-            "locked": "1.10.19",
-            "requested": "latest.release",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic"
-            ]
+            "project": true,
+            "requested": "latest.release"
         },
         "org.mockito:mockito-core": {
-            "locked": "1.8.5",
+            "locked": "1.10.19",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:streaming-utilities-testing"
             ]
         },
@@ -35090,7 +35049,7 @@
             ]
         },
         "org.objenesis:objenesis": {
-            "locked": "1.0",
+            "locked": "2.1",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -38562,15 +38521,13 @@
             ]
         },
         "org.mockito:mockito-all": {
-            "locked": "1.10.19",
-            "requested": "latest.release",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic"
-            ]
+            "project": true,
+            "requested": "latest.release"
         },
         "org.mockito:mockito-core": {
-            "locked": "1.8.5",
+            "locked": "1.10.19",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:streaming-utilities-testing"
             ]
         },
@@ -38593,7 +38550,7 @@
             ]
         },
         "org.objenesis:objenesis": {
-            "locked": "1.0",
+            "locked": "2.1",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -41971,15 +41928,10 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
-        "org.mockito:mockito-all": {
+        "org.mockito:mockito-core": {
             "locked": "1.10.19",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic"
-            ]
-        },
-        "org.mockito:mockito-core": {
-            "locked": "1.8.5",
-            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:streaming-utilities-testing"
             ]
         },
@@ -42002,7 +41954,7 @@
             ]
         },
         "org.objenesis:objenesis": {
-            "locked": "1.0",
+            "locked": "2.1",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -45376,15 +45328,10 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
-        "org.mockito:mockito-all": {
+        "org.mockito:mockito-core": {
             "locked": "1.10.19",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic"
-            ]
-        },
-        "org.mockito:mockito-core": {
-            "locked": "1.8.5",
-            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:streaming-utilities-testing"
             ]
         },
@@ -45407,7 +45354,7 @@
             ]
         },
         "org.objenesis:objenesis": {
-            "locked": "1.0",
+            "locked": "2.1",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -48781,15 +48728,10 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
-        "org.mockito:mockito-all": {
+        "org.mockito:mockito-core": {
             "locked": "1.10.19",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic"
-            ]
-        },
-        "org.mockito:mockito-core": {
-            "locked": "1.8.5",
-            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:streaming-utilities-testing"
             ]
         },
@@ -48812,7 +48754,7 @@
             ]
         },
         "org.objenesis:objenesis": {
-            "locked": "1.0",
+            "locked": "2.1",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -52186,15 +52128,10 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
-        "org.mockito:mockito-all": {
+        "org.mockito:mockito-core": {
             "locked": "1.10.19",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-business-logic"
-            ]
-        },
-        "org.mockito:mockito-core": {
-            "locked": "1.8.5",
-            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:streaming-utilities-testing"
             ]
         },
@@ -52217,7 +52154,7 @@
             ]
         },
         "org.objenesis:objenesis": {
-            "locked": "1.0",
+            "locked": "2.1",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
