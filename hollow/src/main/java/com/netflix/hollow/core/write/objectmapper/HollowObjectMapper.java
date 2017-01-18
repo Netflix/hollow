@@ -66,7 +66,7 @@ public class HollowObjectMapper {
     }
 
     HollowTypeMapper getTypeMapper(Type type, String declaredName, String[] hashKeyFieldPaths) {
-        return getTypeMapper(type, declaredName, hashKeyFieldPaths, 1, null);
+        return getTypeMapper(type, declaredName, hashKeyFieldPaths, -1, null);
     }
     
     HollowTypeMapper getTypeMapper(Type type, String declaredName, String[] hashKeyFieldPaths, int numShards, Set<Type> visited) {
@@ -90,7 +90,7 @@ public class HollowObjectMapper {
                 } else if(Map.class.isAssignableFrom(clazz)) {
                     typeMapper = new HollowMapTypeMapper(this, parameterizedType, declaredName, hashKeyFieldPaths, numShards, stateEngine, useDefaultHashKeys, visited);
                 } else {
-                    return getTypeMapper(clazz, declaredName, hashKeyFieldPaths, 1, visited);
+                    return getTypeMapper(clazz, declaredName, hashKeyFieldPaths, -1, visited);
                 }
 
             } else {
