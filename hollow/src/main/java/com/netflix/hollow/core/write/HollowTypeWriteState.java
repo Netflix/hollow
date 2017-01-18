@@ -43,7 +43,7 @@ public abstract class HollowTypeWriteState {
 
     protected final ByteArrayOrdinalMap ordinalMap;
     
-    protected final int numShards;
+    protected int numShards;
 
     protected HollowSchema restoredSchema;
     protected ByteArrayOrdinalMap restoredMap;
@@ -54,7 +54,7 @@ public abstract class HollowTypeWriteState {
 
     private final ThreadLocal<ByteDataBuffer> serializedScratchSpace;
 
-    private HollowWriteStateEngine stateEngine;
+    protected HollowWriteStateEngine stateEngine;
     
     private boolean wroteData = false;
 
@@ -66,7 +66,7 @@ public abstract class HollowTypeWriteState {
         this.previousCyclePopulated = new ThreadSafeBitSet();
         this.numShards = numShards;
         
-        if((numShards & (numShards - 1)) != 0 || numShards <= 0)
+        if(numShards != -1 && ((numShards & (numShards - 1)) != 0 || numShards <= 0))
             throw new IllegalArgumentException("Number of shards must be a power of 2!  Check configuration for type " + schema.getName());
     }
     

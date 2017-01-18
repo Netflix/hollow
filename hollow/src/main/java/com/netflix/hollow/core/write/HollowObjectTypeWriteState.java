@@ -45,7 +45,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     private ByteDataBuffer deltaRemovedOrdinals[];
 
     public HollowObjectTypeWriteState(HollowObjectSchema schema) {
-        this(schema, 1);
+        this(schema, -1);
     }
     
     public HollowObjectTypeWriteState(HollowObjectSchema schema, int numShards) {
@@ -72,16 +72,25 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
         int maxOrdinal = ordinalMap.maxOrdinal();
         
-        maxShardOrdinal = new int[numShards];
-        int minOrdinalsPerShard = (maxOrdinal + 1) / numShards; 
-        for(int i=0;i<numShards;i++)
-            maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minOrdinalsPerShard : minOrdinalsPerShard - 1;
-
         for(int i=0;i<=maxOrdinal;i++) {
             discoverObjectFieldStatisticsForRecord(fieldStats, i);
         }
 
         fieldStats.completeCalculations();
+        
+        if(numShards == -1) {
+            long projectedSizeOfType = ((long)fieldStats.getNumBitsPerRecord() * (maxOrdinal + 1)) / 8;
+            projectedSizeOfType += fieldStats.getTotalSizeOfAllVarLengthData();
+            
+            numShards = 1;
+            while(stateEngine.getTargetMaxTypeShardSize() * numShards < projectedSizeOfType) 
+                numShards *= 2;
+        }
+        
+        maxShardOrdinal = new int[numShards];
+        int minOrdinalsPerShard = (maxOrdinal + 1) / numShards; 
+        for(int i=0;i<numShards;i++)
+            maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minOrdinalsPerShard : minOrdinalsPerShard - 1;
     }
 
     private void discoverObjectFieldStatisticsForRecord(FieldStatistics fieldStats, int ordinal) {

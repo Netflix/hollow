@@ -104,7 +104,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         HollowShardLargeType numShardsAnnotation = clazz.getAnnotation(HollowShardLargeType.class);
         if(numShardsAnnotation != null)
             return numShardsAnnotation.numShards();
-        return 1;
+        return -1;
     }
 
     @Override
@@ -209,7 +209,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 subTypeMapper = parentMapper.getTypeMapper(type, 
                                                            typeNameAnnotation != null ? typeNameAnnotation.name() : null, 
                                                            hashKeyAnnotation != null ? hashKeyAnnotation.fields() : null, 
-                                                           numShardsAnnotation != null ? numShardsAnnotation.numShards() : 1, 
+                                                           numShardsAnnotation != null ? numShardsAnnotation.numShards() : -1, 
                                                            visitedTypes);
                 
                 // once we've safely returned from a leaf node in recursion, we can remove this MappedField's type

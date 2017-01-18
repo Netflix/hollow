@@ -49,7 +49,7 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
     private ByteDataBuffer deltaRemovedOrdinals[];
 
     public HollowSetTypeWriteState(HollowSetSchema schema) {
-        this(schema, 1);
+        this(schema, -1);
     }
     
     public HollowSetTypeWriteState(HollowSetSchema schema, int numShards) {
@@ -68,6 +68,9 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
     }
 
     private void gatherStatistics() {
+        if(numShards == -1)
+            calculateNumShards();
+        
         int maxElementOrdinal = 0;
 
         int maxOrdinal = ordinalMap.maxOrdinal();
@@ -118,6 +121,54 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         bitsPerElement = 64 - Long.numberOfLeadingZeros(maxElementOrdinal + 1);
         bitsPerSetSizeValue = 64 - Long.numberOfLeadingZeros(maxSetSize);
         bitsPerSetPointer = 64 - Long.numberOfLeadingZeros(maxShardTotalOfSetBuckets);
+    }
+    
+    private void calculateNumShards() {
+        int maxOrdinal = ordinalMap.maxOrdinal();
+        int maxSetSize = 0;
+        int maxElementOrdinal = 0;
+        
+        ByteData data = ordinalMap.getByteData().getUnderlyingArray();
+
+        long totalOfSetBuckets = 0;
+
+        for(int i=0;i<=maxOrdinal;i++) {
+            if(currentCyclePopulated.get(i)) {
+                long pointer = ordinalMap.getPointerForData(i);
+                int size = VarInt.readVInt(data, pointer);
+
+                int numBuckets = HashCodes.hashTableSize(size);
+
+                if(size > maxSetSize)
+                    maxSetSize = size;
+
+                pointer += VarInt.sizeOfVInt(size);
+
+                int elementOrdinal = 0;
+
+                for(int j=0;j<size;j++) {
+                    int elementOrdinalDelta = VarInt.readVInt(data, pointer);
+                    elementOrdinal += elementOrdinalDelta;
+                    if(elementOrdinal > maxElementOrdinal)
+                        maxElementOrdinal = elementOrdinal;
+                    pointer += VarInt.sizeOfVInt(elementOrdinalDelta);
+                    pointer += VarInt.nextVLongSize(data, pointer);  /// discard hashed bucket
+                }
+
+                totalOfSetBuckets += numBuckets;
+            }
+        }
+        
+        long bitsPerElement = 64 - Long.numberOfLeadingZeros(maxElementOrdinal + 1);
+        long bitsPerSetSizeValue = 64 - Long.numberOfLeadingZeros(maxSetSize);
+        long bitsPerSetPointer = 64 - Long.numberOfLeadingZeros(totalOfSetBuckets);
+        
+        long projectedSizeOfType = (bitsPerSetSizeValue + bitsPerSetPointer) * (maxOrdinal + 1) / 8;
+        projectedSizeOfType += (bitsPerElement * totalOfSetBuckets) / 8;
+        
+        numShards = 1;
+        while(stateEngine.getTargetMaxTypeShardSize() * numShards < projectedSizeOfType) 
+            numShards *= 2;
     }
 
     @Override

@@ -71,6 +71,13 @@ public class FieldStatistics {
             numBitsPerRecord += maxBitsForField[i];
         }
     }
+    
+    public long getTotalSizeOfAllVarLengthData() {
+        long totalVarLengthDataSize = 0;
+        for(int i=0;i<totalSizeOfVarLengthField.length;i++) 
+            totalVarLengthDataSize += totalSizeOfVarLengthField[i];
+        return totalVarLengthDataSize;
+    }
 
     private int bitsRequiredForRepresentation(long value) {
         return 64 - Long.numberOfLeadingZeros(value + 1);

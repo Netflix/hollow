@@ -50,7 +50,7 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
     private ByteDataBuffer deltaRemovedOrdinals[];
 
     public HollowMapTypeWriteState(HollowMapSchema schema) {
-        this(schema, 1);
+        this(schema, -1);
     }
     
     public HollowMapTypeWriteState(HollowMapSchema schema, int numShards) {
@@ -70,6 +70,9 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
     }
 
     private void gatherStatistics() {
+        if(numShards == -1)
+            calculateNumShards();
+        
         int maxKeyOrdinal = 0;
         int maxValueOrdinal = 0;
 
@@ -130,6 +133,62 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
         bitsPerMapSizeValue = 64 - Long.numberOfLeadingZeros(maxMapSize);
 
         bitsPerMapPointer = 64 - Long.numberOfLeadingZeros(maxShardTotalOfMapBuckets);
+    }
+    
+    private void calculateNumShards() {
+        int maxKeyOrdinal = 0;
+        int maxValueOrdinal = 0;
+        int maxOrdinal = ordinalMap.maxOrdinal();
+
+        int maxMapSize = 0;
+        ByteData data = ordinalMap.getByteData().getUnderlyingArray();
+
+        long totalOfMapBuckets = 0;
+        
+        for(int i=0;i<=maxOrdinal;i++) {
+            if(currentCyclePopulated.get(i)) {
+                long pointer = ordinalMap.getPointerForData(i);
+                int size = VarInt.readVInt(data, pointer);
+
+                int numBuckets = HashCodes.hashTableSize(size);
+
+                if(size > maxMapSize)
+                    maxMapSize = size;
+
+                pointer += VarInt.sizeOfVInt(size);
+
+                int keyOrdinal = 0;
+
+                for(int j=0;j<size;j++) {
+                    int keyOrdinalDelta = VarInt.readVInt(data, pointer);
+                    pointer += VarInt.sizeOfVInt(keyOrdinalDelta);
+                    int valueOrdinal = VarInt.readVInt(data, pointer);
+                    pointer += VarInt.sizeOfVInt(valueOrdinal);
+
+                    keyOrdinal += keyOrdinalDelta;
+                    if(keyOrdinal > maxKeyOrdinal)
+                        maxKeyOrdinal = keyOrdinal;
+                    if(valueOrdinal > maxValueOrdinal)
+                        maxValueOrdinal = valueOrdinal;
+
+                    pointer += VarInt.nextVLongSize(data, pointer);  /// discard hashed bucket
+                }
+
+                totalOfMapBuckets += numBuckets;
+            }
+        }
+
+        long bitsPerKeyElement = 64 - Long.numberOfLeadingZeros(maxKeyOrdinal + 1);
+        long bitsPerValueElement = 64 - Long.numberOfLeadingZeros(maxValueOrdinal);
+        long bitsPerMapSizeValue = 64 - Long.numberOfLeadingZeros(maxMapSize);
+        long bitsPerMapPointer = 64 - Long.numberOfLeadingZeros(totalOfMapBuckets);
+        
+        long projectedSizeOfType = (bitsPerMapSizeValue + bitsPerMapPointer) * (maxOrdinal + 1) / 8;
+        projectedSizeOfType += ((bitsPerKeyElement + bitsPerValueElement) * totalOfMapBuckets) / 8;
+        
+        numShards = 1;
+        while(stateEngine.getTargetMaxTypeShardSize() * numShards < projectedSizeOfType) 
+            numShards *= 2;
     }
 
     @Override

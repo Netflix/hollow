@@ -61,6 +61,9 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     private final List<HollowTypeWriteState> orderedTypeStates;
     private final Map<String,String> headerTags = new ConcurrentHashMap<String, String>();
     private final HollowObjectHashCodeFinder hashCodeFinder;
+    
+    //// target a maximum shard size to reduce excess memory pool requirement 
+    private long targetMaxTypeShardSize = 25L * 1024L * 1024L;
 
     private List<String> restoredStates;
     private boolean preparedForNextCycle = true;
@@ -122,8 +125,13 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         for(HollowTypeReadState readState : readStateEngine.getTypeStates()) {
             String typeName = readState.getSchema().getName();
             HollowTypeWriteState writeState = writeStates.get(typeName);
-            if(writeState != null && writeState.getNumShards() != readState.numShards())
-                throw new IllegalStateException("The specified HollowReadStateEngine does not have the same number of shards as this state engine for type " + typeName);
+
+            if(writeState != null) {
+                if(writeState.getNumShards() == -1)
+                    writeState.numShards = readState.numShards();
+                else if(writeState.getNumShards() != readState.numShards())
+                    throw new IllegalStateException("Attempting to restore from a HollowReadStateEngine which does not have the same number of shards as explicitly configured for type " + typeName);
+            }
         }
         
         restoredStates = new ArrayList<String>();
@@ -353,6 +361,14 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     
     public void overrideNextStateRandomizedTag(long nextStateRandomizedTag) {
     	this.nextStateRandomizedTag = nextStateRandomizedTag;
+    }
+    
+    public void setTargetMaxTypeShardSize(long targetMaxTypeShardSize) {
+        this.targetMaxTypeShardSize = targetMaxTypeShardSize;
+    }
+    
+    long getTargetMaxTypeShardSize() {
+        return targetMaxTypeShardSize;
     }
 
     private void addTypeNamesWithDefinedHashCodesToHeader() {

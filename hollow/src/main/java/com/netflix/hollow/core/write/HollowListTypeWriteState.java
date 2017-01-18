@@ -47,7 +47,7 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
     private ByteDataBuffer deltaRemovedOrdinals[];
 
     public HollowListTypeWriteState(HollowListSchema schema) {
-        this(schema, 1);
+        this(schema, -1);
     }
     
     public HollowListTypeWriteState(HollowListSchema schema, int numShards) {
@@ -67,9 +67,11 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
     }
 
     private void gatherStatistics() {
-        int maxElementOrdinal = 0;
-
+        if(numShards == -1)
+            calculateNumShards();
+        
         int maxOrdinal = ordinalMap.maxOrdinal();
+        int maxElementOrdinal = 0;
 
         maxShardOrdinal = new int[numShards];
         int minOrdinalsPerShard = (maxOrdinal + 1) / numShards; 
@@ -108,7 +110,43 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
 
         bitsPerListPointer = maxShardTotalOfListSizes == 0 ? 1 : 64 - Long.numberOfLeadingZeros(maxShardTotalOfListSizes);
     }
+    
+    private void calculateNumShards() {
+        int maxOrdinal = ordinalMap.maxOrdinal();
+        ByteData data = ordinalMap.getByteData().getUnderlyingArray();
+        
+        long maxElementOrdinal = 0;
+        long totalOfListSizes = 0;
+        
+        for(int i=0;i<=maxOrdinal;i++) {
+            if(currentCyclePopulated.get(i)) {
+                long pointer = ordinalMap.getPointerForData(i);
+                int size = VarInt.readVInt(data, pointer);
 
+                pointer += VarInt.sizeOfVInt(size);
+
+                for(int j=0;j<size;j++) {
+                    int elementOrdinal = VarInt.readVInt(data, pointer);
+                    if(elementOrdinal > maxElementOrdinal)
+                        maxElementOrdinal = elementOrdinal;
+                    pointer += VarInt.sizeOfVInt(elementOrdinal);
+                }
+
+                totalOfListSizes += size;
+            }
+        }
+
+        long bitsPerElement = maxElementOrdinal == 0 ? 1 : 64 - Long.numberOfLeadingZeros(maxElementOrdinal);
+        long bitsPerListPointer = totalOfListSizes == 0 ? 1 : 64 - Long.numberOfLeadingZeros(totalOfListSizes);
+        
+        long projectedSizeOfType = (bitsPerElement * totalOfListSizes) / 8;
+        projectedSizeOfType += (bitsPerListPointer * maxOrdinal + 1) / 8;
+        
+        numShards = 1;
+        while(stateEngine.getTargetMaxTypeShardSize() * numShards < projectedSizeOfType) 
+            numShards *= 2;
+    }
+    
     @Override
     public void calculateSnapshot() {
         maxOrdinal = ordinalMap.maxOrdinal();
