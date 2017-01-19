@@ -131,6 +131,7 @@ public class VideoCollectionsDataHierarchy {
         episode.supplementalVideos = supplementalVideos;
         episode.topNode = topNode;
         episode.episodesForSeasonSequenceNumberMap = constants.EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
+        episode.videoEpisode = videoEpisode;
 
         addSupplementalVideoCollectionsData(supplementalVideos, v);
     }
