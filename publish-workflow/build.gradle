@@ -13,7 +13,7 @@ dependencies {
     compile 'netflix:hermes:latest.release'
     compile 'netflix:vms-utils:latest.release'
 
-    testCompile 'junit:junit:4.12'
+    testCompile 'junit:junit'
     testCompile 'org.assertj:assertj-core'
     testCompile 'netflix:nflibrary-junit-util'
 }
