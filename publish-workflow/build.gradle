@@ -1,8 +1,11 @@
+dependencyRecommendations {
+    mavenBom module: 'netflix:runtime-platform-recommendations:latest.release'
+}
 dependencies {
     compile project(':vmstransformer-common-interfaces')
     compile project(':vmstransformer-io')
 
-    compile 'com.netflix.hollow:hollow:2.x'
+    compile 'com.netflix.hollow:hollow:2.0.5'
     compile 'com.netflix.vms.logging:vmslogging-api:latest.release'
     compile 'netflix:vms-hollow-generated-notemplate:latest.release'
     compile 'netflix:playback-monkey-model:latest.candidate'
@@ -10,9 +13,9 @@ dependencies {
     compile 'netflix:hermes:latest.release'
     compile 'netflix:vms-utils:latest.release'
 
-    testCompile 'junit:junit:4.11'
-    testCompile 'org.assertj:assertj-core:3.3+'
-    testCompile "netflix:nflibrary-junit-util:latest.release"    
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.assertj:assertj-core'
+    testCompile 'netflix:nflibrary-junit-util'
 }
 configurations {
   // exclude direct and transitive dependencies on platform
