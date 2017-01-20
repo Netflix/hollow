@@ -63,7 +63,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     private final HollowObjectHashCodeFinder hashCodeFinder;
     
     //// target a maximum shard size to reduce excess memory pool requirement 
-    private long targetMaxTypeShardSize = 25L * 1024L * 1024L;
+    private long targetMaxTypeShardSize = Long.MAX_VALUE;
 
     private List<String> restoredStates;
     private boolean preparedForNextCycle = true;
@@ -363,6 +363,15 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     	this.nextStateRandomizedTag = nextStateRandomizedTag;
     }
     
+    /**
+     * Setting a target max type shard size (specified in bytes) will limit the excess memory pool required to perform delta transitions.
+     * 
+     * For use cases where all consumers are running with hollow v2.1.0 or greater, it is recommended to set this value to 
+     * something reasonably small, for example 25MB.
+     * 
+     * In a future release, this value will default to  (25 * 1024 * 1024).  It is currently set to Long.MAX_VALUE to retain backwards
+     * compatibility with pre v2.1.0 consumers. 
+     */
     public void setTargetMaxTypeShardSize(long targetMaxTypeShardSize) {
         this.targetMaxTypeShardSize = targetMaxTypeShardSize;
     }
