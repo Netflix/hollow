@@ -11,6 +11,7 @@ public class VideoStreamInfoTypeAPI extends HollowObjectTypeAPI {
     VideoStreamInfoTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "videoBitrateKBPS",
+            "videoPeakBitrateKBPS",
             "dashHeaderSize",
             "dashMediaStartByteOffset",
             "vmafScore",
@@ -41,37 +42,37 @@ public class VideoStreamInfoTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public long getDashHeaderSize(int ordinal) {
+    public int getVideoPeakBitrateKBPS(int ordinal) {
         if(fieldIndex[1] == -1)
+            return missingDataHandler().handleInt("VideoStreamInfo", ordinal, "videoPeakBitrateKBPS");
+        return getTypeDataAccess().readInt(ordinal, fieldIndex[1]);
+    }
+
+    public Integer getVideoPeakBitrateKBPSBoxed(int ordinal) {
+        int i;
+        if(fieldIndex[1] == -1) {
+            i = missingDataHandler().handleInt("VideoStreamInfo", ordinal, "videoPeakBitrateKBPS");
+        } else {
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[1]);
+            i = getTypeDataAccess().readInt(ordinal, fieldIndex[1]);
+        }
+        if(i == Integer.MIN_VALUE)
+            return null;
+        return Integer.valueOf(i);
+    }
+
+
+
+    public long getDashHeaderSize(int ordinal) {
+        if(fieldIndex[2] == -1)
             return missingDataHandler().handleLong("VideoStreamInfo", ordinal, "dashHeaderSize");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[1]);
+        return getTypeDataAccess().readLong(ordinal, fieldIndex[2]);
     }
 
     public Long getDashHeaderSizeBoxed(int ordinal) {
         long l;
-        if(fieldIndex[1] == -1) {
-            l = missingDataHandler().handleLong("VideoStreamInfo", ordinal, "dashHeaderSize");
-        } else {
-            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[1]);
-            l = getTypeDataAccess().readLong(ordinal, fieldIndex[1]);
-        }
-        if(l == Long.MIN_VALUE)
-            return null;
-        return Long.valueOf(l);
-    }
-
-
-
-    public long getDashMediaStartByteOffset(int ordinal) {
-        if(fieldIndex[2] == -1)
-            return missingDataHandler().handleLong("VideoStreamInfo", ordinal, "dashMediaStartByteOffset");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[2]);
-    }
-
-    public Long getDashMediaStartByteOffsetBoxed(int ordinal) {
-        long l;
         if(fieldIndex[2] == -1) {
-            l = missingDataHandler().handleLong("VideoStreamInfo", ordinal, "dashMediaStartByteOffset");
+            l = missingDataHandler().handleLong("VideoStreamInfo", ordinal, "dashHeaderSize");
         } else {
             boxedFieldAccessSampler.recordFieldAccess(fieldIndex[2]);
             l = getTypeDataAccess().readLong(ordinal, fieldIndex[2]);
@@ -83,16 +84,16 @@ public class VideoStreamInfoTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public long getVmafScore(int ordinal) {
+    public long getDashMediaStartByteOffset(int ordinal) {
         if(fieldIndex[3] == -1)
-            return missingDataHandler().handleLong("VideoStreamInfo", ordinal, "vmafScore");
+            return missingDataHandler().handleLong("VideoStreamInfo", ordinal, "dashMediaStartByteOffset");
         return getTypeDataAccess().readLong(ordinal, fieldIndex[3]);
     }
 
-    public Long getVmafScoreBoxed(int ordinal) {
+    public Long getDashMediaStartByteOffsetBoxed(int ordinal) {
         long l;
         if(fieldIndex[3] == -1) {
-            l = missingDataHandler().handleLong("VideoStreamInfo", ordinal, "vmafScore");
+            l = missingDataHandler().handleLong("VideoStreamInfo", ordinal, "dashMediaStartByteOffset");
         } else {
             boxedFieldAccessSampler.recordFieldAccess(fieldIndex[3]);
             l = getTypeDataAccess().readLong(ordinal, fieldIndex[3]);
@@ -104,16 +105,16 @@ public class VideoStreamInfoTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public long getScaledPsnrTimesHundred(int ordinal) {
+    public long getVmafScore(int ordinal) {
         if(fieldIndex[4] == -1)
-            return missingDataHandler().handleLong("VideoStreamInfo", ordinal, "scaledPsnrTimesHundred");
+            return missingDataHandler().handleLong("VideoStreamInfo", ordinal, "vmafScore");
         return getTypeDataAccess().readLong(ordinal, fieldIndex[4]);
     }
 
-    public Long getScaledPsnrTimesHundredBoxed(int ordinal) {
+    public Long getVmafScoreBoxed(int ordinal) {
         long l;
         if(fieldIndex[4] == -1) {
-            l = missingDataHandler().handleLong("VideoStreamInfo", ordinal, "scaledPsnrTimesHundred");
+            l = missingDataHandler().handleLong("VideoStreamInfo", ordinal, "vmafScore");
         } else {
             boxedFieldAccessSampler.recordFieldAccess(fieldIndex[4]);
             l = getTypeDataAccess().readLong(ordinal, fieldIndex[4]);
@@ -125,19 +126,40 @@ public class VideoStreamInfoTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public float getFps(int ordinal) {
+    public long getScaledPsnrTimesHundred(int ordinal) {
         if(fieldIndex[5] == -1)
+            return missingDataHandler().handleLong("VideoStreamInfo", ordinal, "scaledPsnrTimesHundred");
+        return getTypeDataAccess().readLong(ordinal, fieldIndex[5]);
+    }
+
+    public Long getScaledPsnrTimesHundredBoxed(int ordinal) {
+        long l;
+        if(fieldIndex[5] == -1) {
+            l = missingDataHandler().handleLong("VideoStreamInfo", ordinal, "scaledPsnrTimesHundred");
+        } else {
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[5]);
+            l = getTypeDataAccess().readLong(ordinal, fieldIndex[5]);
+        }
+        if(l == Long.MIN_VALUE)
+            return null;
+        return Long.valueOf(l);
+    }
+
+
+
+    public float getFps(int ordinal) {
+        if(fieldIndex[6] == -1)
             return missingDataHandler().handleFloat("VideoStreamInfo", ordinal, "fps");
-        return getTypeDataAccess().readFloat(ordinal, fieldIndex[5]);
+        return getTypeDataAccess().readFloat(ordinal, fieldIndex[6]);
     }
 
     public Float getFpsBoxed(int ordinal) {
         float f;
-        if(fieldIndex[5] == -1) {
+        if(fieldIndex[6] == -1) {
             f = missingDataHandler().handleFloat("VideoStreamInfo", ordinal, "fps");
         } else {
-            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[5]);
-            f = getTypeDataAccess().readFloat(ordinal, fieldIndex[5]);
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[6]);
+            f = getTypeDataAccess().readFloat(ordinal, fieldIndex[6]);
         }        return Float.isNaN(f) ? null : Float.valueOf(f);
     }
 

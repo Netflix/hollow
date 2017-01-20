@@ -21,6 +21,14 @@ public class VideoStreamInfoDelegateLookupImpl extends HollowObjectAbstractDeleg
         return typeAPI.getVideoBitrateKBPSBoxed(ordinal);
     }
 
+    public int getVideoPeakBitrateKBPS(int ordinal) {
+        return typeAPI.getVideoPeakBitrateKBPS(ordinal);
+    }
+
+    public Integer getVideoPeakBitrateKBPSBoxed(int ordinal) {
+        return typeAPI.getVideoPeakBitrateKBPSBoxed(ordinal);
+    }
+
     public long getDashHeaderSize(int ordinal) {
         return typeAPI.getDashHeaderSize(ordinal);
     }

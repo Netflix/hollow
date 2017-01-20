@@ -6,6 +6,7 @@ public class StreamDataDescriptor implements Cloneable {
 
     public int runTimeInSeconds = java.lang.Integer.MIN_VALUE;
     public int bitrate = java.lang.Integer.MIN_VALUE;
+    public int peakBitrate = java.lang.Integer.MIN_VALUE;
     public PixelAspect pixelAspect = null;
     public VideoResolution videoResolution = null;
     public Set<ISOCountry> cacheDeployedCountries = null;
