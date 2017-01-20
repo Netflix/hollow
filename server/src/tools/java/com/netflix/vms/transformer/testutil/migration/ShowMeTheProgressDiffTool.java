@@ -31,7 +31,6 @@ public class ShowMeTheProgressDiffTool {
         addTypeDiff(diff, "ArtWorkImageFormatEntry", "nameStr");
         addTypeDiff(diff, "ArtWorkImageTypeEntry", "nameStr");
         addTypeDiff(diff, "ArtWorkImageRecipe", "recipeNameStr");
-        addTypeDiff(diff, "DefaultExtensionRecipe", "extensionStr");
         addTypeDiff(diff, "DrmKey", "keyId");
         addTypeDiff(diff, "WmDrmKey", "downloadableId");
         addTypeDiff(diff, "DrmInfoData", "packageId");

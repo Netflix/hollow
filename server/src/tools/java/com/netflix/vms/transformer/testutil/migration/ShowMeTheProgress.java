@@ -100,7 +100,6 @@ public class ShowMeTheProgress {
         filter.addTypeRecursive("ArtWorkImageFormatEntry", outputSchemas);
         filter.addTypeRecursive("ArtWorkImageTypeEntry", outputSchemas);
         filter.addTypeRecursive("ArtWorkImageRecipe", outputSchemas);
-        filter.addTypeRecursive("DefaultExtensionRecipe", outputSchemas);
         filter.addTypeRecursive("DeploymentIntent", outputSchemas);
         filter.addTypeRecursive("TopNVideoData", outputSchemas);
 //        filter.addTypeRecursive("RolloutCharacter", outputSchemas);
