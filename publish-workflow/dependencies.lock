@@ -754,7 +754,7 @@
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
-            "requested": "2.x",
+            "requested": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:vms-hollow-generated-notemplate"
@@ -2485,11 +2485,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.195",
+            "locked": "59.197",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.195",
+            "locked": "59.197",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -3879,7 +3879,7 @@
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
-            "requested": "2.x",
+            "requested": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:vms-hollow-generated-notemplate"
@@ -5610,11 +5610,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.195",
+            "locked": "59.197",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.195",
+            "locked": "59.197",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -7004,7 +7004,7 @@
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
-            "requested": "2.x",
+            "requested": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:vms-hollow-generated-notemplate"
@@ -8735,11 +8735,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.195",
+            "locked": "59.197",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.195",
+            "locked": "59.197",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -10129,7 +10129,7 @@
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
-            "requested": "2.x",
+            "requested": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:vms-hollow-generated-notemplate"
@@ -11860,11 +11860,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.195",
+            "locked": "59.197",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.195",
+            "locked": "59.197",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -12588,13 +12588,19 @@
             ]
         }
     },
+    "nebulaRecommenderBom": {
+        "netflix:runtime-platform-recommendations": {
+            "locked": "4.0.12",
+            "requested": "latest.release"
+        }
+    },
     "resolutionRules": {
         "com.netflix.nebula:gradle-resolution-rules": {
             "locked": "0.41.0",
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
-            "locked": "0.30.0",
+            "locked": "0.31.0",
             "requested": "latest.release"
         }
     },
@@ -13353,7 +13359,7 @@
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
-            "requested": "2.x",
+            "requested": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:vms-hollow-generated-notemplate"
@@ -15084,11 +15090,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.195",
+            "locked": "59.197",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.195",
+            "locked": "59.197",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -16496,7 +16502,7 @@
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
-            "requested": "2.x",
+            "requested": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:vms-hollow-generated-notemplate"
@@ -17514,7 +17520,6 @@
         },
         "junit:junit": {
             "locked": "4.12",
-            "requested": "4.11",
             "transitive": [
                 "com.netflix.archaius:archaius2-test",
                 "com.netflix.governator:governator-test-junit",
@@ -17952,8 +17957,7 @@
             ]
         },
         "netflix:nflibrary-junit-util": {
-            "locked": "4.0.12",
-            "requested": "latest.release"
+            "locked": "4.0.12"
         },
         "netflix:nfsso": {
             "locked": "1.54.0",
@@ -18250,11 +18254,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.195",
+            "locked": "59.197",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.195",
+            "locked": "59.197",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -18515,8 +18519,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.3.0",
-            "requested": "3.3+"
+            "locked": "3.6.1"
         },
         "org.bouncycastle:bcmail-jdk16": {
             "locked": "1.46",
@@ -19675,7 +19678,7 @@
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
-            "requested": "2.x",
+            "requested": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:vms-hollow-generated-notemplate"
@@ -20693,7 +20696,6 @@
         },
         "junit:junit": {
             "locked": "4.12",
-            "requested": "4.11",
             "transitive": [
                 "com.netflix.archaius:archaius2-test",
                 "com.netflix.governator:governator-test-junit",
@@ -21131,8 +21133,7 @@
             ]
         },
         "netflix:nflibrary-junit-util": {
-            "locked": "4.0.12",
-            "requested": "latest.release"
+            "locked": "4.0.12"
         },
         "netflix:nfsso": {
             "locked": "1.54.0",
@@ -21429,11 +21430,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.195",
+            "locked": "59.197",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.195",
+            "locked": "59.197",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -21694,8 +21695,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.3.0",
-            "requested": "3.3+"
+            "locked": "3.6.1"
         },
         "org.bouncycastle:bcmail-jdk16": {
             "locked": "1.46",
@@ -22854,7 +22854,7 @@
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
-            "requested": "2.x",
+            "requested": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:vms-hollow-generated-notemplate"
@@ -23872,7 +23872,6 @@
         },
         "junit:junit": {
             "locked": "4.12",
-            "requested": "4.11",
             "transitive": [
                 "com.netflix.archaius:archaius2-test",
                 "com.netflix.governator:governator-test-junit",
@@ -24310,8 +24309,7 @@
             ]
         },
         "netflix:nflibrary-junit-util": {
-            "locked": "4.0.12",
-            "requested": "latest.release"
+            "locked": "4.0.12"
         },
         "netflix:nfsso": {
             "locked": "1.54.0",
@@ -24608,11 +24606,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.195",
+            "locked": "59.197",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.195",
+            "locked": "59.197",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -24873,8 +24871,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.3.0",
-            "requested": "3.3+"
+            "locked": "3.6.1"
         },
         "org.bouncycastle:bcmail-jdk16": {
             "locked": "1.46",
@@ -26033,7 +26030,7 @@
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
-            "requested": "2.x",
+            "requested": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:vms-hollow-generated-notemplate"
@@ -27051,7 +27048,6 @@
         },
         "junit:junit": {
             "locked": "4.12",
-            "requested": "4.11",
             "transitive": [
                 "com.netflix.archaius:archaius2-test",
                 "com.netflix.governator:governator-test-junit",
@@ -27489,8 +27485,7 @@
             ]
         },
         "netflix:nflibrary-junit-util": {
-            "locked": "4.0.12",
-            "requested": "latest.release"
+            "locked": "4.0.12"
         },
         "netflix:nfsso": {
             "locked": "1.54.0",
@@ -27787,11 +27782,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.195",
+            "locked": "59.197",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.195",
+            "locked": "59.197",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -28052,8 +28047,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.3.0",
-            "requested": "3.3+"
+            "locked": "3.6.1"
         },
         "org.bouncycastle:bcmail-jdk16": {
             "locked": "1.46",
