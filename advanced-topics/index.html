@@ -124,6 +124,8 @@
                 
                     <li><a class="toctree-l4" href="#double-snapshots">Double Snapshots</a></li>
                 
+                    <li><a class="toctree-l4" href="#type-sharding">Type Sharding</a></li>
+                
                     <li><a class="toctree-l4" href="#object-longevity">Object Longevity</a></li>
                 
                     <li><a class="toctree-l4" href="#memory-pooling">Memory Pooling</a></li>
@@ -342,6 +344,22 @@ HollowMapWriteRecord mapRec = new HollowMapWriteRecord();
 <p>At times, a new state may be produced to which there is no available delta from the previous state.  When this <em>broken delta chain</em> scenario occurs, consumers will by default attempt to load a snapshot to the latest state.  If a consumer loads a snapshot when it currently has a state loaded for the same dataset, we call this a <em>double snapshot</em>.  Double snapshots result in a doubling of the heap usage of your dataset.  This is because Hollow assumes that consumers may be actively using the current state, and it therefore must retain the current state to provide data while the next state is loaded.  Only after the next state is fully loaded can the old state be dropped.</p>
 <p>If using the <a href="../producer-consumer/#consumer-framework"><code>Hollow Client</code></a>, you can configure consumers to never attempt a double snapshot.  This is accomplished with a custom <code>HollowClientMemoryConfig</code>.  In this case, you should check for 'stuck' clients in a <code>HollowUpdateListener</code>, so that you may take the appropriate operational action.</p>
 <p>If a dataset is large, double snapshots should be avoided for performance reasons.  Double snapshots can be entirely avoided by <a href="../producer-consumer/#restoring-at-startup">restoring</a> a <code>HollowWriteStateEngine</code> at producer initialization time, and, if necessary, using the <a href="../tooling/#patching"><code>HollowStateDeltaPatcher</code></a> to operationally fill lost or missing deltas in the event an unforeseen issue occurs.  </p>
+<h2 id="type-sharding">Type Sharding</h2>
+<p>During a delta transition each individual record type builds the entire next state of the type in memory while the current state is retained to answer requests.  This means that the memory pool Hollow reserves needs to be large enough to compose an extra copy of the largest type.  This is a miniaturized version of the <a href="./#double-snapshots">double snapshot</a> problem.</p>
+<p>To address this problem, large types can be transparently sharded into smaller individual chunks, each of which updates independently.  The effect of this feature is that Hollow only needs to retain a large enough memory pool to update the largest <em>chunk</em> across all types.</p>
+<p>Type sharding can be specified in two ways:  </p>
+<ul>
+<li>The recommended way is to specify a target max type shard size via a call to <code>setTargetMaxTypeShardSize(long bytes)</code> on a <code>HollowWriteStateEngine</code> prior to writing the first snapshot.  With this call, the number of shards will be automatically calculated based on the target excess memory pool size.</li>
+<li>Additionally, the number of shards for a type can be explicitly specified by annotating a POJO with the <code>@HollowShardLargeType</code> annotation when using the <a href="../data-ingestion/#hollowobjectmapper"><code>HollowObjectMapper</code></a> for data ingestion.  This can be useful if rapid growth is anticipated in a type.</li>
+</ul>
+<p>Within a continuous delta chain, the type sharding configuration cannot be changed.  When a producer <a href="../producer-consumer/#restoring-at-startup">restores</a> the previously produced state at startup, then the restored <code>HollowWriteStateEngine</code> will always retain the sharding configuration of the prior state rather than recalculating based on the current size of each type.  Consequently, if the changes in a dataset over time results in a type sharding configuration which is highly suboptimal, it is recommended to start a new delta chain, which may require a double snapshot on all consumers, a simultaneous restart of all consumers, or a new <a href="../producer-consumer/#blob-namespaces">blob namespace</a> to which consumers can migrate over a period of time.</p>
+<div class="admonition warning">
+<p class="admonition-title">Backwards Compatibility</p>
+<p>Type sharding is new in v2.1.0.  Consumers can read blobs produced by producers v2.1.0 and later <em>as long as type sharding is disabled</em>. 
+If you are sure that all consumers are using v2.1.0 or later, it is safe to turn on type sharding.</p>
+<p>In order to avoid causing issues for early adopters, the default target max type shard size is currently set to <code>Long.MAX_VALUE</code>.  At a later time, 
+this default will be changed to 25MB.</p>
+</div>
 <h2 id="object-longevity">Object Longevity</h2>
 <p>A Hollow object returned from a generated API contains a reference to the Hollow data store, and an ordinal.  For this reason, if a reference to a Hollow object is retained by the consumer for an extended period of time, and the underlying record changes unexpected results may begin to be returned from these references.  We call Hollow objects which were obtained from a no longer current state stale references.</p>
 <p>It is best practice to <strong>never</strong> cache Hollow objects.  However, if it somehow <em>cannot</em> be guaranteed that Hollow Objects will never be cached at the consumer, and guaranteed protection against accidentally cached objects is necessary, then <em>object longevity</em> can be enabled.</p>
