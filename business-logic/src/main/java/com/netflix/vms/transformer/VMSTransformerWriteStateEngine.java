@@ -7,7 +7,6 @@ import com.netflix.vms.transformer.hollowoutput.ArtWorkImageRecipe;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageTypeEntry;
 import com.netflix.vms.transformer.hollowoutput.CharacterImages;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
-import com.netflix.vms.transformer.hollowoutput.DefaultExtensionRecipe;
 import com.netflix.vms.transformer.hollowoutput.DeploymentIntent;
 import com.netflix.vms.transformer.hollowoutput.DrmInfoData;
 import com.netflix.vms.transformer.hollowoutput.DrmKey;
@@ -60,7 +59,6 @@ public class VMSTransformerWriteStateEngine extends HollowWriteStateEngine {
                 ArtWorkImageFormatEntry.class,
                 ArtWorkImageTypeEntry.class,
                 ArtWorkImageRecipe.class,
-                DefaultExtensionRecipe.class,
                 DrmKey.class,
                 WmDrmKey.class,
                 DrmInfoData.class,

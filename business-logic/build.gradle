@@ -3,10 +3,10 @@ dependencies {
     compile 'com.netflix.archaius:archaius2-core:latest.release'
     compile 'com.netflix.hollow:hollow:2.+'
     compile 'com.netflix.vms.logging:vmslogging-core:latest.release'
-    compile 'com.google.guava:guava:18.0'
+    compile 'com.google.guava:guava:19.0'
     compile 'netflix:nfi18n-core:latest.release'
     compile 'commons-codec:commons-codec:1.8+'
-    compile 'org.mockito:mockito-all:latest.release'
+    compile 'org.mockito:mockito-all:1.3'
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.assertj:assertj-core:3.3+'
