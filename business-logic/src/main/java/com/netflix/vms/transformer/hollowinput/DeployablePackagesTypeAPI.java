@@ -12,7 +12,9 @@ public class DeployablePackagesTypeAPI extends HollowObjectTypeAPI {
         super(api, typeDataAccess, new String[] {
             "packageId",
             "movieId",
-            "countryCodes"
+            "countryCodes",
+            "tags",
+            "defaultPackage"
         });
         this.delegateLookupImpl = new DeployablePackagesDelegateLookupImpl(this);
     }
@@ -68,6 +70,30 @@ public class DeployablePackagesTypeAPI extends HollowObjectTypeAPI {
     public ISOCountrySetTypeAPI getCountryCodesTypeAPI() {
         return getAPI().getISOCountrySetTypeAPI();
     }
+
+    public int getTagsOrdinal(int ordinal) {
+        if(fieldIndex[3] == -1)
+            return missingDataHandler().handleReferencedOrdinal("DeployablePackages", ordinal, "tags");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[3]);
+    }
+
+    public ListOfPackageTagsTypeAPI getTagsTypeAPI() {
+        return getAPI().getListOfPackageTagsTypeAPI();
+    }
+
+    public boolean getDefaultPackage(int ordinal) {
+        if(fieldIndex[4] == -1)
+            return missingDataHandler().handleBoolean("DeployablePackages", ordinal, "defaultPackage") == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[4]) == Boolean.TRUE;
+    }
+
+    public Boolean getDefaultPackageBoxed(int ordinal) {
+        if(fieldIndex[4] == -1)
+            return missingDataHandler().handleBoolean("DeployablePackages", ordinal, "defaultPackage");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[4]);
+    }
+
+
 
     public DeployablePackagesDelegateLookupImpl getDelegateLookupImpl() {
         return delegateLookupImpl;

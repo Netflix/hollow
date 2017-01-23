@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.hollowinput;
 
 import com.netflix.hollow.api.objects.HollowObject;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 @SuppressWarnings("all")
 public class DeployablePackagesHollow extends HollowObject {
@@ -30,6 +31,21 @@ public class DeployablePackagesHollow extends HollowObject {
         if(refOrdinal == -1)
             return null;
         return  api().getISOCountrySetHollow(refOrdinal);
+    }
+
+    public ListOfPackageTagsHollow _getTags() {
+        int refOrdinal = delegate().getTagsOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getListOfPackageTagsHollow(refOrdinal);
+    }
+
+    public boolean _getDefaultPackage() {
+        return delegate().getDefaultPackage(ordinal);
+    }
+
+    public Boolean _getDefaultPackageBoxed() {
+        return delegate().getDefaultPackageBoxed(ordinal);
     }
 
     public VMSHollowInputAPI api() {

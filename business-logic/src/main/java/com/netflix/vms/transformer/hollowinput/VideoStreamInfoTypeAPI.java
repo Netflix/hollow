@@ -2,6 +2,7 @@ package com.netflix.vms.transformer.hollowinput;
 
 import com.netflix.hollow.api.custom.HollowObjectTypeAPI;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 
 @SuppressWarnings("all")
 public class VideoStreamInfoTypeAPI extends HollowObjectTypeAPI {
