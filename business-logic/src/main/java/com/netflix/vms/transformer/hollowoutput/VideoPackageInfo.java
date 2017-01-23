@@ -9,9 +9,11 @@ public class VideoPackageInfo implements Cloneable {
     public int packageId = java.lang.Integer.MIN_VALUE;
     public Set<VideoFormatDescriptor> formats = null;
     public boolean isAvailableIn3D = false;
+    public boolean isDefaultPackage = true;
     public int runtimeInSeconds = java.lang.Integer.MIN_VALUE;
     public List<Strings> soundTypes = null;
     public List<Strings> screenFormats = null;
+    public List<Strings> tags = null;
     public List<VideoMoment> phoneSnacks = null;
     public Map<Strings, List<VideoImage>> stillImagesMap = null;
     public Map<Strings, List<VideoClip>> videoClipMap = null;

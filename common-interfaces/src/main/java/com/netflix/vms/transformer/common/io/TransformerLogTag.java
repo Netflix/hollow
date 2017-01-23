@@ -38,7 +38,7 @@ public enum TransformerLogTag implements LogTag {
     //// TRANSFORMATION MISC ////
 
     L10NProcessing,
-
+    InteractivePackage,
 
     //// PUBLISH WORKFLOW ////
 
