@@ -48,9 +48,9 @@ sourceSets {
 
 dependencies {
     // Governator wires up all of our dependencies in dependency injection fashion.
-    compile "com.netflix.governator:governator-core:1.12.15"
-    compile "com.netflix.governator:governator-servlet:1.12.15"
-    compile "com.netflix.governator:governator-jersey:1.12.15"
+    compile 'com.netflix.governator:governator-core:1.15.10'
+    compile 'com.netflix.governator:governator-servlet:1.15.10'
+    compile 'com.netflix.governator:governator-jersey:1.15.10'
     // We don't want this to be packaged with the rest. It's only for local runs of our main().
     provided ("com.netflix.governator:governator-jetty:1.12.15") { transitive=false }
     // Same for the servlet libs.
@@ -75,8 +75,8 @@ dependencies {
     compile 'com.netflix.vms.logging:vmslogging-slf4j:latest.release'
     compile 'netflix:vms-hollow-generated-notemplate:latest.release'
 
-    testCompile 'junit:junit:latest.release'
-    testCompile 'org.mockito:mockito-all:latest.release'
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.mockito:mockito-all:1.3'
     testCompile 'org.assertj:assertj-core:3.3.0'
     testCompile 'com.netflix.hollow:hollow-diff-ui:2.+'
 

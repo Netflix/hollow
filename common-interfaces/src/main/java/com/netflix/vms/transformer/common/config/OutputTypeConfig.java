@@ -34,7 +34,6 @@ public enum OutputTypeConfig {
     ArtWorkImageFormatEntry("ArtWorkImageFormatEntry", "nameStr"),
     ArtWorkImageTypeEntry("ArtWorkImageTypeEntry", "nameStr"),
     ArtWorkImageRecipe("ArtWorkImageRecipe", "recipeNameStr"),
-    DefaultExtensionRecipe("DefaultExtensionRecipe", "extensionStr"),
 
     L10NResources("L10NResources", "resourceIdStr"),
     TopNVideoData("TopNVideoData", "countryId"),
@@ -56,7 +55,7 @@ public enum OutputTypeConfig {
             DrmInfoData, DrmSystem, OriginServer, EncodingProfile, EncodingProfileGroup, FileEncodingData, DeploymentIntent));
 
     public final static Set<OutputTypeConfig> REFERENCED_TYPES = Collections.unmodifiableSet(EnumSet.of(
-            ArtWorkImageFormatEntry, ArtWorkImageTypeEntry, ArtWorkImageRecipe, DefaultExtensionRecipe,
+            ArtWorkImageFormatEntry, ArtWorkImageTypeEntry, ArtWorkImageRecipe,
             StreamData, DrmKey, WmDrmKey));
 
     public final static Set<OutputTypeConfig> FASTLANE_EXCLUDED_TYPES = Collections.unmodifiableSet(EnumSet.of(

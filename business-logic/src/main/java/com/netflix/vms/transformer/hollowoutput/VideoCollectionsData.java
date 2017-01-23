@@ -16,6 +16,7 @@ public class VideoCollectionsData implements Cloneable {
     public Video topNode = null;
     public SortedMapOfIntegerToListOfVideoEpisode episodesForSeasonSequenceNumberMap = null;
     public int seasonNumber = -1;
+    public VideoEpisode videoEpisode = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
@@ -57,6 +58,9 @@ public class VideoCollectionsData implements Cloneable {
             if(episodesForSeasonSequenceNumberMap != null) return false;
         } else if(!o.episodesForSeasonSequenceNumberMap.equals(episodesForSeasonSequenceNumberMap)) return false;
         if (o.seasonNumber != this.seasonNumber) return false;
+        if(o.videoEpisode == null) {
+            if(videoEpisode != null) return false;
+        } else if(!o.videoEpisode.equals(videoEpisode)) return false;
         return true;
     }
 
@@ -73,6 +77,7 @@ public class VideoCollectionsData implements Cloneable {
         hashCode = hashCode * 31 + (seasonParent == null ? 1237 : seasonParent.hashCode());
         hashCode = hashCode * 31 + (topNode == null ? 1237 : topNode.hashCode());
         hashCode = hashCode * 31 + (episodesForSeasonSequenceNumberMap == null ? 1237 : episodesForSeasonSequenceNumberMap.hashCode());
+        hashCode = hashCode * 31 + (videoEpisode == null ? 1237 : videoEpisode.hashCode());
         return hashCode;
     }
 
@@ -90,6 +95,7 @@ public class VideoCollectionsData implements Cloneable {
         builder.append(",topNode=").append(topNode);
         builder.append(",episodesForSeasonSequenceNumberMap=").append(episodesForSeasonSequenceNumberMap);
         builder.append(",seasonNumber=").append(seasonNumber);
+        builder.append(",videoEpisode=").append(videoEpisode);
         builder.append("}");
         return builder.toString();
     }

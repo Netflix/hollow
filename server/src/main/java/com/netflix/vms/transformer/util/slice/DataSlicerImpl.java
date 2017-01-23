@@ -158,7 +158,6 @@ public class DataSlicerImpl implements DataSlicer {
             includeAll(stateEngine, "ArtWorkImageFormatEntry");
             includeAll(stateEngine, "ArtWorkImageTypeEntry");
             includeAll(stateEngine, "ArtWorkImageRecipe");
-            includeAll(stateEngine, "DefaultExtensionRecipe");
             includeAll(stateEngine, "CharacterImages");
             includeAll(stateEngine, "PersonImages");
             includeAll(stateEngine, "TopNVideoData");
@@ -409,7 +408,6 @@ public class DataSlicerImpl implements DataSlicer {
             includeAll(stateEngine, "Characters");
             includeAll(stateEngine, "ConsolidatedCertificationSystems");
             includeAll(stateEngine, "ConsolidatedVideoRatings");
-            includeAll(stateEngine, "DefaultExtensionRecipe");
             includeAll(stateEngine, "DrmSystemIdentifiers");
             includeAll(stateEngine, "Festivals");
             includeAll(stateEngine, "Languages");

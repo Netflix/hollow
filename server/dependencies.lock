@@ -791,7 +791,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -803,7 +803,7 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
@@ -821,7 +821,7 @@
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.15.10",
-            "requested": "1.12.15"
+            "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
@@ -2544,7 +2544,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.32",
+            "locked": "2.33",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -2664,14 +2664,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.193",
+            "locked": "59.197",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.193",
+            "locked": "59.197",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -4174,7 +4174,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -4186,7 +4186,7 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
@@ -4204,7 +4204,7 @@
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.15.10",
-            "requested": "1.12.15"
+            "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
@@ -5927,7 +5927,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.32",
+            "locked": "2.33",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -6047,14 +6047,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.193",
+            "locked": "59.197",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.193",
+            "locked": "59.197",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -7557,7 +7557,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -7569,7 +7569,7 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
@@ -7587,7 +7587,7 @@
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.15.10",
-            "requested": "1.12.15"
+            "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
@@ -9310,7 +9310,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.32",
+            "locked": "2.33",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -9430,14 +9430,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.193",
+            "locked": "59.197",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.193",
+            "locked": "59.197",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -10940,7 +10940,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -10952,7 +10952,7 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
@@ -10970,7 +10970,7 @@
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.15.10",
-            "requested": "1.12.15"
+            "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
@@ -12686,7 +12686,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.32",
+            "locked": "2.33",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -12806,14 +12806,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.193",
+            "locked": "59.197",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.193",
+            "locked": "59.197",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -14338,7 +14338,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -14350,7 +14350,7 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
@@ -14368,7 +14368,7 @@
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.15.10",
-            "requested": "1.12.15"
+            "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
@@ -16091,7 +16091,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.32",
+            "locked": "2.33",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -16211,14 +16211,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.193",
+            "locked": "59.197",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.193",
+            "locked": "59.197",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -17597,7 +17597,7 @@
             ]
         },
         "org.glassfish:javax.el": {
-            "locked": "3.0.0",
+            "locked": "3.0.1-b08",
             "transitive": [
                 "org.eclipse.jetty:jetty-jsp",
                 "org.glassfish.web:javax.servlet.jsp"
@@ -18017,7 +18017,7 @@
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
-            "locked": "0.29.0",
+            "locked": "0.33.0",
             "requested": "latest.release"
         }
     },
@@ -18813,7 +18813,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -18825,7 +18825,7 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
@@ -18843,7 +18843,7 @@
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.15.10",
-            "requested": "1.12.15"
+            "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
@@ -20566,7 +20566,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.32",
+            "locked": "2.33",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -20686,14 +20686,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.193",
+            "locked": "59.197",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.193",
+            "locked": "59.197",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -22196,7 +22196,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -22208,7 +22208,7 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
@@ -22226,7 +22226,7 @@
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.15.10",
-            "requested": "1.12.15"
+            "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
@@ -23948,7 +23948,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.32",
+            "locked": "2.33",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -24068,14 +24068,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.193",
+            "locked": "59.197",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.193",
+            "locked": "59.197",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -25584,7 +25584,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -25596,7 +25596,7 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
@@ -25614,7 +25614,7 @@
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.15.10",
-            "requested": "1.12.15"
+            "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
@@ -26712,8 +26712,8 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.12",
-            "requested": "latest.release",
+            "locked": "4.11",
+            "requested": "4.11",
             "transitive": [
                 "com.googlecode.json-simple:json-simple",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -27375,7 +27375,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.32",
+            "locked": "2.33",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -27495,14 +27495,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.193",
+            "locked": "59.197",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.193",
+            "locked": "59.197",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -28019,7 +28019,7 @@
         },
         "org.mockito:mockito-all": {
             "project": true,
-            "requested": "latest.release"
+            "requested": "1.3"
         },
         "org.mockito:mockito-core": {
             "locked": "1.10.19",
@@ -29085,7 +29085,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -29097,7 +29097,7 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
@@ -29115,7 +29115,7 @@
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.15.10",
-            "requested": "1.12.15"
+            "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
@@ -30213,8 +30213,8 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.12",
-            "requested": "latest.release",
+            "locked": "4.11",
+            "requested": "4.11",
             "transitive": [
                 "com.googlecode.json-simple:json-simple",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -30876,7 +30876,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.32",
+            "locked": "2.33",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -30996,14 +30996,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.193",
+            "locked": "59.197",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.193",
+            "locked": "59.197",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -31520,7 +31520,7 @@
         },
         "org.mockito:mockito-all": {
             "project": true,
-            "requested": "latest.release"
+            "requested": "1.3"
         },
         "org.mockito:mockito-core": {
             "locked": "1.10.19",
@@ -32586,7 +32586,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -32598,7 +32598,7 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
@@ -32616,7 +32616,7 @@
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.15.10",
-            "requested": "1.12.15"
+            "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
@@ -33714,8 +33714,8 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.12",
-            "requested": "latest.release",
+            "locked": "4.11",
+            "requested": "4.11",
             "transitive": [
                 "com.googlecode.json-simple:json-simple",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -34377,7 +34377,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.32",
+            "locked": "2.33",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -34497,14 +34497,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.193",
+            "locked": "59.197",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.193",
+            "locked": "59.197",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -35021,7 +35021,7 @@
         },
         "org.mockito:mockito-all": {
             "project": true,
-            "requested": "latest.release"
+            "requested": "1.3"
         },
         "org.mockito:mockito-core": {
             "locked": "1.10.19",
@@ -36087,7 +36087,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -36099,7 +36099,7 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
@@ -36117,7 +36117,7 @@
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.15.10",
-            "requested": "1.12.15"
+            "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
@@ -37215,8 +37215,8 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.12",
-            "requested": "latest.release",
+            "locked": "4.11",
+            "requested": "4.11",
             "transitive": [
                 "com.googlecode.json-simple:json-simple",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -37878,7 +37878,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.32",
+            "locked": "2.33",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -37998,14 +37998,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.193",
+            "locked": "59.197",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.193",
+            "locked": "59.197",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -38522,7 +38522,7 @@
         },
         "org.mockito:mockito-all": {
             "project": true,
-            "requested": "latest.release"
+            "requested": "1.3"
         },
         "org.mockito:mockito-core": {
             "locked": "1.10.19",
@@ -39552,7 +39552,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -39564,7 +39564,7 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
@@ -39582,7 +39582,7 @@
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.15.10",
-            "requested": "1.12.15"
+            "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
@@ -41314,7 +41314,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.32",
+            "locked": "2.33",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -41434,14 +41434,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.193",
+            "locked": "59.197",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.193",
+            "locked": "59.197",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -42952,7 +42952,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -42964,7 +42964,7 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
@@ -42982,7 +42982,7 @@
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.15.10",
-            "requested": "1.12.15"
+            "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
@@ -44714,7 +44714,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.32",
+            "locked": "2.33",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -44834,14 +44834,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.193",
+            "locked": "59.197",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.193",
+            "locked": "59.197",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -46352,7 +46352,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -46364,7 +46364,7 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
@@ -46382,7 +46382,7 @@
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.15.10",
-            "requested": "1.12.15"
+            "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
@@ -48114,7 +48114,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.32",
+            "locked": "2.33",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -48234,14 +48234,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.193",
+            "locked": "59.197",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.193",
+            "locked": "59.197",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -49752,7 +49752,7 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -49764,7 +49764,7 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.15.10",
-            "requested": "1.12.15",
+            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
@@ -49782,7 +49782,7 @@
         },
         "com.netflix.governator:governator-servlet": {
             "locked": "1.15.10",
-            "requested": "1.12.15"
+            "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
             "locked": "2.0.5",
@@ -51514,7 +51514,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.32",
+            "locked": "2.33",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -51634,14 +51634,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.193",
+            "locked": "59.197",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.193",
+            "locked": "59.197",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
