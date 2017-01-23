@@ -679,7 +679,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
     			// But no corresponding rollout for the image in this country.
     			// To err on side of not leaking a rollout image, drop this image for the country.
                 // not logging for now since there are way too many log messages.
-        		ctx.getLogger().warn(MissingRolloutForArtwork, "Rollout exclusive image has no valid rollout with id={}; data will be dropped.", sourceFileId);
+        		//ctx.getLogger().warn(MissingRolloutForArtwork, "Rollout exclusive image has no valid rollout with id={}; data will be dropped.", sourceFileId);
     			return null;
     		}
         }
