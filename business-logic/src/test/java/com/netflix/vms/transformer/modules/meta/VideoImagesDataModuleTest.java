@@ -1,5 +1,11 @@
 package com.netflix.vms.transformer.modules.meta;
 
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
@@ -17,24 +23,23 @@ import com.netflix.vms.transformer.hollowinput.PhaseTagListTypeAPI;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoArtworkHollow;
+import com.netflix.vms.transformer.hollowoutput.Artwork;
+import com.netflix.vms.transformer.hollowoutput.ArtworkBasicPassthrough;
+import com.netflix.vms.transformer.hollowoutput.ArtworkDerivatives;
 import com.netflix.vms.transformer.hollowoutput.SchedulePhaseInfo;
+import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 /**
  * Test for VideoImagesDataModule. Unit tests for asset schedules.
@@ -344,5 +349,45 @@ public class VideoImagesDataModuleTest {
         SchedulePhaseInfo schedulePhaseInfo = videoImagesDataModule.getEarliestScheduleInfo(schedulePhaseInfoSet, videoId);
 
         verifySchedulePhaseInfo(schedulePhaseInfo, -2L, Long.MIN_VALUE, false, false);
+    }
+    
+    @Test
+    public void testPickArtworkBasedOnRolloutInfo(){
+    	String sourceFileId = "04f3e8c0-e009-11e6-9a23-0e2def47c5ca";
+    	
+        Artwork artworkWithRolloutTrue = new Artwork();
+        artworkWithRolloutTrue.sourceVideoId = 70178217;
+        artworkWithRolloutTrue.hasShowLevelTag = false;
+
+        // Process list of derivatives
+        artworkWithRolloutTrue.derivatives = new ArtworkDerivatives();
+        artworkWithRolloutTrue.sourceFileId = new Strings(sourceFileId);
+        artworkWithRolloutTrue.basic_passthrough = new ArtworkBasicPassthrough();
+        artworkWithRolloutTrue.seqNum = 2;
+        artworkWithRolloutTrue.ordinalPriority = 3;
+        artworkWithRolloutTrue.schedulePhaseInfo = new SchedulePhaseInfo(false, 80151460);
+        artworkWithRolloutTrue.isRolloutExclusive = true;
+        
+        Artwork artworkWithRolloutFalse = artworkWithRolloutTrue.clone();
+        artworkWithRolloutFalse.isRolloutExclusive = false;
+        
+        Set<String> rolloutSourceFileIds = new HashSet<>();
+        rolloutSourceFileIds.add("04f3e8c0-e009-11e6-9a23-0e2def47c5ca");
+		
+        // Input says rollout exclusive true and found a rollout: isRolloutExclusive should be true.
+		Artwork result = videoImagesDataModule.pickArtworkBasedOnRolloutInfo(artworkWithRolloutTrue, artworkWithRolloutFalse, rolloutSourceFileIds, sourceFileId);
+		Assert.assertTrue(result.isRolloutExclusive);
+
+		// Input says rollout exclusive true and did not found a rollout: image is dropped to prevent leaks. Result null.		
+		result = videoImagesDataModule.pickArtworkBasedOnRolloutInfo(artworkWithRolloutTrue, artworkWithRolloutFalse, Collections.emptySet(), sourceFileId);
+		Assert.assertTrue(result == null);
+		
+        // Input says rollout exclusive  false and found a rollout: isRolloutExclusive should be true.
+		result = videoImagesDataModule.pickArtworkBasedOnRolloutInfo(artworkWithRolloutFalse, artworkWithRolloutTrue, rolloutSourceFileIds, sourceFileId);
+		Assert.assertTrue(result.isRolloutExclusive);
+		
+        // Input says rollout exclusive false and did not find a rollout: isRolloutExclusive should be false.
+		result = videoImagesDataModule.pickArtworkBasedOnRolloutInfo(artworkWithRolloutFalse, artworkWithRolloutTrue,  Collections.emptySet(), sourceFileId);
+		Assert.assertFalse(result.isRolloutExclusive);
     }
 }

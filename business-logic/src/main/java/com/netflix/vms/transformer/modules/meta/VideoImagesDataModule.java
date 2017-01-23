@@ -3,9 +3,9 @@ package com.netflix.vms.transformer.modules.meta;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidImagesTerritoryCode;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidPhaseTagForArtwork;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingRolloutForArtwork;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
@@ -672,16 +672,18 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
 		return topNodes;
 	}
 
-	private Artwork pickArtworkBasedOnRolloutInfo(Artwork localeArtworkIsRolloutAsInput, Artwork localeArtworkIsRolloutOppositeToInput, Set<String> rolloutSourceFileIds, String sourceFileId) {
+	@VisibleForTesting
+	Artwork pickArtworkBasedOnRolloutInfo(Artwork localeArtworkIsRolloutAsInput, Artwork localeArtworkIsRolloutOppositeToInput, Set<String> rolloutSourceFileIds, String sourceFileId) {
 		if(localeArtworkIsRolloutAsInput.isRolloutExclusive){
         	// Upstream says this is a rollout image
         	if(rolloutSourceFileIds == null || !rolloutSourceFileIds.contains(sourceFileId)){
     			// But no corresponding rollout for the image in this country.
     			// To err on side of not leaking a rollout image, drop this image for the country.
                 // not logging for now since there are way too many log messages.
-        		//ctx.getLogger().warn(MissingRolloutForArtwork, "Rollout exclusive image has no valid rollout with id={}; data will be dropped.", sourceFileId);
+        		// ctx.getLogger().warn(MissingRolloutForArtwork, "Rollout exclusive image has no valid rollout with id={}; data will be dropped.", sourceFileId);
     			return null;
     		}
+        	return localeArtworkIsRolloutAsInput;
         }
         // localeArtworkIsRolloutAsInput.isRolloutExclusive == false
         if(rolloutSourceFileIds != null && rolloutSourceFileIds.contains(sourceFileId)){
