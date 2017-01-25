@@ -191,6 +191,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     
     @Override
     public void writeSnapshot(DataOutputStream os) throws IOException {
+        /// for unsharded blobs, support pre v2.1.0 clients
         if(numShards == 1) {
             writeSnapshotShard(os, 0);
         } else {
@@ -303,6 +304,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     }
 
     private void writeCalculatedDelta(DataOutputStream os) throws IOException {
+        /// for unsharded blobs, support pre v2.1.0 clients
         if(numShards == 1) {
             writeCalculatedDeltaShard(os, 0);
         } else {
