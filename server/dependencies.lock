@@ -1669,12 +1669,6 @@
                 "netflix:openencryptclient"
             ]
         },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
-            ]
-        },
         "edu.stanford.ppl:snaptree": {
             "locked": "0.1",
             "transitive": [
@@ -2664,14 +2658,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.199",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.199",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -3224,7 +3218,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -3361,12 +3355,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -5052,12 +5040,6 @@
                 "netflix:openencryptclient"
             ]
         },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
-            ]
-        },
         "edu.stanford.ppl:snaptree": {
             "locked": "0.1",
             "transitive": [
@@ -6047,14 +6029,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.199",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.199",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -6607,7 +6589,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -6744,12 +6726,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -8435,12 +8411,6 @@
                 "netflix:openencryptclient"
             ]
         },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
-            ]
-        },
         "edu.stanford.ppl:snaptree": {
             "locked": "0.1",
             "transitive": [
@@ -9430,14 +9400,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.199",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.199",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -9990,7 +9960,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -10127,12 +10097,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -11818,12 +11782,6 @@
                 "netflix:openencryptclient"
             ]
         },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
-            ]
-        },
         "edu.stanford.ppl:snaptree": {
             "locked": "0.1",
             "transitive": [
@@ -12806,14 +12764,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.199",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.199",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -13335,7 +13293,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -13472,12 +13430,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -15216,12 +15168,6 @@
                 "netflix:openencryptclient"
             ]
         },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
-            ]
-        },
         "edu.stanford.ppl:snaptree": {
             "locked": "0.1",
             "transitive": [
@@ -16211,14 +16157,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.199",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.199",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -16771,7 +16717,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -16908,12 +16854,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -19691,12 +19631,6 @@
                 "netflix:openencryptclient"
             ]
         },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
-            ]
-        },
         "edu.stanford.ppl:snaptree": {
             "locked": "0.1",
             "transitive": [
@@ -20686,14 +20620,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.199",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.199",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -21246,7 +21180,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -21383,12 +21317,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -23074,12 +23002,6 @@
                 "netflix:openencryptclient"
             ]
         },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
-            ]
-        },
         "edu.stanford.ppl:snaptree": {
             "locked": "0.1",
             "transitive": [
@@ -24068,14 +23990,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.199",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.199",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -24597,7 +24519,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -24734,12 +24656,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -26478,12 +26394,6 @@
                 "netflix:openencryptclient"
             ]
         },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
-            ]
-        },
         "edu.stanford.ppl:snaptree": {
             "locked": "0.1",
             "transitive": [
@@ -27495,14 +27405,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.199",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.199",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -28094,7 +28004,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -28235,12 +28145,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -29979,12 +29883,6 @@
                 "netflix:openencryptclient"
             ]
         },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
-            ]
-        },
         "edu.stanford.ppl:snaptree": {
             "locked": "0.1",
             "transitive": [
@@ -30996,14 +30894,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.199",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.199",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -31595,7 +31493,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -31736,12 +31634,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -33480,12 +33372,6 @@
                 "netflix:openencryptclient"
             ]
         },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
-            ]
-        },
         "edu.stanford.ppl:snaptree": {
             "locked": "0.1",
             "transitive": [
@@ -34497,14 +34383,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.199",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.199",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -35096,7 +34982,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -35237,12 +35123,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -36981,12 +36861,6 @@
                 "netflix:openencryptclient"
             ]
         },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
-            ]
-        },
         "edu.stanford.ppl:snaptree": {
             "locked": "0.1",
             "transitive": [
@@ -37998,14 +37872,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.199",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.199",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -38597,7 +38471,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -38738,12 +38612,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -40439,12 +40307,6 @@
                 "netflix:openencryptclient"
             ]
         },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
-            ]
-        },
         "edu.stanford.ppl:snaptree": {
             "locked": "0.1",
             "transitive": [
@@ -41434,14 +41296,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.199",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.199",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -42001,7 +41863,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -42138,12 +42000,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -43839,12 +43695,6 @@
                 "netflix:openencryptclient"
             ]
         },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
-            ]
-        },
         "edu.stanford.ppl:snaptree": {
             "locked": "0.1",
             "transitive": [
@@ -44834,14 +44684,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.199",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.199",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -45401,7 +45251,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -45538,12 +45388,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -47239,12 +47083,6 @@
                 "netflix:openencryptclient"
             ]
         },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
-            ]
-        },
         "edu.stanford.ppl:snaptree": {
             "locked": "0.1",
             "transitive": [
@@ -48234,14 +48072,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.199",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.199",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -48801,7 +48639,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -48938,12 +48776,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -50639,12 +50471,6 @@
                 "netflix:openencryptclient"
             ]
         },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
-            ]
-        },
         "edu.stanford.ppl:snaptree": {
             "locked": "0.1",
             "transitive": [
@@ -51634,14 +51460,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.199",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.199",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -52201,7 +52027,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -52338,12 +52164,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
