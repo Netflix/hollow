@@ -78,7 +78,7 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         maxShardOrdinal = new int[numShards];
         int minOrdinalsPerShard = (maxOrdinal + 1) / numShards; 
         for(int i=0;i<numShards;i++)
-            maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minOrdinalsPerShard : minOrdinalsPerShard - 1;
+            maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minOrdinalsPerShard + 1 : minOrdinalsPerShard;
         
         int maxSetSize = 0;
         ByteData data = ordinalMap.getByteData().getUnderlyingArray();
