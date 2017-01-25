@@ -8,12 +8,14 @@ import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.hollowinput.ChunkDurationsStringHollow;
 import com.netflix.vms.transformer.hollowinput.CodecPrivateDataStringHollow;
 import com.netflix.vms.transformer.hollowinput.DeployablePackagesHollow;
 import com.netflix.vms.transformer.hollowinput.DrmHeaderInfoHollow;
 import com.netflix.vms.transformer.hollowinput.DrmHeaderInfoListHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
+import com.netflix.vms.transformer.hollowinput.ListOfPackageTagsHollow;
 import com.netflix.vms.transformer.hollowinput.PackageDrmInfoHollow;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
@@ -32,12 +34,15 @@ import com.netflix.vms.transformer.hollowoutput.FileEncodingData;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
 import com.netflix.vms.transformer.hollowoutput.StreamData;
+import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
 import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.contracts.ContractRestrictionModule;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -189,10 +194,17 @@ public class PackageDataModule {
         }
 
         //////////// DEPLOYABLE PACKAGES //////////////
-
+        pkg.tags = new ArrayList<Strings>();
         if(deployablePackagesOrdinal != -1) {
             pkg.allDeployableCountries = new HashSet<ISOCountry>();
             DeployablePackagesHollow deployablePackages = api.getDeployablePackagesHollow(deployablePackagesOrdinal);
+            pkg.isDefaultPackage = deployablePackages._getDefaultPackage();
+            ListOfPackageTagsHollow packageTags = deployablePackages._getTags();
+            if(packageTags != null) {
+                for(StringHollow tag : packageTags) {
+                    pkg.tags.add(new Strings(tag._getValue()));
+                }
+            }
             for(ISOCountryHollow isoCountry : deployablePackages._getCountryCodes()) {
                 pkg.allDeployableCountries.add(cycleConstants.getISOCountry(isoCountry._getValue()));
             }

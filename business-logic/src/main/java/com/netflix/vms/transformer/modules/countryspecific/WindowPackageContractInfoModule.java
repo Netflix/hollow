@@ -96,14 +96,6 @@ public class WindowPackageContractInfoModule {
         DeployablePackagesHollow deployablePackage = api.getDeployablePackagesHollow(deployablePackageIdx.getMatchingOrdinal((long) packageData.id));
         if(deployablePackage != null) {
             info.videoPackageInfo.isDefaultPackage = deployablePackage._getDefaultPackage();
-            info.videoPackageInfo.tags = new ArrayList<Strings>();
-            ListOfPackageTagsHollow packageTags = deployablePackage._getTags();
-            if(packageTags != null) {
-                for(StringHollow tag : packageTags) {
-                    ctx.getLogger().info(TransformerLogTag.InteractivePackage, "PackageId={}, tag={}", packageData.id, tag._getValue());
-                    info.videoPackageInfo.tags.add(new Strings(tag._getValue()));
-                }
-            }
         }
         Set<com.netflix.vms.transformer.hollowoutput.Long> excludedDownloadables = findRelevantExcludedDownloadables(packageData, country);
 

@@ -28,6 +28,7 @@ import com.netflix.vms.transformer.hollowoutput.SortedMapOfDateWindowToListOfInt
 import com.netflix.vms.transformer.hollowoutput.VMSAvailabilityWindow;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
+import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
@@ -335,9 +336,12 @@ public class CountrySpecificDataModule {
         com.netflix.vms.transformer.hollowoutput.Integer packageId = null;
         for (Map.Entry<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo> entry : window.windowInfosByPackageId.entrySet()) {
             com.netflix.vms.transformer.hollowoutput.Integer key = entry.getKey();
-            if (packageId == null || packageId.val < key.val) {
-                packageId = key;
-                info = entry.getValue();
+            VideoPackageInfo packageInfo = entry.getValue().videoPackageInfo;
+            if(packageInfo == null || (packageInfo != null && packageInfo.isDefaultPackage)) {
+                if (packageId == null || packageId.val < key.val) {
+                    packageId = key;
+                    info = entry.getValue();
+                }
             }
         }
 

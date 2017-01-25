@@ -263,14 +263,16 @@ public class VMSAvailabilityWindowModule {
                                         windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(packageData, rightsContract, contract, country, isAvailableForDownload);
                                         outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
 
-                                        if(packageData.id > maxPackageId) {
-                                            maxPackageId = packageData.id;
-                                            bundledAssetsGroupId = (int)contractId;
-                                        }
-
-                                        if(packageData.id > thisWindowMaxPackageId) {
-                                            thisWindowMaxPackageId = packageData.id;
-                                            thisWindowBundledAssetsGroupId = (int)contractId;
+                                        if(windowPackageContractInfo.videoPackageInfo.isDefaultPackage) {
+                                            if(packageData.id > maxPackageId) {
+                                                maxPackageId = packageData.id;
+                                                bundledAssetsGroupId = (int)contractId;
+                                            }
+    
+                                            if(packageData.id > thisWindowMaxPackageId) {
+                                                thisWindowMaxPackageId = packageData.id;
+                                                thisWindowBundledAssetsGroupId = (int)contractId;
+                                            }
                                         }
 
                                     } else {
