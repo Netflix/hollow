@@ -67,9 +67,11 @@ public class PackageDataModule {
     private final StreamDataModule streamDataModule;
     private final ContractRestrictionModule contractRestrictionModule;
     private final EncodeSummaryDescriptorModule encodeSummaryModule;
+    private final TransformerContext ctx;
 
     public PackageDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper objectMapper, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
         this.api = api;
+        this.ctx = ctx;
         this.mapper = objectMapper;
         this.cycleConstants = cycleConstants;
         this.packagesByVideoIdx = indexer.getHashIndex(IndexSpec.PACKAGES_BY_VIDEO);
@@ -202,6 +204,7 @@ public class PackageDataModule {
             ListOfPackageTagsHollow packageTags = deployablePackages._getTags();
             if(packageTags != null) {
                 for(StringHollow tag : packageTags) {
+                    ctx.getLogger().info(TransformerLogTag.InteractivePackage, "package={}, video={}, tag={}", pkg.id, pkg.video.value, tag._getValue());
                     pkg.tags.add(new Strings(tag._getValue()));
                 }
             }
