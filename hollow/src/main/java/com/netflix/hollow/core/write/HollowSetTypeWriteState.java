@@ -34,7 +34,7 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
     private int bitsPerSetPointer;
     private int bitsPerElement;
     private int bitsPerSetSizeValue;
-    private long shardTotalOfSetBuckets[];
+    private long totalOfSetBuckets[];
 
     /// data required for writing snapshot or delta
     private int maxOrdinal;
@@ -83,7 +83,7 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         int maxSetSize = 0;
         ByteData data = ordinalMap.getByteData().getUnderlyingArray();
 
-        shardTotalOfSetBuckets = new long[numShards];
+        totalOfSetBuckets = new long[numShards];
 
         for(int i=0;i<=maxOrdinal;i++) {
             if(currentCyclePopulated.get(i) || previousCyclePopulated.get(i)) {
@@ -108,14 +108,14 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
                     pointer += VarInt.nextVLongSize(data, pointer);  /// discard hashed bucket
                 }
 
-                shardTotalOfSetBuckets[i & (numShards-1)] += numBuckets;
+                totalOfSetBuckets[i & (numShards-1)] += numBuckets;
             }
         }
         
         long maxShardTotalOfSetBuckets = 0;
         for(int i=0;i<numShards;i++) {
-            if(shardTotalOfSetBuckets[i] > maxShardTotalOfSetBuckets)
-                maxShardTotalOfSetBuckets = shardTotalOfSetBuckets[i];
+            if(totalOfSetBuckets[i] > maxShardTotalOfSetBuckets)
+                maxShardTotalOfSetBuckets = totalOfSetBuckets[i];
         }
 
         bitsPerElement = 64 - Long.numberOfLeadingZeros(maxElementOrdinal + 1);
@@ -181,7 +181,7 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         
         for(int i=0;i<numShards;i++) {
             setPointersAndSizesArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)bitsPerSetFixedLengthPortion * (maxShardOrdinal[i] + 1));
-            elementArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)bitsPerElement * shardTotalOfSetBuckets[i]);
+            elementArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)bitsPerElement * totalOfSetBuckets[i]);
         }
 
         ByteData data = ordinalMap.getByteData().getUnderlyingArray();
@@ -272,7 +272,7 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         VarInt.writeVInt(os, bitsPerSetPointer);
         VarInt.writeVInt(os, bitsPerSetSizeValue);
         VarInt.writeVInt(os, bitsPerElement);
-        VarInt.writeVLong(os, shardTotalOfSetBuckets[shardNumber]);
+        VarInt.writeVLong(os, totalOfSetBuckets[shardNumber]);
 
         /// 3) set pointer array
         int numSetFixedLengthLongs = maxShardOrdinal[shardNumber] == -1 ? 0 : (int)((((long)(maxShardOrdinal[shardNumber] + 1) * bitsPerSetFixedLengthPortion) - 1) / 64) + 1;
@@ -282,7 +282,7 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         }
 
         /// 4) element array
-        int numElementLongs = shardTotalOfSetBuckets[shardNumber] == 0 ? 0 : (int)(((shardTotalOfSetBuckets[shardNumber] * bitsPerElement) - 1) / 64) + 1;
+        int numElementLongs = totalOfSetBuckets[shardNumber] == 0 ? 0 : (int)(((totalOfSetBuckets[shardNumber] * bitsPerElement) - 1) / 64) + 1;
         VarInt.writeVInt(os, numElementLongs);
         for(int i=0;i<numElementLongs;i++) {
             os.writeLong(elementArray[shardNumber].get(i));
@@ -443,7 +443,7 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         VarInt.writeVInt(os, bitsPerSetPointer);
         VarInt.writeVInt(os, bitsPerSetSizeValue);
         VarInt.writeVInt(os, bitsPerElement);
-        VarInt.writeVLong(os, shardTotalOfSetBuckets[shardNumber]);
+        VarInt.writeVLong(os, totalOfSetBuckets[shardNumber]);
 
         /// 4) set pointer array
         int numSetFixedLengthLongs = numSetsInDelta[shardNumber] == 0 ? 0 : (int)((((long)numSetsInDelta[shardNumber] * bitsPerSetFixedLengthPortion) - 1) / 64) + 1;

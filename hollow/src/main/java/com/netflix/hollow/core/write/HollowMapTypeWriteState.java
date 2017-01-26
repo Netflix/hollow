@@ -35,7 +35,7 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
     private int bitsPerMapSizeValue;
     private int bitsPerKeyElement;
     private int bitsPerValueElement;
-    private long shardTotalOfMapBuckets[];
+    private long totalOfMapBuckets[];
 
     /// data required for writing snapshot or delta
     private int maxOrdinal;
@@ -86,7 +86,7 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
         int maxMapSize = 0;
         ByteData data = ordinalMap.getByteData().getUnderlyingArray();
 
-        shardTotalOfMapBuckets = new long[numShards];
+        totalOfMapBuckets = new long[numShards];
         
         for(int i=0;i<=maxOrdinal;i++) {
             if(currentCyclePopulated.get(i) || previousCyclePopulated.get(i)) {
@@ -117,14 +117,14 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
                     pointer += VarInt.nextVLongSize(data, pointer);  /// discard hashed bucket
                 }
 
-                shardTotalOfMapBuckets[i & (numShards-1)] += numBuckets;
+                totalOfMapBuckets[i & (numShards-1)] += numBuckets;
             }
         }
         
         long maxShardTotalOfMapBuckets = 0;
         for(int i=0;i<numShards;i++) {
-            if(shardTotalOfMapBuckets[i] > maxShardTotalOfMapBuckets)
-                maxShardTotalOfMapBuckets = shardTotalOfMapBuckets[i];
+            if(totalOfMapBuckets[i] > maxShardTotalOfMapBuckets)
+                maxShardTotalOfMapBuckets = totalOfMapBuckets[i];
         }
 
         bitsPerKeyElement = 64 - Long.numberOfLeadingZeros(maxKeyOrdinal + 1);
@@ -202,7 +202,7 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
 
         for(int i=0;i<numShards;i++) {
             mapPointersAndSizesArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)bitsPerMapFixedLengthPortion * (maxShardOrdinal[i] + 1));
-            entryArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)bitsPerMapEntry * shardTotalOfMapBuckets[i]);
+            entryArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)bitsPerMapEntry * totalOfMapBuckets[i]);
         }
 
         ByteData data = ordinalMap.getByteData().getUnderlyingArray();
@@ -299,7 +299,7 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
         VarInt.writeVInt(os, bitsPerMapSizeValue);
         VarInt.writeVInt(os, bitsPerKeyElement);
         VarInt.writeVInt(os, bitsPerValueElement);
-        VarInt.writeVLong(os, shardTotalOfMapBuckets[shardNumber]);
+        VarInt.writeVLong(os, totalOfMapBuckets[shardNumber]);
 
         /// 3) list pointer array
         int numMapFixedLengthLongs = maxShardOrdinal[shardNumber] == -1 ? 0 : (int)((((long)(maxShardOrdinal[shardNumber] + 1) * bitsPerMapFixedLengthPortion) - 1) / 64) + 1;
@@ -309,7 +309,7 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
         }
 
         /// 4) element array
-        int numElementLongs = shardTotalOfMapBuckets[shardNumber] == 0 ? 0 : (int)(((shardTotalOfMapBuckets[shardNumber] * bitsPerMapEntry) - 1) / 64) + 1;
+        int numElementLongs = totalOfMapBuckets[shardNumber] == 0 ? 0 : (int)(((totalOfMapBuckets[shardNumber] * bitsPerMapEntry) - 1) / 64) + 1;
         VarInt.writeVInt(os, numElementLongs);
         for(int i=0;i<numElementLongs;i++) {
             os.writeLong(entryArray[shardNumber].get(i));
@@ -478,7 +478,7 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
         VarInt.writeVInt(os, bitsPerMapSizeValue);
         VarInt.writeVInt(os, bitsPerKeyElement);
         VarInt.writeVInt(os, bitsPerValueElement);
-        VarInt.writeVLong(os, shardTotalOfMapBuckets[shardNumber]);
+        VarInt.writeVLong(os, totalOfMapBuckets[shardNumber]);
 
         /// 4) pointer array
         int numMapFixedLengthLongs = numMapsInDelta[shardNumber] == 0 ? 0 : (int)((((long)numMapsInDelta[shardNumber] * bitsPerMapFixedLengthPortion) - 1) / 64) + 1;
