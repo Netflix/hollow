@@ -88,9 +88,9 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         }
         
         maxShardOrdinal = new int[numShards];
-        int minOrdinalsPerShard = (maxOrdinal + 1) / numShards; 
+        int minRecordLocationsPerShard = (maxOrdinal + 1) / numShards; 
         for(int i=0;i<numShards;i++)
-            maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minOrdinalsPerShard + 1 : minOrdinalsPerShard;
+            maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minRecordLocationsPerShard : minRecordLocationsPerShard - 1;
     }
 
     private void discoverObjectFieldStatisticsForRecord(FieldStatistics fieldStats, int ordinal) {
