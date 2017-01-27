@@ -19,15 +19,15 @@ Binaries are available from Maven Central and jcenter.
 
 |GroupID/Org|ArtifactID/Name|Latest Stable Version|
 |-----------|---------------|---------------------|
-|com.netflix.hollow|hollow|2.0.2|
+|com.netflix.hollow|hollow|2.1.0|
 
 In a Maven .pom file:
 
         ...
         <dependency>
-        	<groupId>com.netflix.hollow</groupId>
-        	<artifactId>hollow</artifactId>
-        	<version>2.0.2</version>
+                <groupId>com.netflix.hollow</groupId>
+                <artifactId>hollow</artifactId>
+                <version>2.1.0</version>
         </dependency>
         ...
 
