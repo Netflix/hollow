@@ -337,7 +337,8 @@ public class CountrySpecificDataModule {
         for (Map.Entry<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo> entry : window.windowInfosByPackageId.entrySet()) {
             com.netflix.vms.transformer.hollowoutput.Integer key = entry.getKey();
             VideoPackageInfo packageInfo = entry.getValue().videoPackageInfo;
-            if(packageInfo == null || (packageInfo != null && packageInfo.isDefaultPackage)) {
+            boolean isDefaultPackage = packageInfo == null ? true : packageInfo.isDefaultPackage;
+            if(isDefaultPackage) {
                 if (packageId == null || packageId.val < key.val) {
                     packageId = key;
                     info = entry.getValue();

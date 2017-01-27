@@ -263,7 +263,7 @@ public class VMSAvailabilityWindowModule {
                                         windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(packageData, rightsContract, contract, country, isAvailableForDownload);
                                         outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
 
-                                        if(windowPackageContractInfo.videoPackageInfo.isDefaultPackage) {
+                                        if(packageData.isDefaultPackage) {
                                             if(packageData.id > maxPackageId) {
                                                 maxPackageId = packageData.id;
                                                 bundledAssetsGroupId = (int)contractId;
