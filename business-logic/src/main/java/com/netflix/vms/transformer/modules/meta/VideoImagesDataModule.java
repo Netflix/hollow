@@ -34,6 +34,7 @@ import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkSourceFileIdHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseElementsHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseHollow;
+import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowMapHollow;
 import com.netflix.vms.transformer.hollowinput.SingleValuePassthroughMapHollow;
 import com.netflix.vms.transformer.hollowinput.StatusHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
@@ -194,10 +195,14 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
     	        HollowOrdinalIterator iter = rolloutMatches.iterator();
     	        int rolloutOrdinal = iter.next();
 				while (rolloutOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+					
 					RolloutHollow rollout = api.getRolloutHollow(rolloutOrdinal);
 
 					for(RolloutPhaseHollow phase: rollout._getPhases()){
 
+						if(!isRolloutForCountryAtHand(country, phase))
+							continue; 
+						
 						RolloutPhaseElementsHollow elements = phase._getElements();
 						if(elements == null)
 							continue;
@@ -215,6 +220,23 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
     		}
     	}
     	return countryToListOfSourceFileIds;
+	}
+
+	private boolean isRolloutForCountryAtHand(String country, RolloutPhaseHollow phase) {
+		
+		boolean rolloutAppliesToCountryAtHand = false;
+		RolloutPhaseWindowMapHollow windows = phase._getWindows();
+		
+		if(windows != null){
+			for(ISOCountryHollow countryHollow: windows.keySet()){
+				if(country.equals(countryHollow._getValue())){
+					rolloutAppliesToCountryAtHand = true;
+					break;
+				}
+			}
+		}
+		
+		return rolloutAppliesToCountryAtHand;
 	}
 
 	private void rollupMerchstills(Set<Integer> rollupMerchstillVideoIds /* in */, Set<String> rollupSourceFieldIds /* in */, Map<String, Set<VideoHierarchy>> showHierarchiesByCountry/* in */,
