@@ -66,10 +66,10 @@ public class HollowObjectMapper {
     }
 
     HollowTypeMapper getTypeMapper(Type type, String declaredName, String[] hashKeyFieldPaths) {
-        return getTypeMapper(type, declaredName, hashKeyFieldPaths, null);
+        return getTypeMapper(type, declaredName, hashKeyFieldPaths, -1, null);
     }
     
-    HollowTypeMapper getTypeMapper(Type type, String declaredName, String[] hashKeyFieldPaths, Set<Type> visited) {
+    HollowTypeMapper getTypeMapper(Type type, String declaredName, String[] hashKeyFieldPaths, int numShards, Set<Type> visited) {
         String typeName = declaredName != null ? declaredName : HollowObjectTypeMapper.getDefaultTypeName(type);
 
         HollowTypeMapper typeMapper = typeMappers.get(typeName);
@@ -84,13 +84,13 @@ public class HollowObjectMapper {
                 Class<?> clazz = (Class<?>) parameterizedType.getRawType();
 
                 if(List.class.isAssignableFrom(clazz)) {
-                    typeMapper = new HollowListTypeMapper(this, parameterizedType, declaredName, ignoreListOrdering, visited);
+                    typeMapper = new HollowListTypeMapper(this, parameterizedType, declaredName, numShards, ignoreListOrdering, visited);
                 } else if(Set.class.isAssignableFrom(clazz)) {
-                    typeMapper = new HollowSetTypeMapper(this, parameterizedType, declaredName, hashKeyFieldPaths, stateEngine, useDefaultHashKeys, visited);
+                    typeMapper = new HollowSetTypeMapper(this, parameterizedType, declaredName, hashKeyFieldPaths, numShards, stateEngine, useDefaultHashKeys, visited);
                 } else if(Map.class.isAssignableFrom(clazz)) {
-                    typeMapper = new HollowMapTypeMapper(this, parameterizedType, declaredName, hashKeyFieldPaths, stateEngine, useDefaultHashKeys, visited);
+                    typeMapper = new HollowMapTypeMapper(this, parameterizedType, declaredName, hashKeyFieldPaths, numShards, stateEngine, useDefaultHashKeys, visited);
                 } else {
-                    return getTypeMapper(clazz, declaredName, hashKeyFieldPaths, visited);
+                    return getTypeMapper(clazz, declaredName, hashKeyFieldPaths, -1, visited);
                 }
 
             } else {

@@ -17,29 +17,27 @@
  */
 package com.netflix.hollow.core.read.engine.set;
 
-import com.netflix.hollow.core.memory.encoding.HashCodes;
-
-import com.netflix.hollow.tools.checksum.HollowChecksum;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.schema.HollowSetSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
-import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
 import com.netflix.hollow.api.sampling.DisabledSamplingDirector;
 import com.netflix.hollow.api.sampling.HollowSampler;
 import com.netflix.hollow.api.sampling.HollowSamplingDirector;
 import com.netflix.hollow.api.sampling.HollowSetSampler;
-import com.netflix.hollow.core.read.filter.HollowFilterConfig;
+import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
+import com.netflix.hollow.core.memory.encoding.VarInt;
+import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowCollectionTypeReadState;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
-import com.netflix.hollow.core.read.engine.SetMapKeyHasher;
 import com.netflix.hollow.core.read.engine.SnapshotPopulatedOrdinalsReader;
+import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.iterator.EmptyOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowSetOrdinalIterator;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.schema.HollowSetSchema;
+import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.BitSet;
@@ -49,69 +47,94 @@ import java.util.BitSet;
  */
 public class HollowSetTypeReadState extends HollowCollectionTypeReadState implements HollowSetTypeDataAccess {
 
-    private HollowSetTypeDataElements currentData;
-    private volatile HollowSetTypeDataElements currentDataVolatile;
-
     private final HollowSetSampler sampler;
     
+    private final int shardNumberMask;
+    private final int shardOrdinalShift;
+    private final HollowSetTypeReadStateShard shards[];
+    
     private HollowPrimaryKeyValueDeriver keyDeriver;
+    
+    private int maxOrdinal;
 
-    public HollowSetTypeReadState(HollowReadStateEngine stateEngine, HollowSetSchema schema) {
+    public HollowSetTypeReadState(HollowReadStateEngine stateEngine, HollowSetSchema schema, int numShards) {
         super(stateEngine, schema);
         this.sampler = new HollowSetSampler(schema.getName(), DisabledSamplingDirector.INSTANCE);
+        this.shardNumberMask = numShards - 1;
+        this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
+        
+        if(numShards < 1 || 1 << shardOrdinalShift != numShards)
+            throw new IllegalArgumentException("Number of shards must be a power of 2!");
+        
+        HollowSetTypeReadStateShard shards[] = new HollowSetTypeReadStateShard[numShards];
+        for(int i=0;i<shards.length;i++)
+            shards[i] = new HollowSetTypeReadStateShard();
+        
+        this.shards = shards;
+
     }
 
     @Override
     public void readSnapshot(DataInputStream dis, ArraySegmentRecycler memoryRecycler) throws IOException {
-        HollowSetTypeDataElements currentData = new HollowSetTypeDataElements(memoryRecycler);
-        currentData.readSnapshot(dis);
-        setCurrentData(currentData);
+        if(shards.length > 1)
+            maxOrdinal = VarInt.readVInt(dis);
+        
+        for(int i=0;i<shards.length;i++) {
+            HollowSetTypeDataElements snapshotData = new HollowSetTypeDataElements(memoryRecycler);
+            snapshotData.readSnapshot(dis);
+            shards[i].setCurrentData(snapshotData);
+        }
+        
+        if(shards.length == 1)
+            maxOrdinal = shards[0].currentDataElements().maxOrdinal;
+        
         SnapshotPopulatedOrdinalsReader.readOrdinals(dis, stateListeners);
     }
 
     @Override
     public void applyDelta(DataInputStream dis, HollowSchema schema, ArraySegmentRecycler memoryRecycler) throws IOException {
-        HollowSetTypeDataElements deltaData = new HollowSetTypeDataElements(memoryRecycler);
-        HollowSetTypeDataElements nextData = new HollowSetTypeDataElements(memoryRecycler);
-        deltaData.readDelta(dis);
-        nextData.applyDelta(currentData, deltaData);
-        HollowSetTypeDataElements oldData = currentData;
-        setCurrentData(nextData);
-        notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions);
-        deltaData.destroy();
-        oldData.destroy();
+        if(shards.length > 1)
+            maxOrdinal = VarInt.readVInt(dis);
+
+        for(int i=0;i<shards.length;i++) {
+            HollowSetTypeDataElements deltaData = new HollowSetTypeDataElements(memoryRecycler);
+            HollowSetTypeDataElements nextData = new HollowSetTypeDataElements(memoryRecycler);
+            deltaData.readDelta(dis);
+            HollowSetTypeDataElements oldData = shards[i].currentDataElements();
+            nextData.applyDelta(oldData, deltaData);
+            shards[i].setCurrentData(nextData);
+            notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
+            deltaData.destroy();
+            oldData.destroy();
+            stateEngine.getMemoryRecycler().swap();
+        }
+        
+        if(shards.length == 1)
+            maxOrdinal = shards[0].currentDataElements().maxOrdinal;
     }
 
-    public static void discardSnapshot(DataInputStream dis) throws IOException {
-        discardType(dis, false);
+    public static void discardSnapshot(DataInputStream dis, int numShards) throws IOException {
+        discardType(dis, numShards, false);
     }
 
-    public static void discardDelta(DataInputStream dis) throws IOException {
-        discardType(dis, true);
+    public static void discardDelta(DataInputStream dis, int numShards) throws IOException {
+        discardType(dis, numShards, true);
     }
 
-    public static void discardType(DataInputStream dis, boolean delta) throws IOException {
-        HollowSetTypeDataElements.discardFromStream(dis, delta);
+    public static void discardType(DataInputStream dis, int numShards, boolean delta) throws IOException {
+        HollowSetTypeDataElements.discardFromStream(dis, numShards, delta);
         if(!delta)
             SnapshotPopulatedOrdinalsReader.discardOrdinals(dis);
     }
 
     @Override
     public int maxOrdinal() {
-        return currentData.maxOrdinal;
+        return maxOrdinal;
     }
 
     @Override
     public int size(int ordinal) {
-        HollowSetTypeDataElements currentData;
-        int size;
-
-        do {
-            currentData = this.currentData;
-            size = (int)currentData.setPointerAndSizeArray.getElementValue((long)(ordinal * currentData.bitsPerFixedLengthSetPortion) + currentData.bitsPerSetPointer, currentData.bitsPerSetSizeValue);
-        } while(readWasUnsafe(currentData));
-
-        return size;
+        return shards[ordinal & shardNumberMask].size(ordinal >> shardOrdinalShift);
     }
 
     @Override
@@ -121,40 +144,7 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
 
     @Override
     public boolean contains(int ordinal, int value, int hashCode) {
-        HollowSetTypeDataElements currentData;
-        boolean foundData;
-
-        threadsafe:
-        do {
-            long startBucket;
-            long endBucket;
-
-            do {
-                currentData = this.currentData;
-
-                startBucket = getAbsoluteBucketStart(currentData, ordinal);
-                endBucket = currentData.setPointerAndSizeArray.getElementValue((long)ordinal * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
-            } while(readWasUnsafe(currentData));
-
-            hashCode = HashCodes.hashInt(hashCode);
-            long bucket = startBucket + (hashCode & (endBucket - startBucket - 1));
-            int bucketOrdinal = absoluteBucketValue(currentData, bucket);
-
-            while(bucketOrdinal != currentData.emptyBucketValue) {
-                if(bucketOrdinal == value) {
-                    foundData = true;
-                    continue threadsafe;
-                }
-                bucket++;
-                if(bucket == endBucket)
-                    bucket = startBucket;
-                bucketOrdinal = absoluteBucketValue(currentData, bucket);
-            }
-
-            foundData = false;
-        } while(readWasUnsafe(currentData));
-
-        return foundData;
+        return shards[ordinal & shardNumberMask].contains(ordinal >> shardOrdinalShift, value, hashCode);
     }
     
     @Override
@@ -167,72 +157,13 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
         if(hashKey.length != fieldTypes.length)
             return -1;
 
-        int hashCode = SetMapKeyHasher.hash(hashKey, fieldTypes);
-
-        HollowSetTypeDataElements currentData;
-
-        threadsafe:
-        do {
-            long startBucket;
-            long endBucket;
-
-            do {
-                currentData = this.currentData;
-
-                startBucket = getAbsoluteBucketStart(currentData, ordinal);
-                endBucket = currentData.setPointerAndSizeArray.getElementValue((long)ordinal * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
-            } while(readWasUnsafe(currentData));
-
-            long bucket = startBucket + (hashCode & (endBucket - startBucket - 1));
-            int bucketOrdinal = absoluteBucketValue(currentData, bucket);
-
-            while(bucketOrdinal != currentData.emptyBucketValue) {
-                if(readWasUnsafe(currentData))
-                    continue threadsafe;
-                
-                if(keyDeriver.keyMatches(bucketOrdinal, hashKey))
-                    return bucketOrdinal;
-                
-                bucket++;
-                if(bucket == endBucket)
-                    bucket = startBucket;
-                bucketOrdinal = absoluteBucketValue(currentData, bucket);
-            }
-
-        } while(readWasUnsafe(currentData));
-
-        return -1;
+        return shards[ordinal & shardNumberMask].findElement(ordinal >> shardOrdinalShift, hashKey);
     }
     
 
     @Override
     public int relativeBucketValue(int setOrdinal, int bucketIndex) {
-        HollowSetTypeDataElements currentData;
-        int value;
-
-        do {
-            long startBucket;
-            do {
-                currentData = this.currentData;
-
-                startBucket = getAbsoluteBucketStart(currentData, setOrdinal);
-            } while(readWasUnsafe(currentData));
-
-            value = absoluteBucketValue(currentData, startBucket + bucketIndex);
-
-            if(value == currentData.emptyBucketValue)
-                value = -1;
-        } while(readWasUnsafe(currentData));
-
-        return value;
-    }
-
-    private long getAbsoluteBucketStart(HollowSetTypeDataElements currentData, int ordinal) {
-        return ordinal == 0 ? 0 : currentData.setPointerAndSizeArray.getElementValue((long)(ordinal - 1) * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
-    }
-
-    private int absoluteBucketValue(HollowSetTypeDataElements currentData, long absoluteBucketIndex) {
-        return (int)currentData.elementArray.getElementValue(absoluteBucketIndex * currentData.bitsPerElement, currentData.bitsPerElement);
+        return shards[setOrdinal & shardNumberMask].relativeBucketValue(setOrdinal >> shardOrdinalShift, bucketIndex);
     }
 
     @Override
@@ -277,20 +208,23 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
     @Override
     protected void invalidate() {
         stateListeners = EMPTY_LISTENERS;
-        setCurrentData(null);
+        for(int i=0;i<shards.length;i++)
+            shards[i].invalidate();
     }
 
-    HollowSetTypeDataElements currentDataElements() {
-        return currentData;
-    }
-
-    private boolean readWasUnsafe(HollowSetTypeDataElements data) {
-        return data != currentDataVolatile;
+    HollowSetTypeDataElements[] currentDataElements() {
+        HollowSetTypeDataElements currentDataElements[] = new HollowSetTypeDataElements[shards.length];
+        
+        for(int i=0;i<shards.length;i++)
+            currentDataElements[i] = shards[i].currentDataElements();
+        
+        return currentDataElements;
     }
 
     void setCurrentData(HollowSetTypeDataElements data) {
-        this.currentData = data;
-        this.currentDataVolatile = data;
+        if(shards.length > 1)
+            throw new UnsupportedOperationException("Cannot directly set data on sharded type state");
+        shards[0].setCurrentData(data);
     }
 
     @Override
@@ -300,37 +234,30 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
         
         BitSet populatedOrdinals = getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
 
-        int ordinal = populatedOrdinals.nextSetBit(0);
-        while(ordinal != -1) {
-            int numBuckets = HashCodes.hashTableSize(size(ordinal));
-            long offset = getAbsoluteBucketStart(currentData, ordinal);
-
-            checksum.applyInt(ordinal);
-            for(int i=0;i<numBuckets;i++) {
-                int bucketValue = absoluteBucketValue(currentData, offset + i);
-                if(bucketValue != currentData.emptyBucketValue) {
-                    checksum.applyInt(i);
-                    checksum.applyInt(bucketValue);
-                }
-            }
-
-            ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
-        }
+        for(int i=0;i<shards.length;i++)
+            shards[i].applyToChecksum(checksum, populatedOrdinals, i, shards.length);
     }
 
 	@Override
 	public long getApproximateHeapFootprintInBytes() {
-		long requiredBitsForSetPointers = (long)currentData.bitsPerFixedLengthSetPortion * (currentData.maxOrdinal + 1);
-		long requiredBitsForBuckets = (long)currentData.bitsPerElement * currentData.totalNumberOfBuckets;
-		long requiredBits = requiredBitsForSetPointers + requiredBitsForBuckets;
-		return requiredBits / 8;
+        long totalApproximateHeapFootprintInBytes = 0;
+        
+        for(int i=0;i<shards.length;i++)
+            totalApproximateHeapFootprintInBytes += shards[i].getApproximateHeapFootprintInBytes();
+        
+        return totalApproximateHeapFootprintInBytes;
 	}
 	
 	@Override
 	public long getApproximateHoleCostInBytes() {
-        BitSet populatedOrdinals = getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
+        long totalApproximateHoleCostInBytes = 0;
         
-        return ((long)(populatedOrdinals.length() - populatedOrdinals.cardinality()) * (long)currentData.bitsPerFixedLengthSetPortion) / 8; 
+        BitSet populatedOrdinals = getPopulatedOrdinals();
+
+        for(int i=0;i<shards.length;i++)
+            totalApproximateHoleCostInBytes += shards[i].getApproximateHoleCostInBytes(populatedOrdinals, i, shards.length);
+        
+        return totalApproximateHoleCostInBytes;
 	}
 	
 	public HollowPrimaryKeyValueDeriver getKeyDeriver() {
@@ -340,6 +267,14 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
 	public void buildKeyDeriver() {
 	    if(getSchema().getHashKey() != null)
 	        this.keyDeriver = new HollowPrimaryKeyValueDeriver(getSchema().getHashKey(), getStateEngine());
+	    
+	    for(int i=0;i<shards.length;i++)
+	        shards[i].setKeyDeriver(keyDeriver);
 	}
+
+    @Override
+    public int numShards() {
+        return shards.length;
+    }
 
 }

@@ -61,6 +61,9 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     private final List<HollowTypeWriteState> orderedTypeStates;
     private final Map<String,String> headerTags = new ConcurrentHashMap<String, String>();
     private final HollowObjectHashCodeFinder hashCodeFinder;
+    
+    //// target a maximum shard size to reduce excess memory pool requirement 
+    private long targetMaxTypeShardSize = Long.MAX_VALUE;
 
     private List<String> restoredStates;
     private boolean preparedForNextCycle = true;
@@ -118,6 +121,18 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     public void restoreFrom(HollowReadStateEngine readStateEngine) {
         if(!readStateEngine.isListenToAllPopulatedOrdinals())
             throw new IllegalStateException("The specified HollowReadStateEngine must be listening for all populated ordinals!");
+
+        for(HollowTypeReadState readState : readStateEngine.getTypeStates()) {
+            String typeName = readState.getSchema().getName();
+            HollowTypeWriteState writeState = writeStates.get(typeName);
+
+            if(writeState != null) {
+                if(writeState.getNumShards() == -1)
+                    writeState.numShards = readState.numShards();
+                else if(writeState.getNumShards() != readState.numShards())
+                    throw new IllegalStateException("Attempting to restore from a HollowReadStateEngine which does not have the same number of shards as explicitly configured for type " + typeName);
+            }
+        }
         
         restoredStates = new ArrayList<String>();
 
@@ -346,6 +361,23 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     
     public void overrideNextStateRandomizedTag(long nextStateRandomizedTag) {
     	this.nextStateRandomizedTag = nextStateRandomizedTag;
+    }
+    
+    /**
+     * Setting a target max type shard size (specified in bytes) will limit the excess memory pool required to perform delta transitions.
+     * 
+     * For use cases where all consumers are running with hollow v2.1.0 or greater, it is recommended to set this value to 
+     * something reasonably small, for example 25MB.
+     * 
+     * In a future release, this value will default to  (25 * 1024 * 1024).  It is currently set to Long.MAX_VALUE to retain backwards
+     * compatibility with pre v2.1.0 consumers. 
+     */
+    public void setTargetMaxTypeShardSize(long targetMaxTypeShardSize) {
+        this.targetMaxTypeShardSize = targetMaxTypeShardSize;
+    }
+    
+    long getTargetMaxTypeShardSize() {
+        return targetMaxTypeShardSize;
     }
 
     private void addTypeNamesWithDefinedHashCodesToHeader() {

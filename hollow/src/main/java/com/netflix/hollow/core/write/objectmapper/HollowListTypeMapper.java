@@ -17,16 +17,14 @@
  */
 package com.netflix.hollow.core.write.objectmapper;
 
-import com.netflix.hollow.core.util.IntList;
-
 import com.netflix.hollow.core.schema.HollowListSchema;
+import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.write.HollowListTypeWriteState;
 import com.netflix.hollow.core.write.HollowListWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -40,14 +38,14 @@ public class HollowListTypeMapper extends HollowTypeMapper {
 
     private final HollowTypeMapper elementMapper;
 
-    public HollowListTypeMapper(HollowObjectMapper parentMapper, ParameterizedType type, String declaredName, boolean ignoreListOrdering, Set<Type> visited) {
-        this.elementMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[0], null, null, visited);
+    public HollowListTypeMapper(HollowObjectMapper parentMapper, ParameterizedType type, String declaredName, int numShards, boolean ignoreListOrdering, Set<Type> visited) {
+        this.elementMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[0], null, null, -1, visited);
         String typeName = declaredName != null ? declaredName : getDefaultTypeName(type);
         this.schema = new HollowListSchema(typeName, elementMapper.getTypeName());
         this.ignoreListOrdering = ignoreListOrdering;
 
         HollowListTypeWriteState existingTypeState = (HollowListTypeWriteState)parentMapper.getStateEngine().getTypeState(typeName);
-        this.writeState = existingTypeState != null ? existingTypeState : new HollowListTypeWriteState(schema);
+        this.writeState = existingTypeState != null ? existingTypeState : new HollowListTypeWriteState(schema, numShards);
     }
 
     @Override

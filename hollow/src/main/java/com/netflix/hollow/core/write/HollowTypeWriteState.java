@@ -19,10 +19,8 @@ package com.netflix.hollow.core.write;
 
 import static com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavior.IGNORED_HASHES;
 import static com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavior.UNMIXED_HASHES;
-
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
-
 import com.netflix.hollow.core.memory.ByteArrayOrdinalMap;
 import com.netflix.hollow.core.memory.ByteDataBuffer;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
@@ -44,6 +42,8 @@ public abstract class HollowTypeWriteState {
     protected final HollowSchema schema;
 
     protected final ByteArrayOrdinalMap ordinalMap;
+    
+    protected int numShards;
 
     protected HollowSchema restoredSchema;
     protected ByteArrayOrdinalMap restoredMap;
@@ -54,16 +54,20 @@ public abstract class HollowTypeWriteState {
 
     private final ThreadLocal<ByteDataBuffer> serializedScratchSpace;
 
-    private HollowWriteStateEngine stateEngine;
+    protected HollowWriteStateEngine stateEngine;
     
     private boolean wroteData = false;
 
-    public HollowTypeWriteState(HollowSchema schema) {
+    public HollowTypeWriteState(HollowSchema schema, int numShards) {
         this.schema = schema;
         this.ordinalMap = new ByteArrayOrdinalMap();
         this.serializedScratchSpace = new ThreadLocal<ByteDataBuffer>();
         this.currentCyclePopulated = new ThreadSafeBitSet();
         this.previousCyclePopulated = new ThreadSafeBitSet();
+        this.numShards = numShards;
+        
+        if(numShards != -1 && ((numShards & (numShards - 1)) != 0 || numShards <= 0))
+            throw new IllegalArgumentException("Number of shards must be a power of 2!  Check configuration for type " + schema.getName());
     }
     
     /**
@@ -216,6 +220,10 @@ public abstract class HollowTypeWriteState {
     
     public HollowSchema getSchema() {
         return schema;
+    }
+    
+    int getNumShards() {
+        return numShards;
     }
 
     /**

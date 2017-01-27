@@ -17,15 +17,14 @@
  */
 package com.netflix.hollow.core.write;
 
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
-import com.netflix.hollow.core.memory.encoding.VarInt;
-
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.ByteDataBuffer;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
+import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
+import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
@@ -36,16 +35,21 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
     /// data required for writing snapshot or delta
     private int maxOrdinal;
-    private FixedLengthElementArray fixedLengthLongArray;
-    private ByteDataBuffer varLengthByteArrays[];
-    private long recordBitOffset;
+    private int maxShardOrdinal[];
+    private FixedLengthElementArray fixedLengthLongArray[];
+    private ByteDataBuffer varLengthByteArrays[][];
+    private long recordBitOffset[];
 
     /// additional data required for writing delta
-    private ByteDataBuffer deltaAddedOrdinals;
-    private ByteDataBuffer deltaRemovedOrdinals;
+    private ByteDataBuffer deltaAddedOrdinals[];
+    private ByteDataBuffer deltaRemovedOrdinals[];
 
     public HollowObjectTypeWriteState(HollowObjectSchema schema) {
-        super(schema);
+        this(schema, -1);
+    }
+    
+    public HollowObjectTypeWriteState(HollowObjectSchema schema, int numShards) {
+        super(schema, numShards);
     }
 
     @Override
@@ -67,12 +71,26 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         fieldStats = new FieldStatistics(getSchema());
 
         int maxOrdinal = ordinalMap.maxOrdinal();
-
+        
         for(int i=0;i<=maxOrdinal;i++) {
             discoverObjectFieldStatisticsForRecord(fieldStats, i);
         }
 
         fieldStats.completeCalculations();
+        
+        if(numShards == -1) {
+            long projectedSizeOfType = ((long)fieldStats.getNumBitsPerRecord() * (maxOrdinal + 1)) / 8;
+            projectedSizeOfType += fieldStats.getTotalSizeOfAllVarLengthData();
+            
+            numShards = 1;
+            while(stateEngine.getTargetMaxTypeShardSize() * numShards < projectedSizeOfType) 
+                numShards *= 2;
+        }
+        
+        maxShardOrdinal = new int[numShards];
+        int minRecordLocationsPerShard = (maxOrdinal + 1) / numShards; 
+        for(int i=0;i<numShards;i++)
+            maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minRecordLocationsPerShard : minRecordLocationsPerShard - 1;
     }
 
     private void discoverObjectFieldStatisticsForRecord(FieldStatistics fieldStats, int ordinal) {
@@ -148,27 +166,54 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     public void calculateSnapshot() {
         maxOrdinal = ordinalMap.maxOrdinal();
         int numBitsPerRecord = fieldStats.getNumBitsPerRecord();
-
-        fixedLengthLongArray = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numBitsPerRecord * (maxOrdinal + 1));
-        varLengthByteArrays = new ByteDataBuffer[getSchema().numFields()];
-
-        recordBitOffset = 0;
-
+        
+        fixedLengthLongArray = new FixedLengthElementArray[numShards];
+        varLengthByteArrays = new ByteDataBuffer[numShards][];
+        recordBitOffset = new long[numShards];
+        
+        for(int i=0;i<numShards;i++) {
+            fixedLengthLongArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numBitsPerRecord * (maxShardOrdinal[i] + 1));
+            varLengthByteArrays[i] = new ByteDataBuffer[getSchema().numFields()];
+        }
+        
+        int shardMask = numShards - 1;
+    
         for(int i=0;i<=maxOrdinal;i++) {
+            int shardNumber = i & shardMask;
             if(currentCyclePopulated.get(i)) {
-                addRecord(i, recordBitOffset, fixedLengthLongArray, varLengthByteArrays);
+                addRecord(i, recordBitOffset[shardNumber], fixedLengthLongArray[shardNumber], varLengthByteArrays[shardNumber]);
             } else {
-                addNullRecord(i, recordBitOffset, fixedLengthLongArray, varLengthByteArrays);
+                addNullRecord(i, recordBitOffset[shardNumber], fixedLengthLongArray[shardNumber], varLengthByteArrays[shardNumber]);
             }
-            recordBitOffset += numBitsPerRecord;
+            recordBitOffset[shardNumber] += numBitsPerRecord;
         }
     }
-
-
+    
     @Override
     public void writeSnapshot(DataOutputStream os) throws IOException {
-        /// 1) max ordinal
-        VarInt.writeVInt(os, maxOrdinal);
+        /// for unsharded blobs, support pre v2.1.0 clients
+        if(numShards == 1) {
+            writeSnapshotShard(os, 0);
+        } else {
+            /// overall max ordinal
+            VarInt.writeVInt(os, maxOrdinal);
+            
+            for(int i=0;i<numShards;i++) {
+                writeSnapshotShard(os, i);
+            }
+        }
+
+        /// Populated bits
+        currentCyclePopulated.serializeBitsTo(os);
+        
+        fixedLengthLongArray = null;
+        varLengthByteArrays = null;
+        recordBitOffset = null;
+    }
+
+    private void writeSnapshotShard(DataOutputStream os, int shardNumber) throws IOException {
+        /// 1) shard max ordinal
+        VarInt.writeVInt(os, maxShardOrdinal[shardNumber]);
 
         /// 2) FixedLength field sizes
         for(int i=0;i<getSchema().numFields();i++) {
@@ -176,25 +221,19 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         }
 
         /// 3) FixedLength data
-        long numBitsRequired = recordBitOffset;
-        long numLongsRequired = recordBitOffset == 0 ? 0 : ((numBitsRequired - 1) / 64) + 1;
-        fixedLengthLongArray.writeTo(os, numLongsRequired);
+        long numBitsRequired = recordBitOffset[shardNumber];
+        long numLongsRequired = recordBitOffset[shardNumber] == 0 ? 0 : ((numBitsRequired - 1) / 64) + 1;
+        fixedLengthLongArray[shardNumber].writeTo(os, numLongsRequired);
 
         /// 4) VarLength data
-        for(int i=0;i<varLengthByteArrays.length;i++) {
-            if(varLengthByteArrays[i] == null) {
+        for(int i=0;i<varLengthByteArrays[shardNumber].length;i++) {
+            if(varLengthByteArrays[shardNumber][i] == null) {
                 VarInt.writeVLong(os, 0);
             } else {
-                VarInt.writeVLong(os, varLengthByteArrays[i].length());
-                varLengthByteArrays[i].getUnderlyingArray().writeTo(os, 0, varLengthByteArrays[i].length());
+                VarInt.writeVLong(os, varLengthByteArrays[shardNumber][i].length());
+                varLengthByteArrays[shardNumber][i].getUnderlyingArray().writeTo(os, 0, varLengthByteArrays[shardNumber][i].length());
             }
         }
-
-        /// 5) Populated bits
-        currentCyclePopulated.serializeBitsTo(os);
-
-        fixedLengthLongArray = null;
-        varLengthByteArrays = null;
     }
 
     @Override
@@ -222,42 +261,78 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         int numBitsPerRecord = fieldStats.getNumBitsPerRecord();
 
         ThreadSafeBitSet deltaAdditions = toCyclePopulated.andNot(fromCyclePopulated);
-        int numRecordsInDelta = deltaAdditions.cardinality();
 
-        fixedLengthLongArray = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numRecordsInDelta * numBitsPerRecord);
-        deltaAddedOrdinals = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
-        deltaRemovedOrdinals = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
+        fixedLengthLongArray = new FixedLengthElementArray[numShards];
+        deltaAddedOrdinals = new ByteDataBuffer[numShards];
+        deltaRemovedOrdinals = new ByteDataBuffer[numShards];
+        varLengthByteArrays = new ByteDataBuffer[numShards][];
+        recordBitOffset = new long[numShards];
+        int numAddedRecordsInShard[] = new int[numShards];
+        
+        int shardMask = numShards - 1;
+        
+        int addedOrdinal = deltaAdditions.nextSetBit(0);
+        while(addedOrdinal != -1) {
+            numAddedRecordsInShard[addedOrdinal & shardMask]++;
+            addedOrdinal = deltaAdditions.nextSetBit(addedOrdinal + 1);
+        }
+        
+        for(int i=0;i<numShards;i++) {
+            fixedLengthLongArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numAddedRecordsInShard[i] * numBitsPerRecord);
+            deltaAddedOrdinals[i] = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
+            deltaRemovedOrdinals[i] = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
+            varLengthByteArrays[i] = new ByteDataBuffer[getSchema().numFields()];
+        }
 
-        varLengthByteArrays = new ByteDataBuffer[getSchema().numFields()];
-
-        recordBitOffset = 0;
-
-        int previousRemovedOrdinal = 0;
-        int previousAddedOrdinal = 0;
+        int previousRemovedOrdinal[] = new int[numShards];
+        int previousAddedOrdinal[] = new int[numShards];
 
         for(int i=0;i<=maxOrdinal;i++) {
-            if(toCyclePopulated.get(i) && !fromCyclePopulated.get(i)) {
-                addRecord(i, recordBitOffset, fixedLengthLongArray, varLengthByteArrays);
-                recordBitOffset += numBitsPerRecord;
-                VarInt.writeVInt(deltaAddedOrdinals, i - previousAddedOrdinal);
-                previousAddedOrdinal = i;
+            int shardNumber = i & shardMask;
+            if(deltaAdditions.get(i)) {
+                addRecord(i, recordBitOffset[shardNumber], fixedLengthLongArray[shardNumber], varLengthByteArrays[shardNumber]);
+                recordBitOffset[shardNumber] += numBitsPerRecord;
+                int shardOrdinal = i / numShards;
+                VarInt.writeVInt(deltaAddedOrdinals[shardNumber], shardOrdinal - previousAddedOrdinal[shardNumber]);
+                previousAddedOrdinal[shardNumber] = shardOrdinal;
             } else if(fromCyclePopulated.get(i) && !toCyclePopulated.get(i)) {
-                VarInt.writeVInt(deltaRemovedOrdinals, i - previousRemovedOrdinal);
-                previousRemovedOrdinal = i;
+                int shardOrdinal = i / numShards;
+                VarInt.writeVInt(deltaRemovedOrdinals[shardNumber], shardOrdinal - previousRemovedOrdinal[shardNumber]);
+                previousRemovedOrdinal[shardNumber] = shardOrdinal;
             }
         }
     }
 
     private void writeCalculatedDelta(DataOutputStream os) throws IOException {
+        /// for unsharded blobs, support pre v2.1.0 clients
+        if(numShards == 1) {
+            writeCalculatedDeltaShard(os, 0);
+        } else {
+            /// overall max ordinal
+            VarInt.writeVInt(os, maxOrdinal);
+            
+            for(int i=0;i<numShards;i++) {
+                writeCalculatedDeltaShard(os, i);
+            }
+        }
+        
+        fixedLengthLongArray = null;
+        varLengthByteArrays = null;
+        deltaAddedOrdinals = null;
+        deltaRemovedOrdinals = null;
+        recordBitOffset = null;
+    }
+
+    private void writeCalculatedDeltaShard(DataOutputStream os, int shardNumber) throws IOException {
 
         /// 1) max ordinal
-        VarInt.writeVInt(os, maxOrdinal);
+        VarInt.writeVInt(os, maxShardOrdinal[shardNumber]);
 
         /// 2) removal / addition ordinals.
-        VarInt.writeVLong(os, deltaRemovedOrdinals.length());
-        deltaRemovedOrdinals.getUnderlyingArray().writeTo(os, 0, deltaRemovedOrdinals.length());
-        VarInt.writeVLong(os, deltaAddedOrdinals.length());
-        deltaAddedOrdinals.getUnderlyingArray().writeTo(os, 0, deltaAddedOrdinals.length());
+        VarInt.writeVLong(os, deltaRemovedOrdinals[shardNumber].length());
+        deltaRemovedOrdinals[shardNumber].getUnderlyingArray().writeTo(os, 0, deltaRemovedOrdinals[shardNumber].length());
+        VarInt.writeVLong(os, deltaAddedOrdinals[shardNumber].length());
+        deltaAddedOrdinals[shardNumber].getUnderlyingArray().writeTo(os, 0, deltaAddedOrdinals[shardNumber].length());
 
         /// 3) FixedLength field sizes
         for(int i=0;i<getSchema().numFields();i++) {
@@ -265,24 +340,19 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         }
 
         /// 4) FixedLength data
-        long numBitsRequired = recordBitOffset;
+        long numBitsRequired = recordBitOffset[shardNumber];
         long numLongsRequired = numBitsRequired == 0 ? 0 : ((numBitsRequired - 1) / 64) + 1;
-        fixedLengthLongArray.writeTo(os, numLongsRequired);
+        fixedLengthLongArray[shardNumber].writeTo(os, numLongsRequired);
 
         /// 5) VarLength data
-        for(int i=0;i<varLengthByteArrays.length;i++) {
-            if(varLengthByteArrays[i] == null) {
+        for(int i=0;i<varLengthByteArrays[shardNumber].length;i++) {
+            if(varLengthByteArrays[shardNumber][i] == null) {
                 VarInt.writeVLong(os, 0);
             } else {
-                VarInt.writeVLong(os, varLengthByteArrays[i].length());
-                varLengthByteArrays[i].getUnderlyingArray().writeTo(os, 0, varLengthByteArrays[i].length());
+                VarInt.writeVLong(os, varLengthByteArrays[shardNumber][i].length());
+                varLengthByteArrays[shardNumber][i].getUnderlyingArray().writeTo(os, 0, varLengthByteArrays[shardNumber][i].length());
             }
         }
-
-        fixedLengthLongArray = null;
-        varLengthByteArrays = null;
-        deltaAddedOrdinals = null;
-        deltaRemovedOrdinals = null;
     }
 
     /// here we need to add the offsets for the variable-length field endings, as they will be read as the start position for the following record.

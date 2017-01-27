@@ -19,7 +19,6 @@ package com.netflix.hollow.core.write.objectmapper;
 
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-
 import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
@@ -55,7 +54,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         this.clazz = clazz;
         this.typeName = declaredTypeName != null ? declaredTypeName : getDefaultTypeName(clazz);
         this.mappedFields = new ArrayList<MappedField>();
-
+        
         if(clazz == String.class) {
             try {
                 mappedFields.add(new MappedField(clazz.getDeclaredField("value")));
@@ -86,7 +85,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         }
 
         HollowObjectTypeWriteState existingWriteState = (HollowObjectTypeWriteState) parentMapper.getStateEngine().getTypeState(typeName);
-        this.writeState = existingWriteState != null ? existingWriteState : new HollowObjectTypeWriteState(schema);
+        this.writeState = existingWriteState != null ? existingWriteState : new HollowObjectTypeWriteState(schema, getNumShards(clazz));
 
         long assignedOrdinalFieldOffset = -1;
         try {
@@ -99,6 +98,13 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
     private static String[] getKeyFieldPaths(Class<?> clazz) {
         HollowPrimaryKey primaryKey = clazz.getAnnotation(HollowPrimaryKey.class);
         return primaryKey == null ? null : primaryKey.fields();
+    }
+    
+    private static int getNumShards(Class<?> clazz) {
+        HollowShardLargeType numShardsAnnotation = clazz.getAnnotation(HollowShardLargeType.class);
+        if(numShardsAnnotation != null)
+            return numShardsAnnotation.numShards();
+        return -1;
     }
 
     @Override
@@ -161,6 +167,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         private final HollowTypeMapper subTypeMapper;
         private final HollowTypeName typeNameAnnotation;
         private final HollowHashKey hashKeyAnnotation;
+        private final HollowShardLargeType numShardsAnnotation;
         private final boolean isEnumNameField;
 
         private MappedField(Field f) {
@@ -172,6 +179,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             this.type = f.getGenericType();
             this.typeNameAnnotation = f.getAnnotation(HollowTypeName.class);
             this.hashKeyAnnotation = f.getAnnotation(HollowHashKey.class);
+            this.numShardsAnnotation = f.getAnnotation(HollowShardLargeType.class);
             this.isEnumNameField = false;
 
             HollowTypeMapper subTypeMapper = null;
@@ -198,7 +206,12 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 }
                 // guard recursion here
                 visitedTypes.add(this.type);
-                subTypeMapper = parentMapper.getTypeMapper(type, typeNameAnnotation != null ? typeNameAnnotation.name() : null, hashKeyAnnotation != null ? hashKeyAnnotation.fields() : null, visitedTypes);
+                subTypeMapper = parentMapper.getTypeMapper(type, 
+                                                           typeNameAnnotation != null ? typeNameAnnotation.name() : null, 
+                                                           hashKeyAnnotation != null ? hashKeyAnnotation.fields() : null, 
+                                                           numShardsAnnotation != null ? numShardsAnnotation.numShards() : -1, 
+                                                           visitedTypes);
+                
                 // once we've safely returned from a leaf node in recursion, we can remove this MappedField's type
                 visitedTypes.remove(this.type);
             }
@@ -212,6 +225,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             this.type = null;
             this.typeNameAnnotation = null;
             this.hashKeyAnnotation = null;
+            this.numShardsAnnotation = null;
             this.fieldName = "_name";
             this.fieldType = FieldType.STRING;
             this.isEnumNameField = true;

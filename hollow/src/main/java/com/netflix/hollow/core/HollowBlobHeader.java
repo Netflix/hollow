@@ -41,7 +41,6 @@ import java.util.Map;
  */
 public class HollowBlobHeader {
 
-    public static final int HOLLOW_BLOB_OLD_FORMAT_VERSION_HEADER = 1029;
     public static final int HOLLOW_BLOB_VERSION_HEADER = 1030;
 
     private Map<String, String> headerTags = new HashMap<String, String>();

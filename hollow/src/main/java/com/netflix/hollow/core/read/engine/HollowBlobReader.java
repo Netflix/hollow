@@ -17,8 +17,6 @@
  */
 package com.netflix.hollow.core.read.engine;
 
-import static com.netflix.hollow.core.HollowBlobHeader.HOLLOW_BLOB_OLD_FORMAT_VERSION_HEADER;
-
 import com.netflix.hollow.core.memory.encoding.VarInt;
 
 import com.netflix.hollow.core.schema.HollowListSchema;
@@ -160,34 +158,33 @@ public class HollowBlobReader {
     private String readTypeStateSnapshot(DataInputStream is, HollowBlobHeader header, HollowFilterConfig filter) throws IOException {
         HollowSchema schema = HollowSchema.readFrom(is);
 
-        if(header.getBlobFormatVersion() != HOLLOW_BLOB_OLD_FORMAT_VERSION_HEADER)
-            skipForwardsCompatibilityBytes(is);
-
+        int numShards = readNumShards(is);
+        
         if(schema instanceof HollowObjectSchema) {
             if(!filter.doesIncludeType(schema.getName())) {
-                HollowObjectTypeReadState.discardSnapshot(is, (HollowObjectSchema)schema);
+                HollowObjectTypeReadState.discardSnapshot(is, (HollowObjectSchema)schema, numShards);
             } else {
                 HollowObjectSchema unfilteredSchema = (HollowObjectSchema)schema;
                 HollowObjectSchema filteredSchema = unfilteredSchema.filterSchema(filter);
-                populateTypeStateSnapshot(is, new HollowObjectTypeReadState(stateEngine, filteredSchema, unfilteredSchema));
+                populateTypeStateSnapshot(is, new HollowObjectTypeReadState(stateEngine, filteredSchema, unfilteredSchema, numShards));
             }
         } else if (schema instanceof HollowListSchema) {
             if(!filter.doesIncludeType(schema.getName())) {
-                HollowListTypeReadState.discardSnapshot(is);
+                HollowListTypeReadState.discardSnapshot(is, numShards);
             } else {
-                populateTypeStateSnapshot(is, new HollowListTypeReadState(stateEngine, (HollowListSchema)schema));
+                populateTypeStateSnapshot(is, new HollowListTypeReadState(stateEngine, (HollowListSchema)schema, numShards));
             }
         } else if(schema instanceof HollowSetSchema) {
             if(!filter.doesIncludeType(schema.getName())) {
-                HollowSetTypeReadState.discardSnapshot(is);
+                HollowSetTypeReadState.discardSnapshot(is, numShards);
             } else {
-                populateTypeStateSnapshot(is, new HollowSetTypeReadState(stateEngine, (HollowSetSchema)schema));
+                populateTypeStateSnapshot(is, new HollowSetTypeReadState(stateEngine, (HollowSetSchema)schema, numShards));
             }
         } else if(schema instanceof HollowMapSchema) {
             if(!filter.doesIncludeType(schema.getName())) {
-                HollowMapTypeReadState.discardSnapshot(is);
+                HollowMapTypeReadState.discardSnapshot(is, numShards);
             } else {
-                populateTypeStateSnapshot(is, new HollowMapTypeReadState(stateEngine, (HollowMapSchema)schema));
+                populateTypeStateSnapshot(is, new HollowMapTypeReadState(stateEngine, (HollowMapSchema)schema, numShards));
             }
         }
         
@@ -202,19 +199,29 @@ public class HollowBlobReader {
     private String readTypeStateDelta(DataInputStream is, HollowBlobHeader header) throws IOException {
         HollowSchema schema = HollowSchema.readFrom(is);
 
-        if(header.getBlobFormatVersion() != HOLLOW_BLOB_OLD_FORMAT_VERSION_HEADER)
-            skipForwardsCompatibilityBytes(is);
+        int numShards = readNumShards(is);
 
         HollowTypeReadState typeState = stateEngine.getTypeState(schema.getName());
         if(typeState != null) {
             typeState.applyDelta(is, schema, stateEngine.getMemoryRecycler());
         } else {
-            discardDelta(is, schema);
+            discardDelta(is, schema, numShards);
         }
         
         return schema.getName();
     }
 
+    private int readNumShards(DataInputStream is) throws IOException {
+        int backwardsCompatibilityBytes = VarInt.readVInt(is);
+        
+        if(backwardsCompatibilityBytes == 0)
+            return 1;  /// produced by a version of hollow prior to 2.1.0, always only 1 shard.
+        
+        skipForwardsCompatibilityBytes(is);
+        
+        return VarInt.readVInt(is);
+    }
+        
     private void skipForwardsCompatibilityBytes(DataInputStream is) throws IOException {
         int bytesToSkip = VarInt.readVInt(is);
         while(bytesToSkip > 0) {
@@ -226,15 +233,15 @@ public class HollowBlobReader {
     }
 
 
-    private void discardDelta(DataInputStream dis, HollowSchema schema) throws IOException {
+    private void discardDelta(DataInputStream dis, HollowSchema schema, int numShards) throws IOException {
         if(schema instanceof HollowObjectSchema)
-            HollowObjectTypeReadState.discardDelta(dis, (HollowObjectSchema)schema);
+            HollowObjectTypeReadState.discardDelta(dis, (HollowObjectSchema)schema, numShards);
         else if(schema instanceof HollowListSchema)
-            HollowListTypeReadState.discardDelta(dis);
+            HollowListTypeReadState.discardDelta(dis, numShards);
         else if(schema instanceof HollowSetSchema)
-            HollowSetTypeReadState.discardDelta(dis);
+            HollowSetTypeReadState.discardDelta(dis, numShards);
         else if(schema instanceof HollowMapSchema)
-            HollowMapTypeReadState.discardDelta(dis);
+            HollowMapTypeReadState.discardDelta(dis, numShards);
     }
 
 }
