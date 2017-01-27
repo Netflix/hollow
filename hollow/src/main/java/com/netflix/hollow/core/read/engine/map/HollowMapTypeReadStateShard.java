@@ -143,6 +143,7 @@ class HollowMapTypeReadStateShard {
 
     public long relativeBucket(int ordinal, int bucketIndex) {
         HollowMapTypeDataElements currentData;
+        long bucketValue;
         do {
             long absoluteBucketIndex;
             do {
@@ -151,10 +152,12 @@ class HollowMapTypeReadStateShard {
             } while(readWasUnsafe(currentData));
             long key = getBucketKeyByAbsoluteIndex(currentData, absoluteBucketIndex);
             if(key == currentData.emptyBucketKeyValue)
-                return -1;
+                return -1L;
 
-            return key << 32 | getBucketValueByAbsoluteIndex(currentData, absoluteBucketIndex);
+            bucketValue = key << 32 | getBucketValueByAbsoluteIndex(currentData, absoluteBucketIndex);
         } while(readWasUnsafe(currentData));
+        
+        return bucketValue;
     }
 
     private long getAbsoluteBucketStart(HollowMapTypeDataElements currentData, int ordinal) {
