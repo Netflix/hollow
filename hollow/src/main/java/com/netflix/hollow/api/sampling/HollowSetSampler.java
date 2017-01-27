@@ -32,9 +32,8 @@ public class HollowSetSampler implements HollowSampler {
     private HollowSamplingDirector director;
 
     private long sizeSamples;
-    private long containsSamples;
+    private long getSamples;
     private long iteratorSamples;
-    private long bucketRetrievalSamples;
 
     public HollowSetSampler(String typeName, HollowSamplingDirector director) {
         this.typeName = typeName;
@@ -58,9 +57,9 @@ public class HollowSetSampler implements HollowSampler {
         director.setUpdateThread(t);
     }
 
-    public void recordContains() {
+    public void recordGet() {
         if(director.shouldRecord())
-            containsSamples++;
+            getSamples++;
     }
 
     public void recordSize() {
@@ -73,32 +72,25 @@ public class HollowSetSampler implements HollowSampler {
             iteratorSamples++;
     }
 
-    public void recordBucketRetrieval() {
-        if(director.shouldRecord())
-            bucketRetrievalSamples++;
-    }
-
     @Override
     public boolean hasSampleResults() {
-        return sizeSamples > 0 || containsSamples > 0 || iteratorSamples > 0 || bucketRetrievalSamples > 0;
+        return sizeSamples > 0 || getSamples > 0 || iteratorSamples > 0;
     }
 
     @Override
     public Collection<SampleResult> getSampleResults() {
         List<SampleResult> results = new ArrayList<SampleResult>(3);
         results.add(new SampleResult(typeName + ".size()", sizeSamples));
-        results.add(new SampleResult(typeName + ".contains()", containsSamples));
+        results.add(new SampleResult(typeName + ".get()", getSamples));
         results.add(new SampleResult(typeName + ".iterator()", iteratorSamples));
-        results.add(new SampleResult(typeName + ".bucketValue()", bucketRetrievalSamples));
         return results;
     }
 
     @Override
     public void reset() {
         sizeSamples = 0;
-        containsSamples = 0;
+        getSamples = 0;
         iteratorSamples = 0;
-        bucketRetrievalSamples = 0;
     }
 
 }

@@ -134,6 +134,7 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
 
     @Override
     public int size(int ordinal) {
+        sampler.recordSize();
         return shards[ordinal & shardNumberMask].size(ordinal >> shardOrdinalShift);
     }
 
@@ -144,11 +145,14 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
 
     @Override
     public boolean contains(int ordinal, int value, int hashCode) {
+        sampler.recordGet();
         return shards[ordinal & shardNumberMask].contains(ordinal >> shardOrdinalShift, value, hashCode);
     }
     
     @Override
     public int findElement(int ordinal, Object... hashKey) {
+        sampler.recordGet();
+        
         if(keyDeriver == null)
             return -1;
         
@@ -168,6 +172,7 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
 
     @Override
     public HollowOrdinalIterator potentialMatchOrdinalIterator(int ordinal, int hashCode) {
+        sampler.recordGet();
         if(size(ordinal) == 0)
             return EmptyOrdinalIterator.INSTANCE;
         return new PotentialMatchHollowSetOrdinalIterator(ordinal, this, hashCode);
@@ -175,6 +180,7 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
 
     @Override
     public HollowOrdinalIterator ordinalIterator(int ordinal) {
+        sampler.recordIterator();
         if(size(ordinal) == 0)
             return EmptyOrdinalIterator.INSTANCE;
         return new HollowSetOrdinalIterator(ordinal, this);

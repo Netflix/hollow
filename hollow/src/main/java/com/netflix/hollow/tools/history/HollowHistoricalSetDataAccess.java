@@ -54,7 +54,7 @@ public class HollowHistoricalSetDataAccess extends HollowHistoricalTypeDataAcces
     
     @Override
     public boolean contains(int ordinal, int value) {
-        sampler().recordContains();
+        sampler().recordGet();
         recordStackTrace();
 
         if(!ordinalIsPresent(ordinal))
@@ -64,7 +64,7 @@ public class HollowHistoricalSetDataAccess extends HollowHistoricalTypeDataAcces
     
     @Override
     public int findElement(int ordinal, Object... hashKey) {
-        sampler().recordContains();
+        sampler().recordGet();
         recordStackTrace();
         
         if(keyMatcher == null)
@@ -96,7 +96,7 @@ public class HollowHistoricalSetDataAccess extends HollowHistoricalTypeDataAcces
 
     @Override
     public boolean contains(int ordinal, int value, int hashCode) {
-        sampler().recordContains();
+        sampler().recordGet();
         recordStackTrace();
 
         if(!ordinalIsPresent(ordinal))
@@ -106,7 +106,6 @@ public class HollowHistoricalSetDataAccess extends HollowHistoricalTypeDataAcces
 
     @Override
     public int relativeBucketValue(int ordinal, int bucketIndex) {
-        sampler().recordBucketRetrieval();
         recordStackTrace();
 
         if(!ordinalIsPresent(ordinal))
