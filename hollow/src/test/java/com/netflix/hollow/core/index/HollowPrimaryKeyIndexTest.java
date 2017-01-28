@@ -304,7 +304,7 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
     }
 
 
-    @HollowPrimaryKey(fields = { "a1", "a2", "ab.b1.value" })
+    @HollowPrimaryKey(fields = { "a1", "a2", "ab.b1" })
     private static class TypeA {
         private final int a1;
         private final double a2;
