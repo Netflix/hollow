@@ -33,6 +33,18 @@ public class DeployablePackagesDelegateLookupImpl extends HollowObjectAbstractDe
         return typeAPI.getCountryCodesOrdinal(ordinal);
     }
 
+    public int getTagsOrdinal(int ordinal) {
+        return typeAPI.getTagsOrdinal(ordinal);
+    }
+
+    public boolean getDefaultPackage(int ordinal) {
+        return typeAPI.getDefaultPackage(ordinal);
+    }
+
+    public Boolean getDefaultPackageBoxed(int ordinal) {
+        return typeAPI.getDefaultPackageBoxed(ordinal);
+    }
+
     public DeployablePackagesTypeAPI getTypeAPI() {
         return typeAPI;
     }

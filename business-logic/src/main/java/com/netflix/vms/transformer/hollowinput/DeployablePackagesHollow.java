@@ -33,6 +33,21 @@ public class DeployablePackagesHollow extends HollowObject {
         return  api().getISOCountrySetHollow(refOrdinal);
     }
 
+    public ListOfPackageTagsHollow _getTags() {
+        int refOrdinal = delegate().getTagsOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getListOfPackageTagsHollow(refOrdinal);
+    }
+
+    public boolean _getDefaultPackage() {
+        return delegate().getDefaultPackage(ordinal);
+    }
+
+    public Boolean _getDefaultPackageBoxed() {
+        return delegate().getDefaultPackageBoxed(ordinal);
+    }
+
     public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }
