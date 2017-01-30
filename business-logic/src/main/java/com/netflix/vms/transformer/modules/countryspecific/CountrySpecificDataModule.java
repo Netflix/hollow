@@ -338,6 +338,9 @@ public class CountrySpecificDataModule {
             com.netflix.vms.transformer.hollowoutput.Integer key = entry.getKey();
             VideoPackageInfo packageInfo = entry.getValue().videoPackageInfo;
             boolean isDefaultPackage = packageInfo == null ? true : packageInfo.isDefaultPackage;
+            if(window.windowInfosByPackageId.size() == 1) {
+                isDefaultPackage = true;
+            }
             if(isDefaultPackage) {
                 if (packageId == null || packageId.val < key.val) {
                     packageId = key;

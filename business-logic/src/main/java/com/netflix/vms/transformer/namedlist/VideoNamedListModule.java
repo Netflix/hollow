@@ -357,7 +357,9 @@ public class VideoNamedListModule {
                         for(Map.Entry<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo> entry : window.windowInfosByPackageId.entrySet()) {
                             WindowPackageContractInfo packageContractInfo = entry.getValue();
                             boolean isDefaultPackage = packageContractInfo.videoPackageInfo == null ? true : packageContractInfo.videoPackageInfo.isDefaultPackage;
-
+                            if(window.windowInfosByPackageId.size() == 1) {
+                                isDefaultPackage = true;
+                            }
                             if(entry.getKey().val > maxPackageId && isDefaultPackage) {
                                 maxPackageId = entry.getKey().val;
 
