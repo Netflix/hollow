@@ -1146,7 +1146,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.12-platform",
+            "locked": "0.9.0.13-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -4259,7 +4259,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.12-platform",
+            "locked": "0.9.0.13-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -7372,7 +7372,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.12-platform",
+            "locked": "0.9.0.13-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -10485,7 +10485,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.12-platform",
+            "locked": "0.9.0.13-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -13703,7 +13703,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.12-platform",
+            "locked": "0.9.0.13-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -16834,7 +16834,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.12-platform",
+            "locked": "0.9.0.13-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -19998,7 +19998,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.12-platform",
+            "locked": "0.9.0.13-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -23162,7 +23162,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.12-platform",
+            "locked": "0.9.0.13-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -26326,7 +26326,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.12-platform",
+            "locked": "0.9.0.13-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
