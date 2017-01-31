@@ -17,18 +17,19 @@
  */
 package com.netflix.hollow.core.write.objectmapper;
 
+import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-import com.netflix.hollow.core.memory.HollowUnsafeHandle;
-import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
-import java.lang.reflect.Type;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -61,17 +62,26 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+        } else if(clazz == Date.class) {
+            try {
+                mappedFields.add(new MappedField(SpecialField.DATE_TIME));
+            } catch(Exception e) {
+                throw new RuntimeException(e);
+            }
         } else {
             Field[] declaredFields = clazz.getDeclaredFields();
 
             for(int i=0;i<declaredFields.length;i++) {
-                if(!Modifier.isStatic(declaredFields[i].getModifiers()) && !"__assigned_ordinal".equals(declaredFields[i].getName())) {
+                if(!Modifier.isTransient(declaredFields[i].getModifiers()) && 
+                   !Modifier.isStatic(declaredFields[i].getModifiers()) && 
+                   !"__assigned_ordinal".equals(declaredFields[i].getName())) {
+                    
                     mappedFields.add(new MappedField(declaredFields[i], visited));
                 }
             }
 
             if(clazz.isEnum())
-                mappedFields.add(new MappedField());
+                mappedFields.add(new MappedField(SpecialField.ENUM_NAME));
         }
 
         this.schema = new HollowObjectSchema(typeName, mappedFields.size(), getKeyFieldPaths(clazz));
@@ -168,7 +178,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         private final HollowTypeName typeNameAnnotation;
         private final HollowHashKey hashKeyAnnotation;
         private final HollowShardLargeType numShardsAnnotation;
-        private final boolean isEnumNameField;
+        private final SpecialField specialField;
 
         private MappedField(Field f) {
             this(f, new HashSet<Type>());
@@ -180,7 +190,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             this.typeNameAnnotation = f.getAnnotation(HollowTypeName.class);
             this.hashKeyAnnotation = f.getAnnotation(HollowHashKey.class);
             this.numShardsAnnotation = f.getAnnotation(HollowShardLargeType.class);
-            this.isEnumNameField = false;
+            this.specialField = null;
 
             HollowTypeMapper subTypeMapper = null;
 
@@ -219,16 +229,15 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             this.subTypeMapper = subTypeMapper;
         }
 
-        /// for enum name().
-        private MappedField() {
+        private MappedField(SpecialField specialField) {
             this.fieldOffset = -1;
             this.type = null;
             this.typeNameAnnotation = null;
             this.hashKeyAnnotation = null;
             this.numShardsAnnotation = null;
-            this.fieldName = "_name";
-            this.fieldType = FieldType.STRING;
-            this.isEnumNameField = true;
+            this.fieldName = specialField.getFieldName();
+            this.fieldType = specialField.getFieldType();
+            this.specialField = specialField;
             this.subTypeMapper = null;
         }
 
@@ -284,10 +293,14 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                         rec.setInt(fieldName, unsafe.getChar(obj, fieldOffset));
                     break;
                 case LONG:
-                    rec.setLong(fieldName, unsafe.getLong(obj, fieldOffset));
+                    if(specialField == SpecialField.DATE_TIME) {
+                        rec.setLong(fieldName, ((Date)obj).getTime());
+                    } else {
+                        rec.setLong(fieldName, unsafe.getLong(obj, fieldOffset));
+                    }
                     break;
                 case STRING:
-                    if(isEnumNameField) {
+                    if(specialField == SpecialField.ENUM_NAME) {
                         rec.setString(fieldName, ((Enum<?>)obj).name());
                     } else {
                         Object charArray = unsafe.getObject(obj, fieldOffset);
@@ -302,6 +315,27 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     break;
             }
         }
+        
     }
 
+    private static enum SpecialField {
+        ENUM_NAME(FieldType.STRING, "_name"),
+        DATE_TIME(FieldType.LONG, "value");
+        
+        private final FieldType fieldType;
+        private final String fieldName;
+        
+        private SpecialField(FieldType fieldType, String fieldName) {
+            this.fieldType = fieldType;
+            this.fieldName = fieldName;
+        }
+        
+        public FieldType getFieldType() {
+            return fieldType;
+        }
+        
+        public String getFieldName() {
+            return fieldName;
+        }
+    }
 }

@@ -17,8 +17,9 @@
  */
 package com.netflix.hollow.core.write.objectmapper;
 
-import com.netflix.hollow.core.AbstractStateEngineTest;
+import java.util.Date;
 
+import com.netflix.hollow.core.AbstractStateEngineTest;
 import com.netflix.hollow.tools.stringifier.HollowRecordJsonStringifier;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
@@ -74,6 +75,23 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         
         Assert.assertEquals(2, subObj.getInt("val1"));
         Assert.assertEquals(3, subObj.getInt("val2"));
+    }
+    
+    @Test
+    public void testDate() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        
+        long time = System.currentTimeMillis();
+        
+        mapper.addObject(new Date(time));
+        
+        roundTripSnapshot();
+        
+        int theOrdinal = readStateEngine.getTypeState("Date").maxOrdinal();
+        
+        GenericHollowObject obj = new GenericHollowObject(readStateEngine, "Date", theOrdinal);
+        
+        Assert.assertEquals(time, obj.getLong("value"));
     }
 
     @Test
