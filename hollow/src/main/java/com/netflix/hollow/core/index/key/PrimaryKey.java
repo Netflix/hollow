@@ -92,6 +92,22 @@ public class PrimaryKey {
     }
 
     /**
+     * Returns a separated field path, which has been auto-expanded if necessary based on the provided primary key field path. 
+     */
+    public static String[] getCompleteFieldPathParts(HollowDataset dataset, String type, String fieldPath) {
+        int fieldPathIdx[] = getFieldPathIndex(dataset, type, fieldPath);
+        String fieldPathParts[] = new String[fieldPathIdx.length];
+        
+        HollowObjectSchema schema = (HollowObjectSchema) dataset.getSchema(type);
+        for(int i=0;i<fieldPathParts.length;i++) {
+            fieldPathParts[i] = schema.getFieldName(fieldPathIdx[i]);
+            schema = (HollowObjectSchema) dataset.getSchema(schema.getReferencedType(fieldPathIdx[i]));
+        }
+        
+        return fieldPathParts;
+    }
+    
+    /**
      * The field path index is the object schemas' field positions for a particular field path. 
      */
     public static int[] getFieldPathIndex(HollowDataset dataset, String type, String fieldPath) {

@@ -17,8 +17,11 @@
  */
 package com.netflix.hollow.tools.history;
 
-import com.netflix.hollow.core.AbstractStateEngineTest;
+import com.netflix.hollow.core.index.key.PrimaryKey;
 
+import com.netflix.hollow.core.util.StateEngineRoundTripper;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.AbstractStateEngineTest;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
@@ -43,7 +46,7 @@ public class HollowHistoryKeyIndexTest extends AbstractStateEngineTest {
         aSchema.addField("anotherField", FieldType.LONG);
         aSchema.addField("bRef", FieldType.REFERENCE, "B");
 
-        bSchema = new HollowObjectSchema("B", 2);
+        bSchema = new HollowObjectSchema("B", 2, new PrimaryKey("B", "id"));
         bSchema.addField("id", FieldType.STRING);
         bSchema.addField("anotherField", FieldType.DOUBLE);
 
@@ -52,11 +55,13 @@ public class HollowHistoryKeyIndexTest extends AbstractStateEngineTest {
 
     @Test
     public void extractsAndIndexesKeyRecords() throws IOException {
-        HollowHistoryKeyIndex keyIdx = new HollowHistoryKeyIndex();
+        HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeStateEngine);
+        HollowHistory history = new HollowHistory(readEngine, 1L, 1);
+        HollowHistoryKeyIndex keyIdx = new HollowHistoryKeyIndex(history);
         keyIdx.addTypeIndex("A", "id", "bRef.id");
         keyIdx.addTypeIndex("B", "id");
 
-        keyIdx.indexTypeField("A", "bRef.id");
+        keyIdx.indexTypeField("A", "bRef");
         keyIdx.indexTypeField("A", "id");
         keyIdx.indexTypeField("B", "id");
 

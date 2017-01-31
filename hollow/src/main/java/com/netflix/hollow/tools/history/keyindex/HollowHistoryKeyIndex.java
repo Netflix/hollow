@@ -17,13 +17,14 @@
  */
 package com.netflix.hollow.tools.history.keyindex;
 
-import com.netflix.hollow.core.util.SimultaneousExecutor;
-
-import com.netflix.hollow.core.write.HollowBlobWriter;
-import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
+import com.netflix.hollow.core.write.HollowBlobWriter;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.tools.history.HollowHistory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,11 +33,13 @@ import java.util.Map;
 
 public class HollowHistoryKeyIndex {
 
+    private final HollowHistory history;
     private final Map<String, HollowHistoryTypeKeyIndex> typeKeyIndexes;
     private final HollowWriteStateEngine writeStateEngine;
     private final HollowReadStateEngine readStateEngine;
 
-    public HollowHistoryKeyIndex() {
+    public HollowHistoryKeyIndex(HollowHistory history) {
+        this.history = history;
         this.typeKeyIndexes = new HashMap<String, HollowHistoryTypeKeyIndex>();
         this.writeStateEngine = new HollowWriteStateEngine();
         this.readStateEngine = new HollowReadStateEngine();
@@ -55,12 +58,16 @@ public class HollowHistoryKeyIndex {
     }
 
     public void addTypeIndex(String type, String... keyFieldPaths) {
-        HollowHistoryTypeKeyIndex keyIdx = new HollowHistoryTypeKeyIndex(type, writeStateEngine, readStateEngine, keyFieldPaths);
-        typeKeyIndexes.put(type, keyIdx);
+        addTypeIndex(new PrimaryKey(type, keyFieldPaths));
+    }
+
+    public void addTypeIndex(PrimaryKey primaryKey) {
+        HollowHistoryTypeKeyIndex keyIdx = new HollowHistoryTypeKeyIndex(primaryKey, history.getLatestState(), writeStateEngine, readStateEngine);
+        typeKeyIndexes.put(primaryKey.getType(), keyIdx);
     }
 
     public void indexTypeField(String type, String keyFieldPath) {
-        typeKeyIndexes.get(type).addFieldIndex(keyFieldPath);
+        typeKeyIndexes.get(type).addFieldIndex(keyFieldPath, history.getLatestState());
     }
 
     public Map<String, HollowHistoryTypeKeyIndex> getTypeKeyIndexes() {
