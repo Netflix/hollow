@@ -634,7 +634,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.5",
+            "locked": "2.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -1013,7 +1013,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.12-platform",
+            "locked": "0.9.0.13-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -3378,7 +3378,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.5",
+            "locked": "2.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -3757,7 +3757,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.12-platform",
+            "locked": "0.9.0.13-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -6122,7 +6122,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.5",
+            "locked": "2.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -6501,7 +6501,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.12-platform",
+            "locked": "0.9.0.13-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -8866,7 +8866,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.5",
+            "locked": "2.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -9245,7 +9245,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.12-platform",
+            "locked": "0.9.0.13-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -11709,7 +11709,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.5",
+            "locked": "2.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -12088,7 +12088,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.12-platform",
+            "locked": "0.9.0.13-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -14453,7 +14453,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.5",
+            "locked": "2.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -14832,7 +14832,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.12-platform",
+            "locked": "0.9.0.13-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -17203,7 +17203,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.5",
+            "locked": "2.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -17582,7 +17582,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.12-platform",
+            "locked": "0.9.0.13-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -19953,7 +19953,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.5",
+            "locked": "2.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -20332,7 +20332,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.12-platform",
+            "locked": "0.9.0.13-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -22703,7 +22703,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.5",
+            "locked": "2.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -23082,7 +23082,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.12-platform",
+            "locked": "0.9.0.13-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
