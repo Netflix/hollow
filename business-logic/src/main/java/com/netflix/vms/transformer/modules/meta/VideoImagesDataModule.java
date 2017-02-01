@@ -662,7 +662,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                     Set<Integer> topNodes = getTopNodes(showHierarchiesByCountry, countryCode, entityId);
                     Artwork updatedArtwork = pickArtworkBasedOnRolloutInfo(localeArtworkIsRolloutAsInput, localeArtworkIsRolloutOppositeToInput, rolloutImagesByCountry.get(countryCode), sourceFileId);
                     
-                    if(ctx.getConfig().isRollupImagesForArtworkScheduling() || topNodes == null || topNodes.isEmpty()){
+                    if(!ctx.getConfig().isRollupImagesForArtworkScheduling() || topNodes == null || topNodes.isEmpty()){
                         Set<Artwork> artworkSet = getArtworkSet(entityId, artMap);
                         artworkSet.add(updatedArtwork);
                         continue;
