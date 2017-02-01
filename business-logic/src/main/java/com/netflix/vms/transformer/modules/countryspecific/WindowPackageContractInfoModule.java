@@ -93,7 +93,8 @@ public class WindowPackageContractInfoModule {
         info.videoPackageInfo.formats = new HashSet<VideoFormatDescriptor>();
         info.videoPackageInfo.soundTypes = new ArrayList<Strings>();
 
-        DeployablePackagesHollow deployablePackage = api.getDeployablePackagesHollow(deployablePackageIdx.getMatchingOrdinal((long) packageData.id));
+        int deployablePackageOrdinal = deployablePackageIdx.getMatchingOrdinal((long) packageData.id);
+        DeployablePackagesHollow deployablePackage = deployablePackageOrdinal == -1 ? null : api.getDeployablePackagesHollow(deployablePackageOrdinal);
         if(deployablePackage != null) {
             info.videoPackageInfo.isDefaultPackage = deployablePackage._getDefaultPackage();
         }

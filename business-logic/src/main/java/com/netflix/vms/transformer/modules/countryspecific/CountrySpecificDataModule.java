@@ -337,11 +337,11 @@ public class CountrySpecificDataModule {
         for (Map.Entry<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo> entry : window.windowInfosByPackageId.entrySet()) {
             com.netflix.vms.transformer.hollowoutput.Integer key = entry.getKey();
             VideoPackageInfo packageInfo = entry.getValue().videoPackageInfo;
-            boolean isDefaultPackage = packageInfo == null ? true : packageInfo.isDefaultPackage;
+            boolean considerPackageForSectction = packageInfo == null ? true : packageInfo.isDefaultPackage;
             if(window.windowInfosByPackageId.size() == 1) {
-                isDefaultPackage = true;
+                considerPackageForSectction = true;
             }
-            if(isDefaultPackage) {
+            if(considerPackageForSectction) {
                 if (packageId == null || packageId.val < key.val) {
                     packageId = key;
                     info = entry.getValue();

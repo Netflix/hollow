@@ -172,8 +172,10 @@ public class VMSAvailabilityWindowModule {
                             PackageData packageData = null;
                             if(locale != null) {
                                 packageData = getPackageData(videoId, pkg._getPackageId());
-                                
-                                long packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAvailability);
+                                long packageAvailability = 0;
+                                if(!packageData.isDefaultPackage || packageIdList.size() == 1) {
+                                    packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAvailability);
+                                }
                                 if(packageAvailability == 0) //// multicatalog processing -- make sure contract gives access to some existing asset understandable in this language
                                     continue;
 
@@ -262,8 +264,11 @@ public class VMSAvailabilityWindowModule {
                                         /// package data is available
                                         windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(packageData, rightsContract, contract, country, isAvailableForDownload);
                                         outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
-
-                                        if(packageData.isDefaultPackage) {
+                                        boolean considerForPackageSelection = rightsContract._getPackages() == null ? true : packageData.isDefaultPackage;
+                                        if(!considerForPackageSelection) {
+                                            if(rightsContract._getPackages().size() == 1) considerForPackageSelection = true;
+                                        }
+                                        if(considerForPackageSelection) {
                                             includedWindowPackageData = true;
 
                                             if(packageData.id > maxPackageId) {
@@ -360,14 +365,14 @@ public class VMSAvailabilityWindowModule {
 
             for(Map.Entry<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo> entry : currentOrFirstFutureWindow.windowInfosByPackageId.entrySet()) {
                 VideoPackageInfo videoPackageInfo  = entry.getValue().videoPackageInfo;
-                boolean isDefaultPackage = videoPackageInfo == null ? true : videoPackageInfo.isDefaultPackage;
+                boolean considerForPackageSelection = videoPackageInfo == null ? true : videoPackageInfo.isDefaultPackage;
 
-                if(!isDefaultPackage && currentOrFirstFutureWindow.windowInfosByPackageId.size() ==1) {
-                    isDefaultPackage = true;
+                if(!considerForPackageSelection && currentOrFirstFutureWindow.windowInfosByPackageId.size() ==1) {
+                    considerForPackageSelection = true;
                     ctx.getLogger().warn(TransformerLogTag.InteractivePackage, "Only one non-default package found for video={}, country={}", videoId, country);
                 }
 
-                if(isDefaultPackage && (entry.getKey().val > maxPackageId)) {
+                if(considerForPackageSelection && (entry.getKey().val > maxPackageId)) {
                     maxPackageId = entry.getKey().val;
                     assetBcp47CodesFromMaxPackageId = entry.getValue().videoContractInfo.assetBcp47Codes;
                     videoFormatDescriptorsFromMaxPackageId = entry.getValue().videoPackageInfo.formats;
