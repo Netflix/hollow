@@ -326,7 +326,7 @@ public class CountrySpecificDataModule {
         Integer prePromoDays = packageContractInfo == null ? null : packageContractInfo.videoContractInfo.prePromotionDays;
         Long availabilityDate = firstWindow != null ? firstWindow.startDate.val : null;
         Long earliestOffset = getEarliestSchedulePhaseOffset(videoId, imagesDataByCountry.get(countryCode));
-		Long earliestScheduledPhaseDate = (availabilityDate == null) ? null : (availabilityDate + earliestOffset);
+		Long earliestScheduledPhaseDate = (availabilityDate != null && earliestOffset != null) ? (availabilityDate + earliestOffset) : null;
         
         Integer metadataReleaseDays = getMetaDataReleaseDays(videoId);
         Long firstPhaseStartDate = getFirstPhaseStartDate(videoId, countryCode);
@@ -340,6 +340,10 @@ public class CountrySpecificDataModule {
     @VisibleForTesting
     Long getEarliestSchedulePhaseOffset(long videoId,  Map<Integer, VideoImages> videoImagesByVideoMap) {
 		Long earliestStart = null;
+		
+		// Check if the feature is turned on.
+		if(!ctx.getConfig().isUseSchedulePhasesInAvailabilityDateCalc())
+			return earliestStart;
 		
 		if(videoImagesByVideoMap == null)
 			return earliestStart;

@@ -64,6 +64,7 @@ import java.util.Set;
 
 public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabilityChecker {
 
+	private static final long FAR_FUTURE_DATE = Long.MIN_VALUE;
 	private final HollowHashIndex videoArtworkIndex;
     private final HollowPrimaryKeyIndex damMerchStillsIdx;
     private final HollowPrimaryKeyIndex videoStatusIdx;
@@ -550,8 +551,13 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         // get all schedule phase list for asset validation
         Set<SchedulePhaseInfo> schedulePhaseInfoSet = getAllScheduleInfo(artworkHollowInput, videoId);
         SchedulePhaseInfo window = getEarliestScheduleInfo(schedulePhaseInfoSet, videoId);
-        if (window == null) return null;
-
+        if (window == null) {
+            ctx.getLogger().warn(InvalidPhaseTagForArtwork, "Undefined phaseTagList in VideoArtwork for videoId={} sourceFileId={}." +
+                    "Data will be dropped", videoId, sourceFileId);
+            if(ctx.getConfig().isFilterImagesForArtworkScheduling())
+            	return null;
+            window = getFarInFutureSchedulePhaseInfo(videoId);
+        }
 
         ArtworkAttributesHollow attributes = artworkHollowInput._getAttributes();
         ArtworkDerivativeSetHollow inputDerivatives = artworkHollowInput._getDerivatives();
@@ -654,15 +660,16 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                 	// 2) Mark all rollout images as rollout
                 	// 3) Roll-up all images is to topNode with source video to indicate to which video the image was associated to in input.
                     Set<Integer> topNodes = getTopNodes(showHierarchiesByCountry, countryCode, entityId);
-                    if(topNodes == null || topNodes.isEmpty()){
+                    Artwork updatedArtwork = pickArtworkBasedOnRolloutInfo(localeArtworkIsRolloutAsInput, localeArtworkIsRolloutOppositeToInput, rolloutImagesByCountry.get(countryCode), sourceFileId);
+                    
+                    if(ctx.getConfig().isRollupImagesForArtworkScheduling() || topNodes == null || topNodes.isEmpty()){
                         Set<Artwork> artworkSet = getArtworkSet(entityId, artMap);
-                        artworkSet.add(localeArtworkIsRolloutAsInput);
+                        artworkSet.add(updatedArtwork);
+                        continue;
                     }
                     
                     for (int topNode : topNodes) {
                         Set<Artwork> artworkSet = getArtworkSet(topNode, artMap);
-                        Artwork updatedArtwork = pickArtworkBasedOnRolloutInfo(localeArtworkIsRolloutAsInput, localeArtworkIsRolloutOppositeToInput, rolloutImagesByCountry.get(countryCode), sourceFileId);
-
                         // If pickArtworkBasedOnRolloutInfo return null based on roll-out: we drop the image for the country.
                         // Look at pickArtworkBasedOnRolloutInfo method for details. Logging of dropped IDs is in pickArtworkBasedOnRolloutInfo.
                         if (updatedArtwork != null)
@@ -698,7 +705,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
 	Artwork pickArtworkBasedOnRolloutInfo(Artwork localeArtworkIsRolloutAsInput, Artwork localeArtworkIsRolloutOppositeToInput, Set<String> rolloutSourceFileIds, String sourceFileId) {
 		if(localeArtworkIsRolloutAsInput.isRolloutExclusive){
         	// Upstream says this is a rollout image
-        	if(rolloutSourceFileIds == null || !rolloutSourceFileIds.contains(sourceFileId)){
+        	if(ctx.getConfig().isFilterImagesForArtworkScheduling() && (rolloutSourceFileIds == null || !rolloutSourceFileIds.contains(sourceFileId))){
     			// But no corresponding rollout for the image in this country.
     			// To err on side of not leaking a rollout image, drop this image for the country.
                 // not logging for now since there are way too many log messages.
@@ -725,13 +732,15 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
      */
     Set<SchedulePhaseInfo> getAllScheduleInfo(VideoArtworkHollow videoArtworkHollow, int videoId) {
         Set<SchedulePhaseInfo> schedulePhaseInfos = null;
-        PhaseTagListHollow phaseTagListHollow = videoArtworkHollow._getPhaseTags();
-        if (checkPhaseTagList(phaseTagListHollow, videoArtworkHollow, videoId) == null) return null;
         boolean isSmoky = videoArtworkHollow._getIsSmoky();
-
-        Iterator<PhaseTagHollow> iterator = phaseTagListHollow.iterator();
-
-        if (!iterator.hasNext()) {
+        
+        PhaseTagListHollow phaseTagListHollow = videoArtworkHollow._getPhaseTags();
+        checkPhaseTagList(phaseTagListHollow, videoArtworkHollow, videoId);
+        Iterator<PhaseTagHollow> iterator = null;
+        if(phaseTagListHollow != null)
+        	iterator = phaseTagListHollow.iterator();
+        
+        if (phaseTagListHollow == null || !iterator.hasNext()) {
             // adding a default window for no phase tags.
             SchedulePhaseInfo defaultWindow = new SchedulePhaseInfo(isSmoky, videoId);
             schedulePhaseInfos = new HashSet<>();
@@ -771,8 +780,23 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
             }
         }
 
+        // Returning null will result in dropping the image. To enable gradual roll out of artwork scheduling, dropping of 
+        // images will be enabled only when a property is turned on. To achieve this, bad phase tag images will not be dropped
+        // but will be tagged with far in the future start and end dates. This was for old path image exits.
+        // For new path, image will not be considered. 
+        if(schedulePhaseInfos == null && !ctx.getConfig().isFilterImagesForArtworkScheduling()){
+        	SchedulePhaseInfo phaseWithFarFutureStartAndEnd = getFarInFutureSchedulePhaseInfo(videoId);
+        	return Collections.singleton(phaseWithFarFutureStartAndEnd);
+        }
+        
         return schedulePhaseInfos;
     }
+
+	private SchedulePhaseInfo getFarInFutureSchedulePhaseInfo(int videoId) {
+		SchedulePhaseInfo phaseWithFarFutureStartAndEnd = new SchedulePhaseInfo(videoId);
+		phaseWithFarFutureStartAndEnd.start = phaseWithFarFutureStartAndEnd.end = FAR_FUTURE_DATE;
+		return phaseWithFarFutureStartAndEnd;
+	}
 
     private SchedulePhaseInfo getAbsoluteSchedule(int absoluteScheduleOrdinal, VMSHollowInputAPI api, boolean isSmoky, int videoId) {
         SchedulePhaseInfo window = new SchedulePhaseInfo(isSmoky, videoId);
@@ -801,9 +825,8 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
     private PhaseTagListHollow checkPhaseTagList(PhaseTagListHollow phaseTagListHollow, VideoArtworkHollow videoArtworkHollow, int videoId) {
         if (phaseTagListHollow == null) {
             String sourceFileId = videoArtworkHollow._getSourceFileId()._getValue();
-            ctx.getLogger().warn(InvalidPhaseTagForArtwork, "PhaseTagList is null in VideoArtwork for videoId={} sourceFileId={} " +
+            ctx.getLogger().info(InvalidPhaseTagForArtwork, "PhaseTagList is null in VideoArtwork for videoId={} sourceFileId={} " +
                     "returning null, data will be dropped", videoId, sourceFileId);
-            return null;
         }
         return phaseTagListHollow;
     }
