@@ -56,17 +56,41 @@ public class HollowObjectMapper {
         this.useDefaultHashKeys = false;
     }
 
+    /**
+     * Adds the specified POJO to the state engine.
+     * <p>
+     * Unless previously initialized with {@link #initializeTypeState(Class)},
+     * the first time an instance of a particular type is added
+     * its schema is derived and added to the data model.
+     *
+     * @param o the POJO to add
+     * @return the ordinal assigned to the newly added object
+     */
     public int add(Object o) {
         HollowTypeMapper typeMapper = getTypeMapper(o.getClass(), null, null);
         return typeMapper.write(o);
     }
 
-    /** @deprecated use {@link #add(Object)}. */
+    /**
+     * @deprecated use {@link #add(Object)} instead.
+     */
     @Deprecated
     public int addObject(Object o) {
         return add(o);
     }
-    
+
+    /**
+     * Initializes the schema for the specified type in the data model.
+     * <p>
+     * The schema will be derived from the field and type names in
+     * <code>clazz</code> and added to the state engine's data model;
+     * schemas of types referenced from <code>clazz</code> will also be added.
+     * This can be used to add a type's schema to the state engine
+     * without having to add any data for that type.
+     *
+     * @param clazz type whose schema to derive and add to the data model
+     * @see #add(Object)
+     */
     public void initializeTypeState(Class<?> clazz) {
         getTypeMapper(clazz, null, null);
     }
