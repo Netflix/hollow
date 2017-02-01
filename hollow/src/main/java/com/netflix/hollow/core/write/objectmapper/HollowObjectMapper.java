@@ -56,9 +56,15 @@ public class HollowObjectMapper {
         this.useDefaultHashKeys = false;
     }
 
-    public int addObject(Object o) {
+    public int add(Object o) {
         HollowTypeMapper typeMapper = getTypeMapper(o.getClass(), null, null);
         return typeMapper.write(o);
+    }
+
+    /** @deprecated use {@link #add(Object)}. */
+    @Deprecated
+    public int addObject(Object o) {
+        return add(o);
     }
     
     public void initializeTypeState(Class<?> clazz) {

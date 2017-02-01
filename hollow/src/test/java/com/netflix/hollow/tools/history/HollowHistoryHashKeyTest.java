@@ -44,18 +44,18 @@ public class HollowHistoryHashKeyTest {
         HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
         mapper.useDefaultHashKeys();
         
-        mapper.addObject(new TestTopLevelObject(1, new Obj(1, "US", 100), new Obj(2, "CA", 200), new Obj(3, "IT", 300), new Obj(4, "GB", 400), new Obj(5, "IT", 500)));
+        mapper.add(new TestTopLevelObject(1, new Obj(1, "US", 100), new Obj(2, "CA", 200), new Obj(3, "IT", 300), new Obj(4, "GB", 400), new Obj(5, "IT", 500)));
         
         HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeEngine);
         HollowHistoricalStateDataAccess history0 = new HollowHistoricalStateCreator().createBasedOnNewDelta(0, readEngine);
 
-        mapper.addObject(new TestTopLevelObject(1, new Obj(1, "US", 101), new Obj(2, "CA", 200), new Obj(3, "IT", 300), new Obj(4, "GB", 401), new Obj(5, "IT", 500)));
+        mapper.add(new TestTopLevelObject(1, new Obj(1, "US", 101), new Obj(2, "CA", 200), new Obj(3, "IT", 300), new Obj(4, "GB", 401), new Obj(5, "IT", 500)));
 
         StateEngineRoundTripper.roundTripDelta(writeEngine, readEngine);
         HollowHistoricalStateDataAccess history1 = new HollowHistoricalStateCreator().createBasedOnNewDelta(1, readEngine);
         history0.setNextState(history1);
         
-        mapper.addObject(new TestTopLevelObject(1, new Obj(1, "US", 101), new Obj(2, "CA", 200), new Obj(3, "IT", 302), new Obj(4, "GB", 401), new Obj(5, "IT", 500)));
+        mapper.add(new TestTopLevelObject(1, new Obj(1, "US", 101), new Obj(2, "CA", 200), new Obj(3, "IT", 302), new Obj(4, "GB", 401), new Obj(5, "IT", 500)));
         
         StateEngineRoundTripper.roundTripDelta(writeEngine, readEngine);
         HollowHistoricalStateDataAccess history2 = new HollowHistoricalStateCreator().createBasedOnNewDelta(2, readEngine);

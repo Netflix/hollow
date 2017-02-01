@@ -33,10 +33,10 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
     public void test() throws Exception {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
 
-        mapper.addObject(new TypeA(1, 1.1d, new TypeB("one")));
-        mapper.addObject(new TypeA(1, 1.1d, new TypeB("1")));
-        mapper.addObject(new TypeA(2, 2.2d, new TypeB("two"), new TypeB("twenty"), new TypeB("two hundred")));
-        mapper.addObject(new TypeA(3, 3.3d, new TypeB("three"), new TypeB("thirty"), new TypeB("three hundred")));
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(1, 1.1d, new TypeB("1")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two"), new TypeB("twenty"), new TypeB("two hundred")));
+        mapper.add(new TypeA(3, 3.3d, new TypeB("three"), new TypeB("thirty"), new TypeB("three hundred")));
 
         roundTripSnapshot();
 

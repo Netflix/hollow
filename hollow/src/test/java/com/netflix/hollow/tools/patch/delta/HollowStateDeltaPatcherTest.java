@@ -71,20 +71,20 @@ public class HollowStateDeltaPatcherTest {
         HollowWriteStateEngine stateEngine = new HollowWriteStateEngine();
         HollowObjectMapper mapper = new HollowObjectMapper(stateEngine);
         
-        mapper.addObject(new TypeB1(1, 0));
-        mapper.addObject(new TypeA1(1, new TypeB1(2, 1)));
-        mapper.addObject(new TypeA1(2, new TypeB1(3, 2)));
-        mapper.addObject(new TypeA1(999, new TypeB1(999, 3)));
+        mapper.add(new TypeB1(1, 0));
+        mapper.add(new TypeA1(1, new TypeB1(2, 1)));
+        mapper.add(new TypeA1(2, new TypeB1(3, 2)));
+        mapper.add(new TypeA1(999, new TypeB1(999, 3)));
         
         HollowReadStateEngine state1 = StateEngineRoundTripper.roundTripSnapshot(stateEngine);
         
         stateEngine.prepareForNextCycle();
         
-        mapper.addObject(new TypeB1(1, 0));
-        mapper.addObject(new TypeA1(1, new TypeB1(2, 1)));
-        mapper.addObject(new TypeA1(2, new TypeB1(3, 2)));
-        mapper.addObject(new TypeA1(4, new TypeB1(5, 4)));
-        mapper.addObject(new TypeB1(6, 7));
+        mapper.add(new TypeB1(1, 0));
+        mapper.add(new TypeA1(1, new TypeB1(2, 1)));
+        mapper.add(new TypeA1(2, new TypeB1(3, 2)));
+        mapper.add(new TypeA1(4, new TypeB1(5, 4)));
+        mapper.add(new TypeB1(6, 7));
 
         StateEngineRoundTripper.roundTripDelta(stateEngine, state1);
         
@@ -95,24 +95,24 @@ public class HollowStateDeltaPatcherTest {
         HollowWriteStateEngine stateEngine = new HollowWriteStateEngine();
         HollowObjectMapper mapper = new HollowObjectMapper(stateEngine);
 
-        mapper.addObject(new TypeB2(1, 100));
-        mapper.addObject(new TypeA2(1, new TypeB2(2, 101)));
-        mapper.addObject(new TypeA2(2, new TypeB2(7, 102)));
-        mapper.addObject(new TypeA2(5, new TypeB2(8, 103)));
-        mapper.addObject(new TypeA2(4, new TypeB2(5, 104)));
-        mapper.addObject(new TypeA2(999, new TypeB2(999, 105)));
-        mapper.addObject(new TypeA2(6, new TypeB2(9, 106)));
+        mapper.add(new TypeB2(1, 100));
+        mapper.add(new TypeA2(1, new TypeB2(2, 101)));
+        mapper.add(new TypeA2(2, new TypeB2(7, 102)));
+        mapper.add(new TypeA2(5, new TypeB2(8, 103)));
+        mapper.add(new TypeA2(4, new TypeB2(5, 104)));
+        mapper.add(new TypeA2(999, new TypeB2(999, 105)));
+        mapper.add(new TypeA2(6, new TypeB2(9, 106)));
         
         HollowReadStateEngine state2 = StateEngineRoundTripper.roundTripSnapshot(stateEngine);
         
         stateEngine.prepareForNextCycle();
         
-        mapper.addObject(new TypeB2(1, 100));
-        mapper.addObject(new TypeA2(1, new TypeB2(2, 101)));
-        mapper.addObject(new TypeA2(2, new TypeB2(7, 102)));
-        mapper.addObject(new TypeA2(5, new TypeB2(8, 103)));
-        mapper.addObject(new TypeA2(4, new TypeB2(5, 104)));
-        mapper.addObject(new TypeA2(6, new TypeB2(9, 106)));
+        mapper.add(new TypeB2(1, 100));
+        mapper.add(new TypeA2(1, new TypeB2(2, 101)));
+        mapper.add(new TypeA2(2, new TypeB2(7, 102)));
+        mapper.add(new TypeA2(5, new TypeB2(8, 103)));
+        mapper.add(new TypeA2(4, new TypeB2(5, 104)));
+        mapper.add(new TypeA2(6, new TypeB2(9, 106)));
 
         StateEngineRoundTripper.roundTripDelta(stateEngine, state2);
         

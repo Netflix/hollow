@@ -38,9 +38,9 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
     public void testSnapshotAndDelta() throws IOException {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
 
-        mapper.addObject(new TypeA(1, 1.1d, new TypeB("one")));
-        mapper.addObject(new TypeA(1, 1.1d, new TypeB("1")));
-        mapper.addObject(new TypeA(2, 2.2d, new TypeB("two")));
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(1, 1.1d, new TypeB("1")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
 
         roundTripSnapshot();
 
@@ -60,10 +60,10 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
         assertEquals(idx.getRecordKey(1), 1, 1.1d, "1");
         assertEquals(idx.getRecordKey(2), 2, 2.2d, "two");
 
-        mapper.addObject(new TypeA(1, 1.1d, new TypeB("one")));
-        // mapper.addObject(new TypeA(1, 1.1d, new TypeB("1")));
-        mapper.addObject(new TypeA(2, 2.2d, new TypeB("two")));
-        mapper.addObject(new TypeA(3, 3.3d, new TypeB("three")));
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        // mapper.add(new TypeA(1, 1.1d, new TypeB("1")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
+        mapper.add(new TypeA(3, 3.3d, new TypeB("three")));
 
         roundTripDelta();
 
@@ -87,9 +87,9 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
     public void indicatesWhetherOrNotDuplicateKeysExist() throws IOException {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
 
-        mapper.addObject(new TypeA(1, 1.1d, new TypeB("one")));
-        mapper.addObject(new TypeA(1, 1.1d, new TypeB("1")));
-        mapper.addObject(new TypeA(2, 2.2d, new TypeB("two")));
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(1, 1.1d, new TypeB("1")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
 
         roundTripSnapshot();
 
@@ -100,10 +100,10 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
 
         Assert.assertFalse(idx.containsDuplicates());
 
-        mapper.addObject(new TypeA(1, 1.1d, new TypeB("one")));
-        mapper.addObject(new TypeA(1, 1.1d, new TypeB("1")));
-        mapper.addObject(new TypeA(2, 2.2d, new TypeB("two")));
-        mapper.addObject(new TypeA(2, 2.2d, new TypeB("two", true)));
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(1, 1.1d, new TypeB("1")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two", true)));
 
         roundTripDelta();
 
@@ -130,9 +130,9 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
     public void testSnapshotAndDeltaWithStateEngineMemoryRecycler() throws IOException {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
 
-        mapper.addObject(new TypeA(1, 1.1d, new TypeB("one")));
-        mapper.addObject(new TypeA(1, 1.1d, new TypeB("1")));
-        mapper.addObject(new TypeA(2, 2.2d, new TypeB("two")));
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(1, 1.1d, new TypeB("1")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
 
         roundTripSnapshot();
 
@@ -150,10 +150,10 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
         assertEquals(idx.getRecordKey(1), 1, 1.1d, "1");
         assertEquals(idx.getRecordKey(2), 2, 2.2d, "two");
 
-        mapper.addObject(new TypeA(1, 1.1d, new TypeB("one")));
-        // mapper.addObject(new TypeA(1, 1.1d, new TypeB("1")));
-        mapper.addObject(new TypeA(2, 2.2d, new TypeB("two")));
-        mapper.addObject(new TypeA(3, 3.3d, new TypeB("three")));
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        // mapper.add(new TypeA(1, 1.1d, new TypeB("1")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
+        mapper.add(new TypeA(3, 3.3d, new TypeB("three")));
 
         roundTripDelta();
 
@@ -292,7 +292,7 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
 
         int max = a1Start + size;
         for (int a1 = a1Start; a1 < max; a1++) {
-            mapper.addObject(new TypeA(a1, a2, typeB));
+            mapper.add(new TypeA(a1, a2, typeB));
         }
     }
 

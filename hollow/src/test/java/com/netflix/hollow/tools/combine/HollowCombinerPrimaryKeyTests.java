@@ -62,7 +62,7 @@ public class HollowCombinerPrimaryKeyTests {
         addObject(mapper, 3, 8, 7, 6);
         addObject(mapper, 3, 9, 8, 8);
         addObject(mapper, 3, 10, 4, 10);
-        mapper.addObject(new TypeC(100, 3));
+        mapper.add(new TypeC(100, 3));
         input3 = StateEngineRoundTripper.roundTripSnapshot(input);
 
     }
@@ -217,7 +217,7 @@ public class HollowCombinerPrimaryKeyTests {
     
     
     private void addObject(HollowObjectMapper mapper, int origin, int aKey, int bKey, int cKey) {
-        mapper.addObject(new TypeA(aKey, origin, new TypeB(bKey, origin, new TypeC(cKey, origin))));
+        mapper.add(new TypeA(aKey, origin, new TypeB(bKey, origin, new TypeC(cKey, origin))));
     }
     
     
