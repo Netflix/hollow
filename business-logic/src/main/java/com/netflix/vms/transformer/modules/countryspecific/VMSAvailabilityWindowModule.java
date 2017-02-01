@@ -173,7 +173,7 @@ public class VMSAvailabilityWindowModule {
                             if(locale != null) {
                                 packageData = getPackageData(videoId, pkg._getPackageId());
                                 long packageAvailability = 0;
-                                if(!packageData.isDefaultPackage || packageIdList.size() == 1) {
+                                if((packageData != null && !packageData.isDefaultPackage) || packageIdList.size() == 1) {
                                     packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAvailability);
                                 }
                                 if(packageAvailability == 0) //// multicatalog processing -- make sure contract gives access to some existing asset understandable in this language
