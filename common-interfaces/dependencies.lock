@@ -264,16 +264,16 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.56.0",
+            "locked": "1.57.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.12"
+            "locked": "4.0.14"
         },
         "netflix:server-context": {
-            "locked": "4.0.12",
+            "locked": "4.0.14",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -705,16 +705,16 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.56.0",
+            "locked": "1.57.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.12"
+            "locked": "4.0.14"
         },
         "netflix:server-context": {
-            "locked": "4.0.12",
+            "locked": "4.0.14",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1146,16 +1146,16 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.56.0",
+            "locked": "1.57.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.12"
+            "locked": "4.0.14"
         },
         "netflix:server-context": {
-            "locked": "4.0.12",
+            "locked": "4.0.14",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1587,16 +1587,16 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.56.0",
+            "locked": "1.57.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.12"
+            "locked": "4.0.14"
         },
         "netflix:server-context": {
-            "locked": "4.0.12",
+            "locked": "4.0.14",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1854,7 +1854,7 @@
     },
     "nebulaRecommenderBom": {
         "netflix:runtime-platform-recommendations": {
-            "locked": "4.0.12",
+            "locked": "4.0.14",
             "requested": "latest.release"
         }
     },
@@ -2133,16 +2133,16 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.56.0",
+            "locked": "1.57.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.12"
+            "locked": "4.0.14"
         },
         "netflix:server-context": {
-            "locked": "4.0.12",
+            "locked": "4.0.14",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -2574,16 +2574,16 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.56.0",
+            "locked": "1.57.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.12"
+            "locked": "4.0.14"
         },
         "netflix:server-context": {
-            "locked": "4.0.12",
+            "locked": "4.0.14",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -2656,7 +2656,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.6.1"
+            "locked": "3.6.2"
         },
         "org.codehaus.jackson:jackson-core-asl": {
             "locked": "1.9.13",
@@ -3024,16 +3024,16 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.56.0",
+            "locked": "1.57.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.12"
+            "locked": "4.0.14"
         },
         "netflix:server-context": {
-            "locked": "4.0.12",
+            "locked": "4.0.14",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3106,7 +3106,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.6.1"
+            "locked": "3.6.2"
         },
         "org.codehaus.jackson:jackson-core-asl": {
             "locked": "1.9.13",
@@ -3474,16 +3474,16 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.56.0",
+            "locked": "1.57.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.12"
+            "locked": "4.0.14"
         },
         "netflix:server-context": {
-            "locked": "4.0.12",
+            "locked": "4.0.14",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3556,7 +3556,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.6.1"
+            "locked": "3.6.2"
         },
         "org.codehaus.jackson:jackson-core-asl": {
             "locked": "1.9.13",
@@ -3924,16 +3924,16 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.56.0",
+            "locked": "1.57.0",
             "transitive": [
                 "netflix:server-context"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.0.12"
+            "locked": "4.0.14"
         },
         "netflix:server-context": {
-            "locked": "4.0.12",
+            "locked": "4.0.14",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -4006,7 +4006,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.6.1"
+            "locked": "3.6.2"
         },
         "org.codehaus.jackson:jackson-core-asl": {
             "locked": "1.9.13",
