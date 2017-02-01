@@ -95,6 +95,9 @@ public class VideoImagesDataModuleTest {
         //mock calls
         when(context.getConfig()).thenReturn(config);
         when(context.getLogger()).thenReturn(logger);
+        when(config.isRollupImagesForArtworkScheduling()).thenReturn(true);
+        when(config.isFilterImagesForArtworkScheduling()).thenReturn(true);
+        when(config.isUseSchedulePhasesInAvailabilityDateCalc()).thenReturn(true);
 
         when(listTypeAPI.getOrdinalIterator(1)).thenReturn(listIterator);
         when(listHollow.iterator()).thenReturn(iterator);
