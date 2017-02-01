@@ -4,6 +4,7 @@ import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.SchedulePhaseInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoImages;
@@ -41,7 +42,9 @@ public class CountrySpecificDataModuleTest {
 		HollowPrimaryKeyIndex hollowPrimaryKeyIndex = Mockito.mock(HollowPrimaryKeyIndex.class);
 		Mockito.when(indexer.getPrimaryKeyIndex(Mockito.any(IndexSpec.class))).thenReturn(hollowPrimaryKeyIndex);
 		Mockito.when(hollowPrimaryKeyIndex.getMatchingOrdinal(Mockito.any())).thenReturn(-1);
-		
+		TransformerConfig mockConfig = Mockito.mock(TransformerConfig.class);
+		Mockito.when(ctx.getConfig()).thenReturn(mockConfig);
+		Mockito.when(mockConfig.isUseSchedulePhasesInAvailabilityDateCalc()).thenReturn(true);
 		dataModule = new CountrySpecificDataModule(api, ctx, mapper, constants, indexer);
 		
 		
