@@ -206,7 +206,8 @@ public class VideoImagesDataModuleTest {
         when(videoArtworkHollow._getPhaseTags()).thenReturn(null);
         Set<SchedulePhaseInfo> schedulePhaseInfoSet = videoImagesDataModule.getAllScheduleInfo(videoArtworkHollow, videoId);
         SchedulePhaseInfo info = videoImagesDataModule.getEarliestScheduleInfo(schedulePhaseInfoSet, videoId);
-        Assert.assertNull(info);
+        verifySchedulePhaseInfo(info, 0L, Long.MIN_VALUE, false, false);
+        Assert.assertTrue(schedulePhaseInfoSet.size() == 1);
     }
 
     /**
