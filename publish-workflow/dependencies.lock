@@ -753,7 +753,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.5",
+            "locked": "2.1.0",
             "requested": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -1559,12 +1559,6 @@
             "transitive": [
                 "netflix:geoip-client",
                 "netflix:openencryptclient"
-            ]
-        },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -2485,11 +2479,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.201",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.201",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -2969,7 +2963,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -3103,12 +3097,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -3878,7 +3866,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.5",
+            "locked": "2.1.0",
             "requested": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -4684,12 +4672,6 @@
             "transitive": [
                 "netflix:geoip-client",
                 "netflix:openencryptclient"
-            ]
-        },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -5610,11 +5592,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.201",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.201",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -6094,7 +6076,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -6228,12 +6210,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -7003,7 +6979,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.5",
+            "locked": "2.1.0",
             "requested": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -7809,12 +7785,6 @@
             "transitive": [
                 "netflix:geoip-client",
                 "netflix:openencryptclient"
-            ]
-        },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -8735,11 +8705,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.201",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.201",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -9219,7 +9189,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -9353,12 +9323,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -10128,7 +10092,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.5",
+            "locked": "2.1.0",
             "requested": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -10934,12 +10898,6 @@
             "transitive": [
                 "netflix:geoip-client",
                 "netflix:openencryptclient"
-            ]
-        },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -11860,11 +11818,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.201",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.201",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -12344,7 +12302,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -12478,12 +12436,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -13358,7 +13310,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.5",
+            "locked": "2.1.0",
             "requested": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -14164,12 +14116,6 @@
             "transitive": [
                 "netflix:geoip-client",
                 "netflix:openencryptclient"
-            ]
-        },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -15090,11 +15036,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.201",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.201",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -15574,7 +15520,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -15708,12 +15654,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -16501,7 +16441,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.5",
+            "locked": "2.1.0",
             "requested": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -17307,12 +17247,6 @@
             "transitive": [
                 "netflix:geoip-client",
                 "netflix:openencryptclient"
-            ]
-        },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -18254,11 +18188,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.201",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.201",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -18750,7 +18684,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -18884,12 +18818,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -19677,7 +19605,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.5",
+            "locked": "2.1.0",
             "requested": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -20483,12 +20411,6 @@
             "transitive": [
                 "netflix:geoip-client",
                 "netflix:openencryptclient"
-            ]
-        },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -21430,11 +21352,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.201",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.201",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -21926,7 +21848,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -22060,12 +21982,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -22853,7 +22769,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.5",
+            "locked": "2.1.0",
             "requested": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -23659,12 +23575,6 @@
             "transitive": [
                 "netflix:geoip-client",
                 "netflix:openencryptclient"
-            ]
-        },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -24606,11 +24516,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.201",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.201",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -25102,7 +25012,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -25236,12 +25146,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -26029,7 +25933,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.0.5",
+            "locked": "2.1.0",
             "requested": "2.0.5",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -26835,12 +26739,6 @@
             "transitive": [
                 "netflix:geoip-client",
                 "netflix:openencryptclient"
-            ]
-        },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -27782,11 +27680,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.197",
+            "locked": "59.201",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.197",
+            "locked": "59.201",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -28278,7 +28176,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -28412,12 +28310,6 @@
                 "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {

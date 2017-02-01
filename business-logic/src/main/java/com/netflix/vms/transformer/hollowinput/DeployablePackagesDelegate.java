@@ -16,6 +16,12 @@ public interface DeployablePackagesDelegate extends HollowObjectDelegate {
 
     public int getCountryCodesOrdinal(int ordinal);
 
+    public int getTagsOrdinal(int ordinal);
+
+    public boolean getDefaultPackage(int ordinal);
+
+    public Boolean getDefaultPackageBoxed(int ordinal);
+
     public DeployablePackagesTypeAPI getTypeAPI();
 
 }
