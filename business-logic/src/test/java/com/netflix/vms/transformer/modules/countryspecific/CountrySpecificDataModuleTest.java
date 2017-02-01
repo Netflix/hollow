@@ -50,20 +50,20 @@ public class CountrySpecificDataModuleTest {
 		
 		VideoImages imagesForvideo = new VideoImages();
 		videoImagesByVideoMap.put(videoWithMinus60EarliestWindow,imagesForvideo);
-		imagesForvideo.schedulePhaseInfoWindows = getSchedulePhaseInfo(videoWithMinus60EarliestWindow, 0l, Minus60DaysInMilliS);
+		imagesForvideo.imageAvailabilityWindows = getSchedulePhaseInfo(videoWithMinus60EarliestWindow, 0l, Minus60DaysInMilliS);
 		
 		imagesForvideo = new VideoImages();
 		videoImagesByVideoMap.put(videoWithLaunchEarliestWindow, imagesForvideo);
-		imagesForvideo.schedulePhaseInfoWindows = getSchedulePhaseInfo(videoWithLaunchEarliestWindow, 0l);
+		imagesForvideo.imageAvailabilityWindows = getSchedulePhaseInfo(videoWithLaunchEarliestWindow, 0l);
 		
 		imagesForvideo = new VideoImages();
 		videoImagesByVideoMap.put(videoWith2WindowsBeforeLaunch, imagesForvideo);
-		imagesForvideo.schedulePhaseInfoWindows = getSchedulePhaseInfo(videoWith2WindowsBeforeLaunch, Minus60DaysInMilliS, Minus90DaysInMilliS);
+		imagesForvideo.imageAvailabilityWindows = getSchedulePhaseInfo(videoWith2WindowsBeforeLaunch, Minus60DaysInMilliS, Minus90DaysInMilliS);
 		
 		imagesForvideo = new VideoImages();
 		videoImagesByVideoMap.put(videoWithEarliestWindowFromAnotherSourceVideo, imagesForvideo);
-		imagesForvideo.schedulePhaseInfoWindows = getSchedulePhaseInfo(videoWithEarliestWindowFromAnotherSourceVideo, Minus60DaysInMilliS);
-		imagesForvideo.schedulePhaseInfoWindows.addAll(getSchedulePhaseInfo(70178217, Minus90DaysInMilliS));
+		imagesForvideo.imageAvailabilityWindows = getSchedulePhaseInfo(videoWithEarliestWindowFromAnotherSourceVideo, Minus60DaysInMilliS);
+		imagesForvideo.imageAvailabilityWindows.addAll(getSchedulePhaseInfo(70178217, Minus90DaysInMilliS));
 		
     }
 

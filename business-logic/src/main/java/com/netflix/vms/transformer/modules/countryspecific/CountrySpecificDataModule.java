@@ -355,7 +355,7 @@ public class CountrySpecificDataModule {
 		if(videoImages == null)
 			return earliestStart;
 		
-		Set<SchedulePhaseInfo> schedulePhaseInfoWindows = videoImages.schedulePhaseInfoWindows;
+		Set<SchedulePhaseInfo> schedulePhaseInfoWindows = videoImages.imageAvailabilityWindows;
 		if(schedulePhaseInfoWindows == null)
 			return earliestStart; 
 

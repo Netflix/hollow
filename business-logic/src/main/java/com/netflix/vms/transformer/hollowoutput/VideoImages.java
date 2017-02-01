@@ -8,7 +8,7 @@ public class VideoImages implements Cloneable {
 
     public Map<Strings, List<Artwork>> artworks = null;
     public Map<ArtWorkImageTypeEntry, Set<ArtWorkImageFormatEntry>> artworkFormatsByType = null;
-    public Set<SchedulePhaseInfo> schedulePhaseInfoWindows = null;
+    public Set<SchedulePhaseInfo> imageAvailabilityWindows = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
@@ -22,9 +22,9 @@ public class VideoImages implements Cloneable {
         if(o.artworkFormatsByType == null) {
             if(artworkFormatsByType != null) return false;
         } else if(!o.artworkFormatsByType.equals(artworkFormatsByType)) return false;
-        if(o.schedulePhaseInfoWindows == null) {
-            if(schedulePhaseInfoWindows != null) return false;
-        } else if(!o.schedulePhaseInfoWindows.equals(schedulePhaseInfoWindows)) return false;
+        if(o.imageAvailabilityWindows == null) {
+            if(imageAvailabilityWindows != null) return false;
+        } else if(!o.imageAvailabilityWindows.equals(imageAvailabilityWindows)) return false;
 		return true;
 	}
 
@@ -33,7 +33,7 @@ public class VideoImages implements Cloneable {
         int hashCode = 1;
         hashCode = hashCode * 31 + (artworks == null ? 1237 : artworks.hashCode());
         hashCode = hashCode * 31 + (artworkFormatsByType == null ? 1237 : artworkFormatsByType.hashCode());
-        hashCode = hashCode * 31 + (schedulePhaseInfoWindows == null ? 1237 : schedulePhaseInfoWindows.hashCode());
+        hashCode = hashCode * 31 + (imageAvailabilityWindows == null ? 1237 : imageAvailabilityWindows.hashCode());
         return hashCode;
 	}
 
@@ -42,7 +42,7 @@ public class VideoImages implements Cloneable {
         StringBuilder builder = new StringBuilder("VideoImages{");
         builder.append("artworks=").append(artworks);
         builder.append(",artworkFormatsByType=").append(artworkFormatsByType);
-        builder.append(",imageAvailabilityWindows=").append(schedulePhaseInfoWindows);
+        builder.append(",imageAvailabilityWindows=").append(imageAvailabilityWindows);
         builder.append("}");
         return builder.toString();
 	}
