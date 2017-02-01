@@ -162,7 +162,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                 // get schedule phase for artworks for the given video Id above
                 if (videoSchedulePhaseMap != null) {
                     Set<SchedulePhaseInfo> schedulePhaseInfoList = videoSchedulePhaseMap.get(id);
-                    if (schedulePhaseInfoList != null) images.imageAvailabilityWindows = schedulePhaseInfoList;
+                    if (schedulePhaseInfoList != null) images.schedulePhaseInfoWindows = schedulePhaseInfoList;
                 }
 
                 Set<Artwork> artworkSet = entry.getValue();

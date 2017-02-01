@@ -9,7 +9,7 @@ import org.junit.Test;
 
 public class ReproTransformerScenario {
 
-    private static final String LOCAL_BLOB_STORE = "/Users/ksatiya/local-input-blob-store";
+    private static final String LOCAL_BLOB_STORE = "/space/local-input-blob-store";
 
     @Test
     public void run() throws Throwable {
