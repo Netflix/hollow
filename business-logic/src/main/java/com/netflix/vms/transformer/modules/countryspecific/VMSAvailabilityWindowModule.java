@@ -173,9 +173,9 @@ public class VMSAvailabilityWindowModule {
                             if(locale != null) {
                                 packageData = getPackageData(videoId, pkg._getPackageId());
                                 long packageAvailability = 0;
-                                if((packageData != null && !packageData.isDefaultPackage) || packageIdList.size() == 1) {
+                                // if((packageData != null && !packageData.isDefaultPackage) || packageIdList.size() == 1) {
                                     packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAvailability);
-                                }
+                                // }
                                 if(packageAvailability == 0) //// multicatalog processing -- make sure contract gives access to some existing asset understandable in this language
                                     continue;
 
@@ -257,12 +257,13 @@ public class VMSAvailabilityWindowModule {
                                     if(thisWindowMaxPackageId == 0)
                                         thisWindowBundledAssetsGroupId = Math.max(thisWindowBundledAssetsGroupId, (int)contractId);
                                 } else {
+                                    includedWindowPackageData = true;
+
                                     if(packageData == null)
                                         packageData = getPackageData(videoId, pkg._getPackageId());
                                     
                                     if(packageData != null) {
                                         /// package data is available
-                                        includedWindowPackageData = true;
                                         windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(packageData, rightsContract, contract, country, isAvailableForDownload);
                                         outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
                                         boolean considerForPackageSelection = rightsContract._getPackages() == null ? true : packageData.isDefaultPackage;
