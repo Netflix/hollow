@@ -34,9 +34,15 @@ public class ShowMeTheFastProgress {
     private static final String PUBLISH_CYCLE_DATATS_HEADER = "publishCycleDataTS";
 
     @Test
+    public void getLatestTransformerVersion() {
+        long version = getLatestTransformerVersion(VIP_NAME);
+        System.out.println("getLatestTransformerVersion: " + version);
+    }
+
+    @Test
     public void start() throws Throwable {
-        boolean isLoadLatestVersion = true;
-        long transformerVersion = isLoadLatestVersion ? getLatestTransformerVersion(VIP_NAME) : 20170202180324869L;
+        // NOTE: the specified transformerVersion must be valid or already in local HD; otherwise, run  getLatestTransformerVersion();
+        long transformerVersion = 20170202180324869L;
         int[] topNodes = { 80115503, 70143860 };
 
         long start = System.currentTimeMillis();
