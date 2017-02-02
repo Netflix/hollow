@@ -262,6 +262,7 @@ public class VMSAvailabilityWindowModule {
                                     
                                     if(packageData != null) {
                                         /// package data is available
+                                        includedWindowPackageData = true;
                                         windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(packageData, rightsContract, contract, country, isAvailableForDownload);
                                         outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
                                         boolean considerForPackageSelection = rightsContract._getPackages() == null ? true : packageData.isDefaultPackage;
@@ -269,7 +270,6 @@ public class VMSAvailabilityWindowModule {
                                             if(rightsContract._getPackages().size() == 1) considerForPackageSelection = true;
                                         }
                                         if(considerForPackageSelection) {
-                                            includedWindowPackageData = true;
 
                                             if(packageData.id > maxPackageId) {
                                                 maxPackageId = packageData.id;
