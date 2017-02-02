@@ -39,9 +39,9 @@ public class HollowIndexTraversalTest extends AbstractStateEngineTest {
     public void test() throws IOException {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
 
-        mapper.addObject(new TypeA("two", 2, new TypeB((short)20, 20000000L, 2.2f, "two".toCharArray(), new byte[] { 2, 2, 2 }),
+        mapper.add(new TypeA("two", 2, new TypeB((short)20, 20000000L, 2.2f, "two".toCharArray(), new byte[] { 2, 2, 2 }),
                 Collections.<TypeC>emptySet()));
-        mapper.addObject(new TypeA("one", 1, new TypeB((short)10, 10000000L, 1.1f, "one".toCharArray(), new byte[] { 1, 1, 1 }),
+        mapper.add(new TypeA("one", 1, new TypeB((short)10, 10000000L, 1.1f, "one".toCharArray(), new byte[] { 1, 1, 1 }),
                 new HashSet<TypeC>(Arrays.asList(
                         new TypeC('d', map("one.1", 1, "one.2", 1, 1, "one.3", 1, 2, 3)),
                         new TypeC('e', map("one.x", 1, "one.y", 1, 1, "one.z", 1, 2, 3))

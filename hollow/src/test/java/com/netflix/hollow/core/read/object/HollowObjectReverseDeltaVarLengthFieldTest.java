@@ -36,26 +36,26 @@ public class HollowObjectReverseDeltaVarLengthFieldTest extends AbstractStateEng
 	public void test() throws IOException {
 		HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
 		
-		mapper.addObject("one");
-		mapper.addObject("two");
-		mapper.addObject("three");
-		mapper.addObject("four");
+		mapper.add("one");
+		mapper.add("two");
+		mapper.add("three");
+		mapper.add("four");
 		
 		roundTripSnapshot();
 		
-		mapper.addObject("one");
-		mapper.addObject("four");
+		mapper.add("one");
+		mapper.add("four");
 		
 		roundTripSnapshot();
 		
-		mapper.addObject("one");
+		mapper.add("one");
 		
 		byte reverseDelta1[] = getReverseDelta();
 
 		roundTripDelta();
 		
-		mapper.addObject("one");
-		mapper.addObject("two");
+		mapper.add("one");
+		mapper.add("two");
 		
 		byte reverseDelta2[] = getReverseDelta();
 		

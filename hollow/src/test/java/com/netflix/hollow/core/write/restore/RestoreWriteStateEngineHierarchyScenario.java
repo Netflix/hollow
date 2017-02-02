@@ -74,19 +74,19 @@ public class RestoreWriteStateEngineHierarchyScenario {
         a11.id = 1;
         a11.b.get(0).val = "A";
         a11.b.get(0).removedData = 1.0f;
-        mapper.addObject(a11);
+        mapper.add(a11);
         
         TypeA1 a12 = new TypeA1();
         a12.id = 2;
         a12.b.get(0).val = "B";
         a12.b.get(0).removedData = 2.0f;
-        mapper.addObject(a12);
+        mapper.add(a12);
         
         TypeA1 a13 = new TypeA1();
         a13.id = 3;
         a13.b.get(0).val = "A";
         a13.b.get(0).removedData = 1.0f;
-        mapper.addObject(a13);
+        mapper.add(a13);
         
         HollowReadStateEngine readStateEngine = StateEngineRoundTripper.roundTripSnapshot(writeStateEngine);
         
@@ -105,21 +105,21 @@ public class RestoreWriteStateEngineHierarchyScenario {
         a22.idEcho = 2;
         a22.b.get(0).val = "B";
         a22.b.get(0).idEcho = 2;
-        mapper.addObject(a22);
+        mapper.add(a22);
 
         TypeA2 a23 = new TypeA2();
         a23.id = 3;
         a23.idEcho = 3;
         a23.b.get(0).val = "B";
         a23.b.get(0).idEcho = 3;
-        mapper.addObject(a23);
+        mapper.add(a23);
 
         TypeA2 a21 = new TypeA2();
         a21.id = 1;
         a21.idEcho = 1;
         a21.b.get(0).val = "A";
         a21.b.get(0).idEcho = 1;
-        mapper.addObject(a21);
+        mapper.add(a21);
 
         ///reset after restore
         writeStateEngine.resetToLastPrepareForNextCycle();
@@ -129,21 +129,21 @@ public class RestoreWriteStateEngineHierarchyScenario {
         a22.idEcho = 2;
         a22.b.get(0).val = "B";
         a22.b.get(0).idEcho = 2;
-        mapper.addObject(a22);
+        mapper.add(a22);
 
         a23 = new TypeA2();
         a23.id = 3;
         a23.idEcho = 3;
         a23.b.get(0).val = "A";
         a23.b.get(0).idEcho = 3;
-        mapper.addObject(a23);
+        mapper.add(a23);
 
         a21 = new TypeA2();
         a21.id = 1;
         a21.idEcho = 1;
         a21.b.get(0).val = "A";
         a21.b.get(0).idEcho = 1;
-        mapper.addObject(a21);
+        mapper.add(a21);
 
         writeStateEngine.prepareForWrite();
         HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
@@ -200,21 +200,21 @@ public class RestoreWriteStateEngineHierarchyScenario {
         a22.idEcho = 2;
         a22.b.get(0).val = "B";
         a22.b.get(0).idEcho = 2;
-        mapper.addObject(a22);
+        mapper.add(a22);
 
         TypeA2 a23 = new TypeA2();
         a23.id = 3;
         a23.idEcho = 3;
         a23.b.get(0).val = "A";
         a23.b.get(0).idEcho = 3;
-        mapper.addObject(a23);
+        mapper.add(a23);
 
         TypeA2 a21 = new TypeA2();
         a21.id = 1;
         a21.idEcho = 1;
         a21.b.get(0).val = "A";
         a21.b.get(0).idEcho = 1;
-        mapper.addObject(a21);
+        mapper.add(a21);
         
         HollowReadStateEngine readStateEngine = StateEngineRoundTripper.roundTripSnapshot(writeStateEngine);
 
@@ -232,19 +232,19 @@ public class RestoreWriteStateEngineHierarchyScenario {
         a11.id = 1;
         a11.b.get(0).val = "A";
         a11.b.get(0).removedData = 1.0f;
-        mapper.addObject(a11);
+        mapper.add(a11);
         
         TypeA1 a12 = new TypeA1();
         a12.id = 2;
         a12.b.get(0).val = "B";
         a12.b.get(0).removedData = 2.0f;
-        mapper.addObject(a12);
+        mapper.add(a12);
         
         TypeA1 a13 = new TypeA1();
         a13.id = 3;
         a13.b.get(0).val = "A";
         a13.b.get(0).removedData = 3.0f;
-        mapper.addObject(a13);
+        mapper.add(a13);
         
         writeStateEngine.prepareForWrite();
         writeStateEngine.resetToLastPrepareForNextCycle();
@@ -253,19 +253,19 @@ public class RestoreWriteStateEngineHierarchyScenario {
         a11.id = 1;
         a11.b.get(0).val = "A";
         a11.b.get(0).removedData = 1.0f;
-        mapper.addObject(a11);
+        mapper.add(a11);
         
         a12 = new TypeA1();
         a12.id = 2;
         a12.b.get(0).val = "B";
         a12.b.get(0).removedData = 2.0f;
-        mapper.addObject(a12);
+        mapper.add(a12);
         
         a13 = new TypeA1();
         a13.id = 3;
         a13.b.get(0).val = "A";
         a13.b.get(0).removedData = 1.0f;
-        mapper.addObject(a13);
+        mapper.add(a13);
 
         //writeStateEngine.prepareForWrite();
         HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
