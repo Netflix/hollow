@@ -46,7 +46,7 @@ public class ShowMeTheFastProgress {
         int[] topNodes = { 80115503, 70143860 };
 
         long start = System.currentTimeMillis();
-        setup(false);
+        setup();
 
         // Load Expected StateEngine
         SimpleTransformerContext ctx = new SimpleTransformerContext();
@@ -76,17 +76,9 @@ public class ShowMeTheFastProgress {
         ShowMeTheProgressDiffTool.startTheDiff(expectedOutputStateEngine, actualOutputReadStateEngine);
     }
 
-    public void setup(boolean isCleanWorkingDirectory) {
+    public void setup() {
         File workingDir = new File(WORKING_DIR);
         if (!workingDir.exists()) workingDir.mkdirs();
-
-        System.out.println(String.format(">>> setup: WORKING_DIR=%s, isCleanWorkingDirectory=%s", WORKING_DIR, isCleanWorkingDirectory));
-        if (isCleanWorkingDirectory) {
-            for (File f : workingDir.listFiles()) {
-                f.delete();
-                System.out.println("\t deleted " + f);
-            }
-        }
     }
 
     public long getLatestTransformerVersion(String vip) {
