@@ -11,6 +11,7 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.http.HttpHelper;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
+import com.netflix.vms.transformer.override.InputSlicePinTitleProcessor;
 import com.netflix.vms.transformer.override.OutputSlicePinTitleProcessor;
 import com.netflix.vms.transformer.override.PinTitleHelper;
 import com.netflix.vms.transformer.util.HollowBlobKeybaseBuilder;
@@ -56,7 +57,7 @@ public class ShowMeTheFastProgress {
         long converterBlobVersion = Long.parseLong(expectedOutputStateEngine.getHeaderTag("sourceDataVersion"));
 
         // Load Transformer input based on converterBlobVersion
-        VMSHollowInputAPI inputAPI = loadVMSHollowInputAPI(converterBlobVersion);
+        VMSHollowInputAPI inputAPI = loadVMSHollowInputAPI(ctx, CONVERTER_VIP_NAME, converterBlobVersion, topNodes);
 
         // Setup Fastlane context and Output State Engine
         List<Integer> fastlaneIds = Arrays.stream(topNodes).boxed().collect(Collectors.toList());
@@ -103,15 +104,24 @@ public class ShowMeTheFastProgress {
         }
     }
 
-    private static VMSHollowInputAPI loadVMSHollowInputAPI(long version) {
+    private static VMSHollowInputAPI loadVMSHollowInputAPI(TransformerContext ctx, String vipName, long version, int... topNodes) throws IOException {
+        boolean isUseInputSlicing = true;
         System.out.println("loadVMSHollowInputAPI: Loading version=" + version);
         long start = System.currentTimeMillis();
         try {
-            VMSInputDataClient inputClient = new VMSInputDataClient(PROXY, WORKING_DIR, CONVERTER_VIP_NAME);
-            inputClient.triggerRefreshTo(version);
-            return new VMSHollowInputAPI(inputClient.getStateEngine());
+            HollowReadStateEngine stateEngine;
+            if (isUseInputSlicing) {
+                InputSlicePinTitleProcessor processor = new InputSlicePinTitleProcessor(vipName, PROXY, WORKING_DIR, ctx);
+                File slicedFile = processor.getFile("input", version, topNodes);
+                stateEngine = processor.fetchInputStateEngineSlice(slicedFile, version, topNodes);
+            } else {
+                VMSInputDataClient inputClient = new VMSInputDataClient(PROXY, WORKING_DIR, vipName);
+                inputClient.triggerRefreshTo(version);
+                stateEngine = inputClient.getStateEngine();
+            }
+            return new VMSHollowInputAPI(stateEngine);
         } finally {
-            trackDuration(start, "loadVMSHollowInputAPI: version=%s", version);
+            trackDuration(start, "loadVMSHollowInputAPI: isUseInputSlicing=%s, version=%s, topNodes=%s", isUseInputSlicing, version, toString(topNodes));
         }
     }
 
