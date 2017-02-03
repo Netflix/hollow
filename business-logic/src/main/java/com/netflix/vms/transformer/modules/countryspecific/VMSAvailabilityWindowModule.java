@@ -173,13 +173,14 @@ public class VMSAvailabilityWindowModule {
                             if(locale != null) {
                                 packageData = getPackageData(videoId, pkg._getPackageId());
                                 long packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAvailability);
+
+                                if(packageAvailability == 0) //// multicatalog processing -- make sure contract gives access to some existing asset understandable in this language
+                                    continue;
+
                                 boolean considerPackageForLang = packageData == null ? true : packageData.isDefaultPackage;
                                 if(!considerPackageForLang && packageIdList.size() == 1) {
                                     considerPackageForLang = true;
                                 }
-
-                                if(packageAvailability == 0) //// multicatalog processing -- make sure contract gives access to some existing asset understandable in this language
-                                    continue;
 
                                 if(considerPackageForLang && (packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0) {
                                     thisWindowFoundLocalAudio = true; // rollup.foundLocalAudio();
