@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Artwork implements Cloneable {
 
-    public Strings sourceFileId = null;
+    public ArtworkSourceString sourceFileId = null;
     public long effectiveDate = java.lang.Long.MIN_VALUE;
     public NFLocale locale = null;
     public int seqNum = java.lang.Integer.MIN_VALUE;

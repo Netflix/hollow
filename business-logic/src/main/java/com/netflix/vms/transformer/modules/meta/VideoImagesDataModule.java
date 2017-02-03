@@ -4,6 +4,8 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidIma
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
+import com.netflix.vms.transformer.hollowoutput.ArtworkSourceString;
+
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
@@ -32,7 +34,6 @@ import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoArtworkHollow;
 import com.netflix.vms.transformer.hollowoutput.Artwork;
 import com.netflix.vms.transformer.hollowoutput.ArtworkMerchStillPackageData;
-import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoImages;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
@@ -460,7 +461,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
         // Process list of derivatives
         processDerivativesAndCdnList(entityId, sourceFileId, inputDerivatives, artwork);
 
-        artwork.sourceFileId = new Strings(sourceFileId);
+        artwork.sourceFileId = new ArtworkSourceString(sourceFileId);
         artwork.seqNum = seqNum;
         artwork.ordinalPriority = ordinalPriority;
         fillPassThroughData(artwork, attributes);

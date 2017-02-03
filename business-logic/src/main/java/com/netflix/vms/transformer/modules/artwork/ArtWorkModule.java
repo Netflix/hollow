@@ -99,7 +99,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         // Process list of derivatives
         processDerivativesAndCdnList(entityId, sourceFileId, inputDerivatives, artwork);
 
-        artwork.sourceFileId = new Strings(sourceFileId);
+        artwork.sourceFileId = new ArtworkSourceString(sourceFileId);
         artwork.seqNum = seqNum;
         artwork.ordinalPriority = ordinalPriority;
         fillPassThroughData(artwork, attributes);
