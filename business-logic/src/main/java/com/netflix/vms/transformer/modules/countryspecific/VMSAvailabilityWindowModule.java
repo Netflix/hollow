@@ -172,19 +172,21 @@ public class VMSAvailabilityWindowModule {
                             PackageData packageData = null;
                             if(locale != null) {
                                 packageData = getPackageData(videoId, pkg._getPackageId());
-                                long packageAvailability = 0;
-                                // if((packageData != null && !packageData.isDefaultPackage) || packageIdList.size() == 1) {
-                                    packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAvailability);
-                                // }
+                                long packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAvailability);
+                                boolean considerPackageForLang = packageData == null ? true : packageData.isDefaultPackage;
+                                if(!considerPackageForLang && packageIdList.size() == 1) {
+                                    considerPackageForLang = true;
+                                }
+
                                 if(packageAvailability == 0) //// multicatalog processing -- make sure contract gives access to some existing asset understandable in this language
                                     continue;
 
-                                if((packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0) {
+                                if(considerPackageForLang && (packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0) {
                                     thisWindowFoundLocalAudio = true; // rollup.foundLocalAudio();
                                     if(currentOrFirstFutureWindow == outputWindow)
                                         currentOrFirstFutureWindowFoundLocalAudio = true;
                                 }
-                                if((packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0) {
+                                if(considerPackageForLang && (packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0) {
                                     thisWindowFoundLocalText = true; //rollup.foundLocalText();
                                     if(currentOrFirstFutureWindow == outputWindow)
                                         currentOrFirstFutureWindowFoundLocalText = true;
