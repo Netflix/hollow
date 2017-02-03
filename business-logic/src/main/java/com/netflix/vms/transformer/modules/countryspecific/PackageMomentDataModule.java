@@ -87,7 +87,7 @@ public class PackageMomentDataModule {
                 if("SnackMoment".equals(momentType) && packageMoment._getClipSpecRuntimeMillis() != Long.MIN_VALUE) {
                     VideoMoment videoMoment = videoMomentModule.createVideoMoment(packageData.id, packageMoment, momentType);
                     data.phoneSnackMoments.add(videoMoment);
-                } else {
+                } else if("Start".equals(momentType) || "Ending".equals(momentType) || "BladeImage".equals(momentType)) {
                     List<DownloadableIdHollow> downloadableIdList = packageMoment._getDownloadableIds();
 
                     if(downloadableIdList != null) {
