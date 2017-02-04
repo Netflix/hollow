@@ -56,7 +56,6 @@ import com.netflix.vms.transformer.modules.packages.PackageDataModule;
 import com.netflix.vms.transformer.modules.packages.contracts.LanguageRightsModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkImageRecipeModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkTypeModule;
-import com.netflix.vms.transformer.modules.passthrough.beehive.RolloutCharacterModule;
 import com.netflix.vms.transformer.modules.passthrough.mpl.EncodingProfileGroupModule;
 import com.netflix.vms.transformer.modules.person.GlobalPersonModule;
 import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
@@ -190,7 +189,6 @@ public class SimpleTransformer {
                 new L10NMiscResourcesModule(api, ctx, cycleConstants, objectMapper, indexer),
                 new LanguageRightsModule(api, ctx, cycleConstants, objectMapper, indexer),
                 new TopNVideoDataModule(api, ctx, cycleConstants, objectMapper),
-                new RolloutCharacterModule(api, ctx, cycleConstants, objectMapper),
                 new RolloutVideoModule(api, ctx, cycleConstants, objectMapper, indexer),
                 new PersonImagesModule(api, ctx, cycleConstants, objectMapper, indexer),
                 new CharacterImagesModule(api, ctx, cycleConstants, objectMapper, indexer),
