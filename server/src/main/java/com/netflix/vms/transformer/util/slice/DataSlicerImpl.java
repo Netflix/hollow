@@ -8,29 +8,20 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.tools.combine.HollowCombiner;
 import com.netflix.hollow.tools.combine.HollowCombinerIncludeOrdinalsCopyDirector;
-import com.netflix.vms.generated.notemplate.EpisodeHollow;
-import com.netflix.vms.generated.notemplate.GlobalPersonHollow;
 import com.netflix.vms.generated.notemplate.L10NResourcesHollow;
 import com.netflix.vms.generated.notemplate.NamedCollectionHolderHollow;
-import com.netflix.vms.generated.notemplate.PersonRoleHollow;
-import com.netflix.vms.generated.notemplate.SetOfEpisodeHollow;
-import com.netflix.vms.generated.notemplate.SetOfVPersonHollow;
 import com.netflix.vms.generated.notemplate.SetOfVideoHollow;
 import com.netflix.vms.generated.notemplate.StringsHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
-import com.netflix.vms.generated.notemplate.VPersonHollow;
 import com.netflix.vms.generated.notemplate.VideoHollow;
 import com.netflix.vms.transformer.common.slice.DataSlicer;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
-import com.netflix.vms.transformer.hollowoutput.Episode;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.NFResourceID;
 import com.netflix.vms.transformer.hollowoutput.NamedCollectionHolder;
 import com.netflix.vms.transformer.hollowoutput.Strings;
-import com.netflix.vms.transformer.hollowoutput.VPerson;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -182,17 +173,12 @@ public class DataSlicerImpl implements DataSlicer {
             HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
             mapper.doNotUseDefaultHashKeys();
 
-            HollowPrimaryKeyIndex globalPersonIdx = new HollowPrimaryKeyIndex(readStateEngine, "GlobalPerson", "id");
-
             for(NamedCollectionHolderHollow holder : api.getAllNamedCollectionHolderHollow()) {
                 NamedCollectionHolder outputHolder = new NamedCollectionHolder();
 
                 outputHolder.country = new ISOCountry(holder._getCountry()._getId());
 
                 outputHolder.videoListMap = new HashMap<Strings, Set<Video>>();
-                outputHolder.episodeListMap = new HashMap<Strings, Set<Episode>>();
-                outputHolder.personListMap = new HashMap<Strings, Set<VPerson>>();
-                outputHolder.resourceIdListMap = Collections.emptyMap();
 
                 Set<Integer> validVideoIdsForCountry = new HashSet<Integer>();
 
@@ -214,44 +200,6 @@ public class DataSlicerImpl implements DataSlicer {
 
                     outputHolder.videoListMap.put(new Strings(entry.getKey()._getValue()), videoSet);
                 }
-
-                for(Map.Entry<StringsHollow, SetOfEpisodeHollow> entry : holder._getEpisodeListMap().entrySet()) {
-                    Set<Episode> episodeSet = new HashSet<Episode>();
-
-                    for(EpisodeHollow ep : entry.getValue()) {
-                        Integer id = ep._getIdBoxed();
-
-                        if(includedVideoIds.contains(id)) {
-                            episodeSet.add(new Episode(id.intValue()));
-                        }
-                    }
-
-                    outputHolder.episodeListMap.put(new Strings(entry.getKey()._getValue()), episodeSet);
-                }
-
-                for(Map.Entry<StringsHollow, SetOfVPersonHollow> entry : holder._getPersonListMap().entrySet()) {
-                    Set<VPerson> personSet = new HashSet<VPerson>();
-
-                    for(VPersonHollow person : entry.getValue()) {
-                        Integer id = person._getIdBoxed();
-
-                        int personOrdinal = globalPersonIdx.getMatchingOrdinal(id);
-
-                        if(personOrdinal != -1) {
-                            GlobalPersonHollow globalPerson = api.getGlobalPersonHollow(personOrdinal);
-
-                            for(PersonRoleHollow personRole : globalPerson._getPersonRoles()) {
-                                if(validVideoIdsForCountry.contains(personRole._getVideo()._getValueBoxed())) {
-                                    personSet.add(new VPerson(id.intValue()));
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    outputHolder.personListMap.put(new Strings(entry.getKey()._getValue()), personSet);
-                }
-
 
                 mapper.addObject(outputHolder);
             }

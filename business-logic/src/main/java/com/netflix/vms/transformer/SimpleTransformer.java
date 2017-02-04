@@ -5,7 +5,6 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.Individual
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.NonVideoSpecificTransformDuration;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformInfo;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformProgress;
-import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
@@ -21,7 +20,6 @@ import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
 import com.netflix.vms.transformer.hollowoutput.FallbackUSArtwork;
-import com.netflix.vms.transformer.hollowoutput.GlobalPerson;
 import com.netflix.vms.transformer.hollowoutput.GlobalVideo;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.MoviePersonCharacter;
@@ -195,7 +193,9 @@ public class SimpleTransformer {
                 new RolloutCharacterModule(api, ctx, cycleConstants, objectMapper),
                 new RolloutVideoModule(api, ctx, cycleConstants, objectMapper, indexer),
                 new PersonImagesModule(api, ctx, cycleConstants, objectMapper, indexer),
-                new CharacterImagesModule(api, ctx, cycleConstants, objectMapper, indexer)
+                new CharacterImagesModule(api, ctx, cycleConstants, objectMapper, indexer),
+                new GlobalPersonModule(api, ctx, cycleConstants, objectMapper, indexer),
+                new NamedListCompletionModule(videoNamedListModule, cycleConstants, objectMapper)
                 );
 
         // @formatter:on
@@ -207,22 +207,7 @@ public class SimpleTransformer {
             ctx.getLogger().info(NonVideoSpecificTransformDuration, "Finished Transform for module={}, duration={}", m.getName(), tDuration);
         }
 
-        /// GlobalPersonModule is pulled out separately here because we will use the result in the NamedListCompletionModule
-        GlobalPersonModule globalPersonModule = new GlobalPersonModule(api, ctx, cycleConstants, objectMapper, indexer);
-        long tStart = System.currentTimeMillis();
-        List<GlobalPerson> allGlobalPersonRecords = globalPersonModule.transformPersons();
-        long tDuration = System.currentTimeMillis() - tStart;
-        ctx.getLogger().info(NonVideoSpecificTransformDuration, "Finished Transform for module={}, duration={}", globalPersonModule.getName(), tDuration);
-
         executor.awaitSuccessfulCompletion();
-
-        //// NamedListCompletionModule happens after all hierarchies are already processed -- now we have built the ThreadSafeBitSets corresponding
-        //// to the NamedLists, and we can build the POJOs using those.
-        tStart = System.currentTimeMillis();
-        NamedListCompletionModule namedListCompleter = new NamedListCompletionModule(videoNamedListModule, allGlobalPersonRecords, cycleConstants, objectMapper);
-        namedListCompleter.transform();
-        tDuration = System.currentTimeMillis() - tStart;
-        ctx.getLogger().info(NonVideoSpecificTransformDuration, "Finished Transform for module={}, duration={}", namedListCompleter.getName(), tDuration);
 
         ctx.getLogger().info(TransformProgress, new ProgressMessage(processedCount.get()));
         ctx.getMetricRecorder().recordMetric(FailedProcessingIndividualHierarchies, failedIndividualTransforms.get());
