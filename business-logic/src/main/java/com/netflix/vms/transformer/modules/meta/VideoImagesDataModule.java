@@ -1,11 +1,9 @@
 package com.netflix.vms.transformer.modules.meta;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidImagesTerritoryCode;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidPhaseTagForArtwork;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
@@ -15,7 +13,6 @@ import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
-import com.netflix.vms.transformer.hollowinput.AbsoluteScheduleHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeSetHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
@@ -26,15 +23,7 @@ import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfRightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.LocaleTerritoryCodeHollow;
 import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
-import com.netflix.vms.transformer.hollowinput.PhaseTagHollow;
-import com.netflix.vms.transformer.hollowinput.PhaseTagListHollow;
 import com.netflix.vms.transformer.hollowinput.RightsWindowHollow;
-import com.netflix.vms.transformer.hollowinput.RolloutHollow;
-import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkHollow;
-import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkSourceFileIdHollow;
-import com.netflix.vms.transformer.hollowinput.RolloutPhaseElementsHollow;
-import com.netflix.vms.transformer.hollowinput.RolloutPhaseHollow;
-import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowMapHollow;
 import com.netflix.vms.transformer.hollowinput.SingleValuePassthroughMapHollow;
 import com.netflix.vms.transformer.hollowinput.StatusHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
@@ -43,7 +32,6 @@ import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoArtworkHollow;
 import com.netflix.vms.transformer.hollowoutput.Artwork;
 import com.netflix.vms.transformer.hollowoutput.ArtworkMerchStillPackageData;
-import com.netflix.vms.transformer.hollowoutput.SchedulePhaseInfo;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoImages;
 import com.netflix.vms.transformer.index.IndexSpec;
@@ -55,24 +43,15 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
-public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabilityChecker {
-
-	private static final long FAR_FUTURE_DATE = Long.MIN_VALUE;
-	private final HollowHashIndex videoArtworkIndex;
+public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabilityChecker {
+    private final HollowHashIndex videoArtworkIndex;
     private final HollowPrimaryKeyIndex damMerchStillsIdx;
     private final HollowPrimaryKeyIndex videoStatusIdx;
-	private HollowHashIndex rolloutIndex;
-
-	private HollowHashIndex overrideScheduleIndex;
-	private HollowHashIndex masterScheduleIndex;
-	private HollowHashIndex absoluteScheduleIndex;
 
     private final static String MERCH_STILL_TYPE = "MERCH_STILL";
     private final int MIN_ROLLUP_SIZE = 4; // 3
@@ -83,27 +62,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         this.videoArtworkIndex = indexer.getHashIndex(IndexSpec.ARTWORK_BY_VIDEO_ID);
         this.damMerchStillsIdx = indexer.getPrimaryKeyIndex(IndexSpec.DAM_MERCHSTILLS);
         this.videoStatusIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_STATUS);
-        this.rolloutIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
-
-        overrideScheduleIndex = indexer.getHashIndex(IndexSpec.OVERRIDE_SCHEDULE_BY_VIDEO_ID);
-        masterScheduleIndex = indexer.getHashIndex(IndexSpec.MASTER_SCHEDULE_BY_TAG_SHOW);
-        absoluteScheduleIndex = indexer.getHashIndex(IndexSpec.ABSOLUTE_SCHEDULE_BY_VIDEO_ID_TAG);
-
-        ctx.getLogger().info(TransformerLogTag.TransformInfo, "MerchStill descSorting=" + ctx.getConfig().isMerchstillsSortedDescending() + ", edEpisode=" + ctx.getConfig().isMerchstillEpisodeLiveCheckEnabled());
-    }
-
-    // constructor only for test purposes
-    VideoImagesDataModule(TransformerContext context, HollowHashIndex overrideIndex, HollowHashIndex masterIndex,
-                                 HollowHashIndex absoluteIndex, VMSHollowInputAPI api, HollowObjectMapper mapper, CycleConstants cycleConstants,
-                                 VMSTransformerIndexer indexer) {
-        super("Video", api, context, mapper, cycleConstants, indexer);
-        this.overrideScheduleIndex = overrideIndex;
-        this.masterScheduleIndex = masterIndex;
-        this.absoluteScheduleIndex = absoluteIndex;
-
-        this.videoArtworkIndex = null;
-        this.damMerchStillsIdx = null;
-        this.videoStatusIdx = null;
+        ctx.getLogger().info(TransformerLogTag.TransformInfo, "MerchStill descSorting=" + ctx.getConfig().isMerchstillsSortedDescending() + ", edEpisode=" + ctx.getConfig().isMerchstillEpisodeLiveCheckEnabled()); 
     }
 
     public Map<String, Map<Integer, VideoImages>> buildVideoImagesByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
@@ -119,18 +78,15 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         Set<String> merchstillSourceFieldIds = new HashSet<>();
 
         Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap = new HashMap<>();
-        Map<String, Map<Integer, Set<SchedulePhaseInfo>>> countrySchedulePhaseMap = new HashMap<>();
 
         for (Integer videoId : ids) {
             HollowHashIndexResult matches = videoArtworkIndex.findMatches((long) videoId);
-            //HollowHashIndexResult rolloutInput = getRolloutInput(videoId);
             if (matches != null) {
-            	Map<String, Set<String>> rolloutImagesByCountry = getRolloutImagesByCountry(showHierarchiesByCountry);
                 HollowOrdinalIterator iter = matches.iterator();
                 int videoArtworkOrdinal = iter.next();
                 while (videoArtworkOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
                     VideoArtworkHollow artworkHollowInput = api.getVideoArtworkHollow(videoArtworkOrdinal);
-                    String rollupSourceFileId = processArtwork(showHierarchiesByCountry.keySet(), artworkHollowInput, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry);
+                    String rollupSourceFileId = processArtwork(showHierarchiesByCountry.keySet(), artworkHollowInput, countryArtworkMap, merchstillSourceFieldIds);
                     if (rollupSourceFileId != null) {
                         rollupMerchstillVideoIds.add(videoId);
                         rollupSourceFieldIds.add(rollupSourceFileId);
@@ -151,7 +107,6 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         for (Map.Entry<String, Map<Integer, Set<Artwork>>> countryEntry : countryArtworkMap.entrySet()) {
             String countryCode = countryEntry.getKey();
             Map<Integer, Set<Artwork>> artMap = countryEntry.getValue();
-            Map<Integer, Set<SchedulePhaseInfo>> videoSchedulePhaseMap = countrySchedulePhaseMap.get(countryCode);
 
             Map<Integer, VideoImages> imagesMap = new HashMap<>();
             countryImagesMap.put(countryCode, imagesMap);
@@ -159,12 +114,6 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
             for (Map.Entry<Integer, Set<Artwork>> entry : artMap.entrySet()) {
                 VideoImages images = new VideoImages();
                 Integer id = entry.getKey();
-
-                // get schedule phase for artworks for the given video Id above
-                if (videoSchedulePhaseMap != null) {
-                    Set<SchedulePhaseInfo> schedulePhaseInfoList = videoSchedulePhaseMap.get(id);
-                    if (schedulePhaseInfoList != null) images.imageAvailabilityWindows = schedulePhaseInfoList;
-                }
 
                 Set<Artwork> artworkSet = entry.getValue();
                 images.artworks = createArtworkByTypeMap(artworkSet);
@@ -177,70 +126,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         return countryImagesMap;
     }
 
-    private Map<String, Set<String>> getRolloutImagesByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
-
-    	Map<String, Set<String>> countryToListOfSourceFileIds = new HashMap<String, Set<String>>();
-    	for(Entry<String, Set<VideoHierarchy>> countryVideoHierarchyEntry: showHierarchiesByCountry.entrySet()){
-
-    		Set<String> setOfSourceFileIdsForCountry = new HashSet<>();
-    		String country = countryVideoHierarchyEntry.getKey();
-			countryToListOfSourceFileIds.put(country, setOfSourceFileIdsForCountry);
-
-    		for(VideoHierarchy vh: countryVideoHierarchyEntry.getValue()){
-    			long topNodeId = vh.getTopNodeId();
-    			HollowHashIndexResult rolloutMatches = rolloutIndex.findMatches(topNodeId, "DISPLAY_PAGE");
-
-    			if(rolloutMatches == null)
-    				continue;
-
-    	        HollowOrdinalIterator iter = rolloutMatches.iterator();
-    	        int rolloutOrdinal = iter.next();
-				while (rolloutOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
-					
-					RolloutHollow rollout = api.getRolloutHollow(rolloutOrdinal);
-
-					for(RolloutPhaseHollow phase: rollout._getPhases()){
-
-						if(!isRolloutForCountryAtHand(country, phase))
-							continue; 
-						
-						RolloutPhaseElementsHollow elements = phase._getElements();
-						if(elements == null)
-							continue;
-
-						RolloutPhaseArtworkHollow artwork = elements._getArtwork();
-						if(artwork == null)
-							continue;
-						for(RolloutPhaseArtworkSourceFileIdHollow sourcefileIdHollow: artwork._getSourceFileIds()){
-							String sourceFileId = sourcefileIdHollow._getValue()._getValue();
-							setOfSourceFileIdsForCountry.add(sourceFileId);
-						}
-					}
-					rolloutOrdinal = iter.next();
-				}
-    		}
-    	}
-    	return countryToListOfSourceFileIds;
-	}
-
-	private boolean isRolloutForCountryAtHand(String country, RolloutPhaseHollow phase) {
-		
-		boolean rolloutAppliesToCountryAtHand = false;
-		RolloutPhaseWindowMapHollow windows = phase._getWindows();
-		
-		if(windows != null){
-			for(ISOCountryHollow countryHollow: windows.keySet()){
-				if(country.equals(countryHollow._getValue())){
-					rolloutAppliesToCountryAtHand = true;
-					break;
-				}
-			}
-		}
-		
-		return rolloutAppliesToCountryAtHand;
-	}
-
-	private void rollupMerchstills(Set<Integer> rollupMerchstillVideoIds /* in */, Set<String> rollupSourceFieldIds /* in */, Map<String, Set<VideoHierarchy>> showHierarchiesByCountry/* in */,
+    private void rollupMerchstills(Set<Integer> rollupMerchstillVideoIds /* in */, Set<String> rollupSourceFieldIds /* in */, Map<String, Set<VideoHierarchy>> showHierarchiesByCountry/* in */,
             Set<String> merchstillSourceFieldIds /* in */, Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap /* out */) {
 
         for (String countryCode : showHierarchiesByCountry.keySet()) {
@@ -317,7 +203,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                         for(int iadd= 0; iadd < num_add && iadd < seasonBackFillArtwork.size(); iadd++) {
                             Artwork seasonFallback = seasonBackFillArtwork.get(iadd);
                             seasonFallback.seqNum = ++max_seqNum;
-                            seasonArtwork.add(seasonFallback);
+                            seasonArtwork.add(seasonFallback); 
                         }
                     }
 
@@ -338,7 +224,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                     for(int iadd= 0; iadd < num_add && iadd < showBackFillArtwork.size(); iadd++) {
                         Artwork fallback = showBackFillArtwork.get(iadd);
                         fallback.seqNum = ++max_seqNum;
-                        showArtwork.add(fallback);
+                        showArtwork.add(fallback); 
                     }
                 }
 
@@ -352,7 +238,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
 
     // Ref: https://docs.google.com/document/d/1paFkF8WyWJ6dB1Rh7lWZ_y8hk1WwjPoXt-TD0hzc-z0
     static void rollupMerchstillsDescOrder(
-            Set<String> rollupSourceFieldIds /* in */,
+            Set<String> rollupSourceFieldIds /* in */, 
             Map<String, Set<VideoHierarchy>> showHierarchiesByCountry/* in */,
             Set<String> merchstillSourceFieldIds /* in */,
             Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap /* in-out */,
@@ -434,7 +320,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                         for(int iadd= 0; iadd < num_add && iadd < seasonBackFillArtwork.size(); iadd++) {
                             Artwork seasonFallback = seasonBackFillArtwork.get(iadd);
                             seasonFallback.seqNum = ++max_seqNum;
-                            seasonArtwork.add(seasonFallback);
+                            seasonArtwork.add(seasonFallback); 
                         }
                     }
 
@@ -455,7 +341,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                     for(int iadd= 0; iadd < num_add && iadd < showBackFillArtwork.size(); iadd++) {
                         Artwork fallback = showBackFillArtwork.get(iadd);
                         fallback.seqNum = ++max_seqNum;
-                        showArtwork.add(fallback);
+                        showArtwork.add(fallback); 
                     }
                 }
 
@@ -512,7 +398,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                     windowStart += ONE_THOUSAND_YEARS;
                     windowEnd += ONE_THOUSAND_YEARS;
                 }
-
+                
                 if (windowStart < ctx.getNowMillis() && windowEnd > ctx.getNowMillis()) {
                     isInWindow = true;
                     break;
@@ -528,12 +414,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         throw new UnsupportedOperationException("Use buildVideoImagesByCountry");
     }
 
-    private String processArtwork(Set<String> countrySet, VideoArtworkHollow artworkHollowInput,
-                                  Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap,
-                                  Map<String, Map<Integer, Set<SchedulePhaseInfo>>> countrySchedulePhaseMap,
-                                  Set<String> merchstillSourceFieldIds,
-                                  Map<String, Set<String>> rolloutImagesByCountry, Map<String,
-            Set<VideoHierarchy>> showHierarchiesByCountry) {
+    private String processArtwork(Set<String> countrySet, VideoArtworkHollow artworkHollowInput, Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap, Set<String> merchstillSourceFieldIds) {
         ArtworkLocaleListHollow locales = artworkHollowInput._getLocales();
         int entityId = (int) artworkHollowInput._getMovieId();
         int videoId = entityId;
@@ -546,19 +427,6 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         String sourceFileId = artworkHollowInput._getSourceFileId()._getValue();
         int ordinalPriority = (int) artworkHollowInput._getOrdinalPriority();
         int seqNum = (int) artworkHollowInput._getSeqNum();
-
-        // get earliest schedule phase information
-        // get all schedule phase list for asset validation
-        Set<SchedulePhaseInfo> schedulePhaseInfoSet = getAllScheduleInfo(artworkHollowInput, videoId);
-        SchedulePhaseInfo window = getEarliestScheduleInfo(schedulePhaseInfoSet, videoId);
-        if (window == null) {
-            ctx.getLogger().warn(InvalidPhaseTagForArtwork, "Undefined phaseTagList in VideoArtwork for videoId={} sourceFileId={}." +
-                    "Data will be dropped", videoId, sourceFileId);
-            if(ctx.getConfig().isFilterImagesForArtworkScheduling())
-            	return null;
-            window = getFarInFutureSchedulePhaseInfo(videoId);
-        }
-
         ArtworkAttributesHollow attributes = artworkHollowInput._getAttributes();
         ArtworkDerivativeSetHollow inputDerivatives = artworkHollowInput._getDerivatives();
 
@@ -596,8 +464,6 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         artwork.seqNum = seqNum;
         artwork.ordinalPriority = ordinalPriority;
         fillPassThroughData(artwork, attributes);
-        artwork.schedulePhaseInfo = window;
-        artwork.isRolloutExclusive = artworkHollowInput._getRolloutExclusive();
 
         int ordinal = damMerchStillsIdx.getMatchingOrdinal(sourceFileId);
         if (ordinal != -1) {
@@ -634,54 +500,14 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         } else {
             // Support Country based data
             for (ArtworkLocaleHollow localeHollow : localeSet) {
-            	Artwork localeArtworkIsRolloutAsInput = artwork.clone();
-                localeArtworkIsRolloutAsInput.locale = NFLocaleUtil.createNFLocale(localeHollow._getBcp47Code()._getValue());
-                localeArtworkIsRolloutAsInput.effectiveDate = localeHollow._getEffectiveDate()._getValue();
-
-                Artwork localeArtworkIsRolloutOppositeToInput = localeArtworkIsRolloutAsInput.clone();
-                localeArtworkIsRolloutOppositeToInput.isRolloutExclusive = !localeArtworkIsRolloutAsInput.isRolloutExclusive;
-
+                Artwork localeArtwork = artwork.clone();
+                localeArtwork.locale = NFLocaleUtil.createNFLocale(localeHollow._getBcp47Code()._getValue());
+                localeArtwork.effectiveDate = localeHollow._getEffectiveDate()._getValue();
+                
                 for (String countryCode : getCountryCodes(localeHollow)) {
                     Map<Integer, Set<Artwork>> artMap = getArtworkMap(countryCode, countryArtworkMap);
-
-                    // fill up schedule phase information along with locale artworks
-                    if (!countrySchedulePhaseMap.containsKey(countryCode)) {
-                        countrySchedulePhaseMap.put(countryCode, new HashMap<>());
-                    }
-                    Map<Integer, Set<SchedulePhaseInfo>> videoSchedulePhaseMap = countrySchedulePhaseMap.get(countryCode);
-                    if (!videoSchedulePhaseMap.containsKey(videoId)) {
-                        videoSchedulePhaseMap.put(videoId, new HashSet<>());
-                    }
-                    Set<SchedulePhaseInfo> scheduleSet = videoSchedulePhaseMap.get(videoId);
-                    scheduleSet.addAll(schedulePhaseInfoSet);
-
-                	// For non-merch still images do the following
-                	// 1) Filter any rollout images without rollout
-                	// 2) Mark all rollout images as rollout
-                	// 3) Roll-up all images is to topNode with source video to indicate to which video the image was associated to in input.
-                    Set<Integer> topNodes = getTopNodes(showHierarchiesByCountry, countryCode, entityId);
-                    Artwork updatedArtwork = pickArtworkBasedOnRolloutInfo(localeArtworkIsRolloutAsInput, localeArtworkIsRolloutOppositeToInput, rolloutImagesByCountry.get(countryCode), sourceFileId);
-                    
-                    if(!ctx.getConfig().isRollupImagesForArtworkScheduling() || topNodes == null || topNodes.isEmpty()){
-                        Set<Artwork> artworkSet = getArtworkSet(entityId, artMap);
-                        artworkSet.add(updatedArtwork);
-                        continue;
-                    }
-                    
-                    for (int topNode : topNodes) {
-                        Set<Artwork> artworkSet = getArtworkSet(topNode, artMap);
-                        // If pickArtworkBasedOnRolloutInfo return null based on roll-out: we drop the image for the country.
-                        // Look at pickArtworkBasedOnRolloutInfo method for details. Logging of dropped IDs is in pickArtworkBasedOnRolloutInfo.
-                        if (updatedArtwork != null)
-                            artworkSet.add(updatedArtwork);
-
-                        // roll up schedule windows in top nodes
-                        if (!videoSchedulePhaseMap.containsKey(topNode)) {
-                            videoSchedulePhaseMap.put(topNode, new HashSet<>());
-                        }
-                        scheduleSet = videoSchedulePhaseMap.get(topNode);
-                        scheduleSet.addAll(schedulePhaseInfoSet);
-                    }
+                    Set<Artwork> artworkSet = getArtworkSet(entityId, artMap);
+                    artworkSet.add(localeArtwork);
                 }
             }
         }
@@ -689,175 +515,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         return isMerchstillRollup ? sourceFileId : null;
     }
 
-	private Set<Integer> getTopNodes(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, String countryCode, int entityId) {
-		Set<Integer> topNodes = new HashSet<>();
-		// More than one hierarchy is possible for a video has different hierarchies in different countries
-		Set<VideoHierarchy> hierarchies = showHierarchiesByCountry.get(countryCode);
-		if(hierarchies != null){
-			for(VideoHierarchy vh: hierarchies){
-				topNodes.add(vh.getTopNodeId());
-			}
-		}
-		return topNodes;
-	}
-
-	@VisibleForTesting
-	Artwork pickArtworkBasedOnRolloutInfo(Artwork localeArtworkIsRolloutAsInput, Artwork localeArtworkIsRolloutOppositeToInput, Set<String> rolloutSourceFileIds, String sourceFileId) {
-		if(localeArtworkIsRolloutAsInput.isRolloutExclusive){
-        	// Upstream says this is a rollout image
-        	if(ctx.getConfig().isFilterImagesForArtworkScheduling() && (rolloutSourceFileIds == null || !rolloutSourceFileIds.contains(sourceFileId))){
-    			// But no corresponding rollout for the image in this country.
-    			// To err on side of not leaking a rollout image, drop this image for the country.
-                // not logging for now since there are way too many log messages.
-        		// ctx.getLogger().warn(MissingRolloutForArtwork, "Rollout exclusive image has no valid rollout with id={}; data will be dropped.", sourceFileId);
-    			return null;
-    		}
-        	return localeArtworkIsRolloutAsInput;
-        }
-        // localeArtworkIsRolloutAsInput.isRolloutExclusive == false
-        if(rolloutSourceFileIds != null && rolloutSourceFileIds.contains(sourceFileId)){
-        	// Upstream did not tell us that this source file id was rollout exclusive but the image is in roll-out.
-        	// To err on side of caution mark it rollout exclusive to ensure this image is not returned without proper rollout window.
-        	return(localeArtworkIsRolloutOppositeToInput);
-        }
-		return localeArtworkIsRolloutAsInput;
-	}
-
-    /**
-     * Get all schedule phase information for the given video Id.
-     * @param videoArtworkHollow
-     * @param videoId
-     * @return Null if phase tags list is null or no matching schedule is present for given phase tag.
-     * Else a set of schedule information. Note empty set is never returned.
-     */
-    Set<SchedulePhaseInfo> getAllScheduleInfo(VideoArtworkHollow videoArtworkHollow, int videoId) {
-        Set<SchedulePhaseInfo> schedulePhaseInfos = null;
-        boolean isSmoky = videoArtworkHollow._getIsSmoky();
-        
-        PhaseTagListHollow phaseTagListHollow = videoArtworkHollow._getPhaseTags();
-        checkPhaseTagList(phaseTagListHollow, videoArtworkHollow, videoId);
-        Iterator<PhaseTagHollow> iterator = null;
-        if(phaseTagListHollow != null)
-        	iterator = phaseTagListHollow.iterator();
-        
-        if (phaseTagListHollow == null || !iterator.hasNext()) {
-            // adding a default window for no phase tags.
-            SchedulePhaseInfo defaultWindow = new SchedulePhaseInfo(isSmoky, videoId);
-            schedulePhaseInfos = new HashSet<>();
-            schedulePhaseInfos.add(defaultWindow);
-            return schedulePhaseInfos;
-        }
-
-        while (iterator.hasNext()) {
-
-            PhaseTagHollow phaseTagHollow = iterator.next();
-            String tag = phaseTagHollow._getPhaseTag()._getValue();
-            String scheduleId = phaseTagHollow._getScheduleId()._getValue();
-
-            if (tag != null && scheduleId != null) {
-
-                // check absolute schedule
-                HollowHashIndexResult indexResult = absoluteScheduleIndex.findMatches((long) videoId, tag);
-                if (indexResult != null && indexResult.numResults() >= 1) {
-                    if (schedulePhaseInfos == null) schedulePhaseInfos = new HashSet<>();
-                    schedulePhaseInfos.add(getAbsoluteSchedule(indexResult.iterator().next(), api, isSmoky, videoId));
-                }
-
-                // check override schedule
-                indexResult = overrideScheduleIndex.findMatches((long) videoId, tag);
-                if (indexResult != null && indexResult.numResults() >= 1) {
-                    if (schedulePhaseInfos == null) schedulePhaseInfos = new HashSet<>();
-                    schedulePhaseInfos.add(getSchedule(indexResult.iterator().next(), api, isSmoky, true, videoId));
-                } else {
-                    // get master schedule if override is not present
-                    indexResult = masterScheduleIndex.findMatches(tag, scheduleId);
-                    if (indexResult != null && indexResult.numResults() >= 1) {
-                        if (schedulePhaseInfos == null) schedulePhaseInfos = new HashSet<>();
-                        schedulePhaseInfos.add(getSchedule(indexResult.iterator().next(), api, isSmoky, false, videoId));
-                    }
-                }
-
-            }
-        }
-
-        // Returning null will result in dropping the image. To enable gradual roll out of artwork scheduling, dropping of 
-        // images will be enabled only when a property is turned on. To achieve this, bad phase tag images will not be dropped
-        // but will be tagged with far in the future start and end dates. This was for old path image exits.
-        // For new path, image will not be considered. 
-        if(schedulePhaseInfos == null && !ctx.getConfig().isFilterImagesForArtworkScheduling()){
-        	SchedulePhaseInfo phaseWithFarFutureStartAndEnd = getFarInFutureSchedulePhaseInfo(videoId);
-        	return Collections.singleton(phaseWithFarFutureStartAndEnd);
-        }
-        
-        return schedulePhaseInfos;
-    }
-
-	private SchedulePhaseInfo getFarInFutureSchedulePhaseInfo(int videoId) {
-		SchedulePhaseInfo phaseWithFarFutureStartAndEnd = new SchedulePhaseInfo(videoId);
-		phaseWithFarFutureStartAndEnd.start = phaseWithFarFutureStartAndEnd.end = FAR_FUTURE_DATE;
-		return phaseWithFarFutureStartAndEnd;
-	}
-
-    private SchedulePhaseInfo getAbsoluteSchedule(int absoluteScheduleOrdinal, VMSHollowInputAPI api, boolean isSmoky, int videoId) {
-        SchedulePhaseInfo window = new SchedulePhaseInfo(isSmoky, videoId);
-        AbsoluteScheduleHollow absoluteScheduleHollow = api.getAbsoluteScheduleHollow(absoluteScheduleOrdinal);
-        window.start = absoluteScheduleHollow._getStartDate();
-        window.end = absoluteScheduleHollow._getEndDate();
-        window.isAbsolute = true;
-        return window;
-    }
-
-    private SchedulePhaseInfo getSchedule(int ordinal, VMSHollowInputAPI api, boolean isSmoky, boolean isOverride, int videoId) {
-        Long startOffset;
-        if (isOverride) {
-            startOffset = api.getOverrideScheduleHollow(ordinal)._getAvailabilityOffset();
-        } else {
-            startOffset = api.getMasterScheduleHollow(ordinal)._getAvailabilityOffset();
-        }
-        SchedulePhaseInfo window = new SchedulePhaseInfo(isSmoky, videoId);
-        window.start = startOffset;
-        return window;
-    }
-
-    /**
-     * Check phase tag list, if null then return null, else return the list itself.
-     */
-    private PhaseTagListHollow checkPhaseTagList(PhaseTagListHollow phaseTagListHollow, VideoArtworkHollow videoArtworkHollow, int videoId) {
-        if (phaseTagListHollow == null) {
-            String sourceFileId = videoArtworkHollow._getSourceFileId()._getValue();
-            ctx.getLogger().info(InvalidPhaseTagForArtwork, "PhaseTagList is null in VideoArtwork for videoId={} sourceFileId={} " +
-                    "returning null, data will be dropped", videoId, sourceFileId);
-        }
-        return phaseTagListHollow;
-    }
-
-    /**
-     * This method retrieves the earliest scheduling information for the artwork. It looks up the schedule in images schedules feed.
-     * Check method getAllScheduleInfo.
-     * @param schedulePhaseInfoSet
-     * @return
-     */
-    SchedulePhaseInfo getEarliestScheduleInfo(Set<SchedulePhaseInfo> schedulePhaseInfoSet, int videoId) {
-        // this set is empty if phase tag list is null. Check method getAllScheduleInfo
-        if (schedulePhaseInfoSet == null) return null;
-
-        SchedulePhaseInfo window = null;
-        for (SchedulePhaseInfo schedulePhaseInfo : schedulePhaseInfoSet) {
-            if (schedulePhaseInfo.isAbsolute) {
-                return schedulePhaseInfo;
-            }
-            if (window == null) {
-                window = schedulePhaseInfo;
-            }
-            if (window.start > schedulePhaseInfo.start) {
-                window = schedulePhaseInfo;
-            }
-        }
-        return window;
-    }
-
-
-	protected Map<Integer, Set<Artwork>> getArtworkMap(String countryCode, Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap) {
+    protected Map<Integer, Set<Artwork>> getArtworkMap(String countryCode, Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap) {
         Map<Integer, Set<Artwork>> artMap = countryArtworkMap.get(countryCode);
         if (artMap == null) {
             artMap = new HashMap<>();
