@@ -70,7 +70,7 @@ public class VMSPinTitleSlicer {
 
         synchronized(this) {
             // cleanup prior files
-            cleanupOldFiles(localBlobStore, 7, 10);
+            cleanupOldFiles(localBlobStore, 7, 20);
 
             try {
                 File slicedFile = null;
