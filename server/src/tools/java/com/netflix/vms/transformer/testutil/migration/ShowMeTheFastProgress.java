@@ -36,9 +36,9 @@ import org.junit.Test;
 
 public class ShowMeTheFastProgress {
     private static final boolean isProd = true;
-    private static final boolean isPerformDiff = false;
+    private static final boolean isPerformDiff = true;
     private static final boolean isPublishPinnedData = false;
-    private static final boolean isCheckRemotePinnedData = true;
+    private static final boolean isUseRemotePinTitleSlicer = true;
 
     private static final String VIP_NAME = "newnoevent";
     private static final String CONVERTER_VIP_NAME = "noevent";
@@ -132,6 +132,7 @@ public class ShowMeTheFastProgress {
         }
     }
 
+    @SuppressWarnings("unused")
     private HollowReadStateEngine loadTransformerEngine(TransformerContext ctx, String vipName, long version, int... topNodes) throws Throwable {
         System.out.println("loadTransformerEngine: Loading version=" + version);
         long start = System.currentTimeMillis();
@@ -139,12 +140,12 @@ public class ShowMeTheFastProgress {
             OutputSlicePinTitleProcessor processor = new OutputSlicePinTitleProcessor(vipName, PROXY, WORKING_DIR, ctx);
             processor.setPinTitleFileStore(pinTitleFileStore);
             File slicedFile = processor.getFile("output", version, topNodes);
-            if (isCheckRemotePinnedData && !slicedFile.exists()) {
+            if (isUseRemotePinTitleSlicer && !slicedFile.exists()) {
                 try {
                     downloadSlice(slicedFile, REMOTE_SLICER_URL, isProd, true, vipName, version, topNodes);
                     return processor.readStateEngine(slicedFile);
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    System.out.println("WARN: Remote Slicer failure - " + ex.toString() + ". Falling back to local slicer.");
                 }
             }
             return processor.process(version, topNodes);
@@ -153,6 +154,7 @@ public class ShowMeTheFastProgress {
         }
     }
 
+    @SuppressWarnings("unused")
     private VMSHollowInputAPI loadVMSHollowInputAPI(TransformerContext ctx, String vipName, long version, int... topNodes) throws Exception {
         boolean isUseInputSlicing = true;
         System.out.println("loadVMSHollowInputAPI: Loading version=" + version);
@@ -163,12 +165,12 @@ public class ShowMeTheFastProgress {
                 InputSlicePinTitleProcessor processor = new InputSlicePinTitleProcessor(vipName, PROXY, WORKING_DIR, ctx);
                 processor.setPinTitleFileStore(pinTitleFileStore);
                 File slicedFile = processor.getFile("input", version, topNodes);
-                if (isCheckRemotePinnedData && !slicedFile.exists()) {
+                if (isUseRemotePinTitleSlicer && !slicedFile.exists()) {
                     try {
                         downloadSlice(slicedFile, REMOTE_SLICER_URL, isProd, false, vipName, version, topNodes);
                         stateEngine = processor.readStateEngine(slicedFile);
                     } catch (Exception ex) {
-                        ex.printStackTrace();
+                        System.out.println("WARN: Remote Slicer failure - " + ex.toString() + ". Falling back to local slicer.");
                     }
                 }
 
