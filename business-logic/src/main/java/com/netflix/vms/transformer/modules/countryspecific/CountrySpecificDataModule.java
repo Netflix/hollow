@@ -31,6 +31,7 @@ import com.netflix.vms.transformer.hollowoutput.VMSAvailabilityWindow;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoImages;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
+import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
@@ -379,9 +380,16 @@ public class CountrySpecificDataModule {
         com.netflix.vms.transformer.hollowoutput.Integer packageId = null;
         for (Map.Entry<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo> entry : window.windowInfosByPackageId.entrySet()) {
             com.netflix.vms.transformer.hollowoutput.Integer key = entry.getKey();
-            if (packageId == null || packageId.val < key.val) {
-                packageId = key;
-                info = entry.getValue();
+            VideoPackageInfo packageInfo = entry.getValue().videoPackageInfo;
+            boolean considerPackageForSectction = packageInfo == null ? true : packageInfo.isDefaultPackage;
+            if(window.windowInfosByPackageId.size() == 1) {
+                considerPackageForSectction = true;
+            }
+            if(considerPackageForSectction) {
+                if (packageId == null || packageId.val < key.val) {
+                    packageId = key;
+                    info = entry.getValue();
+                }
             }
         }
 

@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -10,6 +11,8 @@ public class PackageData implements Cloneable {
     public Map<ISOCountry, Set<ContractRestriction>> contractRestrictions = null;
     public Set<StreamData> streams = null;
     public boolean isPrimaryPackage = false;
+    public boolean isDefaultPackage = true;
+    public List<Strings> tags = null;
     public Set<EncodeSummaryDescriptor> audioStreamSummary = null;
     public Set<EncodeSummaryDescriptor> textStreamSummary = null;
     public Set<EncodeSummaryDescriptor> muxAudioStreamSummary = null;
@@ -32,6 +35,7 @@ public class PackageData implements Cloneable {
             if(streams != null) return false;
         } else if(!o.streams.equals(streams)) return false;
         if(o.isPrimaryPackage != isPrimaryPackage) return false;
+        if(o.isDefaultPackage != isDefaultPackage) return false;
         if(o.audioStreamSummary == null) {
             if(audioStreamSummary != null) return false;
         } else if(!o.audioStreamSummary.equals(audioStreamSummary)) return false;
@@ -44,6 +48,9 @@ public class PackageData implements Cloneable {
         if(o.allDeployableCountries == null) {
             if(allDeployableCountries != null) return false;
         } else if(!o.allDeployableCountries.equals(allDeployableCountries)) return false;
+        if(o.tags == null) {
+            if(tags != null) return false;
+        }else if(!o.tags.equals(tags)) return false;
         return true;
     }
 
@@ -58,6 +65,8 @@ public class PackageData implements Cloneable {
         hashCode = hashCode * 31 + (textStreamSummary == null ? 1237 : textStreamSummary.hashCode());
         hashCode = hashCode * 31 + (muxAudioStreamSummary == null ? 1237 : muxAudioStreamSummary.hashCode());
         hashCode = hashCode * 31 + (allDeployableCountries == null ? 1237 : allDeployableCountries.hashCode());
+        hashCode = hashCode * 31 + (tags == null ? 1237 : tags.hashCode());
+        hashCode = hashCode * 31 + (isDefaultPackage ? 1231 : 1237);
         return hashCode;
     }
 
@@ -71,6 +80,8 @@ public class PackageData implements Cloneable {
         builder.append(",audioStreamSummary=").append(audioStreamSummary);
         builder.append(",textStreamSummary=").append(textStreamSummary);
         builder.append(",muxAudioStreamSummary=").append(muxAudioStreamSummary);
+        builder.append(",isDefaultPackage=").append(isDefaultPackage);
+        builder.append(",tags=").append(tags);
         builder.append(",allDeployableCountries=").append(allDeployableCountries);
         builder.append("}");
         return builder.toString();

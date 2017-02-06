@@ -5,6 +5,7 @@ import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.contract.ContractAssetType;
 import com.netflix.vms.transformer.hollowinput.ContractHollow;
 import com.netflix.vms.transformer.hollowinput.FlagsHollow;
@@ -29,6 +30,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoContractInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoImage;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
+import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
@@ -170,17 +172,22 @@ public class VMSAvailabilityWindowModule {
                             PackageData packageData = null;
                             if(locale != null) {
                                 packageData = getPackageData(videoId, pkg._getPackageId());
-                                
                                 long packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAvailability);
+
                                 if(packageAvailability == 0) //// multicatalog processing -- make sure contract gives access to some existing asset understandable in this language
                                     continue;
 
-                                if((packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0) {
+                                boolean considerPackageForLang = packageData == null ? true : packageData.isDefaultPackage;
+                                if(!considerPackageForLang && packageIdList.size() == 1) {
+                                    considerPackageForLang = true;
+                                }
+
+                                if(considerPackageForLang && (packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0) {
                                     thisWindowFoundLocalAudio = true; // rollup.foundLocalAudio();
                                     if(currentOrFirstFutureWindow == outputWindow)
                                         currentOrFirstFutureWindowFoundLocalAudio = true;
                                 }
-                                if((packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0) {
+                                if(considerPackageForLang && (packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0) {
                                     thisWindowFoundLocalText = true; //rollup.foundLocalText();
                                     if(currentOrFirstFutureWindow == outputWindow)
                                         currentOrFirstFutureWindowFoundLocalText = true;
@@ -254,7 +261,7 @@ public class VMSAvailabilityWindowModule {
                                         thisWindowBundledAssetsGroupId = Math.max(thisWindowBundledAssetsGroupId, (int)contractId);
                                 } else {
                                     includedWindowPackageData = true;
-                                    
+
                                     if(packageData == null)
                                         packageData = getPackageData(videoId, pkg._getPackageId());
                                     
@@ -262,15 +269,21 @@ public class VMSAvailabilityWindowModule {
                                         /// package data is available
                                         windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(packageData, rightsContract, contract, country, isAvailableForDownload);
                                         outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
-
-                                        if(packageData.id > maxPackageId) {
-                                            maxPackageId = packageData.id;
-                                            bundledAssetsGroupId = (int)contractId;
+                                        boolean considerForPackageSelection = rightsContract._getPackages() == null ? true : packageData.isDefaultPackage;
+                                        if(!considerForPackageSelection) {
+                                            if(rightsContract._getPackages().size() == 1) considerForPackageSelection = true;
                                         }
+                                        if(considerForPackageSelection) {
 
-                                        if(packageData.id > thisWindowMaxPackageId) {
-                                            thisWindowMaxPackageId = packageData.id;
-                                            thisWindowBundledAssetsGroupId = (int)contractId;
+                                            if(packageData.id > maxPackageId) {
+                                                maxPackageId = packageData.id;
+                                                bundledAssetsGroupId = (int)contractId;
+                                            }
+    
+                                            if(packageData.id > thisWindowMaxPackageId) {
+                                                thisWindowMaxPackageId = packageData.id;
+                                                thisWindowBundledAssetsGroupId = (int)contractId;
+                                            }
                                         }
 
                                     } else {
@@ -355,7 +368,15 @@ public class VMSAvailabilityWindowModule {
             Map<Strings, List<VideoImage>> stillImagesByTypeMapForShowLevelExtraction = null;
 
             for(Map.Entry<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo> entry : currentOrFirstFutureWindow.windowInfosByPackageId.entrySet()) {
-                if(entry.getKey().val > maxPackageId) {
+                VideoPackageInfo videoPackageInfo  = entry.getValue().videoPackageInfo;
+                boolean considerForPackageSelection = videoPackageInfo == null ? true : videoPackageInfo.isDefaultPackage;
+
+                if(!considerForPackageSelection && currentOrFirstFutureWindow.windowInfosByPackageId.size() ==1) {
+                    considerForPackageSelection = true;
+                    ctx.getLogger().warn(TransformerLogTag.InteractivePackage, "Only one non-default package found for video={}, country={}", videoId, country);
+                }
+
+                if(considerForPackageSelection && (entry.getKey().val > maxPackageId)) {
                     maxPackageId = entry.getKey().val;
                     assetBcp47CodesFromMaxPackageId = entry.getValue().videoContractInfo.assetBcp47Codes;
                     videoFormatDescriptorsFromMaxPackageId = entry.getValue().videoPackageInfo.formats;

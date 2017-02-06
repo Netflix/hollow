@@ -2,15 +2,15 @@ package com.netflix.vms.transformer.input;
 
 import com.netflix.aws.db.ItemAttribute;
 import com.netflix.aws.file.FileAccessItem;
-import com.netflix.logging.ILog;
-import com.netflix.logging.LogManager;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("deprecation")
 public class FileStoreUtil {
 
-    private static final ILog LOGGER = LogManager.getLogger(FileStoreUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileStoreUtil.class);
 
     public static long getToVersion(FileAccessItem fileItem) {
         String toVersionStr = getAttribute(fileItem, "toVersion");
@@ -19,7 +19,7 @@ public class FileStoreUtil {
         try {
             return Long.parseLong(toVersionStr);
         } catch(Throwable th) {
-            LOGGER.error(th);
+            LOGGER.error("Exception: ", th);
             return Long.MIN_VALUE;
         }
     }
@@ -31,7 +31,7 @@ public class FileStoreUtil {
         try {
             return Long.parseLong(fromVersionStr);
         } catch (Throwable th) {
-            LOGGER.error(th);
+            LOGGER.error("Exception: ", th);
             return Long.MIN_VALUE;
         }
     }
@@ -47,7 +47,7 @@ public class FileStoreUtil {
         try {
             return Long.parseLong(inputVersionStr);
         } catch(Throwable th) {
-            LOGGER.error(th);
+            LOGGER.error("Exception: ", th);
             return Long.MIN_VALUE;
         }
     }
@@ -60,7 +60,7 @@ public class FileStoreUtil {
         try {
             return Long.parseLong(publishCycleDataTS);
         } catch(Throwable th) {
-            LOGGER.error(th);
+            LOGGER.error("Exception: ", th);
             return Long.MIN_VALUE;
         }
     }

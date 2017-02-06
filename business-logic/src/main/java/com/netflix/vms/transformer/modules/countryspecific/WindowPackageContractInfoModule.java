@@ -3,13 +3,17 @@ package com.netflix.vms.transformer.modules.countryspecific;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.hollowinput.ContractHollow;
+import com.netflix.vms.transformer.hollowinput.DeployablePackagesHollow;
+import com.netflix.vms.transformer.hollowinput.ListOfPackageTagsHollow;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.RightsContractAssetHollow;
 import com.netflix.vms.transformer.hollowinput.RightsContractHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfileGroupsHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfileIdHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
+import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowoutput.ContractRestriction;
@@ -41,6 +45,7 @@ public class WindowPackageContractInfoModule {
     private final TransformerContext ctx;
     private final CycleConstants cycleConstants;
     private final HollowPrimaryKeyIndex packageIdx;
+    private final HollowPrimaryKeyIndex deployablePackageIdx;
     private final HollowPrimaryKeyIndex streamProfileIdx;
     private final HollowPrimaryKeyIndex videoGeneralIdx;
     
@@ -60,6 +65,7 @@ public class WindowPackageContractInfoModule {
         this.packageMomentDataModule = new PackageMomentDataModule(api, cycleConstants, indexer);
 
         this.packageIdx = indexer.getPrimaryKeyIndex(IndexSpec.PACKAGES);
+        this.deployablePackageIdx = indexer.getPrimaryKeyIndex(IndexSpec.DEPLOYABLE_PACKAGES);
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
         this.soundTypesMap = getSoundTypesMap();
@@ -87,6 +93,11 @@ public class WindowPackageContractInfoModule {
         info.videoPackageInfo.formats = new HashSet<VideoFormatDescriptor>();
         info.videoPackageInfo.soundTypes = new ArrayList<Strings>();
 
+        int deployablePackageOrdinal = deployablePackageIdx.getMatchingOrdinal((long) packageData.id);
+        DeployablePackagesHollow deployablePackage = deployablePackageOrdinal == -1 ? null : api.getDeployablePackagesHollow(deployablePackageOrdinal);
+        if(deployablePackage != null) {
+            info.videoPackageInfo.isDefaultPackage = deployablePackage._getDefaultPackage();
+        }
         Set<com.netflix.vms.transformer.hollowoutput.Long> excludedDownloadables = findRelevantExcludedDownloadables(packageData, country);
 
         Set<Integer> soundTypesAudioChannels = new TreeSet<Integer>();

@@ -9,6 +9,7 @@ public class VideoPackageInfo implements Cloneable {
     public int packageId = java.lang.Integer.MIN_VALUE;
     public Set<VideoFormatDescriptor> formats = null;
     public boolean isAvailableIn3D = false;
+    public boolean isDefaultPackage = true;
     public int runtimeInSeconds = java.lang.Integer.MIN_VALUE;
     public List<Strings> soundTypes = null;
     public List<Strings> screenFormats = null;
@@ -51,6 +52,7 @@ public class VideoPackageInfo implements Cloneable {
         } else if(!o.trickPlayMap.equals(trickPlayMap)) return false;
         if (o.startMomentOffsetInSeconds!=this.startMomentOffsetInSeconds) return false;
         if (o.endMomentOffsetInSeconds!=endMomentOffsetInSeconds) return false;
+        if (o.isDefaultPackage!=this.isDefaultPackage) return false;
         return true;
     }
 
@@ -66,6 +68,7 @@ public class VideoPackageInfo implements Cloneable {
         hashCode = hashCode * 31 + (stillImagesMap == null ? 1237 : stillImagesMap.hashCode());
         hashCode = hashCode * 31 + (videoClipMap == null ? 1237 : videoClipMap.hashCode());
         hashCode = hashCode * 31 + (trickPlayMap == null ? 1237 : trickPlayMap.hashCode());
+        hashCode = hashCode * 31 + (isDefaultPackage ? 1231 : 1237);
         return hashCode;
     }
 
@@ -74,6 +77,7 @@ public class VideoPackageInfo implements Cloneable {
         builder.append("packageId=").append(packageId);
         builder.append(",formats=").append(formats);
         builder.append(",isAvailableIn3D=").append(isAvailableIn3D);
+        builder.append(",isDefaultPackage=").append(isDefaultPackage);
         builder.append(",runtimeInSeconds=").append(runtimeInSeconds);
         builder.append(",soundTypes=").append(soundTypes);
         builder.append(",screenFormats=").append(screenFormats);

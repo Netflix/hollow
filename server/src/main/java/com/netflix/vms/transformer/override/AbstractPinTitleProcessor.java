@@ -33,7 +33,7 @@ public abstract class AbstractPinTitleProcessor implements PinTitleProcessor {
         return vip;
     }
 
-    protected File getFile(String type, long version, int ... topNodes) {
+    public File getFile(String type, long version, int... topNodes) {
         String fileVIP = vip + "_" + type;
         HollowBlobFileNamer namer = new HollowBlobFileNamer(fileVIP);
         if (localBlobStore != null) {
