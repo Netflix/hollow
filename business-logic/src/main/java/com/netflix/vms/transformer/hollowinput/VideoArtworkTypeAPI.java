@@ -17,10 +17,7 @@ public class VideoArtworkTypeAPI extends HollowObjectTypeAPI {
             "locales",
             "attributes",
             "ordinalPriority",
-            "fileImageType",
-            "phaseTags",
-            "isSmoky",
-            "rolloutExclusive"
+            "fileImageType"
         });
         this.delegateLookupImpl = new VideoArtworkDelegateLookupImpl(this);
     }
@@ -137,44 +134,6 @@ public class VideoArtworkTypeAPI extends HollowObjectTypeAPI {
     public StringTypeAPI getFileImageTypeTypeAPI() {
         return getAPI().getStringTypeAPI();
     }
-
-    public int getPhaseTagsOrdinal(int ordinal) {
-        if(fieldIndex[8] == -1)
-            return missingDataHandler().handleReferencedOrdinal("VideoArtwork", ordinal, "phaseTags");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[8]);
-    }
-
-    public PhaseTagListTypeAPI getPhaseTagsTypeAPI() {
-        return getAPI().getPhaseTagListTypeAPI();
-    }
-
-    public boolean getIsSmoky(int ordinal) {
-        if(fieldIndex[9] == -1)
-            return missingDataHandler().handleBoolean("VideoArtwork", ordinal, "isSmoky") == Boolean.TRUE;
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[9]) == Boolean.TRUE;
-    }
-
-    public Boolean getIsSmokyBoxed(int ordinal) {
-        if(fieldIndex[9] == -1)
-            return missingDataHandler().handleBoolean("VideoArtwork", ordinal, "isSmoky");
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[9]);
-    }
-
-
-
-    public boolean getRolloutExclusive(int ordinal) {
-        if(fieldIndex[10] == -1)
-            return missingDataHandler().handleBoolean("VideoArtwork", ordinal, "rolloutExclusive") == Boolean.TRUE;
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[10]) == Boolean.TRUE;
-    }
-
-    public Boolean getRolloutExclusiveBoxed(int ordinal) {
-        if(fieldIndex[10] == -1)
-            return missingDataHandler().handleBoolean("VideoArtwork", ordinal, "rolloutExclusive");
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[10]);
-    }
-
-
 
     public VideoArtworkDelegateLookupImpl getDelegateLookupImpl() {
         return delegateLookupImpl;

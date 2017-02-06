@@ -1,17 +1,19 @@
 package com.netflix.vms.transformer.modules.meta;
 
-import static org.mockito.Mockito.when;
-
-import com.netflix.vms.transformer.VideoHierarchy;
-import com.netflix.vms.transformer.hollowoutput.Artwork;
-import com.netflix.vms.transformer.hollowoutput.Strings;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import com.netflix.vms.transformer.VideoHierarchy;
+import com.netflix.vms.transformer.hollowoutput.Artwork;
+import com.netflix.vms.transformer.hollowoutput.Strings;
+
+import static org.mockito.Mockito.when;
 
 public class DescendingMerchStillsOrderTest {
     private final Map<String, Set<VideoHierarchy>> showHierarchiesByCountry = new HashMap<>();

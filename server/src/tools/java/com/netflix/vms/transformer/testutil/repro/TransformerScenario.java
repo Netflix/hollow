@@ -30,7 +30,7 @@ public class TransformerScenario {
     private final long outputDataVersion;
     private final int[] topNodesToProcess;
 
-    private String proxyURL = VMSInputDataClient.TEST_PROXY_URL;
+    private String proxyURL = VMSInputDataClient.PROD_PROXY_URL;
 
     private String converterVip;
     private long inputDataVersion;
