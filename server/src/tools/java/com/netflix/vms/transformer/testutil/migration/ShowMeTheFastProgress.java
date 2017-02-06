@@ -1,11 +1,13 @@
 package com.netflix.vms.transformer.testutil.migration;
 
 import com.netflix.aws.file.FileStore;
+import com.netflix.governator.InjectorBuilder;
+import com.netflix.governator.LifecycleInjector;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.lifecycle.NFLifecycleUnitTester;
+import com.netflix.runtime.lifecycle.RuntimeCoreModule;
 import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
@@ -21,23 +23,28 @@ import com.netflix.vms.transformer.util.OutputUtil;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
 import java.util.stream.Collectors;
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 public class ShowMeTheFastProgress {
-    private static final boolean isProd = false;
+    private static final boolean isProd = true;
     private static final boolean isPerformDiff = false;
     private static final boolean isPublishPinnedData = false;
+    private static final boolean isCheckRemotePinnedData = true;
 
     private static final String VIP_NAME = "newnoevent";
     private static final String CONVERTER_VIP_NAME = "noevent";
     private static final String WORKING_DIR = "/space/transformer-data/fast";
     private static final String PROXY = isProd ? VMSInputDataClient.PROD_PROXY_URL : VMSInputDataClient.TEST_PROXY_URL;
+    private static final String REMOTE_SLICER_URL = "http://go/pintitleslicer";
     private static final String PUBLISH_CYCLE_DATATS_HEADER = "publishCycleDataTS";
 
     private FileStore pinTitleFileStore;
@@ -51,7 +58,7 @@ public class ShowMeTheFastProgress {
     @Test
     public void start() throws Throwable {
         // NOTE: the specified transformerVersion must be valid or already in local HD; otherwise, run  getLatestTransformerVersion();
-        long transformerVersion = 20170202180324869L;
+        long transformerVersion = 20170206213324267L;
         int[] topNodes = { 80115503, 70143860 };
 
         long start = System.currentTimeMillis();
@@ -92,16 +99,8 @@ public class ShowMeTheFastProgress {
         if (!workingDir.exists()) workingDir.mkdirs();
 
         if (isPublishPinnedData) {
-            final Properties props = new Properties();
-            props.setProperty("netflix.appinfo.name", "ShowMeTheFastProgress");
-            props.setProperty("netflix.appinfo.port", "7001");
-            props.setProperty("netflix.appinfo.validateInstanceId", "false");
-            props.setProperty("netflix.environment", "test");
-            props.setProperty("platform.ListOfComponentsToInit", "LOGGING,APPINFO,DISCOVERY");
-
-            final NFLifecycleUnitTester unitTester = new NFLifecycleUnitTester(props);
-            unitTester.start();
-            pinTitleFileStore = unitTester.getInjector().getInstance(FileStore.class);
+            LifecycleInjector lInjector = InjectorBuilder.fromModules(new RuntimeCoreModule()).createInjector();
+            pinTitleFileStore = lInjector.getInstance(FileStore.class);
         }
     }
 
@@ -116,12 +115,38 @@ public class ShowMeTheFastProgress {
         return Long.parseLong(version);
     }
 
+    private static void downloadSlice(File downloadTo, String baseURL, boolean isProd, boolean isOutput, String vipName, long version, int... topNodes) {
+        InputStream is = null;
+        OutputStream os = null;
+        String proxyURL = String.format("%s?prod=%s&output=%s&vip=%s&version=%s&topnodes=%s", baseURL, isProd, isOutput, vipName, version, toString(topNodes));
+        try {
+            is = HttpHelper.getInputStream(proxyURL, false);
+            os = new FileOutputStream(downloadTo);
+            IOUtils.copy(is, os);
+            System.out.println(">>> Done downloading from: " + proxyURL + " to: " + downloadTo);
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to download file " + downloadTo.getAbsolutePath() + " from location " + proxyURL, e);
+        } finally {
+            IOUtils.closeQuietly(is);
+            IOUtils.closeQuietly(os);
+        }
+    }
+
     private HollowReadStateEngine loadTransformerEngine(TransformerContext ctx, String vipName, long version, int... topNodes) throws Throwable {
         System.out.println("loadTransformerEngine: Loading version=" + version);
         long start = System.currentTimeMillis();
         try {
             OutputSlicePinTitleProcessor processor = new OutputSlicePinTitleProcessor(vipName, PROXY, WORKING_DIR, ctx);
             processor.setPinTitleFileStore(pinTitleFileStore);
+            File slicedFile = processor.getFile("output", version, topNodes);
+            if (isCheckRemotePinnedData && !slicedFile.exists()) {
+                try {
+                    downloadSlice(slicedFile, REMOTE_SLICER_URL, isProd, true, vipName, version, topNodes);
+                    return processor.readStateEngine(slicedFile);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
             return processor.process(version, topNodes);
         } finally {
             trackDuration(start, "loadTransformerEngine: vipName=%s, version=%s, topNodes=%s", vipName, version, toString(topNodes));
@@ -133,11 +158,21 @@ public class ShowMeTheFastProgress {
         System.out.println("loadVMSHollowInputAPI: Loading version=" + version);
         long start = System.currentTimeMillis();
         try {
-            HollowReadStateEngine stateEngine;
+            HollowReadStateEngine stateEngine = null;
             if (isUseInputSlicing) {
                 InputSlicePinTitleProcessor processor = new InputSlicePinTitleProcessor(vipName, PROXY, WORKING_DIR, ctx);
                 processor.setPinTitleFileStore(pinTitleFileStore);
-                stateEngine = processor.fetchInputStateEngineSlice(version, topNodes);
+                File slicedFile = processor.getFile("input", version, topNodes);
+                if (isCheckRemotePinnedData && !slicedFile.exists()) {
+                    try {
+                        downloadSlice(slicedFile, REMOTE_SLICER_URL, isProd, false, vipName, version, topNodes);
+                        stateEngine = processor.readStateEngine(slicedFile);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if (stateEngine == null) stateEngine = processor.fetchInputStateEngineSlice(version, topNodes);
             } else {
                 VMSInputDataClient inputClient = new VMSInputDataClient(PROXY, WORKING_DIR, vipName);
                 inputClient.triggerRefreshTo(version);

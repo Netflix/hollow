@@ -3,17 +3,22 @@ package com.netflix.vms.transformer.rest;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.netflix.aws.file.FileStore;
+import com.netflix.config.NetflixConfiguration;
+import com.netflix.config.NetflixConfiguration.EnvironmentEnum;
+import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.override.InputSlicePinTitleProcessor;
 import com.netflix.vms.transformer.override.OutputSlicePinTitleProcessor;
 import com.netflix.vms.transformer.override.PinTitleHelper;
 import com.netflix.vms.transformer.util.VMSProxyUtil;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-
+import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.Set;
+import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -24,46 +29,99 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 @Singleton
 @Path("/vms/pintitleslicer")
 public class VMSPinTitleSlicer {
-    private static final String localBlobStore = "/mnt/VMSPinTitleSlicer";
-
+    private final Set<EnvironmentEnum> supportedEnvs = EnumSet.of(EnvironmentEnum.test);
+    private final File localBlobStore;
     private final FileStore fileStore;
     private final TransformerContext ctx;
 
     @Inject
-    public VMSPinTitleSlicer(FileStore fileStore, TransformerContext ctx) {
+    public VMSPinTitleSlicer(FileStore fileStore) {
         this.fileStore = fileStore;
-        this.ctx = ctx;
+        ctx = new SimpleTransformerContext();
+
+        localBlobStore = new File(System.getProperty("java.io.tmpdir"), "VMSPinTitleSlicer");
+        if (!localBlobStore.exists()) localBlobStore.mkdirs();
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @Produces({ MediaType.APPLICATION_OCTET_STREAM, MediaType.TEXT_PLAIN })
     public Response doGet(@Context HttpServletRequest req,
-            @QueryParam("isProd") boolean isProd,
-            @QueryParam("isOutput") boolean isOutput,
+            @QueryParam("prod") boolean isProd,
+            @QueryParam("output") boolean isOutput,
             @QueryParam("vip") String vip,
-            @QueryParam("version") long version,
-            @QueryParam("topNodes") String topNodesStr) throws Exception {
+            @QueryParam("version") String versionStr,
+            @QueryParam("topnodes") String topNodesStr) throws Exception {
 
-        File slicedFile = null;
-        int[] topNodes = PinTitleHelper.parseTopNodes(topNodesStr);
-        String proxyURL = VMSProxyUtil.getProxyURL(isProd);
-        if (isOutput) {
-            OutputSlicePinTitleProcessor p = new OutputSlicePinTitleProcessor(vip, proxyURL, localBlobStore, ctx);
-            p.setPinTitleFileStore(fileStore);
-            slicedFile = p.fetchOutputSlice(version, topNodes);
-        } else {
-            InputSlicePinTitleProcessor p = new InputSlicePinTitleProcessor(vip, proxyURL, localBlobStore, ctx);
-            p.setPinTitleFileStore(fileStore);
-            slicedFile = p.fetchInputSlice(version, topNodes);
+        // Validate Requirement
+        EnvironmentEnum envEnum = NetflixConfiguration.getEnvironmentEnum();
+        if (!supportedEnvs.contains(envEnum)) {
+            return Response.ok(String.format("ERROR: Feature is not supported in %s - Supported envs:%s.  Specified params[prod=%s, output=%s, vip=%s, version=%s, topnodes=%s], localBlobStore=%s",
+                    envEnum, supportedEnvs, isProd, isOutput, vip, versionStr, topNodesStr, localBlobStore), MediaType.TEXT_PLAIN_TYPE).build();
+        } else if (StringUtils.isEmpty(vip) || StringUtils.isEmpty(topNodesStr) || versionStr == null) {
+            return Response.ok(String.format("ERROR: vip, topnodes and version parameters are required. Specified params[prod=%s, output=%s, vip=%s, version=%s, topnodes=%s], localBlobStore=%s",
+                    isProd, isOutput, vip, versionStr, topNodesStr, localBlobStore), MediaType.TEXT_PLAIN_TYPE).build();
         }
 
-        return Response.ok(new FileStreamingOutput(slicedFile)).build();
+        synchronized(this) {
+            // cleanup prior files
+            cleanupOldFiles(localBlobStore, 7, 10);
+
+            try {
+                File slicedFile = null;
+                long version = Long.parseLong(versionStr);
+                int[] topNodes = PinTitleHelper.parseTopNodes(topNodesStr);
+                String proxyURL = VMSProxyUtil.getProxyURL(isProd);
+                if (isOutput) {
+                    OutputSlicePinTitleProcessor p = new OutputSlicePinTitleProcessor(vip, proxyURL, localBlobStore.getPath(), ctx);
+                    p.setPinTitleFileStore(fileStore);
+                    slicedFile = p.fetchOutputSlice(version, topNodes);
+                } else {
+                    InputSlicePinTitleProcessor p = new InputSlicePinTitleProcessor(vip, proxyURL, localBlobStore.getPath(), ctx);
+                    p.setPinTitleFileStore(fileStore);
+                    slicedFile = p.fetchInputSlice(version, topNodes);
+                }
+
+                return Response.ok(new FileStreamingOutput(slicedFile), MediaType.APPLICATION_OCTET_STREAM_TYPE)
+                        .header("content-disposition", "attachment; filename = " + slicedFile.getName()).build();
+            } catch (Exception ex) {
+                return Response.ok(String.format("ERROR: Failed to slice data with specified params[prod=%s, output=%s, vip=%s, version=%s, topnodes=%s] - Make sure version and vip are valid. Exception=%s",
+                        isProd, isOutput, vip, versionStr, topNodesStr, ex), MediaType.TEXT_PLAIN_TYPE).build();
+            }
+        }
+    }
+
+    private void cleanupOldFiles(File dir, int daysOld, int maxFilesToRetain) {
+        TreeSet<File> sortedFiles = new TreeSet<>(new Comparator<File>() {
+            @Override
+            public int compare(File o1, File o2) {
+                if (o1.lastModified() == o2.lastModified()) return 0;
+                return o1.lastModified() <= o2.lastModified() ? -1 : 1;
+            }
+        });
+
+        // Delete older files than daysOld
+        long purgeTime = System.currentTimeMillis() - (daysOld * 24 * 60 * 60 * 1000);
+        for (File file : dir.listFiles()) {
+            sortedFiles.add(file);
+            if (file.lastModified() < purgeTime) {
+                file.delete();
+            }
+        }
+
+        // Delete oldest files to meet maxFilesToRetain
+        if (sortedFiles.size() > maxFilesToRetain) {
+            int numToDelete = sortedFiles.size() - maxFilesToRetain;
+            for (File file : sortedFiles) {
+                if (numToDelete-- <= 0) break;
+                file.delete();
+            }
+        }
     }
 
     private static class FileStreamingOutput implements StreamingOutput {

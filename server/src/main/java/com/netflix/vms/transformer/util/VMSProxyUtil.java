@@ -28,36 +28,38 @@ public class VMSProxyUtil {
         return getLatestVersion(getProxyURL(isProd), keybase);
     }
 
-    public static InputStream fetch(String proxyURL, String keybase, String version) {
+    public static InputStream fetch(String proxyURL, String keybase, String version, boolean isPrintStackTrace) {
         String proxyUrl = null;
         if (version != null) {
             proxyUrl = String.format("%s/%s?keybase=%s&version=%s", proxyURL, DOWNLOAD_ENDPOINT, keybase, version);
         } else {
             proxyUrl = String.format("%s/%s?keybase=%s", proxyURL, DOWNLOAD_ENDPOINT, keybase);
         }
-        return HttpHelper.getInputStream(proxyUrl);
+        return HttpHelper.getInputStream(proxyUrl, isPrintStackTrace);
     }
 
-    public static InputStream fetch(boolean isProd, String keybase, String version) {
-        return fetch(getProxyURL(isProd), keybase, version);
+    public static InputStream fetch(boolean isProd, String keybase, String version, boolean isPrintStackTrace) {
+        return fetch(getProxyURL(isProd), keybase, version, isPrintStackTrace);
     }
 
-    public static void download(String proxyURL, String keybase, String version, File downloadToFile) {
+    public static boolean download(String proxyURL, String keybase, String version, File downloadToFile, boolean isThrowExceptionOnFailure) {
         InputStream is = null;
         OutputStream os = null;
         try {
-            is = fetch(proxyURL, keybase, version);
+            is = fetch(proxyURL, keybase, version, isThrowExceptionOnFailure);
             os = new FileOutputStream(downloadToFile);
             IOUtils.copy(is, os);
+            return true;
         } catch (Exception e) {
-            throw new RuntimeException("Unable to download file " + downloadToFile.getAbsolutePath(), e);
+            if (isThrowExceptionOnFailure) throw new RuntimeException("Unable to download file " + downloadToFile.getAbsolutePath(), e);
+            return false;
         } finally {
             IOUtils.closeQuietly(is);
             IOUtils.closeQuietly(os);
         }
     }
 
-    public static void download(boolean isProd, String keybase, String version, File downloadToFile) {
-        download(getProxyURL(isProd), keybase, version, downloadToFile);
+    public static boolean download(boolean isProd, String keybase, String version, File downloadToFile, boolean isThrowExceptionOnFailure) {
+        return download(getProxyURL(isProd), keybase, version, downloadToFile, isThrowExceptionOnFailure);
     }
 }

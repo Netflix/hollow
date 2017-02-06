@@ -43,7 +43,7 @@ public abstract class AbstractPinTitleProcessor implements PinTitleProcessor {
         this.pinTitleFileStore = pinTitleFileStore;
     }
 
-    protected File getFile(String type, long version, int... topNodes) throws Exception {
+    public File getFile(String type, long version, int... topNodes) throws Exception {
         String fileVIP = vip + "_" + type;
         HollowBlobFileNamer namer = new HollowBlobFileNamer(fileVIP);
 
@@ -65,8 +65,8 @@ public abstract class AbstractPinTitleProcessor implements PinTitleProcessor {
                         ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Fetched file:{}", file);
                     }
                 } else if (pinTitleProxyURL != null) {
-                    VMSProxyUtil.download(pinTitleProxyURL, keybase, null, file);
-                    ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Fetched file:{} from {}", file, pinTitleProxyURL);
+                    boolean isSuccess = VMSProxyUtil.download(pinTitleProxyURL, keybase, null, file, false);
+                    if (isSuccess) ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Fetched file:{} from {}", file, pinTitleProxyURL);
                 }
             } catch (Exception ex) {
                 ctx.getLogger().error(TransformerLogTag.CyclePinnedTitles, "Failed to Fetch file from keybase:{}", keybase, ex);
@@ -76,7 +76,7 @@ public abstract class AbstractPinTitleProcessor implements PinTitleProcessor {
         return file;
     }
 
-    protected HollowReadStateEngine readStateEngine(File inputFile) throws IOException {
+    public HollowReadStateEngine readStateEngine(File inputFile) throws IOException {
         ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Read StateEngine file:{}", inputFile);
 
         HollowReadStateEngine stateEngine = new HollowReadStateEngine();
