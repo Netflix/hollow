@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
@@ -24,9 +25,11 @@ import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.MulticatalogCountryData;
 import com.netflix.vms.transformer.hollowoutput.MulticatalogCountryLocaleData;
 import com.netflix.vms.transformer.hollowoutput.NFLocale;
+import com.netflix.vms.transformer.hollowoutput.SchedulePhaseInfo;
 import com.netflix.vms.transformer.hollowoutput.SortedMapOfDateWindowToListOfInteger;
 import com.netflix.vms.transformer.hollowoutput.VMSAvailabilityWindow;
 import com.netflix.vms.transformer.hollowoutput.Video;
+import com.netflix.vms.transformer.hollowoutput.VideoImages;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
@@ -58,6 +61,7 @@ public class CountrySpecificDataModule {
 
     private final CertificationListsModule certificationListsModule;
     private final VMSAvailabilityWindowModule availabilityWindowModule;
+	private Map<String, Map<Integer, VideoImages>> imagesDataByCountry = null;
 
     public CountrySpecificDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, CycleConstants constants, VMSTransformerIndexer indexer) {
         this.api = api;
@@ -73,9 +77,11 @@ public class CountrySpecificDataModule {
         this.availabilityWindowModule = new VMSAvailabilityWindowModule(api, ctx, constants, indexer);
     }
 
-    public Map<String, Map<Integer, CompleteVideoCountrySpecificData>> buildCountrySpecificDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<Integer, VideoPackageData> transformedPackageData) {
-        this.availabilityWindowModule.setTransformedPackageData(transformedPackageData);
-
+    public Map<String, Map<Integer, CompleteVideoCountrySpecificData>> buildCountrySpecificDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, 
+    		Map<Integer, VideoPackageData> transformedPackageData, Map<String, Map<Integer, VideoImages>> imagesDataByCountry) {
+    	this.availabilityWindowModule.setTransformedPackageData(transformedPackageData);
+    	this.imagesDataByCountry = imagesDataByCountry;
+    	
         Map<String, Map<Integer, CompleteVideoCountrySpecificData>> allCountrySpecificDataMap = new HashMap<String, Map<Integer,CompleteVideoCountrySpecificData>>();
         CountrySpecificRollupValues rollup = new CountrySpecificRollupValues();
 
@@ -320,16 +326,54 @@ public class CountrySpecificDataModule {
         WindowPackageContractInfo packageContractInfo = getWindowPackageContractInfo(firstWindow);
         Integer prePromoDays = packageContractInfo == null ? null : packageContractInfo.videoContractInfo.prePromotionDays;
         Long availabilityDate = firstWindow != null ? firstWindow.startDate.val : null;
-
+        Long earliestOffset = getEarliestSchedulePhaseOffset(videoId, imagesDataByCountry.get(countryCode));
+		Long earliestScheduledPhaseDate = (availabilityDate != null && earliestOffset != null) ? (availabilityDate + earliestOffset) : null;
+        
         Integer metadataReleaseDays = getMetaDataReleaseDays(videoId);
         Long firstPhaseStartDate = getFirstPhaseStartDate(videoId, countryCode);
 
         Set<VideoSetType> videoSetTypes = VideoSetTypeUtil.computeSetTypes(videoId, countryCode, api, ctx, constants, indexer);
-        data.metadataAvailabilityDate = SensitiveVideoServerSideUtil.getMetadataAvailabilityDate(videoSetTypes, firstDisplayDate, firstPhaseStartDate, availabilityDate, prePromoDays, metadataReleaseDays, constants);
+        data.metadataAvailabilityDate = SensitiveVideoServerSideUtil.getMetadataAvailabilityDate(videoSetTypes, firstDisplayDate, firstPhaseStartDate, 
+        									availabilityDate, prePromoDays, metadataReleaseDays, constants, earliestScheduledPhaseDate);
         data.isSensitiveMetaData = SensitiveVideoServerSideUtil.isSensitiveMetaData(data.metadataAvailabilityDate, ctx);
     }
 
-    private WindowPackageContractInfo getWindowPackageContractInfo(VMSAvailabilityWindow window) {
+    @VisibleForTesting
+    Long getEarliestSchedulePhaseOffset(long videoId,  Map<Integer, VideoImages> videoImagesByVideoMap) {
+		Long earliestStart = null;
+		
+		// Check if the feature is turned on.
+		if(!ctx.getConfig().isUseSchedulePhasesInAvailabilityDateCalc())
+			return earliestStart;
+		
+		if(videoImagesByVideoMap == null)
+			return earliestStart;
+		
+		// TODO: videoImages data uses video id as int but this code uses long and hence the conversion. 
+		// Needs a better fix.
+		int intVideoId = (int)videoId;
+		VideoImages videoImages = videoImagesByVideoMap.get(intVideoId);
+		if(videoImages == null)
+			return earliestStart;
+		
+		Set<SchedulePhaseInfo> schedulePhaseInfoWindows = videoImages.imageAvailabilityWindows;
+		if(schedulePhaseInfoWindows == null)
+			return earliestStart; 
+
+		for(SchedulePhaseInfo info: schedulePhaseInfoWindows){
+			// Only offsets from images associated to current video should count for earliest offset.
+			// In some cases (topNodes) image windows from child video are rolled up. In that case, 
+			// source video will be child video which should be ignored.
+			if(info.sourceVideoId != intVideoId)
+				continue; 
+			
+			if(earliestStart == null || earliestStart > info.start)
+				earliestStart = info.start;
+		}
+		return earliestStart;
+	}
+
+	private WindowPackageContractInfo getWindowPackageContractInfo(VMSAvailabilityWindow window) {
         if (window == null || window.windowInfosByPackageId == null) return null;
 
         WindowPackageContractInfo info = null;

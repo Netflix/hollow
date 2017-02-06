@@ -5,7 +5,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.Individual
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.NonVideoSpecificTransformDuration;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformInfo;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformProgress;
-import com.netflix.vms.transformer.common.io.TransformerLogTag;
+
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
@@ -160,7 +160,8 @@ public class SimpleTransformer {
                             Map<String, Map<Integer, VideoMediaData>> mediaDataByCountry = mediaDataModule.buildVideoMediaDataByCountry(showHierarchiesByCountry);
                             Map<String, Map<Integer, VideoImages>> imagesDataByCountry = imagesDataModule.buildVideoImagesByCountry(showHierarchiesByCountry);
                             Map<Integer, VideoMiscData> miscData = miscDataModule.buildVideoMiscDataByCountry(showHierarchiesByCountry);
-                            Map<String, Map<Integer, CompleteVideoCountrySpecificData>> countrySpecificByCountry = countrySpecificModule.buildCountrySpecificDataByCountry(showHierarchiesByCountry, transformedPackageData);
+                            Map<String, Map<Integer, CompleteVideoCountrySpecificData>> countrySpecificByCountry = 
+                            						countrySpecificModule.buildCountrySpecificDataByCountry(showHierarchiesByCountry, transformedPackageData, imagesDataByCountry);
 
                             if (vcdByCountry != null) {
                                 writeJustTheCurrentData(vcdByCountry, vmdByCountry, miscData, mediaDataByCountry, imagesDataByCountry, countrySpecificByCountry, objectMapper);

@@ -47,9 +47,13 @@ public enum IndexSpec {
     ROLLOUT_VIDEO_TYPE(HASH, "Rollout", "", "movieId", "rolloutType.value"),
     SHOW_COUNTRY_LABEL(HASH, "ShowCountryLabel", "showMemberTypes.element", "videoId", "showMemberTypes.element.countryCodes.element.value"),
     MOVIE_CHARACTER_PERSON_MOVIES_BY_PERSON_ID(HASH, "MovieCharacterPerson", "", "characters.element.personId"),
-    MOVIE_CHARACTER_PERSON_CHARACTERS_BY_PERSON_ID_AND_MOVIE_ID(HASH, "MovieCharacterPerson", "characters.element", "characters.element.personId", "movieId");
-    
-    
+    MOVIE_CHARACTER_PERSON_CHARACTERS_BY_PERSON_ID_AND_MOVIE_ID(HASH, "MovieCharacterPerson", "characters.element", "characters.element.personId", "movieId"),
+
+    //Image Schedules
+    OVERRIDE_SCHEDULE_BY_VIDEO_ID(HASH, "OverrideSchedule", "", "movieId", "phaseTag.value"),
+    MASTER_SCHEDULE_BY_TAG_SHOW(HASH, "MasterSchedule", "", "phaseTag.value", "scheduleId.value"),
+    ABSOLUTE_SCHEDULE_BY_VIDEO_ID_TAG(HASH, "AbsoluteSchedule", "", "movieId", "phaseTag.value");
+
 
     private final IndexType indexType;
     private final String parameters[];
