@@ -40,6 +40,11 @@ public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
 
     @Override
     public HollowReadStateEngine process(long inputDataVersion, int... topNodes) throws Throwable {
+        File localFile = fetchOutputSlice(inputDataVersion, topNodes);
+        return readStateEngine(localFile);
+    }
+
+    public File fetchOutputSlice(long inputDataVersion, int... topNodes) throws Exception, Throwable {
         File localFile = getFile("output", inputDataVersion, topNodes);
         if (!localFile.exists()) {
             HollowReadStateEngine inputStateEngineSlice = fetchInputStateEngineSlice(inputDataVersion, topNodes);
@@ -51,11 +56,15 @@ public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
             String blobID = PinTitleHelper.createBlobID("i", inputDataVersion, topNodes);
             writeStateEngine(outputStateEngine, localFile, blobID, inputDataVersion, topNodes);
         }
-
-        return readStateEngine(localFile);
+        return localFile;
     }
 
     public HollowReadStateEngine fetchInputStateEngineSlice(Long inputDataVersion, int... topNodes) throws Exception {
+        File slicedFile = fetchInputSlice(inputDataVersion, topNodes);
+        return readStateEngine(slicedFile);
+    }
+
+    public File fetchInputSlice(Long inputDataVersion, int... topNodes) throws Exception, IOException {
         File slicedFile = getFile("input", inputDataVersion, topNodes);
         if (!slicedFile.exists()) {
             long start = System.currentTimeMillis();
@@ -68,8 +77,7 @@ public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
             writeStateEngine(slicedStateEngine, slicedFile, blobID, inputDataVersion, topNodes);
             ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Sliced[INPUT] videoId={} from vip={}, version={}, duration={}", Arrays.toString(topNodes), vip, inputDataVersion, (System.currentTimeMillis() - start));
         }
-
-        return readStateEngine(slicedFile);
+        return slicedFile;
     }
 
     private HollowReadStateEngine readInputData(long inputDataVersion) throws IOException {

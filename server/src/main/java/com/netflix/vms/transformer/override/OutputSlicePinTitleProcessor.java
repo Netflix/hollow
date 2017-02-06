@@ -40,6 +40,11 @@ public class OutputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
 
     @Override
     public HollowReadStateEngine process(long version, int... topNodes) throws Throwable {
+        File localFile = fetchOutputSlice(version, topNodes);
+        return readStateEngine(localFile);
+    }
+
+    public File fetchOutputSlice(long version, int... topNodes) throws Exception {
         File localFile = getFile(TYPE, version, topNodes);
         if (!localFile.exists()) {
             long start = System.currentTimeMillis();
@@ -57,7 +62,6 @@ public class OutputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
             writeStateEngine(slicedStateEngine, localFile, blobID, version, topNodes);
             ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Sliced[OUTPUT] videoId={} from vip={}, version={}, duration={}", Arrays.toString(topNodes), vip, version, (System.currentTimeMillis() - start));
         }
-
-        return readStateEngine(localFile);
+        return localFile;
     }
 }
