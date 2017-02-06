@@ -9,7 +9,6 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
-import com.netflix.vms.transformer.util.VMSProxyUtil;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -24,7 +23,6 @@ public abstract class AbstractPinTitleProcessor implements PinTitleProcessor {
     protected final TransformerContext ctx;
 
     protected FileStore pinTitleFileStore;
-    protected String pinTitleProxyURL;
 
     protected AbstractPinTitleProcessor(String vip, String localBlobStore, TransformerContext ctx) {
         this.vip = vip;
@@ -64,9 +62,6 @@ public abstract class AbstractPinTitleProcessor implements PinTitleProcessor {
                         pinTitleFileStore.copyFile(publishedFile, file);
                         ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Fetched file:{}", file);
                     }
-                } else if (pinTitleProxyURL != null) {
-                    boolean isSuccess = VMSProxyUtil.download(pinTitleProxyURL, keybase, null, file, false);
-                    if (isSuccess) ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Fetched file:{} from {}", file, pinTitleProxyURL);
                 }
             } catch (Exception ex) {
                 ctx.getLogger().error(TransformerLogTag.CyclePinnedTitles, "Failed to Fetch file from keybase:{}", keybase, ex);

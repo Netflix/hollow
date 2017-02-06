@@ -34,7 +34,6 @@ public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
     public InputSlicePinTitleProcessor(String vip, String baseProxyURL, String localBlobStore, TransformerContext ctx) {
         super(vip, localBlobStore, ctx);
 
-        this.pinTitleProxyURL = baseProxyURL;
         this.inputDataClient = new VMSInputDataClient(baseProxyURL, localBlobStore, vip);
     }
 

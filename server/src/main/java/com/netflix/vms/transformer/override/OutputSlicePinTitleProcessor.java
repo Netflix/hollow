@@ -34,7 +34,6 @@ public class OutputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
     public OutputSlicePinTitleProcessor(String vip, String baseProxyURL, String localBlobStore, TransformerContext ctx) {
         super(vip, localBlobStore, ctx);
 
-        this.pinTitleProxyURL = baseProxyURL;
         this.outputDataClient = new VMSOutputDataClient(baseProxyURL, localBlobStore, vip);
     }
 
