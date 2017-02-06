@@ -1,9 +1,11 @@
 package com.netflix.vms.transformer.testutil.migration;
 
+import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.lifecycle.NFLifecycleUnitTester;
 import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
@@ -23,16 +25,22 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 import org.junit.Test;
 
 public class ShowMeTheFastProgress {
-    private static final boolean isProd = true;
+    private static final boolean isProd = false;
+    private static final boolean isPerformDiff = false;
+    private static final boolean isPublishPinnedData = false;
+
     private static final String VIP_NAME = "newnoevent";
     private static final String CONVERTER_VIP_NAME = "noevent";
     private static final String WORKING_DIR = "/space/transformer-data/fast";
     private static final String PROXY = isProd ? VMSInputDataClient.PROD_PROXY_URL : VMSInputDataClient.TEST_PROXY_URL;
     private static final String PUBLISH_CYCLE_DATATS_HEADER = "publishCycleDataTS";
+
+    private FileStore pinTitleFileStore;
 
     @Test
     public void getLatestTransformerVersion() {
@@ -74,12 +82,27 @@ public class ShowMeTheFastProgress {
         trackDuration(start, "Done transformerVersion=%s, topNodes=%s", transformerVersion, toString(topNodes));
 
         // Do Diff
-        ShowMeTheProgressDiffTool.startTheDiff(expectedOutputStateEngine, actualOutputReadStateEngine);
+        if (isPerformDiff) {
+            ShowMeTheProgressDiffTool.startTheDiff(expectedOutputStateEngine, actualOutputReadStateEngine);
+        }
     }
 
-    public void setup() {
+    public void setup() throws Exception {
         File workingDir = new File(WORKING_DIR);
         if (!workingDir.exists()) workingDir.mkdirs();
+
+        if (isPublishPinnedData) {
+            final Properties props = new Properties();
+            props.setProperty("netflix.appinfo.name", "ShowMeTheFastProgress");
+            props.setProperty("netflix.appinfo.port", "7001");
+            props.setProperty("netflix.appinfo.validateInstanceId", "false");
+            props.setProperty("netflix.environment", "test");
+            props.setProperty("platform.ListOfComponentsToInit", "LOGGING,APPINFO,DISCOVERY");
+
+            final NFLifecycleUnitTester unitTester = new NFLifecycleUnitTester(props);
+            unitTester.start();
+            pinTitleFileStore = unitTester.getInjector().getInstance(FileStore.class);
+        }
     }
 
     public long getLatestTransformerVersion(String vip) {
@@ -93,18 +116,19 @@ public class ShowMeTheFastProgress {
         return Long.parseLong(version);
     }
 
-    private HollowReadStateEngine loadTransformerEngine(TransformerContext ctx, String vipName, long version, int... topNodes) throws IOException {
+    private HollowReadStateEngine loadTransformerEngine(TransformerContext ctx, String vipName, long version, int... topNodes) throws Throwable {
         System.out.println("loadTransformerEngine: Loading version=" + version);
         long start = System.currentTimeMillis();
         try {
             OutputSlicePinTitleProcessor processor = new OutputSlicePinTitleProcessor(vipName, PROXY, WORKING_DIR, ctx);
+            processor.setPinTitleFileStore(pinTitleFileStore);
             return processor.process(version, topNodes);
         } finally {
             trackDuration(start, "loadTransformerEngine: vipName=%s, version=%s, topNodes=%s", vipName, version, toString(topNodes));
         }
     }
 
-    private static VMSHollowInputAPI loadVMSHollowInputAPI(TransformerContext ctx, String vipName, long version, int... topNodes) throws IOException {
+    private VMSHollowInputAPI loadVMSHollowInputAPI(TransformerContext ctx, String vipName, long version, int... topNodes) throws Exception {
         boolean isUseInputSlicing = true;
         System.out.println("loadVMSHollowInputAPI: Loading version=" + version);
         long start = System.currentTimeMillis();
@@ -112,8 +136,8 @@ public class ShowMeTheFastProgress {
             HollowReadStateEngine stateEngine;
             if (isUseInputSlicing) {
                 InputSlicePinTitleProcessor processor = new InputSlicePinTitleProcessor(vipName, PROXY, WORKING_DIR, ctx);
-                File slicedFile = processor.getFile("input", version, topNodes);
-                stateEngine = processor.fetchInputStateEngineSlice(slicedFile, version, topNodes);
+                processor.setPinTitleFileStore(pinTitleFileStore);
+                stateEngine = processor.fetchInputStateEngineSlice(version, topNodes);
             } else {
                 VMSInputDataClient inputClient = new VMSInputDataClient(PROXY, WORKING_DIR, vipName);
                 inputClient.triggerRefreshTo(version);

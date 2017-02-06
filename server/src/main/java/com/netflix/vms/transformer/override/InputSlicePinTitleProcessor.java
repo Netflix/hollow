@@ -27,12 +27,14 @@ public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
     public InputSlicePinTitleProcessor(String vip, FileStore fileStore, String localBlobStore, TransformerContext ctx) {
         super(vip, localBlobStore, ctx);
 
+        this.pinTitleFileStore = fileStore;
         this.inputDataClient = new VMSInputDataClient(fileStore, vip);
     }
 
     public InputSlicePinTitleProcessor(String vip, String baseProxyURL, String localBlobStore, TransformerContext ctx) {
         super(vip, localBlobStore, ctx);
 
+        this.pinTitleProxyURL = baseProxyURL;
         this.inputDataClient = new VMSInputDataClient(baseProxyURL, localBlobStore, vip);
     }
 
@@ -40,8 +42,7 @@ public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
     public HollowReadStateEngine process(long inputDataVersion, int... topNodes) throws Throwable {
         File localFile = getFile("output", inputDataVersion, topNodes);
         if (!localFile.exists()) {
-            File slicedInputFile = getFile("input", inputDataVersion, topNodes);
-            HollowReadStateEngine inputStateEngineSlice = fetchInputStateEngineSlice(slicedInputFile, inputDataVersion, topNodes);
+            HollowReadStateEngine inputStateEngineSlice = fetchInputStateEngineSlice(inputDataVersion, topNodes);
 
             VMSHollowInputAPI api = new VMSHollowInputAPI(inputStateEngineSlice);
             VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
@@ -54,7 +55,8 @@ public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
         return readStateEngine(localFile);
     }
 
-    public HollowReadStateEngine fetchInputStateEngineSlice(File slicedFile, Long inputDataVersion, int... topNodes) throws IOException {
+    public HollowReadStateEngine fetchInputStateEngineSlice(Long inputDataVersion, int... topNodes) throws Exception {
+        File slicedFile = getFile("input", inputDataVersion, topNodes);
         if (!slicedFile.exists()) {
             long start = System.currentTimeMillis();
             HollowReadStateEngine inputStateEngine = readInputData(inputDataVersion);

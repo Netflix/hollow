@@ -10,7 +10,6 @@ import com.netflix.vms.transformer.common.slice.DataSlicer;
 import com.netflix.vms.transformer.input.VMSOutputDataClient;
 import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -28,17 +27,19 @@ public class OutputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
     public OutputSlicePinTitleProcessor(String vip, FileStore fileStore, String localBlobStore, TransformerContext ctx) {
         super(vip, localBlobStore, ctx);
 
+        this.pinTitleFileStore = fileStore;
         this.outputDataClient = new VMSOutputDataClient(fileStore, vip);
     }
 
     public OutputSlicePinTitleProcessor(String vip, String baseProxyURL, String localBlobStore, TransformerContext ctx) {
         super(vip, localBlobStore, ctx);
 
+        this.pinTitleProxyURL = baseProxyURL;
         this.outputDataClient = new VMSOutputDataClient(baseProxyURL, localBlobStore, vip);
     }
 
     @Override
-    public HollowReadStateEngine process(long version, int... topNodes) throws IOException {
+    public HollowReadStateEngine process(long version, int... topNodes) throws Throwable {
         File localFile = getFile(TYPE, version, topNodes);
         if (!localFile.exists()) {
             long start = System.currentTimeMillis();
