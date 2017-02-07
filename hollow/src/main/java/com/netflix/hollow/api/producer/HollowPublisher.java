@@ -17,16 +17,14 @@
  */
 package com.netflix.hollow.api.producer;
 
-import java.io.File;
+import com.netflix.hollow.api.StateTransition;
 
 public interface HollowPublisher {
 
-    public File openSnapshot(long version);
-    public File openDelta(long previousVersion, long currentVersion);
-    public File openReverseDelta(long previousVersion, long currentVersion);
+    public HollowBlob openSnapshot(StateTransition transition);
+    public HollowBlob openDelta(StateTransition transition);
+    public HollowBlob openReverseDelta(StateTransition transition);
 
-    public void publishSnapshot(File blob, long version);
-    public void publishDelta(File blob, long previousVersion, long currentVersion);
-    public void publishReverseDelta(File blob, long previousVersion, long currentVersion);
+    public void publish(HollowBlob blob);
 
 }
