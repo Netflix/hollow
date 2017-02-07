@@ -34,6 +34,7 @@ public class VMSTransformerWriteStateEngine extends HollowWriteStateEngine {
 
     public VMSTransformerWriteStateEngine() {
         super(new VMSTransformerHashCodeFinder());
+        setTargetMaxTypeShardSize(16 * 1024 * 1024);
         initializeTopLevelTypeStates();
     }
 
