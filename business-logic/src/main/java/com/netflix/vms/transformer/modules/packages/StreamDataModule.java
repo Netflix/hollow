@@ -39,7 +39,6 @@ import com.netflix.vms.transformer.hollowoutput.StreamAdditionalData;
 import com.netflix.vms.transformer.hollowoutput.StreamData;
 import com.netflix.vms.transformer.hollowoutput.StreamDataDescriptor;
 import com.netflix.vms.transformer.hollowoutput.StreamDrmData;
-import com.netflix.vms.transformer.hollowoutput.StreamHashData;
 import com.netflix.vms.transformer.hollowoutput.StreamMostlyConstantData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.TargetDimensions;
@@ -126,11 +125,10 @@ public class StreamDataModule {
 
         outputStream.fileSizeInBytes = inputStreamIdentity._getFileSizeInBytes();
         outputStream.creationTimeStampInSeconds = inputStreamIdentity._getCreatedTimeSeconds();
-        outputStream.hashData = new StreamHashData();
-        outputStream.hashData.cRC32Hash = inputStreamIdentity._getCrc32();
-        outputStream.hashData.sha1_1 = inputStreamIdentity._getSha1_1();
-        outputStream.hashData.sha1_2 = inputStreamIdentity._getSha1_2();
-        outputStream.hashData.sha1_3 = inputStreamIdentity._getSha1_3();
+        outputStream.cRC32Hash = inputStreamIdentity._getCrc32();
+        outputStream.sha1_1 = inputStreamIdentity._getSha1_1();
+        outputStream.sha1_2 = inputStreamIdentity._getSha1_2();
+        outputStream.sha1_3 = inputStreamIdentity._getSha1_3();
 
         outputStream.drmData = EMPTY_DRM_DATA;
         outputStream.additionalData = new StreamAdditionalData();
