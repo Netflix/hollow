@@ -58,7 +58,7 @@ public class ShowMeTheFastProgress {
     @Test
     public void start() throws Throwable {
         // NOTE: the specified transformerVersion must be valid or already in local HD; otherwise, run  getLatestTransformerVersion();
-        long transformerVersion = 20170206213324267L;
+        long transformerVersion = 20170207001824278L;
         int[] topNodes = { 80115503, 70143860 };
 
         long start = System.currentTimeMillis();
@@ -120,6 +120,7 @@ public class ShowMeTheFastProgress {
         OutputStream os = null;
         String proxyURL = String.format("%s?prod=%s&output=%s&vip=%s&version=%s&topnodes=%s", baseURL, isProd, isOutput, vipName, version, toString(topNodes));
         try {
+            System.out.println(">>> Requesting a slice from: " + proxyURL);
             is = HttpHelper.getInputStream(proxyURL, false);
             os = new FileOutputStream(downloadTo);
             IOUtils.copy(is, os);
