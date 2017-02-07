@@ -12,11 +12,11 @@ public final class StateTransition {
 
     /**
      * Creates a transition representing a brand new delta chain or a break
-     * in an existing chain. This transition doesn't have a from nor a to version;
-     * calling {@link #advance(long)} on this transition will return new a transition representing
-     * the first state produced on this chain, i.e. the first snapshot.
+     * in an existing chain, e.g. a state transition with neither a {@code fromVersion} nor a
+     * {@code toVersion}.<p>
      *
-     * @return a state transition with neither a {@code fromVersion} nor a {@code toVersion}
+     * Calling {@link #advance(long)} on this transition will return new a transition representing
+     * the first state produced on this chain, i.e. the first snapshot.
      */
     public StateTransition() {
         this(Long.MIN_VALUE, Long.MIN_VALUE);
@@ -34,19 +34,15 @@ public final class StateTransition {
      * to resume producing on that delta chain by calling {@link #advance(long)} when ready to
      * produce the next state.
      *
-     * @return a state transition with no {@code fromVersion} and the specified version as the {@code toVersion}
-     *
      * @see <a href="http://hollow.how/advanced-topics/#double-snapshots">Double Snapshot</a>
-
      */
     public StateTransition(long toVersion) {
         this(Long.MIN_VALUE, toVersion);
     }
 
     /**
-     * Creates a transition fully representing a transition within the delta chain, a.k.a. a delta.
-     *
-     * @return a state transition with the specified fromVersion and toVersion
+     * Creates a transition fully representing a transition within the delta chain, a.k.a. a delta, between
+     * {@code fromVersion} and {@code toVersion}.
      */
     public StateTransition(long fromVersion, long toVersion) {
         this.fromVersion = fromVersion;
@@ -65,11 +61,29 @@ public final class StateTransition {
      *
      * @param nextVersion the next version to transition to
      *
-     * @return a new state transition with its {@fromVersion} and {@toVersion} assigned our {@toVersion} and
+     * @return a new state transition with its {@code fromVersion} and {@code toVersion} assigned our {@code toVersion} and
      *     the specified {@code nextVersion} respectively
      */
     public StateTransition advance(long nextVersion) {
         return new StateTransition(toVersion, nextVersion);
+    }
+
+    /**
+     * Returns a new transition with versions swapped. Only valid on deltas.
+
+     * <pre>
+     * <code>
+     * [13,45].reverse() == [45,13]
+     * </code>
+     * </pre>
+
+     * @return
+     *
+     * @throws IllegalStateException if this transition isn't a delta
+     */
+    public StateTransition reverse() {
+        if(isDiscontinous() || isSnapshot()) throw new IllegalStateException("must be a delta");
+        return new StateTransition(this.toVersion, this.fromVersion);
     }
 
     public long getFromVersion() {
@@ -92,7 +106,7 @@ public final class StateTransition {
     /**
      * Determines whether this state represents a delta, e.g. a transition between two state versions.
      *
-     * @return true if this has a {@code fromVersion} and {@code toVersion};
+     * @return true if this has a {@code fromVersion} and {@code toVersion}; false otherwise
      */
     public boolean isDelta() {
         return fromVersion != Long.MIN_VALUE && toVersion != Long.MIN_VALUE;
@@ -119,7 +133,8 @@ public final class StateTransition {
             if(isReverseDelta()) sb.append("reverse");
             sb.append("delta [");
             sb.append(fromVersion);
-            sb.append(" <-> ");
+            if(isForwardDelta()) sb.append(" -> ");
+            else sb.append(" <- ");
             sb.append(toVersion);
             sb.append("]");
         } else {
