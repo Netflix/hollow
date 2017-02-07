@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import com.netflix.vms.transformer.hollowoutput.TrickPlayDownloadableFilename;
+
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.hollowinput.CdnDeploymentHollow;
@@ -160,7 +162,7 @@ public class PackageMomentDataModule {
                 trickplay.imageCount = stream._getImageInfo()._getImageCount();
                 trickplay.videoId = new Video((int)inputPackage._getMovieId());
                 trickplay.trickPlayDownloadable = new TrickPlayDownloadable();
-                trickplay.trickPlayDownloadable.fileName = new Strings(stream._getFileIdentification()._getFilename());
+                trickplay.trickPlayDownloadable.fileName = new TrickPlayDownloadableFilename(stream._getFileIdentification()._getFilename());
                 trickplay.trickPlayDownloadable.descriptor = new TrickPlayDescriptor();
                 trickplay.trickPlayDownloadable.descriptor.height = stream._getDimensions()._getHeightInPixels();
                 trickplay.trickPlayDownloadable.descriptor.width = stream._getDimensions()._getWidthInPixels();

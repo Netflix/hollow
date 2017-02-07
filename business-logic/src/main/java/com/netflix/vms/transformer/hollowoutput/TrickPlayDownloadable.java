@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class TrickPlayDownloadable implements Cloneable {
 
-    public Strings fileName = null;
+    public TrickPlayDownloadableFilename fileName = null;
     public BaseDownloadable baseDownloadable = null;
     public TrickPlayDescriptor descriptor = null;
 
