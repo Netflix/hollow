@@ -19,7 +19,7 @@ public class Phase implements Cloneable {
     public List<RolloutRole> roles = null;
     public List<SupplementalVideo> supplementalVideos = null;
     public Set<Long> artWorkImageIds = null;
-    public Set<Strings> sourceFileIds = null;
+    public Set<ArtworkSourceString> sourceFileIds = null;
     public char[] phaseType = null;
     public boolean isOnHold = false;
     public Video seasonVideo = null;
