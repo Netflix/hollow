@@ -192,4 +192,13 @@ public interface TransformerConfig {
 
     @DefaultValue("BE,CH,LU")
     String getMultilanguageCatalogCountries();
+    
+    @DefaultValue("false")
+    public boolean isRollupImagesForArtworkScheduling();
+    
+    @DefaultValue("false")
+    public boolean isFilterImagesForArtworkScheduling();
+    
+    @DefaultValue("false")
+    public boolean isUseSchedulePhasesInAvailabilityDateCalc();
 }

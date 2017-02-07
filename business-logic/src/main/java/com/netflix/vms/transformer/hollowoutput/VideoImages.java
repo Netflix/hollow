@@ -8,12 +8,13 @@ public class VideoImages implements Cloneable {
 
     public Map<Strings, List<Artwork>> artworks = null;
     public Map<ArtWorkImageTypeEntry, Set<ArtWorkImageFormatEntry>> artworkFormatsByType = null;
+    public Set<SchedulePhaseInfo> imageAvailabilityWindows = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
         if(!(other instanceof VideoImages))
-            return false;
-
+        	return false;
+        
         VideoImages o = (VideoImages) other;
         if(o.artworks == null) {
             if(artworks != null) return false;
@@ -21,23 +22,30 @@ public class VideoImages implements Cloneable {
         if(o.artworkFormatsByType == null) {
             if(artworkFormatsByType != null) return false;
         } else if(!o.artworkFormatsByType.equals(artworkFormatsByType)) return false;
-        return true;
-    }
+        if(o.imageAvailabilityWindows == null) {
+            if(imageAvailabilityWindows != null) return false;
+        } else if(!o.imageAvailabilityWindows.equals(imageAvailabilityWindows)) return false;
+		return true;
+	}
 
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         int hashCode = 1;
         hashCode = hashCode * 31 + (artworks == null ? 1237 : artworks.hashCode());
         hashCode = hashCode * 31 + (artworkFormatsByType == null ? 1237 : artworkFormatsByType.hashCode());
+        hashCode = hashCode * 31 + (imageAvailabilityWindows == null ? 1237 : imageAvailabilityWindows.hashCode());
         return hashCode;
-    }
+	}
 
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuilder builder = new StringBuilder("VideoImages{");
         builder.append("artworks=").append(artworks);
         builder.append(",artworkFormatsByType=").append(artworkFormatsByType);
+        builder.append(",imageAvailabilityWindows=").append(imageAvailabilityWindows);
         builder.append("}");
         return builder.toString();
-    }
+	}
 
     public VideoImages clone() {
         try {
