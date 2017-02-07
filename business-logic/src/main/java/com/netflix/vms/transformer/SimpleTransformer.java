@@ -5,6 +5,9 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.Individual
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.NonVideoSpecificTransformDuration;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformInfo;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformProgress;
+
+import com.netflix.vms.transformer.hollowoutput.CompleteVideoData;
+
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
@@ -255,7 +258,7 @@ public class SimpleTransformer {
                 namedListPopulator.addCompleteVideo(topNode, true); // TODO: timt: refactor away duplicate calls (see globalVideoMap)
 
                 // Process Show children
-                if(topNode.facetData.videoCollectionsData.nodeType == cycleConstants.SHOW) {
+                if(topNode.data.facetData.videoCollectionsData.nodeType == cycleConstants.SHOW) {
                     int sequenceNumber = 0;
                     // Process Seasons
                     for(Map.Entry<Integer, VideoCollectionsData> showEntry : hierarchy.getOrderedSeasons().entrySet()) {
@@ -300,8 +303,8 @@ public class SimpleTransformer {
                     representativeVideo = preferredCompleteVideo(representativeVideo, completeVideo);
                     availableCountries.add(country);
 
-                    if (completeVideo.facetData.videoMetaData.aliases != null) {
-                        aliases.addAll(completeVideo.facetData.videoMetaData.aliases);
+                    if (completeVideo.data.facetData.videoMetaData.aliases != null) {
+                        aliases.addAll(completeVideo.data.facetData.videoMetaData.aliases);
                     }
                 }
             }
@@ -312,7 +315,7 @@ public class SimpleTransformer {
             gVideo.completeVideo = representativeVideo;
             gVideo.aliases = aliases;
             gVideo.availableCountries = availableCountries;
-            gVideo.isSupplementalVideo = (representativeVideo.facetData.videoCollectionsData.nodeType == cycleConstants.SUPPLEMENTAL);
+            gVideo.isSupplementalVideo = (representativeVideo.data.facetData.videoCollectionsData.nodeType == cycleConstants.SUPPLEMENTAL);
             gVideo.personCharacters = getPersonCharacters(primaryKeyIndex, representativeVideo);
             
             objectMapper.addObject(gVideo);
@@ -359,7 +362,7 @@ public class SimpleTransformer {
     private CompleteVideo preferredCompleteVideo(CompleteVideo current, CompleteVideo candidate) {
         if (current == null
                 || isGoLive(candidate)
-                || current.facetData.videoMetaData.videoSetTypes.contains(VIDEO_SET_TYPE_EXTENDED)) {
+                || current.data.facetData.videoMetaData.videoSetTypes.contains(VIDEO_SET_TYPE_EXTENDED)) {
             return candidate;
         }
 
@@ -378,15 +381,16 @@ public class SimpleTransformer {
         CompleteVideo completeVideo = new CompleteVideo();
         completeVideo.id = video;
         completeVideo.country = country;
-        completeVideo.facetData = new CompleteVideoFacetData();
-        completeVideo.facetData.videoCollectionsData = videoCollectionsData;
-        completeVideo.facetData.videoMetaData = vmdByCountry.get(countryId).get(completeVideo.id.value);
-        completeVideo.facetData.videoMediaData = mediaDataByCountry.get(countryId).get(completeVideo.id.value);
-        completeVideo.facetData.videoImages = getVideoImages(countryId, completeVideo.id.value, imagesDataByCountry);
+        completeVideo.data = new CompleteVideoData();
+        completeVideo.data.facetData = new CompleteVideoFacetData();
+        completeVideo.data.facetData.videoCollectionsData = videoCollectionsData;
+        completeVideo.data.facetData.videoMetaData = vmdByCountry.get(countryId).get(completeVideo.id.value);
+        completeVideo.data.facetData.videoMediaData = mediaDataByCountry.get(countryId).get(completeVideo.id.value);
+        completeVideo.data.facetData.videoImages = getVideoImages(countryId, completeVideo.id.value, imagesDataByCountry);
         
         if(!isExtended(completeVideo))  /// "Extended" videos have VideoMiscData excluded.
-            completeVideo.facetData.videoMiscData = miscData.get(completeVideo.id.value);
-        completeVideo.countrySpecificData = countrySpecificByCountry.get(countryId).get(completeVideo.id.value);
+            completeVideo.data.facetData.videoMiscData = miscData.get(completeVideo.id.value);
+        completeVideo.data.countrySpecificData = countrySpecificByCountry.get(countryId).get(completeVideo.id.value);
         objectMapper.addObject(completeVideo);
 
         // keep track of created completeVideo for GlobalVideo creation
@@ -429,11 +433,11 @@ public class SimpleTransformer {
     private static final VideoSetType VIDEO_SET_TYPE_EXTENDED = new VideoSetType("Extended");
 
     private static boolean isExtended(CompleteVideo completeVideo) {
-        return completeVideo.facetData.videoMetaData.videoSetTypes.contains(VIDEO_SET_TYPE_EXTENDED);
+        return completeVideo.data.facetData.videoMetaData.videoSetTypes.contains(VIDEO_SET_TYPE_EXTENDED);
     }
 
     private static boolean isGoLive(CompleteVideo completeVideo) {
-        return completeVideo.facetData != null && completeVideo.facetData.videoMediaData != null && completeVideo.facetData.videoMediaData.isGoLive;
+        return completeVideo.data.facetData != null && completeVideo.data.facetData.videoMediaData != null && completeVideo.data.facetData.videoMediaData.isGoLive;
     }
 
     private static Comparator<ISOCountry> countryComparator = new ISOCountryComparator();
