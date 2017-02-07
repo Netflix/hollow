@@ -39,13 +39,13 @@ public class OutputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
 
     @Override
     public HollowReadStateEngine process(long version, int... topNodes) throws Throwable {
-        File localFile = fetchOutputSlice(version, topNodes);
+        File localFile = fetchOutputSlice(true, version, topNodes);
         return readStateEngine(localFile);
     }
 
-    public File fetchOutputSlice(long version, int... topNodes) throws Exception {
+    public File fetchOutputSlice(boolean isPerformSlicingWhenMissing, long version, int... topNodes) throws Exception {
         File localFile = getFile(TYPE, version, topNodes);
-        if (!localFile.exists()) {
+        if (isPerformSlicingWhenMissing && !localFile.exists()) {
             long start = System.currentTimeMillis();
             outputDataClient.triggerRefreshTo(version);
 

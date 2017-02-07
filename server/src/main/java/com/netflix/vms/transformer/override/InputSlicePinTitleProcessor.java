@@ -59,13 +59,13 @@ public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
     }
 
     public HollowReadStateEngine fetchInputStateEngineSlice(Long inputDataVersion, int... topNodes) throws Exception {
-        File slicedFile = fetchInputSlice(inputDataVersion, topNodes);
+        File slicedFile = fetchInputSlice(true, inputDataVersion, topNodes);
         return readStateEngine(slicedFile);
     }
 
-    public File fetchInputSlice(Long inputDataVersion, int... topNodes) throws Exception, IOException {
+    public File fetchInputSlice(boolean isPerformSlicingWhenMissing, Long inputDataVersion, int... topNodes) throws Exception, IOException {
         File slicedFile = getFile("input", inputDataVersion, topNodes);
-        if (!slicedFile.exists()) {
+        if (isPerformSlicingWhenMissing && !slicedFile.exists()) {
             long start = System.currentTimeMillis();
             HollowReadStateEngine inputStateEngine = readInputData(inputDataVersion);
 

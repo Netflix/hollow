@@ -68,31 +68,37 @@ public class VMSPinTitleSlicer {
                     isProd, isOutput, vip, versionStr, topNodesStr, localBlobStore), MediaType.TEXT_PLAIN_TYPE).build();
         }
 
-        synchronized(this) {
-            // cleanup prior files
+        try {
+            // cleanup files older than 7 days or oldest files to keep the max temp files to 20
             cleanupOldFiles(localBlobStore, 7, 20);
 
-            try {
-                File slicedFile = null;
-                long version = Long.parseLong(versionStr);
-                int[] topNodes = PinTitleHelper.parseTopNodes(topNodesStr);
-                String proxyURL = VMSProxyUtil.getProxyURL(isProd);
-                if (isOutput) {
-                    OutputSlicePinTitleProcessor p = new OutputSlicePinTitleProcessor(vip, proxyURL, localBlobStore.getPath(), ctx);
-                    p.setPinTitleFileStore(fileStore);
-                    slicedFile = p.fetchOutputSlice(version, topNodes);
-                } else {
-                    InputSlicePinTitleProcessor p = new InputSlicePinTitleProcessor(vip, proxyURL, localBlobStore.getPath(), ctx);
-                    p.setPinTitleFileStore(fileStore);
-                    slicedFile = p.fetchInputSlice(version, topNodes);
-                }
+            File slicedFile = null;
+            long version = Long.parseLong(versionStr);
+            int[] topNodes = PinTitleHelper.parseTopNodes(topNodesStr);
+            String proxyURL = VMSProxyUtil.getProxyURL(isProd);
 
-                return Response.ok(new FileStreamingOutput(slicedFile), MediaType.APPLICATION_OCTET_STREAM_TYPE)
-                        .header("content-disposition", "attachment; filename = " + slicedFile.getName()).build();
-            } catch (Exception ex) {
-                return Response.ok(String.format("ERROR: Failed to slice data with specified params[prod=%s, output=%s, vip=%s, version=%s, topnodes=%s] - Make sure version and vip are valid. Exception=%s",
-                        isProd, isOutput, vip, versionStr, topNodesStr, ex), MediaType.TEXT_PLAIN_TYPE).build();
+            // Determine whether to process input or output data slicing
+            if (isOutput) {
+                final OutputSlicePinTitleProcessor p = new OutputSlicePinTitleProcessor(vip, proxyURL, localBlobStore.getPath(), ctx);
+                p.setPinTitleFileStore(fileStore);
+                slicedFile = p.fetchOutputSlice(false, version, topNodes);
+                if (!slicedFile.exists()) { // Perform slicing if it does not exists
+                    synchronized (this) { slicedFile = p.fetchOutputSlice(true, version, topNodes); }
+                }
+            } else {
+                InputSlicePinTitleProcessor p = new InputSlicePinTitleProcessor(vip, proxyURL, localBlobStore.getPath(), ctx);
+                p.setPinTitleFileStore(fileStore);
+                slicedFile = p.fetchInputSlice(false, version, topNodes);
+                if (!slicedFile.exists()) { // Perform slicing if it does not exists
+                    synchronized (this) { slicedFile = p.fetchInputSlice(true, version, topNodes); }
+                }
             }
+
+            return Response.ok(new FileStreamingOutput(slicedFile), MediaType.APPLICATION_OCTET_STREAM_TYPE)
+                    .header("content-disposition", "attachment; filename = " + slicedFile.getName()).build();
+        } catch (Exception ex) {
+            return Response.ok(String.format("ERROR: Failed to slice data with specified params[prod=%s, output=%s, vip=%s, version=%s, topnodes=%s] - Make sure version and vip are valid. Exception=%s",
+                    isProd, isOutput, vip, versionStr, topNodesStr, ex), MediaType.TEXT_PLAIN_TYPE).build();
         }
     }
 
