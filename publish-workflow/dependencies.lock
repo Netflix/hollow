@@ -712,7 +712,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.10",
+            "locked": "1.15.11",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -729,7 +729,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.10",
+            "locked": "1.15.11",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
@@ -739,13 +739,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.15.10",
+            "locked": "1.15.11",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.10",
+            "locked": "1.15.11",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.runtime:health-guice",
@@ -3824,7 +3824,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.10",
+            "locked": "1.15.11",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -3841,7 +3841,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.10",
+            "locked": "1.15.11",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
@@ -3851,13 +3851,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.15.10",
+            "locked": "1.15.11",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.10",
+            "locked": "1.15.11",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.runtime:health-guice",
@@ -6936,7 +6936,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.10",
+            "locked": "1.15.11",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -6953,7 +6953,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.10",
+            "locked": "1.15.11",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
@@ -6963,13 +6963,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.15.10",
+            "locked": "1.15.11",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.10",
+            "locked": "1.15.11",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.runtime:health-guice",
@@ -10048,7 +10048,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.10",
+            "locked": "1.15.11",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -10065,7 +10065,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.10",
+            "locked": "1.15.11",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
@@ -10075,13 +10075,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.15.10",
+            "locked": "1.15.11",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.10",
+            "locked": "1.15.11",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.runtime:health-guice",
@@ -13265,7 +13265,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.10",
+            "locked": "1.15.11",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
                 "com.netflix.karyon:karyon-core",
@@ -13282,7 +13282,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.10",
+            "locked": "1.15.11",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
@@ -13292,13 +13292,13 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.15.10",
+            "locked": "1.15.11",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.10",
+            "locked": "1.15.11",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.runtime:health-guice",
