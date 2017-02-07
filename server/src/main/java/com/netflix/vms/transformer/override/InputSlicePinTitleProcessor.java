@@ -39,14 +39,27 @@ public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
 
     @Override
     public HollowReadStateEngine process(long inputDataVersion, int... topNodes) throws Throwable {
-        File localFile = fetchOutputSlice(inputDataVersion, topNodes);
+        File localFile = performOutputSlice(inputDataVersion, topNodes);
         return readStateEngine(localFile);
     }
 
-    public File fetchOutputSlice(long inputDataVersion, int... topNodes) throws Exception, Throwable {
-        File localFile = getFile("output", inputDataVersion, topNodes);
+    @Override
+    public File process(TYPE type, long dataVersion, int... topNodes) throws Throwable {
+        switch (type) {
+            case OUTPUT:
+                return performOutputSlice(dataVersion, topNodes);
+            case INPUT:
+                return performInputSlice(dataVersion, topNodes);
+            default:
+                throw new RuntimeException("Type " + type + " not supported");
+        }
+    }
+
+    private File performOutputSlice(long inputDataVersion, int... topNodes) throws Exception, Throwable {
+        File localFile = getFile(TYPE.OUTPUT, inputDataVersion, topNodes);
         if (!localFile.exists()) {
-            HollowReadStateEngine inputStateEngineSlice = fetchInputStateEngineSlice(inputDataVersion, topNodes);
+            File slicedFile = performInputSlice(inputDataVersion, topNodes);
+            HollowReadStateEngine inputStateEngineSlice = readStateEngine(slicedFile);
 
             VMSHollowInputAPI api = new VMSHollowInputAPI(inputStateEngineSlice);
             VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
@@ -58,14 +71,9 @@ public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
         return localFile;
     }
 
-    public HollowReadStateEngine fetchInputStateEngineSlice(Long inputDataVersion, int... topNodes) throws Exception {
-        File slicedFile = fetchInputSlice(true, inputDataVersion, topNodes);
-        return readStateEngine(slicedFile);
-    }
-
-    public File fetchInputSlice(boolean isPerformSlicingWhenMissing, Long inputDataVersion, int... topNodes) throws Exception, IOException {
-        File slicedFile = getFile("input", inputDataVersion, topNodes);
-        if (isPerformSlicingWhenMissing && !slicedFile.exists()) {
+    private File performInputSlice(Long inputDataVersion, int... topNodes) throws Exception, IOException {
+        File slicedFile = getFile(TYPE.INPUT, inputDataVersion, topNodes);
+        if (!slicedFile.exists()) {
             long start = System.currentTimeMillis();
             HollowReadStateEngine inputStateEngine = readInputData(inputDataVersion);
 

@@ -20,8 +20,6 @@ import java.util.Set;
  * @author dsu
  */
 public class OutputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
-    private static final String TYPE = "output";
-
     private final VMSOutputDataClient outputDataClient;
 
     public OutputSlicePinTitleProcessor(String vip, FileStore fileStore, String localBlobStore, TransformerContext ctx) {
@@ -39,13 +37,23 @@ public class OutputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
 
     @Override
     public HollowReadStateEngine process(long version, int... topNodes) throws Throwable {
-        File localFile = fetchOutputSlice(true, version, topNodes);
+        File localFile = performOutputSlice(version, topNodes);
         return readStateEngine(localFile);
     }
 
-    public File fetchOutputSlice(boolean isPerformSlicingWhenMissing, long version, int... topNodes) throws Exception {
-        File localFile = getFile(TYPE, version, topNodes);
-        if (isPerformSlicingWhenMissing && !localFile.exists()) {
+    @Override
+    public File process(TYPE type, long dataVersion, int... topNodes) throws Throwable {
+        switch (type) {
+            case OUTPUT:
+                return performOutputSlice(dataVersion, topNodes);
+            default:
+                throw new RuntimeException("Type " + type + " not supported");
+        }
+    }
+
+    private File performOutputSlice(long version, int... topNodes) throws Exception {
+        File localFile = getFile(TYPE.OUTPUT, version, topNodes);
+        if (!localFile.exists()) {
             long start = System.currentTimeMillis();
             outputDataClient.triggerRefreshTo(version);
 

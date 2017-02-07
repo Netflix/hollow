@@ -18,6 +18,7 @@ import com.netflix.vms.transformer.input.VMSInputDataClient;
 import com.netflix.vms.transformer.override.InputSlicePinTitleProcessor;
 import com.netflix.vms.transformer.override.OutputSlicePinTitleProcessor;
 import com.netflix.vms.transformer.override.PinTitleHelper;
+import com.netflix.vms.transformer.override.PinTitleProcessor.TYPE;
 import com.netflix.vms.transformer.util.HollowBlobKeybaseBuilder;
 import com.netflix.vms.transformer.util.OutputUtil;
 import java.io.ByteArrayInputStream;
@@ -140,7 +141,7 @@ public class ShowMeTheFastProgress {
         try {
             OutputSlicePinTitleProcessor processor = new OutputSlicePinTitleProcessor(vipName, PROXY, WORKING_DIR, ctx);
             processor.setPinTitleFileStore(pinTitleFileStore);
-            File slicedFile = processor.getFile("output", version, topNodes);
+            File slicedFile = processor.getFile(TYPE.OUTPUT, version, topNodes);
             if (isUseRemotePinTitleSlicer && !slicedFile.exists()) {
                 try {
                     downloadSlice(slicedFile, REMOTE_SLICER_URL, isProd, true, vipName, version, topNodes);
@@ -156,7 +157,7 @@ public class ShowMeTheFastProgress {
     }
 
     @SuppressWarnings("unused")
-    private VMSHollowInputAPI loadVMSHollowInputAPI(TransformerContext ctx, String vipName, long version, int... topNodes) throws Exception {
+    private VMSHollowInputAPI loadVMSHollowInputAPI(TransformerContext ctx, String vipName, long version, int... topNodes) throws Throwable {
         boolean isUseInputSlicing = true;
         System.out.println("loadVMSHollowInputAPI: Loading version=" + version);
         long start = System.currentTimeMillis();
@@ -165,17 +166,17 @@ public class ShowMeTheFastProgress {
             if (isUseInputSlicing) {
                 InputSlicePinTitleProcessor processor = new InputSlicePinTitleProcessor(vipName, PROXY, WORKING_DIR, ctx);
                 processor.setPinTitleFileStore(pinTitleFileStore);
-                File slicedFile = processor.getFile("input", version, topNodes);
+                File slicedFile = processor.getFile(TYPE.INPUT, version, topNodes);
                 if (isUseRemotePinTitleSlicer && !slicedFile.exists()) {
                     try {
                         downloadSlice(slicedFile, REMOTE_SLICER_URL, isProd, false, vipName, version, topNodes);
-                        stateEngine = processor.readStateEngine(slicedFile);
                     } catch (Exception ex) {
                         System.out.println("WARN: Remote Slicer failure - " + ex.toString() + ". Falling back to local slicer.");
                     }
                 }
 
-                if (stateEngine == null) stateEngine = processor.fetchInputStateEngineSlice(version, topNodes);
+                if (!slicedFile.exists()) slicedFile = processor.process(TYPE.INPUT, version, topNodes);
+                stateEngine = processor.readStateEngine(slicedFile);
             } else {
                 VMSInputDataClient inputClient = new VMSInputDataClient(PROXY, WORKING_DIR, vipName);
                 inputClient.triggerRefreshTo(version);

@@ -10,6 +10,8 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.override.InputSlicePinTitleProcessor;
 import com.netflix.vms.transformer.override.OutputSlicePinTitleProcessor;
 import com.netflix.vms.transformer.override.PinTitleHelper;
+import com.netflix.vms.transformer.override.PinTitleProcessor;
+import com.netflix.vms.transformer.override.PinTitleProcessor.TYPE;
 import com.netflix.vms.transformer.util.VMSProxyUtil;
 import java.io.File;
 import java.io.FileInputStream;
@@ -56,7 +58,7 @@ public class VMSPinTitleSlicer {
             @QueryParam("output") boolean isOutput,
             @QueryParam("vip") String vip,
             @QueryParam("version") String versionStr,
-            @QueryParam("topnodes") String topNodesStr) throws Exception {
+            @QueryParam("topnodes") String topNodesStr) throws Exception, Throwable {
 
         // Validate Requirement
         EnvironmentEnum envEnum = NetflixConfiguration.getEnvironmentEnum();
@@ -70,27 +72,20 @@ public class VMSPinTitleSlicer {
 
         try {
             // cleanup files older than 7 days or oldest files to keep the max temp files to 20
-            cleanupOldFiles(localBlobStore, 7, 20);
-
-            File slicedFile = null;
             long version = Long.parseLong(versionStr);
             int[] topNodes = PinTitleHelper.parseTopNodes(topNodesStr);
             String proxyURL = VMSProxyUtil.getProxyURL(isProd);
 
             // Determine whether to process input or output data slicing
-            if (isOutput) {
-                final OutputSlicePinTitleProcessor p = new OutputSlicePinTitleProcessor(vip, proxyURL, localBlobStore.getPath(), ctx);
-                p.setPinTitleFileStore(fileStore);
-                slicedFile = p.fetchOutputSlice(false, version, topNodes);
-                if (!slicedFile.exists()) { // Perform slicing if it does not exists
-                    synchronized (this) { slicedFile = p.fetchOutputSlice(true, version, topNodes); }
-                }
-            } else {
-                InputSlicePinTitleProcessor p = new InputSlicePinTitleProcessor(vip, proxyURL, localBlobStore.getPath(), ctx);
-                p.setPinTitleFileStore(fileStore);
-                slicedFile = p.fetchInputSlice(false, version, topNodes);
-                if (!slicedFile.exists()) { // Perform slicing if it does not exists
-                    synchronized (this) { slicedFile = p.fetchInputSlice(true, version, topNodes); }
+            TYPE type = isOutput ? TYPE.OUTPUT : TYPE.INPUT;
+            PinTitleProcessor processor = isOutput ? new OutputSlicePinTitleProcessor(vip, proxyURL, localBlobStore.getPath(), ctx) : new InputSlicePinTitleProcessor(vip, proxyURL, localBlobStore.getPath(), ctx);
+            processor.setPinTitleFileStore(fileStore);
+            File slicedFile = processor.getFile(type, version, topNodes);
+
+            if (!slicedFile.exists()) { // Perform slicing if it does not exists
+                synchronized (this) {
+                    cleanupOldFiles(localBlobStore, 7, 20);
+                    slicedFile = processor.process(type, version, topNodes);
                 }
             }
 

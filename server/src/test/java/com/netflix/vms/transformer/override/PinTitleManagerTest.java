@@ -1,9 +1,11 @@
 package com.netflix.vms.transformer.override;
 
+import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
 import com.netflix.vms.transformer.override.PinTitleManager.PinTitleProcessorJob;
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -220,6 +222,24 @@ public class PinTitleManagerTest {
         @Override
         public String getVip() {
             return null;
+        }
+
+        @Override
+        public File getFile(TYPE type, long version, int... topNodes) throws Exception {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public File process(TYPE type, long dataVersion, int... topNodes) throws Throwable {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public void setPinTitleFileStore(FileStore pinTitleFileStore) {
+            // TODO Auto-generated method stub
+
         }
     }
 }

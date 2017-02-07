@@ -17,7 +17,6 @@ import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
 
 public abstract class AbstractPinTitleProcessor implements PinTitleProcessor {
-
     protected final String vip;
     protected final String localBlobStore;
     protected final TransformerContext ctx;
@@ -37,12 +36,14 @@ public abstract class AbstractPinTitleProcessor implements PinTitleProcessor {
         return vip;
     }
 
+    @Override
     public void setPinTitleFileStore(FileStore pinTitleFileStore) {
         this.pinTitleFileStore = pinTitleFileStore;
     }
 
-    public File getFile(String type, long version, int... topNodes) throws Exception {
-        String fileVIP = vip + "_" + type;
+    @Override
+    public File getFile(TYPE type, long version, int... topNodes) throws Exception {
+        String fileVIP = vip + "_" + type.name().toLowerCase();
         HollowBlobFileNamer namer = new HollowBlobFileNamer(fileVIP);
 
         File file = null;
