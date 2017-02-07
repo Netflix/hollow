@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.packages;
 
+import com.netflix.vms.transformer.hollowoutput.StreamDownloadLocationFilename;
+
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
@@ -94,7 +96,7 @@ public class StreamDataModule {
         /// only necessary for rogue DrmKeys.
         this.objectMapper = objectMapper;
 
-        EMPTY_DOWNLOAD_LOCATIONS.filename = new Strings("");
+        EMPTY_DOWNLOAD_LOCATIONS.filename = new StreamDownloadLocationFilename("");
         EMPTY_DOWNLOAD_LOCATIONS.locations = Collections.emptyList();
     }
 
@@ -180,7 +182,7 @@ public class StreamDataModule {
             if(cdnDeployments != null) {
                 if(cdnDeployments.size() > 0) {
                     outputStream.additionalData.downloadLocations = new DownloadLocationSet();
-                    outputStream.additionalData.downloadLocations.filename = new Strings(inputStreamIdentity._getFilename());
+                    outputStream.additionalData.downloadLocations.filename = new StreamDownloadLocationFilename(inputStreamIdentity._getFilename());
                     outputStream.additionalData.downloadLocations.locations = new ArrayList<DownloadLocation>();
 
                     for(CdnDeploymentHollow cdnDeployment : cdnDeployments) {

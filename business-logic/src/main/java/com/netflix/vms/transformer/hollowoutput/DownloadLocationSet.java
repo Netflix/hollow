@@ -4,7 +4,7 @@ import java.util.List;
 
 public class DownloadLocationSet implements Cloneable {
 
-    public Strings filename = null;
+    public StreamDownloadLocationFilename filename = null;
     public List<DownloadLocation> locations = null;
 
     public boolean equals(Object other) {
