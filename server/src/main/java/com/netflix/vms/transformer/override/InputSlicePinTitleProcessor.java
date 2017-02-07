@@ -27,6 +27,7 @@ public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
     public InputSlicePinTitleProcessor(String vip, FileStore fileStore, String localBlobStore, TransformerContext ctx) {
         super(vip, localBlobStore, ctx);
 
+        this.pinTitleFileStore = fileStore;
         this.inputDataClient = new VMSInputDataClient(fileStore, vip);
     }
 
@@ -38,10 +39,27 @@ public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
 
     @Override
     public HollowReadStateEngine process(long inputDataVersion, int... topNodes) throws Throwable {
-        File localFile = getFile("output", inputDataVersion, topNodes);
+        File localFile = performOutputSlice(inputDataVersion, topNodes);
+        return readStateEngine(localFile);
+    }
+
+    @Override
+    public File process(TYPE type, long dataVersion, int... topNodes) throws Throwable {
+        switch (type) {
+            case OUTPUT:
+                return performOutputSlice(dataVersion, topNodes);
+            case INPUT:
+                return performInputSlice(dataVersion, topNodes);
+            default:
+                throw new RuntimeException("Type " + type + " not supported");
+        }
+    }
+
+    private File performOutputSlice(long inputDataVersion, int... topNodes) throws Exception, Throwable {
+        File localFile = getFile(TYPE.OUTPUT, inputDataVersion, topNodes);
         if (!localFile.exists()) {
-            File slicedInputFile = getFile("input", inputDataVersion, topNodes);
-            HollowReadStateEngine inputStateEngineSlice = fetchInputStateEngineSlice(slicedInputFile, inputDataVersion, topNodes);
+            File slicedFile = performInputSlice(inputDataVersion, topNodes);
+            HollowReadStateEngine inputStateEngineSlice = readStateEngine(slicedFile);
 
             VMSHollowInputAPI api = new VMSHollowInputAPI(inputStateEngineSlice);
             VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
@@ -50,11 +68,11 @@ public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
             String blobID = PinTitleHelper.createBlobID("i", inputDataVersion, topNodes);
             writeStateEngine(outputStateEngine, localFile, blobID, inputDataVersion, topNodes);
         }
-
-        return readStateEngine(localFile);
+        return localFile;
     }
 
-    public HollowReadStateEngine fetchInputStateEngineSlice(File slicedFile, Long inputDataVersion, int... topNodes) throws IOException {
+    private File performInputSlice(Long inputDataVersion, int... topNodes) throws Exception, IOException {
+        File slicedFile = getFile(TYPE.INPUT, inputDataVersion, topNodes);
         if (!slicedFile.exists()) {
             long start = System.currentTimeMillis();
             HollowReadStateEngine inputStateEngine = readInputData(inputDataVersion);
@@ -66,8 +84,7 @@ public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
             writeStateEngine(slicedStateEngine, slicedFile, blobID, inputDataVersion, topNodes);
             ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Sliced[INPUT] videoId={} from vip={}, version={}, duration={}", Arrays.toString(topNodes), vip, inputDataVersion, (System.currentTimeMillis() - start));
         }
-
-        return readStateEngine(slicedFile);
+        return slicedFile;
     }
 
     private HollowReadStateEngine readInputData(long inputDataVersion) throws IOException {

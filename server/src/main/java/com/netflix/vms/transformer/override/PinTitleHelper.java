@@ -88,4 +88,15 @@ public class PinTitleHelper {
         }
         return sb.toString();
     }
+
+    public static int[] parseTopNodes(String topNodes) {
+        if (topNodes == null) return null;
+
+        String[] parts = topNodes.split(",");
+        int[] result = new int[parts.length];
+        for (int i = 0; i < parts.length; i++) {
+            result[i] = Integer.parseInt(parts[i].trim());
+        }
+        return result;
+    }
 }
