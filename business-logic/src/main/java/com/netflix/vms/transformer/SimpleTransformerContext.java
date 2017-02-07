@@ -1,5 +1,8 @@
 package com.netflix.vms.transformer;
 
+import com.netflix.archaius.api.Config;
+
+import com.netflix.archaius.DefaultPropertyFactory;
 import com.netflix.archaius.ConfigProxyFactory;
 import com.netflix.archaius.config.EmptyConfig;
 import com.netflix.vms.logging.TaggingLogger;
@@ -12,7 +15,6 @@ import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.cup.CupLibrary;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
-
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -29,7 +31,8 @@ public class SimpleTransformerContext implements TransformerContext {
 
     SimpleTransformerContext(TaggingLogger logger, TransformerMetricRecorder recorder, TransformerFiles files) {
         this.logger = logger;
-        this.config = new ConfigProxyFactory(EmptyConfig.INSTANCE).newProxy(TransformerConfig.class);
+        Config archaiusConfig = EmptyConfig.INSTANCE;
+        this.config = new ConfigProxyFactory(archaiusConfig, archaiusConfig.getDecoder(), DefaultPropertyFactory.from(archaiusConfig)).newProxy(TransformerConfig.class);
         this.files = files;
         this.recorder = recorder;
     }
