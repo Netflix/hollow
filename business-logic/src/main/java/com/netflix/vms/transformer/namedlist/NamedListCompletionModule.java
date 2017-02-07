@@ -4,8 +4,8 @@ package com.netflix.vms.transformer.namedlist;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
+import com.netflix.i18n.NFResourceID;
 import com.netflix.vms.transformer.CycleConstants;
-import com.netflix.vms.transformer.hollowoutput.NFResourceID;
 import com.netflix.vms.transformer.hollowoutput.NamedCollectionHolder;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.Video;
@@ -38,7 +38,6 @@ public class NamedListCompletionModule implements TransformModule {
         SimultaneousExecutor executor = new SimultaneousExecutor();
 
         VideoOrdinalTracker videoOrdinalTracker = videoNamedLists.getVideoOrdinalTracker();
-        videoOrdinalTracker.prepareEpisodes();
         
         for(Map.Entry<String, ConcurrentHashMap<VideoNamedListType, ThreadSafeBitSet>> countryEntry : videoNamedLists.getVideoListsByCountryAndName().entrySet()) {
             String country = countryEntry.getKey();

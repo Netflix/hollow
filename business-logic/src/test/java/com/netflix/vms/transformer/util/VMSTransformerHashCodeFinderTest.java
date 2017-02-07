@@ -3,12 +3,8 @@ package com.netflix.vms.transformer.util;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageTypeEntry;
 import com.netflix.vms.transformer.hollowoutput.DrmKeyString;
-import com.netflix.vms.transformer.hollowoutput.Episode;
 import com.netflix.vms.transformer.hollowoutput.NFLocale;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.SupplementalInfoType;
@@ -18,6 +14,8 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.util.VMSTransformerHashCodeFinder.RecordType;
+import org.junit.Before;
+import org.junit.Test;
 
 public class VMSTransformerHashCodeFinderTest {
 
@@ -42,15 +40,6 @@ public class VMSTransformerHashCodeFinderTest {
 
         assertThat(subject.hashCode(RecordType.DrmKeyString.name(), anyOrdinal(), ks))
             .isEqualTo(value.hashCode());
-    }
-
-    @Test
-    public void episodeHashesToId() {
-        int id = 42;
-        Episode ep = new Episode(id);
-
-        assertThat(subject.hashCode(RecordType.Episode.name(), anyOrdinal(), ep))
-            .isEqualTo(id);
     }
 
     @Test

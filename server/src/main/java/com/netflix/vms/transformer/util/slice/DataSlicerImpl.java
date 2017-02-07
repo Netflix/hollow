@@ -17,7 +17,6 @@ import com.netflix.vms.generated.notemplate.VideoHollow;
 import com.netflix.vms.transformer.common.slice.DataSlicer;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
-import com.netflix.vms.transformer.hollowoutput.NFResourceID;
 import com.netflix.vms.transformer.hollowoutput.NamedCollectionHolder;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.Video;
@@ -203,8 +202,6 @@ public class DataSlicerImpl implements DataSlicer {
 
                 mapper.addObject(outputHolder);
             }
-
-            mapper.addObject(new NFResourceID("invalid"));
         }
 
         @Override

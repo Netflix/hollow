@@ -7,7 +7,6 @@ import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageFormatEntry;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageTypeEntry;
 import com.netflix.vms.transformer.hollowoutput.DrmKeyString;
-import com.netflix.vms.transformer.hollowoutput.Episode;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.NFLocale;
 import com.netflix.vms.transformer.hollowoutput.Strings;
@@ -28,7 +27,6 @@ public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder 
         ArtWorkImageTypeEntry,
         ArtWorkImageFormatEntry,
         DrmKeyString,
-        Episode,
         ISOCountry,
         Integer,
         Long,
@@ -58,8 +56,6 @@ public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder 
         switch(recordType) {
         case DrmKeyString:
             return stringHashCode(((DrmKeyString)objectToHash).value);
-        case Episode:
-            return ((Episode)objectToHash).id;
         case Integer:
             return ((com.netflix.vms.transformer.hollowoutput.Integer)objectToHash).val;
         case ISOCountry:
