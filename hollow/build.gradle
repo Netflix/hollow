@@ -3,3 +3,14 @@ apply plugin: 'java'
 dependencies {
     testCompile 'junit:junit:4.11'
 }
+
+// quiet warnings about sun.misc.Unsafe
+compileJava {
+  options.compilerArgs << '-XDignore.symbol.file'
+  options.fork = true
+  options.forkOptions.executable = 'javac'
+}
+
+javadoc {
+    options.addStringOption('XDignore.symbol.file', '-quiet')
+}
