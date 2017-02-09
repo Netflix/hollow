@@ -14,4 +14,11 @@ subprojects {
   repositories {
     jcenter()
   }
+
+  tasks.withType(JavaCompile) {
+    doFirst {
+      if(sourceCompatibility == '1.7' && project.hasProperty('JDK7_HOME'))
+        options.bootClasspath = "$JDK7_HOME/jre/lib/rt.jar"
+    }
+  }
 }
