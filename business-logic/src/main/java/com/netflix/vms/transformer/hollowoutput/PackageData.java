@@ -13,6 +13,7 @@ public class PackageData implements Cloneable {
     public boolean isPrimaryPackage = false;
     public boolean isDefaultPackage = true;
     public List<Strings> tags = null;
+    public Set<Strings> packageTags = null;
     public Set<EncodeSummaryDescriptor> audioStreamSummary = null;
     public Set<EncodeSummaryDescriptor> textStreamSummary = null;
     public Set<EncodeSummaryDescriptor> muxAudioStreamSummary = null;
@@ -51,6 +52,9 @@ public class PackageData implements Cloneable {
         if(o.tags == null) {
             if(tags != null) return false;
         }else if(!o.tags.equals(tags)) return false;
+        if(o.packageTags == null) {
+            if(packageTags != null) return false;
+        }else if(!o.packageTags.equals(packageTags)) return false;
         return true;
     }
 
@@ -65,7 +69,7 @@ public class PackageData implements Cloneable {
         hashCode = hashCode * 31 + (textStreamSummary == null ? 1237 : textStreamSummary.hashCode());
         hashCode = hashCode * 31 + (muxAudioStreamSummary == null ? 1237 : muxAudioStreamSummary.hashCode());
         hashCode = hashCode * 31 + (allDeployableCountries == null ? 1237 : allDeployableCountries.hashCode());
-        hashCode = hashCode * 31 + (tags == null ? 1237 : tags.hashCode());
+        hashCode = hashCode * 31 + (packageTags == null ? 1237 : packageTags.hashCode());
         hashCode = hashCode * 31 + (isDefaultPackage ? 1231 : 1237);
         return hashCode;
     }
@@ -81,7 +85,7 @@ public class PackageData implements Cloneable {
         builder.append(",textStreamSummary=").append(textStreamSummary);
         builder.append(",muxAudioStreamSummary=").append(muxAudioStreamSummary);
         builder.append(",isDefaultPackage=").append(isDefaultPackage);
-        builder.append(",tags=").append(tags);
+        builder.append(",packageTags=").append(packageTags);
         builder.append(",allDeployableCountries=").append(allDeployableCountries);
         builder.append("}");
         return builder.toString();

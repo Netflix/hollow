@@ -10,7 +10,6 @@ import com.netflix.vms.transformer.common.slice.DataSlicer;
 import com.netflix.vms.transformer.input.VMSOutputDataClient;
 import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,13 +20,12 @@ import java.util.Set;
  * @author dsu
  */
 public class OutputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
-    private static final String TYPE = "output";
-
     private final VMSOutputDataClient outputDataClient;
 
     public OutputSlicePinTitleProcessor(String vip, NetflixS3BlobRetriever retriever, String localBlobStore, TransformerContext ctx) {
         super(vip, localBlobStore, ctx);
 
+        //this.pinTitleFileStore = fileStore;
         this.outputDataClient = new VMSOutputDataClient(retriever);
     }
 
@@ -38,8 +36,23 @@ public class OutputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
     }
 
     @Override
-    public HollowReadStateEngine process(long version, int... topNodes) throws IOException {
-        File localFile = getFile(TYPE, version, topNodes);
+    public HollowReadStateEngine process(long version, int... topNodes) throws Throwable {
+        File localFile = performOutputSlice(version, topNodes);
+        return readStateEngine(localFile);
+    }
+
+    @Override
+    public File process(TYPE type, long dataVersion, int... topNodes) throws Throwable {
+        switch (type) {
+            case OUTPUT:
+                return performOutputSlice(dataVersion, topNodes);
+            default:
+                throw new RuntimeException("Type " + type + " not supported");
+        }
+    }
+
+    private File performOutputSlice(long version, int... topNodes) throws Exception {
+        File localFile = getFile(TYPE.OUTPUT, version, topNodes);
         if (!localFile.exists()) {
             long start = System.currentTimeMillis();
             outputDataClient.triggerRefreshTo(version);
@@ -56,7 +69,6 @@ public class OutputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
             writeStateEngine(slicedStateEngine, localFile, blobID, version, topNodes);
             ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Sliced[OUTPUT] videoId={} from vip={}, version={}, duration={}", Arrays.toString(topNodes), vip, version, (System.currentTimeMillis() - start));
         }
-
-        return readStateEngine(localFile);
+        return localFile;
     }
 }

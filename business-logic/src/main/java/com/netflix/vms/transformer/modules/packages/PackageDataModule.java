@@ -197,6 +197,7 @@ public class PackageDataModule {
 
         //////////// DEPLOYABLE PACKAGES //////////////
         pkg.tags = new ArrayList<Strings>();
+        pkg.packageTags = new HashSet<Strings>();
         if(deployablePackagesOrdinal != -1) {
             pkg.allDeployableCountries = new HashSet<ISOCountry>();
             DeployablePackagesHollow deployablePackages = api.getDeployablePackagesHollow(deployablePackagesOrdinal);
@@ -206,6 +207,7 @@ public class PackageDataModule {
                 for(StringHollow tag : packageTags) {
                     ctx.getLogger().info(TransformerLogTag.InteractivePackage, "package={}, video={}, tag={}", pkg.id, pkg.video.value, tag._getValue());
                     pkg.tags.add(new Strings(tag._getValue()));
+                    pkg.packageTags.add(new Strings(tag._getValue()));
                 }
             }
             for(ISOCountryHollow isoCountry : deployablePackages._getCountryCodes()) {
