@@ -2,6 +2,8 @@ package com.netflix.vms.transformer.testutil.migration;
 
 import static com.netflix.vms.transformer.input.VMSInputDataClient.PROD_PROXY_URL;
 
+import net.jpountz.lz4.LZ4BlockInputStream;
+
 import com.netflix.config.NetflixConfiguration.EnvironmentEnum;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.hollow.core.HollowBlobHeader;
@@ -9,7 +11,6 @@ import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.videometadata.util.HttpHelper;
 import com.netflix.vms.transformer.fastproperties.PersistedPropertiesUtil;
 import com.netflix.vms.transformer.input.VMSInputDataKeybaseBuilder;
-import com.netflix.vms.transformer.io.LZ4VMSInputStream;
 import com.netflix.vms.transformer.util.HollowBlobKeybaseBuilder;
 import java.io.File;
 import java.io.FileInputStream;
@@ -87,7 +88,7 @@ public class RollingDiff {
 
         File dir = new File(WORKING_DIR, "rolling-diff");
 
-        HollowBlobHeader header = reader.readHeader(new LZ4VMSInputStream(new FileInputStream(new File(dir, "oldpipeline-snapshot"))));
+        HollowBlobHeader header = reader.readHeader(new LZ4BlockInputStream(new FileInputStream(new File(dir, "oldpipeline-snapshot"))));
         System.out.println("===========================");
         System.out.println("oldpipelien-snapshot header = " + header.getHeaderTags());
         System.out.println("===========================\n");
@@ -141,7 +142,7 @@ public class RollingDiff {
         fos.close();
 
         Map<String, String> expectedColdstartVersions = new HashMap<>();
-        HollowBlobHeader header = new HollowBlobHeaderReader().readHeader(new LZ4VMSInputStream(new FileInputStream(new File(dir, "oldpipeline-snapshot"))));
+        HollowBlobHeader header = new HollowBlobHeaderReader().readHeader(new LZ4BlockInputStream(new FileInputStream(new File(dir, "oldpipeline-snapshot"))));
         for(Map.Entry<String, String> headerEntry : header.getHeaderTags().entrySet()) {
             if(headerEntry.getKey().endsWith("_ColdStartManager")) {
                 String mutationGroup = headerEntry.getKey().substring(6, headerEntry.getKey().indexOf("_ColdStartManager"));
@@ -151,7 +152,7 @@ public class RollingDiff {
             }
         }
 
-        header = new HollowBlobHeaderReader().readHeader(new LZ4VMSInputStream(new FileInputStream(new File(dir, "newpipeline-snapshot"))));
+        header = new HollowBlobHeaderReader().readHeader(new LZ4BlockInputStream(new FileInputStream(new File(dir, "newpipeline-snapshot"))));
         for(Map.Entry<String, String> headerEntry : header.getHeaderTags().entrySet()) {
             if(headerEntry.getKey().endsWith("_ColdStartManager")) {
                 String mutationGroup = headerEntry.getKey().substring(6, headerEntry.getKey().indexOf("_ColdStartManager"));
@@ -171,9 +172,9 @@ public class RollingDiff {
 
     private void triggerDiff() throws IOException {
         File dir = new File(WORKING_DIR, "rolling-diff");
-        HollowBlobHeader header = new HollowBlobHeaderReader().readHeader(new LZ4VMSInputStream(new FileInputStream(new File(dir, "oldpipeline-snapshot"))));
+        HollowBlobHeader header = new HollowBlobHeaderReader().readHeader(new LZ4BlockInputStream(new FileInputStream(new File(dir, "oldpipeline-snapshot"))));
         String oldVersion = header.getHeaderTags().get("dataVersion");
-        header = new HollowBlobHeaderReader().readHeader(new LZ4VMSInputStream(new FileInputStream(new File(dir, "newpipeline-snapshot"))));
+        header = new HollowBlobHeaderReader().readHeader(new LZ4BlockInputStream(new FileInputStream(new File(dir, "newpipeline-snapshot"))));
         String newVersion = header.getHeaderTags().get("dataVersion");
 
         String url = "http://go/vmsdiff-prod?action=submit&User=&Name=ROLLING_DIFF&diffName=" + DIFF_NAME_PREFIX + newVersion + "&fromVip=" + CONTROL_PIPELINE_VIP + "&fromVersion=" + oldVersion + "&toVip=" + CANARY_TRANSFORMER_VIP + "&toVersion=" + newVersion;
@@ -184,7 +185,7 @@ public class RollingDiff {
     @SuppressWarnings("unused")
     private void downloadNewPipelineInput() throws IOException {
         File dir = new File(WORKING_DIR, "rolling-diff");
-        HollowBlobHeader header = new HollowBlobHeaderReader().readHeader(new LZ4VMSInputStream(new FileInputStream(new File(dir, "newpipeline-snapshot"))));
+        HollowBlobHeader header = new HollowBlobHeaderReader().readHeader(new LZ4BlockInputStream(new FileInputStream(new File(dir, "newpipeline-snapshot"))));
         String inputVersionId = header.getHeaderTags().get("sourceDataVersion");
 
         InputStream is = HttpHelper.getInputStream(PROD_PROXY_URL + "/" + "filestore-download?keybase=" + new VMSInputDataKeybaseBuilder(CONTROL_PIPELINE_VIP).getSnapshotKeybase() + "&version=" + inputVersionId);
@@ -203,7 +204,7 @@ public class RollingDiff {
 
         File dir = new File(WORKING_DIR, "rolling-diff");
 
-        HollowBlobHeader header = reader.readHeader(new LZ4VMSInputStream(new FileInputStream(new File(dir, "oldpipeline-snapshot"))));
+        HollowBlobHeader header = reader.readHeader(new LZ4BlockInputStream(new FileInputStream(new File(dir, "oldpipeline-snapshot"))));
 
         for(Map.Entry<String, String> headerEntry : header.getHeaderTags().entrySet()) {
             if(headerEntry.getKey().endsWith("_ColdStartManager")) {

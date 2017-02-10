@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.override;
 
+import com.netflix.hollow.netflixspecific.blob.store.NetflixS3BlobRetriever;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -30,20 +32,23 @@ public class PinTitleManager {
     private final String localBlobStore;
     private final TransformerContext ctx;
     private final FileStore fileStore;
+    private final NetflixS3BlobRetriever outputBlobRetriever;
 
     private final SimultaneousExecutor mainExecutor = new SimultaneousExecutor();
     private Map<PinTitleJobSpec, PinTitleProcessorJob> completedJobs = new HashMap<PinTitleJobSpec, PinTitleProcessorJob>();
     private Map<PinTitleJobSpec, PinTitleProcessorJob> failedJobs = new HashMap<PinTitleJobSpec, PinTitleProcessorJob>();
     private Map<PinTitleJobSpec, PinTitleProcessorJob> activeJobs = new HashMap<PinTitleJobSpec, PinTitleProcessorJob>();
 
-    public PinTitleManager(FileStore fileStore, TransformerContext ctx) {
+    public PinTitleManager(FileStore fileStore, NetflixS3BlobRetriever outputBlobRetriever, TransformerContext ctx) {
         this.fileStore = fileStore;
+        this.outputBlobRetriever = outputBlobRetriever;
         this.localBlobStore = null;
         this.ctx = ctx;
     }
 
     public PinTitleManager(String proxyURL, String inputDataVip, String outputDataVip, String localBlobStore, TransformerContext ctx) {
         this.fileStore = null;
+        this.outputBlobRetriever = null;
         this.localBlobStore = localBlobStore;
         this.ctx = ctx;
 
@@ -273,8 +278,8 @@ public class PinTitleManager {
     @VisibleForTesting
     PinTitleProcessor createOutputBasedProcessor() {
         String vip = outputDataVip != null ? outputDataVip : OverrideVipNameUtil.getPinTitleDataTransformerVip(ctx.getConfig());
-        if (fileStore != null) {
-            return new OutputSlicePinTitleProcessor(vip, fileStore, localBlobStore, ctx);
+        if (outputBlobRetriever != null) {
+            return new OutputSlicePinTitleProcessor(vip, outputBlobRetriever, localBlobStore, ctx);
         } else {
             return new OutputSlicePinTitleProcessor(vip, proxyURL, localBlobStore, ctx);
         }

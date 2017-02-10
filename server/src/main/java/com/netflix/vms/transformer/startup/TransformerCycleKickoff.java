@@ -6,9 +6,13 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformC
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleSuccess;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WaitForNextCycle;
 
+import com.netflix.hollow.netflixspecific.blob.store.NetflixS3BlobRetriever;
+
+import com.amazonaws.auth.AWSCredentialsProvider;
 import com.google.inject.Inject;
 import com.netflix.archaius.api.Config;
 import com.netflix.aws.file.FileStore;
+import com.netflix.hollow.netflixspecific.blob.store.NetflixS3BlobPublisher;
 import com.netflix.vms.transformer.TransformCycle;
 import com.netflix.vms.transformer.atlas.AtlasTransformerMetricRecorder;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -41,6 +45,7 @@ public class TransformerCycleKickoff {
             ElasticSearchClient esClient,
             TransformerCassandraHelper cassandraHelper,
             FileStore fileStore,
+            AWSCredentialsProvider credentials,
             HermesBlobAnnouncer hermesBlobAnnouncer,
             TransformerConfig transformerConfig,
             Config config,
@@ -52,16 +57,18 @@ public class TransformerCycleKickoff {
         FileStore.useMultipartUploadWhenApplicable(true);
 
         TransformerContext ctx = ctx(esClient, transformerConfig, config, octoberSkyData, cupLibrary, cassandraHelper, healthIndicator);
-        PublishWorkflowStager publishStager = publishStager(ctx, fileStore, hermesBlobAnnouncer);
+        PublishWorkflowStager publishStager = publishStager(ctx, fileStore, credentials, hermesBlobAnnouncer);
+        NetflixS3BlobRetriever blobRetriever = new NetflixS3BlobRetriever(credentials, "vms." + transformerConfig.getTransformerVip());
 
         TransformCycle cycle = new TransformCycle(
                 ctx,
                 fileStore,
+                blobRetriever,
                 publishStager,
                 transformerConfig.getConverterVip(),
                 transformerConfig.getTransformerVip());
 
-        restore(cycle, ctx.getConfig(), fileStore, hermesBlobAnnouncer);
+        restore(cycle, ctx.getConfig(), fileStore, credentials, hermesBlobAnnouncer);
 
         Thread t = new Thread(new Runnable() {
             private long previousCycleStartTime;
@@ -151,26 +158,34 @@ public class TransformerCycleKickoff {
                 });
     }
 
-    private final PublishWorkflowStager publishStager(TransformerContext ctx, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer) {
+    private final PublishWorkflowStager publishStager(TransformerContext ctx, FileStore fileStore, AWSCredentialsProvider credentials, HermesBlobAnnouncer hermesBlobAnnouncer) {
         Supplier<ServerUploadStatus> uploadStatus = () -> VMSServerUploadStatus.get();
+        
+        NetflixS3BlobPublisher blobPublisher = new NetflixS3BlobPublisher(credentials, "vms." + ctx.getConfig().getTransformerVip());
+        NetflixS3BlobPublisher nostreamsBlobPublisher = new NetflixS3BlobPublisher(credentials, "vms." + ctx.getConfig().getTransformerVip() + "_nostreams");
+        
         if(isFastlane(ctx.getConfig()))
-            return new HollowFastlanePublishWorkflowStager(ctx, fileStore, hermesBlobAnnouncer, uploadStatus, ctx.getConfig().getTransformerVip());
+            return new HollowFastlanePublishWorkflowStager(ctx, fileStore, blobPublisher, nostreamsBlobPublisher, hermesBlobAnnouncer, uploadStatus, ctx.getConfig().getTransformerVip());
 
-        return new HollowPublishWorkflowStager(ctx, fileStore, hermesBlobAnnouncer, new DataSlicerImpl(), uploadStatus, ctx.getConfig().getTransformerVip());
+        return new HollowPublishWorkflowStager(ctx, fileStore, blobPublisher, nostreamsBlobPublisher, hermesBlobAnnouncer, new DataSlicerImpl(), uploadStatus, ctx.getConfig().getTransformerVip());
     }
 
-    private void restore(TransformCycle cycle, TransformerConfig cfg, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer) {
+    private void restore(TransformCycle cycle, TransformerConfig cfg, FileStore fileStore, AWSCredentialsProvider credentials, HermesBlobAnnouncer hermesBlobAnnouncer) {
         if(cfg.isRestoreFromPreviousStateEngine()) {
             long latestVersion = hermesBlobAnnouncer.getLatestAnnouncedVersionFromCassandra(cfg.getTransformerVip());
             long restoreVersion = cfg.getRestoreFromSpecificVersion() != null ? cfg.getRestoreFromSpecificVersion() : latestVersion;
-
+            
             if(restoreVersion != Long.MIN_VALUE) {
-                VMSOutputDataClient outputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip());
+                NetflixS3BlobRetriever blobRetriever = new NetflixS3BlobRetriever(credentials, "vms." + cfg.getTransformerVip());
+                NetflixS3BlobRetriever nostreamsBlobRetriever = new NetflixS3BlobRetriever(credentials, "vms." + cfg.getTransformerVip() + "_nostreams");
+                VMSOutputDataClient outputClient = new VMSOutputDataClient(blobRetriever);
+                VMSOutputDataClient nostreamsOutputClient = new VMSOutputDataClient(nostreamsBlobRetriever);
                 outputClient.triggerRefreshTo(restoreVersion);
+                nostreamsOutputClient.triggerRefreshTo(restoreVersion);
 
-                if(outputClient.getCurrentVersionId() != restoreVersion)
+                if(outputClient.getCurrentVersionId() != restoreVersion || nostreamsOutputClient.getCurrentVersionId() != restoreVersion)
                     throw new IllegalStateException("Failed to restore from state: " + restoreVersion);
-                cycle.restore(outputClient);
+                cycle.restore(outputClient, nostreamsOutputClient);
             } else {
                 if(cfg.isFailIfRestoreNotAvailable())
                     throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.failIfRestoreNotAvailable=false");

@@ -1,7 +1,8 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import com.netflix.vms.transformer.common.slice.DataSlicer;
+import com.netflix.hollow.netflixspecific.blob.store.NetflixS3BlobPublisher;
 
+import com.netflix.vms.transformer.common.slice.DataSlicer;
 import com.netflix.vms.transformer.publish.workflow.job.CreateDevSliceJob;
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
@@ -43,6 +44,8 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
 
     public DefaultHollowPublishJobCreator(TransformerContext transformerContext,
             FileStore fileStore,
+            NetflixS3BlobPublisher blobPublisher,
+            NetflixS3BlobPublisher nostreamsBlobPublisher,
             HermesBlobAnnouncer hermesBlobAnnouncer,
             HollowBlobDataProvider hollowBlobDataProvider, 
             PlaybackMonkeyTester playbackMonkeyTester,
@@ -58,6 +61,8 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
                 new HermesVipAnnouncer(hermesBlobAnnouncer),
                 serverUploadStatus,
                 fileStore,
+                blobPublisher,
+                nostreamsBlobPublisher,
                 vip);
     }
 
@@ -72,8 +77,8 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
     }
 
     @Override
-    public HollowBlobPublishJob createPublishJob(String vip, PublishType jobType, long inputVersion, long previousVersion, long version, RegionEnum region, File fileToUpload) {
-        return new FileStoreHollowBlobPublishJob(ctx, inputVersion, previousVersion, version, jobType, region, fileToUpload);
+    public HollowBlobPublishJob createPublishJob(String vip, PublishType jobType, long inputVersion, long previousVersion, long version, File fileToUpload, boolean isNostreams) {
+        return new S3HollowBlobPublishJob(ctx, inputVersion, previousVersion, version, jobType, fileToUpload, isNostreams);
     }
 
     @Override
@@ -87,8 +92,8 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
     }
 
     @Override
-    public CircuitBreakerJob createCircuitBreakerJob(String vip, long newVersion, File snapshotFile, File deltaFile, File reverseDeltaFile) {
-        return new HollowBlobCircuitBreakerJob(ctx, newVersion, snapshotFile, deltaFile, reverseDeltaFile, hollowBlobDataProvider);
+    public CircuitBreakerJob createCircuitBreakerJob(String vip, long newVersion, File snapshotFile, File deltaFile, File reverseDeltaFile, File nostreamsSnapshotFile, File nostreamsDeltaFile, File nostreamsReverseDeltaFile) {
+        return new HollowBlobCircuitBreakerJob(ctx, newVersion, snapshotFile, deltaFile, reverseDeltaFile, nostreamsSnapshotFile, nostreamsDeltaFile, nostreamsReverseDeltaFile, hollowBlobDataProvider);
     }
 
     @Override
@@ -112,10 +117,9 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
 			long newVersion, RegionEnum region,
 			CircuitBreakerJob circuitBreakerJob,
 			CanaryValidationJob previousCycleValidationJob,
-			List<PublicationJob> newPublishJobs,
-			CanaryRollbackJob previousCycleCanaryRoleBackJob) {
+			List<PublicationJob> newPublishJobs) {
 		return new HollowBlobBeforeCanaryAnnounceJob(ctx, newVersion, region, circuitBreakerJob, previousCycleValidationJob,
-				newPublishJobs, previousCycleCanaryRoleBackJob, playbackMonkeyTester, videoRanker);
+				newPublishJobs, playbackMonkeyTester, videoRanker);
 	}
 
 	@Override

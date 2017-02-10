@@ -12,7 +12,6 @@ import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.BeforeCanaryAnnounceJob;
-import com.netflix.vms.transformer.publish.workflow.job.CanaryRollbackJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryValidationJob;
 import com.netflix.vms.transformer.publish.workflow.job.CircuitBreakerJob;
 import com.netflix.vms.transformer.publish.workflow.job.impl.ValuableVideoHolder.ValuableVideo;
@@ -24,9 +23,9 @@ public class HollowBlobBeforeCanaryAnnounceJob extends BeforeCanaryAnnounceJob {
 	private final ValuableVideoHolder videoRanker;
 
 	public HollowBlobBeforeCanaryAnnounceJob(PublishWorkflowContext ctx, long newVersion, RegionEnum region, CircuitBreakerJob circuitBreakerJob,
-			CanaryValidationJob previousCycleValidationJob, List<PublicationJob> newPublishJobs, CanaryRollbackJob previousCanaryRollBackJob, PlaybackMonkeyTester dataTester,
+			CanaryValidationJob previousCycleValidationJob, List<PublicationJob> newPublishJobs, PlaybackMonkeyTester dataTester,
 			ValuableVideoHolder videoRanker) {
-		super(ctx, ctx.getVip(), newVersion, region, circuitBreakerJob, previousCycleValidationJob, newPublishJobs, previousCanaryRollBackJob);
+		super(ctx, ctx.getVip(), newVersion, region, circuitBreakerJob, previousCycleValidationJob, newPublishJobs);
 		this.dataTester = dataTester;
 		this.videoRanker = videoRanker;
 		this.testResultVideoCountryKeys = Collections.emptyMap();

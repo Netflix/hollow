@@ -3,7 +3,6 @@ dependencyRecommendations {
 }
 dependencies {
     compile project(':vmstransformer-common-interfaces')
-    compile project(':vmstransformer-io')
 
     compile 'com.netflix.hollow:hollow:2.0.5'
     compile 'com.netflix.vms.logging:vmslogging-api:latest.release'
@@ -12,6 +11,8 @@ dependencies {
     compile 'netflix:awsutils:latest.release'
     compile 'netflix:hermes:latest.release'
     compile 'netflix:vms-utils:latest.release'
+    
+    compile 'com.netflix.hollow:netflix-hollow-blob-store:1.+'
 
     testCompile 'junit:junit'
     testCompile 'org.assertj:assertj-core'

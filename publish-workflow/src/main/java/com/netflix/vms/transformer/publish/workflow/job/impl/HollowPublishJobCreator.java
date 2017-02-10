@@ -30,15 +30,17 @@ public interface HollowPublishJobCreator {
                                                              long newVersion,
                                                              File snapshotFile,
                                                              File deltaFile,
-                                                             File reverseDeltaFile);
+                                                             File reverseDeltaFile,
+                                                             File nostreamsSnapshotFile,
+                                                             File nostreamsDeltaFile,
+                                                             File nostreamsReverseDeltaFile);
 
     BeforeCanaryAnnounceJob   createBeforeCanaryAnnounceJob (String vip,
                                                              long newVersion,
                                                              RegionEnum region,
                                                              CircuitBreakerJob circuitBreakerJob,
                                                              CanaryValidationJob previousCycleValidationJob,
-                                                             List<PublicationJob> newPublishJobs,
-                                                             CanaryRollbackJob previousCycleCanaryRoleBackJob);
+                                                             List<PublicationJob> newPublishJobs);
 
     CanaryAnnounceJob               createCanaryAnnounceJob (String vip,
                                                              long newVersion,
@@ -69,8 +71,8 @@ public interface HollowPublishJobCreator {
                                                              long inputVersion,
                                                              long previousVersion,
                                                              long version,
-                                                             RegionEnum region,
-                                                             File fileToUpload);
+                                                             File fileToUpload,
+                                                             boolean isNostreams);
 
     HollowBlobDeleteFileJob             createDeleteFileJob (List<PublicationJob> copyJobs,
                                                              long version,

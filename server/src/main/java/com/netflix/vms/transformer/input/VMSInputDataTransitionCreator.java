@@ -11,22 +11,20 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class VMSDataTransitionCreator implements HollowBlobRetriever {
+public class VMSInputDataTransitionCreator implements HollowBlobRetriever {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(VMSDataTransitionCreator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VMSInputDataTransitionCreator.class);
 
     private final FileStore fileStore;
     private final KeybaseBuilder keybaseBuilder;
-    private final boolean useVMSLZ4;
 
-    public VMSDataTransitionCreator(FileStore fileStore, String converterVip) {
-        this(fileStore, new VMSInputDataKeybaseBuilder(converterVip), false);
+    public VMSInputDataTransitionCreator(FileStore fileStore, String converterVip) {
+        this(fileStore, new VMSInputDataKeybaseBuilder(converterVip));
     }
     
-    public VMSDataTransitionCreator(FileStore fileStore, KeybaseBuilder keybaseBuilder, boolean useVMSLZ4) {
+    public VMSInputDataTransitionCreator(FileStore fileStore, KeybaseBuilder keybaseBuilder) {
         this.fileStore = fileStore;
         this.keybaseBuilder = keybaseBuilder;
-        this.useVMSLZ4 = useVMSLZ4;
     }
 
     @Override
@@ -116,7 +114,7 @@ public class VMSDataTransitionCreator implements HollowBlobRetriever {
     }
 
     private FileStoreHollowUpdateTransition createTransition(FileAccessItem latestItem) {
-        FileStoreHollowUpdateTransition transition = new FileStoreHollowUpdateTransition(latestItem, fileStore, useVMSLZ4);
+        FileStoreHollowUpdateTransition transition = new FileStoreHollowUpdateTransition(latestItem, fileStore);
         return transition;
     }
 

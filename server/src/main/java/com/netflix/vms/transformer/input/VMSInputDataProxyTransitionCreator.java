@@ -12,24 +12,22 @@ import java.util.TimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class VMSDataProxyTransitionCreator implements HollowBlobRetriever {
+public class VMSInputDataProxyTransitionCreator implements HollowBlobRetriever {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(VMSDataProxyTransitionCreator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VMSInputDataProxyTransitionCreator.class);
 
     private final String baseProxyURL;
     private final String localDataDir;
     private final KeybaseBuilder keybaseBuilder;
-    private final boolean useVMSLZ4;
 
-    public VMSDataProxyTransitionCreator(String baseProxyURL, String localDataDir, String converterVip) {
-        this(baseProxyURL, localDataDir, new VMSInputDataKeybaseBuilder(converterVip), false);
+    public VMSInputDataProxyTransitionCreator(String baseProxyURL, String localDataDir, String converterVip) {
+        this(baseProxyURL, localDataDir, new VMSInputDataKeybaseBuilder(converterVip));
     }
     
-    public VMSDataProxyTransitionCreator(String baseProxyURL, String localDataDir, KeybaseBuilder keybaseBuilder, boolean useVMSLZ4) {
+    public VMSInputDataProxyTransitionCreator(String baseProxyURL, String localDataDir, KeybaseBuilder keybaseBuilder) {
         this.baseProxyURL = baseProxyURL;
         this.localDataDir = localDataDir;
         this.keybaseBuilder = keybaseBuilder;
-        this.useVMSLZ4 = useVMSLZ4;
     }
 
     @Override
@@ -47,7 +45,7 @@ public class VMSDataProxyTransitionCreator implements HollowBlobRetriever {
             
             long snapshotVersion = Long.parseLong(snapshotVersionStr);
             
-            return new VMSInputDataProxyHollowUpdateTransition(baseProxyURL, localDataDir, keybaseBuilder.getSnapshotKeybase(), snapshotVersion, useVMSLZ4);
+            return new VMSInputDataProxyHollowUpdateTransition(baseProxyURL, localDataDir, keybaseBuilder.getSnapshotKeybase(), snapshotVersion);
         } catch(Exception e) {
             LOGGER.error("Could not retrieve snapshot version from proxy", e);
             return null;
@@ -69,7 +67,7 @@ public class VMSDataProxyTransitionCreator implements HollowBlobRetriever {
             long fromVersion = Long.parseLong(props.getProperty("fromVersion"));
             long toVersion = Long.parseLong(props.getProperty("toVersion"));
             
-            return new VMSInputDataProxyHollowUpdateTransition(baseProxyURL, localDataDir, keybaseBuilder.getDeltaKeybase(), fromVersion, toVersion, useVMSLZ4);
+            return new VMSInputDataProxyHollowUpdateTransition(baseProxyURL, localDataDir, keybaseBuilder.getDeltaKeybase(), fromVersion, toVersion);
         } catch(Exception e) {
             return null;
         }

@@ -18,7 +18,7 @@ public class VMSInputDataClient extends HollowClient {
     public static final String PROD_PROXY_URL = "http://discovery.cloud.netflix.net:7001/discovery/resolver/cluster/vmshollowloaderblobproxy-vmstools-prod";
 
     public VMSInputDataClient(FileStore fileStore, String converterVip) {
-        super(new VMSDataTransitionCreator(fileStore, converterVip),
+        super(new VMSInputDataTransitionCreator(fileStore, converterVip),
               new VMSInputDataUpdateDirector(fileStore, converterVip),
               HollowUpdateListener.DEFAULT_LISTENER,
               new VMSInputDataAPIFactory(),
@@ -28,7 +28,7 @@ public class VMSInputDataClient extends HollowClient {
     }
 
     public VMSInputDataClient(String baseProxyURL, String localDataDir, String converterVip) {
-        super(new VMSDataProxyTransitionCreator(baseProxyURL, localDataDir, converterVip),
+        super(new VMSInputDataProxyTransitionCreator(baseProxyURL, localDataDir, converterVip),
               new VMSInputDataProxyUpdateDirector(baseProxyURL, converterVip),
               HollowUpdateListener.DEFAULT_LISTENER,
               new VMSInputDataAPIFactory(),

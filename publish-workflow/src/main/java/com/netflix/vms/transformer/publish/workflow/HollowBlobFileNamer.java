@@ -14,14 +14,27 @@ public class HollowBlobFileNamer {
     public String getDeltaFileName(long previousVersion, long nextVersion) {
         return FILENAME_PREFIX + vip + "-delta-" + previousVersion + "-" + nextVersion;
     }
+    
+    public String getNostreamsDeltaFileName(long previousVersion, long nextVersion) {
+        return FILENAME_PREFIX + vip + "_nostreams-delta-" + previousVersion + "-" + nextVersion;
+    }
 
     public String getReverseDeltaFileName(long nextVersion, long previousVersion) {
         return FILENAME_PREFIX + vip + "-reversedelta-" + nextVersion + "-" + previousVersion;
     }
+    
+    public String getNostreamsReverseDeltaFileName(long nextVersion, long previousVersion) {
+        return FILENAME_PREFIX + vip + "_nostreams-reversedelta-" + nextVersion + "-" + previousVersion;
+    }
+    
     public String getSnapshotFileName(long nextVersion) {
         return FILENAME_PREFIX + vip + "-snapshot-" + nextVersion;
     }
 
+    public String getNostreamsSnapshotFileName(long nextVersion) {
+        return FILENAME_PREFIX + vip + "_nostreams-snapshot-" + nextVersion;
+    }
+    
     public String getPinTitleFileName(long version, boolean includeFullPath, int ... topNodes) {
         String suffix = vip + "-pinnedtitle-" + version + "-";
         for (int i = 0; i < topNodes.length; i++) {
