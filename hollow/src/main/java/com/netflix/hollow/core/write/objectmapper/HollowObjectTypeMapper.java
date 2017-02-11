@@ -69,19 +69,26 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 throw new RuntimeException(e);
             }
         } else {
-            Field[] declaredFields = clazz.getDeclaredFields();
-
-            for(int i=0;i<declaredFields.length;i++) {
-                if(!Modifier.isTransient(declaredFields[i].getModifiers()) && 
-                   !Modifier.isStatic(declaredFields[i].getModifiers()) && 
-                   !"__assigned_ordinal".equals(declaredFields[i].getName())) {
-                    
-                    mappedFields.add(new MappedField(declaredFields[i], visited));
+            /// gather fields from type hierarchy
+            Class<?> currentClass = clazz;
+            
+            while(currentClass != Object.class) {
+                Field[] declaredFields = currentClass.getDeclaredFields();
+    
+                for(int i=0;i<declaredFields.length;i++) {
+                    if(!Modifier.isTransient(declaredFields[i].getModifiers()) && 
+                       !Modifier.isStatic(declaredFields[i].getModifiers()) && 
+                       !"__assigned_ordinal".equals(declaredFields[i].getName())) {
+                        
+                        mappedFields.add(new MappedField(declaredFields[i], visited));
+                    }
                 }
+    
+                if(currentClass.isEnum())
+                    mappedFields.add(new MappedField(SpecialField.ENUM_NAME));
+                
+                currentClass = currentClass.getSuperclass();
             }
-
-            if(clazz.isEnum())
-                mappedFields.add(new MappedField(SpecialField.ENUM_NAME));
         }
 
         this.schema = new HollowObjectSchema(typeName, mappedFields.size(), getKeyFieldPaths(clazz));
@@ -107,6 +114,10 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
 
     private static String[] getKeyFieldPaths(Class<?> clazz) {
         HollowPrimaryKey primaryKey = clazz.getAnnotation(HollowPrimaryKey.class);
+        while(primaryKey == null && clazz != Object.class) {
+            clazz = clazz.getSuperclass();
+            primaryKey = clazz.getAnnotation(HollowPrimaryKey.class);
+        }
         return primaryKey == null ? null : primaryKey.fields();
     }
     
