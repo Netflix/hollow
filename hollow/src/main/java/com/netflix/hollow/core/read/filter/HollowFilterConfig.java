@@ -194,7 +194,11 @@ public class HollowFilterConfig {
     }
 
     public int numSpecifiedTypes() {
-        return specifiedFieldConfigs.size();
+        return specifiedTypes.size();
+    }
+    
+    public Set<String> getSpecifiedTypes() {
+        return specifiedTypes;
     }
 
     public ObjectFilterConfig getObjectTypeConfig(String type) {

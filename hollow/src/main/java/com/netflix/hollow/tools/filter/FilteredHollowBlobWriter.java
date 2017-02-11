@@ -25,22 +25,21 @@ import static com.netflix.hollow.tools.filter.FilteredHollowBlobWriterStreamAndF
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
-
-import com.netflix.hollow.core.util.IOUtils;
-import com.netflix.hollow.core.schema.HollowListSchema;
-import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.memory.pool.RecyclingRecycler;
-import com.netflix.hollow.core.read.filter.HollowFilterConfig;
-import com.netflix.hollow.core.read.filter.HollowFilterConfig.ObjectFilterConfig;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.list.HollowListTypeReadState;
 import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.read.engine.set.HollowSetTypeReadState;
+import com.netflix.hollow.core.read.filter.HollowFilterConfig;
+import com.netflix.hollow.core.read.filter.HollowFilterConfig.ObjectFilterConfig;
+import com.netflix.hollow.core.schema.HollowListSchema;
+import com.netflix.hollow.core.schema.HollowMapSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.schema.HollowSetSchema;
+import com.netflix.hollow.core.util.IOUtils;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -48,7 +47,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The FilteredHollowBlobWriter can be used to pre-filter data from serialized blobs before disseminating to
@@ -59,12 +61,12 @@ import java.util.List;
  * security reasons.
  *
  */
-///TODO: This assumes all configured types and fields EXIST.
 public class FilteredHollowBlobWriter {
 
     private final HollowFilterConfig configs[];
     private final HollowBlobHeaderReader headerReader;
     private final ArraySegmentRecycler memoryRecycler;
+    private final Set<String> expectedTypes;
 
     /**
      * A FilteredHollowBlobWriter should be configured with one or more configs.  
@@ -77,6 +79,9 @@ public class FilteredHollowBlobWriter {
         this.configs = configs;
         this.headerReader = new HollowBlobHeaderReader();
         this.memoryRecycler = new RecyclingRecycler();
+        this.expectedTypes = new HashSet<String>();
+        for(HollowFilterConfig config : configs)
+            expectedTypes.addAll(config.getSpecifiedTypes());
     }
 
     /**
@@ -118,9 +123,13 @@ public class FilteredHollowBlobWriter {
             int numTypesAfterFilter = streamFilterConfig.isExcludeFilter() ? numStates - streamFilterConfig.numSpecifiedTypes() : streamFilterConfig.numSpecifiedTypes();
             VarInt.writeVInt(allStreamAndFilters[i].getStream(), numTypesAfterFilter);
         }
+        
+        Set<String> encounteredTypes = new HashSet<String>();
 
         for(int i=0;i<numStates;i++) {
             HollowSchema schema = HollowSchema.readFrom(in);
+            
+            encounteredTypes.add(schema.getName());
 
             int numShards = readNumShards(in);
 
@@ -157,6 +166,8 @@ public class FilteredHollowBlobWriter {
                 }
             }
         }
+        
+        verifyFilteredTypesExisted(encounteredTypes);
     }
 
     private int readNumShards(InputStream is) throws IOException {
@@ -403,6 +414,15 @@ public class FilteredHollowBlobWriter {
             os[i].writeInt(numLongs);
 
         IOUtils.copyBytes(is, os, numLongs * 8);
+    }
+    
+    private void verifyFilteredTypesExisted(Set<String> encounteredTypes) {
+        if(!encounteredTypes.containsAll(expectedTypes)) {
+            List<String> missingTypes = new ArrayList<String>(expectedTypes);
+            missingTypes.removeAll(encounteredTypes);
+            Collections.sort(missingTypes);
+            throw new IllegalArgumentException("The following types were expected, but not encountered: " + missingTypes);
+        }
     }
 
 }
