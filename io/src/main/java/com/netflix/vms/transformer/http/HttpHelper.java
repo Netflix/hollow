@@ -28,8 +28,11 @@ public class HttpHelper {
         return builder.toString();
     }
 
-
     public static InputStream getInputStream(String url) {
+        return getInputStream(url, true);
+    }
+
+    public static InputStream getInputStream(String url, boolean isPrintStackTrace) {
         Throwable thrownException = null;
 
         for(int i=0;i<3;i++) {
@@ -41,14 +44,14 @@ public class HttpHelper {
 
                 while(responseCode != HttpURLConnection.HTTP_OK) {
                     switch(responseCode) {
-                    case HttpURLConnection.HTTP_MOVED_PERM:
-                    case HttpURLConnection.HTTP_MOVED_TEMP:
-                    case HttpURLConnection.HTTP_SEE_OTHER:
-                        urlObj = new URL(conn.getHeaderField("Location"));
-                        conn = (HttpURLConnection) urlObj.openConnection();
-                        responseCode = conn.getResponseCode();
-                    default:
-                        throw new Exception("Received response " + responseCode + " from proxy server");
+                        case HttpURLConnection.HTTP_MOVED_PERM:
+                        case HttpURLConnection.HTTP_MOVED_TEMP:
+                        case HttpURLConnection.HTTP_SEE_OTHER:
+                            urlObj = new URL(conn.getHeaderField("Location"));
+                            conn = (HttpURLConnection) urlObj.openConnection();
+                            responseCode = conn.getResponseCode();
+                        default:
+                            throw new Exception("Received response " + responseCode + " from proxy server");
                     }
                 }
 
@@ -56,7 +59,7 @@ public class HttpHelper {
 
             } catch (Throwable th) {
                 thrownException = th;
-                th.printStackTrace();
+                if (isPrintStackTrace) th.printStackTrace();
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) { }
