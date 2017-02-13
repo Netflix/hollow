@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-public class SchedulePhaseInfo {
+public class SchedulePhaseInfo implements Cloneable{
 	public long start = 0L;
 	public long end = java.lang.Long.MIN_VALUE;
 	public boolean isAbsolute = false;

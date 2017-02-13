@@ -552,8 +552,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
         Set<SchedulePhaseInfo> schedulePhaseInfoSet = getAllScheduleInfo(artworkHollowInput, videoId);
         SchedulePhaseInfo window = getEarliestScheduleInfo(schedulePhaseInfoSet, videoId);
         if (window == null) {
-            ctx.getLogger().warn(InvalidPhaseTagForArtwork, "Undefined phaseTagList in VideoArtwork for videoId={} sourceFileId={}." +
-                    "Data will be dropped", videoId, sourceFileId);
+            ctx.getLogger().warn(InvalidPhaseTagForArtwork, "Undefined phaseTagList in VideoArtwork for videoId={} sourceFileId={}. dData will be dropped", videoId, sourceFileId);
             if(ctx.getConfig().isFilterImagesForArtworkScheduling())
             	return null;
             window = getFarInFutureSchedulePhaseInfo(videoId);

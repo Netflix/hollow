@@ -1,6 +1,5 @@
 package com.netflix.vms.transformer.testutil.repro;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
-
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowBlobWriter;
@@ -30,7 +29,7 @@ public class TransformerScenario {
     private final long outputDataVersion;
     private final int[] topNodesToProcess;
 
-    private String proxyURL = VMSInputDataClient.TEST_PROXY_URL;
+    private String proxyURL = VMSInputDataClient.PROD_PROXY_URL;
 
     private String converterVip;
     private long inputDataVersion;
