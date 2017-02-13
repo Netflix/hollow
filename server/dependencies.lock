@@ -318,7 +318,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -2538,7 +2538,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.34",
+            "locked": "2.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -3688,7 +3688,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -5908,7 +5908,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.34",
+            "locked": "2.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -7058,7 +7058,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -9278,7 +9278,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.34",
+            "locked": "2.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -10428,7 +10428,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -12641,7 +12641,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.34",
+            "locked": "2.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -13813,7 +13813,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -16033,7 +16033,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.34",
+            "locked": "2.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -18275,7 +18275,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -20495,7 +20495,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.34",
+            "locked": "2.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -21645,7 +21645,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -23864,7 +23864,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.34",
+            "locked": "2.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -25003,7 +25003,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -27278,7 +27278,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.34",
+            "locked": "2.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -28491,7 +28491,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -30766,7 +30766,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.34",
+            "locked": "2.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -31979,7 +31979,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -34254,7 +34254,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.34",
+            "locked": "2.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -35467,7 +35467,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -37742,7 +37742,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.34",
+            "locked": "2.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -38936,7 +38936,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -41165,7 +41165,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.34",
+            "locked": "2.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -42323,7 +42323,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -44552,7 +44552,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.34",
+            "locked": "2.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -45710,7 +45710,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -47939,7 +47939,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.34",
+            "locked": "2.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -49097,7 +49097,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -51326,7 +51326,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.34",
+            "locked": "2.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
