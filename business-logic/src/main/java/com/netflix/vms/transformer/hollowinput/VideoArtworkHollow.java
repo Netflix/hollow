@@ -69,6 +69,29 @@ public class VideoArtworkHollow extends HollowObject {
         return  api().getStringHollow(refOrdinal);
     }
 
+    public PhaseTagListHollow _getPhaseTags() {
+        int refOrdinal = delegate().getPhaseTagsOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getPhaseTagListHollow(refOrdinal);
+    }
+
+    public boolean _getIsSmoky() {
+        return delegate().getIsSmoky(ordinal);
+    }
+
+    public Boolean _getIsSmokyBoxed() {
+        return delegate().getIsSmokyBoxed(ordinal);
+    }
+
+    public boolean _getRolloutExclusive() {
+        return delegate().getRolloutExclusive(ordinal);
+    }
+
+    public Boolean _getRolloutExclusiveBoxed() {
+        return delegate().getRolloutExclusiveBoxed(ordinal);
+    }
+
     public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }

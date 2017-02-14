@@ -4,7 +4,6 @@ import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
-
 import java.util.Set;
 
 public class SensitiveVideoServerSideUtil {
@@ -38,14 +37,15 @@ public class SensitiveVideoServerSideUtil {
         return false;
     }
 
-    public static final Date getMetadataAvailabilityDate(Set<VideoSetType> videoSetTypes, Long firstDisplayDate, Long firstPhaseStartDate, Long availabilityDate, Integer prePromoDays, Integer metadataReleaseDays, CycleConstants constants) {
+    public static final Date getMetadataAvailabilityDate(Set<VideoSetType> videoSetTypes, Long firstDisplayDate, Long firstPhaseStartDate, 
+    		Long availabilityDate, Integer prePromoDays, Integer metadataReleaseDays, CycleConstants constants, Long earliestScheduledPhaseDate) {
         Long gracePeriodDate = null;
         if (availabilityDate!=null) {
             int gracePeriodDays = getFirstNonNullValue(0, metadataReleaseDays, prePromoDays);
             gracePeriodDate = availabilityDate.longValue() - (gracePeriodDays * ONE_DAY_AS_MILLIS);
         }
 
-        Long minValue = min(firstDisplayDate, firstPhaseStartDate, availabilityDate, gracePeriodDate);
+        Long minValue = min(firstDisplayDate, firstPhaseStartDate, availabilityDate, gracePeriodDate, earliestScheduledPhaseDate);
         if (minValue == null) {
             if (isExempt(videoSetTypes, constants)) {
                 return constants.EXEMPT_HOLD_BACK_DATE;
