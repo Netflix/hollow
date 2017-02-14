@@ -1,5 +1,11 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
@@ -39,11 +45,6 @@ import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.util.SensitiveVideoServerSideUtil;
 import com.netflix.vms.transformer.util.VideoDateUtil;
 import com.netflix.vms.transformer.util.VideoSetTypeUtil;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class CountrySpecificDataModule {
 
@@ -75,6 +76,21 @@ public class CountrySpecificDataModule {
 
         this.certificationListsModule = new CertificationListsModule(api, constants, indexer);
         this.availabilityWindowModule = new VMSAvailabilityWindowModule(api, ctx, constants, indexer);
+    }
+    
+    @VisibleForTesting
+    CountrySpecificDataModule(TransformerContext ctx){
+        this.api = null;
+        this.ctx = ctx;
+        this.mapper = null;
+        this.constants = null;
+        this.indexer = null;
+        this.videoStatusIdx = null;
+        this.videoGeneralIdx = null;
+        this.rolloutVideoTypeIndex = null;
+
+        this.certificationListsModule = null;
+        this.availabilityWindowModule = null;
     }
 
     public Map<String, Map<Integer, CompleteVideoCountrySpecificData>> buildCountrySpecificDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, 
