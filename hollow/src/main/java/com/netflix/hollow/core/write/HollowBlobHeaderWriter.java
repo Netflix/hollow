@@ -17,9 +17,10 @@
  */
 package com.netflix.hollow.core.write;
 
-import com.netflix.hollow.core.memory.encoding.VarInt;
-
 import com.netflix.hollow.core.HollowBlobHeader;
+import com.netflix.hollow.core.memory.encoding.VarInt;
+import com.netflix.hollow.core.schema.HollowSchema;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class HollowBlobHeaderWriter {
      * @param header
      * @param dos
      */
-    void writeHeader(HollowBlobHeader header, HollowWriteStateEngine stateEngine, DataOutputStream dos) throws IOException {
+    public void writeHeader(HollowBlobHeader header, DataOutputStream dos) throws IOException {
         /// save 4 bytes to indicate FastBlob version header.  This will be changed to indicate backwards incompatibility.
         dos.writeInt(HollowBlobHeader.HOLLOW_BLOB_VERSION_HEADER);
 
@@ -40,6 +41,16 @@ public class HollowBlobHeaderWriter {
         dos.writeLong(header.getOriginRandomizedTag());
         dos.writeLong(header.getDestinationRandomizedTag());
 
+        /// write the schemas contained in this blob to the stream in the pre v2.2.0 backwards compatibility envelope
+        ByteArrayOutputStream schemasStream = new ByteArrayOutputStream();
+        VarInt.writeVInt(schemasStream, header.getSchemas().size());
+        for(HollowSchema schema : header.getSchemas())
+            schema.writeTo(schemasStream);
+        byte[] schemasData = schemasStream.toByteArray();
+        
+        VarInt.writeVInt(dos, schemasData.length + 1); // plus one byte for new backwards compatibility envelope.
+        dos.write(schemasData);
+        
         ///backwards compatibility -- new data can be added here by first indicating number of bytes used, will be skipped by existing readers.
         VarInt.writeVInt(dos, 0);
 
@@ -51,4 +62,5 @@ public class HollowBlobHeaderWriter {
             dos.writeUTF(headerTag.getValue());
         }
     }
+    
 }

@@ -78,6 +78,7 @@ public class FilteredHollowBlobWriterTest {
         filterConfig.addType("String");
         filterConfig.addField("TypeA", "value");
         filterConfig.addField("TypeA", "nonexistentField");
+        filterConfig.addType("NonexistentType");
         
         FilteredHollowBlobWriter blobWriter = new FilteredHollowBlobWriter(filterConfig);
         ByteArrayOutputStream filteredBlobStream = new ByteArrayOutputStream();
@@ -108,24 +109,6 @@ public class FilteredHollowBlobWriterTest {
         Assert.assertEquals(2.2f, new GenericHollowObject(readEngine, "TypeB", 1).getFloat("value"), 0);
         Assert.assertEquals(3, new GenericHollowObject(readEngine, "TypeB", 3).getInt("id"));
         Assert.assertEquals(4.4f, new GenericHollowObject(readEngine, "TypeB", 3).getFloat("value"), 0);
-    }
-    
-    @Test
-    public void failsForNonexistentTypes() throws IOException {
-        HollowFilterConfig filterConfig = new HollowFilterConfig(true);
-        filterConfig.addType("NonexistentType1");
-        filterConfig.addType("NonexistentType2");
-        
-        FilteredHollowBlobWriter blobWriter = new FilteredHollowBlobWriter(filterConfig);
-        ByteArrayOutputStream filteredBlobStream = new ByteArrayOutputStream();
-        
-        try {
-            blobWriter.filterSnapshot(new ByteArrayInputStream(snapshotData), filteredBlobStream);
-            Assert.fail("Expected Exception was not thrown");
-        } catch(IllegalArgumentException expected) {
-            Assert.assertEquals("The following types were expected, but not encountered: [NonexistentType1, NonexistentType2]",
-                                expected.getMessage());
-        }
     }
 
     @SuppressWarnings("unused")

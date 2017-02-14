@@ -17,15 +17,16 @@
  */
 package com.netflix.hollow.core.read.engine;
 
-import com.netflix.hollow.core.memory.encoding.VarInt;
-
 import com.netflix.hollow.core.HollowBlobHeader;
+import com.netflix.hollow.core.memory.encoding.VarInt;
+import com.netflix.hollow.core.schema.HollowSchema;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -48,9 +49,18 @@ public class HollowBlobHeaderReader {
 
         header.setBlobFormatVersion(headerVersion);
 
-        if(headerVersion == HollowBlobHeader.HOLLOW_BLOB_VERSION_HEADER) {
-            header.setOriginRandomizedTag(dis.readLong());
-            header.setDestinationRandomizedTag(dis.readLong());
+        header.setOriginRandomizedTag(dis.readLong());
+        header.setDestinationRandomizedTag(dis.readLong());
+        
+        int oldBytesToSkip = VarInt.readVInt(is); /// pre v2.2.0 envelope
+        
+        if(oldBytesToSkip != 0) {
+            int numSchemas = VarInt.readVInt(is);
+            
+            List<HollowSchema> schemas = new ArrayList<HollowSchema>();
+            for(int i=0;i<numSchemas;i++)
+                schemas.add(HollowSchema.readFrom(is));
+            header.setSchemas(schemas);
 
             int bytesToSkip = VarInt.readVInt(is); /// forwards-compatibility, new data can be added here.
             while(bytesToSkip > 0) {
@@ -59,11 +69,6 @@ public class HollowBlobHeaderReader {
                     throw new EOFException();
                 bytesToSkip -= skippedBytes;
             }
-
-        } else {
-            //old format header
-            //Discard backward compatibility data
-            dis.readUTF();
         }
 
         Map<String, String> headerTags = readHeaderTags(dis);
@@ -85,48 +90,5 @@ public class HollowBlobHeaderReader {
             headerTags.put(dis.readUTF(), dis.readUTF());
         }
         return headerTags;
-    }
-
-    public void copyHeader(DataInputStream dis, DataOutputStream... dos) throws IOException {
-        int headerVersion = dis.readInt();
-        for(int i=0;i<dos.length;i++)
-            dos[i].writeInt(headerVersion);
-
-        if(headerVersion == HollowBlobHeader.HOLLOW_BLOB_VERSION_HEADER) {
-            long originRandomizedTag = dis.readLong();
-            long destRandomizedTag = dis.readLong();
-
-            int bytesToSkip = VarInt.readVInt(dis); /// forwards-compatibility, new data can be added here.
-            while(bytesToSkip > 0) {
-                int skippedBytes = (int)dis.skip(bytesToSkip);
-                if(skippedBytes < 0)
-                    throw new EOFException();
-                bytesToSkip -= skippedBytes;
-            }
-
-            for(int i=0;i<dos.length;i++){
-                dos[i].writeLong(originRandomizedTag);
-                dos[i].writeLong(destRandomizedTag);
-                VarInt.writeVInt(dos[i], 0);
-            }
-        } else {
-            String backwardCompatbilityString = dis.readUTF();
-            for(int i=0;i<dos.length;i++)
-                dos[i].writeUTF(backwardCompatbilityString);
-        }
-
-        int numHeaderTags = dis.readShort();
-        for(int i=0;i<dos.length;i++)
-            dos[i].writeShort(numHeaderTags);
-
-        for(int i=0;i<numHeaderTags;i++) {
-            String headerTagKey = dis.readUTF();
-            String headerTagValue = dis.readUTF();
-
-            for(int j=0;j<dos.length;j++) {
-                dos[j].writeUTF(headerTagKey);
-                dos[j].writeUTF(headerTagValue);
-            }
-        }
     }
 }

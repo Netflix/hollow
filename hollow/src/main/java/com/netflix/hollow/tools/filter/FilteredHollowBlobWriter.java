@@ -22,11 +22,12 @@ import static com.netflix.hollow.core.util.IOUtils.copyVInt;
 import static com.netflix.hollow.core.util.IOUtils.copyVLong;
 import static com.netflix.hollow.tools.filter.FilteredHollowBlobWriterStreamAndFilter.streamsOnly;
 
+import com.netflix.hollow.core.HollowBlobHeader;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
-import com.netflix.hollow.core.memory.pool.RecyclingRecycler;
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.list.HollowListTypeReadState;
 import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
@@ -38,8 +39,10 @@ import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.util.IOUtils;
+import com.netflix.hollow.core.write.HollowBlobHeaderWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -47,7 +50,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -65,6 +67,7 @@ public class FilteredHollowBlobWriter {
 
     private final HollowFilterConfig configs[];
     private final HollowBlobHeaderReader headerReader;
+    private final HollowBlobHeaderWriter headerWriter;
     private final ArraySegmentRecycler memoryRecycler;
     private final Set<String> expectedTypes;
 
@@ -78,7 +81,8 @@ public class FilteredHollowBlobWriter {
     public FilteredHollowBlobWriter(HollowFilterConfig... configs) {
         this.configs = configs;
         this.headerReader = new HollowBlobHeaderReader();
-        this.memoryRecycler = new RecyclingRecycler();
+        this.headerWriter = new HollowBlobHeaderWriter();
+        this.memoryRecycler = WastefulRecycler.DEFAULT_INSTANCE;
         this.expectedTypes = new HashSet<String>();
         for(HollowFilterConfig config : configs)
             expectedTypes.addAll(config.getSpecifiedTypes());
@@ -115,14 +119,18 @@ public class FilteredHollowBlobWriter {
 
         FilteredHollowBlobWriterStreamAndFilter allStreamAndFilters[] = FilteredHollowBlobWriterStreamAndFilter.combine(out, configs);
 
-        headerReader.copyHeader(dis, streamsOnly(allStreamAndFilters));
+        HollowBlobHeader header = headerReader.readHeader(in);
+        
+        List<HollowSchema> unfilteredSchemaList = header.getSchemas(); 
 
-        int numStates = VarInt.readVInt(in);
-        for(int i=0;i<allStreamAndFilters.length;i++) {
-            HollowFilterConfig streamFilterConfig = allStreamAndFilters[i].getConfig();
-            int numTypesAfterFilter = streamFilterConfig.isExcludeFilter() ? numStates - streamFilterConfig.numSpecifiedTypes() : streamFilterConfig.numSpecifiedTypes();
-            VarInt.writeVInt(allStreamAndFilters[i].getStream(), numTypesAfterFilter);
+        for(FilteredHollowBlobWriterStreamAndFilter streamAndFilter : allStreamAndFilters) {
+            List<HollowSchema> filteredSchemaList = getFilteredSchemaList(unfilteredSchemaList, streamAndFilter.getConfig());
+            header.setSchemas(filteredSchemaList);
+            headerWriter.writeHeader(header, streamAndFilter.getStream());
+            VarInt.writeVInt(streamAndFilter.getStream(), filteredSchemaList.size());
         }
+        
+        int numStates = VarInt.readVInt(in);
         
         Set<String> encounteredTypes = new HashSet<String>();
 
@@ -166,8 +174,6 @@ public class FilteredHollowBlobWriter {
                 }
             }
         }
-        
-        verifyFilteredTypesExisted(encounteredTypes);
     }
 
     private int readNumShards(InputStream is) throws IOException {
@@ -211,10 +217,14 @@ public class FilteredHollowBlobWriter {
         
         for(int shard=0;shard<numShards;shard++) {
             int maxShardOrdinal = copyVInt(is, os);
+            int numRecordsToCopy = maxShardOrdinal;
     
             if(delta) {
                 GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(is, os);
-                GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(is, os);
+                GapEncodedVariableLengthIntegerReader addedOrdinals = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(is, memoryRecycler);
+                numRecordsToCopy = addedOrdinals.remainingElements();
+                for(DataOutputStream stream : os)
+                    addedOrdinals.writeTo(stream);
             }
     
             /// SETUP ///
@@ -231,7 +241,7 @@ public class FilteredHollowBlobWriter {
             for(int i=0;i<streamAndFilters.length;i++) {
                 long bitsPerRecord = writeBitsPerField(schema, bitsPerField, filteredObjectSchemas[i], streamAndFilters[i].getStream());
     
-                bitsRequiredPerStream[i] = bitsPerRecord * (maxShardOrdinal + 1);
+                bitsRequiredPerStream[i] = bitsPerRecord * (numRecordsToCopy + 1);
                 fixedLengthArraysPerStream[i] = new FixedLengthElementArray(memoryRecycler,  bitsRequiredPerStream[i]);
                 FixedLengthArrayWriter filteredArrayWriter = new FixedLengthArrayWriter(fixedLengthArraysPerStream[i]);
     
@@ -251,7 +261,7 @@ public class FilteredHollowBlobWriter {
             for(int fieldBits : bitsPerField)
                 bitsPerRecord += fieldBits;
     
-            long stopBit = bitsPerRecord * (maxShardOrdinal + 1);
+            long stopBit = bitsPerRecord * (numRecordsToCopy + 1);
             long bitCursor = 0;
             int fieldCursor = 0;
     
@@ -310,6 +320,28 @@ public class FilteredHollowBlobWriter {
 
         return bitsPerRecord;
     }
+    
+    private List<HollowSchema> getFilteredSchemaList(List<HollowSchema> schemaList, HollowFilterConfig filterConfig) {
+        List<HollowSchema> filteredList = new ArrayList<HollowSchema>();
+        
+        for(HollowSchema schema : schemaList) {
+            HollowSchema filteredSchema = getFilteredSchema(schema, filterConfig);
+            if(filteredSchema != null)
+                filteredList.add(filteredSchema);
+        }
+        
+        return filteredList;
+    }
+    
+    private HollowSchema getFilteredSchema(HollowSchema schema, HollowFilterConfig filterConfig) {
+        if(filterConfig.doesIncludeType(schema.getName())) {
+            if(schema.getSchemaType() == SchemaType.OBJECT)
+                return getFilteredObjectSchema((HollowObjectSchema) schema, filterConfig);
+            return schema;
+        }
+        
+        return null;
+    }
 
     private HollowObjectSchema getFilteredObjectSchema(HollowObjectSchema schema, HollowFilterConfig filterConfig) {
         ObjectFilterConfig typeConfig = filterConfig.getObjectTypeConfig(schema.getName());
@@ -317,17 +349,18 @@ public class FilteredHollowBlobWriter {
         int numIncludedFields = 0;
 
         for(int i=0;i<schema.numFields();i++) {
-            if(typeConfig.includesField(schema.getFieldName(i))) {
+            if(typeConfig.includesField(schema.getFieldName(i)))
                 numIncludedFields++;
-            }
         }
 
+        if(numIncludedFields == schema.numFields())
+            return schema;
+        
         HollowObjectSchema filteredSchema = new HollowObjectSchema(schema.getName(), numIncludedFields, schema.getPrimaryKey());
 
         for(int i=0;i<schema.numFields();i++) {
-            if(typeConfig.includesField(schema.getFieldName(i))) {
+            if(typeConfig.includesField(schema.getFieldName(i)))
                 filteredSchema.addField(schema.getFieldName(i), schema.getFieldType(i), schema.getReferencedType(i));
-            }
         }
 
         return filteredSchema;
@@ -416,13 +449,4 @@ public class FilteredHollowBlobWriter {
         IOUtils.copyBytes(is, os, numLongs * 8);
     }
     
-    private void verifyFilteredTypesExisted(Set<String> encounteredTypes) {
-        if(!encounteredTypes.containsAll(expectedTypes)) {
-            List<String> missingTypes = new ArrayList<String>(expectedTypes);
-            missingTypes.removeAll(encounteredTypes);
-            Collections.sort(missingTypes);
-            throw new IllegalArgumentException("The following types were expected, but not encountered: " + missingTypes);
-        }
-    }
-
 }

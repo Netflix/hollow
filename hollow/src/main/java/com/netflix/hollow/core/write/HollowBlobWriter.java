@@ -17,8 +17,9 @@
  */
 package com.netflix.hollow.core.write;
 
-import com.netflix.hollow.core.memory.encoding.VarInt;
+import java.util.ArrayList;
 
+import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.HollowBlobHeader;
@@ -48,7 +49,7 @@ public class HollowBlobWriter {
         stateEngine.prepareForWrite();
 
         DataOutputStream dos = new DataOutputStream(os);
-        writeHeader(dos, false);
+        writeHeader(dos, stateEngine.getSchemas(), false);
 
         VarInt.writeVInt(dos, stateEngine.getOrderedTypeStates().size());
 
@@ -88,10 +89,12 @@ public class HollowBlobWriter {
         if(stateEngine.isRestored())
             stateEngine.ensureAllNecessaryStatesRestored();
 
+        List<HollowSchema> changedTypes = changedTypes();
+        
         DataOutputStream dos = new DataOutputStream(os);
-        writeHeader(dos, false);
+        writeHeader(dos, changedTypes, false);
 
-        VarInt.writeVInt(dos, numChangedTypes());
+        VarInt.writeVInt(dos, changedTypes.size());
 
         SimultaneousExecutor executor = new SimultaneousExecutor();
 
@@ -131,11 +134,13 @@ public class HollowBlobWriter {
         
         if(stateEngine.isRestored())
             stateEngine.ensureAllNecessaryStatesRestored();
+        
+        List<HollowSchema> changedTypes = changedTypes();
 
         DataOutputStream dos = new DataOutputStream(os);
-        writeHeader(dos, true);
+        writeHeader(dos, changedTypes, true);
 
-        VarInt.writeVInt(dos, numChangedTypes());
+        VarInt.writeVInt(dos, changedTypes.size());
 
         SimultaneousExecutor executor = new SimultaneousExecutor();
 
@@ -166,14 +171,14 @@ public class HollowBlobWriter {
         }
     }
 
-    private int numChangedTypes() {
-        int changedTypes = 0;
-
+    private List<HollowSchema> changedTypes() {
+        List<HollowSchema> changedTypes = new ArrayList<HollowSchema>();
+        
         List<HollowTypeWriteState> orderedTypeStates = stateEngine.getOrderedTypeStates();
         for(int i=0;i<orderedTypeStates.size();i++) {
             HollowTypeWriteState writeState = orderedTypeStates.get(i);
             if(writeState.hasChangedSinceLastCycle())
-                changedTypes++;
+                changedTypes.add(writeState.getSchema());
         }
 
         return changedTypes;
@@ -188,7 +193,7 @@ public class HollowBlobWriter {
         VarInt.writeVInt(dos, numShards);
     }
 
-    private void writeHeader(DataOutputStream os, boolean isReverseDelta) throws IOException {
+    private void writeHeader(DataOutputStream os, List<HollowSchema> schemasToInclude, boolean isReverseDelta) throws IOException {
         HollowBlobHeader header = new HollowBlobHeader();
         header.setHeaderTags(stateEngine.getHeaderTags());
         if(isReverseDelta) {
@@ -198,6 +203,7 @@ public class HollowBlobWriter {
             header.setOriginRandomizedTag(stateEngine.getPreviousStateRandomizedTag());
             header.setDestinationRandomizedTag(stateEngine.getNextStateRandomizedTag());
         }
-        headerWriter.writeHeader(header, stateEngine, os);
+        header.setSchemas(schemasToInclude);
+        headerWriter.writeHeader(header, os);
     }
 }

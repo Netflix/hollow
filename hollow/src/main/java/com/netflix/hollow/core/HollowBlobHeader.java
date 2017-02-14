@@ -17,7 +17,10 @@
  */
 package com.netflix.hollow.core;
 
+import com.netflix.hollow.core.schema.HollowSchema;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -44,12 +47,21 @@ public class HollowBlobHeader {
     public static final int HOLLOW_BLOB_VERSION_HEADER = 1030;
 
     private Map<String, String> headerTags = new HashMap<String, String>();
+    private List<HollowSchema> schemas = new ArrayList<HollowSchema>();
     private long originRandomizedTag;
     private long destinationRandomizedTag;
     private int blobFormatVersion = HOLLOW_BLOB_VERSION_HEADER;
 
     public Map<String, String> getHeaderTags() {
         return headerTags;
+    }
+    
+    public void setSchemas(List<HollowSchema> schemas) {
+        this.schemas = schemas;
+    }
+    
+    public List<HollowSchema> getSchemas() {
+        return schemas;
     }
 
     public void setHeaderTags(Map<String, String> headerTags) {

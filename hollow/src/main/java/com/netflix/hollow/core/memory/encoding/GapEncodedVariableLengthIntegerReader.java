@@ -18,12 +18,12 @@
 package com.netflix.hollow.core.memory.encoding;
 
 import com.netflix.hollow.core.memory.SegmentedByteArray;
-
-import com.netflix.hollow.core.util.IOUtils;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.util.IOUtils;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 public class GapEncodedVariableLengthIntegerReader {
 
@@ -72,10 +72,24 @@ public class GapEncodedVariableLengthIntegerReader {
         nextElement = 0;
         advance();
     }
+    
+    public int remainingElements() {
+        int remainingElementCount = 0;
+        while(nextElement != Integer.MAX_VALUE) {
+            remainingElementCount++;
+            advance();
+        }
+        return remainingElementCount;
+    }
 
     public void destroy() {
         if(data != null)
             data.destroy();
+    }
+    
+    public void writeTo(OutputStream os) throws IOException {
+        VarInt.writeVInt(os, numBytes);
+        data.writeTo(os, 0, numBytes);
     }
 
     public static GapEncodedVariableLengthIntegerReader readEncodedDeltaOrdinals(DataInputStream dis, ArraySegmentRecycler memoryRecycler) throws IOException {
