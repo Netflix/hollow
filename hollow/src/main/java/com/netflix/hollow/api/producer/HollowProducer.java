@@ -26,6 +26,7 @@ import com.netflix.hollow.api.client.HollowBlobRetriever;
 import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.ReadState;
+import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
@@ -48,6 +49,7 @@ public class HollowProducer {
     private final Announcer announcer;
     private final HollowWriteStateEngine writeEngine;
     private final HollowObjectMapper objectMapper;
+    private final ListenerSupport listeners;
 
     private HollowStateTransition announced;
 
@@ -74,35 +76,39 @@ public class HollowProducer {
         writeEngine = new HollowWriteStateEngine();
         objectMapper = new HollowObjectMapper(writeEngine);
         announced = new HollowStateTransition();
+        listeners = new ListenerSupport();
     }
 
     public void initializeDataModel(Class<?>...classes) {
         for(Class<?> c : classes)
             objectMapper.initializeTypeState(c);
+        listeners.fireProducerInit();
     }
 
     public HollowProducer restore(HollowConsumer.AnnouncementRetriever announcementRetriever,
             HollowBlobRetriever blobRetriever) {
         try {
-            System.out.println("RESTORE PRIOR STATE...");
             long stateVersion = announcementRetriever.get();
             if(stateVersion != Long.MIN_VALUE) {
                 // TODO: timt: use HollowConsumer
                 HollowClient client = new HollowClient(blobRetriever);
                 client.triggerRefreshTo(stateVersion);
+                // FIXME: timt: should fail if we didn't make it to the announced version
                 restoreFrom(client.getStateEngine(), client.getCurrentVersionId());
-                System.out.format("RESUMING DELTA CHAIN AT %s\n", client.getCurrentVersionId());
+                listeners.fireProducerRestore(announced);
             } else {
+                // TODO: timt: notify listeners
                 System.out.println("RESTORE UNAVAILABLE; PRODUCING NEW DELTA CHAIN");
             }
         } catch(Exception ex) {
+            // TODO: timt: notify listeners
             ex.printStackTrace();
             System.out.println("RESTORE UNAVAILABLE; PRODUCING NEW DELTA CHAIN");
         }
         return this;
     }
 
-    public HollowProducer restoreFrom(HollowReadStateEngine priorAnnouncedState, long priorAnnouncedVersion) {
+    private HollowProducer restoreFrom(HollowReadStateEngine priorAnnouncedState, long priorAnnouncedVersion) {
         writeEngine.restoreFrom(priorAnnouncedState);
         announced = new HollowStateTransition(priorAnnouncedVersion);
         return this;
@@ -112,37 +118,53 @@ public class HollowProducer {
      * Each cycle produces a single state.
      */
     public void runCycle(Populator task) {
+        WriteState writeState = null;
+        ProducerStatus cycleStatus = ProducerStatus.unknownFailure();
         try {
-            WriteState writeState = beginCycle(announced.advance(versionMinter.mint()));
+            HollowConsumer.ReadState readState = null;
+            writeState = beginCycle(announced.advance(versionMinter.mint()));
             task.populate(writeState);
             if(writeEngine.hasChangedSinceLastCycle()) {
                 publish(writeState);
-                integrityCheck();
-                validate();
-                announced = announce(writeState);
+                readState = integrityCheck(writeState);
+                validate(writeState.getTransition().getToVersion(), readState);
+                announced = announce(writeState, readState);
             } else {
-                // TODO: timt: replace with listener notification
-                System.out.println("NO SOURCE DATA CHANGES. NOTHING TO DO THIS CYCLE.");
                 writeEngine.resetToLastPrepareForNextCycle();
+                listeners.fireNoDelta(writeState.getTransition());
             }
+            cycleStatus = ProducerStatus.success(writeState.getTransition(), readState);
         } catch(Throwable th) {
             th.printStackTrace();
             rollback();
+            if(writeState != null) cycleStatus = ProducerStatus.fail(writeState.getTransition(), th);
+        } finally {
+            listeners.fireCycleComplete(cycleStatus);
         }
     }
 
+    public void addListener(HollowProducerListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeListener(HollowProducerListener listener) {
+        listeners.remove(listener);
+    }
+
     private WriteState beginCycle(HollowStateTransition transition) {
+        listeners.fireCycleStart(transition);
         writeEngine.prepareForNextCycle();
         WriteState writeState = new WriteStateImpl(objectMapper, transition);
-        System.out.format("PRODUCING %s\n", transition);
         return writeState;
     }
 
     private void publish(WriteState writeState) throws IOException {
+        listeners.firePublishStart(writeState.getTransition());
         HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
         HollowStateTransition transition = writeState.getTransition();
 
         Blob snapshot = publisher.openSnapshot(transition);
+        ProducerStatus publishStatus = ProducerStatus.unknownFailure();
         try {
             writer.writeSnapshot(snapshot.getOutputStream());
 
@@ -170,12 +192,17 @@ public class HollowProducer {
             } catch(Throwable ignored) {
                 ignored.printStackTrace(); // TODO: timt: log and notify listerners
             }
+            publishStatus = ProducerStatus.success(writeState.getTransition());
+        } catch(Throwable th) {
+            publishStatus = ProducerStatus.fail(writeState.getTransition(), th);
+            throw th;
         } finally {
+            listeners.firePublishComplete(publishStatus);
             snapshot.close();
         }
     }
 
-    private void integrityCheck() {
+    private ReadState integrityCheck(WriteState writeState) {
         /// Given
         ///
         /// 1. read state (S1) at the previous announced version
@@ -185,21 +212,57 @@ public class HollowProducer {
         ///
         /// S1.apply(forward delta).checksum == S2.checksum
         /// S2.apply(reverse delta).checksum == S1.checksum
+        listeners.fireIntegrityCheckStart(writeState.getTransition());
+        ProducerStatus integrityCheckStatus = ProducerStatus.unknownFailure();
+        try {
+            ReadState fromReadState = null;
+            ReadState toReadState = null;
+
+            // FIXME: timt: do the integrity checks, leaving (S2) assigned to `toReadState`
+
+            integrityCheckStatus = ProducerStatus.success(writeState.getTransition(), toReadState);
+            return null;
+        } catch(Throwable th) {
+            integrityCheckStatus = ProducerStatus.fail(writeState.getTransition(), th);
+            throw th;
+        } finally {
+            listeners.fireIntegrityCheckComplete(integrityCheckStatus);
+        }
+
     }
 
-    private void validate() {
-        validator.validate(null);
+    private void validate(long version, ReadState readState) {
+        listeners.fireValidationStart(version);
+        ProducerStatus validationStatus = ProducerStatus.unknownFailure();
+        try {
+            validator.validate(null);
+            validationStatus = ProducerStatus.success(version, readState);
+        } catch (Throwable th) {
+            validationStatus = ProducerStatus.fail(version, th);
+            throw th;
+        } finally {
+            listeners.fireValidationComplete(validationStatus);
+        }
     }
 
-    private HollowStateTransition announce(WriteState writeState) {
-        HollowStateTransition transition = writeState.getTransition();
-        announcer.announce(transition.getToVersion());
-        return transition;
+    private HollowStateTransition announce(WriteState writeState, ReadState readState) {
+        ProducerStatus announcementStatus = ProducerStatus.unknownFailure();
+        try {
+            HollowStateTransition transition = writeState.getTransition();
+            listeners.fireAnnouncementStart(transition);
+            announcer.announce(transition.getToVersion());
+            announcementStatus = ProducerStatus.success(transition, readState);
+            return transition;
+        } catch(Throwable th) {
+            announcementStatus = ProducerStatus.fail(writeState.getTransition(), th);
+            throw th;
+        } finally {
+            listeners.fireAnnouncementComplete(announcementStatus);
+        }
     }
 
     private void rollback() {
         writeEngine.resetToLastPrepareForNextCycle();
-        System.out.format("ROLLED BACK\n");
     }
 
     public static interface VersionMinter {
