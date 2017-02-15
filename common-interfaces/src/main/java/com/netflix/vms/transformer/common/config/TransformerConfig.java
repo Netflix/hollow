@@ -199,6 +199,6 @@ public interface TransformerConfig {
     @DefaultValue("false")
     public boolean isFilterImagesForArtworkScheduling();
     
-    @DefaultValue("false")
+    @DefaultValue("true")
     public boolean isUseSchedulePhasesInAvailabilityDateCalc();
 }
