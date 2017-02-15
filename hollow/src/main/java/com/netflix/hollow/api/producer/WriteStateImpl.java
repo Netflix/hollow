@@ -17,7 +17,6 @@
  */
 package com.netflix.hollow.api.producer;
 
-import com.netflix.hollow.api.HollowStateTransition;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 
@@ -29,9 +28,9 @@ import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 final class WriteStateImpl implements HollowProducer.WriteState {
 
     private final HollowObjectMapper objectMapper;
-    private final HollowStateTransition transition;
+    private final HollowProducer.Transition transition;
 
-    protected WriteStateImpl(HollowObjectMapper objectMapper, HollowStateTransition transition) {
+    protected WriteStateImpl(HollowObjectMapper objectMapper, HollowProducer.Transition transition) {
         this.objectMapper = objectMapper;
         this.transition = transition;
     }
@@ -52,8 +51,8 @@ final class WriteStateImpl implements HollowProducer.WriteState {
     }
 
     @Override
-    public HollowStateTransition getTransition() {
-        return transition;
+    public long getVersion() {
+        return transition.getToVersion();
     }
 
 }

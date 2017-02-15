@@ -2,7 +2,6 @@ package com.netflix.hollow.api.producer;
 
 import java.util.EventListener;
 
-import com.netflix.hollow.api.HollowStateTransition;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 
 /**
@@ -137,12 +136,9 @@ public interface HollowProducerListener extends EventListener {
         private final Throwable throwable;
         private final HollowConsumer.ReadState readState;
 
-        static ProducerStatus success(HollowStateTransition transition) {
-            return success(transition, null);
-        }
 
-        static ProducerStatus success(HollowStateTransition transition, HollowConsumer.ReadState readState) {
-            return success(transition.getToVersion(), readState);
+        static ProducerStatus success(long version) {
+            return success(version, null);
         }
 
         static ProducerStatus success(long version, HollowConsumer.ReadState readState) {
@@ -151,10 +147,6 @@ public interface HollowProducerListener extends EventListener {
 
         static ProducerStatus unknownFailure() {
             return fail(Long.MIN_VALUE, null);
-        }
-
-        static ProducerStatus fail(HollowStateTransition transition, Throwable th) {
-            return fail(transition.getToVersion(), th);
         }
 
         static ProducerStatus fail(long version, Throwable th) {

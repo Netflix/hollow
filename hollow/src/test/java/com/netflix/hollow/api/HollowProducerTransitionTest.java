@@ -8,25 +8,17 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
-public final class StateTransitionTest {
+import com.netflix.hollow.api.producer.HollowProducer;
 
-    HollowStateTransition subject;
+import com.netflix.hollow.api.producer.HollowProducer.Transition;
 
-    @Test
-    public void discontinuous(){
-        subject = new HollowStateTransition();
+public final class HollowProducerTransitionTest {
 
-        assertThat(subject.getFromVersion(), equalTo(Long.MIN_VALUE));
-        assertThat(subject.getToVersion(), equalTo(Long.MIN_VALUE));
-
-        assertTrue(subject.isDiscontinous());
-        assertFalse(subject.isSnapshot());
-        assertFalse(subject.isDelta());
-    }
+    HollowProducer.Transition subject;
 
     @Test
     public void snapshot() {
-        subject = new HollowStateTransition(13L);
+        subject = new Transition(13L);
 
         assertThat(subject.getFromVersion(), equalTo(Long.MIN_VALUE));
         assertThat(subject.getToVersion(), equalTo(13L));
@@ -38,7 +30,7 @@ public final class StateTransitionTest {
 
     @Test
     public void delta() {
-        subject = new HollowStateTransition(2L, 3L);
+        subject = new HollowProducer.Transition(2L, 3L);
 
         assertThat(subject.getFromVersion(), equalTo(2L));
         assertThat(subject.getToVersion(), equalTo(3L));
@@ -50,9 +42,7 @@ public final class StateTransitionTest {
 
     @Test
     public void advancing() {
-        subject = new HollowStateTransition();
-
-        subject = subject.advance(6L);
+        subject = new Transition(6L);
 
         assertThat(subject.getFromVersion(), equalTo(Long.MIN_VALUE));
         assertThat(subject.getToVersion(), equalTo(6L));
@@ -69,7 +59,7 @@ public final class StateTransitionTest {
 
     @Test
     public void reversing() {
-        subject = new HollowStateTransition(21L, 22L);
+        subject = new Transition(21L, 22L);
 
         assertTrue(subject.isForwardDelta());
         assertFalse(subject.isReverseDelta());
@@ -82,12 +72,7 @@ public final class StateTransitionTest {
         assertTrue(subject.isReverseDelta());
 
         try {
-            new HollowStateTransition().reverse();
-            fail("expected exception");
-        } catch(IllegalStateException expected){}
-
-        try {
-            new HollowStateTransition(1L).reverse();
+            new Transition(1L).reverse();
             fail("expected exception");
         } catch(IllegalStateException expected){}
     }

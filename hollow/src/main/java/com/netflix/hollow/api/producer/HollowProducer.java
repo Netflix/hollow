@@ -21,7 +21,6 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.netflix.hollow.api.HollowStateTransition;
 import com.netflix.hollow.api.client.HollowBlobRetriever;
 import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.api.consumer.HollowConsumer;
@@ -51,7 +50,7 @@ public class HollowProducer {
     private final HollowObjectMapper objectMapper;
     private final ListenerSupport listeners;
 
-    private HollowStateTransition announced;
+    private Transition announced = null;
 
     public HollowProducer(HollowProducer.Publisher publisher,
             HollowProducer.Announcer announcer ) {
@@ -75,7 +74,6 @@ public class HollowProducer {
 
         writeEngine = new HollowWriteStateEngine();
         objectMapper = new HollowObjectMapper(writeEngine);
-        announced = new HollowStateTransition();
         listeners = new ListenerSupport();
     }
 
@@ -95,7 +93,7 @@ public class HollowProducer {
                 client.triggerRefreshTo(stateVersion);
                 // FIXME: timt: should fail if we didn't make it to the announced version
                 restoreFrom(client.getStateEngine(), client.getCurrentVersionId());
-                listeners.fireProducerRestore(announced);
+                listeners.fireProducerRestore(announced.getToVersion());
             } else {
                 // TODO: timt: notify listeners
                 System.out.println("RESTORE UNAVAILABLE; PRODUCING NEW DELTA CHAIN");
@@ -110,7 +108,7 @@ public class HollowProducer {
 
     private HollowProducer restoreFrom(HollowReadStateEngine priorAnnouncedState, long priorAnnouncedVersion) {
         writeEngine.restoreFrom(priorAnnouncedState);
-        announced = new HollowStateTransition(priorAnnouncedVersion);
+        announced = new Transition(priorAnnouncedVersion);
         return this;
     }
 
@@ -122,22 +120,24 @@ public class HollowProducer {
         ProducerStatus cycleStatus = ProducerStatus.unknownFailure();
         try {
             HollowConsumer.ReadState readState = null;
-            writeState = beginCycle(announced.advance(versionMinter.mint()));
+            Transition transition = announced.advance(versionMinter.mint());
+            writeState = beginCycle(transition);
             task.populate(writeState);
             if(writeEngine.hasChangedSinceLastCycle()) {
-                publish(writeState);
+                publish(transition, writeState);
                 readState = integrityCheck(writeState);
-                validate(writeState.getTransition().getToVersion(), readState);
-                announced = announce(writeState, readState);
+                validate(writeState.getVersion(), readState);
+                announce(writeState, readState);
+                announced = transition;
             } else {
                 writeEngine.resetToLastPrepareForNextCycle();
-                listeners.fireNoDelta(writeState.getTransition());
+                listeners.fireNoDelta(writeState.getVersion());
             }
-            cycleStatus = ProducerStatus.success(writeState.getTransition(), readState);
+            cycleStatus = ProducerStatus.success(writeState.getVersion(), readState);
         } catch(Throwable th) {
             th.printStackTrace();
             rollback();
-            if(writeState != null) cycleStatus = ProducerStatus.fail(writeState.getTransition(), th);
+            if(writeState != null) cycleStatus = ProducerStatus.fail(writeState.getVersion(), th);
         } finally {
             listeners.fireCycleComplete(cycleStatus);
         }
@@ -151,17 +151,17 @@ public class HollowProducer {
         listeners.remove(listener);
     }
 
-    private WriteState beginCycle(HollowStateTransition transition) {
-        listeners.fireCycleStart(transition);
+    private WriteState beginCycle(Transition transition) {
+        listeners.fireCycleStart(transition.getToVersion());
         writeEngine.prepareForNextCycle();
         WriteState writeState = new WriteStateImpl(objectMapper, transition);
         return writeState;
     }
 
-    private void publish(WriteState writeState) throws IOException {
-        listeners.firePublishStart(writeState.getTransition());
+    private void publish(Transition transition, WriteState writeState) throws IOException {
+        long version = writeState.getVersion();
+        listeners.firePublishStart(version);
         HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
-        HollowStateTransition transition = writeState.getTransition();
 
         Blob snapshot = publisher.openSnapshot(transition);
         ProducerStatus publishStatus = ProducerStatus.unknownFailure();
@@ -192,9 +192,9 @@ public class HollowProducer {
             } catch(Throwable ignored) {
                 ignored.printStackTrace(); // TODO: timt: log and notify listerners
             }
-            publishStatus = ProducerStatus.success(writeState.getTransition());
+            publishStatus = ProducerStatus.success(version);
         } catch(Throwable th) {
-            publishStatus = ProducerStatus.fail(writeState.getTransition(), th);
+            publishStatus = ProducerStatus.fail(version, th);
             throw th;
         } finally {
             listeners.firePublishComplete(publishStatus);
@@ -212,7 +212,8 @@ public class HollowProducer {
         ///
         /// S1.apply(forward delta).checksum == S2.checksum
         /// S2.apply(reverse delta).checksum == S1.checksum
-        listeners.fireIntegrityCheckStart(writeState.getTransition());
+        long version = writeState.getVersion();
+        listeners.fireIntegrityCheckStart(version);
         ProducerStatus integrityCheckStatus = ProducerStatus.unknownFailure();
         try {
             ReadState fromReadState = null;
@@ -220,10 +221,10 @@ public class HollowProducer {
 
             // FIXME: timt: do the integrity checks, leaving (S2) assigned to `toReadState`
 
-            integrityCheckStatus = ProducerStatus.success(writeState.getTransition(), toReadState);
+            integrityCheckStatus = ProducerStatus.success(version, toReadState);
             return null;
         } catch(Throwable th) {
-            integrityCheckStatus = ProducerStatus.fail(writeState.getTransition(), th);
+            integrityCheckStatus = ProducerStatus.fail(version, th);
             throw th;
         } finally {
             listeners.fireIntegrityCheckComplete(integrityCheckStatus);
@@ -245,16 +246,15 @@ public class HollowProducer {
         }
     }
 
-    private HollowStateTransition announce(WriteState writeState, ReadState readState) {
+    private void announce(WriteState writeState, ReadState readState) {
+        long version = writeState.getVersion();
         ProducerStatus announcementStatus = ProducerStatus.unknownFailure();
         try {
-            HollowStateTransition transition = writeState.getTransition();
-            listeners.fireAnnouncementStart(transition);
-            announcer.announce(transition.getToVersion());
-            announcementStatus = ProducerStatus.success(transition, readState);
-            return transition;
+            listeners.fireAnnouncementStart(version);
+            announcer.announce(version);
+            announcementStatus = ProducerStatus.success(version, readState);
         } catch(Throwable th) {
-            announcementStatus = ProducerStatus.fail(writeState.getTransition(), th);
+            announcementStatus = ProducerStatus.fail(writeState.getVersion(), th);
             throw th;
         } finally {
             listeners.fireAnnouncementComplete(announcementStatus);
@@ -287,14 +287,13 @@ public class HollowProducer {
 
         HollowWriteStateEngine getStateEngine();
 
-        // TODO: timt: change to getVersion:long
-        HollowStateTransition getTransition();
+        long getVersion();
     }
 
     public static interface Publisher {
-        public HollowProducer.Blob openSnapshot(HollowStateTransition transition);
-        public HollowProducer.Blob openDelta(HollowStateTransition transition);
-        public HollowProducer.Blob openReverseDelta(HollowStateTransition transition);
+        public HollowProducer.Blob openSnapshot(Transition transition);
+        public HollowProducer.Blob openDelta(Transition transition);
+        public HollowProducer.Blob openReverseDelta(Transition transition);
 
         public void publish(HollowProducer.Blob blob);
     }
@@ -312,6 +311,141 @@ public class HollowProducer {
 
     public static interface Announcer {
         public void announce(long stateVersion);
+    }
+
+    /**
+     * Immutable class representing a single point along the delta chain.
+     *
+     * @author Tim Taylor {@literal<timt@netflix.com>}
+     */
+    public static final class Transition {
+
+        private final long fromVersion;
+        private final long toVersion;
+
+        /**
+         * Creates a transition capable of being used to restore from a delta chain at
+         * the specified version, a.k.a. a snapshot.<p>
+         *
+         * Consumers can initialize their read state from a snapshot corresponding to
+         * this transition; an already initialized consumer can only utilize
+         * this by performing a double snapshot.<p>
+         *
+         * A producer would use this transition to restore from a previous announced state in order
+         * to resume producing on that delta chain by calling {@link #advance(long)} when ready to
+         * produce the next state.
+         *
+         * @see <a href="http://hollow.how/advanced-topics/#double-snapshots">Double Snapshot</a>
+         */
+        public Transition(long toVersion) {
+            this(Long.MIN_VALUE, toVersion);
+        }
+
+        /**
+         * Creates a transition fully representing a transition within the delta chain, a.k.a. a delta, between
+         * {@code fromVersion} and {@code toVersion}.
+         */
+        public Transition(long fromVersion, long toVersion) {
+            this.fromVersion = fromVersion;
+            this.toVersion = toVersion;
+        }
+
+        /**
+         * Returns a new transition representing the transition from this state's {@code toVersion} to the specified version;
+         * equivalent to calling {@code new StateTransition(this.toVersion, nextVersion)}.
+         *
+         * <pre>
+         * <code>
+         * [13,45].advance(72) == [45,72]
+         * </code>
+         * </pre>
+         *
+         * @param nextVersion the next version to transition to
+         *
+         * @return a new state transition with its {@code fromVersion} and {@code toVersion} assigned our {@code toVersion} and
+         *     the specified {@code nextVersion} respectively
+         */
+        public Transition advance(long nextVersion) {
+            return new Transition(toVersion, nextVersion);
+        }
+
+        /**
+         * Returns a new transition with versions swapped. Only valid on deltas.
+
+         * <pre>
+         * <code>
+         * [13,45].reverse() == [45,13]
+         * </code>
+         * </pre>
+
+         * @return
+         *
+         * @throws IllegalStateException if this transition isn't a delta
+         */
+        public Transition reverse() {
+            if(isDiscontinous() || isSnapshot()) throw new IllegalStateException("must be a delta");
+            return new Transition(this.toVersion, this.fromVersion);
+        }
+
+        public long getFromVersion() {
+            return fromVersion;
+        }
+
+        public long getToVersion() {
+            return toVersion;
+        }
+
+        /**
+         * Determines whether this transition represents a new or broken delta chain.
+         *
+         * @return true if this has neither a {@code fromVersion} nor a {@code toVersion}; false otherwise.
+         */
+        public boolean isDiscontinous() {
+            return fromVersion == Long.MIN_VALUE && toVersion == Long.MIN_VALUE;
+        }
+
+        /**
+         * Determines whether this state represents a delta, e.g. a transition between two state versions.
+         *
+         * @return true if this has a {@code fromVersion} and {@code toVersion}; false otherwise
+         */
+        public boolean isDelta() {
+            return fromVersion != Long.MIN_VALUE && toVersion != Long.MIN_VALUE;
+        }
+
+        public boolean isForwardDelta() {
+            return isDelta() && fromVersion < toVersion;
+        }
+
+        public boolean isReverseDelta() {
+            return isDelta() && fromVersion > toVersion;
+        }
+
+        public boolean isSnapshot() {
+            return !isDiscontinous() && !isDelta();
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            if(isDiscontinous()) {
+                sb.append("new/broken delta chain");
+            } else if(isDelta()) {
+                if(isReverseDelta()) sb.append("reverse");
+                sb.append("delta [");
+                sb.append(fromVersion);
+                if(isForwardDelta()) sb.append(" -> ");
+                else sb.append(" <- ");
+                sb.append(toVersion);
+                sb.append("]");
+            } else {
+                sb.append("snapshot [");
+                sb.append(toVersion);
+                sb.append("]");
+            }
+            return sb.toString();
+        }
+
     }
 
 }
