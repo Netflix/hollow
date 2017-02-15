@@ -5,7 +5,8 @@ package com.netflix.hollow.api;
  *
  * @author Tim Taylor {@literal<timt@netflix.com>}
  */
-public final class StateTransition {
+// TODO: timt: remove from public API
+public final class HollowStateTransition {
 
     private final long fromVersion;
     private final long toVersion;
@@ -18,7 +19,8 @@ public final class StateTransition {
      * Calling {@link #advance(long)} on this transition will return new a transition representing
      * the first state produced on this chain, i.e. the first snapshot.
      */
-    public StateTransition() {
+    // TODO: timt: don't need discontinous states, remove
+    public HollowStateTransition() {
         this(Long.MIN_VALUE, Long.MIN_VALUE);
     }
 
@@ -36,7 +38,7 @@ public final class StateTransition {
      *
      * @see <a href="http://hollow.how/advanced-topics/#double-snapshots">Double Snapshot</a>
      */
-    public StateTransition(long toVersion) {
+    public HollowStateTransition(long toVersion) {
         this(Long.MIN_VALUE, toVersion);
     }
 
@@ -44,7 +46,7 @@ public final class StateTransition {
      * Creates a transition fully representing a transition within the delta chain, a.k.a. a delta, between
      * {@code fromVersion} and {@code toVersion}.
      */
-    public StateTransition(long fromVersion, long toVersion) {
+    public HollowStateTransition(long fromVersion, long toVersion) {
         this.fromVersion = fromVersion;
         this.toVersion = toVersion;
     }
@@ -64,8 +66,8 @@ public final class StateTransition {
      * @return a new state transition with its {@code fromVersion} and {@code toVersion} assigned our {@code toVersion} and
      *     the specified {@code nextVersion} respectively
      */
-    public StateTransition advance(long nextVersion) {
-        return new StateTransition(toVersion, nextVersion);
+    public HollowStateTransition advance(long nextVersion) {
+        return new HollowStateTransition(toVersion, nextVersion);
     }
 
     /**
@@ -81,9 +83,9 @@ public final class StateTransition {
      *
      * @throws IllegalStateException if this transition isn't a delta
      */
-    public StateTransition reverse() {
+    public HollowStateTransition reverse() {
         if(isDiscontinous() || isSnapshot()) throw new IllegalStateException("must be a delta");
-        return new StateTransition(this.toVersion, this.fromVersion);
+        return new HollowStateTransition(this.toVersion, this.fromVersion);
     }
 
     public long getFromVersion() {

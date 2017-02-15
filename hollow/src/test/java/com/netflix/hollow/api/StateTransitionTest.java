@@ -10,11 +10,11 @@ import org.junit.Test;
 
 public final class StateTransitionTest {
 
-    StateTransition subject;
+    HollowStateTransition subject;
 
     @Test
     public void discontinuous(){
-        subject = new StateTransition();
+        subject = new HollowStateTransition();
 
         assertThat(subject.getFromVersion(), equalTo(Long.MIN_VALUE));
         assertThat(subject.getToVersion(), equalTo(Long.MIN_VALUE));
@@ -26,7 +26,7 @@ public final class StateTransitionTest {
 
     @Test
     public void snapshot() {
-        subject = new StateTransition(13L);
+        subject = new HollowStateTransition(13L);
 
         assertThat(subject.getFromVersion(), equalTo(Long.MIN_VALUE));
         assertThat(subject.getToVersion(), equalTo(13L));
@@ -38,7 +38,7 @@ public final class StateTransitionTest {
 
     @Test
     public void delta() {
-        subject = new StateTransition(2L, 3L);
+        subject = new HollowStateTransition(2L, 3L);
 
         assertThat(subject.getFromVersion(), equalTo(2L));
         assertThat(subject.getToVersion(), equalTo(3L));
@@ -50,7 +50,7 @@ public final class StateTransitionTest {
 
     @Test
     public void advancing() {
-        subject = new StateTransition();
+        subject = new HollowStateTransition();
 
         subject = subject.advance(6L);
 
@@ -69,7 +69,7 @@ public final class StateTransitionTest {
 
     @Test
     public void reversing() {
-        subject = new StateTransition(21L, 22L);
+        subject = new HollowStateTransition(21L, 22L);
 
         assertTrue(subject.isForwardDelta());
         assertFalse(subject.isReverseDelta());
@@ -82,12 +82,12 @@ public final class StateTransitionTest {
         assertTrue(subject.isReverseDelta());
 
         try {
-            new StateTransition().reverse();
+            new HollowStateTransition().reverse();
             fail("expected exception");
         } catch(IllegalStateException expected){}
 
         try {
-            new StateTransition(1L).reverse();
+            new HollowStateTransition(1L).reverse();
             fail("expected exception");
         } catch(IllegalStateException expected){}
     }

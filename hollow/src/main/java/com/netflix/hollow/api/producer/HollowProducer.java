@@ -17,13 +17,13 @@
  */
 package com.netflix.hollow.api.producer;
 
+import java.io.Closeable;
 import java.io.IOException;
-import java.util.EventListener;
+import java.io.OutputStream;
 
 import com.netflix.hollow.api.HollowStateTransition;
 import com.netflix.hollow.api.client.HollowBlobRetriever;
 import com.netflix.hollow.api.client.HollowClient;
-import com.netflix.hollow.api.consumer.HollowAnnouncementRetriever;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.ReadState;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -37,32 +37,39 @@ import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
  * @author Tim Taylor {@literal<timt@netflix.com>}
  */
 public class HollowProducer {
+    public static final Validator NO_VALIDATIONS = new Validator(){
+        @Override
+        public void validate(ReadState readState) {}
+    };
+
     private final VersionMinter versionMinter;
-    private final HollowPublisher publisher;
-    private final HollowProducer.Validator validator;
-    private final HollowAnnouncer announcer;
-    private final HollowAnnouncementRetriever announcementRetriever;
-    private final HollowBlobRetriever blobRetriever;
+    private final Publisher publisher;
+    private final Validator validator;
+    private final Announcer announcer;
     private final HollowWriteStateEngine writeEngine;
     private final HollowObjectMapper objectMapper;
 
     private HollowStateTransition announced;
 
-    public HollowProducer(VersionMinter versionMinter, HollowPublisher publisher, HollowAnnouncer announcer) {
-        this(versionMinter, publisher, announcer, HollowAnnouncementRetriever.NO_ANNOUNCEMENTS, null);
+    public HollowProducer(HollowProducer.Publisher publisher,
+            HollowProducer.Announcer announcer ) {
+        this(new VersionMinterWithCounter(), publisher, NO_VALIDATIONS, announcer);
     }
 
-    public HollowProducer(VersionMinter versionMinter,
-            HollowPublisher publisher,
-            HollowAnnouncer announcer,
-            HollowAnnouncementRetriever announcementRetriever,
-            HollowBlobRetriever blobRetriever) {
+    public HollowProducer(HollowProducer.Publisher publisher,
+            HollowProducer.Validator validator,
+            HollowProducer.Announcer announcer ) {
+        this(new VersionMinterWithCounter(), publisher, validator, announcer);
+    }
+
+    private HollowProducer(HollowProducer.VersionMinter versionMinter,
+            HollowProducer.Publisher publisher,
+            HollowProducer.Validator validator,
+            HollowProducer.Announcer announcer) {
         this.versionMinter = versionMinter;
         this.publisher = publisher;
-        this.validator = Validator.NO_VALIDATIONS;
+        this.validator = validator;
         this.announcer = announcer;
-        this.announcementRetriever = announcementRetriever;
-        this.blobRetriever = blobRetriever;
 
         writeEngine = new HollowWriteStateEngine();
         objectMapper = new HollowObjectMapper(writeEngine);
@@ -74,7 +81,8 @@ public class HollowProducer {
             objectMapper.initializeTypeState(c);
     }
 
-    public HollowProducer restore() {
+    public HollowProducer restore(HollowConsumer.AnnouncementRetriever announcementRetriever,
+            HollowBlobRetriever blobRetriever) {
         try {
             System.out.println("RESTORE PRIOR STATE...");
             long stateVersion = announcementRetriever.get();
@@ -109,21 +117,14 @@ public class HollowProducer {
             task.populate(writeState);
             if(writeEngine.hasChangedSinceLastCycle()) {
                 publish(writeState);
-
                 integrityCheck();
-
-                HollowReadStateEngine foo = null;
-
-                // TODO: timt: provide a no-op Validator implementation for now
                 validate();
-
                 announced = announce(writeState);
             } else {
                 // TODO: timt: replace with listener notification
-                System.out.println("BALLOONS!");
+                System.out.println("NO SOURCE DATA CHANGES. NOTHING TO DO THIS CYCLE.");
                 writeEngine.resetToLastPrepareForNextCycle();
             }
-
         } catch(Throwable th) {
             th.printStackTrace();
             rollback();
@@ -141,19 +142,19 @@ public class HollowProducer {
         HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
         HollowStateTransition transition = writeState.getTransition();
 
-        HollowBlob snapshot = publisher.openSnapshot(transition);
+        Blob snapshot = publisher.openSnapshot(transition);
         try {
             writer.writeSnapshot(snapshot.getOutputStream());
 
             if(transition.isDelta()) {
-                HollowBlob delta = publisher.openDelta(transition);
+                Blob delta = publisher.openDelta(transition);
                 try {
                     writer.writeDelta(delta.getOutputStream());
                     publisher.publish(delta);
                 } finally {
                     delta.close();
                 }
-                HollowBlob reverseDelta = publisher.openReverseDelta(transition);
+                Blob reverseDelta = publisher.openReverseDelta(transition);
                 try {
                     writer.writeReverseDelta(reverseDelta.getOutputStream());
                     publisher.publish(reverseDelta);
@@ -201,17 +202,6 @@ public class HollowProducer {
         System.out.format("ROLLED BACK\n");
     }
 
-    public static interface WriteState {
-        int add(Object o);
-
-        HollowObjectMapper getObjectMapper();
-
-        HollowWriteStateEngine getStateEngine();
-
-        // TODO: timt: change to getVersion:long
-        HollowStateTransition getTransition();
-    }
-
     public static interface VersionMinter {
         /**
          * Create a new state version.<p>
@@ -227,13 +217,38 @@ public class HollowProducer {
         void populate(HollowProducer.WriteState newState);
     }
 
-    public static interface Validator {
-        static final Validator NO_VALIDATIONS = new Validator(){
-            @Override
-            public void validate(ReadState readState) {}
-        };
+    public static interface WriteState {
+        int add(Object o);
 
+        HollowObjectMapper getObjectMapper();
+
+        HollowWriteStateEngine getStateEngine();
+
+        // TODO: timt: change to getVersion:long
+        HollowStateTransition getTransition();
+    }
+
+    public static interface Publisher {
+        public HollowProducer.Blob openSnapshot(HollowStateTransition transition);
+        public HollowProducer.Blob openDelta(HollowStateTransition transition);
+        public HollowProducer.Blob openReverseDelta(HollowStateTransition transition);
+
+        public void publish(HollowProducer.Blob blob);
+    }
+
+    public static interface Blob extends Closeable {
+        OutputStream getOutputStream();
+
+        @Override
+        void close();
+    }
+
+    public static interface Validator {
         void validate(HollowConsumer.ReadState readState);
+    }
+
+    public static interface Announcer {
+        public void announce(long stateVersion);
     }
 
 }
