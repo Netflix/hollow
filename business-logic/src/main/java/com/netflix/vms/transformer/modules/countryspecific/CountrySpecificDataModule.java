@@ -342,54 +342,61 @@ public class CountrySpecificDataModule {
         WindowPackageContractInfo packageContractInfo = getWindowPackageContractInfo(firstWindow);
         Integer prePromoDays = packageContractInfo == null ? null : packageContractInfo.videoContractInfo.prePromotionDays;
         Long availabilityDate = firstWindow != null ? firstWindow.startDate.val : null;
-        Long earliestOffset = getEarliestSchedulePhaseOffset(videoId, imagesDataByCountry.get(countryCode));
-		Long earliestScheduledPhaseDate = (availabilityDate != null && earliestOffset != null) ? (availabilityDate + earliestOffset) : null;
+        Long earliestPhaseDate = getEarliestSchedulePhaseDate(videoId, imagesDataByCountry.get(countryCode), availabilityDate);
         
         Integer metadataReleaseDays = getMetaDataReleaseDays(videoId);
         Long firstPhaseStartDate = getFirstPhaseStartDate(videoId, countryCode);
 
         Set<VideoSetType> videoSetTypes = VideoSetTypeUtil.computeSetTypes(videoId, countryCode, api, ctx, constants, indexer);
         data.metadataAvailabilityDate = SensitiveVideoServerSideUtil.getMetadataAvailabilityDate(videoSetTypes, firstDisplayDate, firstPhaseStartDate, 
-        									availabilityDate, prePromoDays, metadataReleaseDays, constants, earliestScheduledPhaseDate);
+        									availabilityDate, prePromoDays, metadataReleaseDays, constants, earliestPhaseDate);
         data.isSensitiveMetaData = SensitiveVideoServerSideUtil.isSensitiveMetaData(data.metadataAvailabilityDate, ctx);
     }
 
     @VisibleForTesting
-    Long getEarliestSchedulePhaseOffset(long videoId,  Map<Integer, VideoImages> videoImagesByVideoMap) {
-		Long earliestStart = null;
-		
-		// Check if the feature is turned on.
-		if(!ctx.getConfig().isUseSchedulePhasesInAvailabilityDateCalc())
-			return earliestStart;
-		
-		if(videoImagesByVideoMap == null)
-			return earliestStart;
-		
-		// TODO: videoImages data uses video id as int but this code uses long and hence the conversion. 
-		// Needs a better fix.
-		int intVideoId = (int)videoId;
-		VideoImages videoImages = videoImagesByVideoMap.get(intVideoId);
-		if(videoImages == null)
-			return earliestStart;
-		
-		Set<SchedulePhaseInfo> schedulePhaseInfoWindows = videoImages.imageAvailabilityWindows;
-		if(schedulePhaseInfoWindows == null)
-			return earliestStart; 
+    Long getEarliestSchedulePhaseDate(long videoId, Map<Integer, VideoImages> videoImagesByVideoMap, Long availabilityDate) {
+        Long earliestStart = null;
 
-		for(SchedulePhaseInfo info: schedulePhaseInfoWindows){
-			// Only offsets from images associated to current video should count for earliest offset.
-			// In some cases (topNodes) image windows from child video are rolled up. In that case, 
-			// source video will be child video which should be ignored.
-			if(info.sourceVideoId != intVideoId)
-				continue; 
-			
-			if(earliestStart == null || earliestStart > info.start)
-				earliestStart = info.start;
-		}
-		return earliestStart;
-	}
+        // Check if the feature is turned on.
+        if (!ctx.getConfig().isUseSchedulePhasesInAvailabilityDateCalc()) 
+            return earliestStart;
 
-	private WindowPackageContractInfo getWindowPackageContractInfo(VMSAvailabilityWindow window) {
+        if (videoImagesByVideoMap == null) 
+            return earliestStart;
+
+        // TODO: videoImages data uses video id as int but this code uses long and hence the conversion. 
+        // Needs a better fix.
+        int intVideoId = (int) videoId;
+        VideoImages videoImages = videoImagesByVideoMap.get(intVideoId);
+        if (videoImages == null) 
+            return earliestStart;
+
+        Set<SchedulePhaseInfo> schedulePhaseInfoWindows = videoImages.imageAvailabilityWindows;
+        if (schedulePhaseInfoWindows == null) 
+            return earliestStart;
+
+        for (SchedulePhaseInfo info : schedulePhaseInfoWindows) {
+            // Only offsets from images associated to current video should count for earliest offset.
+            // In some cases (topNodes) image windows from child video are rolled up. In that case, 
+            // source video will be child video which should be ignored.
+            if (info.sourceVideoId != intVideoId)
+                continue;
+            
+            // If phase has offset and availability date is null, cannot calculate a date.
+            // So needs to be ignored.
+            if(!info.isAbsolute && availabilityDate == null)
+                continue;
+            
+            //If absolute, use start as is. Else add it to availability date.
+            Long currentOffsetDate = (info.isAbsolute)? info.start : info.start + availabilityDate;
+
+            if (earliestStart == null || earliestStart > currentOffsetDate) 
+                earliestStart = currentOffsetDate;
+        }
+        return earliestStart;
+    }
+
+    private WindowPackageContractInfo getWindowPackageContractInfo(VMSAvailabilityWindow window) {
         if (window == null || window.windowInfosByPackageId == null) return null;
 
         WindowPackageContractInfo info = null;
