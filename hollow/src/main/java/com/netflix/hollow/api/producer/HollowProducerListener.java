@@ -47,7 +47,7 @@ public interface HollowProducerListener extends EventListener {
     public void onNoDeltaAvailable(HollowProducer producer, long version);
 
     /**
-     * Called when the {@code HollowProducer} has begun publishing the {@code HollowBlob} produced this cycle.
+     * Called when the {@code HollowProducer} has begun publishing the {@code HollowBlob}s produced this cycle.
      *
      * @param producer the producer beginning to publish
      * @param version Version to be published.
@@ -55,13 +55,47 @@ public interface HollowProducerListener extends EventListener {
     public void onPublishStart(HollowProducer producer, long version);
 
     /**
-     * Called after the publish stage finishes normally or abnormally. On successful completion this indicates that
-     * the {@code HollowBlob} produced this cycle has been published to the blob store.
+     * Called after the publish stage finishes normally or abnormally. A {@code SUCCESS} status indicates that
+     * the {@code HollowBlob}s produced this cycle has been published to the blob store.
      *
      * @param status CycleStatus of the publish stage. {@link com.netflix.hollow.api.producer.CycleStatus#getStatus()} will return {@code SUCCESS}
      *   when the publish was successful; @{code FAIL} otherwise.
      */
     public void onPublishComplete(CycleStatus status);
+
+    /**
+     * Called when the {@code HollowProducer} has begun checking the integrity of the {@code HollowBlob}s produced this cycle.
+     *
+     * @param producer the producer beginning the integrity checks
+     * @param version Version to be checked
+     */
+    public void onIntegrityCheckStart(HollowProducer producer, long version);
+
+    /**
+     * Called after the integrity check stage finishes normally or abnormally. A {@code SUCCESS} status indicates that
+     * the previous snapshot, current snapshot, delta, and reverse-delta {@code HollowBlob}s are all internally consistent.
+     *
+     * @param status CycleStatus of the integrity check stage. {@link com.netflix.hollow.api.producer.CycleStatus#getStatus()} will return {@code SUCCESS}
+     *   when the blobs are internally consistent; @{code FAIL} otherwise.
+     */
+    public void onIntegrityCheckComplete(CycleStatus status);
+
+    /**
+     * Called when the {@code HollowProducer} has begun validating the new data state produced this cycle.
+     *
+     * @param producer the producer beginning the validation checks
+     * @param version Version to be validated
+     */
+    public void onValidationStart(HollowProducer producer, long version);
+
+    /**
+     * Called after the validation stage finishes normally or abnormally. A {@code SUCCESS} status indicates that
+     * the newly published data state is considered valid.
+     *
+     * @param status CycleStatus of the publish stage. {@link com.netflix.hollow.api.producer.CycleStatus#getStatus()} will return {@code SUCCESS}
+     *   when the publish was successful; @{code FAIL} otherwise.
+     */
+    public void onValidationComplete(CycleStatus status);
 
     /**
      * Called when the {@code HollowProducer} has begun announcing the {@code HollowBlob} published this cycle.
@@ -72,7 +106,7 @@ public interface HollowProducerListener extends EventListener {
     public void onAnnouncementStart(HollowProducer producer, long version);
 
     /**
-     * Called after the announcement stage finishes normally or abnormally. On successful completion this indicates
+     * Called after the announcement stage finishes normally or abnormally. A {@code SUCCESS} status indicates
      * that the {@code HollowBlob} published this cycle has been announced to consumers.
      *
      * @param status CycleStatus of the announcement stage. {@link com.netflix.hollow.api.producer.CycleStatus#getStatus()} will return {@code SUCCESS}
@@ -81,11 +115,12 @@ public interface HollowProducerListener extends EventListener {
     public void onAnnouncementComplete(CycleStatus status);
 
     /**
-     * Called after {@code HollowProducer} has completed a cycle normally or abnormally.
+     * Called after {@code HollowProducer} has completed a cycle normally or abnormally. A {@code SUCCESS} status indicates that the
+     * entire cycle was successful and the producer is available to begin another cycle.
      *
      * @param status CycleStatus of this cycle. {@link com.netflix.hollow.api.producer.CycleStatus#getStatus()} will return {@code SUCCESS}
-     *   when the a new state has been announced to consumers or when there were no changes to the data; it will return @{code FAIL}
-     *   when any stage fails or any other failure occurs during cycle processing.
+     *   when the a new data state has been announced to consumers or when there were no changes to the data; it will return @{code FAIL}
+     *   when any stage failed or any other failure occured during the cycle.
      */
     public void onCycleComplete(CycleStatus status);
 
