@@ -180,7 +180,13 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     }
 
     private void addDeleteJob(long previousVersion, long nextVersion, List<PublicationJob> publishJobsForCycle) {
-        scheduler.submitJob(jobCreator.createDeleteFileJob(publishJobsForCycle, nextVersion, fileNamer.getDeltaFileName(previousVersion, nextVersion), fileNamer.getReverseDeltaFileName(nextVersion, previousVersion), fileNamer.getSnapshotFileName(nextVersion)));
+        scheduler.submitJob(jobCreator.createDeleteFileJob(publishJobsForCycle, nextVersion, 
+                fileNamer.getDeltaFileName(previousVersion, nextVersion), 
+                fileNamer.getReverseDeltaFileName(nextVersion, previousVersion), 
+                fileNamer.getSnapshotFileName(nextVersion),
+                fileNamer.getNostreamsDeltaFileName(previousVersion, nextVersion),
+                fileNamer.getNostreamsReverseDeltaFileName(nextVersion, previousVersion),
+                fileNamer.getNostreamsSnapshotFileName(nextVersion)));
     }
 
     private List<PublicationJob> addPublishJobs(long inputDataVersion, long previousVersion, long newVersion) {

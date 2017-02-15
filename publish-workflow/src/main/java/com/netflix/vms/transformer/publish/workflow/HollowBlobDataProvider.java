@@ -40,8 +40,8 @@ public class HollowBlobDataProvider {
 
     public HollowBlobDataProvider(TransformerContext ctx) {
         this.ctx = ctx;
-        this.hollowReadStateEngine = new HollowReadStateEngine(true);
-        this.nostreamsStateEngine = new HollowReadStateEngine(true);
+        this.hollowReadStateEngine = null;
+        this.nostreamsStateEngine = null;
     }
     
     public void notifyRestoredStateEngine(HollowReadStateEngine restoredState, HollowReadStateEngine restoredNostreamsState) {
@@ -64,13 +64,15 @@ public class HollowBlobDataProvider {
     }
 
     public int countItems(String typeName) {
-        return hollowReadStateEngine.getTypeState(typeName).getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals().cardinality();
+        return hollowReadStateEngine.getTypeState(typeName).getPopulatedOrdinals().cardinality();
     }
 
 	public void updateData(File snapshotFile, File deltaFile, File reverseDeltaFile, File nostreamsSnapshotFile, File nostreamsDeltaFile, File nostreamsReverseDeltaFile) throws IOException {
 		if (deltaFile.exists() && snapshotFile.exists()) {
 		    validateChecksums(snapshotFile, deltaFile, reverseDeltaFile, nostreamsSnapshotFile, nostreamsDeltaFile, nostreamsReverseDeltaFile);
         } else if (snapshotFile.exists()) {
+            hollowReadStateEngine = new HollowReadStateEngine();
+            nostreamsStateEngine = new HollowReadStateEngine();
             readSnapshot(snapshotFile, hollowReadStateEngine);
             readSnapshot(nostreamsSnapshotFile, nostreamsStateEngine);
         } else {
@@ -137,13 +139,13 @@ public class HollowBlobDataProvider {
             if(!initialNostreamsChecksumBeforeDelta.equals(nostreamsReverseDeltaChecksum))
                 throw new RuntimeException("NOSTREAMS REVERSE DELTA CHECKSUM VALIDATION FAILURE!");
             
+            revertableNostreamsStateEngine = anotherNostreamsStateEngine;
             revertableStateEngine = anotherStateEngine;
         }
     }
     
     private void readSnapshot(File snapshotFile, HollowReadStateEngine hollowReadStateEngine) throws IOException {
         ctx.getLogger().info(CircuitBreaker, "Reading Snapshot blob {}", snapshotFile.getName());
-        hollowReadStateEngine = new HollowReadStateEngine(true);
         HollowBlobReader hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
         hollowBlobReader.readSnapshot(ctx.files().newBlobInputStream(snapshotFile));
     }
