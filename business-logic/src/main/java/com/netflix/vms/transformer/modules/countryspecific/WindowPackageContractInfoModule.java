@@ -148,7 +148,6 @@ public class WindowPackageContractInfoModule {
         PackageMomentData packageMomentData = packageMomentDataModule.getWindowPackageMomentData(packageData, inputPackage);
 
         info.videoPackageInfo.stillImagesMap = packageMomentData.stillImagesMap;
-        info.videoPackageInfo.phoneSnacks = packageMomentData.phoneSnackMoments;
         info.videoPackageInfo.trickPlayMap = packageMomentData.trickPlayItemMap;
         info.videoPackageInfo.startMomentOffsetInSeconds = getOffset(VideoMomentModule.START_MOMENT_KEY, packageMomentData.stillImagesMap);
         info.videoPackageInfo.endMomentOffsetInSeconds = getOffset(VideoMomentModule.END_MOMENT_KEY, packageMomentData.stillImagesMap);
@@ -327,7 +326,6 @@ public class WindowPackageContractInfoModule {
         info.runtimeInSeconds = 0;
         info.soundTypes = Collections.emptyList();
         info.screenFormats = Collections.emptyList();
-        info.phoneSnacks = Collections.emptyList();
         info.stillImagesMap = Collections.emptyMap();
         info.trickPlayMap = Collections.emptyMap();
         info.formats = Collections.emptySet();
