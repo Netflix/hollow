@@ -17,9 +17,13 @@
  */
 package com.netflix.hollow.api.producer;
 
+import static java.lang.System.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.consumer.HollowConsumer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 
 /**
@@ -42,55 +46,70 @@ final class ListenerSupport {
         listeners.remove(listener);
     }
 
-    void fireProducerInit() {
-        for(final HollowProducerListener l : listeners) l.onProducerInit();
+    void fireProducerInit(long elapsedMillis) {
+        for(final HollowProducerListener l : listeners) l.onProducerInit(elapsedMillis, MILLISECONDS);
     }
 
-    void fireProducerRestore(long version) {
-        for(final HollowProducerListener l : listeners) l.onProducerRestore(version);
+    void fireProducerRestore(long version, long elapsedMillis) {
+        for(final HollowProducerListener l : listeners) l.onProducerRestore(version, elapsedMillis, MILLISECONDS);
     }
 
-    void fireCycleStart(long version) {
+    long fireCycleStart(long version) {
+        long start = currentTimeMillis();
         for(final HollowProducerListener l : listeners) l.onCycleStart(version);
+        return start;
     }
 
-    void fireCycleComplete(ProducerStatus cycleStatus) {
-        for(final HollowProducerListener l : listeners) l.onCycleComplete(cycleStatus);
+    void fireCycleComplete(ProducerStatus cycleStatus, long startMillis) {
+        long elapsedMillis = currentTimeMillis() - startMillis;
+        for(final HollowProducerListener l : listeners) l.onCycleComplete(cycleStatus, elapsedMillis, MILLISECONDS);
     }
 
     void fireNoDelta(long version) {
         for(final HollowProducerListener l : listeners) l.onNoDeltaAvailable(version);
     }
 
-    void firePublishStart(long version) {
+    long firePublishStart(long version) {
+        long start = currentTimeMillis();
         for(final HollowProducerListener l : listeners) l.onPublishStart(version);
+        return start;
     }
 
-    void firePublishComplete(ProducerStatus publishStatus) {
-        for(final HollowProducerListener l : listeners) l.onPublishComplete(publishStatus);
+    void firePublishComplete(ProducerStatus publishStatus, long startMillis) {
+        long elapsedMillis = currentTimeMillis() - startMillis;
+        for(final HollowProducerListener l : listeners) l.onPublishComplete(publishStatus, elapsedMillis, MILLISECONDS);
     }
 
-    void fireIntegrityCheckStart(long version) {
-        for(final HollowProducerListener l : listeners) l.onIntegrityCheckStart(version);
+    long fireIntegrityCheckStart(HollowProducer.WriteState writeState) {
+        long start = currentTimeMillis();
+        for(final HollowProducerListener l : listeners) l.onIntegrityCheckStart(writeState.getVersion());
+        return start;
     }
 
-    void fireIntegrityCheckComplete(ProducerStatus integrityCheckStatus) {
-        for(final HollowProducerListener l : listeners) l.onIntegrityCheckComplete(integrityCheckStatus);
+    void fireIntegrityCheckComplete(ProducerStatus integrityCheckStatus, long startMillis) {
+        long elapsedMillis = currentTimeMillis() - startMillis;
+        for(final HollowProducerListener l : listeners) l.onIntegrityCheckComplete(integrityCheckStatus, elapsedMillis, MILLISECONDS);
     }
 
-    void fireValidationStart(long version) {
-        for(final HollowProducerListener l : listeners) l.onValidationStart(version);
+    long fireValidationStart(HollowConsumer.ReadState readState) {
+        long start = currentTimeMillis();
+        for(final HollowProducerListener l : listeners) l.onValidationStart(readState.getVersion());
+        return start;
     }
 
-    void fireValidationComplete(ProducerStatus validationStatus) {
-        for(final HollowProducerListener l : listeners) l.onValidationComplete(validationStatus);
+    void fireValidationComplete(ProducerStatus validationStatus, long startMillis) {
+        long elapsedMillis = currentTimeMillis() - startMillis;
+        for(final HollowProducerListener l : listeners) l.onValidationComplete(validationStatus, elapsedMillis, MILLISECONDS);
     }
 
-    void fireAnnouncementStart(long version) {
-        for(final HollowProducerListener l : listeners) l.onAnnouncementStart(version);
+    long fireAnnouncementStart(HollowConsumer.ReadState readState) {
+        long start = currentTimeMillis();
+        for(final HollowProducerListener l : listeners) l.onAnnouncementStart(readState.getVersion());
+        return start;
     }
 
-    void fireAnnouncementComplete(ProducerStatus announcementStatus) {
-        for(final HollowProducerListener l : listeners) l.onAnnouncementComplete(announcementStatus);
+    void fireAnnouncementComplete(ProducerStatus announcementStatus, long startMillis) {
+        long elapsedMillis = currentTimeMillis() - startMillis;
+        for(final HollowProducerListener l : listeners) l.onAnnouncementComplete(announcementStatus, elapsedMillis, MILLISECONDS);
     }
 }

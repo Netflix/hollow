@@ -19,29 +19,35 @@ package com.netflix.hollow.api.consumer;
 
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
+// TODO: timt: should be package protected
 /**
  * Alpha API subject to change.
  *
  * @author Tim Taylor {@literal<tim@toolbear.io>}
  */
-public class HollowConsumer {
+public class ReadStateImpl implements HollowConsumer.ReadState {
+    private final long version;
+    private final HollowReadStateEngine stateEngine;
 
-    // TODO: timt: is this needed, or do we just use a HollowReadStateEngine in place of this? Created for now
-    //   to have symmetry with HollowProducer.WriteState
-    public static interface ReadState {
-        long getVersion();
-        HollowReadStateEngine getStateEngine();
+    // TODO: timt: temporary until we stop using HollowClient in HollowProducer
+    public ReadStateImpl(HollowClient client) {
+        this(client.getCurrentVersionId(), client.getStateEngine());
     }
 
-    public static interface AnnouncementRetriever {
-        static final AnnouncementRetriever NO_ANNOUNCEMENTS = new AnnouncementRetriever(){
-            @Override
-            public long get() {
-                return Long.MIN_VALUE;
-            }
-        };
-
-        long get();
+    // TODO: timt: should be package protected
+    public ReadStateImpl(long version, HollowReadStateEngine stateEngine) {
+        this.version = version;
+        this.stateEngine = stateEngine;
     }
 
+
+    @Override
+    public long getVersion() {
+        return version;
+    }
+
+    @Override
+    public HollowReadStateEngine getStateEngine() {
+        return stateEngine;
+    }
 }
