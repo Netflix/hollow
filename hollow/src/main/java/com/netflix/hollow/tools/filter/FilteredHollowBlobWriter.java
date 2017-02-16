@@ -217,7 +217,7 @@ public class FilteredHollowBlobWriter {
         
         for(int shard=0;shard<numShards;shard++) {
             int maxShardOrdinal = copyVInt(is, os);
-            int numRecordsToCopy = maxShardOrdinal;
+            int numRecordsToCopy = maxShardOrdinal + 1;
     
             if(delta) {
                 GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(is, os);
@@ -241,7 +241,7 @@ public class FilteredHollowBlobWriter {
             for(int i=0;i<streamAndFilters.length;i++) {
                 long bitsPerRecord = writeBitsPerField(schema, bitsPerField, filteredObjectSchemas[i], streamAndFilters[i].getStream());
     
-                bitsRequiredPerStream[i] = bitsPerRecord * (numRecordsToCopy + 1);
+                bitsRequiredPerStream[i] = bitsPerRecord * numRecordsToCopy;
                 fixedLengthArraysPerStream[i] = new FixedLengthElementArray(memoryRecycler,  bitsRequiredPerStream[i]);
                 FixedLengthArrayWriter filteredArrayWriter = new FixedLengthArrayWriter(fixedLengthArraysPerStream[i]);
     
@@ -261,7 +261,7 @@ public class FilteredHollowBlobWriter {
             for(int fieldBits : bitsPerField)
                 bitsPerRecord += fieldBits;
     
-            long stopBit = bitsPerRecord * (numRecordsToCopy + 1);
+            long stopBit = bitsPerRecord * numRecordsToCopy;
             long bitCursor = 0;
             int fieldCursor = 0;
     

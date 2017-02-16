@@ -37,6 +37,7 @@ public class FilteredHollowBlobWriterTest {
     
     private byte[] snapshotData;
     private byte[] deltaData;
+    private byte[] removeOnlyDeltaData;
     
     @Before
     public void setUp() throws IOException {
@@ -65,10 +66,22 @@ public class FilteredHollowBlobWriterTest {
         mapper.add(new TypeB(1, 1.1f));
         mapper.add(new TypeB(2, 2.2f));
         mapper.add(new TypeB(3, 4.4f));
-        
+
         baos.reset();
         writer.writeDelta(baos);
         deltaData = baos.toByteArray();
+        
+        writeEngine.prepareForNextCycle();
+        
+        mapper.add(new TypeA(2, "two"));
+        mapper.add(new TypeA(3, "four"));
+        
+        mapper.add(new TypeB(2, 2.2f));
+        mapper.add(new TypeB(3, 4.4f));
+        
+        baos.reset();
+        writer.writeDelta(baos);
+        removeOnlyDeltaData = baos.toByteArray();
     }
     
     
@@ -109,6 +122,14 @@ public class FilteredHollowBlobWriterTest {
         Assert.assertEquals(2.2f, new GenericHollowObject(readEngine, "TypeB", 1).getFloat("value"), 0);
         Assert.assertEquals(3, new GenericHollowObject(readEngine, "TypeB", 3).getInt("id"));
         Assert.assertEquals(4.4f, new GenericHollowObject(readEngine, "TypeB", 3).getFloat("value"), 0);
+        
+        filteredBlobStream.reset();
+        blobWriter.filterDelta(new ByteArrayInputStream(removeOnlyDeltaData), filteredBlobStream);
+        
+        reader.applyDelta(new ByteArrayInputStream(filteredBlobStream.toByteArray()));
+        
+        Assert.assertEquals(2, readEngine.getTypeState("TypeA").getPopulatedOrdinals().cardinality());
+        Assert.assertEquals(2, readEngine.getTypeState("TypeB").getPopulatedOrdinals().cardinality());
     }
 
     @SuppressWarnings("unused")
