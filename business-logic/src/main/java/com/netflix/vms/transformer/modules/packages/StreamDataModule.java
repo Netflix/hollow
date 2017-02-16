@@ -1,5 +1,8 @@
 package com.netflix.vms.transformer.modules.packages;
 
+import com.netflix.vms.transformer.hollowinput.VideoStreamCropParamsHollow;
+
+import com.netflix.vms.transformer.hollowoutput.StreamCropParams;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
@@ -144,7 +147,26 @@ public class StreamDataModule {
             outputStream.additionalData.qoeInfo.scaledPsnrScore = (int)inputVideoStreamInfo._getScaledPsnrTimesHundred();
         if(inputVideoStreamInfo._getVmafScore() != Long.MIN_VALUE)
             outputStream.additionalData.qoeInfo.vmafScore = (int)inputVideoStreamInfo._getVmafScore();
-
+        outputStream.additionalData.qoeInfo.vmafAlgoVersionExp = inputVideoStreamInfo._getVmafAlgoVersionExp();
+        outputStream.additionalData.qoeInfo.vmafAlgoVersionLts = inputVideoStreamInfo._getVmafAlgoVersionLts();
+        outputStream.additionalData.qoeInfo.vmafScoreExp = inputVideoStreamInfo._getVmafScoreExp();
+        outputStream.additionalData.qoeInfo.vmafScoreLts = inputVideoStreamInfo._getVmafScoreLts();
+        outputStream.additionalData.qoeInfo.vmafplusScoreExp = inputVideoStreamInfo._getVmafplusScoreExp();
+        outputStream.additionalData.qoeInfo.vmafplusScoreLts = inputVideoStreamInfo._getVmafplusScoreLts();
+        outputStream.additionalData.qoeInfo.vmafplusPhoneScoreExp = inputVideoStreamInfo._getVmafplusPhoneScoreExp();
+        outputStream.additionalData.qoeInfo.vmafplusPhoneScoreLts = inputVideoStreamInfo._getVmafplusPhoneScoreLts();
+        
+        VideoStreamCropParamsHollow inputCropParams = inputVideoStreamInfo._getCropParams();
+        if(inputCropParams != null) {
+            outputStream.additionalData.cropParams = new StreamCropParams();
+            outputStream.additionalData.cropParams.x = inputCropParams._getX();
+            outputStream.additionalData.cropParams.y = inputCropParams._getY();
+            outputStream.additionalData.cropParams.width = inputCropParams._getWidth();
+            outputStream.additionalData.cropParams.height = inputCropParams._getHeight();
+        }
+        
+        outputStream.additionalData.cropParams = new StreamCropParams();
+        
         Set<StreamDeploymentLabelHollow> deploymentLabels = inputStreamDeployment._getDeploymentLabel();
         int deploymentLabelBits = 0;
         if(deploymentLabels != null) {

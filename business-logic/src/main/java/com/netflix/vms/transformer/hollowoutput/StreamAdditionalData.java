@@ -6,6 +6,7 @@ public class StreamAdditionalData implements Cloneable {
     public FrameRate frameRate = null;
     public DownloadLocationSet downloadLocations = null;
     public QoEInfo qoeInfo = null;
+    public StreamCropParams cropParams;
     public StreamMostlyConstantData mostlyConstantData = null;
 
     public boolean equals(Object other) {
@@ -23,6 +24,9 @@ public class StreamAdditionalData implements Cloneable {
         if(o.qoeInfo == null) {
             if(qoeInfo != null) return false;
         } else if(!o.qoeInfo.equals(qoeInfo)) return false;
+        if(o.cropParams == null) {
+            if(cropParams != null) return false;
+        } else if(!o.cropParams.equals(cropParams)) return false;
         if(o.mostlyConstantData == null) {
             if(mostlyConstantData != null) return false;
         } else if(!o.mostlyConstantData.equals(mostlyConstantData)) return false;
@@ -34,6 +38,7 @@ public class StreamAdditionalData implements Cloneable {
         hashCode = hashCode * 31 + (frameRate == null ? 1237 : frameRate.hashCode());
         hashCode = hashCode * 31 + (downloadLocations == null ? 1237 : downloadLocations.hashCode());
         hashCode = hashCode * 31 + (qoeInfo == null ? 1237 : qoeInfo.hashCode());
+        hashCode = hashCode * 31 + (cropParams == null ? 1237 : cropParams.hashCode());
         hashCode = hashCode * 31 + (mostlyConstantData == null ? 1237 : mostlyConstantData.hashCode());
         return hashCode;
     }
@@ -43,6 +48,7 @@ public class StreamAdditionalData implements Cloneable {
         builder.append("frameRate=").append(frameRate);
         builder.append(",downloadLocations=").append(downloadLocations);
         builder.append(",qoeInfo=").append(qoeInfo);
+        builder.append(",cropParams=").append(cropParams);
         builder.append(",mostlyConstantData=").append(mostlyConstantData);
         builder.append("}");
         return builder.toString();

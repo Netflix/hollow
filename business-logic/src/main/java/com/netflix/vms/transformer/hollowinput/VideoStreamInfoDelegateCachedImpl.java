@@ -14,8 +14,17 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
     private final Long dashHeaderSize;
     private final Long dashMediaStartByteOffset;
     private final Long vmafScore;
+    private final Integer vmafAlgoVersionExp;
+    private final Integer vmafAlgoVersionLts;
+    private final Integer vmafScoreExp;
+    private final Integer vmafScoreLts;
+    private final Integer vmafplusScoreExp;
+    private final Integer vmafplusScoreLts;
+    private final Integer vmafplusPhoneScoreExp;
+    private final Integer vmafplusPhoneScoreLts;
     private final Long scaledPsnrTimesHundred;
     private final Float fps;
+    private final int cropParamsOrdinal;
    private VideoStreamInfoTypeAPI typeAPI;
 
     public VideoStreamInfoDelegateCachedImpl(VideoStreamInfoTypeAPI typeAPI, int ordinal) {
@@ -24,8 +33,17 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
         this.dashHeaderSize = typeAPI.getDashHeaderSizeBoxed(ordinal);
         this.dashMediaStartByteOffset = typeAPI.getDashMediaStartByteOffsetBoxed(ordinal);
         this.vmafScore = typeAPI.getVmafScoreBoxed(ordinal);
+        this.vmafAlgoVersionExp = typeAPI.getVmafAlgoVersionExpBoxed(ordinal);
+        this.vmafAlgoVersionLts = typeAPI.getVmafAlgoVersionLtsBoxed(ordinal);
+        this.vmafScoreExp = typeAPI.getVmafScoreExpBoxed(ordinal);
+        this.vmafScoreLts = typeAPI.getVmafScoreLtsBoxed(ordinal);
+        this.vmafplusScoreExp = typeAPI.getVmafplusScoreExpBoxed(ordinal);
+        this.vmafplusScoreLts = typeAPI.getVmafplusScoreLtsBoxed(ordinal);
+        this.vmafplusPhoneScoreExp = typeAPI.getVmafplusPhoneScoreExpBoxed(ordinal);
+        this.vmafplusPhoneScoreLts = typeAPI.getVmafplusPhoneScoreLtsBoxed(ordinal);
         this.scaledPsnrTimesHundred = typeAPI.getScaledPsnrTimesHundredBoxed(ordinal);
         this.fps = typeAPI.getFpsBoxed(ordinal);
+        this.cropParamsOrdinal = typeAPI.getCropParamsOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -69,6 +87,70 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
         return vmafScore;
     }
 
+    public int getVmafAlgoVersionExp(int ordinal) {
+        return vmafAlgoVersionExp.intValue();
+    }
+
+    public Integer getVmafAlgoVersionExpBoxed(int ordinal) {
+        return vmafAlgoVersionExp;
+    }
+
+    public int getVmafAlgoVersionLts(int ordinal) {
+        return vmafAlgoVersionLts.intValue();
+    }
+
+    public Integer getVmafAlgoVersionLtsBoxed(int ordinal) {
+        return vmafAlgoVersionLts;
+    }
+
+    public int getVmafScoreExp(int ordinal) {
+        return vmafScoreExp.intValue();
+    }
+
+    public Integer getVmafScoreExpBoxed(int ordinal) {
+        return vmafScoreExp;
+    }
+
+    public int getVmafScoreLts(int ordinal) {
+        return vmafScoreLts.intValue();
+    }
+
+    public Integer getVmafScoreLtsBoxed(int ordinal) {
+        return vmafScoreLts;
+    }
+
+    public int getVmafplusScoreExp(int ordinal) {
+        return vmafplusScoreExp.intValue();
+    }
+
+    public Integer getVmafplusScoreExpBoxed(int ordinal) {
+        return vmafplusScoreExp;
+    }
+
+    public int getVmafplusScoreLts(int ordinal) {
+        return vmafplusScoreLts.intValue();
+    }
+
+    public Integer getVmafplusScoreLtsBoxed(int ordinal) {
+        return vmafplusScoreLts;
+    }
+
+    public int getVmafplusPhoneScoreExp(int ordinal) {
+        return vmafplusPhoneScoreExp.intValue();
+    }
+
+    public Integer getVmafplusPhoneScoreExpBoxed(int ordinal) {
+        return vmafplusPhoneScoreExp;
+    }
+
+    public int getVmafplusPhoneScoreLts(int ordinal) {
+        return vmafplusPhoneScoreLts.intValue();
+    }
+
+    public Integer getVmafplusPhoneScoreLtsBoxed(int ordinal) {
+        return vmafplusPhoneScoreLts;
+    }
+
     public long getScaledPsnrTimesHundred(int ordinal) {
         return scaledPsnrTimesHundred.longValue();
     }
@@ -83,6 +165,10 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
 
     public Float getFpsBoxed(int ordinal) {
         return fps;
+    }
+
+    public int getCropParamsOrdinal(int ordinal) {
+        return cropParamsOrdinal;
     }
 
     @Override

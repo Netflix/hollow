@@ -50,6 +50,70 @@ public class VideoStreamInfoHollow extends HollowObject {
         return delegate().getVmafScoreBoxed(ordinal);
     }
 
+    public int _getVmafAlgoVersionExp() {
+        return delegate().getVmafAlgoVersionExp(ordinal);
+    }
+
+    public Integer _getVmafAlgoVersionExpBoxed() {
+        return delegate().getVmafAlgoVersionExpBoxed(ordinal);
+    }
+
+    public int _getVmafAlgoVersionLts() {
+        return delegate().getVmafAlgoVersionLts(ordinal);
+    }
+
+    public Integer _getVmafAlgoVersionLtsBoxed() {
+        return delegate().getVmafAlgoVersionLtsBoxed(ordinal);
+    }
+
+    public int _getVmafScoreExp() {
+        return delegate().getVmafScoreExp(ordinal);
+    }
+
+    public Integer _getVmafScoreExpBoxed() {
+        return delegate().getVmafScoreExpBoxed(ordinal);
+    }
+
+    public int _getVmafScoreLts() {
+        return delegate().getVmafScoreLts(ordinal);
+    }
+
+    public Integer _getVmafScoreLtsBoxed() {
+        return delegate().getVmafScoreLtsBoxed(ordinal);
+    }
+
+    public int _getVmafplusScoreExp() {
+        return delegate().getVmafplusScoreExp(ordinal);
+    }
+
+    public Integer _getVmafplusScoreExpBoxed() {
+        return delegate().getVmafplusScoreExpBoxed(ordinal);
+    }
+
+    public int _getVmafplusScoreLts() {
+        return delegate().getVmafplusScoreLts(ordinal);
+    }
+
+    public Integer _getVmafplusScoreLtsBoxed() {
+        return delegate().getVmafplusScoreLtsBoxed(ordinal);
+    }
+
+    public int _getVmafplusPhoneScoreExp() {
+        return delegate().getVmafplusPhoneScoreExp(ordinal);
+    }
+
+    public Integer _getVmafplusPhoneScoreExpBoxed() {
+        return delegate().getVmafplusPhoneScoreExpBoxed(ordinal);
+    }
+
+    public int _getVmafplusPhoneScoreLts() {
+        return delegate().getVmafplusPhoneScoreLts(ordinal);
+    }
+
+    public Integer _getVmafplusPhoneScoreLtsBoxed() {
+        return delegate().getVmafplusPhoneScoreLtsBoxed(ordinal);
+    }
+
     public long _getScaledPsnrTimesHundred() {
         return delegate().getScaledPsnrTimesHundred(ordinal);
     }
@@ -64,6 +128,13 @@ public class VideoStreamInfoHollow extends HollowObject {
 
     public Float _getFpsBoxed() {
         return delegate().getFpsBoxed(ordinal);
+    }
+
+    public VideoStreamCropParamsHollow _getCropParams() {
+        int refOrdinal = delegate().getCropParamsOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getVideoStreamCropParamsHollow(refOrdinal);
     }
 
     public VMSHollowInputAPI api() {
