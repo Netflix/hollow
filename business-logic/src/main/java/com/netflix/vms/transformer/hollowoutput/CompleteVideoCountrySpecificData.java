@@ -11,7 +11,7 @@ public class CompleteVideoCountrySpecificData implements Cloneable {
     public Map<NFLocale, Date> firstDisplayDateByLocale = null;
     public List<Certification> certificationList = null;
     public SortedMapOfDateWindowToListOfInteger dateWindowWiseSeasonSequenceNumberMap = null;
-    public List<VMSAvailabilityWindow> mediaAvailabilityWindows = null;
+    public List<VMSAvailabilityWindow> availabilityWindows = null;
 
     @Override
     public boolean equals(Object other) {
@@ -35,9 +35,9 @@ public class CompleteVideoCountrySpecificData implements Cloneable {
         if(o.dateWindowWiseSeasonSequenceNumberMap == null) {
             if(dateWindowWiseSeasonSequenceNumberMap != null) return false;
         } else if(!o.dateWindowWiseSeasonSequenceNumberMap.equals(dateWindowWiseSeasonSequenceNumberMap)) return false;
-        if(o.mediaAvailabilityWindows == null) {
-            if(mediaAvailabilityWindows != null) return false;
-        } else if(!o.mediaAvailabilityWindows.equals(mediaAvailabilityWindows)) return false;
+        if(o.availabilityWindows == null) {
+            if(availabilityWindows != null) return false;
+        } else if(!o.availabilityWindows.equals(availabilityWindows)) return false;
         return true;
     }
 
@@ -49,7 +49,7 @@ public class CompleteVideoCountrySpecificData implements Cloneable {
         hashCode = hashCode * 31 + (firstDisplayDateByLocale == null ? 1237 : firstDisplayDateByLocale.hashCode());
         hashCode = hashCode * 31 + (certificationList == null ? 1237 : certificationList.hashCode());
         hashCode = hashCode * 31 + (dateWindowWiseSeasonSequenceNumberMap == null ? 1237 : dateWindowWiseSeasonSequenceNumberMap.hashCode());
-        hashCode = hashCode * 31 + (mediaAvailabilityWindows == null ? 1237 : mediaAvailabilityWindows.hashCode());
+        hashCode = hashCode * 31 + (availabilityWindows == null ? 1237 : availabilityWindows.hashCode());
         return hashCode;
     }
 
@@ -61,7 +61,7 @@ public class CompleteVideoCountrySpecificData implements Cloneable {
         builder.append(",firstDisplayDateByLocale=").append(firstDisplayDateByLocale);
         builder.append(",certificationList=").append(certificationList);
         builder.append(",dateWindowWiseSeasonSequenceNumberMap=").append(dateWindowWiseSeasonSequenceNumberMap);
-        builder.append(",mediaAvailabilityWindows=").append(mediaAvailabilityWindows);
+        builder.append(",mediaAvailabilityWindows=").append(availabilityWindows);
         builder.append("}");
         return builder.toString();
     }

@@ -94,7 +94,7 @@ public class VMSAvailabilityWindowModule {
         
         List<VMSAvailabilityWindow> windows = calculateWindowData(videoId, country, null, videoRights, rollup, isGoLive);
 
-        data.mediaAvailabilityWindows = windows;
+        data.availabilityWindows = windows;
         
         return windows;
     }

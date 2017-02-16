@@ -289,7 +289,7 @@ public class VideoNamedListModule {
 
             if(video.data.facetData.videoMediaData != null && video.data.facetData.videoMediaData.isGoLive) {
                 isGoLive = true;
-                for(VMSAvailabilityWindow window : video.data.countrySpecificData.mediaAvailabilityWindows) {
+                for(VMSAvailabilityWindow window : video.data.countrySpecificData.availabilityWindows) {
                     if(window.startDate.val <= ctx.getNowMillis() && window.endDate.val >= ctx.getNowMillis()) {
                         int maxPackageId = -1;
                         VideoPackageInfo maxPackageInfo = null;
