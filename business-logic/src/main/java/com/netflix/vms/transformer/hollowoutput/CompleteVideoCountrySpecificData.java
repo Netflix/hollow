@@ -12,7 +12,6 @@ public class CompleteVideoCountrySpecificData implements Cloneable {
     public List<Certification> certificationList = null;
     public SortedMapOfDateWindowToListOfInteger dateWindowWiseSeasonSequenceNumberMap = null;
     public List<VMSAvailabilityWindow> mediaAvailabilityWindows = null;
-    public List<VMSAvailabilityWindow> imagesAvailabilityWindows = null;
 
     @Override
     public boolean equals(Object other) {
@@ -39,9 +38,6 @@ public class CompleteVideoCountrySpecificData implements Cloneable {
         if(o.mediaAvailabilityWindows == null) {
             if(mediaAvailabilityWindows != null) return false;
         } else if(!o.mediaAvailabilityWindows.equals(mediaAvailabilityWindows)) return false;
-        if(o.imagesAvailabilityWindows == null) {
-            if(imagesAvailabilityWindows != null) return false;
-        } else if(!o.imagesAvailabilityWindows.equals(imagesAvailabilityWindows)) return false;
         return true;
     }
 
@@ -54,7 +50,6 @@ public class CompleteVideoCountrySpecificData implements Cloneable {
         hashCode = hashCode * 31 + (certificationList == null ? 1237 : certificationList.hashCode());
         hashCode = hashCode * 31 + (dateWindowWiseSeasonSequenceNumberMap == null ? 1237 : dateWindowWiseSeasonSequenceNumberMap.hashCode());
         hashCode = hashCode * 31 + (mediaAvailabilityWindows == null ? 1237 : mediaAvailabilityWindows.hashCode());
-        hashCode = hashCode * 31 + (imagesAvailabilityWindows == null ? 1237 : imagesAvailabilityWindows.hashCode());
         return hashCode;
     }
 
@@ -67,7 +62,6 @@ public class CompleteVideoCountrySpecificData implements Cloneable {
         builder.append(",certificationList=").append(certificationList);
         builder.append(",dateWindowWiseSeasonSequenceNumberMap=").append(dateWindowWiseSeasonSequenceNumberMap);
         builder.append(",mediaAvailabilityWindows=").append(mediaAvailabilityWindows);
-        builder.append(",imagesAvailabilityWindows=").append(imagesAvailabilityWindows);
         builder.append("}");
         return builder.toString();
     }
