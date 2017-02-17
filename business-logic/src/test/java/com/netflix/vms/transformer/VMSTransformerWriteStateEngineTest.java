@@ -12,7 +12,7 @@ import org.reflections.scanners.SubTypesScanner;
 
 public class VMSTransformerWriteStateEngineTest {
     private static final String POJO_DATAMODEL_PACKAGE = "com.netflix.vms.transformer.hollowoutput";
-    private static final List<String> IGNORE_TYPES = Arrays.asList("ImageDownloadable", "VideoImage", "ImageDownloadableDescriptor", "StreamDownloadDescriptor");
+    private static final List<String> IGNORE_TYPES = Arrays.asList("ImageDownloadable", "VideoImage", "ImageDownloadableDescriptor", "StreamDownloadDescriptor", "VideoMoment");
 
     private VMSTransformerWriteStateEngine stateEngine;
 
