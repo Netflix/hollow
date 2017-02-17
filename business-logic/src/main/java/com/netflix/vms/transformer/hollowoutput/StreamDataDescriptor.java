@@ -10,7 +10,6 @@ public class StreamDataDescriptor implements Cloneable {
     public PixelAspect pixelAspect = null;
     public VideoResolution videoResolution = null;
     public Set<ISOCountry> cacheDeployedCountries = null;
-    public VideoMoment videoMoment = null;
     public int imageCount = java.lang.Integer.MIN_VALUE;
     public TargetDimensions targetDimensions = null;
 
@@ -31,9 +30,6 @@ public class StreamDataDescriptor implements Cloneable {
         if(o.cacheDeployedCountries == null) {
             if(cacheDeployedCountries != null) return false;
         } else if(!o.cacheDeployedCountries.equals(cacheDeployedCountries)) return false;
-        if(o.videoMoment == null) {
-            if(videoMoment != null) return false;
-        } else if(!o.videoMoment.equals(videoMoment)) return false;
         if(o.imageCount != imageCount) return false;
         if(o.targetDimensions == null) {
             if(targetDimensions != null) return false;
@@ -48,7 +44,6 @@ public class StreamDataDescriptor implements Cloneable {
         hashCode = hashCode * 31 + (pixelAspect == null ? 1237 : pixelAspect.hashCode());
         hashCode = hashCode * 31 + (videoResolution == null ? 1237 : videoResolution.hashCode());
         hashCode = hashCode * 31 + (cacheDeployedCountries == null ? 1237 : cacheDeployedCountries.hashCode());
-        hashCode = hashCode * 31 + (videoMoment == null ? 1237 : videoMoment.hashCode());
         hashCode = hashCode * 31 + imageCount;
         hashCode = hashCode * 31 + (targetDimensions == null ? 1237 : targetDimensions.hashCode());
         return hashCode;
@@ -61,7 +56,6 @@ public class StreamDataDescriptor implements Cloneable {
         builder.append(",pixelAspect=").append(pixelAspect);
         builder.append(",videoResolution=").append(videoResolution);
         builder.append(",cacheDeployedCountries=").append(cacheDeployedCountries);
-        builder.append(",videoMoment=").append(videoMoment);
         builder.append(",imageCount=").append(imageCount);
         builder.append(",targetDimensions=").append(targetDimensions);
         builder.append("}");
