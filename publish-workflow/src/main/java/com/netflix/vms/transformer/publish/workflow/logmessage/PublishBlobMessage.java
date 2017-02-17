@@ -6,7 +6,7 @@ public class PublishBlobMessage {
     private MessageBuilder msgBuilder = new MessageBuilder("Uploaded VMS Blob: ");
 
     public PublishBlobMessage(String vip, boolean isNostreams, long version, long dataVersion, long size, long duration) {
-        msgBuilder.put("keybase", isNostreams ? vip + " (nostreams)" : vip);
+        msgBuilder.put("keybase", isNostreams ? vip + "_nostreams" : vip);
         msgBuilder.put("region", "ALL");
         msgBuilder.put("version", version);
         msgBuilder.put("dataVersion", dataVersion);
