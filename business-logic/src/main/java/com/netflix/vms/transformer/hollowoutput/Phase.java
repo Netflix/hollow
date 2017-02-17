@@ -18,7 +18,6 @@ public class Phase implements Cloneable {
     public List<RolloutCast> casts = null;
     public List<RolloutRole> roles = null;
     public List<SupplementalVideo> supplementalVideos = null;
-    public Set<Long> artWorkImageIds = null;
     public Set<ArtworkSourceString> sourceFileIds = null;
     public char[] phaseType = null;
     public boolean isOnHold = false;
@@ -57,9 +56,6 @@ public class Phase implements Cloneable {
         if(o.supplementalVideos == null) {
             if(supplementalVideos != null) return false;
         } else if(!o.supplementalVideos.equals(supplementalVideos)) return false;
-        if(o.artWorkImageIds == null) {
-            if(artWorkImageIds != null) return false;
-        } else if(!o.artWorkImageIds.equals(artWorkImageIds)) return false;
         if(o.sourceFileIds == null) {
             if(sourceFileIds != null) return false;
         } else if(!o.sourceFileIds.equals(sourceFileIds)) return false;
@@ -84,7 +80,6 @@ public class Phase implements Cloneable {
         hashCode = hashCode * 31 + (casts == null ? 1237 : casts.hashCode());
         hashCode = hashCode * 31 + (roles == null ? 1237 : roles.hashCode());
         hashCode = hashCode * 31 + (supplementalVideos == null ? 1237 : supplementalVideos.hashCode());
-        hashCode = hashCode * 31 + (artWorkImageIds == null ? 1237 : artWorkImageIds.hashCode());
         hashCode = hashCode * 31 + (sourceFileIds == null ? 1237 : sourceFileIds.hashCode());
         hashCode = hashCode * 31 + Arrays.hashCode(phaseType);
         hashCode = hashCode * 31 + (isOnHold? 1231 : 1237);
@@ -105,7 +100,6 @@ public class Phase implements Cloneable {
         builder.append(",casts=").append(casts);
         builder.append(",roles=").append(roles);
         builder.append(",supplementalVideos=").append(supplementalVideos);
-        builder.append(",artWorkImageIds=").append(artWorkImageIds);
         builder.append(",sourceFileIds=").append(sourceFileIds);
         builder.append(",phaseType=").append(phaseType);
         builder.append(",isOnHold=").append(isOnHold);

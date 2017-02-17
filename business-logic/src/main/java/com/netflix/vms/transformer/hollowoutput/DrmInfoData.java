@@ -5,7 +5,7 @@ import java.util.Map;
 public class DrmInfoData implements Cloneable {
 
     public int packageId = java.lang.Integer.MIN_VALUE;
-    public Map<Long, DrmInfo> downloadableIdToDrmInfoMap = null;
+    public Map<DownloadableId, DrmInfo> downloadableIdToDrmInfoMap = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

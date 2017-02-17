@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class StreamData implements Cloneable {
 
-    public long downloadableId = java.lang.Long.MIN_VALUE;
+    public DownloadableId downloadableId = null;
     public int packageId = java.lang.Integer.MIN_VALUE;
     public long fileSizeInBytes = java.lang.Long.MIN_VALUE;
     public long creationTimeStampInSeconds = java.lang.Long.MIN_VALUE;
@@ -25,7 +25,9 @@ public class StreamData implements Cloneable {
             return false;
 
         StreamData o = (StreamData) other;
-        if(o.downloadableId != downloadableId) return false;
+        if(o.downloadableId == null) {
+            if(downloadableId != null) return false;
+        } else if(!o.downloadableId.equals(downloadableId)) return false;
         if(o.packageId != packageId) return false;
         if(o.fileSizeInBytes != fileSizeInBytes) return false;
         if(o.creationTimeStampInSeconds != creationTimeStampInSeconds) return false;
@@ -52,7 +54,7 @@ public class StreamData implements Cloneable {
 
     public int hashCode() {
         int hashCode = 1;
-        hashCode = hashCode * 31 + (int) (downloadableId ^ (downloadableId >>> 32));
+        hashCode = hashCode * 31 + (downloadableId == null ? 1237 : downloadableId.hashCode());
         hashCode = hashCode * 31 + packageId;
         hashCode = hashCode * 31 + (int) (fileSizeInBytes ^ (fileSizeInBytes >>> 32));
         hashCode = hashCode * 31 + (int) (creationTimeStampInSeconds ^ (creationTimeStampInSeconds >>> 32));

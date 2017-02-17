@@ -6,6 +6,7 @@ import static java.util.stream.Collectors.toMap;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageFormatEntry;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageTypeEntry;
+import com.netflix.vms.transformer.hollowoutput.DownloadableId;
 import com.netflix.vms.transformer.hollowoutput.DrmKeyString;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.NFLocale;
@@ -29,7 +30,7 @@ public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder 
         DrmKeyString,
         ISOCountry,
         Integer,
-        Long,
+        DownloadableId,
         NFLocale,
         Strings,
         SupplementalInfoType,
@@ -60,8 +61,8 @@ public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder 
             return ((com.netflix.vms.transformer.hollowoutput.Integer)objectToHash).val;
         case ISOCountry:
             return stringHashCode(((ISOCountry)objectToHash).id);
-        case Long:
-            return Long.hashCode(((com.netflix.vms.transformer.hollowoutput.Long)objectToHash).val);
+        case DownloadableId:
+            return Long.hashCode(((DownloadableId)objectToHash).val);
         case NFLocale:
             return stringHashCode(((NFLocale)objectToHash).value);
         case Strings:

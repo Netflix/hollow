@@ -5,6 +5,7 @@ import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
+import com.netflix.vms.transformer.hollowoutput.DownloadableId;
 import com.netflix.vms.transformer.hollowoutput.EncodeSummaryDescriptor;
 import com.netflix.vms.transformer.hollowoutput.EncodeSummaryDescriptorData;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
@@ -120,14 +121,13 @@ public class EncodeSummaryDescriptorModule {
 
     }
 
-
     private void addDownloadableIdToDescriptor(EncodeSummaryDescriptorDataKey key, String profileType, StreamData stream, Map<EncodeSummaryDescriptorDataKey, EncodeSummaryDescriptor> descriptorMap) {
         EncodeSummaryDescriptor descriptor = descriptorMap.get(key);
 
         if(descriptor == null) {
             descriptor = new EncodeSummaryDescriptor();
             descriptor.descriptorData = key.data;
-            descriptor.downloadableIds = new ArrayList<com.netflix.vms.transformer.hollowoutput.Long>();
+            descriptor.downloadableIds = new ArrayList<DownloadableId>();
             descriptor.fromMuxedOnlyStreams = true;
 
             descriptorMap.put(key, descriptor);
@@ -137,7 +137,7 @@ public class EncodeSummaryDescriptorModule {
             descriptor.descriptorData.encodingProfileId = key.data.encodingProfileId;
 
         descriptor.fromMuxedOnlyStreams = descriptor.fromMuxedOnlyStreams && "MUXED".equals(profileType);
-        descriptor.downloadableIds.add(new com.netflix.vms.transformer.hollowoutput.Long(stream.downloadableId));
+        descriptor.downloadableIds.add(stream.downloadableId);
     }
 
     private String getNativeLanguage(long videoId) {

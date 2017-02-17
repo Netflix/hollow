@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class OfflineViewingRestrictions implements Cloneable {
-    public Set<Long> streamOnlyDownloadables = null;
+    public Set<DownloadableId> streamOnlyDownloadables = null;
     public List<CupKey> downloadOnlyCupKeys = null;
     public Map<Strings, LanguageRestrictions> downloadLanguageBcp47RestrictionsMap = null;
 

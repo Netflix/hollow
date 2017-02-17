@@ -189,7 +189,6 @@ public class RolloutVideoModule extends AbstractTransformModule {
     private void initialize(Phase phase) {
         phase.projectedLaunchDates = new HashMap<ISOCountry, Date>();
         phase.windowsMap = new HashMap<ISOCountry, AvailabilityWindow>();
-        phase.artWorkImageIds = new HashSet<com.netflix.vms.transformer.hollowoutput.Long>();
         phase.sourceFileIds = new HashSet<ArtworkSourceString>();
         phase.trailers = new ArrayList<RolloutTrailer>();
         phase.casts = new ArrayList<RolloutCast>();

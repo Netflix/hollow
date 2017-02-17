@@ -14,6 +14,7 @@ import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowoutput.ContractRestriction;
+import com.netflix.vms.transformer.hollowoutput.DownloadableId;
 import com.netflix.vms.transformer.hollowoutput.LinkedHashSetOfStrings;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
 import com.netflix.vms.transformer.hollowoutput.PixelAspect;
@@ -95,7 +96,7 @@ public class WindowPackageContractInfoModule {
         if(deployablePackage != null) {
             info.videoPackageInfo.isDefaultPackage = deployablePackage._getDefaultPackage();
         }
-        Set<com.netflix.vms.transformer.hollowoutput.Long> excludedDownloadables = findRelevantExcludedDownloadables(packageData, country);
+        Set<DownloadableId> excludedDownloadables = findRelevantExcludedDownloadables(packageData, country);
 
         Set<Integer> soundTypesAudioChannels = new TreeSet<Integer>();
         Set<String> screenFormats = new TreeSet<String>();
@@ -140,7 +141,7 @@ public class WindowPackageContractInfoModule {
                 }
 
             } else if("AUDIO".equals(streamProfileType)) {
-                if(excludedDownloadables != null && !excludedDownloadables.contains(new com.netflix.vms.transformer.hollowoutput.Long(streamData.downloadableId)))
+                if(excludedDownloadables != null && !excludedDownloadables.contains(streamData.downloadableId))
                     soundTypesAudioChannels.add(Integer.valueOf((int)profile._getAudioChannelCount()));
             }
         }
@@ -271,7 +272,7 @@ public class WindowPackageContractInfoModule {
     }
 
 
-    private Set<com.netflix.vms.transformer.hollowoutput.Long> findRelevantExcludedDownloadables(PackageData packageData, String country) {
+    private Set<DownloadableId> findRelevantExcludedDownloadables(PackageData packageData, String country) {
         Set<ContractRestriction> countryContractRestrictions = packageData.contractRestrictions.get(cycleConstants.getISOCountry(country));
 
         if(countryContractRestrictions == null)
@@ -279,7 +280,7 @@ public class WindowPackageContractInfoModule {
 
         long now = ctx.getNowMillis();
 
-        Set<com.netflix.vms.transformer.hollowoutput.Long> nextExcludedDownloadables = Collections.emptySet();
+        Set<DownloadableId> nextExcludedDownloadables = Collections.emptySet();
         long nextStartDate = Long.MAX_VALUE;
 
         for(ContractRestriction restriction : countryContractRestrictions) {

@@ -1,22 +1,22 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 
-public class Long implements Cloneable {
+public class DownloadableId implements Cloneable {
 
     public long val = java.lang.Long.MIN_VALUE;
 
-    public Long() { }
+    public DownloadableId() { }
 
-    public Long(long value) {
+    public DownloadableId(long value) {
         this.val = value;
     }
 
     public boolean equals(Object other) {
         if(other == this)  return true;
-        if(!(other instanceof Long))
+        if(!(other instanceof DownloadableId))
             return false;
 
-        Long o = (Long) other;
+        DownloadableId o = (DownloadableId) other;
         if(o.val != val) return false;
         return true;
     }
@@ -34,9 +34,9 @@ public class Long implements Cloneable {
         return builder.toString();
     }
 
-    public Long clone() {
+    public DownloadableId clone() {
         try {
-            Long clone = (Long)super.clone();
+            DownloadableId clone = (DownloadableId)super.clone();
             clone.__assigned_ordinal = -1;
             return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }

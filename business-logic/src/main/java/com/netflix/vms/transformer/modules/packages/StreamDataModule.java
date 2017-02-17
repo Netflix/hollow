@@ -1,7 +1,5 @@
 package com.netflix.vms.transformer.modules.packages;
 
-import com.netflix.vms.transformer.hollowoutput.StreamDownloadLocationFilename;
-
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
@@ -29,6 +27,7 @@ import com.netflix.vms.transformer.hollowoutput.AssetTypeDescriptor;
 import com.netflix.vms.transformer.hollowoutput.DownloadDescriptor;
 import com.netflix.vms.transformer.hollowoutput.DownloadLocation;
 import com.netflix.vms.transformer.hollowoutput.DownloadLocationSet;
+import com.netflix.vms.transformer.hollowoutput.DownloadableId;
 import com.netflix.vms.transformer.hollowoutput.DrmInfo;
 import com.netflix.vms.transformer.hollowoutput.DrmInfoData;
 import com.netflix.vms.transformer.hollowoutput.DrmKey;
@@ -40,6 +39,7 @@ import com.netflix.vms.transformer.hollowoutput.QoEInfo;
 import com.netflix.vms.transformer.hollowoutput.StreamAdditionalData;
 import com.netflix.vms.transformer.hollowoutput.StreamData;
 import com.netflix.vms.transformer.hollowoutput.StreamDataDescriptor;
+import com.netflix.vms.transformer.hollowoutput.StreamDownloadLocationFilename;
 import com.netflix.vms.transformer.hollowoutput.StreamDrmData;
 import com.netflix.vms.transformer.hollowoutput.StreamMostlyConstantData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
@@ -122,7 +122,7 @@ public class StreamDataModule {
 
         StreamData outputStream = new StreamData();
 
-        outputStream.downloadableId = inputStream._getDownloadableId();
+        outputStream.downloadableId = new DownloadableId(inputStream._getDownloadableId());
         outputStream.packageId = (int)packages._getPackageId();
 
         outputStream.fileSizeInBytes = inputStreamIdentity._getFileSizeInBytes();
@@ -263,8 +263,6 @@ public class StreamDataModule {
                 outputStream.streamDataDescriptor.targetDimensions.widthInPixels = targetWidth;
             }
 
-
-            ////TODO: There is a discrepancy here -- some package-level DrmKeys are NOT available at the streams level
             Integer drmKeyGroup = Integer.valueOf((int)streamProfile._getDrmKeyGroup());
             Object drmKey = drmKeysByGroupId.get(drmKeyGroup);
             if(drmKey != null) {
@@ -286,7 +284,7 @@ public class StreamDataModule {
 
                 DrmInfo drmInfo = drmInfoByGroupId.get(drmKeyGroup);
                 if(drmInfo != null) {
-                    drmInfoData.downloadableIdToDrmInfoMap.put(new com.netflix.vms.transformer.hollowoutput.Long(outputStream.downloadableId), drmInfo);
+                    drmInfoData.downloadableIdToDrmInfoMap.put(outputStream.downloadableId, drmInfo);
                 }
             }
 

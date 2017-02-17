@@ -53,12 +53,12 @@ public class VMSTransformerHashCodeFinderTest {
     }
 
     @Test
-    public void hollowLongHashesToLongValueHashCode() {
+    public void hollowDownloadableIdHashesToLongValueHashCode() {
         Long value = 19L;
-        com.netflix.vms.transformer.hollowoutput.Long l =
-                new com.netflix.vms.transformer.hollowoutput.Long(value);
+        com.netflix.vms.transformer.hollowoutput.DownloadableId l =
+                new com.netflix.vms.transformer.hollowoutput.DownloadableId(value);
 
-        assertThat(subject.hashCode(RecordType.Long.name(), anyOrdinal(), l))
+        assertThat(subject.hashCode(RecordType.DownloadableId.name(), anyOrdinal(), l))
             .isEqualTo(value.hashCode());
     }
 

@@ -25,6 +25,7 @@ import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoStreamInfoHollow;
 import com.netflix.vms.transformer.hollowoutput.ChunkDurationsString;
 import com.netflix.vms.transformer.hollowoutput.CodecPrivateDataString;
+import com.netflix.vms.transformer.hollowoutput.DownloadableId;
 import com.netflix.vms.transformer.hollowoutput.DrmHeader;
 import com.netflix.vms.transformer.hollowoutput.DrmInfo;
 import com.netflix.vms.transformer.hollowoutput.DrmInfoData;
@@ -41,7 +42,6 @@ import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.contracts.ContractRestrictionModule;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -176,7 +176,7 @@ public class PackageDataModule {
         /// also create the DrmInfoData while iterating over the streams
         DrmInfoData drmInfoData = new DrmInfoData();
         drmInfoData.packageId = pkg.id;
-        drmInfoData.downloadableIdToDrmInfoMap = new HashMap<com.netflix.vms.transformer.hollowoutput.Long, DrmInfo>();
+        drmInfoData.downloadableIdToDrmInfoMap = new HashMap<DownloadableId, DrmInfo>();
 
 
         /////////// CONTRACT RESTRICTIONS /////////////////
