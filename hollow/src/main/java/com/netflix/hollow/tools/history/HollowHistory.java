@@ -83,7 +83,7 @@ public class HollowHistory {
      * @param maxHistoricalStatesToKeep The number of historical states to keep in memory
      */
     public HollowHistory(HollowReadStateEngine initialHollowStateEngine, long initialVersion, int maxHistoricalStatesToKeep, boolean isAutoDiscoverTypeIndex) {
-        this.keyIndex = new HollowHistoryKeyIndex();
+        this.keyIndex = new HollowHistoryKeyIndex(this);
         this.creator = new HollowHistoricalStateCreator(this);
         this.latestHollowReadStateEngine = initialHollowStateEngine;
         this.latestHeaderEntries = latestHollowReadStateEngine.getHeaderTags();
@@ -98,9 +98,7 @@ public class HollowHistory {
                     PrimaryKey pKey = ((HollowObjectSchema) schema).getPrimaryKey();
                     if (pKey == null) continue;
 
-                    String type = schema.getName();
-                    String[] keyFieldPaths = pKey.getFieldPaths();
-                    keyIndex.addTypeIndex(type, keyFieldPaths );
+                    keyIndex.addTypeIndex(pKey);
                 }
             }
         }
