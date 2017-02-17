@@ -86,10 +86,7 @@ public class PackageMomentDataModule {
             for(PackageMomentHollow packageMoment : inputPackage._getMoments()) {
                 String momentType = packageMoment._getMomentType()._getValue();
 
-                if("SnackMoment".equals(momentType) && packageMoment._getClipSpecRuntimeMillis() != Long.MIN_VALUE) {
-                    VideoMoment videoMoment = videoMomentModule.createVideoMoment(packageData.id, packageMoment, momentType);
-                    data.phoneSnackMoments.add(videoMoment);
-                } else if("Start".equals(momentType) || "Ending".equals(momentType) || "BladeImage".equals(momentType)) {
+                if("Start".equals(momentType) || "Ending".equals(momentType)) {
                     List<DownloadableIdHollow> downloadableIdList = packageMoment._getDownloadableIds();
 
                     if(downloadableIdList != null) {

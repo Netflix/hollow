@@ -1,8 +1,9 @@
 package com.netflix.vms.transformer;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,9 +12,11 @@ import org.reflections.scanners.SubTypesScanner;
 
 public class VMSTransformerWriteStateEngineTest {
     private static final String POJO_DATAMODEL_PACKAGE = "com.netflix.vms.transformer.hollowoutput";
+    private static final List<String> IGNORE_TYPES = Arrays.asList("ImageDownloadable", "VideoImage", "ImageDownloadableDescriptor", "StreamDownloadDescriptor");
 
     private VMSTransformerWriteStateEngine stateEngine;
 
+    
     @Before
     public void setup() {
         stateEngine = new VMSTransformerWriteStateEngine();
@@ -27,6 +30,8 @@ public class VMSTransformerWriteStateEngineTest {
         for (String className : reflections.getAllTypes()) {
             Class<?> clazz = Class.forName(className);
             String typeName = clazz.getSimpleName();
+            if(IGNORE_TYPES.contains(typeName))
+                continue;
             if (stateEngine.getTypeState(typeName) == null) {
                 missingSet.add(typeName);
                 System.out.println("\t *** [MISSING]: \t" + typeName);

@@ -13,7 +13,7 @@ public class VideoPackageInfo implements Cloneable {
     public int runtimeInSeconds = java.lang.Integer.MIN_VALUE;
     public List<Strings> soundTypes = null;
     public List<Strings> screenFormats = null;
-    public Map<Strings, List<VideoImage>> stillImagesMap = null;
+    public transient Map<Strings, List<VideoImage>> stillImagesMap = null;
     public Map<TrickPlayType, TrickPlayItem> trickPlayMap = null;
     public long startMomentOffsetInSeconds = -1;
     public long endMomentOffsetInSeconds = -1;
