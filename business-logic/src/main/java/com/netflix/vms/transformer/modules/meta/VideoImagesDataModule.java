@@ -663,7 +663,8 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
                     
                     if(!ctx.getConfig().isRollupImagesForArtworkScheduling() || topNodes == null || topNodes.isEmpty()){
                         Set<Artwork> artworkSet = getArtworkSet(entityId, artMap);
-                        artworkSet.add(updatedArtwork);
+                        if (updatedArtwork != null)
+                        	artworkSet.add(updatedArtwork);
                         continue;
                     }
                     
