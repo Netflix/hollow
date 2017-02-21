@@ -165,8 +165,6 @@ public class StreamDataModule {
             outputStream.additionalData.cropParams.height = inputCropParams._getHeight();
         }
         
-        outputStream.additionalData.cropParams = new StreamCropParams();
-        
         Set<StreamDeploymentLabelHollow> deploymentLabels = inputStreamDeployment._getDeploymentLabel();
         int deploymentLabelBits = 0;
         if(deploymentLabels != null) {
