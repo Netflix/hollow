@@ -1,4 +1,4 @@
-package com.netflix.hollow.api;
+package com.netflix.hollow.api.producer;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertFalse;

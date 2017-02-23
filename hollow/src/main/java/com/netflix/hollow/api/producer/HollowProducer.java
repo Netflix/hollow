@@ -144,7 +144,6 @@ public class HollowProducer {
                 cycleStatus = ProducerStatus.success(writeState.getVersion());
             }
         } catch(Throwable th) {
-            th.printStackTrace();
             writeEngine.resetToLastPrepareForNextCycle();
             cycleStatus = ProducerStatus.fail(mintedVersion, th);
         } finally {
@@ -295,7 +294,7 @@ public class HollowProducer {
     }
 
     public static interface Populator {
-        void populate(HollowProducer.WriteState newState);
+        void populate(HollowProducer.WriteState newState) throws Exception;
     }
 
     public static interface WriteState {
