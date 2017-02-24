@@ -48,7 +48,6 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     /* fields */
     private final String vip;
     private final Map<RegionEnum, AnnounceJob> priorAnnouncedJobs;
-    private CanaryValidationJob priorCycleCanaryValidationJob;
 
     public HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, NetflixS3BlobPublisher blobPublisher, NetflixS3BlobPublisher nostreamsBlobPublisher, HermesBlobAnnouncer hermesBlobAnnouncer, DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
         this(ctx, fileStore, blobPublisher, nostreamsBlobPublisher, hermesBlobAnnouncer, new HollowBlobDataProvider(ctx), dataSlicer, uploadStatus, vip);
@@ -109,8 +108,6 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         if(ctx.getConfig().isCreateDevSlicedBlob())
             scheduler.submitJob(jobCreator.createDevSliceJob(ctx, primaryRegionAnnounceJob, inputDataVersion, newVersion));
         
-        priorCycleCanaryValidationJob = canaryValidationJob;
-        
         return new WorkflowCycleStatusFuture(ctx.getStatusIndicator(), newVersion);
     }
 
@@ -137,10 +134,10 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs = new HashMap<RegionEnum, AfterCanaryAnnounceJob>(3);
 
         for (RegionEnum region : PublishRegionProvider.ALL_REGIONS) {
-            BeforeCanaryAnnounceJob beforeCanaryAnnounceJob = jobCreator.createBeforeCanaryAnnounceJob(vip, newVersion, region, circuitBreakerJob, priorCycleCanaryValidationJob, publishJobs);
+            BeforeCanaryAnnounceJob beforeCanaryAnnounceJob = jobCreator.createBeforeCanaryAnnounceJob(vip, newVersion, region, circuitBreakerJob, publishJobs);
             scheduler.submitJob(beforeCanaryAnnounceJob);
 
-            CanaryAnnounceJob canaryAnnounceJob = jobCreator.createCanaryAnnounceJob(vip, newVersion, region, beforeCanaryAnnounceJob, priorCycleCanaryValidationJob, publishJobs);
+            CanaryAnnounceJob canaryAnnounceJob = jobCreator.createCanaryAnnounceJob(vip, newVersion, region, beforeCanaryAnnounceJob);
             scheduler.submitJob(canaryAnnounceJob);
 
             AfterCanaryAnnounceJob afterCanaryAnnounceJob = jobCreator.createAfterCanaryAnnounceJob(vip, newVersion, region, beforeCanaryAnnounceJob, canaryAnnounceJob);

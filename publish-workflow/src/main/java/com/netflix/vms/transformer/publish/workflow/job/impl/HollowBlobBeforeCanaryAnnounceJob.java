@@ -2,20 +2,18 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.PlaybackMonkey;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.BeforeCanaryAnnounceJob;
-import com.netflix.vms.transformer.publish.workflow.job.CanaryValidationJob;
 import com.netflix.vms.transformer.publish.workflow.job.CircuitBreakerJob;
 import com.netflix.vms.transformer.publish.workflow.job.impl.ValuableVideoHolder.ValuableVideo;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.PlaybackMonkeyTester;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class HollowBlobBeforeCanaryAnnounceJob extends BeforeCanaryAnnounceJob {
     private final PlaybackMonkeyTester dataTester;
@@ -23,9 +21,8 @@ public class HollowBlobBeforeCanaryAnnounceJob extends BeforeCanaryAnnounceJob {
 	private final ValuableVideoHolder videoRanker;
 
 	public HollowBlobBeforeCanaryAnnounceJob(PublishWorkflowContext ctx, long newVersion, RegionEnum region, CircuitBreakerJob circuitBreakerJob,
-			CanaryValidationJob previousCycleValidationJob, List<PublicationJob> newPublishJobs, PlaybackMonkeyTester dataTester,
-			ValuableVideoHolder videoRanker) {
-		super(ctx, ctx.getVip(), newVersion, region, circuitBreakerJob, previousCycleValidationJob, newPublishJobs);
+			List<PublicationJob> newPublishJobs, PlaybackMonkeyTester dataTester, ValuableVideoHolder videoRanker) {
+		super(ctx, ctx.getVip(), newVersion, region, circuitBreakerJob, newPublishJobs);
 		this.dataTester = dataTester;
 		this.videoRanker = videoRanker;
 		this.testResultVideoCountryKeys = Collections.emptyMap();

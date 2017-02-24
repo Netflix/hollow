@@ -39,15 +39,12 @@ public interface HollowPublishJobCreator {
                                                              long newVersion,
                                                              RegionEnum region,
                                                              CircuitBreakerJob circuitBreakerJob,
-                                                             CanaryValidationJob previousCycleValidationJob,
                                                              List<PublicationJob> newPublishJobs);
 
     CanaryAnnounceJob               createCanaryAnnounceJob (String vip,
                                                              long newVersion,
                                                              RegionEnum region,
-                                                             BeforeCanaryAnnounceJob beforeCanaryAnnounceHook,
-                                                             CanaryValidationJob priorCycleCanaryValidationJob,
-                                                             List<PublicationJob> newPublishJobs);
+                                                             BeforeCanaryAnnounceJob beforeCanaryAnnounceHook);
 
     CanaryRollbackJob               createCanaryRollbackJob (String vip,
                                                              long cycleVersion,

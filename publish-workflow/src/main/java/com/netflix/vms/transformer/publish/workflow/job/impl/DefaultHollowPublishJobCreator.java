@@ -116,20 +116,15 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
 	public BeforeCanaryAnnounceJob createBeforeCanaryAnnounceJob(String vip,
 			long newVersion, RegionEnum region,
 			CircuitBreakerJob circuitBreakerJob,
-			CanaryValidationJob previousCycleValidationJob,
 			List<PublicationJob> newPublishJobs) {
-		return new HollowBlobBeforeCanaryAnnounceJob(ctx, newVersion, region, circuitBreakerJob, previousCycleValidationJob,
+		return new HollowBlobBeforeCanaryAnnounceJob(ctx, newVersion, region, circuitBreakerJob, 
 				newPublishJobs, playbackMonkeyTester, videoRanker);
 	}
 
 	@Override
-	public CanaryAnnounceJob createCanaryAnnounceJob(String vip,
-			long newVersion, RegionEnum region,
-			BeforeCanaryAnnounceJob beforeCanaryAnnounceHook,
-			CanaryValidationJob previousCycleValidationJob,
-			List<PublicationJob> newPublishJobs) {
-		return new HermesCanaryAnnounceJob(ctx, vip, newVersion, region, beforeCanaryAnnounceHook, previousCycleValidationJob,
-				newPublishJobs);
+	public CanaryAnnounceJob createCanaryAnnounceJob(String vip, long newVersion, 
+	        RegionEnum region, BeforeCanaryAnnounceJob beforeCanaryAnnounceHook) {
+		return new HermesCanaryAnnounceJob(ctx, vip, newVersion, region, beforeCanaryAnnounceHook);
 	}
 
 	@Override

@@ -17,15 +17,13 @@ public abstract class BeforeCanaryAnnounceJob extends PublishWorkflowPublication
     protected final RegionEnum region;
     private final List<HollowBlobPublishJob> snapshotPublishJobs;
     private final List<HollowBlobPublishJob> deltaPublishJobs;
-    private final CanaryValidationJob previousCanaryValidationJob;
     private final CircuitBreakerJob circuitBreakerJob;
 
 
-	public BeforeCanaryAnnounceJob(PublishWorkflowContext ctx, String vip, long newVersion, RegionEnum region, CircuitBreakerJob circuitBreakerJob, CanaryValidationJob previousCycleValidationJob, List<PublicationJob> newPublishJobs) {
+	public BeforeCanaryAnnounceJob(PublishWorkflowContext ctx, String vip, long newVersion, RegionEnum region, CircuitBreakerJob circuitBreakerJob, List<PublicationJob> newPublishJobs) {
 		super(ctx, "Before-canary-annouce-"+region, newVersion);
         this.vip = vip;
         this.region = region;
-        this.previousCanaryValidationJob = previousCycleValidationJob;
         this.circuitBreakerJob = circuitBreakerJob;
         this.snapshotPublishJobs = findJob(newPublishJobs, PublishType.SNAPSHOT);
         this.deltaPublishJobs = findJob(newPublishJobs, PublishType.DELTA);
@@ -46,21 +44,19 @@ public abstract class BeforeCanaryAnnounceJob extends PublishWorkflowPublication
 
     @Override
     public boolean isEligible() {
-        if(previousCanaryValidationJobFinished()) {
-            if(jobExistsAndCompletedSuccessfully(circuitBreakerJob)) {
-                if(!deltaPublishJobs.isEmpty()) {
-                    for(HollowBlobPublishJob deltaPublishJob : deltaPublishJobs) {
-                        if(!jobExistsAndCompletedSuccessfully(deltaPublishJob))
-                            return false;
-                    }
-                    return true;
-                } else if(!snapshotPublishJobs.isEmpty()){
-                    for(HollowBlobPublishJob snapshotPublishJob : snapshotPublishJobs) {
-                        if(!jobExistsAndCompletedSuccessfully(snapshotPublishJob))
-                            return false;
-                    }
-                    return true;
+        if(jobExistsAndCompletedSuccessfully(circuitBreakerJob)) {
+            if(!deltaPublishJobs.isEmpty()) {
+                for(HollowBlobPublishJob deltaPublishJob : deltaPublishJobs) {
+                    if(!jobExistsAndCompletedSuccessfully(deltaPublishJob))
+                        return false;
                 }
+                return true;
+            } else if(!snapshotPublishJobs.isEmpty()){
+                for(HollowBlobPublishJob snapshotPublishJob : snapshotPublishJobs) {
+                    if(!jobExistsAndCompletedSuccessfully(snapshotPublishJob))
+                        return false;
+                }
+                return true;
             }
         }
         return false;
@@ -68,30 +64,21 @@ public abstract class BeforeCanaryAnnounceJob extends PublishWorkflowPublication
 
     @Override
     protected boolean isFailedBasedOnDependencies() {
-        if(previousCanaryValidationJobFinished()) {
-            if(jobDoesNotExistOrFailed(circuitBreakerJob))
-                return true;
+        if(jobDoesNotExistOrFailed(circuitBreakerJob))
+            return true;
 
-            if(deltaPublishJobs.isEmpty() && snapshotPublishJobs.isEmpty())
-                return true;
+        if(deltaPublishJobs.isEmpty() && snapshotPublishJobs.isEmpty())
+            return true;
 
-            if(!deltaPublishJobs.isEmpty()) {
-                if(jobDoesNotExistOrFailed(previousCanaryValidationJob))
-                    return true;
-                
-                for(HollowBlobPublishJob deltaPublishJob : deltaPublishJobs)
-                    if(deltaPublishJob.hasJobFailed()) return true;
-            } else {
-                for(HollowBlobPublishJob snapshotPublishJob : snapshotPublishJobs)
-                    if(snapshotPublishJob.hasJobFailed()) return true;
-            }
+        if(!deltaPublishJobs.isEmpty()) {
+            for(HollowBlobPublishJob deltaPublishJob : deltaPublishJobs)
+                if(deltaPublishJob.hasJobFailed()) return true;
+        } else {
+            for(HollowBlobPublishJob snapshotPublishJob : snapshotPublishJobs)
+                if(snapshotPublishJob.hasJobFailed()) return true;
         }
 
         return false;
-    }
-
-    private boolean previousCanaryValidationJobFinished() {
-        return previousCanaryValidationJob == null || previousCanaryValidationJob.isComplete() || previousCanaryValidationJob.hasJobFailed();
     }
 
     /**
