@@ -62,7 +62,7 @@ public class S3HollowBlobPublishJob extends HollowBlobPublishJob {
         long duration = System.currentTimeMillis() - startTime;
         if(success) {
             status.setStatus(UploadStatus.SUCCESS);
-            ctx.getLogger().info(PublishedBlob, new PublishBlobMessage(vip, isNostreams, getCycleVersion(), getCycleVersion(), fileToUpload.length(), duration));
+            ctx.getLogger().info(PublishedBlob, new PublishBlobMessage(vip, isNostreams, getPublishType().toString(), getCycleVersion(), getCycleVersion(), fileToUpload.length(), duration));
         } else {
             status.setStatus(UploadStatus.FAILED);
         }
