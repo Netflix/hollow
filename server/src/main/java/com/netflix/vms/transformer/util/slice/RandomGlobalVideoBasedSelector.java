@@ -72,7 +72,7 @@ public class RandomGlobalVideoBasedSelector {
         while (completeVideoOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
             CompleteVideoHollow completeVideo = api.getCompleteVideoHollow(completeVideoOrdinal);
             String countryCode = completeVideo._getCountry()._getId();
-            VideoCollectionsDataHollow videoCollectionsData = completeVideo._getFacetData()._getVideoCollectionsData();
+            VideoCollectionsDataHollow videoCollectionsData = completeVideo._getData()._getFacetData()._getVideoCollectionsData();
             VideoNodeTypeHollow nodeType = videoCollectionsData._getNodeType();
             if (nodeType._isValueEqual("SHOW") || nodeType._isValueEqual("MOVIE")) {
                 Integer videoId = vid._getCompleteVideo()._getId()._getValueBoxed();
@@ -102,7 +102,7 @@ public class RandomGlobalVideoBasedSelector {
         int completeVideoOrdinal = completeVideoPrimaryKeyIdx.getMatchingOrdinal(videoId, countryCode);
         CompleteVideoHollow vid = api.getCompleteVideoHollow(completeVideoOrdinal);
 
-        VideoCollectionsDataHollow videoCollectionsData = vid._getFacetData()._getVideoCollectionsData();
+        VideoCollectionsDataHollow videoCollectionsData = vid._getData()._getFacetData()._getVideoCollectionsData();
 
         for (SupplementalVideoHollow supplemental : videoCollectionsData._getSupplementalVideos()) {
             toSet.add(supplemental._getId()._getValueBoxed());

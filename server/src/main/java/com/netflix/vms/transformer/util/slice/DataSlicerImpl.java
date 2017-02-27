@@ -118,13 +118,6 @@ public class DataSlicerImpl implements DataSlicer {
                 }
             });
 
-            findIncludedOrdinals(stateEngine, "VideoEpisode_CountryList", videoIdsToInclude, new VideoIdDeriver() {
-                @Override
-                public Integer deriveId(int ordinal) {
-                    return outputAPI.getVideoEpisode_CountryListHollow(ordinal)._getItem()._getDeliverableVideo()._getValueBoxed();
-                }
-            });
-
             findIncludedOrdinals(stateEngine, "FallbackUSArtwork", videoIdsToInclude, new VideoIdDeriver() {
                 @Override
                 public Integer deriveId(int ordinal) {
