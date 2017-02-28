@@ -181,13 +181,8 @@ public class HollowProducer {
                 }
             }
 
-            /// it's ok to fail to publish a snapshot, as long as you don't miss too many in a row.
-            /// you can add a timeout or even do this in a separate thread.
-            try {
-                publisher.publish(snapshot);
-            } catch(Throwable ignored) {
-                ignored.printStackTrace(); // TODO: timt: log and notify listerners
-            }
+            // TODO: timt: allow some failed snapshot publishes
+            publisher.publish(snapshot);
             status = ProducerStatus.success(writeState.getVersion());
         } catch(Throwable th) {
             status = ProducerStatus.fail(writeState.getVersion(), th);
