@@ -72,11 +72,11 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             /// gather fields from type hierarchy
             Class<?> currentClass = clazz;
             
-            while(currentClass != Object.class) {
+            while(currentClass != Object.class && currentClass != Enum.class) {
                 Field[] declaredFields = currentClass.getDeclaredFields();
     
                 for(int i=0;i<declaredFields.length;i++) {
-                    if(!Modifier.isTransient(declaredFields[i].getModifiers()) && 
+                    if(!Modifier.isTransient(declaredFields[i].getModifiers()) &&
                        !Modifier.isStatic(declaredFields[i].getModifiers()) && 
                        !"__assigned_ordinal".equals(declaredFields[i].getName())) {
                         
