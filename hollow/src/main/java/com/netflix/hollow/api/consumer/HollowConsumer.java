@@ -17,6 +17,9 @@
  */
 package com.netflix.hollow.api.consumer;
 
+import com.netflix.hollow.api.client.HollowAnnouncementWatcher;
+import com.netflix.hollow.api.client.HollowBlobRetriever;
+import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
 /**
@@ -44,4 +47,31 @@ public class HollowConsumer {
         long get();
     }
 
+    public static interface StateRetriever {
+        ReadState retrieveLatestAnnounced();
+        long latestAnnouncedVersion();
+    }
+
+    // TODO: timt: don't use HollowBlobRetriever or HollowClient; this is temporary bridge code
+    public static class BlobStoreStateRetriever implements StateRetriever {
+        private final HollowAnnouncementWatcher announcementWatcher;
+        private final HollowBlobRetriever blobRetriever;
+
+        public BlobStoreStateRetriever(HollowAnnouncementWatcher announcementWatcher, HollowBlobRetriever blobRetriever) {
+            this.announcementWatcher = announcementWatcher;
+            this.blobRetriever = blobRetriever;
+        }
+
+        @Override
+        public long latestAnnouncedVersion() {
+            return announcementWatcher.getLatestVersion();
+        }
+
+        @Override
+        public ReadState retrieveLatestAnnounced() {
+            HollowClient client = new HollowClient(blobRetriever);
+            client.triggerRefreshTo(latestAnnouncedVersion());
+            return new ReadStateImpl(client.getCurrentVersionId(), client.getStateEngine());
+        }
+    }
 }

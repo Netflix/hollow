@@ -24,10 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.netflix.hollow.api.client.HollowBlobRetriever;
-import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.consumer.ReadStateImpl;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
@@ -83,29 +80,27 @@ public class HollowProducer {
         listeners.fireProducerInit(currentTimeMillis() - start);
     }
 
-    public HollowProducer restore(HollowConsumer.AnnouncementRetriever announcementRetriever, HollowBlobRetriever blobRetriever) {
+    public HollowProducer restore(HollowConsumer.StateRetriever retriever) {
         long start = currentTimeMillis();
         RestoreStatus status = RestoreStatus.unknownFailure();
         long versionDesired = Long.MIN_VALUE;
-        long versionReached = Long.MIN_VALUE;
+        HollowConsumer.ReadState readState = null;
 
         try {
-            versionDesired = announcementRetriever.get();
+            versionDesired = retriever.latestAnnouncedVersion();
             listeners.fireProducerRestoreStart(versionDesired);
             if(versionDesired != Long.MIN_VALUE) {
-                HollowClient client = new HollowClient(blobRetriever);
-                client.triggerRefreshTo(versionDesired);
-                versionReached = client.getCurrentVersionId();
-                if(versionReached == versionDesired) {
-                    readStates = ReadStateHelper.restored(new ReadStateImpl(client));
+                readState = retriever.retrieveLatestAnnounced();
+                if(readState.getVersion() == versionDesired) {
+                    readStates = ReadStateHelper.restored(readState);
                     writeEngine.restoreFrom(readStates.current().getStateEngine());
-                    status = RestoreStatus.success(versionDesired, versionReached);
+                    status = RestoreStatus.success(versionDesired, readState.getVersion());
                 } else {
-                    status = RestoreStatus.fail(versionDesired, versionReached, null);
+                    status = RestoreStatus.fail(versionDesired, readState.getVersion(), null);
                 }
             }
         } catch(Throwable th) {
-            status = RestoreStatus.fail(versionDesired, versionReached, th);
+            status = RestoreStatus.fail(versionDesired, readState != null ? readState.getVersion() : Long.MIN_VALUE, th);
         } finally {
             listeners.fireProducerRestoreComplete(status, currentTimeMillis() - start);
         }
