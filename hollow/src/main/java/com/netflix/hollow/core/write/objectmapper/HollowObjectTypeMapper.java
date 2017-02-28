@@ -78,8 +78,9 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 for(int i=0;i<declaredFields.length;i++) {
                     if(!Modifier.isTransient(declaredFields[i].getModifiers()) &&
                        !Modifier.isStatic(declaredFields[i].getModifiers()) && 
-                       !"__assigned_ordinal".equals(declaredFields[i].getName())) {
-                        
+                       !"__assigned_ordinal".equals(declaredFields[i].getName()) &&
+                       declaredFields[i].getAnnotation(HollowTransient.class) == null) {
+
                         mappedFields.add(new MappedField(declaredFields[i], visited));
                     }
                 }

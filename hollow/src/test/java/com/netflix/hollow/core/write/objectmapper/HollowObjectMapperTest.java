@@ -17,9 +17,11 @@
  */
 package com.netflix.hollow.core.write.objectmapper;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Date;
 
 import com.netflix.hollow.core.AbstractStateEngineTest;
+import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.stringifier.HollowRecordJsonStringifier;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
@@ -92,6 +94,26 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         GenericHollowObject obj = new GenericHollowObject(readStateEngine, "Date", theOrdinal);
         
         Assert.assertEquals(time, obj.getLong("value"));
+    }
+
+    @Test
+    public void testTransient() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+
+        mapper.initializeTypeState(TestTransientClass.class);
+        mapper.add(new TestTransientClass(1, 2, 3));
+
+        roundTripSnapshot();
+
+        HollowSchema schema = readStateEngine.getSchema("TestTransientClass");
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        schema.writeTo(baos);
+
+        String schemeText = baos.toString();
+        Assert.assertTrue(schemeText.contains("notTransient"));
+        Assert.assertFalse(schemeText.contains("transientKeyword"));
+        Assert.assertFalse(schemeText.contains("annotatedTransient"));
     }
 
     @Test
@@ -184,5 +206,16 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
     }
 
 
+    private static class TestTransientClass {
+        int notTransient;
+        transient int transientKeyword;
+        @HollowTransient
+        int annotatedTransient;
 
+        public TestTransientClass(int notTransient, int transientKeyword, int annotatedTransient) {
+            this.notTransient = notTransient;
+            this.transientKeyword = transientKeyword;
+            this.annotatedTransient = annotatedTransient;
+        }
+    }
 }
