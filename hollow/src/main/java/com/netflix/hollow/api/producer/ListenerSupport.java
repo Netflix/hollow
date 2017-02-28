@@ -89,9 +89,9 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) l.onPublishComplete(publishStatus, elapsedMillis, MILLISECONDS);
     }
 
-    long fireIntegrityCheckStart(HollowProducer.WriteState writeState) {
+    long fireIntegrityCheckStart(long version) {
         long start = currentTimeMillis();
-        for(final HollowProducerListener l : listeners) l.onIntegrityCheckStart(writeState.getVersion());
+        for(final HollowProducerListener l : listeners) l.onIntegrityCheckStart(version);
         return start;
     }
 

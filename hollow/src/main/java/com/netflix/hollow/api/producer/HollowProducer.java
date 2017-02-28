@@ -32,7 +32,6 @@ import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
@@ -48,46 +47,33 @@ public class HollowProducer {
         public void validate(HollowConsumer.ReadState readState) {}
     };
 
-    private final VersionMinter versionMinter;
     private final Publisher publisher;
     private final Validator validator;
     private final Announcer announcer;
-    // TODO: timt: use HollowConsumer API
-    private final HollowBlobRetriever blobRetriever;
     private final HollowWriteStateEngine writeEngine;
     private final HollowObjectMapper objectMapper;
+    private final VersionMinter versionMinter;
     private final ListenerSupport listeners;
-
-    private Transition announced;
-
-    public HollowProducer(HollowProducer.Publisher publisher,
-            HollowProducer.Announcer announcer,
-            HollowBlobRetriever blobRetriever) {
-        this(new VersionMinterWithCounter(), publisher, NO_VALIDATIONS, announcer, blobRetriever);
-    }
+    private ReadStateHelper readStates;
 
     public HollowProducer(HollowProducer.Publisher publisher,
-            HollowProducer.Validator validator,
-            HollowProducer.Announcer announcer,
-            HollowBlobRetriever blobRetriever) {
-        this(new VersionMinterWithCounter(), publisher, validator, announcer, blobRetriever);
+            HollowProducer.Announcer announcer) {
+        this(publisher, NO_VALIDATIONS, announcer);
     }
 
-    private HollowProducer(VersionMinter versionMinter,
+    public HollowProducer(
             Publisher publisher,
             Validator validator,
-            Announcer announcer,
-            HollowBlobRetriever blobRetriever) {
-        this.versionMinter = versionMinter;
+            Announcer announcer) {
         this.publisher = publisher;
         this.validator = validator;
         this.announcer = announcer;
-        this.blobRetriever = blobRetriever;
 
-        announced = new Transition();
         writeEngine = new HollowWriteStateEngine();
         objectMapper = new HollowObjectMapper(writeEngine);
+        versionMinter = new VersionMinterWithCounter();
         listeners = new ListenerSupport();
+        readStates = ReadStateHelper.newDeltaChain();
     }
 
     public void initializeDataModel(Class<?>...classes) {
@@ -97,7 +83,7 @@ public class HollowProducer {
         listeners.fireProducerInit(currentTimeMillis() - start);
     }
 
-    public HollowProducer restore(HollowConsumer.AnnouncementRetriever announcementRetriever) {
+    public HollowProducer restore(HollowConsumer.AnnouncementRetriever announcementRetriever, HollowBlobRetriever blobRetriever) {
         long start = currentTimeMillis();
         RestoreStatus status = RestoreStatus.unknownFailure();
         long versionDesired = Long.MIN_VALUE;
@@ -106,20 +92,23 @@ public class HollowProducer {
         try {
             versionDesired = announcementRetriever.get();
             listeners.fireProducerRestoreStart(versionDesired);
-
             if(versionDesired != Long.MIN_VALUE) {
-                HollowConsumer.ReadState readState = toReadState(versionDesired);
-                versionReached = readState.getVersion();
+                HollowClient client = new HollowClient(blobRetriever);
+                client.triggerRefreshTo(versionDesired);
+                versionReached = client.getCurrentVersionId();
                 if(versionReached == versionDesired) {
-                    writeEngine.restoreFrom(readState.getStateEngine());
-                    announced = new Transition(versionReached);
+                    readStates = ReadStateHelper.restored(new ReadStateImpl(client));
+                    writeEngine.restoreFrom(readStates.current().getStateEngine());
                     status = RestoreStatus.success(versionDesired, versionReached);
+                } else {
+                    status = RestoreStatus.fail(versionDesired, versionReached, null);
                 }
             }
         } catch(Throwable th) {
             status = RestoreStatus.fail(versionDesired, versionReached, th);
+        } finally {
+            listeners.fireProducerRestoreComplete(status, currentTimeMillis() - start);
         }
-        listeners.fireProducerRestoreComplete(status, currentTimeMillis() - start);
         return this;
     }
 
@@ -127,24 +116,20 @@ public class HollowProducer {
      * Each cycle produces a single data state.
      */
     public void runCycle(Populator task) {
-        WriteState writeState = null;
         long start = currentTimeMillis();
         ProducerStatus cycleStatus = ProducerStatus.unknownFailure();
-        long mintedVersion = Long.MIN_VALUE;
+        WriteState writeState = null;
         try {
-            mintedVersion = versionMinter.mint();
-            Transition transition = announced.advance(mintedVersion);
-            if(transition.isSnapshot()) listeners.fireNewDeltaChain(mintedVersion);
-            listeners.fireCycleStart(mintedVersion);
-            writeState = beginCycle(transition);
+            writeState = beginCycle();
             task.populate(writeState);
             if(writeEngine.hasChangedSinceLastCycle()) {
-                publish(transition, writeState);
-                HollowConsumer.ReadState readState = checkIntegrity(transition, writeState);
-                validate(readState);
-                announce(readState);
-                announced = transition;
-                cycleStatus = ProducerStatus.success(readState);
+                publish(writeState);
+                ReadStateHelper candidate = readStates.roundtrip(writeState);
+                checkIntegrity(candidate);
+                validate(candidate.pending());
+                announce(candidate.pending());
+                readStates = candidate.commit();
+                cycleStatus = ProducerStatus.success(readStates.current());
             } else {
                 writeEngine.resetToLastPrepareForNextCycle();
                 listeners.fireNoDelta(writeState.getVersion());
@@ -152,7 +137,7 @@ public class HollowProducer {
             }
         } catch(Throwable th) {
             writeEngine.resetToLastPrepareForNextCycle();
-            cycleStatus = ProducerStatus.fail(mintedVersion, th);
+            cycleStatus = ProducerStatus.fail(writeState != null ? writeState.getVersion() : Long.MIN_VALUE, th);
         } finally {
             listeners.fireCycleComplete(cycleStatus, start);
         }
@@ -166,30 +151,33 @@ public class HollowProducer {
         listeners.remove(listener);
     }
 
-    private WriteState beginCycle(Transition transition) {
+    private WriteState beginCycle() {
+        long toVersion = versionMinter.mint();
+        if(!readStates.hasCurrent()) listeners.fireNewDeltaChain(toVersion);
+        listeners.fireCycleStart(toVersion);
         writeEngine.prepareForNextCycle();
-        WriteState writeState = new WriteStateImpl(objectMapper, transition.toVersion);
-        return writeState;
+        return new WriteStateImpl(objectMapper, toVersion);
     }
 
-    private void publish(Transition transition, WriteState writeState) throws IOException {
+    private void publish(WriteState writeState) throws IOException {
         long start = listeners.firePublishStart(writeState.getVersion());
         HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
 
-        Blob snapshot = publisher.openSnapshot(transition.toVersion);
+        Blob snapshot = null;
         ProducerStatus status = ProducerStatus.unknownFailure();
         try {
+            snapshot = publisher.openSnapshot(writeState.getVersion());
             writer.writeSnapshot(snapshot.getOutputStream());
 
-            if(transition.isDelta()) {
-                Blob delta = publisher.openDelta(transition.fromVersion, transition.toVersion);
+            if(readStates.hasCurrent()) {
+                Blob delta = publisher.openDelta(readStates.current().getVersion(), writeState.getVersion());
                 try {
                     writer.writeDelta(delta.getOutputStream());
                     publisher.publish(delta);
                 } finally {
                     delta.close();
                 }
-                Blob reverseDelta = publisher.openReverseDelta(transition.fromVersion, transition.toVersion);
+                Blob reverseDelta = publisher.openReverseDelta(readStates.current().getVersion(), writeState.getVersion());
                 try {
                     writer.writeReverseDelta(reverseDelta.getOutputStream());
                     publisher.publish(reverseDelta);
@@ -211,52 +199,44 @@ public class HollowProducer {
             throw th;
         } finally {
             listeners.firePublishComplete(status, start);
-            snapshot.close();
+            if(snapshot != null) snapshot.close();
         }
     }
 
     /**
-     *  Given
+     *  Given these read states
      *
-     *  1. read state (S1) at the previous announced version
-     *  2. read state (S2) from the currently produced snapshot
+     *  * S(cur) at the currently announced version
+     *  * S(pnd) at the pending version
      *
-     *  Ensure:
+     *  Ensure that:
      *
-     *  S1.apply(forward delta).checksum == S2.checksum
-     *  S2.apply(reverse delta).checksum == S1.checksum
+     *  S(cur).apply(forwardDelta).checksum == S(pnd).checksum
+     *  S(pnd).apply(reverseDelta).checksum == S(cur).checksum
      *
-     * @param transition
-     * @param writeState
-     * @return
+     * @param readStates
      */
-    private HollowConsumer.ReadState checkIntegrity(Transition transition, WriteState writeState) {
-        long start = listeners.fireIntegrityCheckStart(writeState);
+    private void checkIntegrity(ReadStateHelper readStates) throws Exception {
+        long start = listeners.fireIntegrityCheckStart(readStates.pendingVersion());
         ProducerStatus status = ProducerStatus.unknownFailure();
+        Blob snapshot = null;
         try {
-            final HollowConsumer.ReadState result;
+            snapshot = publisher.openSnapshot(readStates.pendingVersion());
+            HollowBlobReader reader = new HollowBlobReader(readStates.pending().getStateEngine(), new HollowBlobHeaderReader());
+            reader.readSnapshot(snapshot.getInputStream());
 
-            // TODO: timt: use HollowConsumer
-            if(transition.isDelta()) {
-                long desiredVersion = transition.fromVersion;
-                @SuppressWarnings("unused")
-                HollowConsumer.ReadState fromReadState = toReadState(desiredVersion);
-                // FIXME: timt: do the integrity checks, leaving (S2) assigned to `toReadState`
-
-                result = readSnapshot(transition);
-            } else if(transition.isSnapshot()) {
-                result = readSnapshot(transition);
-            } else {
-                throw new IllegalStateException("no blobs to check");
+            if(readStates.hasCurrent()) {
+                // FIXME: timt: do delta integrity checks; we only compare checksums for
+                // schemas that are common and unchanged between S(curr) and S(prev)
             }
 
-            status = ProducerStatus.success(result);
-            return result;
+            status = ProducerStatus.success(readStates.pending());
         } catch(Throwable th) {
-            status = ProducerStatus.fail(writeState.getVersion(), th);
+            status = ProducerStatus.fail(readStates.pendingVersion(), th);
             throw th;
         } finally {
             listeners.fireIntegrityCheckComplete(status, start);
+            if(snapshot != null) snapshot.close();
         }
     }
 
@@ -289,7 +269,7 @@ public class HollowProducer {
         }
     }
 
-    public static interface VersionMinter {
+    static interface VersionMinter {
         /**
          * Create a new state version.<p>
          *
@@ -385,158 +365,4 @@ public class HollowProducer {
     public static interface Announcer {
         public void announce(long stateVersion);
     }
-
-    /**
-     * Immutable class representing a single point along the delta chain.
-     *
-     * @author Tim Taylor {@literal<timt@netflix.com>}
-     */
-    private static final class Transition {
-
-        private final long fromVersion;
-        private final long toVersion;
-
-        /**
-         * Creates a null transition.
-         *
-         * A producer would use this to avoid null checks when beginning a new delta chain; calling
-         * {@link #advance(long)} will return a transition representing the first snapshot in
-         * a chain.<p>
-         *
-         * Consumers cannot initialize their read state from this transition.<p>
-         *
-         * @see <a href="http://hollow.how/advanced-topics/#double-snapshots">Double Snapshot</a>
-         */
-        private Transition() {
-            this(Long.MIN_VALUE, Long.MIN_VALUE);
-        }
-
-        /**
-         * Creates a transition capable of being used to restore from a delta chain at
-         * the specified version, a.k.a. a snapshot.<p>
-         *
-         * Consumers can initialize their read state from a snapshot corresponding to
-         * this transition; an already initialized consumer can only utilize
-         * this by performing a double snapshot.<p>
-         *
-         * A producer would use this transition to restore from a previous announced state in order
-         * to resume producing on that delta chain by calling {@link #advance(long)} when ready to
-         * produce the next state.
-         *
-         * @see <a href="http://hollow.how/advanced-topics/#double-snapshots">Double Snapshot</a>
-         */
-        private Transition(long toVersion) {
-            this(Long.MIN_VALUE, toVersion);
-        }
-
-        /**
-         * Creates a transition fully representing a transition within the delta chain, a.k.a. a delta, between
-         * {@code fromVersion} and {@code toVersion}.
-         */
-        private Transition(long fromVersion, long toVersion) {
-            this.fromVersion = fromVersion;
-            this.toVersion = toVersion;
-        }
-
-        /**
-         * Returns a new transition representing the transition from this state's {@code toVersion} to the specified version;
-         * equivalent to calling {@code new StateTransition(this.toVersion, nextVersion)}.
-         *
-         * <pre>
-         * <code>
-         * [13,45].advance(72) == [45,72]
-         * </code>
-         * </pre>
-         *
-         * @param nextVersion the next version to transition to
-         *
-         * @return a new state transition with its {@code fromVersion} and {@code toVersion} assigned our {@code toVersion} and
-         *     the specified {@code nextVersion} respectively
-         */
-        private Transition advance(long nextVersion) {
-            return new Transition(toVersion, nextVersion);
-        }
-
-
-
-        /**
-         * Determines whether this transition represents a new or broken delta chain.
-         *
-         * @return true if this has neither a {@code fromVersion} nor a {@code toVersion}; false otherwise.
-         */
-        private boolean isDiscontinous() {
-            return fromVersion == Long.MIN_VALUE && toVersion == Long.MIN_VALUE;
-        }
-
-        /**
-         * Determines whether this state represents a delta, e.g. a transition between two state versions.
-         *
-         * @return true if this has a {@code fromVersion} and {@code toVersion}; false otherwise
-         */
-        private boolean isDelta() {
-            return fromVersion != Long.MIN_VALUE && toVersion != Long.MIN_VALUE;
-        }
-
-        private boolean isForwardDelta() {
-            return isDelta() && fromVersion < toVersion;
-        }
-
-        private boolean isReverseDelta() {
-            return isDelta() && fromVersion > toVersion;
-        }
-
-        private boolean isSnapshot() {
-            return !isDiscontinous() && !isDelta();
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            if(isDiscontinous()) {
-                sb.append("new/broken delta chain");
-            } else if(isDelta()) {
-                if(isReverseDelta()) sb.append("reverse");
-                sb.append("delta [");
-                sb.append(fromVersion);
-                if(isForwardDelta()) sb.append(" -> ");
-                else sb.append(" <- ");
-                sb.append(toVersion);
-                sb.append("]");
-            } else {
-                sb.append("snapshot [");
-                sb.append(toVersion);
-                sb.append("]");
-            }
-            return sb.toString();
-        }
-
-    }
-
-    ///// TODO: timt: move to HollowConsumer API ////
-    private HollowConsumer.ReadState toReadState(long desiredVersion) {
-        HollowClient client = new HollowClient(blobRetriever);
-        client.triggerRefreshTo(desiredVersion);
-        long actualVersion = client.getCurrentVersionId();
-        if(desiredVersion != actualVersion) throw new IllegalStateException(String.format("desiredVersion=%d actualVersion=%d", desiredVersion, actualVersion));
-        HollowConsumer.ReadState readState = new ReadStateImpl(client);
-        return readState;
-    }
-
-    private HollowConsumer.ReadState readSnapshot(Transition transition) {
-        final HollowConsumer.ReadState readState;
-        HollowReadStateEngine readEngine = new HollowReadStateEngine();
-        HollowBlobReader reader = new HollowBlobReader(readEngine, new HollowBlobHeaderReader());
-        Blob snapshot = publisher.openSnapshot(transition.toVersion);
-        try {
-            reader.readSnapshot(snapshot.getInputStream());
-            readState = new ReadStateImpl(transition.toVersion, readEngine);
-        } catch(IOException ex) {
-            throw new RuntimeException(ex);
-        } finally {
-            snapshot.close();
-        }
-        return readState;
-    }
-    ///// END TODO ////
-
 }
