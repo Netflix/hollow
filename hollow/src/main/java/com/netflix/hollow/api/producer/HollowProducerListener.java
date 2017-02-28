@@ -278,7 +278,7 @@ public interface HollowProducerListener extends EventListener {
 
         /**
          * The version desired to restore to when calling
-         * {@link HollowProducer#restore(com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementRetriever)
+         * {@link HollowProducer#restore(com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementRetriever)}
          *
          * @return the latest announced version or {@code Long.MIN_VALUE} if latest announced version couldn't be
          * retrieved
