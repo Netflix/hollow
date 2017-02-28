@@ -19,7 +19,6 @@ package com.netflix.hollow.core.write.objectmapper;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
-
 import com.netflix.hollow.core.AbstractStateEngineTest;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.stringifier.HollowRecordJsonStringifier;
@@ -206,6 +205,7 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
     }
 
 
+    @SuppressWarnings("unused")
     private static class TestTransientClass {
         int notTransient;
         transient int transientKeyword;
