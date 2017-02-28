@@ -168,7 +168,7 @@ public class HollowProducer {
 
     private WriteState beginCycle(Transition transition) {
         writeEngine.prepareForNextCycle();
-        WriteState writeState = new WriteStateImpl(objectMapper, transition);
+        WriteState writeState = new WriteStateImpl(objectMapper, transition.toVersion);
         return writeState;
     }
 
@@ -176,20 +176,20 @@ public class HollowProducer {
         long start = listeners.firePublishStart(writeState.getVersion());
         HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
 
-        Blob snapshot = publisher.openSnapshot(transition);
+        Blob snapshot = publisher.openSnapshot(transition.toVersion);
         ProducerStatus status = ProducerStatus.unknownFailure();
         try {
             writer.writeSnapshot(snapshot.getOutputStream());
 
             if(transition.isDelta()) {
-                Blob delta = publisher.openDelta(transition);
+                Blob delta = publisher.openDelta(transition.fromVersion, transition.toVersion);
                 try {
                     writer.writeDelta(delta.getOutputStream());
                     publisher.publish(delta);
                 } finally {
                     delta.close();
                 }
-                Blob reverseDelta = publisher.openReverseDelta(transition);
+                Blob reverseDelta = publisher.openReverseDelta(transition.fromVersion, transition.toVersion);
                 try {
                     writer.writeReverseDelta(reverseDelta.getOutputStream());
                     publisher.publish(reverseDelta);
@@ -238,7 +238,7 @@ public class HollowProducer {
 
             // TODO: timt: use HollowConsumer
             if(transition.isDelta()) {
-                long desiredVersion = transition.getFromVersion();
+                long desiredVersion = transition.fromVersion;
                 @SuppressWarnings("unused")
                 HollowConsumer.ReadState fromReadState = toReadState(desiredVersion);
                 // FIXME: timt: do the integrity checks, leaving (S2) assigned to `toReadState`
@@ -315,10 +315,56 @@ public class HollowProducer {
     }
 
     public static interface Publisher {
-        public HollowProducer.Blob openSnapshot(Transition transition);
-        public HollowProducer.Blob openDelta(Transition transition);
-        public HollowProducer.Blob openReverseDelta(Transition transition);
+        /**
+         * Returns a blob with which a {@code HollowProducer} will write a snapshot for the version specified.<p>
+         *
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(Blob)}.
+         *
+         * @param version the blob version
+         *
+         * @return a {@link HollowProducer.Blob} representing a snapshot for the {@code version}
+         */
+        public HollowProducer.Blob openSnapshot(long version);
 
+        /**
+         * Returns a blob with which a {@code HollowProducer} will write a forward delta from the version specified to
+         * the version specified, i.e. {@code fromVersion => toVersion}.<p>
+         *
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(Blob)}.
+         *
+         * In the delta chain {@code fromVersion} is the older version such that {@code fromVersion < toVersion}.
+         *
+         * @param fromVersion the data state this delta will transition from
+         * @param toVersion the data state this delta will transition to
+         *
+         * @return a {@link HollowProducer.Blob} representing a snapshot for the {@code version}
+         */
+        public HollowProducer.Blob openDelta(long fromVersion, long toVersion);
+
+        /**
+         * Returns a blob with which a {@code HollowProducer} will write a reverse delta from the version specified to
+         * the version specified, i.e. {@code fromVersion <= toVersion}.<p>
+         *
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(Blob)}.
+         *
+         * In the delta chain {@code fromVersion} is the older version such that {@code fromVersion < toVersion}.
+         *
+         * @param fromVersion version in the delta chain immediately before {@code toVersion}
+         * @param toVersion version in the delta chain immediately after {@code fromVersion}
+         *
+         * @return a {@link HollowProducer.Blob} representing a snapshot for the {@code version}
+         */
+        public HollowProducer.Blob openReverseDelta(long fromVersion, long toVersion);
+
+        /**
+         * Publish the blob specified to this publisher's blobstore.<p>
+         *
+         * It is guaranteed that {@code blob} was created by calling one of
+         * {@link Publisher#openSnapshot(long)}, {@link Publisher#openDelta(long,long)}, or
+         * {@link Publisher#openReverseDelta(long,long)} on this publisher.
+         *
+         * @param blob the blob to publish
+         */
         public void publish(HollowProducer.Blob blob);
     }
 
@@ -345,7 +391,7 @@ public class HollowProducer {
      *
      * @author Tim Taylor {@literal<timt@netflix.com>}
      */
-    public static final class Transition {
+    private static final class Transition {
 
         private final long fromVersion;
         private final long toVersion;
@@ -361,7 +407,7 @@ public class HollowProducer {
          *
          * @see <a href="http://hollow.how/advanced-topics/#double-snapshots">Double Snapshot</a>
          */
-        public Transition() {
+        private Transition() {
             this(Long.MIN_VALUE, Long.MIN_VALUE);
         }
 
@@ -379,7 +425,7 @@ public class HollowProducer {
          *
          * @see <a href="http://hollow.how/advanced-topics/#double-snapshots">Double Snapshot</a>
          */
-        public Transition(long toVersion) {
+        private Transition(long toVersion) {
             this(Long.MIN_VALUE, toVersion);
         }
 
@@ -387,7 +433,7 @@ public class HollowProducer {
          * Creates a transition fully representing a transition within the delta chain, a.k.a. a delta, between
          * {@code fromVersion} and {@code toVersion}.
          */
-        public Transition(long fromVersion, long toVersion) {
+        private Transition(long fromVersion, long toVersion) {
             this.fromVersion = fromVersion;
             this.toVersion = toVersion;
         }
@@ -407,42 +453,18 @@ public class HollowProducer {
          * @return a new state transition with its {@code fromVersion} and {@code toVersion} assigned our {@code toVersion} and
          *     the specified {@code nextVersion} respectively
          */
-        public Transition advance(long nextVersion) {
+        private Transition advance(long nextVersion) {
             return new Transition(toVersion, nextVersion);
         }
 
-        /**
-         * Returns a new transition with versions swapped. Only valid on deltas.
 
-         * <pre>
-         * <code>
-         * [13,45].reverse() == [45,13]
-         * </code>
-         * </pre>
-
-         * @return
-         *
-         * @throws IllegalStateException if this transition isn't a delta
-         */
-        public Transition reverse() {
-            if(isDiscontinous() || isSnapshot()) throw new IllegalStateException("must be a delta");
-            return new Transition(this.toVersion, this.fromVersion);
-        }
-
-        public long getFromVersion() {
-            return fromVersion;
-        }
-
-        public long getToVersion() {
-            return toVersion;
-        }
 
         /**
          * Determines whether this transition represents a new or broken delta chain.
          *
          * @return true if this has neither a {@code fromVersion} nor a {@code toVersion}; false otherwise.
          */
-        public boolean isDiscontinous() {
+        private boolean isDiscontinous() {
             return fromVersion == Long.MIN_VALUE && toVersion == Long.MIN_VALUE;
         }
 
@@ -451,19 +473,19 @@ public class HollowProducer {
          *
          * @return true if this has a {@code fromVersion} and {@code toVersion}; false otherwise
          */
-        public boolean isDelta() {
+        private boolean isDelta() {
             return fromVersion != Long.MIN_VALUE && toVersion != Long.MIN_VALUE;
         }
 
-        public boolean isForwardDelta() {
+        private boolean isForwardDelta() {
             return isDelta() && fromVersion < toVersion;
         }
 
-        public boolean isReverseDelta() {
+        private boolean isReverseDelta() {
             return isDelta() && fromVersion > toVersion;
         }
 
-        public boolean isSnapshot() {
+        private boolean isSnapshot() {
             return !isDiscontinous() && !isDelta();
         }
 
@@ -504,10 +526,10 @@ public class HollowProducer {
         final HollowConsumer.ReadState readState;
         HollowReadStateEngine readEngine = new HollowReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(readEngine, new HollowBlobHeaderReader());
-        Blob snapshot = publisher.openSnapshot(transition);
+        Blob snapshot = publisher.openSnapshot(transition.toVersion);
         try {
             reader.readSnapshot(snapshot.getInputStream());
-            readState = new ReadStateImpl(transition.getToVersion(), readEngine);
+            readState = new ReadStateImpl(transition.toVersion, readEngine);
         } catch(IOException ex) {
             throw new RuntimeException(ex);
         } finally {
