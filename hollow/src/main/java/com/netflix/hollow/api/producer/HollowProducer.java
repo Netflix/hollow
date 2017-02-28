@@ -29,6 +29,7 @@ import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.ReadStateImpl;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
+import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -39,7 +40,7 @@ import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 /**
  * Beta API subject to change.
  *
- * @author Tim Taylor {@literal<timt@netflix.com>}
+ * @author Tim Taylor {@literal<tim@toolbear.io>}
  */
 public class HollowProducer {
     public static final Validator NO_VALIDATIONS = new Validator(){
@@ -98,22 +99,27 @@ public class HollowProducer {
 
     public HollowProducer restore(HollowConsumer.AnnouncementRetriever announcementRetriever) {
         long start = currentTimeMillis();
+        RestoreStatus status = RestoreStatus.unknownFailure();
+        long versionDesired = Long.MIN_VALUE;
+        long versionReached = Long.MIN_VALUE;
+
         try {
-            long version = announcementRetriever.get();
-            if(version != Long.MIN_VALUE) {
-                HollowConsumer.ReadState readState = toReadState(version);
-                writeEngine.restoreFrom(readState.getStateEngine());
-                announced = new Transition(readState.getVersion());
-                listeners.fireProducerRestore(announced.getToVersion(), currentTimeMillis() - start);
-            } else {
-                // TODO: timt: notify listeners
-                System.out.println("RESTORE UNAVAILABLE; PRODUCING NEW DELTA CHAIN");
+            versionDesired = announcementRetriever.get();
+            listeners.fireProducerRestoreStart(versionDesired);
+
+            if(versionDesired != Long.MIN_VALUE) {
+                HollowConsumer.ReadState readState = toReadState(versionDesired);
+                versionReached = readState.getVersion();
+                if(versionReached == versionDesired) {
+                    writeEngine.restoreFrom(readState.getStateEngine());
+                    announced = new Transition(versionReached);
+                    status = RestoreStatus.success(versionDesired, versionReached);
+                }
             }
-        } catch(Exception ex) {
-            // TODO: timt: notify listeners
-            ex.printStackTrace();
-            System.out.println("RESTORE UNAVAILABLE; PRODUCING NEW DELTA CHAIN");
+        } catch(Throwable th) {
+            status = RestoreStatus.fail(versionDesired, versionReached, th);
         }
+        listeners.fireProducerRestoreComplete(status, currentTimeMillis() - start);
         return this;
     }
 
@@ -127,8 +133,9 @@ public class HollowProducer {
         long mintedVersion = Long.MIN_VALUE;
         try {
             mintedVersion = versionMinter.mint();
-            listeners.fireCycleStart(mintedVersion);
             Transition transition = announced.advance(mintedVersion);
+            if(transition.isSnapshot()) listeners.fireNewDeltaChain(mintedVersion);
+            listeners.fireCycleStart(mintedVersion);
             writeState = beginCycle(transition);
             task.populate(writeState);
             if(writeEngine.hasChangedSinceLastCycle()) {

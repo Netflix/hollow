@@ -17,14 +17,15 @@
  */
 package com.netflix.hollow.api.producer;
 
-import static java.lang.System.*;
+import static java.lang.System.currentTimeMillis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.consumer.HollowConsumer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
+import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 
 /**
  * Beta API subject to change.
@@ -50,8 +51,16 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) l.onProducerInit(elapsedMillis, MILLISECONDS);
     }
 
-    void fireProducerRestore(long version, long elapsedMillis) {
-        for(final HollowProducerListener l : listeners) l.onProducerRestore(version, elapsedMillis, MILLISECONDS);
+    void fireProducerRestoreStart(long version) {
+        for(final HollowProducerListener l : listeners) l.onProducerRestoreStart(version);
+    }
+
+    void fireProducerRestoreComplete(RestoreStatus status, long elapsedMillis) {
+        for(final HollowProducerListener l : listeners) l.onProducerRestoreComplete(status, elapsedMillis, MILLISECONDS);
+    }
+
+    void fireNewDeltaChain(long version) {
+        for(final HollowProducerListener l : listeners) l.onNewDeltaChain(version);
     }
 
     long fireCycleStart(long version) {

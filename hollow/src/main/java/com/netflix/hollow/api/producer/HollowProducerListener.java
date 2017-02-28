@@ -42,7 +42,28 @@ public interface HollowProducerListener extends EventListener {
      *
      * @param restoreVersion Version from which the state for {@code HollowProducer} was restored.
      */
-    public void onProducerRestore(long restoreVersion, long elapsed, TimeUnit unit);
+    public void onProducerRestoreStart(long restoreVersion);
+
+    /**
+     * Called after the {@code HollowProducer} has restored its data state to the indicated version.
+     * If previous state is not available to restore from, then this callback will not be called.
+     *
+     * @param status of the restore. {@link RestoreStatus#getStatus()} will return {@code SUCCESS} when
+     *   the desired version was reached during restore, otheriwse {@code FAIL} will be returned.
+     * @param elapsed duration of the restore in {@code unit} units
+     * @param unit units of the {@code elapsed} duration
+     */
+    public void onProducerRestoreComplete(RestoreStatus status, long elapsed, TimeUnit unit);
+
+    /**
+     * Indicates that the next state produced will begin a new delta chain.
+     * Thiis will be called prior to the next state being produced either if
+     * {@link HollowProducer#restore(com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementRetriever)}
+     * hasn't been called or the restore failed.
+     *
+     * @param version the version of the state that will become the first of a new delta chain
+     */
+    public void onNewDeltaChain(long version);
 
     /**
      * Called when the {@code HollowProducer} has begun a new cycle.
@@ -55,9 +76,11 @@ public interface HollowProducerListener extends EventListener {
      * Called after {@code HollowProducer} has completed a cycle normally or abnormally. A {@code SUCCESS} status indicates that the
      * entire cycle was successful and the producer is available to begin another cycle.
      *
-     * @param status CycleStatus of this cycle. {@link ProducerStatus#getStatus()} will return {@code SUCCESS}
+     * @param status ProducerStatus of this cycle. {@link ProducerStatus#getStatus()} will return {@code SUCCESS}
      *   when the a new data state has been announced to consumers or when there were no changes to the data; it will return @{code FAIL}
      *   when any stage failed or any other failure occured during the cycle.
+     * @param elapsed duration of the cycle in {@code unit} units
+     * @param unit units of the {@code elapsed} duration
      */
     public void onCycleComplete(ProducerStatus status, long elapsed, TimeUnit unit);
 
@@ -81,6 +104,8 @@ public interface HollowProducerListener extends EventListener {
      *
      * @param status CycleStatus of the publish stage. {@link ProducerStatus#getStatus()} will return {@code SUCCESS}
      *   when the publish was successful; @{code FAIL} otherwise.
+     * @param elapsed duration of the publish stage in {@code unit} units
+     * @param unit units of the {@code elapsed} duration
      */
     public void onPublishComplete(ProducerStatus status, long elapsed, TimeUnit unit);
 
@@ -97,6 +122,8 @@ public interface HollowProducerListener extends EventListener {
      *
      * @param status CycleStatus of the integrity check stage. {@link ProducerStatus#getStatus()} will return {@code SUCCESS}
      *   when the blobs are internally consistent; @{code FAIL} otherwise.
+     * @param elapsed duration of the integrity check stage in {@code unit} units
+     * @param unit units of the {@code elapsed} duration
      */
     public void onIntegrityCheckComplete(ProducerStatus status, long elapsed, TimeUnit unit);
 
@@ -113,6 +140,8 @@ public interface HollowProducerListener extends EventListener {
      *
      * @param status CycleStatus of the publish stage. {@link ProducerStatus#getStatus()} will return {@code SUCCESS}
      *   when the publish was successful; @{code FAIL} otherwise.
+     * @param elapsed duration of the validation stage in {@code unit} units
+     * @param unit units of the {@code elapsed} duration
      */
     public void onValidationComplete(ProducerStatus status, long elapsed, TimeUnit unit);
 
@@ -129,6 +158,8 @@ public interface HollowProducerListener extends EventListener {
      *
      * @param status CycleStatus of the announcement stage. {@link ProducerStatus#getStatus()} will return {@code SUCCESS}
      *   when the announce was successful; @{code FAIL} otherwise.
+     * @param elapsed duration of the announcement stage in {@code unit} units
+     * @param unit units of the {@code elapsed} duration
      */
     public void onAnnouncementComplete(ProducerStatus status, long elapsed, TimeUnit unit);
 
@@ -139,10 +170,6 @@ public interface HollowProducerListener extends EventListener {
      * @author Kinesh Satiya {@literal kineshsatiya@gmail.com}
      */
     public class ProducerStatus {
-
-        public enum Status {
-            SUCCESS, FAIL
-        }
 
         private final long version;
         private final Status status;
@@ -216,6 +243,84 @@ public interface HollowProducerListener extends EventListener {
         public HollowConsumer.ReadState getReadState() {
             return readState;
         }
+    }
 
+    /**
+     * This class represents information on details when {@link HollowProducer} has finished executing a particular stage.
+     * An instance of this class is provided on different events of {@link HollowProducerListener}.
+     *
+     * @author Tim Taylor {@literal tim@toolbear.io}
+     */
+    public class RestoreStatus {
+        private final Status status;
+        private final long versionDesired;
+        private final long versionReached;
+        private final Throwable throwable;
+
+        static RestoreStatus success(long versionDesired, long versionReached) {
+            return new RestoreStatus(Status.SUCCESS, versionDesired, versionReached, null);
+        }
+
+        static RestoreStatus unknownFailure() {
+            return new RestoreStatus(Status.FAIL, Long.MIN_VALUE, Long.MIN_VALUE, null);
+        }
+
+        static RestoreStatus fail(long versionDesired, long versionReached, Throwable cause) {
+            return new RestoreStatus(Status.FAIL, versionDesired, versionReached, cause);
+        }
+
+        private RestoreStatus(Status status, long versionDesired, long versionReached, Throwable throwable) {
+            this.status = status;
+            this.versionDesired = versionDesired;
+            this.versionReached = versionReached;
+            this.throwable = throwable;
+        }
+
+        /**
+         * The version desired to restore to when calling
+         * {@link HollowProducer#restore(com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementRetriever)
+         *
+         * @return the latest announced version or {@code Long.MIN_VALUE} if latest announced version couldn't be
+         * retrieved
+         */
+        public long getDesiredVersion() {
+            return versionDesired;
+        }
+
+        /**
+         * The version reached when restoring.
+         * When {@link HollowProducer#restore(com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementRetriever)}
+         * succeeds then {@code versionDesired == versionReached} is always true. Can be {@code Long.MIN_VALUE}
+         * indicating restore failed to reach any state, or the version of an intermediate state reached.
+         *
+         * @return the version restored to when successful, otherwise {@code Long.MIN_VALUE} if no version was
+         * reached or the version of an intermediate state reached before restore completed unsuccessfully.
+         */
+        public long getVersionReached() {
+            return versionReached;
+        }
+
+        /**
+         * Status of the restore
+         *
+         * @return SUCCESS or FAIL.
+         */
+        public Status getStatus() {
+            return status;
+        }
+
+        /**
+         * Returns the failure cause if this status represents a {@code HollowProducer} failure that was caused by an exception.
+         *
+         * @return the {@code Throwable} cause of a failure, otherwise {@code null} if restore succeeded or it failed
+         * without an exception.
+         */
+        public Throwable getCause() {
+            return throwable;
+        }
+    }
+
+    public enum Status {
+        SUCCESS, FAIL
     }
 }

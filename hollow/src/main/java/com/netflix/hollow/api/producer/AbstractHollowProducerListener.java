@@ -26,7 +26,10 @@ import java.util.concurrent.TimeUnit;
  */
 public class AbstractHollowProducerListener implements HollowProducerListener {
     @Override public void onProducerInit(long elapsed, TimeUnit unit) {}
-    @Override public void onProducerRestore(long restoreVersion, long elapsed, TimeUnit unit) {}
+
+    @Override public void onProducerRestoreStart(long restoreVersion) {}
+    @Override public void onProducerRestoreComplete(RestoreStatus status, long elapsed, TimeUnit unit) {}
+    @Override public void onNewDeltaChain(long version) {}
 
     @Override public void onCycleStart(long version) {}
     @Override public void onCycleComplete(ProducerStatus status, long elapsed, TimeUnit unit) {}
