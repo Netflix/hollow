@@ -13559,13 +13559,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.49",
+            "locked": "1.11.28",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-cloudwatch": {
-            "locked": "1.11.49",
+            "locked": "1.11.28",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
@@ -13664,11 +13664,12 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.8.6",
+            "locked": "2.8.0",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.governator:governator-archaius",
                 "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -13688,6 +13689,7 @@
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.governator:governator-archaius",
                 "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -13708,6 +13710,7 @@
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
+                "com.netflix.governator:governator-archaius",
                 "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.suro:suro-client",
@@ -13719,7 +13722,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.8.6",
+            "locked": "2.6.6",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "org.elasticsearch:elasticsearch"
@@ -13734,13 +13737,13 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
-            "locked": "2.8.6",
+            "locked": "2.6.6",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.8.6",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -13814,6 +13817,7 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.archaius:archaius-core",
+                "com.netflix.governator:governator-archaius",
                 "com.netflix.netflix-commons:netflix-infix"
             ]
         },
@@ -14312,7 +14316,7 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.15.11",
+            "locked": "1.8.1",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
@@ -14337,7 +14341,7 @@
             ]
         },
         "com.netflix.governator:governator-jetty": {
-            "locked": "1.15.11",
+            "locked": "1.12.15",
             "requested": "1.12.15"
         },
         "com.netflix.governator:governator-providers": {
@@ -14348,7 +14352,7 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.15.11",
+            "locked": "1.15.10",
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
@@ -15257,7 +15261,7 @@
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.5.Final",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -15310,6 +15314,7 @@
                 "com.netflix.archaius:archaius2-api",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-api",
+                "com.netflix.governator:governator-archaius",
                 "com.netflix.governator:governator-core",
                 "com.netflix.governator:governator-providers",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -16863,7 +16868,7 @@
             ]
         },
         "org.yaml:snakeyaml": {
-            "locked": "1.17",
+            "locked": "1.15",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
@@ -21412,13 +21417,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.49",
+            "locked": "1.11.28",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-cloudwatch": {
-            "locked": "1.11.49",
+            "locked": "1.11.28",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
@@ -21517,11 +21522,12 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.8.6",
+            "locked": "2.8.0",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.governator:governator-archaius",
                 "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -21541,6 +21547,7 @@
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
+                "com.netflix.governator:governator-archaius",
                 "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -21561,6 +21568,7 @@
                 "com.netflix.chaski:chaski-parser-jackson",
                 "com.netflix.eureka:eureka-client",
                 "com.netflix.governator:governator",
+                "com.netflix.governator:governator-archaius",
                 "com.netflix.hystrix:hystrix-serialization",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.suro:suro-client",
@@ -21572,7 +21580,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.8.6",
+            "locked": "2.6.6",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "org.elasticsearch:elasticsearch"
@@ -21587,13 +21595,13 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
-            "locked": "2.8.6",
+            "locked": "2.6.6",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.8.6",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -21667,6 +21675,7 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.archaius:archaius-core",
+                "com.netflix.governator:governator-archaius",
                 "com.netflix.netflix-commons:netflix-infix"
             ]
         },
@@ -22165,7 +22174,7 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.15.11",
+            "locked": "1.8.1",
             "transitive": [
                 "com.netflix.karyon:karyon-core"
             ]
@@ -22190,7 +22199,7 @@
             ]
         },
         "com.netflix.governator:governator-jetty": {
-            "locked": "1.15.11",
+            "locked": "1.12.15",
             "requested": "1.12.15"
         },
         "com.netflix.governator:governator-providers": {
@@ -22201,7 +22210,7 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.15.11",
+            "locked": "1.15.10",
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
@@ -23110,7 +23119,7 @@
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.5.Final",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -23163,6 +23172,7 @@
                 "com.netflix.archaius:archaius2-api",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-api",
+                "com.netflix.governator:governator-archaius",
                 "com.netflix.governator:governator-core",
                 "com.netflix.governator:governator-providers",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -24684,7 +24694,7 @@
             ]
         },
         "org.yaml:snakeyaml": {
-            "locked": "1.17",
+            "locked": "1.15",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
