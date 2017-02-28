@@ -76,8 +76,12 @@ public class GenericHollowObject extends HollowObject {
                 return null;
             }
         }
-
-        return GenericHollowRecordHelper.instantiate(getTypeDataAccess().getDataAccess(), referencedType, getOrdinal(fieldName));
+        
+        int ordinal = getOrdinal(fieldName);
+        if(ordinal == -1)
+            return null;
+        
+        return GenericHollowRecordHelper.instantiate(getTypeDataAccess().getDataAccess(), referencedType, ordinal);
     }
     
     @Override
