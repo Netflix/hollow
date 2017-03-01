@@ -85,17 +85,17 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
 
         List<PublicationJob> submittedJobs = new ArrayList<>();
         if(snapshotFile.exists()){
-            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, inputDataVersion, previousVersion, newVersion, PublishType.SNAPSHOT, region, snapshotFile);
+            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, ctx.getVip(), inputDataVersion, previousVersion, newVersion, PublishType.SNAPSHOT, region, snapshotFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
         if(deltaFile.exists()){
-            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, inputDataVersion, previousVersion, newVersion, PublishType.DELTA, region, deltaFile);
+            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, ctx.getVip(), inputDataVersion, previousVersion, newVersion, PublishType.DELTA, region, deltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
         if(reverseDeltaFile.exists()){
-            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, inputDataVersion, previousVersion, newVersion, PublishType.REVERSEDELTA, region, reverseDeltaFile);
+            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, ctx.getVip(), inputDataVersion, previousVersion, newVersion, PublishType.REVERSEDELTA, region, reverseDeltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }

@@ -20,8 +20,8 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
 
     private static final int  RETRY_ATTEMPTS = 10;
     
-    public FileStoreHollowBlobPublishJob(PublishWorkflowContext ctx, long inputVersion, long previousVersion, long version, PublishType jobType, RegionEnum region, File fileToUpload) {
-        super(ctx, ctx.getVip(), inputVersion, previousVersion, version, jobType, region, fileToUpload);
+    public FileStoreHollowBlobPublishJob(PublishWorkflowContext ctx, String vip, long inputVersion, long previousVersion, long version, PublishType jobType, RegionEnum region, File fileToUpload) {
+        super(ctx, vip, inputVersion, previousVersion, version, jobType, region, fileToUpload);
     }
 
     @Override

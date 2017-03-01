@@ -71,7 +71,7 @@ public class DefaultHollowPublishJobCreator {
     }
 
     public HollowBlobPublishJob createPublishJob(String vip, PublishType jobType, long inputVersion, long previousVersion, long version, RegionEnum region, File fileToUpload) {
-        return new FileStoreHollowBlobPublishJob(ctx, inputVersion, previousVersion, version, jobType, region, fileToUpload);
+        return new FileStoreHollowBlobPublishJob(ctx, vip, inputVersion, previousVersion, version, jobType, region, fileToUpload);
     }
 
     public HollowBlobDeleteFileJob createDeleteFileJob(List<PublicationJob> copyJobs, long version, String... filesToDelete) {
