@@ -14,9 +14,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformC
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WritingBlobsFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WroteBlob;
-
 import java.io.InputStream;
-
 import com.netflix.hollow.tools.filter.FilteredHollowBlobWriter;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.servo.monitor.Monitors;
@@ -299,9 +297,9 @@ public class TransformCycle {
     }
     
     private void createNostreamsFilteredFile(String unfilteredFilename, String filteredFilename, boolean isSnapshot) throws IOException {
-        HollowFilterConfig filterConfig = getStreamsFilter("StreamData", "StreamDownloadLocationFilename", "SetOfStreamData", "SetOfLong", "FileEncodingData",
-                "MapOfLongToDrmInfo", "DrmHeader", "DrmKeyString", "Long", "ChunkDurationsString", "StreamDataDescriptor",
-                "StreamAdditionalData", "ListOfLong", "DownloadLocationSet", "MapOfIntegerToDrmHeader", "DrmKey", "StreamDrmData",
+        HollowFilterConfig filterConfig = getStreamsFilter("StreamData", "StreamDownloadLocationFilename", "SetOfStreamData", "SetOfDownloadableId", "FileEncodingData",
+                "MapOfDownloadableIdToDrmInfo", "DrmHeader", "DrmKeyString", "DownloadableId", "ChunkDurationsString", "StreamDataDescriptor",
+                "StreamAdditionalData", "ListOfDownloadableId", "DownloadLocationSet", "MapOfIntegerToDrmHeader", "DrmKey", "StreamDrmData",
                 "WmDrmKey", "DrmInfo", "StreamMostlyConstantData", "ImageSubtitleIndexByteRange", "DrmInfoData", "QoEInfo",
                 "DeploymentIntent", "CodecPrivateDataString");
         
@@ -366,7 +364,8 @@ public class TransformCycle {
         return false;
       }
       
-      private String resolveConverterVip(TransformerContext ctx, String converterVip) {
+    @SuppressWarnings("unchecked")
+    private String resolveConverterVip(TransformerContext ctx, String converterVip) {
         
         // get the map of converterVip vs keybase
         String json = this.ctx.getConfig().getConverterVipToKeybaseMap();
