@@ -1,8 +1,8 @@
 package com.netflix.vms.transformer.override;
 
+import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.hollow.netflixspecific.blob.store.NetflixS3BlobRetriever;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.OutputTypeConfig;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
@@ -22,11 +22,10 @@ import java.util.Set;
 public class OutputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
     private final VMSOutputDataClient outputDataClient;
 
-    public OutputSlicePinTitleProcessor(String vip, NetflixS3BlobRetriever retriever, String localBlobStore, TransformerContext ctx) {
+    public OutputSlicePinTitleProcessor(String vip, FileStore fileStore, String localBlobStore, TransformerContext ctx) {
         super(vip, localBlobStore, ctx);
 
-        //this.pinTitleFileStore = fileStore;
-        this.outputDataClient = new VMSOutputDataClient(retriever);
+        this.outputDataClient = new VMSOutputDataClient(fileStore, vip);
     }
 
     public OutputSlicePinTitleProcessor(String vip, String baseProxyURL, String localBlobStore, TransformerContext ctx) {

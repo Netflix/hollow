@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.publish.workflow;
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.netflixspecific.blob.store.NetflixS3BlobPublisher;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.common.slice.DataSlicer;
@@ -24,7 +23,6 @@ import com.netflix.vms.transformer.publish.workflow.job.PoisonStateMarkerJob;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublicationJobScheduler;
 import com.netflix.vms.transformer.publish.workflow.job.impl.DefaultHollowPublishJobCreator;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HermesBlobAnnouncer;
-import com.netflix.vms.transformer.publish.workflow.job.impl.HollowPublishJobCreator;
 import com.netflix.vms.transformer.publish.workflow.job.impl.ValuableVideoHolder;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.PlaybackMonkeyTester;
 import java.io.File;
@@ -42,23 +40,23 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     private final PublicationJobScheduler scheduler;
     private final HollowBlobFileNamer fileNamer;
     private PublishRegionProvider regionProvider;
-    private final HollowPublishJobCreator jobCreator;
+    private final DefaultHollowPublishJobCreator jobCreator;
     private HollowBlobDataProvider circuitBreakerDataProvider;
 
     /* fields */
     private final String vip;
     private final Map<RegionEnum, AnnounceJob> priorAnnouncedJobs;
 
-    public HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, NetflixS3BlobPublisher blobPublisher, NetflixS3BlobPublisher nostreamsBlobPublisher, HermesBlobAnnouncer hermesBlobAnnouncer, DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
-        this(ctx, fileStore, blobPublisher, nostreamsBlobPublisher, hermesBlobAnnouncer, new HollowBlobDataProvider(ctx), dataSlicer, uploadStatus, vip);
+    public HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+        this(ctx, fileStore, hermesBlobAnnouncer, new HollowBlobDataProvider(ctx), dataSlicer, uploadStatus, vip);
     }
 
-    private HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, NetflixS3BlobPublisher blobPublisher, NetflixS3BlobPublisher nostreamsBlobPublisher, HermesBlobAnnouncer hermesBlobAnnouncer, HollowBlobDataProvider circuitBreakerDataProvider, DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
-        this(ctx, new DefaultHollowPublishJobCreator(ctx, fileStore, blobPublisher, nostreamsBlobPublisher, hermesBlobAnnouncer, circuitBreakerDataProvider, new PlaybackMonkeyTester(), new ValuableVideoHolder(circuitBreakerDataProvider), dataSlicer, uploadStatus, vip), vip);
+    private HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, HollowBlobDataProvider circuitBreakerDataProvider, DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+        this(ctx, new DefaultHollowPublishJobCreator(ctx, fileStore, hermesBlobAnnouncer, circuitBreakerDataProvider, new PlaybackMonkeyTester(), new ValuableVideoHolder(circuitBreakerDataProvider), dataSlicer, uploadStatus, vip), vip);
         this.circuitBreakerDataProvider = circuitBreakerDataProvider;
     }
 
-    public HollowPublishWorkflowStager(TransformerContext ctx, HollowPublishJobCreator jobCreator, String vip) {
+    public HollowPublishWorkflowStager(TransformerContext ctx, DefaultHollowPublishJobCreator jobCreator, String vip) {
         this.ctx = ctx;
         this.scheduler = new PublicationJobScheduler();
         this.fileNamer = new HollowBlobFileNamer(vip);
@@ -91,10 +89,10 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         final CircuitBreakerJob circuitBreakerJob = addCircuitBreakerJob(previousVersion, newVersion);
 
         // Add publish jobs
-        List<PublicationJob> publishJobs = addPublishJobs(inputDataVersion, previousVersion, newVersion);
+        final Map<RegionEnum, List<PublicationJob>> addPublishJobsAllRegions = addPublishJobsAllRegions(inputDataVersion, previousVersion, newVersion, circuitBreakerJob);
 
         // / add canary announcement and validation jobs
-        final CanaryValidationJob canaryValidationJob = addCanaryJobs(previousVersion, newVersion, circuitBreakerJob, publishJobs);
+        final CanaryValidationJob canaryValidationJob = addCanaryJobs(previousVersion, newVersion, circuitBreakerJob, addPublishJobsAllRegions);
 
         final AnnounceJob primaryRegionAnnounceJob = createAnnounceJobForRegion(regionProvider.getPrimaryRegion(), previousVersion, newVersion, canaryValidationJob, null);
 
@@ -103,7 +101,11 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
             createAnnounceJobForRegion(region, previousVersion, newVersion, canaryValidationJob, primaryRegionAnnounceJob);
         }
 
-        addDeleteJob(previousVersion, newVersion, publishJobs);
+        final List<PublicationJob> allPublishJobs = new ArrayList<>();
+        for (final List<PublicationJob> list : addPublishJobsAllRegions.values()) {
+            allPublishJobs.addAll(list);
+        }
+        addDeleteJob(previousVersion, newVersion, allPublishJobs);
 
         if(ctx.getConfig().isCreateDevSlicedBlob())
             scheduler.submitJob(jobCreator.createDevSliceJob(ctx, primaryRegionAnnounceJob, inputDataVersion, newVersion));
@@ -129,12 +131,23 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         return announceJob;
     }
 
-    private CanaryValidationJob addCanaryJobs(long previousVersion, long newVersion, CircuitBreakerJob circuitBreakerJob, List<PublicationJob> publishJobs) {
+    private Map<RegionEnum, List<PublicationJob>> addPublishJobsAllRegions(long inputDataVersion, long previousVersion, long newVersion, CircuitBreakerJob circuitBreakerJob) {
+        Map<RegionEnum, List<PublicationJob>> publishJobsByRegion = new HashMap<>(RegionEnum.values().length);
+        for (RegionEnum region : PublishRegionProvider.ALL_REGIONS) {
+            List<PublicationJob> allPublishJobs = new ArrayList<>();
+            List<PublicationJob> publishJobs = addPublishJobs(region, inputDataVersion, previousVersion, newVersion);
+            allPublishJobs.addAll(publishJobs);
+            publishJobsByRegion.put(region, allPublishJobs);
+        }
+        return publishJobsByRegion;
+    }
+
+    private CanaryValidationJob addCanaryJobs(long previousVersion, long newVersion, CircuitBreakerJob circuitBreakerJob, Map<RegionEnum, List<PublicationJob>> publishJobsByRegion) {
         Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs = new HashMap<RegionEnum, BeforeCanaryAnnounceJob>(3);
         Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs = new HashMap<RegionEnum, AfterCanaryAnnounceJob>(3);
 
         for (RegionEnum region : PublishRegionProvider.ALL_REGIONS) {
-            BeforeCanaryAnnounceJob beforeCanaryAnnounceJob = jobCreator.createBeforeCanaryAnnounceJob(vip, newVersion, region, circuitBreakerJob, publishJobs);
+            BeforeCanaryAnnounceJob beforeCanaryAnnounceJob = jobCreator.createBeforeCanaryAnnounceJob(vip, newVersion, region, circuitBreakerJob, publishJobsByRegion.get(region));
             scheduler.submitJob(beforeCanaryAnnounceJob);
 
             CanaryAnnounceJob canaryAnnounceJob = jobCreator.createCanaryAnnounceJob(vip, newVersion, region, beforeCanaryAnnounceJob);
@@ -186,40 +199,39 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
                 fileNamer.getNostreamsSnapshotFileName(nextVersion)));
     }
 
-    private List<PublicationJob> addPublishJobs(long inputDataVersion, long previousVersion, long newVersion) {
+    private List<PublicationJob> addPublishJobs(RegionEnum region, long inputDataVersion, long previousVersion, long newVersion) {
         File snapshotFile = new File(fileNamer.getSnapshotFileName(newVersion));
         File reverseDeltaFile = new File(fileNamer.getReverseDeltaFileName(newVersion, previousVersion));
         File deltaFile = new File(fileNamer.getDeltaFileName(previousVersion, newVersion));
-        
         File nostreamsSnapshotFile = new File(fileNamer.getNostreamsSnapshotFileName(newVersion));
         File nostreamsReverseDeltaFile = new File(fileNamer.getNostreamsReverseDeltaFileName(newVersion, previousVersion));
         File nostreamsDeltaFile = new File(fileNamer.getNostreamsDeltaFileName(previousVersion, newVersion));
 
         List<PublicationJob> submittedJobs = new ArrayList<>();
         if (snapshotFile.exists()) {
-            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.SNAPSHOT, inputDataVersion, previousVersion, newVersion, snapshotFile, false);
+            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.SNAPSHOT, inputDataVersion, previousVersion, newVersion, region, snapshotFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
             
-            publishJob = jobCreator.createPublishJob(vip, PublishType.SNAPSHOT, inputDataVersion, previousVersion, newVersion, nostreamsSnapshotFile, true);
+            publishJob = jobCreator.createPublishJob(vip + "_nostreams", PublishType.SNAPSHOT, inputDataVersion, previousVersion, newVersion, region, nostreamsSnapshotFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
         if (deltaFile.exists()) {
-            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.DELTA, inputDataVersion, previousVersion, newVersion, deltaFile, false);
+            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.DELTA, inputDataVersion, previousVersion, newVersion, region, deltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
             
-            publishJob = jobCreator.createPublishJob(vip, PublishType.DELTA, inputDataVersion, previousVersion, newVersion, nostreamsDeltaFile, true);
+            publishJob = jobCreator.createPublishJob(vip + "_nostreams", PublishType.DELTA, inputDataVersion, previousVersion, newVersion, region, nostreamsDeltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
         if (reverseDeltaFile.exists()) {
-            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.REVERSEDELTA, inputDataVersion, previousVersion, newVersion, reverseDeltaFile, false);
+            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.REVERSEDELTA, inputDataVersion, previousVersion, newVersion, region, reverseDeltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
             
-            publishJob = jobCreator.createPublishJob(vip, PublishType.REVERSEDELTA, inputDataVersion, previousVersion, newVersion, nostreamsReverseDeltaFile, true);
+            publishJob = jobCreator.createPublishJob(vip + "_nostreams", PublishType.REVERSEDELTA, inputDataVersion, previousVersion, newVersion, region, nostreamsReverseDeltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }

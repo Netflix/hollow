@@ -13,6 +13,7 @@ import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+import com.netflix.vms.transformer.io.LZ4VMSInputStream;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -124,7 +125,7 @@ public class ShowMeTheProgress {
 
     private Map<String, String> getHeaderTagsFromStateEngine(String resourceFilename) throws IOException {
         FileInputStream fio = new FileInputStream(new File(ROOT_DATA_DIR, resourceFilename));
-        InputStream is = isUseFastLane ? new LZ4BlockInputStream(fio) : new BufferedInputStream(fio);
+        InputStream is = isUseFastLane ? new LZ4VMSInputStream(fio) : new BufferedInputStream(fio);
 
         HollowBlobHeaderReader reader = new HollowBlobHeaderReader();
         HollowBlobHeader header = reader.readHeader(is);

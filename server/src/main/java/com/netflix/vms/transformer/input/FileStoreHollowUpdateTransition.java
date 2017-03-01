@@ -4,6 +4,7 @@ import com.netflix.aws.S3.S3Object;
 import com.netflix.aws.file.FileAccessItem;
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.api.client.HollowBlob;
+import com.netflix.vms.transformer.io.LZ4VMSInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -23,13 +24,16 @@ public class FileStoreHollowUpdateTransition extends HollowBlob {
 
     private final FileStore fileStore;
 
+    private final boolean useVMSLZ4;
+
     private String localFileLocation = System.getProperty("java.io.tmpdir");
 
-    public FileStoreHollowUpdateTransition(FileAccessItem fileItem, FileStore fileStore) {
+    public FileStoreHollowUpdateTransition(FileAccessItem fileItem, FileStore fileStore, boolean useVMSLZ4) {
         super(FileStoreUtil.getFromVersion(fileItem), FileStoreUtil.getToVersion(fileItem));
         this.fileStoreKeybase = fileItem.getSimpleDBKeybase();
         this.fileStoreVersion = fileItem.getSimpleDBVersionString();
         this.fileStore = fileStore;
+        this.useVMSLZ4 = useVMSLZ4;
     }
 
     public FileStoreHollowUpdateTransition withLocalFileLocation(String localFileLocation) {
@@ -45,7 +49,7 @@ public class FileStoreHollowUpdateTransition extends HollowBlob {
         File localFile = new File(localFileLocation, filename);
 
         if (localFile.exists()) {
-            return new LZ4BlockInputStream(new FileInputStream(localFile));
+            return useVMSLZ4 ? new LZ4VMSInputStream(new FileInputStream(localFile)) : new LZ4BlockInputStream(new FileInputStream(localFile));
         }
 
         int retryCount = 0;
@@ -75,6 +79,6 @@ public class FileStoreHollowUpdateTransition extends HollowBlob {
             }
         }
 
-        return new LZ4BlockInputStream(new DeleteOnCloseFileInputStream(localFile));
+        return useVMSLZ4 ? new LZ4VMSInputStream(new DeleteOnCloseFileInputStream(localFile)) : new LZ4BlockInputStream(new DeleteOnCloseFileInputStream(localFile));
     }
 }

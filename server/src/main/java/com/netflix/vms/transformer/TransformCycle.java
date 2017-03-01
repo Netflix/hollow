@@ -15,10 +15,9 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformC
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WritingBlobsFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WroteBlob;
 
-import com.netflix.hollow.netflixspecific.blob.store.NetflixS3BlobRetriever;
+import java.io.InputStream;
 
 import com.netflix.hollow.tools.filter.FilteredHollowBlobWriter;
-import java.io.InputStream;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.servo.monitor.Monitors;
 import com.google.gson.Gson;
@@ -74,12 +73,12 @@ public class TransformCycle {
 
     private long previousCycleNumber = Long.MIN_VALUE;
     private long currentCycleNumber = Long.MIN_VALUE;
-    private final boolean isFastlane;
+    private boolean isFastlane = false;
     private boolean isFirstCycle = true;
     
     private String previouslyResolvedConverterVip;
 
-    public TransformCycle(TransformerContext ctx, FileStore fileStore, NetflixS3BlobRetriever blobRetriever, PublishWorkflowStager publishStager, String converterVip, String transformerVip) {
+    public TransformCycle(TransformerContext ctx, FileStore fileStore, PublishWorkflowStager publishStager, String converterVip, String transformerVip) {
         this.ctx = ctx;
         this.transformerVip = transformerVip;
         this.converterVip = converterVip;
@@ -93,7 +92,7 @@ public class TransformCycle {
         this.publishWorkflowStager = publishStager;
         this.versionMinter = new SequenceVersionMinter();
         this.followVipPinExtractor = new FollowVipPinExtractor(fileStore);
-        this.pinTitleMgr = new PinTitleManager(fileStore, blobRetriever, ctx);
+        this.pinTitleMgr = new PinTitleManager(fileStore, ctx);
         this.timeSinceLastPublishGauge = new TransformerTimeSinceLastPublishGauge();
         Monitors.registerObject(timeSinceLastPublishGauge);
     }

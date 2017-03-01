@@ -1,8 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import com.netflix.hollow.netflixspecific.blob.store.NetflixS3BlobPublisher;
-
 import com.netflix.vms.transformer.common.slice.DataSlicer;
+
 import com.netflix.vms.transformer.publish.workflow.job.CreateDevSliceJob;
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
@@ -31,7 +30,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 
-public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
+public class DefaultHollowPublishJobCreator {
     /* dependencies */
     private HollowBlobDataProvider hollowBlobDataProvider;
     private final PlaybackMonkeyTester playbackMonkeyTester;
@@ -44,8 +43,6 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
 
     public DefaultHollowPublishJobCreator(TransformerContext transformerContext,
             FileStore fileStore,
-            NetflixS3BlobPublisher blobPublisher,
-            NetflixS3BlobPublisher nostreamsBlobPublisher,
             HermesBlobAnnouncer hermesBlobAnnouncer,
             HollowBlobDataProvider hollowBlobDataProvider, 
             PlaybackMonkeyTester playbackMonkeyTester,
@@ -61,8 +58,6 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
                 new HermesVipAnnouncer(hermesBlobAnnouncer),
                 serverUploadStatus,
                 fileStore,
-                blobPublisher,
-                nostreamsBlobPublisher,
                 vip);
     }
 
@@ -71,48 +66,39 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
         return ctx;
     }
 
-    @Override
     public AnnounceJob createAnnounceJob(String vip, long priorVersion, long newVersion, RegionEnum region, CanaryValidationJob validationJob, DelayJob delayJob, AnnounceJob previousAnnounceJob) {
         return new HermesAnnounceJob(ctx, priorVersion, newVersion, region, validationJob, delayJob, previousAnnounceJob);
     }
 
-    @Override
-    public HollowBlobPublishJob createPublishJob(String vip, PublishType jobType, long inputVersion, long previousVersion, long version, File fileToUpload, boolean isNostreams) {
-        return new S3HollowBlobPublishJob(ctx, inputVersion, previousVersion, version, jobType, fileToUpload, isNostreams);
+    public HollowBlobPublishJob createPublishJob(String vip, PublishType jobType, long inputVersion, long previousVersion, long version, RegionEnum region, File fileToUpload) {
+        return new FileStoreHollowBlobPublishJob(ctx, inputVersion, previousVersion, version, jobType, region, fileToUpload);
     }
 
-    @Override
     public HollowBlobDeleteFileJob createDeleteFileJob(List<PublicationJob> copyJobs, long version, String... filesToDelete) {
         return new HollowBlobDeleteFileJob(ctx, copyJobs, version, filesToDelete);
     }
 
-    @Override
     public DelayJob createDelayJob(PublicationJob dependency, long delayMillis, long cycleVersion) {
         return new HollowBlobDelayJob(ctx, dependency, delayMillis, cycleVersion);
     }
 
-    @Override
     public CircuitBreakerJob createCircuitBreakerJob(String vip, long newVersion, File snapshotFile, File deltaFile, File reverseDeltaFile, File nostreamsSnapshotFile, File nostreamsDeltaFile, File nostreamsReverseDeltaFile) {
         return new HollowBlobCircuitBreakerJob(ctx, newVersion, snapshotFile, deltaFile, reverseDeltaFile, nostreamsSnapshotFile, nostreamsDeltaFile, nostreamsReverseDeltaFile, hollowBlobDataProvider);
     }
 
-    @Override
     public PoisonStateMarkerJob createPoisonStateMarkerJob(PublicationJob validationJob, long newVersion) {
         return new CassandraPoisonStateMarkerJob(ctx, validationJob, hollowBlobDataProvider, newVersion);
     }
 
-    @Override
     public CanaryRollbackJob createCanaryRollbackJob(String vip, long cycleVersion, long priorVersion,CanaryValidationJob validationJob) {
         return new HermesCanaryRollbackJob(ctx, vip, cycleVersion, priorVersion, validationJob);
     }
 
-    @Override
     public CanaryValidationJob createCanaryValidationJob(String vip, long cycleVersion, Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs,
             Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs) {
         return new CassandraCanaryValidationJob(ctx, cycleVersion, beforeCanaryAnnounceJobs, afterCanaryAnnounceJobs, videoRanker);
     }
 
-	@Override
 	public BeforeCanaryAnnounceJob createBeforeCanaryAnnounceJob(String vip,
 			long newVersion, RegionEnum region,
 			CircuitBreakerJob circuitBreakerJob,
@@ -121,13 +107,11 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
 				newPublishJobs, playbackMonkeyTester, videoRanker);
 	}
 
-	@Override
 	public CanaryAnnounceJob createCanaryAnnounceJob(String vip, long newVersion, 
 	        RegionEnum region, BeforeCanaryAnnounceJob beforeCanaryAnnounceHook) {
 		return new HermesCanaryAnnounceJob(ctx, vip, newVersion, region, beforeCanaryAnnounceHook);
 	}
 
-	@Override
 	public AfterCanaryAnnounceJob createAfterCanaryAnnounceJob(String vip,
 			long newVersion, RegionEnum region,
 			BeforeCanaryAnnounceJob beforeCanaryAnnounceJob,
@@ -136,12 +120,10 @@ public class DefaultHollowPublishJobCreator implements HollowPublishJobCreator {
 				canaryAnnounceJob, playbackMonkeyTester, videoRanker);
 	}
 
-    @Override
     public AutoPinbackJob createAutoPinbackJob(AnnounceJob announcement, long waitMillis, long cycleVersion) {
         return new HermesAutoPinbackJob(ctx, announcement, waitMillis, cycleVersion);
     }
 
-    @Override
     public CreateDevSliceJob createDevSliceJob(PublishWorkflowContext ctx, AnnounceJob dependency, long inputVersion, long cycleVersion) {
         return new CreateHollowDevSliceJob(ctx, dependency, hollowBlobDataProvider, dataSlicer, inputVersion, cycleVersion);
     }
