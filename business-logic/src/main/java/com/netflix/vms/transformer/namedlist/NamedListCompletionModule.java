@@ -4,7 +4,6 @@ package com.netflix.vms.transformer.namedlist;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
-import com.netflix.i18n.NFResourceID;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.hollowoutput.NamedCollectionHolder;
 import com.netflix.vms.transformer.hollowoutput.Strings;
@@ -70,12 +69,10 @@ public class NamedListCompletionModule implements TransformModule {
                     holder.videoListMap.put(new Strings(listName.toString()), videoSet);
                 }
 
-                objectMapper.addObject(holder);
+                objectMapper.add(holder);
             });
 
         }
-
-        objectMapper.addObject(new NFResourceID("invalid"));
 
         executor.awaitSuccessfulCompletion();
 
