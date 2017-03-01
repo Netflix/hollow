@@ -528,7 +528,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.36",
+            "locked": "1.38",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -3906,7 +3906,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.36",
+            "locked": "1.38",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -7284,7 +7284,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.36",
+            "locked": "1.38",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -10662,7 +10662,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.36",
+            "locked": "1.38",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -14059,7 +14059,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.36",
+            "locked": "1.38",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -18535,7 +18535,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.36",
+            "locked": "1.38",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -21917,7 +21917,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.36",
+            "locked": "1.38",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -25292,7 +25292,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.36",
+            "locked": "1.38",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -25300,13 +25300,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.25",
+            "locked": "1.27",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.36",
+            "locked": "1.38",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -28788,7 +28788,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.36",
+            "locked": "1.38",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -28796,13 +28796,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.25",
+            "locked": "1.27",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.36",
+            "locked": "1.38",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -32284,7 +32284,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.36",
+            "locked": "1.38",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -32292,13 +32292,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.25",
+            "locked": "1.27",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.36",
+            "locked": "1.38",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -35780,7 +35780,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.36",
+            "locked": "1.38",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -35788,13 +35788,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.25",
+            "locked": "1.27",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.36",
+            "locked": "1.38",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -39254,7 +39254,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.36",
+            "locked": "1.38",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -42649,7 +42649,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.36",
+            "locked": "1.38",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -46044,7 +46044,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.36",
+            "locked": "1.38",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -49439,7 +49439,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.36",
+            "locked": "1.38",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
