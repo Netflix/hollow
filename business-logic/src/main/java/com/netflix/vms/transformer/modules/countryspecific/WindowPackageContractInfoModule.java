@@ -22,7 +22,6 @@ import com.netflix.vms.transformer.hollowoutput.StreamData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoContractInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
-import com.netflix.vms.transformer.hollowoutput.VideoImage;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoResolution;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
@@ -60,7 +59,7 @@ public class WindowPackageContractInfoModule {
         this.ctx = ctx;
         this.cycleConstants = cycleConstants;
 
-        this.packageMomentDataModule = new PackageMomentDataModule(api, cycleConstants, indexer);
+        this.packageMomentDataModule = new PackageMomentDataModule(api, indexer);
 
         this.packageIdx = indexer.getPrimaryKeyIndex(IndexSpec.PACKAGES);
         this.deployablePackageIdx = indexer.getPrimaryKeyIndex(IndexSpec.DEPLOYABLE_PACKAGES);
@@ -148,10 +147,9 @@ public class WindowPackageContractInfoModule {
 
         PackageMomentData packageMomentData = packageMomentDataModule.getWindowPackageMomentData(packageData, inputPackage);
 
-        info.videoPackageInfo.stillImagesMap = packageMomentData.stillImagesMap;
         info.videoPackageInfo.trickPlayMap = packageMomentData.trickPlayItemMap;
-        info.videoPackageInfo.startMomentOffsetInSeconds = getOffset(VideoMomentModule.START_MOMENT_KEY, packageMomentData.stillImagesMap);
-        info.videoPackageInfo.endMomentOffsetInSeconds = getOffset(VideoMomentModule.END_MOMENT_KEY, packageMomentData.stillImagesMap);
+        info.videoPackageInfo.startMomentOffsetInSeconds = packageMomentData.startMomentOffsetInSeconds;
+        info.videoPackageInfo.endMomentOffsetInSeconds = packageMomentData.endMomentOffsetInSeconds;
 
         info.videoPackageInfo.screenFormats = new ArrayList<Strings>(screenFormats.size());
         for(String screenFormat : screenFormats) {
@@ -168,30 +166,6 @@ public class WindowPackageContractInfoModule {
         info.videoPackageInfo.runtimeInSeconds = (int) longestRuntimeInSeconds;
 
         return info;
-    }
-
-    /**
-     * Get start and end offset in seconds from video moments data.
-     *
-     * @param momentKey
-     * @param stillImageMap
-     * @return value in seconds, if value not available then default value is -1
-     */
-    private long getOffset(Strings momentKey, Map<Strings, List<VideoImage>> stillImageMap) {
-        long offset = -1;
-
-        if (stillImageMap == null || stillImageMap.isEmpty()) return offset;
-        List<VideoImage> videoImages = stillImageMap.get(momentKey);
-        if (videoImages == null || videoImages.isEmpty()) return offset;
-
-        // There is only 1 or 0 Start/End moments for the video, hence looking up the first VideoImage in list.
-        VideoImage videoImage = videoImages.get(0);
-        if (videoImage == null || videoImage.videoMoment == null) return offset;
-
-        Long msOffset = videoImage.videoMoment.msOffset;
-        if (msOffset == null || msOffset.longValue() <= 0) return offset;
-
-        return msOffset.longValue() / 1000;
     }
 
     private void populateEncodingProfileIdSets(VMSHollowInputAPI api, HollowPrimaryKeyIndex primaryKeyIndex) {
@@ -327,7 +301,6 @@ public class WindowPackageContractInfoModule {
         info.runtimeInSeconds = 0;
         info.soundTypes = Collections.emptyList();
         info.screenFormats = Collections.emptyList();
-        info.stillImagesMap = Collections.emptyMap();
         info.trickPlayMap = Collections.emptyMap();
         info.formats = Collections.emptySet();
         return info;

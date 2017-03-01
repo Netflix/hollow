@@ -13,7 +13,6 @@ public class VideoPackageInfo implements Cloneable {
     public int runtimeInSeconds = java.lang.Integer.MIN_VALUE;
     public List<Strings> soundTypes = null;
     public List<Strings> screenFormats = null;
-    public transient Map<Strings, List<VideoImage>> stillImagesMap = null;
     public Map<TrickPlayType, TrickPlayItem> trickPlayMap = null;
     public long startMomentOffsetInSeconds = -1;
     public long endMomentOffsetInSeconds = -1;
@@ -36,9 +35,6 @@ public class VideoPackageInfo implements Cloneable {
         if(o.screenFormats == null) {
             if(screenFormats != null) return false;
         } else if(!o.screenFormats.equals(screenFormats)) return false;
-        if(o.stillImagesMap == null) {
-            if(stillImagesMap != null) return false;
-        } else if(!o.stillImagesMap.equals(stillImagesMap)) return false;
         if(o.trickPlayMap == null) {
             if(trickPlayMap != null) return false;
         } else if(!o.trickPlayMap.equals(trickPlayMap)) return false;
@@ -56,7 +52,6 @@ public class VideoPackageInfo implements Cloneable {
         hashCode = hashCode * 31 + runtimeInSeconds;
         hashCode = hashCode * 31 + (soundTypes == null ? 1237 : soundTypes.hashCode());
         hashCode = hashCode * 31 + (screenFormats == null ? 1237 : screenFormats.hashCode());
-        hashCode = hashCode * 31 + (stillImagesMap == null ? 1237 : stillImagesMap.hashCode());
         hashCode = hashCode * 31 + (trickPlayMap == null ? 1237 : trickPlayMap.hashCode());
         hashCode = hashCode * 31 + (isDefaultPackage ? 1231 : 1237);
         return hashCode;
@@ -71,7 +66,6 @@ public class VideoPackageInfo implements Cloneable {
         builder.append(",runtimeInSeconds=").append(runtimeInSeconds);
         builder.append(",soundTypes=").append(soundTypes);
         builder.append(",screenFormats=").append(screenFormats);
-        builder.append(",stillImagesMap=").append(stillImagesMap);
         builder.append(",trickPlayMap=").append(trickPlayMap);
         builder.append(",startOffsetInSeconds=").append(startMomentOffsetInSeconds);
         builder.append(",endOffsetInSeconds=").append(endMomentOffsetInSeconds);
