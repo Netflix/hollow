@@ -345,11 +345,28 @@ public class HollowProducer {
     public static interface Blob extends Closeable {
         OutputStream getOutputStream();
 
-        // TODO: timt: belongs in HollowConsumer.Blob
         InputStream getInputStream();
 
         @Override
         void close();
+
+        long getFromVersion();
+
+        long getToVersion();
+
+        Type getType();
+
+        public static enum Type {
+            SNAPSHOT("snapshot"),
+            DELTA("delta"),
+            REVERSE_DELTA("reversedelta");
+
+            public final String prefix;
+
+            Type(String prefix) {
+                this.prefix = prefix;
+            }
+        }
     }
 
     public static interface Validator {
