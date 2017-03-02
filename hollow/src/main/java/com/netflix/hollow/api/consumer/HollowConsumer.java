@@ -17,9 +17,6 @@
  */
 package com.netflix.hollow.api.consumer;
 
-import com.netflix.hollow.api.client.HollowAnnouncementWatcher;
-import com.netflix.hollow.api.client.HollowBlobRetriever;
-import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
 /**
@@ -28,50 +25,12 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
  * @author Tim Taylor {@literal<tim@toolbear.io>}
  */
 public class HollowConsumer {
+    public static ReadState newReadState(long version, HollowReadStateEngine stateEngine) {
+        return new ReadStateImpl(version, stateEngine);
+    }
 
-    // TODO: timt: is this needed, or do we just use a HollowReadStateEngine in place of this? Created for now
-    //   to have symmetry with HollowProducer.WriteState
     public static interface ReadState {
         long getVersion();
         HollowReadStateEngine getStateEngine();
-    }
-
-    public static interface AnnouncementRetriever {
-        static final AnnouncementRetriever NO_ANNOUNCEMENTS = new AnnouncementRetriever(){
-            @Override
-            public long get() {
-                return Long.MIN_VALUE;
-            }
-        };
-
-        long get();
-    }
-
-    public static interface StateRetriever {
-        ReadState retrieveLatestAnnounced();
-        long latestAnnouncedVersion();
-    }
-
-    // TODO: timt: don't use HollowBlobRetriever or HollowClient; this is temporary bridge code
-    public static class BlobStoreStateRetriever implements StateRetriever {
-        private final HollowAnnouncementWatcher announcementWatcher;
-        private final HollowBlobRetriever blobRetriever;
-
-        public BlobStoreStateRetriever(HollowAnnouncementWatcher announcementWatcher, HollowBlobRetriever blobRetriever) {
-            this.announcementWatcher = announcementWatcher;
-            this.blobRetriever = blobRetriever;
-        }
-
-        @Override
-        public long latestAnnouncedVersion() {
-            return announcementWatcher.getLatestVersion();
-        }
-
-        @Override
-        public ReadState retrieveLatestAnnounced() {
-            HollowClient client = new HollowClient(blobRetriever);
-            client.triggerRefreshTo(latestAnnouncedVersion());
-            return new ReadStateImpl(client.getCurrentVersionId(), client.getStateEngine());
-        }
     }
 }

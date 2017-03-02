@@ -17,6 +17,7 @@
  */
 package com.netflix.hollow.api.producer;
 
+import static com.netflix.hollow.api.consumer.HollowConsumer.newReadState;
 import static java.lang.System.currentTimeMillis;
 
 import java.io.Closeable;
@@ -24,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import com.netflix.hollow.api.client.HollowBlobRetriever;
+import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
@@ -80,17 +83,18 @@ public class HollowProducer {
         listeners.fireProducerInit(currentTimeMillis() - start);
     }
 
-    public HollowProducer restore(HollowConsumer.StateRetriever retriever) {
+    public HollowProducer restore(long versionDesired, HollowBlobRetriever blobRetriever) {
         long start = currentTimeMillis();
         RestoreStatus status = RestoreStatus.unknownFailure();
-        long versionDesired = Long.MIN_VALUE;
         HollowConsumer.ReadState readState = null;
 
         try {
-            versionDesired = retriever.latestAnnouncedVersion();
             listeners.fireProducerRestoreStart(versionDesired);
             if(versionDesired != Long.MIN_VALUE) {
-                readState = retriever.retrieveLatestAnnounced();
+
+                HollowClient client = new HollowClient(blobRetriever);
+                client.triggerRefreshTo(versionDesired);
+                readState = newReadState(client.getCurrentVersionId(), client.getStateEngine());
                 if(readState.getVersion() == versionDesired) {
                     readStates = ReadStateHelper.restored(readState);
                     writeEngine.restoreFrom(readStates.current().getStateEngine());

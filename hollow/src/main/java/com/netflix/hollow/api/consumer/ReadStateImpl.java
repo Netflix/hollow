@@ -19,13 +19,12 @@ package com.netflix.hollow.api.consumer;
 
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
-// TODO: timt: should be package protected
 /**
  * Alpha API subject to change.
  *
  * @author Tim Taylor {@literal<tim@toolbear.io>}
  */
-public class ReadStateImpl implements HollowConsumer.ReadState {
+class ReadStateImpl implements HollowConsumer.ReadState {
     private final long version;
     private final HollowReadStateEngine stateEngine;
 

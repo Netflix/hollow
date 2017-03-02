@@ -17,9 +17,11 @@
  */
 package com.netflix.hollow.api.producer;
 
+import static com.netflix.hollow.api.consumer.HollowConsumer.newReadState;
+
 import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.consumer.ReadStateImpl;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+
 /**
  * Beta API subject to change.
  *
@@ -48,7 +50,7 @@ final class ReadStateHelper {
 
     ReadStateHelper roundtrip(HollowProducer.WriteState writeState) {
         if(pending != null) throw new IllegalStateException();
-        return new ReadStateHelper(this.current, new ReadStateImpl(writeState.getVersion(), new HollowReadStateEngine()));
+        return new ReadStateHelper(this.current, newReadState(writeState.getVersion(), new HollowReadStateEngine()));
     }
 
     ReadStateHelper commit() {
