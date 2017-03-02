@@ -17,12 +17,9 @@
  */
 package com.netflix.hollow.api.producer.fs;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.newBufferedWriter;
-import static java.nio.file.StandardOpenOption.CREATE;
-import static java.nio.file.StandardOpenOption.DSYNC;
-import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
-import static java.nio.file.StandardOpenOption.WRITE;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -54,7 +51,7 @@ public class HollowFilesystemAnnouncer implements HollowProducer.Announcer {
         BufferedWriter writer = null;
         try {
             createDirectories(publishPath);
-            writer = newBufferedWriter(annnouncementPath, CREATE, WRITE, TRUNCATE_EXISTING, DSYNC);
+            writer = newBufferedWriter(annnouncementPath, UTF_8);
             writer.write(String.valueOf(stateVersion));
         } catch(IOException ex) {
             throw new RuntimeException("Unable to write to announcement file", ex);
