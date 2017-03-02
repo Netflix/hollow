@@ -17,10 +17,15 @@
  */
 package com.netflix.hollow.api.producer;
 
+import static com.netflix.hollow.api.producer.HollowProducerListener.Status.FAIL;
+import static com.netflix.hollow.api.producer.HollowProducerListener.Status.SUCCESS;
+
 import java.util.EventListener;
 import java.util.concurrent.TimeUnit;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.consumer.HollowConsumer.ReadState;
+import com.netflix.hollow.api.producer.HollowProducer.WriteState;
 
 /**
  * Beta API subject to change.
@@ -242,6 +247,62 @@ public interface HollowProducerListener extends EventListener {
          */
         public HollowConsumer.ReadState getReadState() {
             return readState;
+        }
+
+        static final class Builder {
+            private final long start;
+            private long end;
+
+            private long version = Long.MIN_VALUE;
+            private Status status = FAIL;
+            private Throwable cause = null;
+            private HollowConsumer.ReadState readState = null;
+
+            Builder() {
+                start = System.currentTimeMillis();
+            }
+
+            ProducerStatus.Builder version(long version) {
+                this.version = version;
+                return this;
+            }
+
+            ProducerStatus.Builder version(WriteState writeState) {
+                return version(writeState.getVersion());
+            }
+
+            ProducerStatus.Builder version(ReadState readState) {
+                this.readState = readState;
+                return version(readState.getVersion());
+            }
+
+            ProducerStatus.Builder success() {
+                this.status = SUCCESS;
+                return this;
+            }
+
+            ProducerStatus.Builder fail() {
+                return this;
+            }
+
+            ProducerStatus.Builder fail(Throwable cause) {
+                this.status = FAIL;
+                this.cause = cause;
+                return this;
+            }
+
+            ProducerStatus build() {
+                end = System.currentTimeMillis();
+                return new ProducerStatus(status, version, readState, cause);
+            }
+
+            long elapsed() {
+                return end - start;
+            }
+
+            long version() {
+                return version;
+            }
         }
     }
 

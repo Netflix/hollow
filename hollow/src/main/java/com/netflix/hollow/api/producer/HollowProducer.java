@@ -119,32 +119,34 @@ public class HollowProducer {
      * Each cycle produces a single data state.
      */
     public void runCycle(Populator task) {
-        long start = currentTimeMillis();
-        ProducerStatus cycleStatus = ProducerStatus.unknownFailure();
-        WriteState writeState = null;
+        long toVersion = versionMinter.mint();
+        if(!readStates.hasCurrent()) listeners.fireNewDeltaChain(toVersion);
+        ProducerStatus.Builder cycleStatus = listeners.fireCycleStart(toVersion);
         Artifacts artifacts = new Artifacts();
         try {
-            writeState = beginCycle();
+            writeEngine.prepareForNextCycle();
+            WriteState writeState = new WriteStateImpl(objectMapper, toVersion);
             task.populate(writeState);
             if(writeEngine.hasChangedSinceLastCycle()) {
                 publish(writeState, artifacts);
                 ReadStateHelper candidate = readStates.roundtrip(writeState);
+                cycleStatus.version(candidate.pending());
                 candidate = checkIntegrity(candidate, artifacts);
                 validate(candidate.pending());
                 announce(candidate.pending());
                 readStates = candidate.commit();
-                cycleStatus = ProducerStatus.success(readStates.current());
+                cycleStatus.version(readStates.current()).success();
             } else {
                 writeEngine.resetToLastPrepareForNextCycle();
-                listeners.fireNoDelta(writeState.getVersion());
-                cycleStatus = ProducerStatus.success(writeState.getVersion());
+                listeners.fireNoDelta(cycleStatus);
+                cycleStatus.success();
             }
         } catch(Throwable th) {
             writeEngine.resetToLastPrepareForNextCycle();
-            cycleStatus = ProducerStatus.fail(writeState != null ? writeState.getVersion() : Long.MIN_VALUE, th);
+            cycleStatus.fail(th);
         } finally {
             artifacts.cleanup();
-            listeners.fireCycleComplete(cycleStatus, start);
+            listeners.fireCycleComplete(cycleStatus);
         }
     }
 
@@ -156,19 +158,10 @@ public class HollowProducer {
         listeners.remove(listener);
     }
 
-    private WriteState beginCycle() {
-        long toVersion = versionMinter.mint();
-        if(!readStates.hasCurrent()) listeners.fireNewDeltaChain(toVersion);
-        listeners.fireCycleStart(toVersion);
-        writeEngine.prepareForNextCycle();
-        return new WriteStateImpl(objectMapper, toVersion);
-    }
-
     private void publish(WriteState writeState, Artifacts artifacts) throws IOException {
-        long start = listeners.firePublishStart(writeState.getVersion());
+        ProducerStatus.Builder status = listeners.firePublishStart(writeState);
         HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
 
-        ProducerStatus status = ProducerStatus.unknownFailure();
         try {
             // 1. Write the snapshot
             artifacts.snapshot = publisher.openSnapshot(writeState.getVersion());
@@ -190,12 +183,12 @@ public class HollowProducer {
 
             // 3. Publish the snapshot
             publisher.publish(artifacts.snapshot);
-            status = ProducerStatus.success(writeState.getVersion());
+            status.success();
         } catch(Throwable th) {
-            status = ProducerStatus.fail(writeState.getVersion(), th);
+            status.fail(th);
             throw th;
         } finally {
-            listeners.firePublishComplete(status, start);
+            listeners.firePublishComplete(status);
         }
     }
 
@@ -214,10 +207,9 @@ public class HollowProducer {
      * @return updated read states
      */
     private ReadStateHelper checkIntegrity(ReadStateHelper readStates, Artifacts artifacts) throws Exception {
-        ReadStateHelper result = readStates;
-        long start = listeners.fireIntegrityCheckStart(readStates.pendingVersion());
-        ProducerStatus status = ProducerStatus.unknownFailure();
+        ProducerStatus.Builder status = listeners.fireIntegrityCheckStart(readStates.pending());
         try {
+            ReadStateHelper result = readStates;
             HollowReadStateEngine current = readStates.hasCurrent() ? readStates.current().getStateEngine() : null;
             HollowReadStateEngine pending = readStates.pending().getStateEngine();
             readSnapshot(artifacts.snapshot, pending);
@@ -225,36 +217,36 @@ public class HollowProducer {
             if(readStates.hasCurrent()) {
                 System.out.println("CHECKSUMS");
                 HollowChecksum currentChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
-                out.format("  CUR        %s\n", currentChecksum);
+                //out.format("  CUR        %s\n", currentChecksum);
 
                 HollowChecksum pendingChecksum = HollowChecksum.forStateEngineWithCommonSchemas(pending, current);
-                out.format("         PND %s\n", pendingChecksum);
+                //out.format("         PND %s\n", pendingChecksum);
 
                 if(artifacts.hasDelta()) {
                     // FIXME: timt: future cycles will fail unless this delta validates *and* we have a reverse
                     // delta *and* it also validates
                     applyDelta(artifacts.delta, current);
                     HollowChecksum forwardChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
-                    out.format("  CUR => PND %s\n", forwardChecksum);
+                    //out.format("  CUR => PND %s\n", forwardChecksum);
                     if(!forwardChecksum.equals(pendingChecksum)) throw new ChecksumValidationException(DELTA);
                 }
 
                 if(artifacts.hasReverseDelta()) {
                     applyDelta(artifacts.reverseDelta, pending);
                     HollowChecksum reverseChecksum = HollowChecksum.forStateEngineWithCommonSchemas(pending, current);
-                    out.format("  CUR <= PND %s\n", reverseChecksum);
+                    //out.format("  CUR <= PND %s\n", reverseChecksum);
                     if(!reverseChecksum.equals(currentChecksum)) throw new ChecksumValidationException(REVERSE_DELTA);
                     result = readStates.swap();
                 }
             }
-            status = ProducerStatus.success(readStates.pending());
+            status.success();
+            return result;
         } catch(Throwable th) {
-            status = ProducerStatus.fail(readStates.pendingVersion(), th);
+            status.fail(th);
             throw th;
         } finally {
-            listeners.fireIntegrityCheckComplete(status, start);
+            listeners.fireIntegrityCheckComplete(status);
         }
-        return result;
     }
 
     public static final class ChecksumValidationException extends IllegalStateException {
@@ -283,32 +275,29 @@ public class HollowProducer {
         }
     }
 
-    /// TODO: timt: validator API TBD
     private void validate(HollowConsumer.ReadState readState) {
-        long start = listeners.fireValidationStart(readState);
-        ProducerStatus status = ProducerStatus.unknownFailure();
+        ProducerStatus.Builder status = listeners.fireValidationStart(readState);
         try {
             validator.validate(readState);
-            status = ProducerStatus.success(readState);
+            status.success();
         } catch (Throwable th) {
-            status = ProducerStatus.fail(readState, th);
+            status.fail(th);
             throw th;
         } finally {
-            listeners.fireValidationComplete(status, start);
+            listeners.fireValidationComplete(status);
         }
     }
 
     private void announce(HollowConsumer.ReadState readState) {
-        long start = listeners.fireAnnouncementStart(readState);
-        ProducerStatus status = ProducerStatus.unknownFailure();
+        ProducerStatus.Builder status = listeners.fireAnnouncementStart(readState);
         try {
             announcer.announce(readState.getVersion());
-            status = ProducerStatus.success(readState);
+            status.success();
         } catch(Throwable th) {
-            status = ProducerStatus.fail(readState, th);
+            status.fail(th);
             throw th;
         } finally {
-            listeners.fireAnnouncementComplete(status, start);
+            listeners.fireAnnouncementComplete(status);
         }
     }
 
