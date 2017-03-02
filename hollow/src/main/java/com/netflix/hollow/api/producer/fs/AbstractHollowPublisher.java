@@ -23,6 +23,8 @@ import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.SNAPSHOT;
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.deleteIfExists;
 
+import java.util.Map;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -31,7 +33,6 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
 
@@ -68,6 +69,13 @@ public abstract class AbstractHollowPublisher implements HollowProducer.Publishe
     public Blob openReverseDelta(long fromVersion, long toVersion) {
         return new StagedBlob(REVERSE_DELTA, namespace, stagingPath, fromVersion, toVersion);
     }
+    
+    @Override
+    public void publish(Blob blob, Map<String, String> headerTags) {
+        publish((StagedBlob)blob, headerTags);
+    }
+    
+    public abstract void publish(StagedBlob blob, Map<String, String> headerTags);
 
     public static class StagedBlob implements Blob {
         protected final Blob.Type type;

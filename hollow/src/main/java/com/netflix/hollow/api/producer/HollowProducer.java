@@ -22,10 +22,6 @@ import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.DELTA;
 import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.REVERSE_DELTA;
 import static java.lang.System.currentTimeMillis;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import com.netflix.hollow.api.client.HollowBlobRetriever;
 import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.api.consumer.HollowConsumer;
@@ -38,6 +34,10 @@ import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Map;
 
 /**
  * Beta API subject to change.
@@ -187,16 +187,16 @@ public class HollowProducer {
                 artifacts.delta = publisher.openDelta(readStates.current().getVersion(), writeState.getVersion());
                 OutputStream fdos = artifacts.delta.newOutputStream();
                 try { writer.writeDelta(fdos); } finally { fdos.close(); }
-                publisher.publish(artifacts.delta);
+                publisher.publish(artifacts.delta, writeState.getStateEngine().getHeaderTags());
 
                 artifacts.reverseDelta = publisher.openReverseDelta(readStates.current().getVersion(), writeState.getVersion());
                 OutputStream rdos = artifacts.reverseDelta.newOutputStream();
                 try { writer.writeReverseDelta(rdos); } finally { rdos.close(); }
-                publisher.publish(artifacts.reverseDelta);
+                publisher.publish(artifacts.reverseDelta, writeState.getStateEngine().getHeaderTags());
             }
 
             // 3. Publish the snapshot
-            publisher.publish(artifacts.snapshot);
+            publisher.publish(artifacts.snapshot, writeState.getStateEngine().getHeaderTags());
             status.success();
         } catch(Throwable th) {
             status.fail(th);
@@ -390,8 +390,9 @@ public class HollowProducer {
          * {@link Publisher#openReverseDelta(long,long)} on this publisher.
          *
          * @param blob the blob to publish
+         * @param headerTags the header tags, in case these should be added as metadata on published artifacts.
          */
-        public void publish(HollowProducer.Blob blob);
+        public void publish(HollowProducer.Blob blob, Map<String, String> headerTags);
     }
 
     public static interface Blob {
@@ -401,7 +402,7 @@ public class HollowProducer {
         long getToVersion();
         Type getType();
         void cleanup();
-
+        
         public static enum Type {
             SNAPSHOT("snapshot"),
             DELTA("delta"),
@@ -441,10 +442,6 @@ public class HollowProducer {
                 reverseDelta.cleanup();
                 reverseDelta = null;
             }
-        }
-
-        public boolean hasSnapshot() {
-            return snapshot != null;
         }
 
         boolean hasDelta() {
