@@ -21,12 +21,12 @@ import static java.nio.file.Files.createDirectories;
 import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
+import java.util.Map;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import com.netflix.hollow.api.producer.HollowProducer;
 
 public class HollowFilesystemPublisher extends AbstractHollowPublisher {
     private final Path publishPath;
@@ -46,20 +46,16 @@ public class HollowFilesystemPublisher extends AbstractHollowPublisher {
         this.publishPath = publishPath;
     }
 
-    @Override
-    public void publish(HollowProducer.Blob blob) {
-        publishBlob((StagedBlob)blob);
-    }
-
     public Path getStagingDir() {
         return publishPath;
     }
-
+    
     public Path getPublishDir() {
         return publishPath;
     }
-
-    private void publishBlob(StagedBlob blob) {
+    
+    @Override
+    public void publish(StagedBlob blob, Map<String, String> headerTags) {
         try {
             createDirectories(publishPath);
 
