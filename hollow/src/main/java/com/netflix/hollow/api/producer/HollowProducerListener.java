@@ -63,7 +63,7 @@ public interface HollowProducerListener extends EventListener {
     /**
      * Indicates that the next state produced will begin a new delta chain.
      * Thiis will be called prior to the next state being produced either if
-     * {@link HollowProducer#restore(com.netflix.hollow.api.consumer.HollowConsumer.StateRetriever)}
+     * {@link HollowProducer#restore(long, com.netflix.hollow.api.client.HollowBlobRetriever)}
      * hasn't been called or the restore failed.
      *
      * @param version the version of the state that will become the first of a new delta chain
@@ -339,7 +339,7 @@ public interface HollowProducerListener extends EventListener {
 
         /**
          * The version desired to restore to when calling
-         * {@link HollowProducer#restore(com.netflix.hollow.api.consumer.HollowConsumer.StateRetriever)}
+         * {@link HollowProducer#restore(long, com.netflix.hollow.api.client.HollowBlobRetriever)}
          *
          * @return the latest announced version or {@code Long.MIN_VALUE} if latest announced version couldn't be
          * retrieved
@@ -350,7 +350,7 @@ public interface HollowProducerListener extends EventListener {
 
         /**
          * The version reached when restoring.
-         * When {@link HollowProducer#restore(com.netflix.hollow.api.consumer.HollowConsumer.StateRetriever)}
+         * When {@link HollowProducer#restore(long, com.netflix.hollow.api.client.HollowBlobRetriever)}
          * succeeds then {@code versionDesired == versionReached} is always true. Can be {@code Long.MIN_VALUE}
          * indicating restore failed to reach any state, or the version of an intermediate state reached.
          *
