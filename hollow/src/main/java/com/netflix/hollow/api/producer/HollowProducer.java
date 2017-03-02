@@ -30,6 +30,8 @@ import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.util.HollowWriteStateCreator;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
@@ -37,6 +39,7 @@ import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -87,6 +90,12 @@ public class HollowProducer {
         long start = currentTimeMillis();
         for(Class<?> c : classes)
             objectMapper.initializeTypeState(c);
+        listeners.fireProducerInit(currentTimeMillis() - start);
+    }
+    
+    public void initializeDataModel(HollowSchema... schemas) {
+        long start = currentTimeMillis();
+        HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(writeEngine, Arrays.asList(schemas));
         listeners.fireProducerInit(currentTimeMillis() - start);
     }
 
