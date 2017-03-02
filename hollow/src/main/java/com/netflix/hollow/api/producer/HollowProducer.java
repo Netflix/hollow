@@ -21,7 +21,6 @@ import static com.netflix.hollow.api.consumer.HollowConsumer.newReadState;
 import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.DELTA;
 import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.REVERSE_DELTA;
 import static java.lang.System.currentTimeMillis;
-import static java.lang.System.out;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,6 +49,10 @@ public class HollowProducer {
         @Override
         public void validate(HollowConsumer.ReadState readState) {}
     };
+
+    public static WriteState newWriteState(long version, HollowObjectMapper objectMapper) {
+        return new WriteStateImpl(version, objectMapper);
+    }
 
     private final Publisher publisher;
     private final Validator validator;
@@ -119,27 +122,38 @@ public class HollowProducer {
      * Each cycle produces a single data state.
      */
     public void runCycle(Populator task) {
+        // 1. Begin a new cycle
         long toVersion = versionMinter.mint();
         if(!readStates.hasCurrent()) listeners.fireNewDeltaChain(toVersion);
         ProducerStatus.Builder cycleStatus = listeners.fireCycleStart(toVersion);
         Artifacts artifacts = new Artifacts();
         try {
+            // 1a. Prepare the write state
             writeEngine.prepareForNextCycle();
-            WriteState writeState = new WriteStateImpl(objectMapper, toVersion);
+            HollowObjectMapper objectMapper = this.objectMapper;
+            WriteState writeState = newWriteState(toVersion, objectMapper);
+
+            // 2. Populate the state
             task.populate(writeState);
+
+            // 3. Produce a new state if there's work to do
             if(writeEngine.hasChangedSinceLastCycle()) {
+                // 3a. Publish, run checks & validation, then announce new state consumers
                 publish(writeState, artifacts);
+
                 ReadStateHelper candidate = readStates.roundtrip(writeState);
                 cycleStatus.version(candidate.pending());
                 candidate = checkIntegrity(candidate, artifacts);
+
                 validate(candidate.pending());
+
                 announce(candidate.pending());
                 readStates = candidate.commit();
                 cycleStatus.version(readStates.current()).success();
             } else {
+                // 3b. Nothing to do; reset the effects of Step 2
                 writeEngine.resetToLastPrepareForNextCycle();
-                listeners.fireNoDelta(cycleStatus);
-                cycleStatus.success();
+                listeners.fireNoDelta(cycleStatus.success());
             }
         } catch(Throwable th) {
             writeEngine.resetToLastPrepareForNextCycle();

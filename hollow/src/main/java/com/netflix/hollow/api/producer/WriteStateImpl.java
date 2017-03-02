@@ -26,12 +26,12 @@ import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
  * @author Tim Taylor {@literal<tim@toolbear.io>}
  */
 final class WriteStateImpl implements HollowProducer.WriteState {
-    private final HollowObjectMapper objectMapper;
     private final long version;
+    private final HollowObjectMapper objectMapper;
 
-    protected WriteStateImpl(HollowObjectMapper objectMapper, long version) {
-        this.objectMapper = objectMapper;
+    protected WriteStateImpl(long version, HollowObjectMapper objectMapper) {
         this.version = version;
+        this.objectMapper = objectMapper;
     }
 
     @Override
