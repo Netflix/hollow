@@ -20,7 +20,6 @@ package com.netflix.hollow.api.producer;
 import static com.netflix.hollow.api.consumer.HollowConsumer.newReadState;
 import static java.lang.System.currentTimeMillis;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -118,11 +117,12 @@ public class HollowProducer {
         long start = currentTimeMillis();
         ProducerStatus cycleStatus = ProducerStatus.unknownFailure();
         WriteState writeState = null;
+        Artifacts artifacts = new Artifacts();
         try {
             writeState = beginCycle();
             task.populate(writeState);
             if(writeEngine.hasChangedSinceLastCycle()) {
-                publish(writeState);
+                publish(writeState, artifacts);
                 ReadStateHelper candidate = readStates.roundtrip(writeState);
                 checkIntegrity(candidate);
                 validate(candidate.pending());
@@ -138,6 +138,7 @@ public class HollowProducer {
             writeEngine.resetToLastPrepareForNextCycle();
             cycleStatus = ProducerStatus.fail(writeState != null ? writeState.getVersion() : Long.MIN_VALUE, th);
         } finally {
+            artifacts.cleanup();
             listeners.fireCycleComplete(cycleStatus, start);
         }
     }
@@ -158,42 +159,38 @@ public class HollowProducer {
         return new WriteStateImpl(objectMapper, toVersion);
     }
 
-    private void publish(WriteState writeState) throws IOException {
+    private void publish(WriteState writeState, Artifacts artifacts) throws IOException {
         long start = listeners.firePublishStart(writeState.getVersion());
         HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
 
-        Blob snapshot = null;
         ProducerStatus status = ProducerStatus.unknownFailure();
         try {
-            snapshot = publisher.openSnapshot(writeState.getVersion());
-            writer.writeSnapshot(snapshot.getOutputStream());
+            // 1. Write the snapshot
+            artifacts.snapshot = publisher.openSnapshot(writeState.getVersion());
+            OutputStream ssos = artifacts.snapshot.newOutputStream();
+            try { writer.writeSnapshot(ssos); } finally { ssos.close(); }
 
+            // 2. Write & publish the deltas; active canaries and tooling receive it sooner
             if(readStates.hasCurrent()) {
-                Blob delta = publisher.openDelta(readStates.current().getVersion(), writeState.getVersion());
-                try {
-                    writer.writeDelta(delta.getOutputStream());
-                    publisher.publish(delta);
-                } finally {
-                    delta.close();
-                }
-                Blob reverseDelta = publisher.openReverseDelta(readStates.current().getVersion(), writeState.getVersion());
-                try {
-                    writer.writeReverseDelta(reverseDelta.getOutputStream());
-                    publisher.publish(reverseDelta);
-                } finally {
-                    reverseDelta.close();
-                }
+                artifacts.delta = publisher.openDelta(readStates.current().getVersion(), writeState.getVersion());
+                OutputStream fdos = artifacts.delta.newOutputStream();
+                try { writer.writeDelta(fdos); } finally { fdos.close(); }
+                publisher.publish(artifacts.delta);
+
+                artifacts.reverseDelta = publisher.openReverseDelta(readStates.current().getVersion(), writeState.getVersion());
+                OutputStream rdos = artifacts.reverseDelta.newOutputStream();
+                try { writer.writeReverseDelta(rdos); } finally { rdos.close(); }
+                publisher.publish(artifacts.reverseDelta);
             }
 
-            // TODO: timt: allow some failed snapshot publishes
-            publisher.publish(snapshot);
+            // 3. Publish the snapshot
+            publisher.publish(artifacts.snapshot);
             status = ProducerStatus.success(writeState.getVersion());
         } catch(Throwable th) {
             status = ProducerStatus.fail(writeState.getVersion(), th);
             throw th;
         } finally {
             listeners.firePublishComplete(status, start);
-            if(snapshot != null) snapshot.close();
         }
     }
 
@@ -342,19 +339,13 @@ public class HollowProducer {
         public void publish(HollowProducer.Blob blob);
     }
 
-    public static interface Blob extends Closeable {
-        OutputStream getOutputStream();
-
-        InputStream getInputStream();
-
-        @Override
-        void close();
-
+    public static interface Blob {
+        OutputStream newOutputStream();
+        InputStream newInputStream();
         long getFromVersion();
-
         long getToVersion();
-
         Type getType();
+        void cleanup();
 
         public static enum Type {
             SNAPSHOT("snapshot"),
@@ -375,5 +366,38 @@ public class HollowProducer {
 
     public static interface Announcer {
         public void announce(long stateVersion);
+    }
+
+    private static final class Artifacts {
+        Blob snapshot = null;
+        Blob delta = null;
+        Blob reverseDelta = null;
+
+        void cleanup() {
+            if(snapshot != null) {
+                snapshot.cleanup();
+                snapshot = null;
+            }
+            if(delta != null) {
+                delta.cleanup();
+                delta = null;
+            }
+            if(reverseDelta != null) {
+                reverseDelta.cleanup();
+                reverseDelta = null;
+            }
+        }
+
+        public boolean hasSnapshot() {
+            return snapshot != null;
+        }
+
+        boolean hasDelta() {
+            return delta != null;
+        }
+
+        public boolean hasReverseDelta() {
+            return reverseDelta != null;
+        }
     }
 }

@@ -17,24 +17,23 @@
  */
 package com.netflix.hollow.api.producer.fs;
 
-import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.*;
+import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.DELTA;
+import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.REVERSE_DELTA;
+import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.SNAPSHOT;
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.deleteIfExists;
-import static java.nio.file.Files.newInputStream;
-import static java.nio.file.Files.newOutputStream;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
-import com.netflix.hollow.api.producer.HollowProducer.Publisher;
-import com.netflix.hollow.api.producer.HollowProducer.Blob.Type;
 
 public abstract class AbstractHollowPublisher implements HollowProducer.Publisher {
     protected final String namespace;
@@ -75,8 +74,6 @@ public abstract class AbstractHollowPublisher implements HollowProducer.Publishe
         protected final long fromVersion;
         protected final long toVersion;
         protected final Path stagedArtifactPath;
-        private BufferedOutputStream out;
-        private BufferedInputStream in;
 
         protected StagedBlob(Blob.Type type, String namespace, Path stagingPath, long fromVersion, long toVersion) {
             this.type = type;
@@ -101,38 +98,30 @@ public abstract class AbstractHollowPublisher implements HollowProducer.Publishe
         }
 
         @Override
-        public OutputStream getOutputStream() {
+        public OutputStream newOutputStream() {
             try {
                 createDirectories(stagedArtifactPath.getParent());
-                out = new BufferedOutputStream(newOutputStream(stagedArtifactPath));
-                return out;
+                return new BufferedOutputStream(Files.newOutputStream(stagedArtifactPath));
             } catch(IOException ex) {
                 throw new RuntimeException(ex);
             }
         }
 
         @Override
-        public InputStream getInputStream() {
+        public InputStream newInputStream() {
             try {
-                in = new BufferedInputStream(newInputStream(stagedArtifactPath));
-                return in;
+                return new BufferedInputStream(Files.newInputStream(stagedArtifactPath));
             } catch(IOException ex) {
                 throw new RuntimeException(ex);
             }
         }
 
         @Override
-        public void close() {
-            if(out != null) {
-                try {
-                    if(out != null) out.close();
-                    out = null;
-                    if(in != null) in.close();
-                    in = null;
-                    //                    deleteIfExists(stagedPath);
-                } catch(IOException ex) {
-                    throw new RuntimeException(ex);
-                }
+        public void cleanup() {
+            try {
+                deleteIfExists(stagedArtifactPath);
+            } catch(IOException ex) {
+                ex.printStackTrace();
             }
         }
 
