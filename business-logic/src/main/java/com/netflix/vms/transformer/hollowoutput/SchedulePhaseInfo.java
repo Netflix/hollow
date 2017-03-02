@@ -1,8 +1,12 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import java.util.GregorianCalendar;
+
 public class SchedulePhaseInfo implements Cloneable{
+	public static final long FAR_FUTURE_DATE = new GregorianCalendar(3000,1,1).getTimeInMillis();
+	
 	public long start = 0L;
-	public long end = java.lang.Long.MIN_VALUE;
+	public long end = FAR_FUTURE_DATE;
 	public boolean isAbsolute = false;
 	public boolean isAutomatedImg = false;
 	public int sourceVideoId = -1;
