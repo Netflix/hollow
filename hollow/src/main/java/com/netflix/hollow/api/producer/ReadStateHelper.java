@@ -53,6 +53,17 @@ final class ReadStateHelper {
         return new ReadStateHelper(this.current, newReadState(writeState.getVersion(), new HollowReadStateEngine()));
     }
 
+    /**
+     * Swap underlying state engines between current and pending while keeping the versions consistent;
+     * used after delta integrity checks have altered the underlying state engines.
+     *
+     * @return
+     */
+    ReadStateHelper swap() {
+        return new ReadStateHelper(newReadState(current.getVersion(), pending.getStateEngine()),
+                newReadState(pending.getVersion(), current.getStateEngine()));
+    }
+
     ReadStateHelper commit() {
         if(pending == null) throw new IllegalStateException();
         return new ReadStateHelper(this.pending, null);

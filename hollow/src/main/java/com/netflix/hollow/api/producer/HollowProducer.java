@@ -18,7 +18,10 @@
 package com.netflix.hollow.api.producer;
 
 import static com.netflix.hollow.api.consumer.HollowConsumer.newReadState;
+import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.DELTA;
+import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.REVERSE_DELTA;
 import static java.lang.System.currentTimeMillis;
+import static java.lang.System.out;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,9 +34,11 @@ import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.tools.checksum.HollowChecksum;
 
 /**
  * Beta API subject to change.
@@ -124,7 +129,7 @@ public class HollowProducer {
             if(writeEngine.hasChangedSinceLastCycle()) {
                 publish(writeState, artifacts);
                 ReadStateHelper candidate = readStates.roundtrip(writeState);
-                checkIntegrity(candidate);
+                candidate = checkIntegrity(candidate, artifacts);
                 validate(candidate.pending());
                 announce(candidate.pending());
                 readStates = candidate.commit();
@@ -206,28 +211,75 @@ public class HollowProducer {
      *  S(pnd).apply(reverseDelta).checksum == S(cur).checksum
      *
      * @param readStates
+     * @return updated read states
      */
-    private void checkIntegrity(ReadStateHelper readStates) throws Exception {
+    private ReadStateHelper checkIntegrity(ReadStateHelper readStates, Artifacts artifacts) throws Exception {
+        ReadStateHelper result = readStates;
         long start = listeners.fireIntegrityCheckStart(readStates.pendingVersion());
         ProducerStatus status = ProducerStatus.unknownFailure();
-        Blob snapshot = null;
         try {
-            snapshot = publisher.openSnapshot(readStates.pendingVersion());
-            HollowBlobReader reader = new HollowBlobReader(readStates.pending().getStateEngine(), new HollowBlobHeaderReader());
-            reader.readSnapshot(snapshot.getInputStream());
+            HollowReadStateEngine current = readStates.hasCurrent() ? readStates.current().getStateEngine() : null;
+            HollowReadStateEngine pending = readStates.pending().getStateEngine();
+            readSnapshot(artifacts.snapshot, pending);
 
             if(readStates.hasCurrent()) {
-                // FIXME: timt: do delta integrity checks; we only compare checksums for
-                // schemas that are common and unchanged between S(curr) and S(prev)
-            }
+                System.out.println("CHECKSUMS");
+                HollowChecksum currentChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
+                out.format("  CUR        %s\n", currentChecksum);
 
+                HollowChecksum pendingChecksum = HollowChecksum.forStateEngineWithCommonSchemas(pending, current);
+                out.format("         PND %s\n", pendingChecksum);
+
+                if(artifacts.hasDelta()) {
+                    // FIXME: timt: future cycles will fail unless this delta validates *and* we have a reverse
+                    // delta *and* it also validates
+                    applyDelta(artifacts.delta, current);
+                    HollowChecksum forwardChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
+                    out.format("  CUR => PND %s\n", forwardChecksum);
+                    if(!forwardChecksum.equals(pendingChecksum)) throw new ChecksumValidationException(DELTA);
+                }
+
+                if(artifacts.hasReverseDelta()) {
+                    applyDelta(artifacts.reverseDelta, pending);
+                    HollowChecksum reverseChecksum = HollowChecksum.forStateEngineWithCommonSchemas(pending, current);
+                    out.format("  CUR <= PND %s\n", reverseChecksum);
+                    if(!reverseChecksum.equals(currentChecksum)) throw new ChecksumValidationException(REVERSE_DELTA);
+                    result = readStates.swap();
+                }
+            }
             status = ProducerStatus.success(readStates.pending());
         } catch(Throwable th) {
             status = ProducerStatus.fail(readStates.pendingVersion(), th);
             throw th;
         } finally {
             listeners.fireIntegrityCheckComplete(status, start);
-            if(snapshot != null) snapshot.close();
+        }
+        return result;
+    }
+
+    public static final class ChecksumValidationException extends IllegalStateException {
+        private static final long serialVersionUID = -4399719849669674206L;
+
+        ChecksumValidationException(Blob.Type type) {
+            super(type.name() + " checksum invalid");
+        }
+    }
+
+    private void readSnapshot(Blob blob, HollowReadStateEngine stateEngine) throws IOException {
+        InputStream is = blob.newInputStream();
+        try {
+            new HollowBlobReader(stateEngine, new HollowBlobHeaderReader()).readSnapshot(is);
+        } finally {
+            is.close();
+        }
+    }
+
+    private void applyDelta(Blob blob, HollowReadStateEngine stateEngine) throws IOException {
+        InputStream is = blob.newInputStream();
+        try {
+            new HollowBlobReader(stateEngine, new HollowBlobHeaderReader()).applyDelta(is);
+        } finally {
+            is.close();
         }
     }
 
