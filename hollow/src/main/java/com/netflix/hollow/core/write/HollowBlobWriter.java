@@ -77,6 +77,7 @@ public class HollowBlobWriter {
 
             typeState.writeSnapshot(dos);
         }
+        os.flush();
     }
 
     /**
@@ -123,6 +124,7 @@ public class HollowBlobWriter {
                 typeState.writeDelta(dos);
             }
         }
+        os.flush();
     }
 
     /**
@@ -169,6 +171,7 @@ public class HollowBlobWriter {
                 typeState.writeReverseDelta(dos);
             }
         }
+        os.flush();
     }
 
     private List<HollowSchema> changedTypes() {
