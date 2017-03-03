@@ -50,7 +50,7 @@ public class HollowHistoryTypeKeyIndex {
     private int maxIndexedKeyOrdinal = 0;
 
     private final HollowWriteStateEngine writeStateEngine;
-    private final HollowReadStateEngine readStateEngine;
+    private HollowReadStateEngine readStateEngine;
     private boolean isInitialized = false;
 
     public HollowHistoryTypeKeyIndex(PrimaryKey primaryKey, HollowDataset dataModel, HollowWriteStateEngine writeEngine, HollowReadStateEngine readEngine) {
@@ -83,6 +83,10 @@ public class HollowHistoryTypeKeyIndex {
         initKeySchema(initialTypeState.getSchema());
         initializeTypeWriteState();
         isInitialized = true;
+    }
+
+    public void updateReadStateEngine(HollowReadStateEngine readEngine) {
+        readStateEngine=readEngine;
     }
 
     public void update(HollowObjectTypeReadState latestTypeState, boolean isDelta) {

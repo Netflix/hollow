@@ -37,7 +37,7 @@ public class HollowHistoryKeyIndex {
     private final HollowHistory history;
     private final Map<String, HollowHistoryTypeKeyIndex> typeKeyIndexes;
     private final HollowWriteStateEngine writeStateEngine;
-    private final HollowReadStateEngine readStateEngine;
+    private HollowReadStateEngine readStateEngine;
 
     public HollowHistoryKeyIndex(HollowHistory history) {
         this.history = history;
@@ -100,10 +100,16 @@ public class HollowHistoryKeyIndex {
         boolean isInitialUpdate = !isInitialized();
 
         initializeTypeIndexes(latestStateEngine);
-
         updateTypeIndexes(latestStateEngine, isDelta && !isInitialUpdate);
 
-        roundTripStateEngine(isInitialUpdate || !isDelta);
+        HollowReadStateEngine newReadState = roundTripStateEngine(isInitialUpdate, !isDelta);
+        if (newReadState != readStateEngine) {
+            // New ReadState was created so let's update references to old one
+            readStateEngine = newReadState;
+            for(final Map.Entry<String, HollowHistoryTypeKeyIndex> entry : typeKeyIndexes.entrySet()) {
+                entry.getValue().updateReadStateEngine(readStateEngine);
+            }
+        }
 
         rehashKeys();
     }
@@ -140,20 +146,24 @@ public class HollowHistoryKeyIndex {
         executor.awaitUninterruptibly();
     }
 
-    private void roundTripStateEngine(boolean isSnapshot) {
+    private HollowReadStateEngine roundTripStateEngine(boolean isInitialUpdate, boolean isSnapshot) {
         try {
-            if (isSnapshot) {
+            if (isInitialUpdate || isSnapshot) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
                 writer.writeSnapshot(baos);
-                HollowBlobReader reader = new HollowBlobReader(readStateEngine);
+                // Use existing readStateEngine on initial update; otherwise, create new one to properly handle double snapshot
+                HollowReadStateEngine newReadStateEngine = isInitialUpdate ? readStateEngine : new HollowReadStateEngine();
+                HollowBlobReader reader = new HollowBlobReader(newReadStateEngine);
                 reader.readSnapshot(new ByteArrayInputStream(baos.toByteArray()));
+                return newReadStateEngine;
             } else {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
                 writer.writeDelta(baos);
                 HollowBlobReader reader = new HollowBlobReader(readStateEngine);
                 reader.applyDelta(new ByteArrayInputStream(baos.toByteArray()));
+                return readStateEngine;
             }
         } catch(IOException e) {
             throw new RuntimeException(e);
