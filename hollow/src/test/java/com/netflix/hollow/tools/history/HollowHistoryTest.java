@@ -143,6 +143,7 @@ public class HollowHistoryTest extends AbstractStateEngineTest {
 
         // Double Snapshot - With New Type
         {
+            initWriteStateEngine();
             addRecord(1, 2, 3);
             // addRecord(2, 3, 4);  removed record
             addRecord(3, 4, 5);
@@ -188,6 +189,9 @@ public class HollowHistoryTest extends AbstractStateEngineTest {
 
         // Double Snapshot - With New Type
         {
+            initWriteStateEngine();
+            Assert.assertNull(writeStateEngine.getTypeState(B_TYPE));
+
             addRecord(1, 2, 3);
             // addRecord(2, 3, 4);
             addRecord(3, 4, 5);
