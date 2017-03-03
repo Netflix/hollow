@@ -11,7 +11,6 @@ public class Artwork implements Cloneable {
     public int ordinalPriority = java.lang.Integer.MIN_VALUE;
     public ArtworkDerivatives derivatives = null;
     public List<ArtworkCdn> cdns = null;
-    public List<DeprecatedImageId> deprecatedImageIds = null;
     public PassthroughVideo source_movie_id = null;
     public ArtworkSourcePassthrough source = null;
     public ArtworkBasicPassthrough basic_passthrough = null;
@@ -32,7 +31,6 @@ public class Artwork implements Cloneable {
         builder.append(",ordinalPriority=").append(ordinalPriority);
         builder.append(",derivatives=").append(derivatives);
         builder.append(",cdns=").append(cdns);
-        builder.append(",deprecatedImageIds=").append(deprecatedImageIds);
         builder.append(",source_movie_id=").append(source_movie_id);
         builder.append(",source=").append(source);
         builder.append(",basic_passthrough=").append(basic_passthrough);
