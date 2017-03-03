@@ -195,8 +195,7 @@ public class SimpleTransformer {
                 new RolloutVideoModule(api, ctx, cycleConstants, objectMapper, indexer),
                 new PersonImagesModule(api, ctx, cycleConstants, objectMapper, indexer),
                 new CharacterImagesModule(api, ctx, cycleConstants, objectMapper, indexer),
-                new GlobalPersonModule(api, ctx, cycleConstants, objectMapper, indexer),
-                new NamedListCompletionModule(videoNamedListModule, cycleConstants, objectMapper)
+                new GlobalPersonModule(api, ctx, cycleConstants, objectMapper, indexer)
                 );
 
         // @formatter:on
@@ -209,6 +208,14 @@ public class SimpleTransformer {
         }
 
         executor.awaitSuccessfulCompletion();
+
+        //// NamedListCompletionModule happens after all hierarchies are already processed -- now we have built the ThreadSafeBitSets corresponding
+        //// to the NamedLists, and we can build the POJOs using those.
+        long tStart = System.currentTimeMillis();
+        NamedListCompletionModule namedListCompleter = new NamedListCompletionModule(videoNamedListModule, cycleConstants, objectMapper);
+        namedListCompleter.transform();
+        long tDuration = System.currentTimeMillis() - tStart;
+        ctx.getLogger().info(NonVideoSpecificTransformDuration, "Finished Transform for module={}, duration={}", namedListCompleter.getName(), tDuration);
 
         ctx.getLogger().info(TransformProgress, new ProgressMessage(processedCount.get()));
         ctx.getMetricRecorder().recordMetric(FailedProcessingIndividualHierarchies, failedIndividualTransforms.get());
