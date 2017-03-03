@@ -1,10 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
-
 import java.util.Map;
 
-@HollowPrimaryKey(fields={"contractId", "videoId"})
 public class LanguageRights implements Cloneable {
 
     public int contractId = java.lang.Integer.MIN_VALUE;

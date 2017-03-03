@@ -1,10 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
-
 import java.util.Map;
 
-@HollowPrimaryKey(fields="video")
 public class RolloutVideo implements Cloneable {
 
     public Video video = null;

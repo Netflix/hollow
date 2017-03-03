@@ -1,8 +1,6 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 
-@HollowPrimaryKey(fields={"id", "country"})
 public class CompleteVideo implements Cloneable {
 
     public Video id = null;

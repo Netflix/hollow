@@ -1,11 +1,8 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
-
 import java.util.Map;
 import java.util.Set;
 
-@HollowPrimaryKey(fields="country")
 public class NamedCollectionHolder implements Cloneable {
 
     public ISOCountry country = null;

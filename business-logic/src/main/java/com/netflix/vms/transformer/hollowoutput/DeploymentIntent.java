@@ -1,8 +1,6 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 
-@HollowPrimaryKey(fields={"profileId", "bitrate", "country"})
 public class DeploymentIntent implements Cloneable {
 
     public int profileId = java.lang.Integer.MIN_VALUE;

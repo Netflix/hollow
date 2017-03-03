@@ -1,11 +1,8 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
-
 import java.util.Arrays;
 import java.util.Set;
 
-@HollowPrimaryKey(fields={"groupNameStr"})
 public class EncodingProfileGroup implements Cloneable {
 
     public char[] groupNameStr = null;

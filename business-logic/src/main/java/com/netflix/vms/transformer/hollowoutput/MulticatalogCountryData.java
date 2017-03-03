@@ -1,11 +1,8 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
-
 import java.util.Collections;
 import java.util.Map;
 
-@HollowPrimaryKey(fields={"videoId", "country"})
 public class MulticatalogCountryData {
     
     public Video videoId = null;

@@ -1,11 +1,8 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
-
 import java.util.Arrays;
 import java.util.Map;
 
-@HollowPrimaryKey(fields="resourceIdStr")
 public class L10NResources implements Cloneable {
 
     public char[] resourceIdStr = null;

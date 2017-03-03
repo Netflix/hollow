@@ -1,10 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
-
 import java.util.List;
 
-@HollowPrimaryKey(fields="id")
 public class GlobalPerson implements Cloneable {
 
     public int id = java.lang.Integer.MIN_VALUE;

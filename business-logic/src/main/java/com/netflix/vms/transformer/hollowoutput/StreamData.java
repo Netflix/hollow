@@ -1,8 +1,6 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 
-@HollowPrimaryKey(fields="downloadableId")
 public class StreamData implements Cloneable {
 
     public DownloadableId downloadableId = null;
