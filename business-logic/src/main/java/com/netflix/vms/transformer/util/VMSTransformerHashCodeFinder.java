@@ -3,6 +3,8 @@ package com.netflix.vms.transformer.util;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
+import com.netflix.vms.transformer.hollowoutput.ArtworkSourceString;
+
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageFormatEntry;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageTypeEntry;
@@ -33,6 +35,7 @@ public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder 
         DownloadableId,
         NFLocale,
         Strings,
+        ArtworkSourceString,
         SupplementalInfoType,
         TrickPlayType,
         VPerson,
@@ -67,6 +70,8 @@ public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder 
             return stringHashCode(((NFLocale)objectToHash).value);
         case Strings:
             return stringHashCode(((Strings)objectToHash).value);
+        case ArtworkSourceString:
+            return stringHashCode(((ArtworkSourceString)objectToHash).value);
         case SupplementalInfoType:
             return stringHashCode(((SupplementalInfoType)objectToHash).value);
         case TrickPlayType:
