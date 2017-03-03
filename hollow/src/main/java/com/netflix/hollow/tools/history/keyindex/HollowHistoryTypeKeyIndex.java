@@ -63,7 +63,7 @@ public class HollowHistoryTypeKeyIndex {
 
     public void addFieldIndex(String fieldName, HollowDataset dataModel) {
         String fieldPathParts[] = PrimaryKey.getCompleteFieldPathParts(dataModel, primaryKey.getType(), fieldName);
-
+        
         for(int i=0;i<primaryKey.numFields();i++) {
             String pkFieldPathParts[] = PrimaryKey.getCompleteFieldPathParts(dataModel, primaryKey.getType(), primaryKey.getFieldPath(i));
             if(Arrays.equals(pkFieldPathParts, fieldPathParts)) {
@@ -139,25 +139,25 @@ public class HollowHistoryTypeKeyIndex {
         hashedRecordKeys[bucket] = ordinal;
 
         indexFields:
-            for(int j=0;j<primaryKey.numFields();j++) {
-                if(keyFieldIsIndexed[j]) {
-                    int fieldBucket = HashCodes.hashInt(HollowReadFieldUtils.fieldHashCode(keyTypeState, ordinal, j)) & bucketMask;
-                    int chainStartIndex = hashedFieldKeys[j][fieldBucket];
-                    while(chainStartIndex != -1) {
-                        int representativeOrdinal = (int)hashedFieldKeyChains.get(chainStartIndex);
-                        if(HollowReadFieldUtils.fieldsAreEqual(keyTypeState, ordinal, j, keyTypeState, representativeOrdinal, j)) {
-                            hashedFieldKeyChains.add(((long)chainStartIndex << 32) | ordinal);
-                            hashedFieldKeys[j][fieldBucket] = hashedFieldKeyChains.size() - 1;
-                            break indexFields;
-                        }
-                        fieldBucket = (fieldBucket + 1) & bucketMask;
-                        chainStartIndex = hashedFieldKeys[j][fieldBucket];
+        for(int j=0;j<primaryKey.numFields();j++) {
+            if(keyFieldIsIndexed[j]) {
+                int fieldBucket = HashCodes.hashInt(HollowReadFieldUtils.fieldHashCode(keyTypeState, ordinal, j)) & bucketMask;
+                int chainStartIndex = hashedFieldKeys[j][fieldBucket];
+                while(chainStartIndex != -1) {
+                    int representativeOrdinal = (int)hashedFieldKeyChains.get(chainStartIndex);
+                    if(HollowReadFieldUtils.fieldsAreEqual(keyTypeState, ordinal, j, keyTypeState, representativeOrdinal, j)) {
+                        hashedFieldKeyChains.add(((long)chainStartIndex << 32) | ordinal);
+                        hashedFieldKeys[j][fieldBucket] = hashedFieldKeyChains.size() - 1;
+                        break indexFields;
                     }
-
-                    hashedFieldKeyChains.add(((long)Integer.MAX_VALUE << 32) | ordinal);
-                    hashedFieldKeys[j][fieldBucket] = hashedFieldKeyChains.size() - 1;
+                    fieldBucket = (fieldBucket + 1) & bucketMask;
+                    chainStartIndex = hashedFieldKeys[j][fieldBucket];
                 }
+
+                hashedFieldKeyChains.add(((long)Integer.MAX_VALUE << 32) | ordinal);
+                hashedFieldKeys[j][fieldBucket] = hashedFieldKeyChains.size() - 1;
             }
+        }
     }
 
     private int[] initializeHashedKeyArray(int hashTableSize) {
@@ -212,51 +212,51 @@ public class HollowHistoryTypeKeyIndex {
                 int hashCode;
                 if(keyFieldIsIndexed[i]) {
                     switch(keySchema.getFieldType(i)) {
-                        case INT:
-                            final int queryInt = Integer.parseInt(query);
-                            hashCode = HollowReadFieldUtils.intHashCode(queryInt);
-                            addMatches(new Matcher() {
-                                public boolean foundMatch(int ordinal) {
-                                    return keyTypeState.readInt(ordinal, fieldIndex) == queryInt;
-                                }
-                            }, i, hashCode, matchingKeys);
-                            break;
-                        case LONG:
-                            final long queryLong = Long.parseLong(query);
-                            hashCode = HollowReadFieldUtils.longHashCode(queryLong);
-                            addMatches(new Matcher() {
-                                public boolean foundMatch(int ordinal) {
-                                    return keyTypeState.readLong(ordinal, fieldIndex) == queryLong;
-                                }
-                            }, i, hashCode, matchingKeys);
-                            break;
-                        case STRING:
-                            hashCode = HashCodes.hashCode(query);
-                            addMatches(new Matcher() {
-                                public boolean foundMatch(int ordinal) {
-                                    return keyTypeState.isStringFieldEqual(ordinal, fieldIndex, query);
-                                }
-                            }, i, hashCode, matchingKeys);
-                            break;
-                        case DOUBLE:
-                            final double queryDouble = Double.parseDouble(query);
-                            hashCode = HollowReadFieldUtils.doubleHashCode(queryDouble);
-                            addMatches(new Matcher() {
-                                public boolean foundMatch(int ordinal) {
-                                    return keyTypeState.readDouble(ordinal, fieldIndex) == queryDouble;
-                                }
-                            }, i, hashCode, matchingKeys);
-                            break;
-                        case FLOAT:
-                            final float queryFloat = Float.parseFloat(query);
-                            hashCode = HollowReadFieldUtils.floatHashCode(queryFloat);
-                            addMatches(new Matcher() {
-                                public boolean foundMatch(int ordinal) {
-                                    return keyTypeState.readFloat(ordinal, fieldIndex) == queryFloat;
-                                }
-                            }, i, hashCode, matchingKeys);
-                            break;
-                        default:
+                    case INT:
+                        final int queryInt = Integer.parseInt(query);
+                        hashCode = HollowReadFieldUtils.intHashCode(queryInt);
+                        addMatches(new Matcher() {
+                            public boolean foundMatch(int ordinal) {
+                                return keyTypeState.readInt(ordinal, fieldIndex) == queryInt;
+                            }
+                        }, i, hashCode, matchingKeys);
+                        break;
+                    case LONG:
+                        final long queryLong = Long.parseLong(query);
+                        hashCode = HollowReadFieldUtils.longHashCode(queryLong);
+                        addMatches(new Matcher() {
+                            public boolean foundMatch(int ordinal) {
+                                return keyTypeState.readLong(ordinal, fieldIndex) == queryLong;
+                            }
+                        }, i, hashCode, matchingKeys);
+                        break;
+                    case STRING:
+                        hashCode = HashCodes.hashCode(query);
+                        addMatches(new Matcher() {
+                            public boolean foundMatch(int ordinal) {
+                                return keyTypeState.isStringFieldEqual(ordinal, fieldIndex, query);
+                            }
+                        }, i, hashCode, matchingKeys);
+                        break;
+                    case DOUBLE:
+                        final double queryDouble = Double.parseDouble(query);
+                        hashCode = HollowReadFieldUtils.doubleHashCode(queryDouble);
+                        addMatches(new Matcher() {
+                            public boolean foundMatch(int ordinal) {
+                                return keyTypeState.readDouble(ordinal, fieldIndex) == queryDouble;
+                            }
+                        }, i, hashCode, matchingKeys);
+                        break;
+                    case FLOAT:
+                        final float queryFloat = Float.parseFloat(query);
+                        hashCode = HollowReadFieldUtils.floatHashCode(queryFloat);
+                        addMatches(new Matcher() {
+                            public boolean foundMatch(int ordinal) {
+                                return keyTypeState.readFloat(ordinal, fieldIndex) == queryFloat;
+                            }
+                        }, i, hashCode, matchingKeys);
+                        break;
+                    default:
                     }
                 }
             } catch(NumberFormatException ignore) { }
@@ -389,41 +389,41 @@ public class HollowHistoryTypeKeyIndex {
             writeKeyField(nextPartTypeState, nextOrdinal, rec, keyField, keyFieldParts, keyFieldPartPosition + 1);
         } else {
             switch(typeState.getSchema().getFieldType(schemaPosition)) {
-                case BOOLEAN:
-                    Boolean bool = typeState.readBoolean(ordinal, schemaPosition);
-                    if(bool != null)
-                        rec.setBoolean(keyField, bool);
-                    break;
-                case BYTES:
-                    byte[] b = typeState.readBytes(ordinal, schemaPosition);
-                    if(b != null)
-                        rec.setBytes(keyField, b);
-                    break;
-                case DOUBLE:
-                    double d = typeState.readDouble(ordinal, schemaPosition);
-                    if(!Double.isNaN(d))
-                        rec.setDouble(keyField, d);
-                    break;
-                case FLOAT:
-                    float f = typeState.readFloat(ordinal, schemaPosition);
-                    if(!Float.isNaN(f))
-                        rec.setFloat(keyField, f);
-                    break;
-                case INT:
-                    int i = typeState.readInt(ordinal, schemaPosition);
-                    rec.setInt(keyField, i);
-                    break;
-                case LONG:
-                    long l = typeState.readLong(ordinal, schemaPosition);
-                    rec.setLong(keyField, l);
-                    break;
-                case STRING:
-                    String s = typeState.readString(ordinal, schemaPosition);
-                    if(s != null)
-                        rec.setString(keyField, s);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Primary key components must be a value leaf node");
+            case BOOLEAN:
+                Boolean bool = typeState.readBoolean(ordinal, schemaPosition);
+                if(bool != null)
+                    rec.setBoolean(keyField, bool);
+                break;
+            case BYTES:
+                byte[] b = typeState.readBytes(ordinal, schemaPosition);
+                if(b != null)
+                    rec.setBytes(keyField, b);
+                break;
+            case DOUBLE:
+                double d = typeState.readDouble(ordinal, schemaPosition);
+                if(!Double.isNaN(d))
+                    rec.setDouble(keyField, d);
+                break;
+            case FLOAT:
+                float f = typeState.readFloat(ordinal, schemaPosition);
+                if(!Float.isNaN(f))
+                    rec.setFloat(keyField, f);
+                break;
+            case INT:
+                int i = typeState.readInt(ordinal, schemaPosition);
+                rec.setInt(keyField, i);
+                break;
+            case LONG:
+                long l = typeState.readLong(ordinal, schemaPosition);
+                rec.setLong(keyField, l);
+                break;
+            case STRING:
+                String s = typeState.readString(ordinal, schemaPosition);
+                if(s != null)
+                    rec.setString(keyField, s);
+                break;
+            default:
+                throw new IllegalArgumentException("Primary key components must be a value leaf node");
             }
         }
     }

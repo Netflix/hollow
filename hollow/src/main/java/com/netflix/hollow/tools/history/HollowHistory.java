@@ -102,6 +102,7 @@ public class HollowHistory {
                 }
             }
         }
+
     }
 
     /**
@@ -175,7 +176,7 @@ public class HollowHistory {
      * @param newVersion
      */
     public void doubleSnapshotOccurred(HollowReadStateEngine newHollowStateEngine, long newVersion) {
-        if (!keyIndex.isInitialized())
+        if(!keyIndex.isInitialized())
             keyIndex.update(latestHollowReadStateEngine, false);
 
         keyIndex.update(newHollowStateEngine, false);
@@ -281,7 +282,6 @@ public class HollowHistory {
             HollowHistoricalStateTypeKeyOrdinalMapping typeMapping = keyOrdinalMapping.getTypeMapping(keyType);
             HollowObjectTypeReadState fromTypeState = (HollowObjectTypeReadState) latestHollowReadStateEngine.getTypeState(keyType);
             HollowObjectTypeReadState toTypeState = (HollowObjectTypeReadState) newStateEngine.getTypeState(keyType);
-
             DiffEqualOrdinalMap equalOrdinalMap = mapping.getEqualOrdinalMap(keyType);
 
             BitSet fromOrdinals = fromTypeState == null ? new BitSet() : fromTypeState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
