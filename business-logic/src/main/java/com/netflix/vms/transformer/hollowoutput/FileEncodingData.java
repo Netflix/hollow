@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class FileEncodingData implements Cloneable {
 
-    public long downloadableId = java.lang.Long.MIN_VALUE;
+    public DownloadableId downloadableId = null;
     public CodecPrivateDataString codecPrivateData = null;
     public ChunkDurationsString chunkDurations = null;
     public long dashHeaderSize = java.lang.Long.MIN_VALUE;
@@ -15,7 +15,9 @@ public class FileEncodingData implements Cloneable {
             return false;
 
         FileEncodingData o = (FileEncodingData) other;
-        if(o.downloadableId != downloadableId) return false;
+        if(o.downloadableId == null) {
+            if(downloadableId != null) return false;
+        } else if(!o.downloadableId.equals(downloadableId)) return false;
         if(o.codecPrivateData == null) {
             if(codecPrivateData != null) return false;
         } else if(!o.codecPrivateData.equals(codecPrivateData)) return false;
@@ -29,7 +31,7 @@ public class FileEncodingData implements Cloneable {
 
     public int hashCode() {
         int hashCode = 1;
-        hashCode = hashCode * 31 + (int) (downloadableId ^ (downloadableId >>> 32));
+        hashCode = hashCode * 31 + (downloadableId == null ? 1237 : downloadableId.hashCode());
         hashCode = hashCode * 31 + (codecPrivateData == null ? 1237 : codecPrivateData.hashCode());
         hashCode = hashCode * 31 + (chunkDurations == null ? 1237 : chunkDurations.hashCode());
         hashCode = hashCode * 31 + (int) (dashHeaderSize ^ (dashHeaderSize >>> 32));

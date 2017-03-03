@@ -228,7 +228,7 @@ public class PackageDataModule {
         StreamNonImageInfoHollow nonImageInfo = inputStream._getNonImageInfo();
         if(nonImageInfo != null) {
             FileEncodingData encodingData = new FileEncodingData();
-            encodingData.downloadableId = inputStream._getDownloadableId();
+            encodingData.downloadableId = new DownloadableId(inputStream._getDownloadableId());
             CodecPrivateDataStringHollow codecPrivateData = nonImageInfo._getCodecPrivateData();
             ChunkDurationsStringHollow chunkDurations = nonImageInfo._getChunkDurations();
 
