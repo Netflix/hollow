@@ -17,18 +17,22 @@
  */
 package com.netflix.hollow.tools.history;
 
-import com.netflix.hollow.core.AbstractStateEngineTest;
-
-import com.netflix.hollow.core.util.IntList;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.api.objects.HollowObject;
 import com.netflix.hollow.api.objects.generic.GenericHollowRecordHelper;
-import com.netflix.hollow.tools.history.HollowHistoricalState;
-import com.netflix.hollow.tools.history.HollowHistory;
+import com.netflix.hollow.core.AbstractStateEngineTest;
+import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
+import com.netflix.hollow.tools.history.keyindex.HollowHistoryKeyIndex;
+import com.netflix.hollow.tools.history.keyindex.HollowHistoryTypeKeyIndex;
 import java.io.IOException;
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +42,11 @@ public class HollowHistoryTest extends AbstractStateEngineTest {
     ///TODO: Use key index to test double snapshot behavior.
 
     private HollowObjectSchema aSchema;
+    private HollowObjectSchema bSchema;
 
+    private static final String B_TYPE = "B";
+    private static final String B_FN_PREFIX = "b";
+    
     @Override
     @Before
     public void setUp() {
@@ -46,6 +54,10 @@ public class HollowHistoryTest extends AbstractStateEngineTest {
         aSchema.addField("a1", FieldType.INT);
         aSchema.addField("a2", FieldType.INT);
         aSchema.addField("a3", FieldType.INT);
+
+        bSchema = new HollowObjectSchema(B_TYPE, 2,  B_FN_PREFIX + "1");
+        bSchema.addField(B_FN_PREFIX + "1", FieldType.INT);
+        bSchema.addField(B_FN_PREFIX + "2", FieldType.INT);
 
         super.setUp();
     }
@@ -120,29 +132,139 @@ public class HollowHistoryTest extends AbstractStateEngineTest {
         assertRecord(retrieveAddedRecord  (history, 5L, 3), 3, 4, 7);
     }
 
+    @Test
+    public void testNewType() throws IOException {
+        addRecord(1, 2, 3);
+        addRecord(2, 3, 4);
+        roundTripSnapshot();
+
+        HollowHistory history = new HollowHistory(readStateEngine, 1L, 5);
+        setupKeyIndex(readStateEngine, history);
+
+        // Double Snapshot - With New Type
+        {
+            addRecord(1, 2, 3);
+            // addRecord(2, 3, 4);  removed record
+            addRecord(3, 4, 5);
+            addRecord(bSchema, B_FN_PREFIX, 1, 2);
+
+            roundTripSnapshot();
+            setupKeyIndex(readStateEngine, history);
+            history.doubleSnapshotOccurred(readStateEngine, 2L);
+
+            assertRecord(retrieveRemovedRecord(history, 2L, 2), 2, 3, 4);
+            assertRecord(retrieveAddedRecord(history, 2L, 3), 3, 4, 5);
+
+            // First cycle with new type, it does not know
+            assertRecord(retrieveAddedRecord(history, 2L, B_TYPE, 1), B_FN_PREFIX, 1, 2);
+        }
+
+        {
+            addRecord(1, 2, 3);
+            addRecord(2, 3, 4);
+            addRecord(3, 4, 5);
+            // addRecord(bSchema, B_FN_PREFIX, 1, 2); remove record
+            addRecord(bSchema, B_FN_PREFIX, 2, 3);
+
+            roundTripDelta();
+            history.deltaOccurred(3L);
+
+            assertRecord(retrieveAddedRecord(history, 3L, 2), 2, 3, 4);
+            assertRecord(retrieveRemovedRecord(history, 3L, B_TYPE, 1), B_FN_PREFIX, 1, 2);
+            assertRecord(retrieveAddedRecord(history, 3L, B_TYPE, 2), B_FN_PREFIX, 2, 3);
+        }
+    }
+    
+    @Test
+    public void testRemoveType() throws IOException {
+        addRecord(1, 2, 3);
+        addRecord(2, 3, 4);
+        addRecord(bSchema, B_FN_PREFIX, 1, 2);
+        addRecord(bSchema, B_FN_PREFIX, 2, 3);
+        roundTripSnapshot();
+
+        HollowHistory history = new HollowHistory(readStateEngine, 1L, 5);
+        setupKeyIndex(readStateEngine, history);
+
+        // Double Snapshot - With New Type
+        {
+            addRecord(1, 2, 3);
+            // addRecord(2, 3, 4);
+            addRecord(3, 4, 5);
+            // addRecord(bSchema, B_FN_PREFIX, 1, 2);
+            // addRecord(bSchema, B_FN_PREFIX, 2, 3);
+
+            roundTripSnapshot();
+            setupKeyIndex(readStateEngine, history);
+            history.doubleSnapshotOccurred(readStateEngine, 2L);
+
+            assertRecord(retrieveRemovedRecord(history, 2L, 2), 2, 3, 4);
+            assertRecord(retrieveAddedRecord(history, 2L, 3), 3, 4, 5);
+
+            assertRecord(retrieveRemovedRecord(history, 2L, B_TYPE, 1), B_FN_PREFIX, 1, 2);
+            assertRecord(retrieveRemovedRecord(history, 2L, B_TYPE, 2), B_FN_PREFIX, 2, 3);
+        }
+
+        {
+            addRecord(1, 2, 3);
+            addRecord(2, 3, 4); // Added it back
+            addRecord(3, 4, 5);
+
+            roundTripDelta();
+            history.deltaOccurred(3L);
+
+            assertRecord(retrieveAddedRecord(history, 3L, 2), 2, 3, 4);
+        }
+    }
+
+    private void setupKeyIndex(HollowReadStateEngine stateEngine, HollowHistory history) {
+        HollowHistoryKeyIndex keyIndex = history.getKeyIndex();
+        for (String type : stateEngine.getAllTypes()) {
+
+            HollowTypeReadState typeState = stateEngine.getTypeState(type);
+            HollowSchema schema = typeState.getSchema();
+            if (schema instanceof HollowObjectSchema) {
+                HollowObjectSchema oSchema = (HollowObjectSchema) schema;
+                PrimaryKey pKey = oSchema.getPrimaryKey();
+                if (pKey == null) continue;
+
+                keyIndex.indexTypeField(pKey, stateEngine);
+                System.out.println("Setup KeyIndex: type=" + type + "\t" + pKey);
+            }
+        }
+    }
+
     private HollowObject retrieveRemovedRecord(HollowHistory history, long version, int key) {
-        HollowHistoricalState historicalState = history.getHistoricalState(version);
-
-        IntList queryResult = history.getKeyIndex().getTypeKeyIndexes().get("A").queryIndexedFields(String.valueOf(key));
-        int keyOrdinal = queryResult.get(0);
-
-        int removedOrdinal = historicalState.getKeyOrdinalMapping().getTypeMapping("A").findRemovedOrdinal(keyOrdinal);
-
-        return (HollowObject) GenericHollowRecordHelper.instantiate(historicalState.getDataAccess(), "A", removedOrdinal);
+        return retrieveRemovedRecord(history, version, "A", key);
     }
 
     private HollowObject retrieveAddedRecord(HollowHistory history, long version, int key) {
+        return retrieveAddedRecord(history, version, "A", key);
+    }
+
+    private HollowObject retrieveRemovedRecord(HollowHistory history, long version, String type, int key) {
         HollowHistoricalState historicalState = history.getHistoricalState(version);
 
-        IntList queryResult = history.getKeyIndex().getTypeKeyIndexes().get("A").queryIndexedFields(String.valueOf(key));
+        IntList queryResult = history.getKeyIndex().getTypeKeyIndexes().get(type).queryIndexedFields(String.valueOf(key));
         int keyOrdinal = queryResult.get(0);
 
-        int addedOrdinal = historicalState.getKeyOrdinalMapping().getTypeMapping("A").findAddedOrdinal(keyOrdinal);
+        int removedOrdinal = historicalState.getKeyOrdinalMapping().getTypeMapping(type).findRemovedOrdinal(keyOrdinal);
 
-        return (HollowObject) GenericHollowRecordHelper.instantiate(historicalState.getDataAccess(), "A", addedOrdinal);
+        return (HollowObject) GenericHollowRecordHelper.instantiate(historicalState.getDataAccess(), type, removedOrdinal);
     }
 
 
+    private HollowObject retrieveAddedRecord(HollowHistory history, long version, String type, int key) {
+        HollowHistoricalState historicalState = history.getHistoricalState(version);
+
+        Map<String, HollowHistoryTypeKeyIndex> typeKeyIndexes = history.getKeyIndex().getTypeKeyIndexes();
+        IntList queryResult = typeKeyIndexes.get(type).queryIndexedFields(String.valueOf(key));
+        int keyOrdinal = queryResult.get(0);
+
+        int addedOrdinal = historicalState.getKeyOrdinalMapping().getTypeMapping(type).findAddedOrdinal(keyOrdinal);
+
+        return (HollowObject) GenericHollowRecordHelper.instantiate(historicalState.getDataAccess(), type, addedOrdinal);
+    }
 
     private void assertRecord(HollowObject obj, int a1, int a2, int a3) {
         Assert.assertEquals(a1, obj.getInt("a1"));
@@ -164,6 +286,28 @@ public class HollowHistoryTest extends AbstractStateEngineTest {
         rec.setInt("a3", a3);
 
         writeStateEngine.add("A", rec);
+    }
+    
+    private void assertRecord(HollowObject obj, String fnPrefix, int... vals) {
+        for (int i = 0; i < vals.length; i++) {
+            String fn = fnPrefix + (i + 1);
+            Assert.assertEquals(vals[i], obj.getInt(fn));
+        }
+    }
+
+    private void addRecord(HollowObjectSchema schema, String fnPrefix, int ... vals) {
+        String bType = schema.getName();
+        if (writeStateEngine.getTypeState(bType) == null) {
+            writeStateEngine.addTypeState(new HollowObjectTypeWriteState(schema));
+        }
+
+        HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
+        for (int i = 0; i < vals.length; i++) {
+            String fn = fnPrefix + (i + 1);
+            rec.setInt(fn, vals[i]);
+        }
+
+        writeStateEngine.add(bType, rec);
     }
 
     @Override

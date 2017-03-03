@@ -17,6 +17,7 @@
  */
 package com.netflix.hollow.tools.history.keyindex;
 
+import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -62,12 +63,33 @@ public class HollowHistoryKeyIndex {
     }
 
     public void addTypeIndex(PrimaryKey primaryKey) {
-        HollowHistoryTypeKeyIndex keyIdx = new HollowHistoryTypeKeyIndex(primaryKey, history.getLatestState(), writeStateEngine, readStateEngine);
+        addTypeIndex(primaryKey, history.getLatestState());
+    }
+
+    public HollowHistoryTypeKeyIndex addTypeIndex(PrimaryKey primaryKey, HollowDataset dataModel) {
+        HollowHistoryTypeKeyIndex keyIdx = new HollowHistoryTypeKeyIndex(primaryKey, dataModel, writeStateEngine, readStateEngine);
         typeKeyIndexes.put(primaryKey.getType(), keyIdx);
+        return keyIdx;
     }
 
     public void indexTypeField(String type, String keyFieldPath) {
         typeKeyIndexes.get(type).addFieldIndex(keyFieldPath, history.getLatestState());
+    }
+
+    public void indexTypeField(PrimaryKey primaryKey) {
+        indexTypeField(primaryKey, history.getLatestState());
+    }
+
+    public void indexTypeField(PrimaryKey primaryKey, HollowDataset dataModel) {
+        String type = primaryKey.getType();
+        HollowHistoryTypeKeyIndex typeIndex = typeKeyIndexes.get(type);
+        if (typeIndex==null) {
+            typeIndex = addTypeIndex(primaryKey, dataModel);
+        }
+
+        for (String fieldPath : primaryKey.getFieldPaths()) {
+            typeIndex.addFieldIndex(fieldPath, dataModel);
+        }
     }
 
     public Map<String, HollowHistoryTypeKeyIndex> getTypeKeyIndexes() {
@@ -77,12 +99,11 @@ public class HollowHistoryKeyIndex {
     public void update(HollowReadStateEngine latestStateEngine, boolean isDelta) {
         boolean isInitialUpdate = !isInitialized();
 
-        if(isInitialUpdate)
-            initializeTypeIndexes(latestStateEngine);
+        initializeTypeIndexes(latestStateEngine);
 
         updateTypeIndexes(latestStateEngine, isDelta && !isInitialUpdate);
 
-        roundTripStateEngine(isInitialUpdate);
+        roundTripStateEngine(isInitialUpdate || !isDelta);
 
         rehashKeys();
     }
@@ -93,10 +114,14 @@ public class HollowHistoryKeyIndex {
 
     private void initializeTypeIndexes(HollowReadStateEngine latestStateEngine) {
         for(Map.Entry<String, HollowHistoryTypeKeyIndex> entry : typeKeyIndexes.entrySet()) {
-            HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) latestStateEngine.getTypeState(entry.getKey());
-            if(typeState == null)
-                throw new RuntimeException("HollowHistory: Configured index type " + entry.getKey() + " does not exist!");
-            entry.getValue().initialize(typeState);
+            String type = entry.getKey();
+            HollowHistoryTypeKeyIndex index = entry.getValue();
+            if (index.isInitialized()) continue;
+
+            HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) latestStateEngine.getTypeState(type);
+            if (typeState == null) continue;
+
+            index.initialize(typeState);
         }
     }
 
@@ -115,9 +140,9 @@ public class HollowHistoryKeyIndex {
         executor.awaitUninterruptibly();
     }
 
-    private void roundTripStateEngine(boolean isInitialUpdate) {
+    private void roundTripStateEngine(boolean isSnapshot) {
         try {
-            if(isInitialUpdate) {
+            if (isSnapshot) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
                 writer.writeSnapshot(baos);
