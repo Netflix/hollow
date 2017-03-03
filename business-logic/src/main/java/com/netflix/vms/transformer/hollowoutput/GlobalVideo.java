@@ -1,8 +1,11 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
+
 import java.util.List;
 import java.util.Set;
 
+@HollowPrimaryKey(fields="completeVideo.id")
 public class GlobalVideo implements Cloneable {
 
     public CompleteVideo completeVideo = null;

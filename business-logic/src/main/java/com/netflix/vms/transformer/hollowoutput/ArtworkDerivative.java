@@ -1,6 +1,8 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 
+@HollowPrimaryKey(fields="recipeDesc")
 public class ArtworkDerivative implements Cloneable {
 
     public ArtWorkImageFormatEntry format = null;

@@ -1,7 +1,10 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
+
 import java.util.Map;
 
+@HollowPrimaryKey(fields="packageId")
 public class DrmInfoData implements Cloneable {
 
     public int packageId = java.lang.Integer.MIN_VALUE;

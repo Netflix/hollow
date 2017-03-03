@@ -1,10 +1,12 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-import com.netflix.hollow.core.write.objectmapper.HollowShardLargeType;
+import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 
+import com.netflix.hollow.core.write.objectmapper.HollowShardLargeType;
 import java.util.List;
 
 @HollowShardLargeType(numShards=32)
+@HollowPrimaryKey(fields="sourceFileId")
 public class Artwork implements Cloneable {
 
     public ArtworkSourceString sourceFileId = null;
