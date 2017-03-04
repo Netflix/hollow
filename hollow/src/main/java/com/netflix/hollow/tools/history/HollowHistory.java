@@ -248,6 +248,7 @@ public class HollowHistory {
         for(String keyType : keyIndex.getTypeKeyIndexes().keySet()) {
             HollowHistoricalStateTypeKeyOrdinalMapping typeMapping = keyOrdinalMapping.getTypeMapping(keyType);
             HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) latestHollowReadStateEngine.getTypeState(keyType);
+            if (typeState==null) continue;
 
             PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
 
@@ -284,8 +285,8 @@ public class HollowHistory {
             HollowObjectTypeReadState toTypeState = (HollowObjectTypeReadState) newStateEngine.getTypeState(keyType);
             DiffEqualOrdinalMap equalOrdinalMap = mapping.getEqualOrdinalMap(keyType);
 
-            BitSet fromOrdinals = fromTypeState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
-            BitSet toOrdinals = toTypeState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
+            BitSet fromOrdinals = fromTypeState == null ? new BitSet() : fromTypeState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
+            BitSet toOrdinals = toTypeState == null ? new BitSet() : toTypeState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
 
             int removedOrdinalsCount = countUnmatchedOrdinals(fromOrdinals, equalOrdinalMap.getFromOrdinalIdentityTranslator());
             int addedOrdinalsCount = countUnmatchedOrdinals(toOrdinals, equalOrdinalMap.getToOrdinalIdentityTranslator());

@@ -50,7 +50,8 @@ public class HollowHistoryTypeKeyIndex {
     private int maxIndexedKeyOrdinal = 0;
 
     private final HollowWriteStateEngine writeStateEngine;
-    private final HollowReadStateEngine readStateEngine;
+    private HollowReadStateEngine readStateEngine;
+    private boolean isInitialized = false;
 
     public HollowHistoryTypeKeyIndex(PrimaryKey primaryKey, HollowDataset dataModel, HollowWriteStateEngine writeEngine, HollowReadStateEngine readEngine) {
         this.primaryKey = primaryKey;
@@ -72,9 +73,20 @@ public class HollowHistoryTypeKeyIndex {
         }
     }
 
+    public boolean isInitialized() {
+        return isInitialized;
+    }
+
     public void initialize(HollowObjectTypeReadState initialTypeState) {
+        if (isInitialized) return;
+
         initKeySchema(initialTypeState.getSchema());
         initializeTypeWriteState();
+        isInitialized = true;
+    }
+
+    public void updateReadStateEngine(HollowReadStateEngine readEngine) {
+        readStateEngine=readEngine;
     }
 
     public void update(HollowObjectTypeReadState latestTypeState, boolean isDelta) {
@@ -87,6 +99,7 @@ public class HollowHistoryTypeKeyIndex {
 
     public void hashRecordKeys() {
         HollowObjectTypeReadState keyTypeState = (HollowObjectTypeReadState) readStateEngine.getTypeState(primaryKey.getType());
+        if (keyTypeState == null) return;
 
         int hashTableSize = HashCodes.hashTableSize(keyTypeState.maxOrdinal() + 1);
 
@@ -343,11 +356,11 @@ public class HollowHistoryTypeKeyIndex {
             ordinal = iter.next();
         }
     }
-    
+
     public String[] getKeyFields() {
         return primaryKey.getFieldPaths();
     }
-    
+
     public Object getKeyFieldValue(int keyFieldIdx, int keyOrdinal) {
         return HollowReadFieldUtils.fieldValueObject((HollowObjectTypeReadState)readStateEngine.getTypeState(primaryKey.getType()), keyOrdinal, keyFieldIdx);
     }
