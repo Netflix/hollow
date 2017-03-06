@@ -1,5 +1,11 @@
 package com.netflix.hollow.diff.ui;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import org.junit.Test;
+
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -16,10 +22,6 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer;
 import com.netflix.hollow.tools.history.HollowHistory;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoryKeyIndex;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import org.junit.Test;
 
 public class HistoryUITest {
 
@@ -100,11 +102,11 @@ public class HistoryUITest {
         reader.applyDelta(new ByteArrayInputStream(baos.toByteArray()));
         history.deltaOccurred(20001231235959999L);
 
+        // Double Snapshot
+        bSchema = new HollowObjectSchema("TypeB", 2, "b1");
+        bSchema.addField("b1", FieldType.INT);
+        bSchema.addField("b2", FieldType.INT);
         { // do double snapshot and introduce new type
-            bSchema = new HollowObjectSchema("TypeB", 2, "b1");
-            bSchema.addField("b1", FieldType.INT);
-            bSchema.addField("b2", FieldType.INT);
-
             HollowWriteStateEngine stateEngine2 = new HollowWriteStateEngine();
             stateEngine2.addTypeState(new HollowObjectTypeWriteState(schema));
             stateEngine2.addTypeState(new HollowObjectTypeWriteState(bSchema));
