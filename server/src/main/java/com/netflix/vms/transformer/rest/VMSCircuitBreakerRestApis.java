@@ -1,0 +1,354 @@
+package com.netflix.vms.transformer.rest;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.netflix.appinfo.InstanceInfo;
+import com.netflix.config.NetflixConfiguration;
+import com.netflix.vms.transformer.common.config.OctoberSkyData;
+import com.netflix.vms.transformer.common.config.TransformerConfig;
+import com.netflix.vms.transformer.elasticsearch.ElasticSearchClient;
+import com.netflix.vms.transformer.fastproperties.PersistedPropertiesUtil;
+
+@Singleton
+@Path("/vms/circuitbreaker")
+public class VMSCircuitBreakerRestApis {
+
+	
+	private final TransformerConfig transformerConfig;
+	private final ElasticSearchClient elasticSearchClient;
+	private final OctoberSkyData octoberSkyData;
+	
+	@Inject
+	public VMSCircuitBreakerRestApis(TransformerConfig transformerConfig, 
+			ElasticSearchClient elasticSearchClient,
+			OctoberSkyData octoberSkyData) {
+		this.transformerConfig = transformerConfig;
+		this.elasticSearchClient = elasticSearchClient;
+		this.octoberSkyData = octoberSkyData;
+	}
+	
+	@GET
+	@Path("/status/{cbname}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getCircuitBreakerStatus(@PathParam("cbname") String circuitBreakerName, 
+			@QueryParam("vip") String vipName, 
+			@QueryParam("cycleId") String cycleId) {
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		Map<String, String> errorResponse = new HashMap<String, String>();
+		// We are only supporting playback monkey as of now
+		if(!circuitBreakerName.equals("playbackmonkey")) {
+			errorResponse.put("error", "Getting status for " + circuitBreakerName + " not supported");
+			return gson.toJson(errorResponse);
+		}
+		
+		// If vipname is null, use the defualt vip
+		if(vipName == null)
+			vipName = transformerConfig.getTransformerVip();
+		
+		// Get elastic search hostname to query
+		String esHostname = getElasticSearchHostname();
+		if(esHostname == null)
+			return "{}";
+		
+		// Get the last cycle for this vip
+		// If cycle id is null, use the last comopleted cycle
+		if(cycleId == null)
+			cycleId = VMSElasticSearchDataFetcher.getLastCycle(esHostname, vipName);
+		String cycleStatus = VMSElasticSearchDataFetcher.getCycleStatus(esHostname, vipName, cycleId);
+		
+		// get the pbmmessages and figure out if it failed etc
+		Map<String, List<String>> pbmMessages = VMSElasticSearchDataFetcher.getPlaybackMonkeyInfo(esHostname, vipName, cycleId);
+		Map<String, List<Integer>> failedVideos = new LinkedHashMap<String, List<Integer>>();
+		if(pbmMessages.get("ERROR") != null && pbmMessages.get("ERROR").size() > 0) {
+			for(String errorMessage : pbmMessages.get("ERROR")) {
+				if(errorMessage.contains("FailedIds")) {
+					failedVideos = getFailedVideoIds(errorMessage);
+					gson = new GsonBuilder().setPrettyPrinting().create();
+				}
+			}
+		}
+		
+		// Build the POJO
+		CircuitBreakerStatus status = new CircuitBreakerStatus();
+		status.setVipName(vipName);
+		status.setCycleId(cycleId);
+		status.setCircuitBreakerName(circuitBreakerName);
+		status.setCycleSuccess(cycleStatus);
+		if(pbmMessages.containsKey("ERROR") && pbmMessages.get("ERROR").size() > 0)
+			status.setCbSuccess(false);
+		else
+			status.setCbSuccess(true);
+		status.setFailedVideos(failedVideos);
+		status.setErrors(pbmMessages.get("ERROR"));
+		status.setWarnings(pbmMessages.get("WARN"));
+		
+		return gson.toJson(status, CircuitBreakerStatus.class);
+
+
+	}
+	
+	@GET
+	@Path("/config/{cbname}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getCircuitBreakerConfig(@PathParam("cbname") String circuitBreakerName) {
+		Gson gson = new Gson();
+		
+		if(!circuitBreakerName.equals("playbackmonkey")) {
+			Map<String, String> data = new HashMap<String, String>();			
+			data.put("error", "Config data not available for: " + circuitBreakerName);
+			return gson.toJson(data);
+		}
+		
+		CircuitBreakerConfig config = new CircuitBreakerConfig();
+		config.setVip(transformerConfig.getTransformerVip());
+		config.setEnabled(transformerConfig.isPlaybackMonkeyEnabled());
+		config.setAllowedOverrides(getListOfCountries());
+		config.setEnabledOverrides(getCommaSeparatedStringToList(transformerConfig.getPlaybackMonkeyTestForCountries()));
+		config.setDisabledOverrides(new ArrayList<String>());
+		config.setExclusions(getVideoCountryExclusions());
+		
+		return gson.toJson(config, CircuitBreakerConfig.class);
+	}
+	
+	@POST
+	@Path("/config/{cbname}")
+	@Consumes(MediaType.TEXT_PLAIN)
+	public String updateCircuitBreakerConfig(@PathParam("cbname") String circuitBreakerName, String requestData) {
+		Map<String, Object> data = new HashMap<String, Object>();
+		Gson gson = new Gson();
+		
+		// Currently only enabled for playback monkey
+		if(!circuitBreakerName.equals("playbackmonkey")) {
+			data.put("error", "Updating config for " + circuitBreakerName + " not supported");
+			return gson.toJson(data);
+		}
+
+		// Parse the incoming request data (JSON)
+		JsonElement jelement = new JsonParser().parse(requestData);
+		JsonObject jobject = jelement.getAsJsonObject();
+		
+		// If we need to toggle enabled bit of this 
+		if(jobject.has("enabled")) {
+			boolean enabled = jobject.get("enabled").getAsBoolean();
+			try {
+				enableOrDisablePlaybackMonkey(enabled);
+			} catch(Exception e) {
+				e.printStackTrace();
+				data.put("error", e.getMessage() + ": error setting enabled = " + enabled + "for playbackmonkey");
+				return gson.toJson(data);
+			}
+			
+		}
+		
+		// If we need to update the countries for which playback monkey is enabled
+		if(jobject.has("enabledOverrides")) {
+			JsonArray enabledCountries = jobject.get("enabledOverrides").getAsJsonArray();
+			List<String> countries = new ArrayList<String>();
+			for(int i = 0; i < enabledCountries.size(); i++) {
+				String country = enabledCountries.get(i).getAsString();
+				countries.add(country);
+			}
+			try {
+				updatePlaybackMonkeyCountries(countries);
+			} catch(Exception e) {
+				e.printStackTrace();
+				data.put("error", "Error creating fast property vms.playbackMonkeyTestForCountries with value : " 
+				+ countries.toString());
+				return gson.toJson(data);
+			}
+		}
+		
+		// If we need to update the video country exclusions
+		if(jobject.has("exclusions")) {
+			JsonObject exclusionObject = jobject.get("exclusions").getAsJsonObject();
+			String exclusionStr = getExclusionStringFromJson(exclusionObject);
+			try {
+				PersistedPropertiesUtil.createOrUpdateFastProperty("vms.playbackMonkeyVideoCountryToExclude", 
+						exclusionStr, 
+						"vmstransformer", 
+						NetflixConfiguration.getEnvironmentEnum(), 
+						NetflixConfiguration.getRegionEnum(), 
+						null, 
+						transformerConfig.getTransformerVip(), 
+						null);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return null;
+	}
+	
+	private Map<String, List<Integer>> getFailedVideoIds(String message) {
+		Map<String, List<Integer>> data = new LinkedHashMap<String, List<Integer>>();
+		String substring = (message.substring(message.indexOf("FailedIds=") + "FailedId=".length() + 1));
+		List<String> countryVideoIds = new ArrayList<String>();
+		int i = substring.indexOf('[');
+		int j = substring.indexOf(']');
+		while(i != -1 && j != -1) {
+			countryVideoIds.add(substring.substring(i + 1, j));
+			substring = substring.substring(j + 1);
+			i = substring.indexOf('[');
+			j = substring.indexOf(']');
+		}
+		
+		for(String countryVideoId : countryVideoIds) {
+			countryVideoId = countryVideoId.trim();
+			String[] tokens = countryVideoId.split(",");
+			String  country = tokens[0].trim();
+			int videoId = Integer.parseInt(tokens[1].trim());
+			if(!data.containsKey(country)) {
+				data.put(country, new ArrayList<Integer>());
+			}
+			data.get(country).add(videoId);
+		}
+		
+		
+		return data;
+	}
+
+	
+	/**
+	 * Construct the exclusion string from the incoming JSON
+	 * @param obj Parsed Json object referring to exclusion list
+	 * @return Fast property string of the format <country>:[videoIds];<country>:[videoIds]
+	 */
+	private String getExclusionStringFromJson(JsonObject obj) {
+		// First collect all the countries
+		Set<Map.Entry<String, JsonElement>> entries = obj.entrySet();
+		
+		// Return a space instead of empty string, fast property util complains if it is an empty string
+		if(entries.size() == 0)
+			return " ";
+		
+		// Iterate over the keys
+		List<String> exclusionCountries = new ArrayList<String>();
+		for(Map.Entry<String, JsonElement> entry : entries) {
+			String country = entry.getKey();
+			exclusionCountries.add(country);
+		}
+		
+		// Get all the countries
+		List<String> exclusions = new ArrayList<String>();
+		for(String country : exclusionCountries) {
+			JsonArray videoIds = obj.get(country).getAsJsonArray();
+			List<Integer> videos = new ArrayList<Integer>();
+			for(int i = 0; i < videoIds.size(); i++)
+				videos.add(videoIds.get(i).getAsInt());
+			String commaSeparatedVideoIds = Joiner.on(",").join(videos);
+			exclusions.add(country + ":" + commaSeparatedVideoIds);
+		}
+		
+		return Joiner.on(";").join(exclusions);
+	}
+	
+	/**
+	 * Get the elastic search host name for querying
+	 * @return
+	 */
+	private String getElasticSearchHostname() {
+		if(!transformerConfig.isElasticSearchLoggingEnabled())
+			return null;
+		Set<InstanceInfo> instances = elasticSearchClient.getElasticSearchClientBridge().getInstances();
+		if(instances.size() > 0) {
+			String hostname = instances.iterator().next().getHostName();
+			return hostname;
+		} else {
+			return null;
+		}
+	}
+	
+	// Gets the list of countries
+	private List<String> getListOfCountries() {
+		Set<String> countries = octoberSkyData.getSupportedCountries();
+		List<String> ret = new ArrayList<String>();
+		ret.add("GLOBAL");
+		ret.addAll(countries);
+		return ret;
+	}
+	
+	// Convert comma separated string to list of strings
+	private List<String> getCommaSeparatedStringToList(String s) {
+		return Splitter.on(',').trimResults().omitEmptyStrings().splitToList(s);
+	}
+	
+	// Parse the playback monkey exclusions and convert it into a map of string to list of string
+	private Map<String, List<String>> getVideoCountryExclusions() {
+		String exclusionString = transformerConfig.getPlaybackMonkeyVideoCountryToExclude().trim();
+		
+		Map<String, List<String>> exclusions = new HashMap<String, List<String>>();
+		
+		// If the String is empty or null return
+		if(exclusionString == null || exclusionString.length() == 0)
+			return exclusions;
+		
+		// Tokenize it on semi colon
+		String[] videoCountryTokens = exclusionString.split(";");
+		for(String videoCountryToken : videoCountryTokens) {
+			// Each token is of the form
+			// country : <comma separated videoIds>
+			String[] tokens = videoCountryToken.split(":");
+			String country = tokens[0];
+			String commaSeparatedVideoIds = tokens[1];
+			List<String> videoIds = getCommaSeparatedStringToList(commaSeparatedVideoIds);
+			exclusions.put(country, videoIds);
+		}
+		
+		return exclusions;
+	}
+	
+	// Enable or disable playback monkey for this Vip
+	private void enableOrDisablePlaybackMonkey(boolean enabled) throws IOException {
+		PersistedPropertiesUtil.createOrUpdateFastProperty("vms.playbackMonkeyEnabled", 
+				Boolean.valueOf(enabled).toString(), 
+				"vmstransformer", 
+				NetflixConfiguration.getEnvironmentEnum(), 
+				NetflixConfiguration.getRegionEnum(), 
+				null, 
+				transformerConfig.getTransformerVip(), 
+				null);
+	}
+	
+	// Update playback monkey enabled country for this Vip
+	private void updatePlaybackMonkeyCountries(List<String> countries) throws IOException {
+		String value = "";
+		// First convert the list of countries into comma separated list of countries
+		if(countries != null && countries.size() > 0)
+			value = Joiner.on(",").join(countries);
+		
+		PersistedPropertiesUtil.createOrUpdateFastProperty("vms.playbackMonkeyTestForCountries", 
+				value, 
+				"vmstransformer", 
+				NetflixConfiguration.getEnvironmentEnum(), 
+				NetflixConfiguration.getRegionEnum(), 
+				null, 
+				transformerConfig.getTransformerVip(), 
+				null);
+		
+	}
+}

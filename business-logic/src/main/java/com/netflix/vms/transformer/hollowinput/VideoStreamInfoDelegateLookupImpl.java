@@ -53,6 +53,70 @@ public class VideoStreamInfoDelegateLookupImpl extends HollowObjectAbstractDeleg
         return typeAPI.getVmafScoreBoxed(ordinal);
     }
 
+    public int getVmafAlgoVersionExp(int ordinal) {
+        return typeAPI.getVmafAlgoVersionExp(ordinal);
+    }
+
+    public Integer getVmafAlgoVersionExpBoxed(int ordinal) {
+        return typeAPI.getVmafAlgoVersionExpBoxed(ordinal);
+    }
+
+    public int getVmafAlgoVersionLts(int ordinal) {
+        return typeAPI.getVmafAlgoVersionLts(ordinal);
+    }
+
+    public Integer getVmafAlgoVersionLtsBoxed(int ordinal) {
+        return typeAPI.getVmafAlgoVersionLtsBoxed(ordinal);
+    }
+
+    public int getVmafScoreExp(int ordinal) {
+        return typeAPI.getVmafScoreExp(ordinal);
+    }
+
+    public Integer getVmafScoreExpBoxed(int ordinal) {
+        return typeAPI.getVmafScoreExpBoxed(ordinal);
+    }
+
+    public int getVmafScoreLts(int ordinal) {
+        return typeAPI.getVmafScoreLts(ordinal);
+    }
+
+    public Integer getVmafScoreLtsBoxed(int ordinal) {
+        return typeAPI.getVmafScoreLtsBoxed(ordinal);
+    }
+
+    public int getVmafplusScoreExp(int ordinal) {
+        return typeAPI.getVmafplusScoreExp(ordinal);
+    }
+
+    public Integer getVmafplusScoreExpBoxed(int ordinal) {
+        return typeAPI.getVmafplusScoreExpBoxed(ordinal);
+    }
+
+    public int getVmafplusScoreLts(int ordinal) {
+        return typeAPI.getVmafplusScoreLts(ordinal);
+    }
+
+    public Integer getVmafplusScoreLtsBoxed(int ordinal) {
+        return typeAPI.getVmafplusScoreLtsBoxed(ordinal);
+    }
+
+    public int getVmafplusPhoneScoreExp(int ordinal) {
+        return typeAPI.getVmafplusPhoneScoreExp(ordinal);
+    }
+
+    public Integer getVmafplusPhoneScoreExpBoxed(int ordinal) {
+        return typeAPI.getVmafplusPhoneScoreExpBoxed(ordinal);
+    }
+
+    public int getVmafplusPhoneScoreLts(int ordinal) {
+        return typeAPI.getVmafplusPhoneScoreLts(ordinal);
+    }
+
+    public Integer getVmafplusPhoneScoreLtsBoxed(int ordinal) {
+        return typeAPI.getVmafplusPhoneScoreLtsBoxed(ordinal);
+    }
+
     public long getScaledPsnrTimesHundred(int ordinal) {
         return typeAPI.getScaledPsnrTimesHundred(ordinal);
     }
@@ -67,6 +131,10 @@ public class VideoStreamInfoDelegateLookupImpl extends HollowObjectAbstractDeleg
 
     public Float getFpsBoxed(int ordinal) {
         return typeAPI.getFpsBoxed(ordinal);
+    }
+
+    public int getCropParamsOrdinal(int ordinal) {
+        return typeAPI.getCropParamsOrdinal(ordinal);
     }
 
     public VideoStreamInfoTypeAPI getTypeAPI() {

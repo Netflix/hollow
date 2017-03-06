@@ -206,7 +206,7 @@ public class VideoImagesDataModuleTest {
         when(videoArtworkHollow._getPhaseTags()).thenReturn(null);
         Set<SchedulePhaseInfo> schedulePhaseInfoSet = videoImagesDataModule.getAllScheduleInfo(videoArtworkHollow, videoId);
         SchedulePhaseInfo info = videoImagesDataModule.getEarliestScheduleInfo(schedulePhaseInfoSet, videoId);
-        verifySchedulePhaseInfo(info, 0L, Long.MIN_VALUE, false, false);
+        verifySchedulePhaseInfo(info, 0L, SchedulePhaseInfo.FAR_FUTURE_DATE, false, false);
         Assert.assertTrue(schedulePhaseInfoSet.size() == 1);
     }
 
@@ -219,7 +219,7 @@ public class VideoImagesDataModuleTest {
         Set<SchedulePhaseInfo> schedulePhaseInfoSet = videoImagesDataModule.getAllScheduleInfo(videoArtworkHollow, videoId);
         SchedulePhaseInfo schedulePhaseInfo = videoImagesDataModule.getEarliestScheduleInfo(schedulePhaseInfoSet, videoId);
 
-        verifySchedulePhaseInfo(schedulePhaseInfo, 0L, Long.MIN_VALUE, false, false);
+        verifySchedulePhaseInfo(schedulePhaseInfo, 0L, SchedulePhaseInfo.FAR_FUTURE_DATE, false, false);
         Assert.assertTrue(schedulePhaseInfoSet.size() == 1);
     }
 
@@ -282,7 +282,7 @@ public class VideoImagesDataModuleTest {
         Set<SchedulePhaseInfo> schedulePhaseInfoSet = videoImagesDataModule.getAllScheduleInfo(videoArtworkHollow, videoId);
         Assert.assertTrue(schedulePhaseInfoSet.size() == 2);// since we hve two phase tags
         SchedulePhaseInfo schedulePhaseInfo = videoImagesDataModule.getEarliestScheduleInfo(schedulePhaseInfoSet, videoId);
-        verifySchedulePhaseInfo(schedulePhaseInfo, -200L, Long.MIN_VALUE, false, false);
+        verifySchedulePhaseInfo(schedulePhaseInfo, -200L, SchedulePhaseInfo.FAR_FUTURE_DATE, false, false);
     }
 
     /**
@@ -352,7 +352,7 @@ public class VideoImagesDataModuleTest {
         Assert.assertTrue(schedulePhaseInfoSet.size() == 2);
         SchedulePhaseInfo schedulePhaseInfo = videoImagesDataModule.getEarliestScheduleInfo(schedulePhaseInfoSet, videoId);
 
-        verifySchedulePhaseInfo(schedulePhaseInfo, -2L, Long.MIN_VALUE, false, false);
+        verifySchedulePhaseInfo(schedulePhaseInfo, -2L, SchedulePhaseInfo.FAR_FUTURE_DATE, false, false);
     }
     
     @Test

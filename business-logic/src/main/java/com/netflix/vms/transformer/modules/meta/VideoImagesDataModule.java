@@ -64,7 +64,6 @@ import java.util.Set;
 
 public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabilityChecker {
 
-	private static final long FAR_FUTURE_DATE = Long.MIN_VALUE;
 	private final HollowHashIndex videoArtworkIndex;
     private final HollowPrimaryKeyIndex damMerchStillsIdx;
     private final HollowPrimaryKeyIndex videoStatusIdx;
@@ -794,7 +793,7 @@ public class VideoImagesDataModule extends ArtWorkModule  implements EDAvailabil
 
 	private SchedulePhaseInfo getFarInFutureSchedulePhaseInfo(int videoId) {
 		SchedulePhaseInfo phaseWithFarFutureStartAndEnd = new SchedulePhaseInfo(videoId);
-		phaseWithFarFutureStartAndEnd.start = phaseWithFarFutureStartAndEnd.end = FAR_FUTURE_DATE;
+		phaseWithFarFutureStartAndEnd.start = phaseWithFarFutureStartAndEnd.end = SchedulePhaseInfo.FAR_FUTURE_DATE;
 		return phaseWithFarFutureStartAndEnd;
 	}
 

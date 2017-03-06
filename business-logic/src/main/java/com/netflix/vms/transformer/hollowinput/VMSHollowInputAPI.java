@@ -25,7 +25,6 @@ import com.netflix.hollow.api.sampling.SampleResult;
 import com.netflix.hollow.core.util.AllHollowRecordCollection;
 
 @SuppressWarnings("all")
-
 public class VMSHollowInputAPI extends HollowAPI {
 
     private final HollowObjectCreationSampler objectCreationSampler;
@@ -224,6 +223,7 @@ public class VMSHollowInputAPI extends HollowAPI {
     private final VideoRatingRatingTypeAPI videoRatingRatingTypeAPI;
     private final VideoRatingArrayOfRatingTypeAPI videoRatingArrayOfRatingTypeAPI;
     private final VideoRatingTypeAPI videoRatingTypeAPI;
+    private final VideoStreamCropParamsTypeAPI videoStreamCropParamsTypeAPI;
     private final VideoStreamInfoTypeAPI videoStreamInfoTypeAPI;
     private final StreamNonImageInfoTypeAPI streamNonImageInfoTypeAPI;
     private final PackageStreamTypeAPI packageStreamTypeAPI;
@@ -429,6 +429,7 @@ public class VMSHollowInputAPI extends HollowAPI {
     private final HollowObjectProvider videoRatingRatingProvider;
     private final HollowObjectProvider videoRatingArrayOfRatingProvider;
     private final HollowObjectProvider videoRatingProvider;
+    private final HollowObjectProvider videoStreamCropParamsProvider;
     private final HollowObjectProvider videoStreamInfoProvider;
     private final HollowObjectProvider streamNonImageInfoProvider;
     private final HollowObjectProvider packageStreamProvider;
@@ -457,7 +458,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         HollowTypeDataAccess typeDataAccess;
         HollowFactory factory;
 
-        objectCreationSampler = new HollowObjectCreationSampler("CharacterQuote","CharacterQuoteList","ChunkDurationsString","CodecPrivateDataString","Date","DownloadableId","DownloadableIdList","DrmInfoString","Episode","EpisodeList","ExplicitDate","ISOCountry","ISOCountryList","ISOCountrySet","MapKey","MapOfFlagsFirstDisplayDates","Flags","PersonCharacter","CharacterList","MovieCharacterPerson","PersonVideoAliasId","PersonVideoAliasIdsList","PersonVideoRole","PersonVideoRolesList","PersonVideo","RightsContractPackage","ListOfRightsContractPackage","RightsWindowContract","ListOfRightsWindowContract","RightsWindow","ListOfRightsWindow","RolloutPhaseWindow","RolloutPhaseWindowMap","Season","SeasonList","ShowMemberType","ShowMemberTypeList","ShowCountryLabel","ShowSeasonEpisode","StreamAssetMetadata","StreamDimensions","StreamFileIdentification","StreamProfileId","StreamProfileIdList","String","AbsoluteSchedule","ArtWorkImageType","ArtworkDerivative","ArtworkDerivativeSet","ArtworkRecipe","AudioStreamInfo","CSMReview","CacheDeploymentIntent","Cdn","CdnDeployment","CdnDeploymentSet","CertificationSystemRating","CertificationSystemRatingList","CertificationSystem","CharacterElements","Character","DamMerchStillsMoment","DamMerchStills","DisallowedSubtitleLangCode","DisallowedSubtitleLangCodesList","DisallowedAssetBundle","DisallowedAssetBundlesList","Contract","DrmHeaderInfo","DrmHeaderInfoList","DrmSystemIdentifiers","ImageStreamInfo","ListOfContract","Contracts","ListOfPackageTags","DeployablePackages","ListOfString","LocaleTerritoryCode","LocaleTerritoryCodeList","ArtworkLocale","ArtworkLocaleList","MasterSchedule","MultiValuePassthroughMap","OriginServer","OverrideSchedule","PackageDrmInfo","PackageDrmInfoList","PackageMoment","PackageMomentList","PhaseTag","PhaseTagList","ProtectionTypes","ReleaseDate","ListOfReleaseDates","RightsContractAsset","ListOfRightsContractAsset","RightsContract","ListOfRightsContract","Rights","RolloutPhaseArtworkSourceFileId","RolloutPhaseArtworkSourceFileIdList","RolloutPhaseArtwork","RolloutPhaseLocalizedMetadata","RolloutPhaseElements","RolloutPhase","RolloutPhaseList","Rollout","SetOfString","SingleValuePassthroughMap","PassthroughData","ArtworkAttributes","CharacterArtwork","IndividualSupplemental","PersonArtwork","Status","StorageGroups","StreamAssetType","StreamDeploymentInfo","StreamDeploymentLabel","StreamDeploymentLabelSet","StreamDeployment","StreamDrmInfo","StreamProfileGroups","StreamProfiles","SupplementalsList","Supplementals","TerritoryCountries","TextStreamInfo","TopNAttribute","TopNAttributesSet","TopN","TranslatedTextValue","MapOfTranslatedText","AltGenresAlternateNames","AltGenresAlternateNamesList","LocalizedCharacter","LocalizedMetadata","StoriesSynopsesHook","StoriesSynopsesHookList","TranslatedText","AltGenres","AssetMetaDatas","Awards","Categories","CategoryGroups","Certifications","Characters","ConsolidatedCertSystemRating","ConsolidatedCertSystemRatingList","ConsolidatedCertificationSystems","Episodes","Festivals","Languages","MovieRatings","Movies","PersonAliases","PersonCharacterResource","Persons","Ratings","ShowMemberTypes","StoriesSynopses","TurboCollections","VMSAward","VideoArtwork","VideoAwardMapping","VideoAwardList","VideoAward","VideoDateWindow","VideoDateWindowList","VideoDate","VideoGeneralAlias","VideoGeneralAliasList","VideoGeneralEpisodeType","VideoGeneralEpisodeTypeList","VideoGeneralTitleType","VideoGeneralTitleTypeList","VideoGeneral","VideoId","ListOfVideoIds","PersonBio","VideoRatingAdvisoryId","VideoRatingAdvisoryIdList","VideoRatingAdvisories","ConsolidatedVideoCountryRating","ConsolidatedVideoCountryRatingList","ConsolidatedVideoRating","ConsolidatedVideoRatingList","ConsolidatedVideoRatings","VideoRatingRatingReasonIds","VideoRatingRatingReasonArrayOfIds","VideoRatingRatingReason","VideoRatingRating","VideoRatingArrayOfRating","VideoRating","VideoStreamInfo","StreamNonImageInfo","PackageStream","PackageStreamSet","Package","VideoTypeMedia","VideoTypeMediaList","VideoTypeDescriptor","VideoTypeDescriptorSet","VideoType");
+        objectCreationSampler = new HollowObjectCreationSampler("CharacterQuote","CharacterQuoteList","ChunkDurationsString","CodecPrivateDataString","Date","DownloadableId","DownloadableIdList","DrmInfoString","Episode","EpisodeList","ExplicitDate","ISOCountry","ISOCountryList","ISOCountrySet","MapKey","MapOfFlagsFirstDisplayDates","Flags","PersonCharacter","CharacterList","MovieCharacterPerson","PersonVideoAliasId","PersonVideoAliasIdsList","PersonVideoRole","PersonVideoRolesList","PersonVideo","RightsContractPackage","ListOfRightsContractPackage","RightsWindowContract","ListOfRightsWindowContract","RightsWindow","ListOfRightsWindow","RolloutPhaseWindow","RolloutPhaseWindowMap","Season","SeasonList","ShowMemberType","ShowMemberTypeList","ShowCountryLabel","ShowSeasonEpisode","StreamAssetMetadata","StreamDimensions","StreamFileIdentification","StreamProfileId","StreamProfileIdList","String","AbsoluteSchedule","ArtWorkImageType","ArtworkDerivative","ArtworkDerivativeSet","ArtworkRecipe","AudioStreamInfo","CSMReview","CacheDeploymentIntent","Cdn","CdnDeployment","CdnDeploymentSet","CertificationSystemRating","CertificationSystemRatingList","CertificationSystem","CharacterElements","Character","DamMerchStillsMoment","DamMerchStills","DisallowedSubtitleLangCode","DisallowedSubtitleLangCodesList","DisallowedAssetBundle","DisallowedAssetBundlesList","Contract","DrmHeaderInfo","DrmHeaderInfoList","DrmSystemIdentifiers","ImageStreamInfo","ListOfContract","Contracts","ListOfPackageTags","DeployablePackages","ListOfString","LocaleTerritoryCode","LocaleTerritoryCodeList","ArtworkLocale","ArtworkLocaleList","MasterSchedule","MultiValuePassthroughMap","OriginServer","OverrideSchedule","PackageDrmInfo","PackageDrmInfoList","PackageMoment","PackageMomentList","PhaseTag","PhaseTagList","ProtectionTypes","ReleaseDate","ListOfReleaseDates","RightsContractAsset","ListOfRightsContractAsset","RightsContract","ListOfRightsContract","Rights","RolloutPhaseArtworkSourceFileId","RolloutPhaseArtworkSourceFileIdList","RolloutPhaseArtwork","RolloutPhaseLocalizedMetadata","RolloutPhaseElements","RolloutPhase","RolloutPhaseList","Rollout","SetOfString","SingleValuePassthroughMap","PassthroughData","ArtworkAttributes","CharacterArtwork","IndividualSupplemental","PersonArtwork","Status","StorageGroups","StreamAssetType","StreamDeploymentInfo","StreamDeploymentLabel","StreamDeploymentLabelSet","StreamDeployment","StreamDrmInfo","StreamProfileGroups","StreamProfiles","SupplementalsList","Supplementals","TerritoryCountries","TextStreamInfo","TopNAttribute","TopNAttributesSet","TopN","TranslatedTextValue","MapOfTranslatedText","AltGenresAlternateNames","AltGenresAlternateNamesList","LocalizedCharacter","LocalizedMetadata","StoriesSynopsesHook","StoriesSynopsesHookList","TranslatedText","AltGenres","AssetMetaDatas","Awards","Categories","CategoryGroups","Certifications","Characters","ConsolidatedCertSystemRating","ConsolidatedCertSystemRatingList","ConsolidatedCertificationSystems","Episodes","Festivals","Languages","MovieRatings","Movies","PersonAliases","PersonCharacterResource","Persons","Ratings","ShowMemberTypes","StoriesSynopses","TurboCollections","VMSAward","VideoArtwork","VideoAwardMapping","VideoAwardList","VideoAward","VideoDateWindow","VideoDateWindowList","VideoDate","VideoGeneralAlias","VideoGeneralAliasList","VideoGeneralEpisodeType","VideoGeneralEpisodeTypeList","VideoGeneralTitleType","VideoGeneralTitleTypeList","VideoGeneral","VideoId","ListOfVideoIds","PersonBio","VideoRatingAdvisoryId","VideoRatingAdvisoryIdList","VideoRatingAdvisories","ConsolidatedVideoCountryRating","ConsolidatedVideoCountryRatingList","ConsolidatedVideoRating","ConsolidatedVideoRatingList","ConsolidatedVideoRatings","VideoRatingRatingReasonIds","VideoRatingRatingReasonArrayOfIds","VideoRatingRatingReason","VideoRatingRating","VideoRatingArrayOfRating","VideoRating","VideoStreamCropParams","VideoStreamInfo","StreamNonImageInfo","PackageStream","PackageStreamSet","Package","VideoTypeMedia","VideoTypeMediaList","VideoTypeDescriptor","VideoTypeDescriptorSet","VideoType");
 
         typeDataAccess = dataAccess.getTypeDataAccess("CharacterQuote");
         if(typeDataAccess != null) {
@@ -4145,6 +4146,25 @@ public class VMSHollowInputAPI extends HollowAPI {
             videoRatingProvider = new HollowObjectFactoryProvider(typeDataAccess, videoRatingTypeAPI, factory);
         }
 
+        typeDataAccess = dataAccess.getTypeDataAccess("VideoStreamCropParams");
+        if(typeDataAccess != null) {
+            videoStreamCropParamsTypeAPI = new VideoStreamCropParamsTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
+        } else {
+            videoStreamCropParamsTypeAPI = new VideoStreamCropParamsTypeAPI(this, new HollowObjectMissingDataAccess(dataAccess, "VideoStreamCropParams"));
+        }
+        addTypeAPI(videoStreamCropParamsTypeAPI);
+        factory = factoryOverrides.get("VideoStreamCropParams");
+        if(factory == null)
+            factory = new VideoStreamCropParamsHollowFactory();
+        if(cachedTypes.contains("VideoStreamCropParams")) {
+            HollowObjectCacheProvider previousCacheProvider = null;
+            if(previousCycleAPI != null && (previousCycleAPI.videoStreamCropParamsProvider instanceof HollowObjectCacheProvider))
+                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.videoStreamCropParamsProvider;
+            videoStreamCropParamsProvider = new HollowObjectCacheProvider(typeDataAccess, videoStreamCropParamsTypeAPI, factory, previousCacheProvider);
+        } else {
+            videoStreamCropParamsProvider = new HollowObjectFactoryProvider(typeDataAccess, videoStreamCropParamsTypeAPI, factory);
+        }
+
         typeDataAccess = dataAccess.getTypeDataAccess("VideoStreamInfo");
         if(typeDataAccess != null) {
             videoStreamInfoTypeAPI = new VideoStreamInfoTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
@@ -4726,6 +4746,8 @@ public class VMSHollowInputAPI extends HollowAPI {
             ((HollowObjectCacheProvider)videoRatingArrayOfRatingProvider).detach();
         if(videoRatingProvider instanceof HollowObjectCacheProvider)
             ((HollowObjectCacheProvider)videoRatingProvider).detach();
+        if(videoStreamCropParamsProvider instanceof HollowObjectCacheProvider)
+            ((HollowObjectCacheProvider)videoStreamCropParamsProvider).detach();
         if(videoStreamInfoProvider instanceof HollowObjectCacheProvider)
             ((HollowObjectCacheProvider)videoStreamInfoProvider).detach();
         if(streamNonImageInfoProvider instanceof HollowObjectCacheProvider)
@@ -5329,6 +5351,9 @@ public class VMSHollowInputAPI extends HollowAPI {
     }
     public VideoRatingTypeAPI getVideoRatingTypeAPI() {
         return videoRatingTypeAPI;
+    }
+    public VideoStreamCropParamsTypeAPI getVideoStreamCropParamsTypeAPI() {
+        return videoStreamCropParamsTypeAPI;
     }
     public VideoStreamInfoTypeAPI getVideoStreamInfoTypeAPI() {
         return videoStreamInfoTypeAPI;
@@ -7494,6 +7519,17 @@ public class VMSHollowInputAPI extends HollowAPI {
         objectCreationSampler.recordCreation(193);
         return (VideoRatingHollow)videoRatingProvider.getHollowObject(ordinal);
     }
+    public Collection<VideoStreamCropParamsHollow> getAllVideoStreamCropParamsHollow() {
+        return new AllHollowRecordCollection<VideoStreamCropParamsHollow>(getDataAccess().getTypeDataAccess("VideoStreamCropParams").getTypeState()) {
+            protected VideoStreamCropParamsHollow getForOrdinal(int ordinal) {
+                return getVideoStreamCropParamsHollow(ordinal);
+            }
+        };
+    }
+    public VideoStreamCropParamsHollow getVideoStreamCropParamsHollow(int ordinal) {
+        objectCreationSampler.recordCreation(194);
+        return (VideoStreamCropParamsHollow)videoStreamCropParamsProvider.getHollowObject(ordinal);
+    }
     public Collection<VideoStreamInfoHollow> getAllVideoStreamInfoHollow() {
         return new AllHollowRecordCollection<VideoStreamInfoHollow>(getDataAccess().getTypeDataAccess("VideoStreamInfo").getTypeState()) {
             protected VideoStreamInfoHollow getForOrdinal(int ordinal) {
@@ -7502,7 +7538,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoStreamInfoHollow getVideoStreamInfoHollow(int ordinal) {
-        objectCreationSampler.recordCreation(194);
+        objectCreationSampler.recordCreation(195);
         return (VideoStreamInfoHollow)videoStreamInfoProvider.getHollowObject(ordinal);
     }
     public Collection<StreamNonImageInfoHollow> getAllStreamNonImageInfoHollow() {
@@ -7513,7 +7549,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public StreamNonImageInfoHollow getStreamNonImageInfoHollow(int ordinal) {
-        objectCreationSampler.recordCreation(195);
+        objectCreationSampler.recordCreation(196);
         return (StreamNonImageInfoHollow)streamNonImageInfoProvider.getHollowObject(ordinal);
     }
     public Collection<PackageStreamHollow> getAllPackageStreamHollow() {
@@ -7524,7 +7560,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PackageStreamHollow getPackageStreamHollow(int ordinal) {
-        objectCreationSampler.recordCreation(196);
+        objectCreationSampler.recordCreation(197);
         return (PackageStreamHollow)packageStreamProvider.getHollowObject(ordinal);
     }
     public Collection<PackageStreamSetHollow> getAllPackageStreamSetHollow() {
@@ -7535,7 +7571,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PackageStreamSetHollow getPackageStreamSetHollow(int ordinal) {
-        objectCreationSampler.recordCreation(197);
+        objectCreationSampler.recordCreation(198);
         return (PackageStreamSetHollow)packageStreamSetProvider.getHollowObject(ordinal);
     }
     public Collection<PackageHollow> getAllPackageHollow() {
@@ -7546,7 +7582,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PackageHollow getPackageHollow(int ordinal) {
-        objectCreationSampler.recordCreation(198);
+        objectCreationSampler.recordCreation(199);
         return (PackageHollow)packageProvider.getHollowObject(ordinal);
     }
     public Collection<VideoTypeMediaHollow> getAllVideoTypeMediaHollow() {
@@ -7557,7 +7593,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoTypeMediaHollow getVideoTypeMediaHollow(int ordinal) {
-        objectCreationSampler.recordCreation(199);
+        objectCreationSampler.recordCreation(200);
         return (VideoTypeMediaHollow)videoTypeMediaProvider.getHollowObject(ordinal);
     }
     public Collection<VideoTypeMediaListHollow> getAllVideoTypeMediaListHollow() {
@@ -7568,7 +7604,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoTypeMediaListHollow getVideoTypeMediaListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(200);
+        objectCreationSampler.recordCreation(201);
         return (VideoTypeMediaListHollow)videoTypeMediaListProvider.getHollowObject(ordinal);
     }
     public Collection<VideoTypeDescriptorHollow> getAllVideoTypeDescriptorHollow() {
@@ -7579,7 +7615,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoTypeDescriptorHollow getVideoTypeDescriptorHollow(int ordinal) {
-        objectCreationSampler.recordCreation(201);
+        objectCreationSampler.recordCreation(202);
         return (VideoTypeDescriptorHollow)videoTypeDescriptorProvider.getHollowObject(ordinal);
     }
     public Collection<VideoTypeDescriptorSetHollow> getAllVideoTypeDescriptorSetHollow() {
@@ -7590,7 +7626,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoTypeDescriptorSetHollow getVideoTypeDescriptorSetHollow(int ordinal) {
-        objectCreationSampler.recordCreation(202);
+        objectCreationSampler.recordCreation(203);
         return (VideoTypeDescriptorSetHollow)videoTypeDescriptorSetProvider.getHollowObject(ordinal);
     }
     public Collection<VideoTypeHollow> getAllVideoTypeHollow() {
@@ -7601,7 +7637,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public VideoTypeHollow getVideoTypeHollow(int ordinal) {
-        objectCreationSampler.recordCreation(203);
+        objectCreationSampler.recordCreation(204);
         return (VideoTypeHollow)videoTypeProvider.getHollowObject(ordinal);
     }
     public void setSamplingDirector(HollowSamplingDirector director) {
