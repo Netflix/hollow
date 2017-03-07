@@ -52,7 +52,7 @@ public class SetMapKeyHasher {
         case INT:
             return HashCodes.hashInt(((Integer)key).intValue());
         case LONG:
-            long longVal = ((Long)key).intValue();
+            long longVal = ((Long)key).longValue();
             return HashCodes.hashInt((int)(longVal ^ (longVal >>> 32)));
         case REFERENCE:
             return HashCodes.hashInt(((Integer)key).intValue());

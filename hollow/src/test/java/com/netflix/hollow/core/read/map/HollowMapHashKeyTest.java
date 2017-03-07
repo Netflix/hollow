@@ -18,7 +18,7 @@
 package com.netflix.hollow.core.read.map;
 
 import com.netflix.hollow.core.util.StateEngineRoundTripper;
-
+import com.netflix.hollow.api.objects.generic.GenericHollowMap;
 import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
@@ -156,7 +156,6 @@ public class HollowMapHashKeyTest {
         Assert.assertEquals(500, value.getInt("value"));
     }
     
-    
     @SuppressWarnings("unused")
     private static class TestTopLevelObject {
         int id;
@@ -196,6 +195,31 @@ public class HollowMapHashKeyTest {
             this.country = country;
             this.extraValue = extraValue;
         }
+    }
+    
+    @Test
+    public void testLookupOfLongKey() throws IOException {
+        HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+        HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
+        mapper.initializeTypeState(TypeWithLongMap.class);
+        
+        TypeWithLongMap top = new TypeWithLongMap();
+        long longValue = (long)Integer.MAX_VALUE+1;
+        top.longMap.put(longValue, 100L);
+        
+        mapper.add(top);
+        
+        HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeEngine);
+        
+        GenericHollowMap map = new GenericHollowMap(readEngine, "MapOfLongToLong", 0);
+        
+        GenericHollowObject value = new GenericHollowObject(readEngine, "Long", map.findValue(longValue).getOrdinal());
+        
+        Assert.assertEquals(100L, value.getLong("value"));
+    }
+    
+    private static class TypeWithLongMap {
+        Map<Long, Long> longMap = new HashMap<>();
     }
 
 }
