@@ -18,6 +18,7 @@
 package com.netflix.hollow.history.ui.jetty;
 
 import com.netflix.hollow.history.ui.HollowHistoryUI;
+
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +27,6 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 public class HollowHistoryHandler extends AbstractHandler {
-
     private final HollowHistoryUI ui;
 
     public HollowHistoryHandler(HollowHistoryUI ui) {
@@ -38,5 +38,4 @@ public class HollowHistoryHandler extends AbstractHandler {
         if(ui.handle(target, request, response))
             baseRequest.setHandled(true);
     }
-
 }

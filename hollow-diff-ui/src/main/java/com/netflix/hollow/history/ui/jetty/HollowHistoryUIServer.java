@@ -19,11 +19,11 @@ package com.netflix.hollow.history.ui.jetty;
 
 import com.netflix.hollow.history.ui.HollowHistoryUI;
 import com.netflix.hollow.tools.history.HollowHistory;
-import org.eclipse.jetty.server.Server;
 
 public class HollowHistoryUIServer {
-    private final Server server;
-    private final HollowHistoryHandler handler;
+    private static final UIServer.Factory FACTORY = new OptionalDependencyHelper().historyUIServerFactory();
+
+    private final UIServer server;
     private final HollowHistoryUI ui;
 
     public HollowHistoryUIServer(HollowHistory history, int port) {
@@ -31,13 +31,11 @@ public class HollowHistoryUIServer {
     }
 
     public HollowHistoryUIServer(HollowHistoryUI ui, int port) {
-        this.server = new Server(port);
-        this.handler = new HollowHistoryHandler(ui);
+        this.server = FACTORY.newServer(ui, port);
         this.ui = ui;
     }
 
     public void start() throws Exception {
-        server.setHandler(handler);
         server.start();
     }
 
@@ -53,4 +51,13 @@ public class HollowHistoryUIServer {
         return ui;
     }
 
+    static interface UIServer {
+        void start() throws Exception;
+        void stop() throws Exception;
+        void join() throws InterruptedException;
+
+        static interface Factory {
+            UIServer newServer(HollowHistoryUI ui, int port);
+        }
+    }
 }

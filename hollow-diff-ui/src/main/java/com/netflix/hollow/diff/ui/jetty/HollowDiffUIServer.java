@@ -19,20 +19,18 @@ package com.netflix.hollow.diff.ui.jetty;
 
 import com.netflix.hollow.diff.ui.HollowDiffUI;
 import com.netflix.hollow.tools.diff.HollowDiff;
-import org.eclipse.jetty.server.Server;
 
 public class HollowDiffUIServer {
+    private static final UIServer.Factory FACTORY = new OptionalDependencyHelper().uiServerFactory();
 
-    private final Server server;
-    private final HollowDiffHandler handler;
+    private final UIServer server;
 
     public HollowDiffUIServer() {
         this(8080);
     }
 
     public HollowDiffUIServer(int port) {
-        this.server = new Server(port);
-        this.handler = new HollowDiffHandler();
+        this.server = FACTORY.newServer(port);
     }
 
     public HollowDiffUI addDiff(String diffPath, HollowDiff diff) {
@@ -40,11 +38,10 @@ public class HollowDiffUIServer {
     }
 
     public HollowDiffUI addDiff(String diffPath, HollowDiff diff, String fromBlobName, String toBlobName) {
-        return handler.getRouter().addDiff(diffPath, diff, fromBlobName, toBlobName);
+        return server.addDiff(diffPath, diff, fromBlobName, toBlobName);
     }
 
     public void start() throws Exception {
-        server.setHandler(handler);
         server.start();
     }
 
@@ -56,4 +53,14 @@ public class HollowDiffUIServer {
         server.join();
     }
 
+    static interface UIServer {
+        void start() throws Exception;
+        void stop() throws Exception;
+        void join() throws InterruptedException;
+        public HollowDiffUI addDiff(String diffPath, HollowDiff diff, String fromBlobName, String toBlobName);
+
+        static interface Factory {
+            UIServer newServer(int port);
+        }
+    }
 }
