@@ -441,6 +441,7 @@
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nfsso",
+                "netflix:nfzookeeper",
                 "netflix:nimble-int-java",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -1127,7 +1128,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.12",
+            "locked": "0.12.13",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -1692,6 +1693,7 @@
             "locked": "3.10.5.Final",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cql",
+                "netflix:nfzookeeper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.zookeeper:zookeeper",
                 "org.elasticsearch:elasticsearch"
@@ -2150,26 +2152,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.148",
+            "locked": "1.154",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.189.0",
+            "locked": "1.190.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -2234,6 +2236,7 @@
                 "netflix:fit-impl",
                 "netflix:luna-safetynet",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:openencryptclient",
                 "netflix:platform",
                 "netflix:platform-aws",
@@ -2283,6 +2286,7 @@
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform-ipc"
             ]
         },
@@ -2368,7 +2372,7 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.52.0",
+            "locked": "1.53.0",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -2439,6 +2443,7 @@
                 "netflix:fit-impl",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -3819,6 +3824,7 @@
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nfsso",
+                "netflix:nfzookeeper",
                 "netflix:nimble-int-java",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -4505,7 +4511,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.12",
+            "locked": "0.12.13",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -5070,6 +5076,7 @@
             "locked": "3.10.5.Final",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cql",
+                "netflix:nfzookeeper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.zookeeper:zookeeper",
                 "org.elasticsearch:elasticsearch"
@@ -5528,26 +5535,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.148",
+            "locked": "1.154",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.189.0",
+            "locked": "1.190.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -5612,6 +5619,7 @@
                 "netflix:fit-impl",
                 "netflix:luna-safetynet",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:openencryptclient",
                 "netflix:platform",
                 "netflix:platform-aws",
@@ -5661,6 +5669,7 @@
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform-ipc"
             ]
         },
@@ -5746,7 +5755,7 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.52.0",
+            "locked": "1.53.0",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -5817,6 +5826,7 @@
                 "netflix:fit-impl",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -7197,6 +7207,7 @@
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nfsso",
+                "netflix:nfzookeeper",
                 "netflix:nimble-int-java",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -7883,7 +7894,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.12",
+            "locked": "0.12.13",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -8448,6 +8459,7 @@
             "locked": "3.10.5.Final",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cql",
+                "netflix:nfzookeeper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.zookeeper:zookeeper",
                 "org.elasticsearch:elasticsearch"
@@ -8906,26 +8918,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.148",
+            "locked": "1.154",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.189.0",
+            "locked": "1.190.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -8990,6 +9002,7 @@
                 "netflix:fit-impl",
                 "netflix:luna-safetynet",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:openencryptclient",
                 "netflix:platform",
                 "netflix:platform-aws",
@@ -9039,6 +9052,7 @@
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform-ipc"
             ]
         },
@@ -9124,7 +9138,7 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.52.0",
+            "locked": "1.53.0",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -9195,6 +9209,7 @@
                 "netflix:fit-impl",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -10575,6 +10590,7 @@
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nfsso",
+                "netflix:nfzookeeper",
                 "netflix:nimble-int-java",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -11261,7 +11277,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.12",
+            "locked": "0.12.13",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -11826,6 +11842,7 @@
             "locked": "3.10.5.Final",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cql",
+                "netflix:nfzookeeper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.zookeeper:zookeeper",
                 "org.elasticsearch:elasticsearch"
@@ -12277,26 +12294,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.148",
+            "locked": "1.154",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.189.0",
+            "locked": "1.190.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -12361,6 +12378,7 @@
                 "netflix:fit-impl",
                 "netflix:luna-safetynet",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:openencryptclient",
                 "netflix:platform",
                 "netflix:platform-aws",
@@ -12410,6 +12428,7 @@
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform-ipc"
             ]
         },
@@ -12495,7 +12514,7 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.52.0",
+            "locked": "1.53.0",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -12566,6 +12585,7 @@
                 "netflix:fit-impl",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -13972,6 +13992,7 @@
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nfsso",
+                "netflix:nfzookeeper",
                 "netflix:nimble-int-java",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -14658,7 +14679,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.12",
+            "locked": "0.12.13",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -15223,6 +15244,7 @@
             "locked": "3.10.5.Final",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cql",
+                "netflix:nfzookeeper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.zookeeper:zookeeper",
                 "org.elasticsearch:elasticsearch"
@@ -15682,26 +15704,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.148",
+            "locked": "1.154",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.189.0",
+            "locked": "1.190.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -15766,6 +15788,7 @@
                 "netflix:fit-impl",
                 "netflix:luna-safetynet",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:openencryptclient",
                 "netflix:platform",
                 "netflix:platform-aws",
@@ -15815,6 +15838,7 @@
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform-ipc"
             ]
         },
@@ -15900,7 +15924,7 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.52.0",
+            "locked": "1.53.0",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -15971,6 +15995,7 @@
                 "netflix:fit-impl",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -18448,6 +18473,7 @@
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nfsso",
+                "netflix:nfzookeeper",
                 "netflix:nimble-int-java",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -19134,7 +19160,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.12",
+            "locked": "0.12.13",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -19699,6 +19725,7 @@
             "locked": "3.10.5.Final",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cql",
+                "netflix:nfzookeeper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.zookeeper:zookeeper",
                 "org.elasticsearch:elasticsearch"
@@ -20157,26 +20184,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.148",
+            "locked": "1.154",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.189.0",
+            "locked": "1.190.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -20241,6 +20268,7 @@
                 "netflix:fit-impl",
                 "netflix:luna-safetynet",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:openencryptclient",
                 "netflix:platform",
                 "netflix:platform-aws",
@@ -20290,6 +20318,7 @@
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform-ipc"
             ]
         },
@@ -20375,7 +20404,7 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.52.0",
+            "locked": "1.53.0",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -20446,6 +20475,7 @@
                 "netflix:fit-impl",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -21830,6 +21860,7 @@
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nfsso",
+                "netflix:nfzookeeper",
                 "netflix:nimble-int-java",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -22516,7 +22547,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.12",
+            "locked": "0.12.13",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -23081,6 +23112,7 @@
             "locked": "3.10.5.Final",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cql",
+                "netflix:nfzookeeper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.zookeeper:zookeeper",
                 "org.elasticsearch:elasticsearch"
@@ -23539,26 +23571,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.148",
+            "locked": "1.154",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.189.0",
+            "locked": "1.190.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -23623,6 +23655,7 @@
                 "netflix:fit-impl",
                 "netflix:luna-safetynet",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:openencryptclient",
                 "netflix:platform",
                 "netflix:platform-aws",
@@ -23672,6 +23705,7 @@
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform-ipc"
             ]
         },
@@ -23757,7 +23791,7 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.52.0",
+            "locked": "1.53.0",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -23828,6 +23862,7 @@
                 "netflix:fit-impl",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -25202,6 +25237,7 @@
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nfsso",
+                "netflix:nfzookeeper",
                 "netflix:nimble-int-java",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -25913,7 +25949,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.12",
+            "locked": "0.12.13",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -26487,6 +26523,7 @@
             "locked": "3.10.5.Final",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cql",
+                "netflix:nfzookeeper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.zookeeper:zookeeper",
                 "org.elasticsearch:elasticsearch"
@@ -26965,26 +27002,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.148",
+            "locked": "1.154",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.189.0",
+            "locked": "1.190.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -27049,6 +27086,7 @@
                 "netflix:fit-impl",
                 "netflix:luna-safetynet",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:openencryptclient",
                 "netflix:platform",
                 "netflix:platform-aws",
@@ -27098,6 +27136,7 @@
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform-ipc"
             ]
         },
@@ -27184,7 +27223,7 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.52.0",
+            "locked": "1.53.0",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -27255,6 +27294,7 @@
                 "netflix:fit-impl",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -28698,6 +28738,7 @@
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nfsso",
+                "netflix:nfzookeeper",
                 "netflix:nimble-int-java",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -29409,7 +29450,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.12",
+            "locked": "0.12.13",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -29983,6 +30024,7 @@
             "locked": "3.10.5.Final",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cql",
+                "netflix:nfzookeeper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.zookeeper:zookeeper",
                 "org.elasticsearch:elasticsearch"
@@ -30461,26 +30503,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.148",
+            "locked": "1.154",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.189.0",
+            "locked": "1.190.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -30545,6 +30587,7 @@
                 "netflix:fit-impl",
                 "netflix:luna-safetynet",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:openencryptclient",
                 "netflix:platform",
                 "netflix:platform-aws",
@@ -30594,6 +30637,7 @@
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform-ipc"
             ]
         },
@@ -30680,7 +30724,7 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.52.0",
+            "locked": "1.53.0",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -30751,6 +30795,7 @@
                 "netflix:fit-impl",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -32194,6 +32239,7 @@
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nfsso",
+                "netflix:nfzookeeper",
                 "netflix:nimble-int-java",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -32905,7 +32951,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.12",
+            "locked": "0.12.13",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -33479,6 +33525,7 @@
             "locked": "3.10.5.Final",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cql",
+                "netflix:nfzookeeper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.zookeeper:zookeeper",
                 "org.elasticsearch:elasticsearch"
@@ -33957,26 +34004,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.148",
+            "locked": "1.154",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.189.0",
+            "locked": "1.190.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -34041,6 +34088,7 @@
                 "netflix:fit-impl",
                 "netflix:luna-safetynet",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:openencryptclient",
                 "netflix:platform",
                 "netflix:platform-aws",
@@ -34090,6 +34138,7 @@
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform-ipc"
             ]
         },
@@ -34176,7 +34225,7 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.52.0",
+            "locked": "1.53.0",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -34247,6 +34296,7 @@
                 "netflix:fit-impl",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -35690,6 +35740,7 @@
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nfsso",
+                "netflix:nfzookeeper",
                 "netflix:nimble-int-java",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -36401,7 +36452,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.12",
+            "locked": "0.12.13",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -36975,6 +37026,7 @@
             "locked": "3.10.5.Final",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cql",
+                "netflix:nfzookeeper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.zookeeper:zookeeper",
                 "org.elasticsearch:elasticsearch"
@@ -37453,26 +37505,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.148",
+            "locked": "1.154",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.189.0",
+            "locked": "1.190.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -37537,6 +37589,7 @@
                 "netflix:fit-impl",
                 "netflix:luna-safetynet",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:openencryptclient",
                 "netflix:platform",
                 "netflix:platform-aws",
@@ -37586,6 +37639,7 @@
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform-ipc"
             ]
         },
@@ -37672,7 +37726,7 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.52.0",
+            "locked": "1.53.0",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -37743,6 +37797,7 @@
                 "netflix:fit-impl",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -39167,6 +39222,7 @@
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nfsso",
+                "netflix:nfzookeeper",
                 "netflix:nimble-int-java",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -39858,7 +39914,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.12",
+            "locked": "0.12.13",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -40427,6 +40483,7 @@
             "locked": "3.10.5.Final",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cql",
+                "netflix:nfzookeeper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.zookeeper:zookeeper",
                 "org.elasticsearch:elasticsearch"
@@ -40885,26 +40942,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.148",
+            "locked": "1.154",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.189.0",
+            "locked": "1.190.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -40969,6 +41026,7 @@
                 "netflix:fit-impl",
                 "netflix:luna-safetynet",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:openencryptclient",
                 "netflix:platform",
                 "netflix:platform-aws",
@@ -41018,6 +41076,7 @@
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform-ipc"
             ]
         },
@@ -41103,7 +41162,7 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.52.0",
+            "locked": "1.53.0",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -41174,6 +41233,7 @@
                 "netflix:fit-impl",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -42562,6 +42622,7 @@
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nfsso",
+                "netflix:nfzookeeper",
                 "netflix:nimble-int-java",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -43253,7 +43314,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.12",
+            "locked": "0.12.13",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -43822,6 +43883,7 @@
             "locked": "3.10.5.Final",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cql",
+                "netflix:nfzookeeper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.zookeeper:zookeeper",
                 "org.elasticsearch:elasticsearch"
@@ -44280,26 +44342,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.148",
+            "locked": "1.154",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.189.0",
+            "locked": "1.190.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -44364,6 +44426,7 @@
                 "netflix:fit-impl",
                 "netflix:luna-safetynet",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:openencryptclient",
                 "netflix:platform",
                 "netflix:platform-aws",
@@ -44413,6 +44476,7 @@
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform-ipc"
             ]
         },
@@ -44498,7 +44562,7 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.52.0",
+            "locked": "1.53.0",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -44569,6 +44633,7 @@
                 "netflix:fit-impl",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -45957,6 +46022,7 @@
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nfsso",
+                "netflix:nfzookeeper",
                 "netflix:nimble-int-java",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -46648,7 +46714,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.12",
+            "locked": "0.12.13",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -47217,6 +47283,7 @@
             "locked": "3.10.5.Final",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cql",
+                "netflix:nfzookeeper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.zookeeper:zookeeper",
                 "org.elasticsearch:elasticsearch"
@@ -47675,26 +47742,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.148",
+            "locked": "1.154",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.189.0",
+            "locked": "1.190.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -47759,6 +47826,7 @@
                 "netflix:fit-impl",
                 "netflix:luna-safetynet",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:openencryptclient",
                 "netflix:platform",
                 "netflix:platform-aws",
@@ -47808,6 +47876,7 @@
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform-ipc"
             ]
         },
@@ -47893,7 +47962,7 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.52.0",
+            "locked": "1.53.0",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -47964,6 +48033,7 @@
                 "netflix:fit-impl",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -49352,6 +49422,7 @@
                 "netflix:nf-eventbus-guice",
                 "netflix:nflibrary",
                 "netflix:nfsso",
+                "netflix:nfzookeeper",
                 "netflix:nimble-int-java",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -50043,7 +50114,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.12",
+            "locked": "0.12.13",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -50612,6 +50683,7 @@
             "locked": "3.10.5.Final",
             "transitive": [
                 "com.netflix.astyanax:astyanax-cql",
+                "netflix:nfzookeeper",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.zookeeper:zookeeper",
                 "org.elasticsearch:elasticsearch"
@@ -51070,26 +51142,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.148",
+            "locked": "1.154",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.149",
+            "locked": "1.155",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.189.0",
+            "locked": "1.190.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -51154,6 +51226,7 @@
                 "netflix:fit-impl",
                 "netflix:luna-safetynet",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:openencryptclient",
                 "netflix:platform",
                 "netflix:platform-aws",
@@ -51203,6 +51276,7 @@
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform-ipc"
             ]
         },
@@ -51288,7 +51362,7 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.52.0",
+            "locked": "1.53.0",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -51359,6 +51433,7 @@
                 "netflix:fit-impl",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
+                "netflix:nfzookeeper",
                 "netflix:platform",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
