@@ -37,6 +37,7 @@ import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -195,23 +196,27 @@ public class HollowProducer {
     private void publish(WriteState writeState, Artifacts artifacts) throws IOException {
         listeners.firePublishStart(writeState.getVersion());
         HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
+
+        if (readStates.hasCurrent()) {
+            publishDelta(writeState, artifacts);
+            publishReverseDelta(writeState, artifacts);
+        }
+
         PublishStatus.Builder builder = (new PublishStatus.Builder()).blob(artifacts.snapshot);
         try {
-            // 1. Write the snapshot
             artifacts.snapshot = publisher.openSnapshot(writeState.getVersion());
             OutputStream ssos = artifacts.snapshot.newOutputStream();
-            try { writer.writeSnapshot(ssos); } finally { ssos.close(); }
-
-            // 2. Write & publish the deltas; active canaries and tooling receive it sooner
-            if(readStates.hasCurrent()) {
-                publishDelta(writeState, artifacts);
-                publishReverseDelta(writeState, artifacts);
+            try {
+                writer.writeSnapshot(ssos);
+            } finally {
+                ssos.close();
             }
 
-            // 3. Publish the snapshot
-            publisher.publish(artifacts.snapshot, writeState.getStateEngine().getHeaderTags());
+            long size = publisher.publish(artifacts.snapshot, writeState.getStateEngine().getHeaderTags());
+            artifacts.snapshot.setSize(size);
             builder.success();
-        } catch(Throwable th) {
+
+        } catch (Throwable th) {
             builder.fail(th);
             throw th;
         } finally {
@@ -225,8 +230,13 @@ public class HollowProducer {
         try {
             artifacts.delta = publisher.openDelta(readStates.current().getVersion(), writeState.getVersion());
             OutputStream fdos = artifacts.delta.newOutputStream();
-            try { writer.writeDelta(fdos); } finally { fdos.close(); }
-            publisher.publish(artifacts.delta, writeState.getStateEngine().getHeaderTags());
+            try {
+                writer.writeDelta(fdos);
+            } finally {
+                fdos.close();
+            }
+            long size = publisher.publish(artifacts.delta, writeState.getStateEngine().getHeaderTags());
+            artifacts.delta.setSize(size);
             builder.success();
 
         } catch (Throwable th) {
@@ -243,8 +253,13 @@ public class HollowProducer {
         try {
             artifacts.reverseDelta = publisher.openReverseDelta(readStates.current().getVersion(), writeState.getVersion());
             OutputStream fdos = artifacts.delta.newOutputStream();
-            try { writer.writeDelta(fdos); } finally { fdos.close(); }
-            publisher.publish(artifacts.delta, writeState.getStateEngine().getHeaderTags());
+            try {
+                writer.writeDelta(fdos);
+            } finally {
+                fdos.close();
+            }
+            long size = publisher.publish(artifacts.delta, writeState.getStateEngine().getHeaderTags());
+            artifacts.reverseDelta.setSize(size);
             builder.success();
 
         } catch (Throwable th) {
@@ -393,7 +408,7 @@ public class HollowProducer {
         /**
          * Returns a blob with which a {@code HollowProducer} will write a snapshot for the version specified.<p>
          *
-         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(Blob)}.
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(Blob, Map)}.
          *
          * @param version the blob version
          *
@@ -405,7 +420,7 @@ public class HollowProducer {
          * Returns a blob with which a {@code HollowProducer} will write a forward delta from the version specified to
          * the version specified, i.e. {@code fromVersion => toVersion}.<p>
          *
-         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(Blob)}.
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(Blob, Map)}.
          *
          * In the delta chain {@code fromVersion} is the older version such that {@code fromVersion < toVersion}.
          *
@@ -420,7 +435,7 @@ public class HollowProducer {
          * Returns a blob with which a {@code HollowProducer} will write a reverse delta from the version specified to
          * the version specified, i.e. {@code fromVersion <= toVersion}.<p>
          *
-         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(Blob)}.
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(Blob, Map)}.
          *
          * In the delta chain {@code fromVersion} is the older version such that {@code fromVersion < toVersion}.
          *
@@ -440,8 +455,9 @@ public class HollowProducer {
          *
          * @param blob the blob to publish
          * @param headerTags the header tags, in case these should be added as metadata on published artifacts.
+         * @return size of the blob published in bytes.
          */
-        public void publish(HollowProducer.Blob blob, Map<String, String> headerTags);
+        public long publish(HollowProducer.Blob blob, Map<String, String> headerTags);
     }
 
     public static interface Blob {
@@ -451,6 +467,7 @@ public class HollowProducer {
         long getToVersion();
         Type getType();
         long getSize();
+        void setSize(long size);
         void cleanup();
         
         public static enum Type {

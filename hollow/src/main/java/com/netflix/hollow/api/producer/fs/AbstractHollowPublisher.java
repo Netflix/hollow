@@ -71,11 +71,11 @@ public abstract class AbstractHollowPublisher implements HollowProducer.Publishe
     }
     
     @Override
-    public void publish(Blob blob, Map<String, String> headerTags) {
-        publish((StagedBlob)blob, headerTags);
+    public long publish(Blob blob, Map<String, String> headerTags) {
+        return publish((StagedBlob)blob, headerTags);
     }
     
-    public abstract void publish(StagedBlob blob, Map<String, String> headerTags);
+    public abstract long publish(StagedBlob blob, Map<String, String> headerTags);
 
     public static class StagedBlob implements Blob {
         protected final Blob.Type type;
@@ -138,8 +138,12 @@ public abstract class AbstractHollowPublisher implements HollowProducer.Publishe
             return type;
         }
 
+        public void setSize(long size) {
+            this.size = size;
+        }
+
         public long getSize() {
-            return 0;// todo: need better way to get size of blobs in bytes.
+            return this.size;
         }
 
         public Path getStagedArtifactPath() {

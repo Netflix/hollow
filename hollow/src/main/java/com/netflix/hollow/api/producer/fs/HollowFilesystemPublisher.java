@@ -55,16 +55,18 @@ public class HollowFilesystemPublisher extends AbstractHollowPublisher {
     }
     
     @Override
-    public void publish(StagedBlob blob, Map<String, String> headerTags) {
+    public long publish(StagedBlob blob, Map<String, String> headerTags) {
         try {
             createDirectories(publishPath);
 
             Path source = blob.getStagedArtifactPath();
             Path filename = source.getFileName();
             Path destination = publishPath.resolve(filename);
+            long size = Files.size(source);
             Path intermediate = destination.resolveSibling(filename + ".incomplete");
             Files.copy(source, intermediate, REPLACE_EXISTING);
             Files.move(intermediate, destination, ATOMIC_MOVE);
+            return size;
         } catch(IOException ex) {
             throw new RuntimeException("Unable to publish file!", ex);
         }
