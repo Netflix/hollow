@@ -919,7 +919,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.7.4",
+            "locked": "2.8.2",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -2017,7 +2017,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.73.0",
+            "locked": "1.76.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -2031,7 +2031,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.0.8",
+            "locked": "4.1.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -2112,7 +2112,7 @@
             ]
         },
         "netflix:epic-plugin": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -4302,7 +4302,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.7.4",
+            "locked": "2.8.2",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -5400,7 +5400,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.73.0",
+            "locked": "1.76.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -5414,7 +5414,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.0.8",
+            "locked": "4.1.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -5495,7 +5495,7 @@
             ]
         },
         "netflix:epic-plugin": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -7685,7 +7685,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.7.4",
+            "locked": "2.8.2",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -8783,7 +8783,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.73.0",
+            "locked": "1.76.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -8797,7 +8797,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.0.8",
+            "locked": "4.1.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -8878,7 +8878,7 @@
             ]
         },
         "netflix:epic-plugin": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -11068,7 +11068,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.7.4",
+            "locked": "2.8.2",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -12159,7 +12159,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.73.0",
+            "locked": "1.76.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -12173,7 +12173,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.0.8",
+            "locked": "4.1.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -12254,7 +12254,7 @@
             ]
         },
         "netflix:epic-plugin": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -14470,7 +14470,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.7.4",
+            "locked": "2.8.2",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -15569,7 +15569,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.73.0",
+            "locked": "1.76.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -15583,7 +15583,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.0.8",
+            "locked": "4.1.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -15664,7 +15664,7 @@
             ]
         },
         "netflix:epic-plugin": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -18951,7 +18951,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.7.4",
+            "locked": "2.8.2",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -20049,7 +20049,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.73.0",
+            "locked": "1.76.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -20063,7 +20063,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.0.8",
+            "locked": "4.1.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -20144,7 +20144,7 @@
             ]
         },
         "netflix:epic-plugin": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -22338,7 +22338,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.7.4",
+            "locked": "2.8.2",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -23436,7 +23436,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.73.0",
+            "locked": "1.76.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -23450,7 +23450,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.0.8",
+            "locked": "4.1.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -23531,7 +23531,7 @@
             ]
         },
         "netflix:epic-plugin": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -25737,7 +25737,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.7.4",
+            "locked": "2.8.2",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -26867,7 +26867,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.73.0",
+            "locked": "1.76.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -26881,7 +26881,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.0.8",
+            "locked": "4.1.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -26962,7 +26962,7 @@
             ]
         },
         "netflix:epic-plugin": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -29238,7 +29238,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.7.4",
+            "locked": "2.8.2",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -30368,7 +30368,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.73.0",
+            "locked": "1.76.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -30382,7 +30382,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.0.8",
+            "locked": "4.1.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -30463,7 +30463,7 @@
             ]
         },
         "netflix:epic-plugin": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -32739,7 +32739,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.7.4",
+            "locked": "2.8.2",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -33869,7 +33869,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.73.0",
+            "locked": "1.76.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -33883,7 +33883,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.0.8",
+            "locked": "4.1.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -33964,7 +33964,7 @@
             ]
         },
         "netflix:epic-plugin": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -36240,7 +36240,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.7.4",
+            "locked": "2.8.2",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -37370,7 +37370,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.73.0",
+            "locked": "1.76.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -37384,7 +37384,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.0.8",
+            "locked": "4.1.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -37465,7 +37465,7 @@
             ]
         },
         "netflix:epic-plugin": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -39705,7 +39705,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.7.4",
+            "locked": "2.8.2",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -40807,7 +40807,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.73.0",
+            "locked": "1.76.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -40821,7 +40821,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.0.8",
+            "locked": "4.1.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -40902,7 +40902,7 @@
             ]
         },
         "netflix:epic-plugin": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -43105,7 +43105,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.7.4",
+            "locked": "2.8.2",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -44207,7 +44207,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.73.0",
+            "locked": "1.76.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -44221,7 +44221,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.0.8",
+            "locked": "4.1.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -44302,7 +44302,7 @@
             ]
         },
         "netflix:epic-plugin": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -46505,7 +46505,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.7.4",
+            "locked": "2.8.2",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -47607,7 +47607,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.73.0",
+            "locked": "1.76.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -47621,7 +47621,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.0.8",
+            "locked": "4.1.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -47702,7 +47702,7 @@
             ]
         },
         "netflix:epic-plugin": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -49905,7 +49905,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.7.4",
+            "locked": "2.8.2",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -51007,7 +51007,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.73.0",
+            "locked": "1.76.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -51021,7 +51021,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.0.8",
+            "locked": "4.1.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -51102,7 +51102,7 @@
             ]
         },
         "netflix:epic-plugin": {
-            "locked": "1.54.0",
+            "locked": "1.55.0",
             "transitive": [
                 "netflix:base-server"
             ]
