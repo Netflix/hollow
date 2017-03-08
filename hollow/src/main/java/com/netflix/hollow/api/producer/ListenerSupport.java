@@ -86,7 +86,7 @@ final class ListenerSupport {
         return builder;
     }
 
-    void fireOnPopulateComplete(ProducerStatus.Builder builder) {
+    void firePopulateComplete(ProducerStatus.Builder builder) {
         ProducerStatus st = builder.build();
         for (final HollowProducerListener l : listeners) l.onPopulateComplete(st, builder.elapsed(), MILLISECONDS);
     }

@@ -152,7 +152,7 @@ public class HollowProducer {
                 populateStatus.fail();
                 throw th;
             } finally {
-                listeners.fireOnPopulateComplete(populateStatus);
+                listeners.firePopulateComplete(populateStatus);
             }
 
 
