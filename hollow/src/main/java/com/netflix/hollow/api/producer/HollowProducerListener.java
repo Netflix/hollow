@@ -21,7 +21,6 @@ import static com.netflix.hollow.api.producer.HollowProducerListener.Status.FAIL
 import static com.netflix.hollow.api.producer.HollowProducerListener.Status.SUCCESS;
 
 import java.util.EventListener;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;

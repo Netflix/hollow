@@ -150,7 +150,7 @@ public class HollowProducer {
                 task.populate(writeState);
                 populateStatus.success();
             } catch (Throwable th) {
-                populateStatus.fail();
+                populateStatus.fail(th);
                 throw th;
             } finally {
                 listeners.firePopulateComplete(populateStatus);
