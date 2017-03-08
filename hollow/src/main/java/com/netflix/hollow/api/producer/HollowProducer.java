@@ -27,6 +27,7 @@ import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
+import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -143,7 +144,17 @@ public class HollowProducer {
             WriteState writeState = newWriteState(toVersion, objectMapper);
 
             // 2. Populate the state
-            task.populate(writeState);
+            ProducerStatus.Builder populateStatus = listeners.firePopulateStart(toVersion);
+            try {
+                task.populate(writeState);
+                populateStatus.success();
+            } catch (Throwable th) {
+                populateStatus.fail();
+                throw th;
+            } finally {
+                listeners.fireOnPopulateComplete(populateStatus);
+            }
+
 
             // 3. Produce a new state if there's work to do
             if(writeEngine.hasChangedSinceLastCycle()) {
@@ -182,9 +193,9 @@ public class HollowProducer {
     }
 
     private void publish(WriteState writeState, Artifacts artifacts) throws IOException {
-        ProducerStatus.Builder status = listeners.firePublishStart(writeState);
+        listeners.firePublishStart(writeState.getVersion());
         HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
-
+        PublishStatus.Builder builder = (new PublishStatus.Builder()).blob(artifacts.snapshot);
         try {
             // 1. Write the snapshot
             artifacts.snapshot = publisher.openSnapshot(writeState.getVersion());
@@ -193,25 +204,54 @@ public class HollowProducer {
 
             // 2. Write & publish the deltas; active canaries and tooling receive it sooner
             if(readStates.hasCurrent()) {
-                artifacts.delta = publisher.openDelta(readStates.current().getVersion(), writeState.getVersion());
-                OutputStream fdos = artifacts.delta.newOutputStream();
-                try { writer.writeDelta(fdos); } finally { fdos.close(); }
-                publisher.publish(artifacts.delta, writeState.getStateEngine().getHeaderTags());
-
-                artifacts.reverseDelta = publisher.openReverseDelta(readStates.current().getVersion(), writeState.getVersion());
-                OutputStream rdos = artifacts.reverseDelta.newOutputStream();
-                try { writer.writeReverseDelta(rdos); } finally { rdos.close(); }
-                publisher.publish(artifacts.reverseDelta, writeState.getStateEngine().getHeaderTags());
+                publishDelta(writeState, artifacts);
+                publishReverseDelta(writeState, artifacts);
             }
 
             // 3. Publish the snapshot
             publisher.publish(artifacts.snapshot, writeState.getStateEngine().getHeaderTags());
-            status.success();
+            builder.success();
         } catch(Throwable th) {
-            status.fail(th);
+            builder.fail(th);
             throw th;
         } finally {
-            listeners.firePublishComplete(status);
+            listeners.firePublishComplete(builder);
+        }
+    }
+
+    private void publishDelta(WriteState writeState, Artifacts artifacts) throws IOException {
+        HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
+        PublishStatus.Builder builder = (new PublishStatus.Builder()).blob(artifacts.delta);
+        try {
+            artifacts.delta = publisher.openDelta(readStates.current().getVersion(), writeState.getVersion());
+            OutputStream fdos = artifacts.delta.newOutputStream();
+            try { writer.writeDelta(fdos); } finally { fdos.close(); }
+            publisher.publish(artifacts.delta, writeState.getStateEngine().getHeaderTags());
+            builder.success();
+
+        } catch (Throwable th) {
+            builder.fail(th);
+            throw th;
+        } finally {
+            listeners.firePublishComplete(builder);
+        }
+    }
+
+    private void publishReverseDelta(WriteState writeState, Artifacts artifacts) throws IOException {
+        HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
+        PublishStatus.Builder builder = (new PublishStatus.Builder()).blob(artifacts.delta);
+        try {
+            artifacts.reverseDelta = publisher.openReverseDelta(readStates.current().getVersion(), writeState.getVersion());
+            OutputStream fdos = artifacts.delta.newOutputStream();
+            try { writer.writeDelta(fdos); } finally { fdos.close(); }
+            publisher.publish(artifacts.delta, writeState.getStateEngine().getHeaderTags());
+            builder.success();
+
+        } catch (Throwable th) {
+            builder.fail(th);
+            throw th;
+        } finally {
+            listeners.firePublishComplete(builder);
         }
     }
 
@@ -410,6 +450,7 @@ public class HollowProducer {
         long getFromVersion();
         long getToVersion();
         Type getType();
+        long getSize();
         void cleanup();
         
         public static enum Type {
