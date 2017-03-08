@@ -82,6 +82,7 @@ public abstract class AbstractHollowPublisher implements HollowProducer.Publishe
         protected final long fromVersion;
         protected final long toVersion;
         protected final Path stagedArtifactPath;
+        protected long size;
 
         protected StagedBlob(Blob.Type type, String namespace, Path stagingPath, long fromVersion, long toVersion) {
             this.type = type;
@@ -135,6 +136,10 @@ public abstract class AbstractHollowPublisher implements HollowProducer.Publishe
 
         public Blob.Type getType() {
             return type;
+        }
+
+        public long getSize() {
+            return 0;// todo: need better way to get size of blobs in bytes.
         }
 
         public Path getStagedArtifactPath() {
