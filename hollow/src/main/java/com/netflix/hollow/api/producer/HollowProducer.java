@@ -245,7 +245,7 @@ public class HollowProducer {
             builder.fail(th);
             throw th;
         } finally {
-            listeners.fireBlobArtifactPublishComplete(builder);
+            listeners.fireArtifactPublish(builder);
         }
     }
 

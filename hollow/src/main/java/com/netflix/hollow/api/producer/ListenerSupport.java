@@ -101,7 +101,7 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) l.onPublishComplete(status, builder.elapsed(), MILLISECONDS);
     }
 
-    void fireBlobArtifactPublishComplete(PublishStatus.Builder builder) {
+    void fireArtifactPublish(PublishStatus.Builder builder) {
         PublishStatus status = builder.build();
         for(final HollowProducerListener l : listeners) l.onArtifactPublish(status, builder.elapsed(), MILLISECONDS);
     }
