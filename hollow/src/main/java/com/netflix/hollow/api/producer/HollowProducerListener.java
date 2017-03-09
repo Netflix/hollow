@@ -97,6 +97,22 @@ public interface HollowProducerListener extends EventListener {
     public void onNoDeltaAvailable(long version);
 
     /**
+     * Called before starting to execute the task to populate data into Hollow.
+     *
+     * @param version
+     */
+    public void onPopulateStart(long version);
+
+    /**
+     * Called once populating task stage has finished successfully or failed. Use {@code ProducerStatus#getStatus()} to get status of the task.
+     *
+     * @param status A value of {@code Success} indicates that all data was successfully populated. {@code Fail} status indicates populating hollow with data failed.
+     * @param elapsed Time taken to populate hollow.
+     * @param unit unit of {@code elapsed} duration.
+     */
+    public void onPopulateComplete(ProducerStatus status, long elapsed, TimeUnit unit);
+
+    /**
      * Called when the {@code HollowProducer} has begun publishing the {@code HollowBlob}s produced this cycle.
      *
      * @param version Version to be published.
@@ -113,6 +129,16 @@ public interface HollowProducerListener extends EventListener {
      * @param unit units of the {@code elapsed} duration
      */
     public void onPublishComplete(ProducerStatus status, long elapsed, TimeUnit unit);
+
+    /**
+     * Called once a blob has been published successfully or failed to published. Use {@link PublishStatus#getBlob()} to get more details on blob type and size.
+     * This method is called for every {@link com.netflix.hollow.api.producer.HollowProducer.Blob.Type} that was published.
+     *
+     * @param publishStatus Status of publishing. {@link PublishStatus#getStatus()} returns {@code SUCCESS} or {@code FAIL}.
+     * @param elapsed       time taken to publish the blob
+     * @param unit          unit of elapsed.
+     */
+    public void onArtifactPublish(PublishStatus publishStatus, long elapsed, TimeUnit unit);
 
     /**
      * Called when the {@code HollowProducer} has begun checking the integrity of the {@code HollowBlob}s produced this cycle.
@@ -379,6 +405,82 @@ public interface HollowProducerListener extends EventListener {
         public Throwable getCause() {
             return throwable;
         }
+    }
+
+    public class PublishStatus {
+        private final Status status;
+        private final HollowProducer.Blob blob;
+        private final Throwable throwable;
+
+        private PublishStatus(Status status, HollowProducer.Blob blob, Throwable throwable) {
+            this.status = status;
+            this.blob = blob;
+            this.throwable = throwable;
+        }
+
+        static class Builder {
+            private final long start;
+            private long elapsed;
+            private Status status;
+            private HollowProducer.Blob blob;
+            private Throwable throwable;
+
+            Builder() {
+                this.start = System.currentTimeMillis();
+            }
+
+            PublishStatus.Builder blob(final HollowProducer.Blob blob) {
+                this.blob = blob;
+                return this;
+            }
+
+            PublishStatus.Builder success() {
+                this.status = SUCCESS;
+                return this;
+            }
+
+            PublishStatus.Builder fail(Throwable throwable) {
+                this.status = FAIL;
+                this.throwable = throwable;
+                return this;
+            }
+
+            long elapsed() {
+                return elapsed;
+            }
+
+            PublishStatus build() {
+                this.elapsed = System.currentTimeMillis() - start;
+                return new PublishStatus(status, blob, throwable);
+            }
+
+        }
+
+        /**
+         * Status to indicate if publishing was successful or failed.
+         *
+         * @return {@code Success} or {@code Fail}
+         */
+        public Status getStatus() {
+            return status;
+        }
+
+        /**
+         * An instance of {@code Blob} has methods to get details on type of blob, size, from and to version.
+         *
+         * @return Blob that was published.
+         */
+        public HollowProducer.Blob getBlob() {
+            return blob;
+        }
+
+        /**
+         * @return Throwable that contains the error cause if publishing failed.
+         */
+        public Throwable getCause() {
+            return throwable;
+        }
+
     }
 
     public enum Status {

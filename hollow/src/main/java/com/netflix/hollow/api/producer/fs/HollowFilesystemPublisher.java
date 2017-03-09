@@ -17,10 +17,11 @@
  */
 package com.netflix.hollow.api.producer.fs;
 
-import static java.nio.file.Files.createDirectories;
+import com.netflix.hollow.api.producer.HollowProducer;
 import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
+import java.nio.file.FileSystems;
 import java.util.Map;
 
 import java.io.IOException;
@@ -28,22 +29,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class HollowFilesystemPublisher extends AbstractHollowPublisher {
+public class HollowFilesystemPublisher extends HollowProducer.Publisher {
     private final Path publishPath;
 
     public HollowFilesystemPublisher(String namespace) {
-        super(namespace);
-        this.publishPath = scratchPath.resolve(Paths.get(namespace, "published"));
-    }
-
-    public HollowFilesystemPublisher(String namespace, Path scratchPath) {
-        super(namespace, scratchPath);
-        this.publishPath = scratchPath.resolve(Paths.get(namespace, "published"));
-    }
-
-    public HollowFilesystemPublisher(String namespace, Path scratchPath, Path stagingPath, Path publishPath) {
-        super(namespace, scratchPath, stagingPath);
-        this.publishPath = publishPath;
+        super(namespace, FileSystems.getDefault().getPath(System.getProperty("java.io.tmpdir"), namespace).toString());
+        this.publishPath = Paths.get(System.getProperty("java.io.tmpdir"), namespace, "published");
     }
 
     public Path getStagingDir() {
@@ -55,16 +46,15 @@ public class HollowFilesystemPublisher extends AbstractHollowPublisher {
     }
     
     @Override
-    public void publish(StagedBlob blob, Map<String, String> headerTags) {
+    public void publish(HollowProducer.Blob blob, Map<String, String> headerTags) {
         try {
-            createDirectories(publishPath);
-
-            Path source = blob.getStagedArtifactPath();
+            Path source = Paths.get(blob.getFile().getPath());
             Path filename = source.getFileName();
             Path destination = publishPath.resolve(filename);
             Path intermediate = destination.resolveSibling(filename + ".incomplete");
             Files.copy(source, intermediate, REPLACE_EXISTING);
             Files.move(intermediate, destination, ATOMIC_MOVE);
+
         } catch(IOException ex) {
             throw new RuntimeException("Unable to publish file!", ex);
         }

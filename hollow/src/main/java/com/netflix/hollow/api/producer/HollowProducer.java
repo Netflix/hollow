@@ -20,6 +20,7 @@ package com.netflix.hollow.api.producer;
 import static com.netflix.hollow.api.consumer.HollowConsumer.newReadState;
 import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.DELTA;
 import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.REVERSE_DELTA;
+import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.SNAPSHOT;
 import static java.lang.System.currentTimeMillis;
 
 import com.netflix.hollow.api.client.HollowBlobRetriever;
@@ -27,6 +28,7 @@ import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
+import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -36,6 +38,12 @@ import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -143,7 +151,17 @@ public class HollowProducer {
             WriteState writeState = newWriteState(toVersion, objectMapper);
 
             // 2. Populate the state
-            task.populate(writeState);
+            ProducerStatus.Builder populateStatus = listeners.firePopulateStart(toVersion);
+            try {
+                task.populate(writeState);
+                populateStatus.success();
+            } catch (Throwable th) {
+                populateStatus.fail(th);
+                throw th;
+            } finally {
+                listeners.firePopulateComplete(populateStatus);
+            }
+
 
             // 3. Produce a new state if there's work to do
             if(writeEngine.hasChangedSinceLastCycle()) {
@@ -182,36 +200,52 @@ public class HollowProducer {
     }
 
     private void publish(WriteState writeState, Artifacts artifacts) throws IOException {
-        ProducerStatus.Builder status = listeners.firePublishStart(writeState);
-        HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
-
+        ProducerStatus.Builder psb = listeners.firePublishStart(writeState.getVersion());
         try {
-            // 1. Write the snapshot
-            artifacts.snapshot = publisher.openSnapshot(writeState.getVersion());
-            OutputStream ssos = artifacts.snapshot.newOutputStream();
-            try { writer.writeSnapshot(ssos); } finally { ssos.close(); }
-
-            // 2. Write & publish the deltas; active canaries and tooling receive it sooner
-            if(readStates.hasCurrent()) {
-                artifacts.delta = publisher.openDelta(readStates.current().getVersion(), writeState.getVersion());
-                OutputStream fdos = artifacts.delta.newOutputStream();
-                try { writer.writeDelta(fdos); } finally { fdos.close(); }
-                publisher.publish(artifacts.delta, writeState.getStateEngine().getHeaderTags());
-
-                artifacts.reverseDelta = publisher.openReverseDelta(readStates.current().getVersion(), writeState.getVersion());
-                OutputStream rdos = artifacts.reverseDelta.newOutputStream();
-                try { writer.writeReverseDelta(rdos); } finally { rdos.close(); }
-                publisher.publish(artifacts.reverseDelta, writeState.getStateEngine().getHeaderTags());
+            if (readStates.hasCurrent()) {
+                publishBlob(writeState, artifacts, Blob.Type.DELTA);
+                publishBlob(writeState, artifacts, Blob.Type.REVERSE_DELTA);
             }
+            publishBlob(writeState, artifacts, Blob.Type.SNAPSHOT);
 
-            // 3. Publish the snapshot
-            publisher.publish(artifacts.snapshot, writeState.getStateEngine().getHeaderTags());
-            status.success();
-        } catch(Throwable th) {
-            status.fail(th);
+        } catch (Throwable throwable) {
+            psb.fail(throwable);
+            throw throwable;
+        } finally {
+            listeners.firePublishComplete(psb);
+        }
+    }
+
+    private void publishBlob(WriteState writeState, Artifacts artifacts, Blob.Type blobType) throws IOException {
+        HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
+        PublishStatus.Builder builder = (new PublishStatus.Builder());
+        try {
+            switch (blobType) {
+                case SNAPSHOT:
+                    artifacts.snapshot = publisher.openSnapshot(writeState.getVersion());
+                    artifacts.snapshot.write(writer);
+                    publisher.publish(artifacts.snapshot, writeState.getStateEngine().getHeaderTags());
+                    break;
+                case DELTA:
+                    artifacts.delta = publisher.openDelta(readStates.current().getVersion(), writeState.getVersion());
+                    artifacts.delta.write(writer);
+                    publisher.publish(artifacts.delta, writeState.getStateEngine().getHeaderTags());
+                    break;
+                case REVERSE_DELTA:
+                    artifacts.reverseDelta = publisher.openReverseDelta(readStates.current().getVersion(), writeState.getVersion());
+                    artifacts.reverseDelta.write(writer);
+                    publisher.publish(artifacts.reverseDelta, writeState.getStateEngine().getHeaderTags());
+                    break;
+                default:
+                    throw new IllegalStateException("unknown type, type=" + blobType);
+            }
+            builder.success();
+
+        } catch (Throwable th) {
+            builder.fail(th);
             throw th;
         } finally {
-            listeners.firePublishComplete(status);
+            listeners.fireArtifactPublish(builder);
         }
     }
 
@@ -349,7 +383,22 @@ public class HollowProducer {
         long getVersion();
     }
 
-    public static interface Publisher {
+    public static abstract class Publisher {
+
+        protected String namespace;
+        protected String dir;
+
+        /**
+         * Constructor to create a new Publisher with namespace & disk path for Hollow blobs.
+         *
+         * @param namespace typically project namespace
+         * @param dir       directory to use to write hollow blob files.
+         */
+        public Publisher(String namespace, String dir) {
+            this.namespace = namespace;
+            this.dir = dir;
+        }
+
         /**
          * Returns a blob with which a {@code HollowProducer} will write a snapshot for the version specified.<p>
          *
@@ -359,7 +408,9 @@ public class HollowProducer {
          *
          * @return a {@link HollowProducer.Blob} representing a snapshot for the {@code version}
          */
-        public HollowProducer.Blob openSnapshot(long version);
+        public HollowProducer.Blob openSnapshot(long version) {
+            return Blob.withNamespace(namespace, Long.MIN_VALUE, version, dir, SNAPSHOT);
+        }
 
         /**
          * Returns a blob with which a {@code HollowProducer} will write a forward delta from the version specified to
@@ -374,7 +425,9 @@ public class HollowProducer {
          *
          * @return a {@link HollowProducer.Blob} representing a snapshot for the {@code version}
          */
-        public HollowProducer.Blob openDelta(long fromVersion, long toVersion);
+        public HollowProducer.Blob openDelta(long fromVersion, long toVersion) {
+            return Blob.withNamespace(namespace, fromVersion, toVersion, dir, DELTA);
+        }
 
         /**
          * Returns a blob with which a {@code HollowProducer} will write a reverse delta from the version specified to
@@ -389,7 +442,9 @@ public class HollowProducer {
          *
          * @return a {@link HollowProducer.Blob} representing a snapshot for the {@code version}
          */
-        public HollowProducer.Blob openReverseDelta(long fromVersion, long toVersion);
+        public HollowProducer.Blob openReverseDelta(long fromVersion, long toVersion) {
+            return Blob.withNamespace(namespace, fromVersion, toVersion, dir, REVERSE_DELTA);
+        }
 
         /**
          * Publish the blob specified to this publisher's blobstore.<p>
@@ -400,18 +455,92 @@ public class HollowProducer {
          *
          * @param blob the blob to publish
          * @param headerTags the header tags, in case these should be added as metadata on published artifacts.
+         * @return size of the blob published in bytes.
          */
-        public void publish(HollowProducer.Blob blob, Map<String, String> headerTags);
+        public abstract void publish(HollowProducer.Blob blob, Map<String, String> headerTags);
     }
 
-    public static interface Blob {
-        OutputStream newOutputStream();
-        InputStream newInputStream();
-        long getFromVersion();
-        long getToVersion();
-        Type getType();
-        void cleanup();
-        
+    public static class Blob {
+
+        protected final String namespace;
+        protected final long fromVersion;
+        protected final long toVersion;
+        protected final String dir;
+        protected final Blob.Type type;
+        protected final File file;
+
+        static Blob withNamespace(String namespace, long fromVersion, long toVersion, String dir, Blob.Type type) {
+            return new Blob(namespace, fromVersion, toVersion, dir, type);
+        }
+
+        private Blob(String namespace, long fromVersion, long toVersion, String dir, Blob.Type type) {
+            this.namespace = namespace;
+            this.fromVersion = fromVersion;
+            this.toVersion = toVersion;
+            this.type = type;
+            this.dir = dir;
+
+            switch (type) {
+                case SNAPSHOT:
+                    this.file = new File(dir, String.format("%s-%s-%d", namespace, type.prefix, toVersion));
+                    break;
+                case DELTA:
+                    this.file = new File(dir, String.format("%s-%s-%d-%d", namespace, type.prefix, fromVersion, toVersion));
+                    break;
+                case REVERSE_DELTA:
+                    this.file = new File(dir, String.format("%s-%s-%d-%d", namespace, type.prefix, toVersion, fromVersion));
+                    break;
+                default:
+                    throw new IllegalStateException("unknown blob type, type=" + type);
+            }
+        }
+
+        protected void write(HollowBlobWriter writer) throws IOException {
+            this.file.mkdirs();
+            try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
+                switch (type) {
+                    case SNAPSHOT:
+                        writer.writeSnapshot(os);
+                        break;
+                    case DELTA:
+                        writer.writeDelta(os);
+                        break;
+                    case REVERSE_DELTA:
+                        writer.writeReverseDelta(os);
+                        break;
+                    default:
+                        throw new IllegalStateException("unknown type, type=" + type);
+                }
+            }
+        }
+
+        protected InputStream newInputStream() throws IOException {
+            return new BufferedInputStream(new FileInputStream(this.file));
+        }
+
+        public File getFile() {
+            return this.file;
+        }
+
+        public Type getType() {
+            return this.type;
+        }
+
+        public long getFromVersion() {
+            return this.fromVersion;
+        }
+
+        public long getToVersion() {
+            return this.toVersion;
+        }
+
+        public void cleanup() {
+            if (this.file != null) this.file.delete();
+        }
+
+        /**
+         * Hollow blob types are {@code SNAPSHOT}, {@code DELTA} and {@code REVERSE_DELTA}.
+         */
         public static enum Type {
             SNAPSHOT("snapshot"),
             DELTA("delta"),

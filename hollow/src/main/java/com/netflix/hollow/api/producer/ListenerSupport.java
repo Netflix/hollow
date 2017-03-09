@@ -24,9 +24,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.ReadState;
-import com.netflix.hollow.api.producer.HollowProducer.WriteState;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
+import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
 
 /**
  * Beta API subject to change.
@@ -79,15 +79,31 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) l.onNoDeltaAvailable(psb.version());
     }
 
-    ProducerStatus.Builder firePublishStart(WriteState writeState) {
-        ProducerStatus.Builder psb = new ProducerStatus.Builder().version(writeState);
-        for(final HollowProducerListener l : listeners) l.onPublishStart(psb.version());
+    ProducerStatus.Builder firePopulateStart(long version) {
+        ProducerStatus.Builder builder = new ProducerStatus.Builder().version(version);
+        for (final HollowProducerListener l : listeners) l.onPopulateStart(version);
+        return builder;
+    }
+
+    void firePopulateComplete(ProducerStatus.Builder builder) {
+        ProducerStatus st = builder.build();
+        for (final HollowProducerListener l : listeners) l.onPopulateComplete(st, builder.elapsed(), MILLISECONDS);
+    }
+
+    ProducerStatus.Builder firePublishStart(long version) {
+        ProducerStatus.Builder psb = new ProducerStatus.Builder().version(version);
+        for(final HollowProducerListener l : listeners) l.onPublishStart(version);
         return psb;
     }
 
-    void firePublishComplete(ProducerStatus.Builder psb) {
-        ProducerStatus st = psb.build();
-        for(final HollowProducerListener l : listeners) l.onPublishComplete(st, psb.elapsed(), MILLISECONDS);
+    void firePublishComplete(ProducerStatus.Builder builder) {
+        ProducerStatus status = builder.build();
+        for(final HollowProducerListener l : listeners) l.onPublishComplete(status, builder.elapsed(), MILLISECONDS);
+    }
+
+    void fireArtifactPublish(PublishStatus.Builder builder) {
+        PublishStatus status = builder.build();
+        for(final HollowProducerListener l : listeners) l.onArtifactPublish(status, builder.elapsed(), MILLISECONDS);
     }
 
     ProducerStatus.Builder fireIntegrityCheckStart(ReadState readState) {
