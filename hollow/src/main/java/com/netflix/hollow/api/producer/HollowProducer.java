@@ -389,7 +389,7 @@ public class HollowProducer {
         protected String dir;
 
         /**
-         * Constructor to create a new Publisher with namespace & disk path for Hollow blobs.
+         * Constructor to create a new Publisher with namespace &amp; disk path for Hollow blobs.
          *
          * @param namespace typically project namespace
          * @param dir       directory to use to write hollow blob files.
@@ -455,7 +455,6 @@ public class HollowProducer {
          *
          * @param blob the blob to publish
          * @param headerTags the header tags, in case these should be added as metadata on published artifacts.
-         * @return size of the blob published in bytes.
          */
         public abstract void publish(HollowProducer.Blob blob, Map<String, String> headerTags);
     }
