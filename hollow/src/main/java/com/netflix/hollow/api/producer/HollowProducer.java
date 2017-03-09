@@ -224,16 +224,19 @@ public class HollowProducer {
                 case SNAPSHOT:
                     artifacts.snapshot = publisher.openSnapshot(writeState.getVersion());
                     artifacts.snapshot.write(writer);
+                    builder.blob(artifacts.snapshot);
                     publisher.publish(artifacts.snapshot, writeState.getStateEngine().getHeaderTags());
                     break;
                 case DELTA:
                     artifacts.delta = publisher.openDelta(readStates.current().getVersion(), writeState.getVersion());
                     artifacts.delta.write(writer);
+                    builder.blob(artifacts.delta);
                     publisher.publish(artifacts.delta, writeState.getStateEngine().getHeaderTags());
                     break;
                 case REVERSE_DELTA:
                     artifacts.reverseDelta = publisher.openReverseDelta(readStates.current().getVersion(), writeState.getVersion());
                     artifacts.reverseDelta.write(writer);
+                    builder.blob(artifacts.reverseDelta);
                     publisher.publish(artifacts.reverseDelta, writeState.getStateEngine().getHeaderTags());
                     break;
                 default:
@@ -495,7 +498,8 @@ public class HollowProducer {
         }
 
         protected void write(HollowBlobWriter writer) throws IOException {
-            this.file.mkdirs();
+            this.file.getParentFile().mkdirs();
+            this.file.createNewFile();
             try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
                 switch (type) {
                     case SNAPSHOT:
