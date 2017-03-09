@@ -138,7 +138,7 @@ public interface HollowProducerListener extends EventListener {
      * @param elapsed       time taken to publish the blob
      * @param unit          unit of elapsed.
      */
-    public void onBlobArtifactPublishComplete(PublishStatus publishStatus, long elapsed, TimeUnit unit);
+    public void onArtifactPublish(PublishStatus publishStatus, long elapsed, TimeUnit unit);
 
     /**
      * Called when the {@code HollowProducer} has begun checking the integrity of the {@code HollowBlob}s produced this cycle.

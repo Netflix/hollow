@@ -224,14 +224,17 @@ public class HollowProducer {
                 case SNAPSHOT:
                     artifacts.snapshot = publisher.openSnapshot(writeState.getVersion());
                     artifacts.snapshot.write(writer);
+                    publisher.publish(artifacts.snapshot, writeState.getStateEngine().getHeaderTags());
                     break;
                 case DELTA:
                     artifacts.delta = publisher.openDelta(readStates.current().getVersion(), writeState.getVersion());
                     artifacts.delta.write(writer);
+                    publisher.publish(artifacts.delta, writeState.getStateEngine().getHeaderTags());
                     break;
                 case REVERSE_DELTA:
                     artifacts.reverseDelta = publisher.openReverseDelta(readStates.current().getVersion(), writeState.getVersion());
                     artifacts.reverseDelta.write(writer);
+                    publisher.publish(artifacts.reverseDelta, writeState.getStateEngine().getHeaderTags());
                     break;
                 default:
                     throw new IllegalStateException("unknown type, type=" + blobType);

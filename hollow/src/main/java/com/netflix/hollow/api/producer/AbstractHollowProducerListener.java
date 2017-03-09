@@ -41,7 +41,7 @@ public class AbstractHollowProducerListener implements HollowProducerListener {
 
     @Override public void onPublishStart(long version) {}
     @Override public void onPublishComplete(ProducerStatus status, long elapsed, TimeUnit unit) {}
-    @Override public void onBlobArtifactPublishComplete(PublishStatus publishStatus, long elapsed, TimeUnit unit) {}
+    @Override public void onArtifactPublish(PublishStatus publishStatus, long elapsed, TimeUnit unit) {}
 
     @Override public void onIntegrityCheckStart(long version) {}
     @Override public void onIntegrityCheckComplete(ProducerStatus status, long elapsed, TimeUnit unit) {}

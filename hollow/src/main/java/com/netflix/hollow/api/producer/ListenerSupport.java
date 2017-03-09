@@ -24,7 +24,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.ReadState;
-import com.netflix.hollow.api.producer.HollowProducer.WriteState;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
@@ -104,7 +103,7 @@ final class ListenerSupport {
 
     void fireBlobArtifactPublishComplete(PublishStatus.Builder builder) {
         PublishStatus status = builder.build();
-        for(final HollowProducerListener l : listeners) l.onBlobArtifactPublishComplete(status, builder.elapsed(), MILLISECONDS);
+        for(final HollowProducerListener l : listeners) l.onArtifactPublish(status, builder.elapsed(), MILLISECONDS);
     }
 
     ProducerStatus.Builder fireIntegrityCheckStart(ReadState readState) {
