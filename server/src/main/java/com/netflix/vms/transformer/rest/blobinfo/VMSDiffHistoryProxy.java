@@ -46,13 +46,13 @@ public class VMSDiffHistoryProxy {
 		// Get the environment 
 		String env = NetflixConfiguration.getEnvironment();
 		
-		String diffClusterName = "vmshistoryui-" + vip + "-" + env;
+		String diffClusterName = String.format("vmstransformerhistory-%s", vip);
 		
 		String diffOverviewUrl = null;
 		if(env.equals("prod")) {
-			diffOverviewUrl = DISCOVERY_PROD_BASE + DISCOVERY_PATH + diffClusterName + "/history"; 
+			diffOverviewUrl = DISCOVERY_PROD_BASE + DISCOVERY_PATH + diffClusterName + "/REST/history";
 		} else {
-			diffOverviewUrl = DISCOVERY_TEST_BASE + DISCOVERY_PATH + diffClusterName + "/history"; 			
+			diffOverviewUrl = DISCOVERY_TEST_BASE + DISCOVERY_PATH + diffClusterName + "/REST/history";
 		}
 		diffOverviewUrl += "?format=json";
 		

@@ -123,7 +123,7 @@
             discoverybaseUrl = 'http://discovery.cloud.netflix.net:7001'
         }
 
-        var diffUiClusterName = 'vmshistoryui-' + _getVip() + '-' + app.environment;
+        var diffUiClusterName = 'vmstransformerhistory-' + _getVip();
 
         var pinnableJarVersion = null;
         var blobRows = blobs.map(function (blob) {
@@ -136,7 +136,7 @@
             blobRow.version = blob.version;
             blobRow.types = blob.types;
             blobRow.changes = _history[Math.floor(blob.version / 100) * 100];
-            blobRow.changeUrl = discoverybaseUrl + '/discovery/resolver/cluster/' + diffUiClusterName + '/history/state?version=' + blob.version;
+            blobRow.changeUrl = discoverybaseUrl + '/discovery/resolver/cluster/' + diffUiClusterName + '/REST/history/state?version=' + blob.version;
             blobRow.selectedType = null;
             blobRow.isPoisoned = blob.poisoned || false;
             blobRow.isPinnable = isBlobPinnable(blob, pinnableJarVersion, publishedVersions);
