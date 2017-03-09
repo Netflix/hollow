@@ -53,7 +53,7 @@ public class HollowFilesystemPublisher extends HollowProducer.Publisher {
             Path source = Paths.get(blob.getFile().getPath());
             Path filename = source.getFileName();
             Path destination = publishPath.resolve(filename);
-            Path intermediate = destination.resolveSibling(filename + ".incomplete").getFileName();
+            Path intermediate = destination.resolveSibling(filename + ".incomplete");
             Files.copy(source, intermediate, REPLACE_EXISTING);
             Files.move(intermediate, destination, ATOMIC_MOVE);
 

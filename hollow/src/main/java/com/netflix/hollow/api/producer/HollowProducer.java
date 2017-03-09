@@ -208,7 +208,7 @@ public class HollowProducer {
             }
             publishBlob(writeState, artifacts, Blob.Type.SNAPSHOT);
             psb.success();
-            
+
         } catch (Throwable throwable) {
             psb.fail(throwable);
             throw throwable;
