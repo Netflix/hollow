@@ -48,6 +48,8 @@ public class HollowFilesystemPublisher extends HollowProducer.Publisher {
     @Override
     public void publish(HollowProducer.Blob blob, Map<String, String> headerTags) {
         try {
+            Files.createDirectories(publishPath);
+
             Path source = Paths.get(blob.getFile().getPath());
             Path filename = source.getFileName();
             Path destination = publishPath.resolve(filename);
