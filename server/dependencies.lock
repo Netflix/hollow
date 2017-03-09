@@ -825,7 +825,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -4208,7 +4208,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -7591,7 +7591,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -10974,7 +10974,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -14376,7 +14376,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -18857,7 +18857,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -22244,7 +22244,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -25638,7 +25638,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -25648,7 +25648,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -27926,13 +27926,13 @@
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
@@ -27944,9 +27944,8 @@
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
                 "org.eclipse.jetty:jetty-security"
             ]
         },
@@ -27955,7 +27954,7 @@
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-io"
@@ -29139,7 +29138,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -29149,7 +29148,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -31427,13 +31426,13 @@
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
@@ -31445,9 +31444,8 @@
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
                 "org.eclipse.jetty:jetty-security"
             ]
         },
@@ -31456,7 +31454,7 @@
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-io"
@@ -32640,7 +32638,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -32650,7 +32648,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -34928,13 +34926,13 @@
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
@@ -34946,9 +34944,8 @@
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
                 "org.eclipse.jetty:jetty-security"
             ]
         },
@@ -34957,7 +34954,7 @@
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-io"
@@ -36141,7 +36138,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -36151,7 +36148,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -38429,13 +38426,13 @@
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
@@ -38447,9 +38444,8 @@
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
                 "org.eclipse.jetty:jetty-security"
             ]
         },
@@ -38458,7 +38454,7 @@
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-io"
@@ -39606,7 +39602,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -39616,7 +39612,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -41847,13 +41843,13 @@
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
@@ -41865,9 +41861,8 @@
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
                 "org.eclipse.jetty:jetty-security"
             ]
         },
@@ -41876,7 +41871,7 @@
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-io"
@@ -43006,7 +43001,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -43016,7 +43011,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -45247,13 +45242,13 @@
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
@@ -45265,9 +45260,8 @@
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
                 "org.eclipse.jetty:jetty-security"
             ]
         },
@@ -45276,7 +45270,7 @@
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-io"
@@ -46406,7 +46400,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -46416,7 +46410,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -48647,13 +48641,13 @@
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
@@ -48665,9 +48659,8 @@
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
                 "org.eclipse.jetty:jetty-security"
             ]
         },
@@ -48676,7 +48669,7 @@
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-io"
@@ -49806,7 +49799,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -49816,7 +49809,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -52047,13 +52040,13 @@
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
@@ -52065,9 +52058,8 @@
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
                 "org.eclipse.jetty:jetty-security"
             ]
         },
@@ -52076,7 +52068,7 @@
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.3.0.M1",
+            "locked": "9.2.15.v20160210",
             "transitive": [
                 "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-io"

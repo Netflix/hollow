@@ -110,7 +110,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
@@ -551,7 +551,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
@@ -992,7 +992,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
@@ -1433,7 +1433,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
@@ -1979,7 +1979,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
@@ -2420,7 +2420,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
@@ -2870,7 +2870,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
@@ -3320,7 +3320,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
@@ -3770,7 +3770,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.2.5",
+            "locked": "2.3.0",
             "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
