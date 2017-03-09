@@ -48,7 +48,7 @@ public class HollowFilesystemPublisher extends HollowProducer.Publisher {
     @Override
     public void publish(HollowProducer.Blob blob, Map<String, String> headerTags) {
         try {
-            Path source = Paths.get(blob.getBlobFile().getPath());
+            Path source = Paths.get(blob.getFile().getPath());
             Path filename = source.getFileName();
             Path destination = publishPath.resolve(filename);
             Path intermediate = destination.resolveSibling(filename + ".incomplete");

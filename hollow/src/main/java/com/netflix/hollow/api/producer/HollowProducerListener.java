@@ -130,6 +130,13 @@ public interface HollowProducerListener extends EventListener {
      */
     public void onPublishComplete(ProducerStatus status, long elapsed, TimeUnit unit);
 
+    /**
+     * Called once a blob has been published successfully or failed to published. Use {@link PublishStatus#getBlob()} to get more details on blob type and size.
+     *
+     * @param publishStatus Status of publishing. {@link PublishStatus#getStatus()} returns {@code SUCCESS} or {@code FAIL}.
+     * @param elapsed       time taken to publish the blob
+     * @param unit          unit of elapsed.
+     */
     public void onBlobArtifactPublishComplete(PublishStatus publishStatus, long elapsed, TimeUnit unit);
 
     /**

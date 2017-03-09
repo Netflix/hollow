@@ -47,8 +47,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -466,8 +464,7 @@ public class HollowProducer {
         protected final long toVersion;
         protected final String dir;
         protected final Blob.Type type;
-
-        protected File blobFile;
+        protected final File file;
 
         static Blob withNamespace(String namespace, long fromVersion, long toVersion, String dir, Blob.Type type) {
             return new Blob(namespace, fromVersion, toVersion, dir, type);
@@ -482,13 +479,13 @@ public class HollowProducer {
 
             switch (type) {
                 case SNAPSHOT:
-                    this.blobFile = new File(dir, String.format("%s-%s-%d", namespace, type.prefix, toVersion));
+                    this.file = new File(dir, String.format("%s-%s-%d", namespace, type.prefix, toVersion));
                     break;
                 case DELTA:
-                    this.blobFile = new File(dir, String.format("%s-%s-%d-%d", namespace, type.prefix, fromVersion, toVersion));
+                    this.file = new File(dir, String.format("%s-%s-%d-%d", namespace, type.prefix, fromVersion, toVersion));
                     break;
                 case REVERSE_DELTA:
-                    this.blobFile = new File(dir, String.format("%s-%s-%d-%d", namespace, type.prefix, toVersion, fromVersion));
+                    this.file = new File(dir, String.format("%s-%s-%d-%d", namespace, type.prefix, toVersion, fromVersion));
                     break;
                 default:
                     throw new IllegalStateException("unknown blob type, type=" + type);
@@ -496,8 +493,8 @@ public class HollowProducer {
         }
 
         protected void write(HollowBlobWriter writer) throws IOException {
-            this.blobFile.mkdirs();
-            try (OutputStream os = new BufferedOutputStream(new FileOutputStream(blobFile))) {
+            this.file.mkdirs();
+            try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
                 switch (type) {
                     case SNAPSHOT:
                         writer.writeSnapshot(os);
@@ -515,15 +512,27 @@ public class HollowProducer {
         }
 
         protected InputStream newInputStream() throws IOException {
-            return new BufferedInputStream(new FileInputStream(this.blobFile));
+            return new BufferedInputStream(new FileInputStream(this.file));
         }
 
-        public File getBlobFile() {
-            return this.blobFile;
+        public File getFile() {
+            return this.file;
+        }
+
+        public Type getType() {
+            return this.type;
+        }
+
+        public long getFromVersion() {
+            return this.fromVersion;
+        }
+
+        public long getToVersion() {
+            return this.toVersion;
         }
 
         public void cleanup() {
-            if (this.blobFile != null) this.blobFile.delete();
+            if (this.file != null) this.file.delete();
         }
 
         public static enum Type {
