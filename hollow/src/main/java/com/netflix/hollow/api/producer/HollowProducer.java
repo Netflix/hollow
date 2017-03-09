@@ -535,6 +535,9 @@ public class HollowProducer {
             if (this.file != null) this.file.delete();
         }
 
+        /**
+         * Hollow blob types are {@code SNAPSHOT}, {@code DELTA} and {@code REVERSE_DELTA}.
+         */
         public static enum Type {
             SNAPSHOT("snapshot"),
             DELTA("delta"),

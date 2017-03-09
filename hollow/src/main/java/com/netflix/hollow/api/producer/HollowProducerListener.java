@@ -132,6 +132,7 @@ public interface HollowProducerListener extends EventListener {
 
     /**
      * Called once a blob has been published successfully or failed to published. Use {@link PublishStatus#getBlob()} to get more details on blob type and size.
+     * This method is called for every {@link com.netflix.hollow.api.producer.HollowProducer.Blob.Type} that was published.
      *
      * @param publishStatus Status of publishing. {@link PublishStatus#getStatus()} returns {@code SUCCESS} or {@code FAIL}.
      * @param elapsed       time taken to publish the blob
