@@ -91,13 +91,20 @@ final class ListenerSupport {
         for (final HollowProducerListener l : listeners) l.onPopulateComplete(st, builder.elapsed(), MILLISECONDS);
     }
 
-    void firePublishStart(long version) {
+    ProducerStatus.Builder firePublishStart(long version) {
+        ProducerStatus.Builder psb = new ProducerStatus.Builder().version(version);
         for(final HollowProducerListener l : listeners) l.onPublishStart(version);
+        return psb;
     }
 
-    void firePublishComplete(PublishStatus.Builder builder) {
-        PublishStatus status = builder.build();
+    void firePublishComplete(ProducerStatus.Builder builder) {
+        ProducerStatus status = builder.build();
         for(final HollowProducerListener l : listeners) l.onPublishComplete(status, builder.elapsed(), MILLISECONDS);
+    }
+
+    void fireBlobArtifactPublishComplete(PublishStatus.Builder builder) {
+        PublishStatus status = builder.build();
+        for(final HollowProducerListener l : listeners) l.onBlobArtifactPublishComplete(status, builder.elapsed(), MILLISECONDS);
     }
 
     ProducerStatus.Builder fireIntegrityCheckStart(ReadState readState) {

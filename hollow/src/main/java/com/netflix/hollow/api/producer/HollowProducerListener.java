@@ -122,14 +122,15 @@ public interface HollowProducerListener extends EventListener {
     /**
      * Called after the publish stage finishes normally or abnormally. A {@code SUCCESS} status indicates that
      * the {@code HollowBlob}s produced this cycle has been published to the blob store.
-     * This method is called for every {@link com.netflix.hollow.api.producer.HollowProducer.Blob.Type} that was published.
      *
-     * @param publishStatus CycleStatus of the publish stage. {@link PublishStatus#getStatus()} will return {@code SUCCESS}
+     * @param status CycleStatus of the publish stage. {@link ProducerStatus#getStatus()} will return {@code SUCCESS}
      *   when the publish was successful; @{code FAIL} otherwise.
      * @param elapsed duration of the publish stage in {@code unit} units
      * @param unit units of the {@code elapsed} duration
      */
-    public void onPublishComplete(PublishStatus publishStatus, long elapsed, TimeUnit unit);
+    public void onPublishComplete(ProducerStatus status, long elapsed, TimeUnit unit);
+
+    public void onBlobArtifactPublishComplete(PublishStatus publishStatus, long elapsed, TimeUnit unit);
 
     /**
      * Called when the {@code HollowProducer} has begun checking the integrity of the {@code HollowBlob}s produced this cycle.
