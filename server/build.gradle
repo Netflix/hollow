@@ -39,13 +39,6 @@ ospackage {
     requires('nflx-base-www')
 }
 
-sourceSets {
-    tools {
-        compileClasspath += main.output
-        runtimeClasspath += main.output
-    }
-}
-
 dependencies {
     // Governator wires up all of our dependencies in dependency injection fashion.
     compile 'com.netflix.governator:governator-core:1.15.10'
@@ -86,14 +79,13 @@ dependencies {
     // Cassandra Aeneas unit test kit.
     testCompile "com.netflix.aeneas:aeneas-test:latest.release"
 
-    toolsCompile configurations.compile
-    toolsRuntime configurations.runtime
-
-    toolsCompile 'com.netflix.hollow:hollow-diff-ui:2.+'
+    testCompile 'com.netflix.hollow:hollow-diff-ui:2.+'
 }
 
-configurations {
-  toolsCompile.extendsFrom compile
+facets {
+    tools {
+        parentSourceSet = 'test'
+    }
 }
 
 // Required exclusions to work around a bug in gretty: log4j-over-slf4j is accidentally included
