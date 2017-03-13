@@ -80,6 +80,7 @@ dependencies {
     testCompile "com.netflix.aeneas:aeneas-test:latest.release"
 
     testCompile 'com.netflix.hollow:hollow-diff-ui:2.+'
+    testCompile 'org.eclipse.jetty:jetty-server:9.4.2.v20170220'
 }
 
 facets {
