@@ -285,7 +285,7 @@ movieSchema.addField(&quot;releaseYear&quot;, FieldType.INT);
 
 HollowObjectTypeWriteState movieState = new HollowObjectTypeWriteState(movieSchema);
 
-writeEngine.addTypeState(typeState);
+writeEngine.addTypeState(movieState);
 </code></pre>
 
 <p>Once we’ve initialized our type states, we can add data into our state engine using HollowWriteRecords:</p>
