@@ -248,8 +248,7 @@
                 "netflix:concurrent",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing",
-                "org.reflections:reflections"
+                "netflix:streaming-utilities-testing"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -2498,11 +2497,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.233",
+            "locked": "59.235",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.233",
+            "locked": "59.235",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -2908,7 +2907,7 @@
             ]
         },
         "org.javassist:javassist": {
-            "locked": "3.20.0-GA",
+            "locked": "3.21.0-GA",
             "transitive": [
                 "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command",
@@ -2982,7 +2981,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.10",
+            "locked": "0.9.11",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -3381,8 +3380,7 @@
                 "netflix:concurrent",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing",
-                "org.reflections:reflections"
+                "netflix:streaming-utilities-testing"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -5631,11 +5629,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.233",
+            "locked": "59.235",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.233",
+            "locked": "59.235",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -6041,7 +6039,7 @@
             ]
         },
         "org.javassist:javassist": {
-            "locked": "3.20.0-GA",
+            "locked": "3.21.0-GA",
             "transitive": [
                 "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command",
@@ -6115,7 +6113,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.10",
+            "locked": "0.9.11",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -6514,8 +6512,7 @@
                 "netflix:concurrent",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing",
-                "org.reflections:reflections"
+                "netflix:streaming-utilities-testing"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -8764,11 +8761,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.233",
+            "locked": "59.235",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.233",
+            "locked": "59.235",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -9174,7 +9171,7 @@
             ]
         },
         "org.javassist:javassist": {
-            "locked": "3.20.0-GA",
+            "locked": "3.21.0-GA",
             "transitive": [
                 "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command",
@@ -9248,7 +9245,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.10",
+            "locked": "0.9.11",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -9647,8 +9644,7 @@
                 "netflix:concurrent",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing",
-                "org.reflections:reflections"
+                "netflix:streaming-utilities-testing"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -11897,11 +11893,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.233",
+            "locked": "59.235",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.233",
+            "locked": "59.235",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -12307,7 +12303,7 @@
             ]
         },
         "org.javassist:javassist": {
-            "locked": "3.20.0-GA",
+            "locked": "3.21.0-GA",
             "transitive": [
                 "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command",
@@ -12381,7 +12377,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.10",
+            "locked": "0.9.11",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -12885,8 +12881,7 @@
                 "netflix:concurrent",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing",
-                "org.reflections:reflections"
+                "netflix:streaming-utilities-testing"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -15135,11 +15130,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.233",
+            "locked": "59.235",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.233",
+            "locked": "59.235",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -15545,7 +15540,7 @@
             ]
         },
         "org.javassist:javassist": {
-            "locked": "3.20.0-GA",
+            "locked": "3.21.0-GA",
             "transitive": [
                 "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command",
@@ -15619,7 +15614,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.10",
+            "locked": "0.9.11",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -16018,8 +16013,7 @@
                 "netflix:concurrent",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing",
-                "org.reflections:reflections"
+                "netflix:streaming-utilities-testing"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -18307,11 +18301,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.233",
+            "locked": "59.235",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.233",
+            "locked": "59.235",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -18728,7 +18722,7 @@
             ]
         },
         "org.javassist:javassist": {
-            "locked": "3.20.0-GA",
+            "locked": "3.21.0-GA",
             "transitive": [
                 "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command",
@@ -18803,7 +18797,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.10",
+            "locked": "0.9.11",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -19202,8 +19196,7 @@
                 "netflix:concurrent",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing",
-                "org.reflections:reflections"
+                "netflix:streaming-utilities-testing"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -21491,11 +21484,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.233",
+            "locked": "59.235",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.233",
+            "locked": "59.235",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -21912,7 +21905,7 @@
             ]
         },
         "org.javassist:javassist": {
-            "locked": "3.20.0-GA",
+            "locked": "3.21.0-GA",
             "transitive": [
                 "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command",
@@ -21987,7 +21980,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.10",
+            "locked": "0.9.11",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -22386,8 +22379,7 @@
                 "netflix:concurrent",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing",
-                "org.reflections:reflections"
+                "netflix:streaming-utilities-testing"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -24675,11 +24667,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.233",
+            "locked": "59.235",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.233",
+            "locked": "59.235",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -25096,7 +25088,7 @@
             ]
         },
         "org.javassist:javassist": {
-            "locked": "3.20.0-GA",
+            "locked": "3.21.0-GA",
             "transitive": [
                 "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command",
@@ -25171,7 +25163,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.10",
+            "locked": "0.9.11",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -25570,8 +25562,7 @@
                 "netflix:concurrent",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing",
-                "org.reflections:reflections"
+                "netflix:streaming-utilities-testing"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -27859,11 +27850,11 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.233",
+            "locked": "59.235",
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "59.233",
+            "locked": "59.235",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -28280,7 +28271,7 @@
             ]
         },
         "org.javassist:javassist": {
-            "locked": "3.20.0-GA",
+            "locked": "3.21.0-GA",
             "transitive": [
                 "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command",
@@ -28355,7 +28346,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.10",
+            "locked": "0.9.11",
             "transitive": [
                 "netflix:vms-utils"
             ]
