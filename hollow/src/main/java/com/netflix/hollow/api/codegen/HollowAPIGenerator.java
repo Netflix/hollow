@@ -103,6 +103,8 @@ public class HollowAPIGenerator {
     }
 
     public void generateFiles(File directory) throws IOException {
+        directory.mkdirs();
+        
         HollowAPIClassJavaGenerator apiClassGenerator = new HollowAPIClassJavaGenerator(packageName, apiClassname, dataset, parameterizeClassNames);
         HollowAPIFactoryJavaGenerator apiFactoryGenerator = new HollowAPIFactoryJavaGenerator(packageName, apiClassname);
 
