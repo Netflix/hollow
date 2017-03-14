@@ -18,7 +18,6 @@
 package com.netflix.hollow.api.objects.generic;
 
 import com.netflix.hollow.api.objects.HollowRecord;
-
 import java.util.Iterator;
 
 class GenericHollowIterable<T extends HollowRecord> implements Iterable<T> {
@@ -40,8 +39,9 @@ class GenericHollowIterable<T extends HollowRecord> implements Iterable<T> {
             }
 
             @Override
+            @SuppressWarnings("unchecked")
             public T next() {
-                return (T) next();
+                return (T) iter.next();
             }
             
             @Override
