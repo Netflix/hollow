@@ -82,7 +82,25 @@ public class HollowWriteStateCreator {
     }
     
     public static HollowWriteStateEngine recreateAndPopulateUsingReadEngine(final HollowReadStateEngine readEngine) {
-        final HollowWriteStateEngine writeEngine = createWithSchemas(readEngine.getSchemas());
+        final HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+        
+        for(HollowTypeReadState readState : readEngine.getTypeStates()) {
+            HollowSchema schema = readState.getSchema();
+            switch(schema.getSchemaType()) {
+            case OBJECT:
+                writeEngine.addTypeState(new HollowObjectTypeWriteState((HollowObjectSchema)schema, readState.numShards()));
+                break;
+            case LIST:
+                writeEngine.addTypeState(new HollowListTypeWriteState((HollowListSchema)schema, readState.numShards()));
+                break;
+            case SET:
+                writeEngine.addTypeState(new HollowSetTypeWriteState((HollowSetSchema)schema, readState.numShards()));
+                break;
+            case MAP:
+                writeEngine.addTypeState(new HollowMapTypeWriteState((HollowMapSchema)schema, readState.numShards()));
+                break;
+            }
+        }
         
         SimultaneousExecutor executor = new SimultaneousExecutor();
         
