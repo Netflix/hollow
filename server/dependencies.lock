@@ -2017,7 +2017,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.77.0",
+            "locked": "1.78.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -5412,7 +5412,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.77.0",
+            "locked": "1.78.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -8807,7 +8807,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.77.0",
+            "locked": "1.78.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -12195,7 +12195,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.77.0",
+            "locked": "1.78.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -15617,7 +15617,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.77.0",
+            "locked": "1.78.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -20109,7 +20109,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.77.0",
+            "locked": "1.78.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -23508,7 +23508,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.77.0",
+            "locked": "1.78.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -26951,7 +26951,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.77.0",
+            "locked": "1.78.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -30463,7 +30463,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.77.0",
+            "locked": "1.78.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -33975,7 +33975,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.77.0",
+            "locked": "1.78.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -37487,7 +37487,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.77.0",
+            "locked": "1.78.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -40935,7 +40935,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.77.0",
+            "locked": "1.78.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -44346,7 +44346,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.77.0",
+            "locked": "1.78.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -47757,7 +47757,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.77.0",
+            "locked": "1.78.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -51168,7 +51168,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.77.0",
+            "locked": "1.78.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
