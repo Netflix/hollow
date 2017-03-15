@@ -1854,14 +1854,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.4.0",
+            "locked": "3.0.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.4.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -4597,14 +4597,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.4.0",
+            "locked": "3.0.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.4.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -7340,14 +7340,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.4.0",
+            "locked": "3.0.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.4.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -10083,14 +10083,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.4.0",
+            "locked": "3.0.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.4.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -12925,14 +12925,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.4.0",
+            "locked": "3.0.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.4.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -15669,14 +15669,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.4.0",
+            "locked": "3.0.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.4.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -18418,14 +18418,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.4.0",
+            "locked": "3.0.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.4.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -21167,14 +21167,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.4.0",
+            "locked": "3.0.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.4.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -23916,14 +23916,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "2.4.0",
+            "locked": "3.0.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "2.4.0",
+            "locked": "3.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
