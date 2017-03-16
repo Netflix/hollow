@@ -25721,7 +25721,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.3.0",
+            "locked": "2.3.1",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -25731,7 +25731,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.3.0",
+            "locked": "2.3.1",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -29235,7 +29235,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.3.0",
+            "locked": "2.3.1",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -29245,7 +29245,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.3.0",
+            "locked": "2.3.1",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -32749,7 +32749,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.3.0",
+            "locked": "2.3.1",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -32759,7 +32759,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.3.0",
+            "locked": "2.3.1",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -36263,7 +36263,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.3.0",
+            "locked": "2.3.1",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -36273,7 +36273,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.3.0",
+            "locked": "2.3.1",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -39777,7 +39777,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.3.0",
+            "locked": "2.3.1",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -39787,7 +39787,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.3.0",
+            "locked": "2.3.1",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -43291,7 +43291,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.3.0",
+            "locked": "2.3.1",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -43301,7 +43301,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.3.0",
+            "locked": "2.3.1",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -46805,7 +46805,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.3.0",
+            "locked": "2.3.1",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -46815,7 +46815,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.3.0",
+            "locked": "2.3.1",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -50319,7 +50319,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.3.0",
+            "locked": "2.3.1",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
@@ -50329,7 +50329,7 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.3.0",
+            "locked": "2.3.1",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
