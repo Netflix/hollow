@@ -29,12 +29,14 @@ import com.netflix.vms.transformer.hollowoutput.ArtworkDerivatives;
 import com.netflix.vms.transformer.hollowoutput.ArtworkSourceString;
 import com.netflix.vms.transformer.hollowoutput.SchedulePhaseInfo;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -170,22 +172,30 @@ public class VideoImagesDataModuleTest {
         return result;
     }
 
-    private MasterScheduleHollow getMasterScheduleHollow(long offset) {
+    private MasterScheduleHollow getMasterScheduleHollow(Long offset) {
         MasterScheduleHollow masterScheduleHollow = mock(MasterScheduleHollow.class);
-        when(masterScheduleHollow._getAvailabilityOffset()).thenReturn(offset);
+        if (offset == null) when(masterScheduleHollow._getAvailabilityOffset()).thenReturn(0L);
+        else when(masterScheduleHollow._getAvailabilityOffset()).thenReturn(offset);
         return masterScheduleHollow;
     }
 
-    private AbsoluteScheduleHollow getAbsoluteScheduleHollow(long startOffset, long endOffset) {
+    private AbsoluteScheduleHollow getAbsoluteScheduleHollow(Long startOffset, Long endOffset) {
         AbsoluteScheduleHollow absoluteScheduleHollow = mock(AbsoluteScheduleHollow.class);
-        when(absoluteScheduleHollow._getStartDate()).thenReturn(startOffset);
-        when(absoluteScheduleHollow._getEndDate()).thenReturn(endOffset);
+        // 0l is expected for start offset if null is mocked.
+        if (startOffset == null) when(absoluteScheduleHollow._getStartDate()).thenReturn(0L);
+        else when(absoluteScheduleHollow._getStartDate()).thenReturn(startOffset);
+
+        if (endOffset == null) {
+            // Hollow returns Long.MIN_VALUE when null is present in field. Check DefaultMissingHandler class.
+            when(absoluteScheduleHollow._getEndDate()).thenReturn(Long.MIN_VALUE);
+        } else when(absoluteScheduleHollow._getEndDate()).thenReturn(endOffset);
         return absoluteScheduleHollow;
     }
 
-    private OverrideScheduleHollow getOverrideScheduleHollow(long offset) {
+    private OverrideScheduleHollow getOverrideScheduleHollow(Long offset) {
         OverrideScheduleHollow overrideScheduleHollow = mock(OverrideScheduleHollow.class);
-        when(overrideScheduleHollow._getAvailabilityOffset()).thenReturn(offset);
+        if (offset == null) when(overrideScheduleHollow._getAvailabilityOffset()).thenReturn(0L);
+        else when(overrideScheduleHollow._getAvailabilityOffset()).thenReturn(offset);
         return overrideScheduleHollow;
     }
 
@@ -305,14 +315,14 @@ public class VideoImagesDataModuleTest {
         when(absoluteIndex.findMatches(eq((long) videoId), eq(promoTag))).thenReturn(result);
 
         //mock absolute schedule
-        AbsoluteScheduleHollow absoluteScheduleHollow = getAbsoluteScheduleHollow(-10L, 200L);
+        AbsoluteScheduleHollow absoluteScheduleHollow = getAbsoluteScheduleHollow(-10L, null);
         when(api.getAbsoluteScheduleHollow(eq(1))).thenReturn(absoluteScheduleHollow);
 
         Set<SchedulePhaseInfo> schedulePhaseInfoSet = videoImagesDataModule.getAllScheduleInfo(videoArtworkHollow, videoId);
         Assert.assertTrue(schedulePhaseInfoSet.size() == 1);
         SchedulePhaseInfo schedulePhaseInfo = videoImagesDataModule.getEarliestScheduleInfo(schedulePhaseInfoSet, videoId);
 
-        verifySchedulePhaseInfo(schedulePhaseInfo, -10, 200L, true, false);
+        verifySchedulePhaseInfo(schedulePhaseInfo, -10, SchedulePhaseInfo.FAR_FUTURE_DATE, true, false);
     }
 
     /**
@@ -354,11 +364,11 @@ public class VideoImagesDataModuleTest {
 
         verifySchedulePhaseInfo(schedulePhaseInfo, -2L, SchedulePhaseInfo.FAR_FUTURE_DATE, false, false);
     }
-    
+
     @Test
-    public void testPickArtworkBasedOnRolloutInfo(){
-    	String sourceFileId = "04f3e8c0-e009-11e6-9a23-0e2def47c5ca";
-    	
+    public void testPickArtworkBasedOnRolloutInfo() {
+        String sourceFileId = "04f3e8c0-e009-11e6-9a23-0e2def47c5ca";
+
         Artwork artworkWithRolloutTrue = new Artwork();
         artworkWithRolloutTrue.sourceVideoId = 70178217;
         artworkWithRolloutTrue.hasShowLevelTag = false;
@@ -371,27 +381,27 @@ public class VideoImagesDataModuleTest {
         artworkWithRolloutTrue.ordinalPriority = 3;
         artworkWithRolloutTrue.schedulePhaseInfo = new SchedulePhaseInfo(false, 80151460);
         artworkWithRolloutTrue.isRolloutExclusive = true;
-        
+
         Artwork artworkWithRolloutFalse = artworkWithRolloutTrue.clone();
         artworkWithRolloutFalse.isRolloutExclusive = false;
-        
+
         Set<String> rolloutSourceFileIds = new HashSet<>();
         rolloutSourceFileIds.add("04f3e8c0-e009-11e6-9a23-0e2def47c5ca");
-		
-        // Input says rollout exclusive true and found a rollout: isRolloutExclusive should be true.
-		Artwork result = videoImagesDataModule.pickArtworkBasedOnRolloutInfo(artworkWithRolloutTrue, artworkWithRolloutFalse, rolloutSourceFileIds, sourceFileId);
-		Assert.assertTrue(result.isRolloutExclusive);
 
-		// Input says rollout exclusive true and did not found a rollout: image is dropped to prevent leaks. Result null.		
-		result = videoImagesDataModule.pickArtworkBasedOnRolloutInfo(artworkWithRolloutTrue, artworkWithRolloutFalse, Collections.emptySet(), sourceFileId);
-		Assert.assertTrue(result == null);
-		
+        // Input says rollout exclusive true and found a rollout: isRolloutExclusive should be true.
+        Artwork result = videoImagesDataModule.pickArtworkBasedOnRolloutInfo(artworkWithRolloutTrue, artworkWithRolloutFalse, rolloutSourceFileIds, sourceFileId);
+        Assert.assertTrue(result.isRolloutExclusive);
+
+        // Input says rollout exclusive true and did not found a rollout: image is dropped to prevent leaks. Result null.
+        result = videoImagesDataModule.pickArtworkBasedOnRolloutInfo(artworkWithRolloutTrue, artworkWithRolloutFalse, Collections.emptySet(), sourceFileId);
+        Assert.assertTrue(result == null);
+
         // Input says rollout exclusive  false and found a rollout: isRolloutExclusive should be true.
-		result = videoImagesDataModule.pickArtworkBasedOnRolloutInfo(artworkWithRolloutFalse, artworkWithRolloutTrue, rolloutSourceFileIds, sourceFileId);
-		Assert.assertTrue(result.isRolloutExclusive);
-		
+        result = videoImagesDataModule.pickArtworkBasedOnRolloutInfo(artworkWithRolloutFalse, artworkWithRolloutTrue, rolloutSourceFileIds, sourceFileId);
+        Assert.assertTrue(result.isRolloutExclusive);
+
         // Input says rollout exclusive false and did not find a rollout: isRolloutExclusive should be false.
-		result = videoImagesDataModule.pickArtworkBasedOnRolloutInfo(artworkWithRolloutFalse, artworkWithRolloutTrue,  Collections.emptySet(), sourceFileId);
-		Assert.assertFalse(result.isRolloutExclusive);
+        result = videoImagesDataModule.pickArtworkBasedOnRolloutInfo(artworkWithRolloutFalse, artworkWithRolloutTrue, Collections.emptySet(), sourceFileId);
+        Assert.assertFalse(result.isRolloutExclusive);
     }
 }
