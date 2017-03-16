@@ -28021,14 +28021,15 @@
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
+                "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-server"
             ]
         },
@@ -28039,7 +28040,8 @@
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
+            "requested": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-security"
             ]
@@ -28049,7 +28051,7 @@
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-io"
@@ -31533,14 +31535,15 @@
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
+                "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-server"
             ]
         },
@@ -31551,7 +31554,8 @@
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
+            "requested": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-security"
             ]
@@ -31561,7 +31565,7 @@
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-io"
@@ -35045,14 +35049,15 @@
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
+                "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-server"
             ]
         },
@@ -35063,7 +35068,8 @@
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
+            "requested": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-security"
             ]
@@ -35073,7 +35079,7 @@
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-io"
@@ -38557,14 +38563,15 @@
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
+                "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-server"
             ]
         },
@@ -38575,7 +38582,8 @@
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
+            "requested": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-security"
             ]
@@ -38585,7 +38593,7 @@
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-io"
@@ -39019,10 +39027,22 @@
                 "com.amazonaws:aws-java-sdk-sqs"
             ]
         },
+        "com.boundary:high-scale-lib": {
+            "locked": "1.0.6",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
+            ]
+        },
         "com.carrotsearch:hppc": {
             "locked": "0.7.1",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "com.clearspring.analytics:stream": {
+            "locked": "2.5.2",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.codahale.metrics:metrics-core": {
@@ -39035,6 +39055,7 @@
             "locked": "3.1.2",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql"
             ]
         },
@@ -39126,6 +39147,12 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer"
+            ]
+        },
+        "com.github.jbellis:jamm": {
+            "locked": "0.3.0",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.github.jnr:jffi": {
@@ -39371,7 +39398,8 @@
         "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru": {
             "locked": "1.3",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.googlecode.java-diff-utils:diffutils": {
@@ -39384,7 +39412,8 @@
             "locked": "1.1.1",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.ibm.icu:icu4j": {
@@ -39420,7 +39449,8 @@
         "com.lmax:disruptor": {
             "locked": "3.0.1",
             "transitive": [
-                "com.thinkaurelius.thrift:thrift-server"
+                "com.thinkaurelius.thrift:thrift-server",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.mchange:c3p0": {
@@ -39436,6 +39466,20 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
+            "locked": "1.38",
+            "requested": "latest.release",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-recipes",
+                "com.netflix.aeneas:aeneas-test"
+            ]
+        },
+        "com.netflix.aeneas:aeneas-recipes": {
+            "locked": "1.27",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-test"
+            ]
+        },
+        "com.netflix.aeneas:aeneas-test": {
             "locked": "1.38",
             "requested": "latest.release"
         },
@@ -40020,7 +40064,10 @@
         },
         "com.netflix.runtime:runtime-lifecycle": {
             "locked": "1.31",
-            "requested": "latest.release"
+            "requested": "latest.release",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-test"
+            ]
         },
         "com.netflix.servo:servo-apache": {
             "locked": "0.12.12",
@@ -40248,6 +40295,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded",
                 "org.elasticsearch:elasticsearch"
             ]
         },
@@ -40380,7 +40428,8 @@
         "com.thinkaurelius.thrift:thrift-server": {
             "locked": "0.3.7",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.thoughtworks.xstream:xstream": {
@@ -40426,6 +40475,7 @@
             "transitive": [
                 "netflix:nfastyanax",
                 "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded",
                 "org.elasticsearch:elasticsearch"
             ]
         },
@@ -40443,7 +40493,8 @@
                 "netflix:platform-core",
                 "netflix:platform-ipc",
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.httpcomponents:httpclient"
+                "org.apache.httpcomponents:httpclient",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "commons-collections:commons-collections": {
@@ -40604,7 +40655,8 @@
             "locked": "3.1.2",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
-                "com.netflix.aeneas:aeneas-core"
+                "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test"
             ]
         },
         "io.netty:netty": {
@@ -40653,6 +40705,7 @@
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.iep-shadow:iepshadow-rxnetty"
             ]
         },
@@ -40687,6 +40740,13 @@
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc"
+            ]
+        },
+        "it.unimi.dsi:fastutil": {
+            "locked": "6.5.7",
+            "transitive": [
+                "com.clearspring.analytics:stream",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "javax.activation:activation": {
@@ -40784,7 +40844,8 @@
             "locked": "1.0",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.zookeeper:zookeeper"
+                "org.apache.zookeeper:zookeeper",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "joda-time:joda-time": {
@@ -40808,10 +40869,12 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.10",
+            "locked": "4.11",
+            "requested": "4.11",
             "transitive": [
                 "com.googlecode.json-simple:json-simple",
-                "com.thinkaurelius.thrift:thrift-server"
+                "com.thinkaurelius.thrift:thrift-server",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "log4j:log4j": {
@@ -40849,6 +40912,12 @@
                 "netflix:streaming-utilities-testing"
             ]
         },
+        "net.java.dev.jna:jna": {
+            "locked": "4.0.0",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
+            ]
+        },
         "net.jcip:jcip-annotations": {
             "locked": "1.0",
             "transitive": [
@@ -40859,11 +40928,13 @@
             "locked": "1.3.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.kafka:kafka-clients"
+                "org.apache.kafka:kafka-clients",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "net.sf.ezmorph:ezmorph": {
@@ -40891,7 +40962,8 @@
         "net.sf.supercsv:super-csv": {
             "locked": "2.1.0",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "netflix:adminresources": {
@@ -41271,6 +41343,7 @@
             "locked": "4.1.6",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test",
                 "netflix:adminresources",
                 "netflix:akmsclient",
                 "netflix:concurrent",
@@ -41670,7 +41743,8 @@
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.cassandra:cassandra-thrift"
+                "org.apache.cassandra:cassandra-thrift",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "org.apache.commons:commons-math": {
@@ -41680,6 +41754,12 @@
                 "netflix:nf-eventbus",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
+            ]
+        },
+        "org.apache.commons:commons-math3": {
+            "locked": "3.2",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "org.apache.commons:commons-pool2": {
@@ -41859,7 +41939,8 @@
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:nfastyanax",
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.cassandra:cassandra-thrift"
+                "org.apache.cassandra:cassandra-thrift",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "org.apache.velocity:velocity": {
@@ -41880,6 +41961,10 @@
                 "netflix:platform-core"
             ]
         },
+        "org.assertj:assertj-core": {
+            "locked": "3.3.0",
+            "requested": "3.3.0"
+        },
         "org.bouncycastle:bcmail-jdk16": {
             "locked": "1.46",
             "transitive": [
@@ -41899,6 +41984,12 @@
                 "netflix:crypto-common-util",
                 "org.bouncycastle:bcmail-jdk16",
                 "org.bouncycastle:bcpg-jdk16"
+            ]
+        },
+        "org.cassandraunit:cassandra-unit-shaded": {
+            "locked": "2.1.9.2",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-test"
             ]
         },
         "org.codehaus.jackson:jackson-core-asl": {
@@ -41986,14 +42077,15 @@
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
+                "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-server"
             ]
         },
@@ -42004,7 +42096,8 @@
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
+            "requested": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-security"
             ]
@@ -42014,7 +42107,7 @@
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-io"
@@ -42041,9 +42134,18 @@
             ]
         },
         "org.hamcrest:hamcrest-core": {
-            "locked": "1.1",
+            "locked": "1.3",
             "transitive": [
+                "junit:junit",
+                "org.cassandraunit:cassandra-unit-shaded",
+                "org.hamcrest:hamcrest-library",
                 "org.mockito:mockito-core"
+            ]
+        },
+        "org.hamcrest:hamcrest-library": {
+            "locked": "1.3",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "org.hdrhistogram:HdrHistogram": {
@@ -42089,8 +42191,13 @@
         "org.mindrot:jbcrypt": {
             "locked": "0.3m",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
+        },
+        "org.mockito:mockito-all": {
+            "project": true,
+            "requested": "1.3"
         },
         "org.mockito:mockito-core": {
             "locked": "1.10.19",
@@ -42249,6 +42356,7 @@
                 "org.apache.kafka:kafka-clients",
                 "org.apache.thrift:libthrift",
                 "org.apache.zookeeper:zookeeper",
+                "org.cassandraunit:cassandra-unit-shaded",
                 "org.slf4j:slf4j-log4j12"
             ]
         },
@@ -42264,11 +42372,13 @@
             "locked": "1.1.1.7",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
                 "netflix:hermes",
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.kafka:kafka-clients"
+                "org.apache.kafka:kafka-clients",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "org.yaml:snakeyaml": {
@@ -42276,7 +42386,8 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "redis.clients:jedis": {
@@ -42430,10 +42541,22 @@
                 "com.amazonaws:aws-java-sdk-sqs"
             ]
         },
+        "com.boundary:high-scale-lib": {
+            "locked": "1.0.6",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
+            ]
+        },
         "com.carrotsearch:hppc": {
             "locked": "0.7.1",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "com.clearspring.analytics:stream": {
+            "locked": "2.5.2",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.codahale.metrics:metrics-core": {
@@ -42446,6 +42569,7 @@
             "locked": "3.1.2",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql"
             ]
         },
@@ -42537,6 +42661,12 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer"
+            ]
+        },
+        "com.github.jbellis:jamm": {
+            "locked": "0.3.0",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.github.jnr:jffi": {
@@ -42782,7 +42912,8 @@
         "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru": {
             "locked": "1.3",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.googlecode.java-diff-utils:diffutils": {
@@ -42795,7 +42926,8 @@
             "locked": "1.1.1",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.ibm.icu:icu4j": {
@@ -42831,7 +42963,8 @@
         "com.lmax:disruptor": {
             "locked": "3.0.1",
             "transitive": [
-                "com.thinkaurelius.thrift:thrift-server"
+                "com.thinkaurelius.thrift:thrift-server",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.mchange:c3p0": {
@@ -42847,6 +42980,20 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
+            "locked": "1.38",
+            "requested": "latest.release",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-recipes",
+                "com.netflix.aeneas:aeneas-test"
+            ]
+        },
+        "com.netflix.aeneas:aeneas-recipes": {
+            "locked": "1.27",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-test"
+            ]
+        },
+        "com.netflix.aeneas:aeneas-test": {
             "locked": "1.38",
             "requested": "latest.release"
         },
@@ -43431,7 +43578,10 @@
         },
         "com.netflix.runtime:runtime-lifecycle": {
             "locked": "1.31",
-            "requested": "latest.release"
+            "requested": "latest.release",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-test"
+            ]
         },
         "com.netflix.servo:servo-apache": {
             "locked": "0.12.12",
@@ -43659,6 +43809,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded",
                 "org.elasticsearch:elasticsearch"
             ]
         },
@@ -43791,7 +43942,8 @@
         "com.thinkaurelius.thrift:thrift-server": {
             "locked": "0.3.7",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.thoughtworks.xstream:xstream": {
@@ -43837,6 +43989,7 @@
             "transitive": [
                 "netflix:nfastyanax",
                 "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded",
                 "org.elasticsearch:elasticsearch"
             ]
         },
@@ -43854,7 +44007,8 @@
                 "netflix:platform-core",
                 "netflix:platform-ipc",
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.httpcomponents:httpclient"
+                "org.apache.httpcomponents:httpclient",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "commons-collections:commons-collections": {
@@ -44015,7 +44169,8 @@
             "locked": "3.1.2",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
-                "com.netflix.aeneas:aeneas-core"
+                "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test"
             ]
         },
         "io.netty:netty": {
@@ -44064,6 +44219,7 @@
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.iep-shadow:iepshadow-rxnetty"
             ]
         },
@@ -44098,6 +44254,13 @@
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc"
+            ]
+        },
+        "it.unimi.dsi:fastutil": {
+            "locked": "6.5.7",
+            "transitive": [
+                "com.clearspring.analytics:stream",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "javax.activation:activation": {
@@ -44195,7 +44358,8 @@
             "locked": "1.0",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.zookeeper:zookeeper"
+                "org.apache.zookeeper:zookeeper",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "joda-time:joda-time": {
@@ -44219,10 +44383,12 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.10",
+            "locked": "4.11",
+            "requested": "4.11",
             "transitive": [
                 "com.googlecode.json-simple:json-simple",
-                "com.thinkaurelius.thrift:thrift-server"
+                "com.thinkaurelius.thrift:thrift-server",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "log4j:log4j": {
@@ -44260,6 +44426,12 @@
                 "netflix:streaming-utilities-testing"
             ]
         },
+        "net.java.dev.jna:jna": {
+            "locked": "4.0.0",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
+            ]
+        },
         "net.jcip:jcip-annotations": {
             "locked": "1.0",
             "transitive": [
@@ -44270,11 +44442,13 @@
             "locked": "1.3.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.kafka:kafka-clients"
+                "org.apache.kafka:kafka-clients",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "net.sf.ezmorph:ezmorph": {
@@ -44302,7 +44476,8 @@
         "net.sf.supercsv:super-csv": {
             "locked": "2.1.0",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "netflix:adminresources": {
@@ -44682,6 +44857,7 @@
             "locked": "4.1.6",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test",
                 "netflix:adminresources",
                 "netflix:akmsclient",
                 "netflix:concurrent",
@@ -45081,7 +45257,8 @@
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.cassandra:cassandra-thrift"
+                "org.apache.cassandra:cassandra-thrift",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "org.apache.commons:commons-math": {
@@ -45091,6 +45268,12 @@
                 "netflix:nf-eventbus",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
+            ]
+        },
+        "org.apache.commons:commons-math3": {
+            "locked": "3.2",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "org.apache.commons:commons-pool2": {
@@ -45270,7 +45453,8 @@
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:nfastyanax",
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.cassandra:cassandra-thrift"
+                "org.apache.cassandra:cassandra-thrift",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "org.apache.velocity:velocity": {
@@ -45291,6 +45475,10 @@
                 "netflix:platform-core"
             ]
         },
+        "org.assertj:assertj-core": {
+            "locked": "3.3.0",
+            "requested": "3.3.0"
+        },
         "org.bouncycastle:bcmail-jdk16": {
             "locked": "1.46",
             "transitive": [
@@ -45310,6 +45498,12 @@
                 "netflix:crypto-common-util",
                 "org.bouncycastle:bcmail-jdk16",
                 "org.bouncycastle:bcpg-jdk16"
+            ]
+        },
+        "org.cassandraunit:cassandra-unit-shaded": {
+            "locked": "2.1.9.2",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-test"
             ]
         },
         "org.codehaus.jackson:jackson-core-asl": {
@@ -45397,14 +45591,15 @@
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
+                "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-server"
             ]
         },
@@ -45415,7 +45610,8 @@
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
+            "requested": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-security"
             ]
@@ -45425,7 +45621,7 @@
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-io"
@@ -45452,9 +45648,18 @@
             ]
         },
         "org.hamcrest:hamcrest-core": {
-            "locked": "1.1",
+            "locked": "1.3",
             "transitive": [
+                "junit:junit",
+                "org.cassandraunit:cassandra-unit-shaded",
+                "org.hamcrest:hamcrest-library",
                 "org.mockito:mockito-core"
+            ]
+        },
+        "org.hamcrest:hamcrest-library": {
+            "locked": "1.3",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "org.hdrhistogram:HdrHistogram": {
@@ -45500,8 +45705,13 @@
         "org.mindrot:jbcrypt": {
             "locked": "0.3m",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
+        },
+        "org.mockito:mockito-all": {
+            "project": true,
+            "requested": "1.3"
         },
         "org.mockito:mockito-core": {
             "locked": "1.10.19",
@@ -45660,6 +45870,7 @@
                 "org.apache.kafka:kafka-clients",
                 "org.apache.thrift:libthrift",
                 "org.apache.zookeeper:zookeeper",
+                "org.cassandraunit:cassandra-unit-shaded",
                 "org.slf4j:slf4j-log4j12"
             ]
         },
@@ -45675,11 +45886,13 @@
             "locked": "1.1.1.7",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
                 "netflix:hermes",
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.kafka:kafka-clients"
+                "org.apache.kafka:kafka-clients",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "org.yaml:snakeyaml": {
@@ -45687,7 +45900,8 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "redis.clients:jedis": {
@@ -45841,10 +46055,22 @@
                 "com.amazonaws:aws-java-sdk-sqs"
             ]
         },
+        "com.boundary:high-scale-lib": {
+            "locked": "1.0.6",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
+            ]
+        },
         "com.carrotsearch:hppc": {
             "locked": "0.7.1",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "com.clearspring.analytics:stream": {
+            "locked": "2.5.2",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.codahale.metrics:metrics-core": {
@@ -45857,6 +46083,7 @@
             "locked": "3.1.2",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql"
             ]
         },
@@ -45948,6 +46175,12 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer"
+            ]
+        },
+        "com.github.jbellis:jamm": {
+            "locked": "0.3.0",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.github.jnr:jffi": {
@@ -46193,7 +46426,8 @@
         "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru": {
             "locked": "1.3",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.googlecode.java-diff-utils:diffutils": {
@@ -46206,7 +46440,8 @@
             "locked": "1.1.1",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.ibm.icu:icu4j": {
@@ -46242,7 +46477,8 @@
         "com.lmax:disruptor": {
             "locked": "3.0.1",
             "transitive": [
-                "com.thinkaurelius.thrift:thrift-server"
+                "com.thinkaurelius.thrift:thrift-server",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.mchange:c3p0": {
@@ -46258,6 +46494,20 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
+            "locked": "1.38",
+            "requested": "latest.release",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-recipes",
+                "com.netflix.aeneas:aeneas-test"
+            ]
+        },
+        "com.netflix.aeneas:aeneas-recipes": {
+            "locked": "1.27",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-test"
+            ]
+        },
+        "com.netflix.aeneas:aeneas-test": {
             "locked": "1.38",
             "requested": "latest.release"
         },
@@ -46842,7 +47092,10 @@
         },
         "com.netflix.runtime:runtime-lifecycle": {
             "locked": "1.31",
-            "requested": "latest.release"
+            "requested": "latest.release",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-test"
+            ]
         },
         "com.netflix.servo:servo-apache": {
             "locked": "0.12.12",
@@ -47070,6 +47323,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded",
                 "org.elasticsearch:elasticsearch"
             ]
         },
@@ -47202,7 +47456,8 @@
         "com.thinkaurelius.thrift:thrift-server": {
             "locked": "0.3.7",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.thoughtworks.xstream:xstream": {
@@ -47248,6 +47503,7 @@
             "transitive": [
                 "netflix:nfastyanax",
                 "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded",
                 "org.elasticsearch:elasticsearch"
             ]
         },
@@ -47265,7 +47521,8 @@
                 "netflix:platform-core",
                 "netflix:platform-ipc",
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.httpcomponents:httpclient"
+                "org.apache.httpcomponents:httpclient",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "commons-collections:commons-collections": {
@@ -47426,7 +47683,8 @@
             "locked": "3.1.2",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
-                "com.netflix.aeneas:aeneas-core"
+                "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test"
             ]
         },
         "io.netty:netty": {
@@ -47475,6 +47733,7 @@
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.iep-shadow:iepshadow-rxnetty"
             ]
         },
@@ -47509,6 +47768,13 @@
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc"
+            ]
+        },
+        "it.unimi.dsi:fastutil": {
+            "locked": "6.5.7",
+            "transitive": [
+                "com.clearspring.analytics:stream",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "javax.activation:activation": {
@@ -47606,7 +47872,8 @@
             "locked": "1.0",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.zookeeper:zookeeper"
+                "org.apache.zookeeper:zookeeper",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "joda-time:joda-time": {
@@ -47630,10 +47897,12 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.10",
+            "locked": "4.11",
+            "requested": "4.11",
             "transitive": [
                 "com.googlecode.json-simple:json-simple",
-                "com.thinkaurelius.thrift:thrift-server"
+                "com.thinkaurelius.thrift:thrift-server",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "log4j:log4j": {
@@ -47671,6 +47940,12 @@
                 "netflix:streaming-utilities-testing"
             ]
         },
+        "net.java.dev.jna:jna": {
+            "locked": "4.0.0",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
+            ]
+        },
         "net.jcip:jcip-annotations": {
             "locked": "1.0",
             "transitive": [
@@ -47681,11 +47956,13 @@
             "locked": "1.3.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.kafka:kafka-clients"
+                "org.apache.kafka:kafka-clients",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "net.sf.ezmorph:ezmorph": {
@@ -47713,7 +47990,8 @@
         "net.sf.supercsv:super-csv": {
             "locked": "2.1.0",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "netflix:adminresources": {
@@ -48093,6 +48371,7 @@
             "locked": "4.1.6",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test",
                 "netflix:adminresources",
                 "netflix:akmsclient",
                 "netflix:concurrent",
@@ -48492,7 +48771,8 @@
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.cassandra:cassandra-thrift"
+                "org.apache.cassandra:cassandra-thrift",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "org.apache.commons:commons-math": {
@@ -48502,6 +48782,12 @@
                 "netflix:nf-eventbus",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
+            ]
+        },
+        "org.apache.commons:commons-math3": {
+            "locked": "3.2",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "org.apache.commons:commons-pool2": {
@@ -48681,7 +48967,8 @@
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:nfastyanax",
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.cassandra:cassandra-thrift"
+                "org.apache.cassandra:cassandra-thrift",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "org.apache.velocity:velocity": {
@@ -48702,6 +48989,10 @@
                 "netflix:platform-core"
             ]
         },
+        "org.assertj:assertj-core": {
+            "locked": "3.3.0",
+            "requested": "3.3.0"
+        },
         "org.bouncycastle:bcmail-jdk16": {
             "locked": "1.46",
             "transitive": [
@@ -48721,6 +49012,12 @@
                 "netflix:crypto-common-util",
                 "org.bouncycastle:bcmail-jdk16",
                 "org.bouncycastle:bcpg-jdk16"
+            ]
+        },
+        "org.cassandraunit:cassandra-unit-shaded": {
+            "locked": "2.1.9.2",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-test"
             ]
         },
         "org.codehaus.jackson:jackson-core-asl": {
@@ -48808,14 +49105,15 @@
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
+                "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-server"
             ]
         },
@@ -48826,7 +49124,8 @@
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
+            "requested": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-security"
             ]
@@ -48836,7 +49135,7 @@
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-io"
@@ -48863,9 +49162,18 @@
             ]
         },
         "org.hamcrest:hamcrest-core": {
-            "locked": "1.1",
+            "locked": "1.3",
             "transitive": [
+                "junit:junit",
+                "org.cassandraunit:cassandra-unit-shaded",
+                "org.hamcrest:hamcrest-library",
                 "org.mockito:mockito-core"
+            ]
+        },
+        "org.hamcrest:hamcrest-library": {
+            "locked": "1.3",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "org.hdrhistogram:HdrHistogram": {
@@ -48911,8 +49219,13 @@
         "org.mindrot:jbcrypt": {
             "locked": "0.3m",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
+        },
+        "org.mockito:mockito-all": {
+            "project": true,
+            "requested": "1.3"
         },
         "org.mockito:mockito-core": {
             "locked": "1.10.19",
@@ -49071,6 +49384,7 @@
                 "org.apache.kafka:kafka-clients",
                 "org.apache.thrift:libthrift",
                 "org.apache.zookeeper:zookeeper",
+                "org.cassandraunit:cassandra-unit-shaded",
                 "org.slf4j:slf4j-log4j12"
             ]
         },
@@ -49086,11 +49400,13 @@
             "locked": "1.1.1.7",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
                 "netflix:hermes",
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.kafka:kafka-clients"
+                "org.apache.kafka:kafka-clients",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "org.yaml:snakeyaml": {
@@ -49098,7 +49414,8 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "redis.clients:jedis": {
@@ -49252,10 +49569,22 @@
                 "com.amazonaws:aws-java-sdk-sqs"
             ]
         },
+        "com.boundary:high-scale-lib": {
+            "locked": "1.0.6",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
+            ]
+        },
         "com.carrotsearch:hppc": {
             "locked": "0.7.1",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
+            ]
+        },
+        "com.clearspring.analytics:stream": {
+            "locked": "2.5.2",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.codahale.metrics:metrics-core": {
@@ -49268,6 +49597,7 @@
             "locked": "3.1.2",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql"
             ]
         },
@@ -49359,6 +49689,12 @@
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer"
+            ]
+        },
+        "com.github.jbellis:jamm": {
+            "locked": "0.3.0",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.github.jnr:jffi": {
@@ -49604,7 +49940,8 @@
         "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru": {
             "locked": "1.3",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.googlecode.java-diff-utils:diffutils": {
@@ -49617,7 +49954,8 @@
             "locked": "1.1.1",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.ibm.icu:icu4j": {
@@ -49653,7 +49991,8 @@
         "com.lmax:disruptor": {
             "locked": "3.0.1",
             "transitive": [
-                "com.thinkaurelius.thrift:thrift-server"
+                "com.thinkaurelius.thrift:thrift-server",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.mchange:c3p0": {
@@ -49669,6 +50008,20 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
+            "locked": "1.38",
+            "requested": "latest.release",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-recipes",
+                "com.netflix.aeneas:aeneas-test"
+            ]
+        },
+        "com.netflix.aeneas:aeneas-recipes": {
+            "locked": "1.27",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-test"
+            ]
+        },
+        "com.netflix.aeneas:aeneas-test": {
             "locked": "1.38",
             "requested": "latest.release"
         },
@@ -50253,7 +50606,10 @@
         },
         "com.netflix.runtime:runtime-lifecycle": {
             "locked": "1.31",
-            "requested": "latest.release"
+            "requested": "latest.release",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-test"
+            ]
         },
         "com.netflix.servo:servo-apache": {
             "locked": "0.12.12",
@@ -50481,6 +50837,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded",
                 "org.elasticsearch:elasticsearch"
             ]
         },
@@ -50613,7 +50970,8 @@
         "com.thinkaurelius.thrift:thrift-server": {
             "locked": "0.3.7",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "com.thoughtworks.xstream:xstream": {
@@ -50659,6 +51017,7 @@
             "transitive": [
                 "netflix:nfastyanax",
                 "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded",
                 "org.elasticsearch:elasticsearch"
             ]
         },
@@ -50676,7 +51035,8 @@
                 "netflix:platform-core",
                 "netflix:platform-ipc",
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.httpcomponents:httpclient"
+                "org.apache.httpcomponents:httpclient",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "commons-collections:commons-collections": {
@@ -50837,7 +51197,8 @@
             "locked": "3.1.2",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
-                "com.netflix.aeneas:aeneas-core"
+                "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test"
             ]
         },
         "io.netty:netty": {
@@ -50886,6 +51247,7 @@
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.iep-shadow:iepshadow-rxnetty"
             ]
         },
@@ -50920,6 +51282,13 @@
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc"
+            ]
+        },
+        "it.unimi.dsi:fastutil": {
+            "locked": "6.5.7",
+            "transitive": [
+                "com.clearspring.analytics:stream",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "javax.activation:activation": {
@@ -51017,7 +51386,8 @@
             "locked": "1.0",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.zookeeper:zookeeper"
+                "org.apache.zookeeper:zookeeper",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "joda-time:joda-time": {
@@ -51041,10 +51411,12 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.10",
+            "locked": "4.11",
+            "requested": "4.11",
             "transitive": [
                 "com.googlecode.json-simple:json-simple",
-                "com.thinkaurelius.thrift:thrift-server"
+                "com.thinkaurelius.thrift:thrift-server",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "log4j:log4j": {
@@ -51082,6 +51454,12 @@
                 "netflix:streaming-utilities-testing"
             ]
         },
+        "net.java.dev.jna:jna": {
+            "locked": "4.0.0",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
+            ]
+        },
         "net.jcip:jcip-annotations": {
             "locked": "1.0",
             "transitive": [
@@ -51092,11 +51470,13 @@
             "locked": "1.3.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:vms-utils",
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.kafka:kafka-clients"
+                "org.apache.kafka:kafka-clients",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "net.sf.ezmorph:ezmorph": {
@@ -51124,7 +51504,8 @@
         "net.sf.supercsv:super-csv": {
             "locked": "2.1.0",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "netflix:adminresources": {
@@ -51504,6 +51885,7 @@
             "locked": "4.1.6",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test",
                 "netflix:adminresources",
                 "netflix:akmsclient",
                 "netflix:concurrent",
@@ -51903,7 +52285,8 @@
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.cassandra:cassandra-thrift"
+                "org.apache.cassandra:cassandra-thrift",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "org.apache.commons:commons-math": {
@@ -51913,6 +52296,12 @@
                 "netflix:nf-eventbus",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
+            ]
+        },
+        "org.apache.commons:commons-math3": {
+            "locked": "3.2",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "org.apache.commons:commons-pool2": {
@@ -52092,7 +52481,8 @@
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:nfastyanax",
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.cassandra:cassandra-thrift"
+                "org.apache.cassandra:cassandra-thrift",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "org.apache.velocity:velocity": {
@@ -52113,6 +52503,10 @@
                 "netflix:platform-core"
             ]
         },
+        "org.assertj:assertj-core": {
+            "locked": "3.3.0",
+            "requested": "3.3.0"
+        },
         "org.bouncycastle:bcmail-jdk16": {
             "locked": "1.46",
             "transitive": [
@@ -52132,6 +52526,12 @@
                 "netflix:crypto-common-util",
                 "org.bouncycastle:bcmail-jdk16",
                 "org.bouncycastle:bcpg-jdk16"
+            ]
+        },
+        "org.cassandraunit:cassandra-unit-shaded": {
+            "locked": "2.1.9.2",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-test"
             ]
         },
         "org.codehaus.jackson:jackson-core-asl": {
@@ -52219,14 +52619,15 @@
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
+                "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-server"
             ]
         },
@@ -52237,7 +52638,8 @@
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
+            "requested": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-security"
             ]
@@ -52247,7 +52649,7 @@
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.2.v20170220",
             "transitive": [
                 "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-io"
@@ -52274,9 +52676,18 @@
             ]
         },
         "org.hamcrest:hamcrest-core": {
-            "locked": "1.1",
+            "locked": "1.3",
             "transitive": [
+                "junit:junit",
+                "org.cassandraunit:cassandra-unit-shaded",
+                "org.hamcrest:hamcrest-library",
                 "org.mockito:mockito-core"
+            ]
+        },
+        "org.hamcrest:hamcrest-library": {
+            "locked": "1.3",
+            "transitive": [
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "org.hdrhistogram:HdrHistogram": {
@@ -52322,8 +52733,13 @@
         "org.mindrot:jbcrypt": {
             "locked": "0.3m",
             "transitive": [
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
+        },
+        "org.mockito:mockito-all": {
+            "project": true,
+            "requested": "1.3"
         },
         "org.mockito:mockito-core": {
             "locked": "1.10.19",
@@ -52482,6 +52898,7 @@
                 "org.apache.kafka:kafka-clients",
                 "org.apache.thrift:libthrift",
                 "org.apache.zookeeper:zookeeper",
+                "org.cassandraunit:cassandra-unit-shaded",
                 "org.slf4j:slf4j-log4j12"
             ]
         },
@@ -52497,11 +52914,13 @@
             "locked": "1.1.1.7",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
+                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
                 "netflix:hermes",
                 "org.apache.cassandra:cassandra-all",
-                "org.apache.kafka:kafka-clients"
+                "org.apache.kafka:kafka-clients",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "org.yaml:snakeyaml": {
@@ -52509,7 +52928,8 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
-                "org.apache.cassandra:cassandra-all"
+                "org.apache.cassandra:cassandra-all",
+                "org.cassandraunit:cassandra-unit-shaded"
             ]
         },
         "redis.clients:jedis": {
