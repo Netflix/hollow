@@ -8,6 +8,7 @@ subprojects {
     apply plugin: 'nebula.dependency-lock'
     apply plugin: 'netflix.jacoco'
     apply plugin: 'netflix.findbugs'
+    apply plugin: 'nebula.facet'
 
     group = "com.netflix.vms.transformer"
 

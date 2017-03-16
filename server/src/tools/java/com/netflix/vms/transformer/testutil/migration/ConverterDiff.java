@@ -23,21 +23,22 @@ import net.jpountz.lz4.LZ4BlockOutputStream;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 
 public class ConverterDiff {
     private static final String LOCAL_BLOB_STORE = "/space/local-blob-store";
     private static final int TARGET_NUMBER_OF_TOPNODES = 1000;
-    private static final boolean REUSE_SLICE_FILES = true;
+
+    private static HollowDiffUIServer server;
+    private static boolean reuseSliceFiles;
 
     private Environment env;
     private DataSlicer.SliceTask slicer;
-    private static HollowDiffUIServer server;
 
     @BeforeClass
     public static void createServer() throws Exception {
+        reuseSliceFiles = true;
         server = new HollowDiffUIServer(8080);
         server.start();
     }
@@ -54,34 +55,17 @@ public class ConverterDiff {
     }
 
     @Test
-    @Ignore
-    public void self() throws Exception {
-        String name = "self";
-        HollowReadStateEngine from = slice(name, "muon_ami_16524801_v015", 20161017213128210L);
-        server.addDiff(name, createDiff(from, from));
-    }
+    public void pr61_converterCodeCleanup() throws Exception {
+        String name = "pr61";
+        HollowReadStateEngine from = slice(name, "muon", 20170315214609500L);
+        HollowReadStateEngine to = slice(name, "pr61", 20170315215144811L);
 
-    @Test
-    @Ignore
-    public void chain() throws Exception {
-        String name = "chain";
-        HollowReadStateEngine from = slice(name, "muon_ami_16524801_v015", 20161020174756408L);
-        HollowReadStateEngine to = slice(name, "muon", 20161020190459781L);
-
-        server.addDiff(name, createDiff(from, to));
-    }
-
-    @Test
-    public void peakBitrate() throws Exception {
-        String name = "bitrate";
-        HollowReadStateEngine from = slice(name, "muon_ami_16524801_v015", 20170110010155816L);
-        HollowReadStateEngine to = slice(name, "pr46", 20170110010157830L);
         server.addDiff(name, createDiff(from, to));
     }
 
     private HollowReadStateEngine slice(String diff, String converterVip, long version) throws IOException {
         File sliceFile = env.localBlobStore().resolve(format("vms.%s-%s_sliced-%d", converterVip, diff, version)).toFile();
-        if(sliceFile.exists() && !REUSE_SLICE_FILES) sliceFile.delete();
+        if(sliceFile.exists() && !reuseSliceFiles) sliceFile.delete();
         if(!sliceFile.exists()) {
             VMSInputDataClient client = new VMSInputDataClient(env.proxyURL(), env.localBlobStore().toString(), converterVip);
             client.triggerRefreshTo(version);
@@ -114,6 +98,7 @@ public class ConverterDiff {
         diff.addTypeDiff("ArtWorkImageType", "imageType.value");
         diff.addTypeDiff("ArtworkRecipe", "recipeName.value");
         diff.addTypeDiff("AssetMetaDatas", "assetId.value");
+        diff.addTypeDiff("Asset", "assetId.value");
         diff.addTypeDiff("Awards", "awardId");
         diff.addTypeDiff("CacheDeploymentIntent", "streamProfileId", "isoCountryCode.value", "bitrateKBPS");
         diff.addTypeDiff("Categories", "categoryId");
