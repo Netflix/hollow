@@ -120,6 +120,9 @@ public class FixedLengthElementArray extends SegmentedLongArray {
     }
 
     public void copyBits(FixedLengthElementArray copyFrom, long sourceStartBit, long destStartBit, long numBits) {
+        if(numBits == 0)
+            return;
+        
         if ((destStartBit & 63) != 0) {
             int fillBits = (int)Math.min(64 - (destStartBit & 63), numBits);
             long fillValue = copyFrom.getLargeElementValue(sourceStartBit, fillBits);

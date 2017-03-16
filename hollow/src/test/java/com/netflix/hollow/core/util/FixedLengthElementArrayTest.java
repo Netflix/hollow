@@ -163,6 +163,13 @@ public class FixedLengthElementArrayTest {
             } catch(ArrayIndexOutOfBoundsException acceptable) { }
         }
     }
+    
+    @Test
+    public void testArrayIndexOutOfBoundsEdgeCase() {
+        FixedLengthElementArray arr = new FixedLengthElementArray(new WastefulRecycler(2, 2), 256);
+        
+        arr.copyBits(arr, 256, 10, 0);
+    }
 
     @Test
     public void convenienceMethodForNumberOfBitsRequiredForValue() {
