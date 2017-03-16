@@ -45,7 +45,7 @@ final class JettyBasedUIServer implements UIServer {
         server.join();
     }
 
-    static final class Factory implements UIServer.Factory {
+    public static final class Factory implements UIServer.Factory {
         @Override
         public UIServer newServer(int port) {
             return new JettyBasedUIServer(port);
