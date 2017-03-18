@@ -80,10 +80,9 @@ public class HollowDiffFieldCountingNode extends HollowDiffCountingNode {
     }
 
     @Override
-    public void traverseDiffs(IntList fromOrdinals, IntList toOrdinals) {
+    public int traverseDiffs(IntList fromOrdinals, IntList toOrdinals) {
         if(fromFieldIndex == -1 || toFieldIndex == -1) {
-            traverseMissingFields(fromOrdinals, toOrdinals);
-            return;
+            return traverseMissingFields(fromOrdinals, toOrdinals);
         }
 
         clearHashTable();
@@ -104,14 +103,23 @@ public class HollowDiffFieldCountingNode extends HollowDiffCountingNode {
         if(score != 0) {
             fieldDiff.addDiff(currentTopLevelFromOrdinal, currentTopLevelToOrdinal, score);
         }
+        
+        return score;
     }
 
     @Override
-    public void traverseMissingFields(IntList fromOrdinals, IntList toOrdinals) {
-        if(fromFieldIndex == -1)
+    public int traverseMissingFields(IntList fromOrdinals, IntList toOrdinals) {
+        if(fromFieldIndex == -1) {
             fieldDiff.addDiff(currentTopLevelFromOrdinal, currentTopLevelToOrdinal, toOrdinals.size());
-        else if(toFieldIndex == -1)
+            return toOrdinals.size();
+        }
+        
+        if(toFieldIndex == -1) {
             fieldDiff.addDiff(currentTopLevelFromOrdinal, currentTopLevelToOrdinal, fromOrdinals.size());
+            return fromOrdinals.size();
+        }
+        
+        return 0;
     }
 
     private void clearHashTable() {

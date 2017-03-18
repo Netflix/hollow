@@ -94,6 +94,16 @@ public class HollowDiffMatcher {
             unmatchedFromOrdinal = fromUnmatchedOrdinals.nextSetBit(unmatchedFromOrdinal + 1);
         }
     }
+    
+    public int getMatchedFromOrdinal(int toOrdinal) {
+        Object[] key = toIdx.getRecordKey(toOrdinal);
+        return fromIdx.getMatchingOrdinal(key);
+    }
+    
+    public int getMatchedToOrdinal(int fromOrdinal) {
+        Object[] key = fromIdx.getRecordKey(fromOrdinal);
+        return toIdx.getMatchingOrdinal(key);
+    }
 
     public LongList getMatchedOrdinals() {
         return matchedOrdinals;

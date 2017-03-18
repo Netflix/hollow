@@ -72,22 +72,26 @@ public class HollowDiffCollectionCountingNode extends HollowDiffCountingNode {
     private final IntList traversalToOrdinals = new IntList();
 
     @Override
-    public void traverseDiffs(IntList fromOrdinals, IntList toOrdinals) {
+    public int traverseDiffs(IntList fromOrdinals, IntList toOrdinals) {
         fillTraversalLists(fromOrdinals, toOrdinals);
 
         referenceFilter.filter(traversalFromOrdinals, traversalToOrdinals);
+        
+        int score = 0;
 
         if(referenceFilter.getUnmatchedFromOrdinals().size() != 0 || referenceFilter.getUnmatchedToOrdinals().size() != 0)
-            elementNode.traverseDiffs(referenceFilter.getUnmatchedFromOrdinals(), referenceFilter.getUnmatchedToOrdinals());
+            score += elementNode.traverseDiffs(referenceFilter.getUnmatchedFromOrdinals(), referenceFilter.getUnmatchedToOrdinals());
         if(requiresTraversalForMissingFields)
             if(referenceFilter.getMatchedFromOrdinals().size() != 0 || referenceFilter.getMatchedToOrdinals().size() != 0)
-                elementNode.traverseMissingFields(referenceFilter.getMatchedFromOrdinals(), referenceFilter.getMatchedToOrdinals());
+                score += elementNode.traverseMissingFields(referenceFilter.getMatchedFromOrdinals(), referenceFilter.getMatchedToOrdinals());
+        
+        return score;
     }
 
     @Override
-    public void traverseMissingFields(IntList fromOrdinals, IntList toOrdinals) {
+    public int traverseMissingFields(IntList fromOrdinals, IntList toOrdinals) {
         fillTraversalLists(fromOrdinals, toOrdinals);
-        elementNode.traverseMissingFields(traversalFromOrdinals, traversalToOrdinals);
+        return elementNode.traverseMissingFields(traversalFromOrdinals, traversalToOrdinals);
     }
 
     private void fillTraversalLists(IntList fromOrdinals, IntList toOrdinals) {

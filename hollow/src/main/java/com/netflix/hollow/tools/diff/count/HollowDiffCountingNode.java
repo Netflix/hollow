@@ -19,9 +19,6 @@ package com.netflix.hollow.tools.diff.count;
 
 import com.netflix.hollow.core.util.IntList;
 
-import com.netflix.hollow.core.schema.HollowCollectionSchema;
-import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
 import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
@@ -52,8 +49,8 @@ public abstract class HollowDiffCountingNode {
 
     public abstract void prepare(int topLevelFromOrdinal, int topLevelToOrdinal);
 
-    public abstract void traverseDiffs(IntList fromOrdinals, IntList toOrdinals);
-    public abstract void traverseMissingFields(IntList fromOrdinals, IntList toOrdinals);
+    public abstract int traverseDiffs(IntList fromOrdinals, IntList toOrdinals);
+    public abstract int traverseMissingFields(IntList fromOrdinals, IntList toOrdinals);
 
     public abstract List<HollowFieldDiff> getFieldDiffs();
 
@@ -65,12 +62,13 @@ public abstract class HollowDiffCountingNode {
 
         HollowDiffNodeIdentifier childNodeId = new HollowDiffNodeIdentifier(this.nodeId, viaFieldName, elementSchema.getName());
 
-
-        if(elementSchema instanceof HollowObjectSchema) {
+        switch(elementSchema.getSchemaType()) {
+        case OBJECT:
             return new HollowDiffObjectCountingNode(equalityMapping, childNodeId, (HollowObjectTypeReadState)refFromState, (HollowObjectTypeReadState)refToState);
-        } else if(elementSchema instanceof HollowCollectionSchema) {
+        case LIST:
+        case SET:
             return new HollowDiffCollectionCountingNode(equalityMapping, childNodeId, (HollowCollectionTypeReadState)refFromState, (HollowCollectionTypeReadState)refToState);
-        } else if(elementSchema instanceof HollowMapSchema) {
+        case MAP:
             return new HollowDiffMapCountingNode(equalityMapping, childNodeId, (HollowMapTypeReadState)refFromState, (HollowMapTypeReadState)refToState);
         }
 
