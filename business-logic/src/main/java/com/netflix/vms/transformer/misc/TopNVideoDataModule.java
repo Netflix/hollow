@@ -33,10 +33,17 @@ public class TopNVideoDataModule extends AbstractTransformModule{
             TopNAttributesSetHollow attributes = topN._getAttributes();
             int videoId = (int) topN._getVideoId();
             for(TopNAttributeHollow topNAttribute : attributes) {
-                String countryId = topNAttribute._getCountry()._getValue();
-                TopNVideoData topNVideoData = getOrAddTopNVideoData(topNVideoDataMap, topNAttribute, countryId);
-                float viewShare = java.lang.Float.parseFloat(topNAttribute._getViewShare()._getValue());
-                topNVideoData.videoViewHrs1Day.put(new Integer(videoId), new Float(viewShare));
+                try {
+                    String countryId = topNAttribute._getCountry()._getValue();
+                    TopNVideoData topNVideoData = getOrAddTopNVideoData(topNVideoDataMap, topNAttribute, countryId);
+                    float viewShare = java.lang.Float.parseFloat(topNAttribute._getViewShare()._getValue());
+                    topNVideoData.videoViewHrs1Day.put(new Integer(videoId), new Float(viewShare));
+                } catch(Exception ex) {
+                    throw new RuntimeException("Faile to process videoId=" + videoId
+                            + ", country=" + topNAttribute._getCountry()._getValue()
+                            + ", countryViewShare[" + topNAttribute._getCountryViewHrs()._getValue() + "]"
+                            + ", viewShare[" + topNAttribute._getViewShare()._getValue() + "]", ex);
+                }
             }
         }
 
