@@ -18,9 +18,8 @@
 package com.netflix.hollow.tools.diff.count;
 
 import com.netflix.hollow.core.util.IntList;
-
+import com.netflix.hollow.tools.diff.HollowDiff;
 import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
-import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,8 +34,8 @@ public class HollowDiffMissingCountingNode extends HollowDiffCountingNode {
 
     public static final HollowDiffMissingCountingNode INSTANCE = new HollowDiffMissingCountingNode(null, null);
 
-    public HollowDiffMissingCountingNode(DiffEqualityMapping equalityMapping, HollowDiffNodeIdentifier nodeId) {
-        super(equalityMapping, nodeId);
+    public HollowDiffMissingCountingNode(HollowDiff diff, HollowDiffNodeIdentifier nodeId) {
+        super(diff, nodeId);
     }
 
     @Override

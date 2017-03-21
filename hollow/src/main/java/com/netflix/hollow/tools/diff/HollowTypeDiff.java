@@ -201,7 +201,7 @@ public class HollowTypeDiff {
                 public void run() {
                     try {
                         DiffEqualityMapping equalityMapping = rootDiff.getEqualityMapping();
-                        HollowDiffCountingNode rootNode = new HollowDiffObjectCountingNode(equalityMapping, rootId, from, to);
+                        HollowDiffCountingNode rootNode = new HollowDiffObjectCountingNode(rootDiff, rootId, from, to);
 
                         DiffEqualOrdinalMap rootNodeOrdinalMap = equalityMapping.getEqualOrdinalMap(type);
                         boolean requiresMissingFieldTraversal = equalityMapping.requiresMissingFieldTraversal(type);

@@ -17,14 +17,13 @@
  */
 package com.netflix.hollow.tools.diff.count;
 
-import com.netflix.hollow.core.util.IntList;
-
-import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
-import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalFilter;
-import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
+import com.netflix.hollow.core.util.IntList;
+import com.netflix.hollow.tools.diff.HollowDiff;
+import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
+import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalFilter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,8 +46,8 @@ public class HollowDiffMapCountingNode extends HollowDiffCountingNode {
     private final boolean keyRequiresTraversalForMissingFields;
     private final boolean valueRequiresTraversalForMissingFields;
 
-    public HollowDiffMapCountingNode(DiffEqualityMapping equalityMapping, HollowDiffNodeIdentifier nodeId, HollowMapTypeReadState fromState, HollowMapTypeReadState toState) {
-        super(equalityMapping, nodeId);
+    public HollowDiffMapCountingNode(HollowDiff diff, HollowDiffNodeIdentifier nodeId, HollowMapTypeReadState fromState, HollowMapTypeReadState toState) {
+        super(diff, nodeId);
         this.fromState = fromState;
         this.toState = toState;
 

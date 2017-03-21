@@ -17,15 +17,14 @@
  */
 package com.netflix.hollow.tools.diff.count;
 
-import com.netflix.hollow.core.util.IntList;
-
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
-import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalFilter;
-import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.util.IntList;
+import com.netflix.hollow.tools.diff.HollowDiff;
+import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
+import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalFilter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,8 +49,8 @@ public class HollowDiffObjectCountingNode extends HollowDiffCountingNode {
     private final boolean fieldRequiresMissingFieldTraversal[];
     private final DiffEqualOrdinalFilter fieldEqualOrdinalFilters[];
 
-    public HollowDiffObjectCountingNode(DiffEqualityMapping equalityMapping, HollowDiffNodeIdentifier nodeId, HollowObjectTypeReadState fromState, HollowObjectTypeReadState toState) {
-        super(equalityMapping, nodeId);
+    public HollowDiffObjectCountingNode(HollowDiff diff, HollowDiffNodeIdentifier nodeId, HollowObjectTypeReadState fromState, HollowObjectTypeReadState toState) {
+        super(diff, nodeId);
         this.fromState = fromState;
         this.toState = toState;
         this.fromSchema = fromState == null ? emptySchema(toState.getSchema()) : fromState.getSchema();
@@ -79,7 +78,7 @@ public class HollowDiffObjectCountingNode extends HollowDiffCountingNode {
             } else {
                 HollowDiffNodeIdentifier childNodeId = new HollowDiffNodeIdentifier(nodeId, unionSchema.getFieldName(i), unionSchema.getFieldType(i).toString());
 
-                fieldNodes[i] = new HollowDiffFieldCountingNode(equalityMapping, childNodeId, fromState, toState, unionSchema, i);
+                fieldNodes[i] = new HollowDiffFieldCountingNode(diff, childNodeId, fromState, toState, unionSchema, i);
             }
         }
     }

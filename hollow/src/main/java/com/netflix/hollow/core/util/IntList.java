@@ -65,6 +65,10 @@ public class IntList {
     public void sort() {
         Arrays.sort(values, 0, size);
     }
+    
+    public int binarySearch(int value) {
+        return Arrays.binarySearch(values, 0, size, value);
+    }
 
     public void expandTo(int size) {
         if(values.length < size)
