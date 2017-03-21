@@ -303,7 +303,7 @@
             ]
         },
         "com.netflix.spectator:spectator-api": {
-            "locked": "0.44.0",
+            "locked": "0.52.0",
             "transitive": [
                 "netflix:nimble-int-java"
             ]
@@ -605,7 +605,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary",
@@ -613,7 +613,7 @@
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.41",
+            "locked": "1.42",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -635,25 +635,25 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:nflibrary"
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.1",
+            "locked": "0.5.11",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:server-context": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -857,7 +857,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.24",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -887,7 +887,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.24",
+            "locked": "1.7.25",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
             ]
@@ -1230,7 +1230,7 @@
             ]
         },
         "com.netflix.spectator:spectator-api": {
-            "locked": "0.44.0",
+            "locked": "0.52.0",
             "transitive": [
                 "netflix:nimble-int-java"
             ]
@@ -1532,7 +1532,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary",
@@ -1540,7 +1540,7 @@
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.41",
+            "locked": "1.42",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -1562,25 +1562,25 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:nflibrary"
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.1",
+            "locked": "0.5.11",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:server-context": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -1784,7 +1784,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.24",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -1814,7 +1814,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.24",
+            "locked": "1.7.25",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
             ]
@@ -2157,7 +2157,7 @@
             ]
         },
         "com.netflix.spectator:spectator-api": {
-            "locked": "0.44.0",
+            "locked": "0.52.0",
             "transitive": [
                 "netflix:nimble-int-java"
             ]
@@ -2459,7 +2459,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary",
@@ -2467,7 +2467,7 @@
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.41",
+            "locked": "1.42",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -2489,25 +2489,25 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:nflibrary"
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.1",
+            "locked": "0.5.11",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:server-context": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -2711,7 +2711,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.24",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -2741,7 +2741,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.24",
+            "locked": "1.7.25",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
             ]
@@ -3084,7 +3084,7 @@
             ]
         },
         "com.netflix.spectator:spectator-api": {
-            "locked": "0.44.0",
+            "locked": "0.52.0",
             "transitive": [
                 "netflix:nimble-int-java"
             ]
@@ -3386,7 +3386,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary",
@@ -3394,7 +3394,7 @@
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.41",
+            "locked": "1.42",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -3416,25 +3416,25 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:nflibrary"
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.1",
+            "locked": "0.5.11",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:server-context": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -3638,7 +3638,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.24",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -3668,7 +3668,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.24",
+            "locked": "1.7.25",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
             ]
@@ -4110,7 +4110,7 @@
             ]
         },
         "com.netflix.spectator:spectator-api": {
-            "locked": "0.44.0",
+            "locked": "0.52.0",
             "transitive": [
                 "netflix:nimble-int-java"
             ]
@@ -4412,7 +4412,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary",
@@ -4420,7 +4420,7 @@
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.41",
+            "locked": "1.42",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -4442,25 +4442,25 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:nflibrary"
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.1",
+            "locked": "0.5.11",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:server-context": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -4664,7 +4664,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.24",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -4694,7 +4694,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.24",
+            "locked": "1.7.25",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
             ]
@@ -5039,7 +5039,7 @@
             ]
         },
         "com.netflix.spectator:spectator-api": {
-            "locked": "0.44.0",
+            "locked": "0.52.0",
             "transitive": [
                 "netflix:nimble-int-java"
             ]
@@ -5348,7 +5348,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary",
@@ -5356,7 +5356,7 @@
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.41",
+            "locked": "1.42",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -5378,25 +5378,25 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:nflibrary"
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.1",
+            "locked": "0.5.11",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:server-context": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -5615,7 +5615,7 @@
             "requested": "0.9.9-RC2"
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.24",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -5645,7 +5645,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.24",
+            "locked": "1.7.25",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
             ]
@@ -5996,7 +5996,7 @@
             ]
         },
         "com.netflix.spectator:spectator-api": {
-            "locked": "0.44.0",
+            "locked": "0.52.0",
             "transitive": [
                 "netflix:nimble-int-java"
             ]
@@ -6305,7 +6305,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary",
@@ -6313,7 +6313,7 @@
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.41",
+            "locked": "1.42",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -6335,25 +6335,25 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:nflibrary"
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.1",
+            "locked": "0.5.11",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:server-context": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -6572,7 +6572,7 @@
             "requested": "0.9.9-RC2"
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.24",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -6602,7 +6602,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.24",
+            "locked": "1.7.25",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
             ]
@@ -6953,7 +6953,7 @@
             ]
         },
         "com.netflix.spectator:spectator-api": {
-            "locked": "0.44.0",
+            "locked": "0.52.0",
             "transitive": [
                 "netflix:nimble-int-java"
             ]
@@ -7262,7 +7262,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary",
@@ -7270,7 +7270,7 @@
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.41",
+            "locked": "1.42",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -7292,25 +7292,25 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:nflibrary"
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.1",
+            "locked": "0.5.11",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:server-context": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -7529,7 +7529,7 @@
             "requested": "0.9.9-RC2"
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.24",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -7559,7 +7559,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.24",
+            "locked": "1.7.25",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
             ]
@@ -7910,7 +7910,7 @@
             ]
         },
         "com.netflix.spectator:spectator-api": {
-            "locked": "0.44.0",
+            "locked": "0.52.0",
             "transitive": [
                 "netflix:nimble-int-java"
             ]
@@ -8219,7 +8219,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary",
@@ -8227,7 +8227,7 @@
             ]
         },
         "netflix:nf-eureka-client": {
-            "locked": "1.41",
+            "locked": "1.42",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -8249,25 +8249,25 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:nflibrary"
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.1",
+            "locked": "0.5.11",
             "transitive": [
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:server-context": {
-            "locked": "4.1.6",
+            "locked": "4.1.7",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -8486,7 +8486,7 @@
             "requested": "0.9.9-RC2"
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.24",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -8516,7 +8516,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.24",
+            "locked": "1.7.25",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
             ]
