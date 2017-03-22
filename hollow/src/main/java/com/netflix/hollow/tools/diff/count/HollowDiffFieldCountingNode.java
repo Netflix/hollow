@@ -20,6 +20,8 @@ package com.netflix.hollow.tools.diff.count;
 import static com.netflix.hollow.core.read.HollowReadFieldUtils.fieldHashCode;
 import static com.netflix.hollow.core.read.HollowReadFieldUtils.fieldsAreEqual;
 
+import com.netflix.hollow.tools.diff.HollowTypeDiff;
+
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.util.IntList;
@@ -57,8 +59,8 @@ public class HollowDiffFieldCountingNode extends HollowDiffCountingNode {
 
     private final HollowFieldDiff fieldDiff;
 
-    public HollowDiffFieldCountingNode(HollowDiff diff, HollowDiffNodeIdentifier nodeId, HollowObjectTypeReadState fromState, HollowObjectTypeReadState toState, HollowObjectSchema unionSchema, int unionFieldIndex) {
-        super(diff, nodeId);
+    public HollowDiffFieldCountingNode(HollowDiff diff, HollowTypeDiff topLevelTypeDiff, HollowDiffNodeIdentifier nodeId, HollowObjectTypeReadState fromState, HollowObjectTypeReadState toState, HollowObjectSchema unionSchema, int unionFieldIndex) {
+        super(diff, topLevelTypeDiff, nodeId);
         this.fromState = fromState;
         this.toState = toState;
         String fieldName = unionSchema.getFieldName(unionFieldIndex);

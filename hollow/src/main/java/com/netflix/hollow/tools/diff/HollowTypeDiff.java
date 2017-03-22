@@ -17,6 +17,9 @@
  */
 package com.netflix.hollow.tools.diff;
 
+import java.util.HashSet;
+
+import java.util.Set;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.util.LongList;
@@ -48,6 +51,8 @@ public class HollowTypeDiff {
     
     private final HollowDiffUnmatchedRecordFieldCounter unmatchedRecordFieldCounter;
     
+    private final Set<String> shortcutTypes;
+    
     private final int matchedDiffScoresByFromOrdinal[];
 
     HollowTypeDiff(HollowDiff rootDiff, String type, String... matchPaths) {
@@ -58,6 +63,7 @@ public class HollowTypeDiff {
         this.matcher = new HollowDiffMatcher(this.from, this.to);
         this.matchedDiffScoresByFromOrdinal = new int[from.maxOrdinal()+1];
         this.unmatchedRecordFieldCounter = new HollowDiffUnmatchedRecordFieldCounter(rootDiff, from, to);
+        this.shortcutTypes = new HashSet<String>();
         
         for(String matchPath : matchPaths) {
             addMatchPath(matchPath);
@@ -77,6 +83,26 @@ public class HollowTypeDiff {
      */
     public void addMatchPath(String path) {
         matcher.addMatchPath(path);
+    }
+    
+    /**
+     * Shortcut the diff detail when encountering a specific type.  This can be done to improve the performance
+     * of diff calculation -- at the expense of some detail.
+     * 
+     * @param type
+     */
+    public void addShortcutType(String type) {
+        shortcutTypes.add(type);
+    }
+    
+    /**
+     * Returns whether or not this type diff will shortcut at the specified type.
+     * 
+     * @param type
+     * @return
+     */
+    public boolean isShortcutType(String type) {
+        return shortcutTypes.contains(type);
     }
 
     /**
@@ -181,7 +207,7 @@ public class HollowTypeDiff {
                 public void run() {
                     try {
                         DiffEqualityMapping equalityMapping = rootDiff.getEqualityMapping();
-                        HollowDiffCountingNode rootNode = new HollowDiffObjectCountingNode(rootDiff, rootId, from, to);
+                        HollowDiffCountingNode rootNode = new HollowDiffObjectCountingNode(rootDiff, HollowTypeDiff.this, rootId, from, to);
 
                         DiffEqualOrdinalMap rootNodeOrdinalMap = equalityMapping.getEqualOrdinalMap(type);
                         boolean requiresMissingFieldTraversal = equalityMapping.requiresMissingFieldTraversal(type);

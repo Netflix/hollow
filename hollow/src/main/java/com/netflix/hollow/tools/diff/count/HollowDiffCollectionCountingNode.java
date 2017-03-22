@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.tools.diff.count;
 
+import com.netflix.hollow.tools.diff.HollowTypeDiff;
+
 import com.netflix.hollow.core.read.engine.HollowCollectionTypeReadState;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
@@ -42,8 +44,8 @@ public class HollowDiffCollectionCountingNode extends HollowDiffCountingNode {
     private final DiffEqualOrdinalFilter referenceFilter;
     private final boolean requiresTraversalForMissingFields;
 
-    public HollowDiffCollectionCountingNode(HollowDiff diff, HollowDiffNodeIdentifier nodeId, HollowCollectionTypeReadState fromState, HollowCollectionTypeReadState toState) {
-        super(diff, nodeId);
+    public HollowDiffCollectionCountingNode(HollowDiff diff, HollowTypeDiff topLevelTypeDiff, HollowDiffNodeIdentifier nodeId, HollowCollectionTypeReadState fromState, HollowCollectionTypeReadState toState) {
+        super(diff, topLevelTypeDiff, nodeId);
         this.fromState = fromState;
         this.toState = toState;
         HollowTypeReadState refFromState = fromState == null ? null : fromState.getSchema().getElementTypeState();

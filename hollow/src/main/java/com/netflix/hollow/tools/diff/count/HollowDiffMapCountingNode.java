@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.tools.diff.count;
 
+import com.netflix.hollow.tools.diff.HollowTypeDiff;
+
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
@@ -46,8 +48,8 @@ public class HollowDiffMapCountingNode extends HollowDiffCountingNode {
     private final boolean keyRequiresTraversalForMissingFields;
     private final boolean valueRequiresTraversalForMissingFields;
 
-    public HollowDiffMapCountingNode(HollowDiff diff, HollowDiffNodeIdentifier nodeId, HollowMapTypeReadState fromState, HollowMapTypeReadState toState) {
-        super(diff, nodeId);
+    public HollowDiffMapCountingNode(HollowDiff diff, HollowTypeDiff topLevelTypeDiff, HollowDiffNodeIdentifier nodeId, HollowMapTypeReadState fromState, HollowMapTypeReadState toState) {
+        super(diff, topLevelTypeDiff, nodeId);
         this.fromState = fromState;
         this.toState = toState;
 

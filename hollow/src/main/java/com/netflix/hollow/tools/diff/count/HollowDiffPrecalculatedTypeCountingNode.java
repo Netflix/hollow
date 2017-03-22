@@ -18,8 +18,8 @@ public class HollowDiffPrecalculatedTypeCountingNode extends HollowDiffCountingN
     private int currentTopLevelFromOrdinal;
     private int currentTopLevelToOrdinal;
     
-    public HollowDiffPrecalculatedTypeCountingNode(HollowDiff diff, HollowDiffNodeIdentifier nodeId, HollowTypeDiff precalculatedTypeDiff) {
-        super(diff, nodeId);
+    public HollowDiffPrecalculatedTypeCountingNode(HollowDiff diff, HollowTypeDiff topLevelTypeDiff, HollowDiffNodeIdentifier nodeId, HollowTypeDiff precalculatedTypeDiff) {
+        super(diff, topLevelTypeDiff, nodeId);
         
         this.precalculatedTypeDiff = precalculatedTypeDiff;
         this.matchedToOrdinalIndexes = new BitSet();

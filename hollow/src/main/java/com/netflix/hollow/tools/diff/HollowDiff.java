@@ -48,7 +48,7 @@ public class HollowDiff {
     private final DiffEqualityMapping equalityMapping;
 
     private final List<HollowTypeDiff> typeDiffs;
-
+    
     /**
      * Instantiate a HollowDiff.  By default, all OBJECT types with a defined PrimaryKey will be
      * configured to be diffed.
