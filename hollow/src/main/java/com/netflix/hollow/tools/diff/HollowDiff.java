@@ -183,6 +183,8 @@ public class HollowDiff {
         }
 
         executor.awaitUninterruptibly();
+        
+        equalityMapping.markPrepared();
     }
 
 }
