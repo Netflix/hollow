@@ -47,13 +47,13 @@ public class HollowDiffPrecalculatedTypeCountingNode extends HollowDiffCountingN
                 score += precalculatedTypeDiff.getMatchedRecordDiffScoreByFromOrdinal(fromOrdinals.get(i));
                 matchedToOrdinalIndexes.set(matchedToOrdinalIdx);
             } else {
-                score += precalculatedTypeDiff.getUnmatchedRecordDiffScoreByFromOrdinal(fromOrdinals.get(i));
+                score += precalculatedTypeDiff.getUnmatchedRecordFieldCounter().getUnmatchedFromRecordDiffScore(fromOrdinals.get(i));
             }
         }
         
         for(int i=0;i<toOrdinals.size();i++) {
             if(!matchedToOrdinalIndexes.get(i)) {
-                score += precalculatedTypeDiff.getUnmatchedRecordDiffScoreByToOrdinal(toOrdinals.get(i));
+                score += precalculatedTypeDiff.getUnmatchedRecordFieldCounter().getUnmatchedToRecordDiffScore(toOrdinals.get(i));
             }
         }
         
@@ -67,11 +67,11 @@ public class HollowDiffPrecalculatedTypeCountingNode extends HollowDiffCountingN
         int score = 0;
         
         for(int i=0;i<toOrdinals.size();i++) {
-            score += precalculatedTypeDiff.getUnmatchedRecordDiffScoreByToOrdinal(toOrdinals.get(i));
+            score += precalculatedTypeDiff.getUnmatchedRecordFieldCounter().getUnmatchedToRecordDiffScore(toOrdinals.get(i));
         }
         
         for(int i=0;i<fromOrdinals.size();i++) {
-            score += precalculatedTypeDiff.getUnmatchedRecordDiffScoreByFromOrdinal(fromOrdinals.get(i));
+            score += precalculatedTypeDiff.getUnmatchedRecordFieldCounter().getUnmatchedFromRecordDiffScore(fromOrdinals.get(i));
         }
         
         fieldDiff.addDiff(currentTopLevelFromOrdinal, currentTopLevelToOrdinal, score);

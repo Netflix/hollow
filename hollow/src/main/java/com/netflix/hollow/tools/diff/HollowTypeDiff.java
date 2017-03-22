@@ -27,7 +27,6 @@ import com.netflix.hollow.tools.diff.count.HollowFieldDiff;
 import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap;
 import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,13 +46,9 @@ public class HollowTypeDiff {
     private final String type;
     private List<HollowFieldDiff> calculatedFieldDiffs;
     
-    private final HollowDiffFieldCounter unmatchedFromFieldCounter;
-    private final HollowDiffFieldCounter unmatchedToFieldCounter;
+    private final HollowDiffUnmatchedRecordFieldCounter unmatchedRecordFieldCounter;
     
     private final int matchedDiffScoresByFromOrdinal[];
-    private final int unmatchedDiffScoresByFromOrdinal[];
-    private final int unmatchedDiffScoresByToOrdinal[];
-    
 
     HollowTypeDiff(HollowDiff rootDiff, String type, String... matchPaths) {
         this.rootDiff = rootDiff;
@@ -62,14 +57,7 @@ public class HollowTypeDiff {
         this.to = (HollowObjectTypeReadState) rootDiff.getToStateEngine().getTypeState(type);
         this.matcher = new HollowDiffMatcher(this.from, this.to);
         this.matchedDiffScoresByFromOrdinal = new int[from.maxOrdinal()+1];
-        this.unmatchedDiffScoresByFromOrdinal = new int[from.maxOrdinal()+1];
-        this.unmatchedDiffScoresByToOrdinal = new int[to.maxOrdinal()+1];
-        
-        this.unmatchedFromFieldCounter = new HollowDiffFieldCounter(rootDiff, true, from);
-        this.unmatchedToFieldCounter = new HollowDiffFieldCounter(rootDiff, false, to);
-        
-        Arrays.fill(unmatchedDiffScoresByFromOrdinal, -1);
-        Arrays.fill(unmatchedDiffScoresByToOrdinal, -1);
+        this.unmatchedRecordFieldCounter = new HollowDiffUnmatchedRecordFieldCounter(rootDiff, from, to);
         
         for(String matchPath : matchPaths) {
             addMatchPath(matchPath);
@@ -125,16 +113,8 @@ public class HollowTypeDiff {
         return matchedDiffScoresByFromOrdinal[fromOrdinal];
     }
     
-    public int getUnmatchedRecordDiffScoreByFromOrdinal(int fromOrdinal) {
-        if(unmatchedDiffScoresByFromOrdinal[fromOrdinal] == -1)
-            unmatchedDiffScoresByFromOrdinal[fromOrdinal] = unmatchedFromFieldCounter.countFields(fromOrdinal);
-        return unmatchedDiffScoresByFromOrdinal[fromOrdinal];
-    }
-    
-    public int getUnmatchedRecordDiffScoreByToOrdinal(int toOrdinal) {
-        if(unmatchedDiffScoresByToOrdinal[toOrdinal] == -1)
-            unmatchedDiffScoresByToOrdinal[toOrdinal] = unmatchedToFieldCounter.countFields(toOrdinal);
-        return unmatchedDiffScoresByToOrdinal[toOrdinal];
+    public HollowDiffUnmatchedRecordFieldCounter getUnmatchedRecordFieldCounter() {
+        return unmatchedRecordFieldCounter;
     }
     
     /**

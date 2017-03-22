@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.tools.diff;
 
+import java.util.Arrays;
+
 import com.netflix.hollow.core.read.engine.HollowCollectionTypeReadState;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
@@ -28,23 +30,41 @@ import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 
-public class HollowDiffFieldCounter {
+public class HollowDiffUnmatchedRecordFieldCounter {
     
     private final HollowDiff diff;
-    private final boolean isFrom;
-    private final HollowTypeReadState typeState;
-    
-    public HollowDiffFieldCounter(HollowDiff diff, boolean isFrom, HollowTypeReadState typeState) {
+    private final HollowTypeReadState fromState;
+    private final HollowTypeReadState toState;
+
+    private final int unmatchedDiffScoresByFromOrdinal[];
+    private final int unmatchedDiffScoresByToOrdinal[];
+
+    public HollowDiffUnmatchedRecordFieldCounter(HollowDiff diff, HollowTypeReadState fromState, HollowTypeReadState toState) {
         this.diff = diff;
-        this.isFrom = isFrom;
-        this.typeState = typeState;
+        this.fromState = fromState;
+        this.toState = toState;
+        this.unmatchedDiffScoresByFromOrdinal = new int[fromState.maxOrdinal()+1];
+        this.unmatchedDiffScoresByToOrdinal = new int[toState.maxOrdinal()+1];
+        
+        Arrays.fill(unmatchedDiffScoresByFromOrdinal, -1);
+        Arrays.fill(unmatchedDiffScoresByToOrdinal, -1);
     }
     
-    public int countFields(int ordinal) {
-        return countFields(diff, isFrom, typeState, ordinal);
+    
+    public int getUnmatchedFromRecordDiffScore(int fromOrdinal) {
+        if(unmatchedDiffScoresByFromOrdinal[fromOrdinal] == -1)
+            unmatchedDiffScoresByFromOrdinal[fromOrdinal] = countFields(true, fromState, fromOrdinal);
+        return unmatchedDiffScoresByFromOrdinal[fromOrdinal];
     }
     
-    private static int countFields(HollowDiff diff, boolean isFrom, HollowTypeReadState typeState, int ordinal) {
+    public int getUnmatchedToRecordDiffScore(int toOrdinal) {
+        if(unmatchedDiffScoresByToOrdinal[toOrdinal] == -1)
+            unmatchedDiffScoresByToOrdinal[toOrdinal] = countFields(false, toState, toOrdinal);
+        return unmatchedDiffScoresByToOrdinal[toOrdinal];
+    }
+    
+    
+    private int countFields(boolean isFrom, HollowTypeReadState typeState, int ordinal) {
         int score = 0;
         
         switch(typeState.getSchema().getSchemaType()) {
@@ -53,7 +73,7 @@ public class HollowDiffFieldCounter {
             
             for(int i=0;i<objectSchema.numFields();i++) {
                 if(objectSchema.getFieldType(i) == FieldType.REFERENCE)
-                    score += lookupOrCountFields(diff, isFrom, objectSchema.getReferencedTypeState(i), ((HollowObjectTypeReadState)typeState).readOrdinal(ordinal, i));
+                    score += lookupOrCountFields(isFrom, objectSchema.getReferencedTypeState(i), ((HollowObjectTypeReadState)typeState).readOrdinal(ordinal, i));
                 else
                     score++;
             }
@@ -69,7 +89,7 @@ public class HollowDiffFieldCounter {
             
             int elementOrdinal = elementIter.next();
             while(elementOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
-                score += lookupOrCountFields(diff, isFrom, elementTypeState, elementOrdinal);
+                score += lookupOrCountFields(isFrom, elementTypeState, elementOrdinal);
                 elementOrdinal = elementIter.next();
             }
             
@@ -83,8 +103,8 @@ public class HollowDiffFieldCounter {
             HollowMapEntryOrdinalIterator entryIter = ((HollowMapTypeReadState)typeState).ordinalIterator(ordinal);
             
             while(entryIter.next()) {
-                score += lookupOrCountFields(diff, isFrom, keyTypeState, entryIter.getKey());
-                score += lookupOrCountFields(diff, isFrom, valueTypeState, entryIter.getValue());
+                score += lookupOrCountFields(isFrom, keyTypeState, entryIter.getKey());
+                score += lookupOrCountFields(isFrom, valueTypeState, entryIter.getValue());
             }
             
             break;
@@ -93,17 +113,18 @@ public class HollowDiffFieldCounter {
         return score;
     }
     
-    private static int lookupOrCountFields(HollowDiff diff, boolean isFrom, HollowTypeReadState typeState, int ordinal) {
+    private int lookupOrCountFields(boolean isFrom, HollowTypeReadState typeState, int ordinal) {
         if(ordinal == -1)
             return 0;
         
         HollowTypeDiff typeDiff = diff.getTypeDiff(typeState.getSchema().getName());
         
         if(typeDiff != null) {
-            return isFrom ? typeDiff.getUnmatchedRecordDiffScoreByFromOrdinal(ordinal) : typeDiff.getUnmatchedRecordDiffScoreByToOrdinal(ordinal);
+            HollowDiffUnmatchedRecordFieldCounter unmatchedRecordFieldCounter = typeDiff.getUnmatchedRecordFieldCounter();
+            return isFrom ? unmatchedRecordFieldCounter.getUnmatchedFromRecordDiffScore(ordinal) : unmatchedRecordFieldCounter.getUnmatchedToRecordDiffScore(ordinal);
         }
         
-        return countFields(diff, isFrom, typeState, ordinal);
+        return countFields(isFrom, typeState, ordinal);
     }
 
 }
