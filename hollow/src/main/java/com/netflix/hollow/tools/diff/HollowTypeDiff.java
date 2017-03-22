@@ -49,20 +49,14 @@ public class HollowTypeDiff {
     private final String type;
     private List<HollowFieldDiff> calculatedFieldDiffs;
     
-    private final HollowDiffUnmatchedRecordFieldCounter unmatchedRecordFieldCounter;
-    
     private final Set<String> shortcutTypes;
     
-    private final int matchedDiffScoresByFromOrdinal[];
-
     HollowTypeDiff(HollowDiff rootDiff, String type, String... matchPaths) {
         this.rootDiff = rootDiff;
         this.type = type;
         this.from = (HollowObjectTypeReadState) rootDiff.getFromStateEngine().getTypeState(type);
         this.to = (HollowObjectTypeReadState) rootDiff.getToStateEngine().getTypeState(type);
         this.matcher = new HollowDiffMatcher(this.from, this.to);
-        this.matchedDiffScoresByFromOrdinal = new int[from.maxOrdinal()+1];
-        this.unmatchedRecordFieldCounter = new HollowDiffUnmatchedRecordFieldCounter(rootDiff, from, to);
         this.shortcutTypes = new HashSet<String>();
         
         for(String matchPath : matchPaths) {
@@ -133,14 +127,6 @@ public class HollowTypeDiff {
      */
     public IntList getUnmatchedOrdinalsInTo() {
         return matcher.getExtraInTo();
-    }
-    
-    public int getMatchedRecordDiffScoreByFromOrdinal(int fromOrdinal) {
-        return matchedDiffScoresByFromOrdinal[fromOrdinal];
-    }
-    
-    public HollowDiffUnmatchedRecordFieldCounter getUnmatchedRecordFieldCounter() {
-        return unmatchedRecordFieldCounter;
     }
     
     /**
@@ -220,12 +206,10 @@ public class HollowTypeDiff {
                             if(rootNodeOrdinalMap.getIdentityFromOrdinal(fromOrdinal) == -1
                                     || rootNodeOrdinalMap.getIdentityFromOrdinal(fromOrdinal) != rootNodeOrdinalMap.getIdentityToOrdinal(toOrdinal)) {
                                 rootNode.prepare(fromOrdinal, toOrdinal);
-                                int score = rootNode.traverseDiffs(fromIntList(fromOrdinal), toIntList(toOrdinal));
-                                matchedDiffScoresByFromOrdinal[fromOrdinal] = score;
+                                rootNode.traverseDiffs(fromIntList(fromOrdinal), toIntList(toOrdinal));
                             } else if(requiresMissingFieldTraversal) {
                                 rootNode.prepare(fromOrdinal, toOrdinal);
-                                int score = rootNode.traverseMissingFields(fromIntList(fromOrdinal), toIntList(toOrdinal));
-                                matchedDiffScoresByFromOrdinal[fromOrdinal] = score;
+                                rootNode.traverseMissingFields(fromIntList(fromOrdinal), toIntList(toOrdinal));
                             }
                         }
 

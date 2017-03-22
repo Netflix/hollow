@@ -72,10 +72,6 @@ public abstract class HollowDiffCountingNode {
         
         switch(elementSchema.getSchemaType()) {
         case OBJECT:
-            HollowTypeDiff precalculatedTypeDiff = diff.getTypeDiff(elementSchema.getName());
-            if(precalculatedTypeDiff != null)
-                return new HollowDiffPrecalculatedTypeCountingNode(diff, topLevelTypeDiff, childNodeId, precalculatedTypeDiff);
-            
             return new HollowDiffObjectCountingNode(diff, topLevelTypeDiff, childNodeId, (HollowObjectTypeReadState)refFromState, (HollowObjectTypeReadState)refToState);
         case LIST:
         case SET:
