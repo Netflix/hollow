@@ -1,11 +1,5 @@
 package com.netflix.vms.transformer.modules.artwork;
 
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.UnknownArtworkImageType;
-import com.netflix.vms.transformer.hollowoutput.ArtworkReExploreLongTimestamp;
-import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_IMAGE_FORMAT;
-import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_RECIPE;
-import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_TERRITORY_COUNTRIES;
-
 import com.google.common.collect.ComparisonChain;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
@@ -13,6 +7,8 @@ import com.netflix.hollow.core.write.objectmapper.NullablePrimitiveBoolean;
 import com.netflix.vms.transformer.ConversionUtils;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.ReexploreTags;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.UnknownArtworkImageType;
 import com.netflix.vms.transformer.hollowinput.ArtWorkImageTypeHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeHollow;
@@ -35,6 +31,7 @@ import com.netflix.vms.transformer.hollowoutput.ArtworkBasicPassthrough;
 import com.netflix.vms.transformer.hollowoutput.ArtworkCdn;
 import com.netflix.vms.transformer.hollowoutput.ArtworkDerivative;
 import com.netflix.vms.transformer.hollowoutput.ArtworkDerivatives;
+import com.netflix.vms.transformer.hollowoutput.ArtworkReExploreLongTimestamp;
 import com.netflix.vms.transformer.hollowoutput.ArtworkSourcePassthrough;
 import com.netflix.vms.transformer.hollowoutput.ArtworkSourceString;
 import com.netflix.vms.transformer.hollowoutput.Integer;
@@ -42,9 +39,15 @@ import com.netflix.vms.transformer.hollowoutput.PassthroughString;
 import com.netflix.vms.transformer.hollowoutput.PassthroughVideo;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.__passthrough_string;
+import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_IMAGE_FORMAT;
+import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_RECIPE;
+import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_TERRITORY_COUNTRIES;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
 import com.netflix.vms.transformer.util.NFLocaleUtil;
+import org.apache.commons.codec.digest.DigestUtils;
+
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -57,7 +60,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import org.apache.commons.codec.digest.DigestUtils;
 
 public abstract class ArtWorkModule extends AbstractTransformModule{
     protected final String entityType;
@@ -372,6 +374,12 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             long timestamp = Long.valueOf(keyValues.get("REEXPLORE_TIME"));
             passThrough.reExploreLongTimestamp = new ArtworkReExploreLongTimestamp(timestamp);
             setBasicPassThrough = true;
+            long timestamp36DaysBack = Instant.now().toEpochMilli() - (3600 * 24 * 36);
+            if (timestamp < timestamp36DaysBack) {
+                ctx.getLogger().warn(ReexploreTags, "found reexplore timestamp={} that is older than 36 days timestamp={}", timestamp, timestamp36DaysBack);
+            } else {
+                ctx.getLogger().warn(ReexploreTags, "Found reexplore timestamp={} for artwork={}", timestamp, desc.sourceFileId.toString());
+            }
         }
 
         ArtworkSourcePassthrough sourcePassThrough = new ArtworkSourcePassthrough();
