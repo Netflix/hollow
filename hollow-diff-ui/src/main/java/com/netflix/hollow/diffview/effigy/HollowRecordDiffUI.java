@@ -17,8 +17,13 @@
  */
 package com.netflix.hollow.diffview.effigy;
 
+import com.netflix.hollow.core.index.key.PrimaryKey;
+import java.util.Map;
 
-public interface CustomHollowEffigyFactoryProvider {
 
+public interface HollowRecordDiffUI {
+
+    public Map<String, PrimaryKey> getMatchHints();
+    
     public CustomHollowEffigyFactory getCustomHollowEffigyFactory(String typeName);
 }

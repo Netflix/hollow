@@ -17,12 +17,13 @@
  */
 package com.netflix.hollow.diffview.effigy.pairer;
 
+import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.diffview.effigy.HollowEffigy;
 
 public class HollowEffigyMapPairer extends HollowEffigyCollectionPairer {
 
-    public HollowEffigyMapPairer(HollowEffigy fromCollection, HollowEffigy toCollection, long deadlineBeforeLazyPairingTimeout) {
-        super(fromCollection, toCollection, deadlineBeforeLazyPairingTimeout);
+    public HollowEffigyMapPairer(HollowEffigy fromCollection, HollowEffigy toCollection, PrimaryKey matchHint, long deadlineBeforeLazyPairingTimeout) {
+        super(fromCollection, toCollection, matchHint, deadlineBeforeLazyPairingTimeout);
     }
 
     @Override

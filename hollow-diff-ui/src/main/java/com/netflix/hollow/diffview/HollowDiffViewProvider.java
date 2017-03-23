@@ -30,6 +30,7 @@ public class HollowDiffViewProvider implements HollowObjectViewProvider {
         this.diffUI = diffUI;
     }
 
+    @Override
     public HollowDiffView getObjectView(HttpServletRequest req, HollowDiffSession session) {
         String type = req.getParameter("type");
         int fromOrdinal = Integer.parseInt(req.getParameter("fromOrdinal"));

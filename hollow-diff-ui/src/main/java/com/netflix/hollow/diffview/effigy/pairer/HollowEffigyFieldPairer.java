@@ -17,10 +17,14 @@
  */
 package com.netflix.hollow.diffview.effigy.pairer;
 
+import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.schema.HollowCollectionSchema;
+import com.netflix.hollow.core.schema.HollowMapSchema;
+import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.diffview.effigy.HollowEffigy;
-import com.netflix.hollow.diffview.effigy.HollowEffigy.CollectionType;
 import com.netflix.hollow.diffview.effigy.HollowEffigy.Field;
 import java.util.List;
+import java.util.Map;
 
 public abstract class HollowEffigyFieldPairer {
 
@@ -81,15 +85,27 @@ public abstract class HollowEffigyFieldPairer {
         }
     }
 
-    public static List<EffigyFieldPair> pair(HollowEffigy from, HollowEffigy to, long deadlineBeforePairingTimeout) {
+    public static List<EffigyFieldPair> pair(HollowEffigy from, HollowEffigy to, Map<String, PrimaryKey> matchHints, long deadlineBeforePairingTimeout) {
         if(from == null || to == null)
             return new HollowEffigyNullPartnerPairer(from, to).pair();
 
-        if(from.getCollectionType() == CollectionType.NONE)
+        if(from.getDataAccess() == null)
             return new HollowEffigyObjectPairer(from, to).pair();
-        if(from.getCollectionType() == CollectionType.MAP)
-            return new HollowEffigyMapPairer(from, to, deadlineBeforePairingTimeout).pair();
-
-        return new HollowEffigyCollectionPairer(from, to, deadlineBeforePairingTimeout).pair();
+        
+        HollowSchema schema = from.getDataAccess().getSchema();
+        
+        switch(schema.getSchemaType()) {
+        case OBJECT:
+            return new HollowEffigyObjectPairer(from, to).pair();
+        case MAP:
+            String keyType = ((HollowMapSchema)schema).getKeyType();
+            return new HollowEffigyMapPairer(from, to, matchHints.get(keyType), deadlineBeforePairingTimeout).pair();
+        case LIST:
+        case SET:
+            String elementType = ((HollowCollectionSchema)schema).getElementType();
+            return new HollowEffigyCollectionPairer(from, to, matchHints.get(elementType), deadlineBeforePairingTimeout).pair();
+        }
+        
+        throw new IllegalArgumentException("I don't know how to pair fields for type " + schema.getName() + "(" + schema.getSchemaType() + ")");
     }
 }

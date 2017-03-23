@@ -19,6 +19,8 @@ package com.netflix.hollow.diff.ui;
 
 import static com.netflix.hollow.diff.ui.HollowDiffSession.getSession;
 
+import com.netflix.hollow.core.index.key.PrimaryKey;
+
 import com.netflix.hollow.diff.ui.pages.DiffFieldPage;
 import com.netflix.hollow.diff.ui.pages.DiffObjectPage;
 import com.netflix.hollow.diff.ui.pages.DiffOverviewPage;
@@ -28,7 +30,7 @@ import com.netflix.hollow.diffview.DiffViewOutputGenerator;
 import com.netflix.hollow.diffview.HollowDiffViewProvider;
 import com.netflix.hollow.diffview.HollowObjectViewProvider;
 import com.netflix.hollow.diffview.effigy.CustomHollowEffigyFactory;
-import com.netflix.hollow.diffview.effigy.CustomHollowEffigyFactoryProvider;
+import com.netflix.hollow.diffview.effigy.HollowRecordDiffUI;
 import com.netflix.hollow.tools.diff.HollowDiff;
 import java.io.IOException;
 import java.util.HashMap;
@@ -37,7 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.velocity.app.VelocityEngine;
 
-public class HollowDiffUI implements CustomHollowEffigyFactoryProvider {
+public class HollowDiffUI implements HollowRecordDiffUI {
 
     private final String baseURLPath;
     private final String diffUIPath;
@@ -54,6 +56,7 @@ public class HollowDiffUI implements CustomHollowEffigyFactoryProvider {
     private final HollowObjectViewProvider viewProvider;
     private final DiffViewOutputGenerator diffViewOutputGenerator;
 
+    private final Map<String, PrimaryKey> matchHints;
     private final Map<String, CustomHollowEffigyFactory> customHollowEffigyFactories;
 
     HollowDiffUI(String baseURLPath, String diffUIPath, HollowDiff diff, String fromBlobName, String toBlobName, VelocityEngine ve) {
@@ -70,8 +73,9 @@ public class HollowDiffUI implements CustomHollowEffigyFactoryProvider {
         this.viewProvider = new HollowDiffViewProvider(this);
         this.diffViewOutputGenerator = new DiffViewOutputGenerator(viewProvider);
         this.customHollowEffigyFactories = new HashMap<String, CustomHollowEffigyFactory>();
+        this.matchHints = new HashMap<String, PrimaryKey>();
     }
-
+    
     public boolean serveRequest(String pageName, HttpServletRequest req, HttpServletResponse resp) throws IOException {
         if("diffrowdata".equals(pageName)) {
             diffViewOutputGenerator.uncollapseRow(req, resp);
@@ -126,8 +130,18 @@ public class HollowDiffUI implements CustomHollowEffigyFactoryProvider {
         customHollowEffigyFactories.put(typeName, factory);
     }
 
+    @Override
     public CustomHollowEffigyFactory getCustomHollowEffigyFactory(String typeName) {
         return customHollowEffigyFactories.get(typeName);
+    }
+    
+    public void addMatchHint(PrimaryKey matchHint) {
+        this.matchHints.put(matchHint.getType(), matchHint);
+    }
+
+    @Override
+    public Map<String, PrimaryKey> getMatchHints() {
+        return matchHints;
     }
 
     public HollowObjectViewProvider getHollowObjectViewProvider() {
