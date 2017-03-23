@@ -23,7 +23,6 @@ import com.netflix.hollow.core.read.HollowReadFieldUtils;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.diffview.effigy.HollowEffigy;
-import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -215,8 +214,8 @@ public class HollowEffigyCollectionPairer extends HollowEffigyFieldPairer {
         }
 
         if(System.currentTimeMillis() > deadlineBeforePairingTimeout) {
-            HollowEffigy.Field fromField = new HollowEffigy.Field(new HollowDiffNodeIdentifier("TRUNCATED"), "PAIRING TIMEOUT");
-            HollowEffigy.Field toField = new HollowEffigy.Field(new HollowDiffNodeIdentifier("TRUNCATED"), "ROWS OMITTED");
+            HollowEffigy.Field fromField = new HollowEffigy.Field(null, "TRUNCATED", "PAIRING TIMEOUT");
+            HollowEffigy.Field toField = new HollowEffigy.Field(null, "TRUNCATED", "ROWS OMITTED");
             fieldPairs.add(new EffigyFieldPair(fromField, toField, -1, -1));
         } else {
             addUnmatchedElements(fieldPairs, pairedFromIndices, pairedToIndices);

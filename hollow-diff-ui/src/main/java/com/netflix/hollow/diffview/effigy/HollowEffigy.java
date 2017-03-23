@@ -18,14 +18,12 @@
 package com.netflix.hollow.diffview.effigy;
 
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
-import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * The HollowEffigy is an Object-based representation of a Hollow record,
- * it is used in creation of the diff HTML, and for holding representations
- * of expired hollow records in a state chain in the diff history.
+ * it is used in creation of the diff HTML.
  */
 public class HollowEffigy {
 
@@ -71,22 +69,28 @@ public class HollowEffigy {
     }
 
     public static class Field {
-        private final HollowDiffNodeIdentifier fieldIdentifier;
+        private final String fieldName;
+        private final String typeName;
         private final Object value;
         private final int hashCode;
 
-        public Field(HollowDiffNodeIdentifier fieldIdentifier, Object value) {
-            this.fieldIdentifier = fieldIdentifier;
+        public Field(String fieldName, HollowEffigy value) {
+            this(fieldName, value.getObjectType(), value);
+        }
+        
+        public Field(String fieldName, String typeName, Object value) {
+            this.fieldName = fieldName;
+            this.typeName = typeName;
             this.value = value;
-            this.hashCode = 31 * fieldIdentifier.hashCode() + (value == null ? 0 : value.hashCode());
+            this.hashCode = 31 * (31 * (fieldName == null ? 0 : fieldName.hashCode()) + typeName.hashCode()) + (value == null ? 0 : value.hashCode());
         }
 
-        public HollowDiffNodeIdentifier getFieldNodeIndex() {
-            return fieldIdentifier;
+        public String getTypeName() {
+            return typeName;
         }
 
         public String getFieldName() {
-            return fieldIdentifier.getViaFieldName();
+            return fieldName;
         }
 
         public Object getValue() {
@@ -108,11 +112,10 @@ public class HollowEffigy {
                 return true;
 
             if(other instanceof Field) {
-                Field otherField = (Field)other;
-                if(this.fieldIdentifier.equals(otherField.fieldIdentifier)) {
+                if(this.fieldName.equals(((Field) other).fieldName) && this.typeName.equals(((Field) other).typeName)) {
                     if(this.value == null)
-                        return otherField.value == null;
-                    return this.value.equals(otherField.value);
+                        return ((Field) other).value == null;
+                    return this.value.equals(((Field) other).value);
                 }
             }
 

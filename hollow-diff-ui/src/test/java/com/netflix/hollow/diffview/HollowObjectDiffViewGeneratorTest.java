@@ -44,7 +44,7 @@ public class HollowObjectDiffViewGeneratorTest {
         for(HollowDiffViewRow viewRow : hollowDiffViewRows) {
             Object value = viewRow.getFieldPair().getFrom().getValue();
             String valueStr = value instanceof HollowEffigy ? ((HollowEffigy) value).getObjectType() : value.toString();
-            String val = viewRow.getFieldPair().getFrom().getFieldNodeIndex().getViaFieldName() + ":" + valueStr;
+            String val = viewRow.getFieldPair().getFrom().getFieldName() + ":" + valueStr;
 
             System.out.print(viewRow.getRowId());
 

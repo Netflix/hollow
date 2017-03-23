@@ -31,7 +31,6 @@ import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.diffview.effigy.HollowEffigy.Field;
-import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,13 +40,8 @@ public class HollowEffigyFactory {
 
     private final Base64 base64 = new Base64();
     private final Map<HollowEffigy.Field, HollowEffigy.Field> fieldMemoizer = new HashMap<HollowEffigy.Field, HollowEffigy.Field>();
-    private final Map<HollowDiffNodeIdentifier, HollowDiffNodeIdentifier> diffNodeIdMemoizer = new HashMap<HollowDiffNodeIdentifier, HollowDiffNodeIdentifier>();
 
     public HollowEffigy effigy(HollowDataAccess dataAccess, String typeName, int ordinal) {
-        return effigy(dataAccess, typeName, ordinal, memoize(new HollowDiffNodeIdentifier(typeName)));
-    }
-
-    private HollowEffigy effigy(HollowDataAccess dataAccess, String typeName, int ordinal, HollowDiffNodeIdentifier identifier) {
         if(ordinal == -1)
             return null;
 
@@ -57,25 +51,24 @@ public class HollowEffigyFactory {
             return null;
 
         if(typeState instanceof HollowObjectTypeDataAccess) {
-            return objectEffigy((HollowObjectTypeDataAccess) typeState, ordinal, identifier);
+            return objectEffigy((HollowObjectTypeDataAccess) typeState, ordinal);
         } else if(typeState instanceof HollowCollectionTypeDataAccess) {
-            return collectionEffigy((HollowCollectionTypeDataAccess) typeState, ordinal, identifier);
+            return collectionEffigy((HollowCollectionTypeDataAccess) typeState, ordinal);
         } else if(typeState instanceof HollowMapTypeDataAccess){
-            return mapEffigy((HollowMapTypeDataAccess) typeState, ordinal, identifier);
+            return mapEffigy((HollowMapTypeDataAccess) typeState, ordinal);
         }
 
         throw new IllegalArgumentException("I don't know how to effigize a " + typeState.getClass());
     }
 
 
-    private HollowEffigy objectEffigy(HollowObjectTypeDataAccess typeDataAccess, int ordinal, HollowDiffNodeIdentifier identifier) {
+    private HollowEffigy objectEffigy(HollowObjectTypeDataAccess typeDataAccess, int ordinal) {
         HollowObjectSchema schema = typeDataAccess.getSchema();
         HollowEffigy effigy = new HollowEffigy(typeDataAccess, ordinal);
 
         for(int i=0;i<schema.numFields();i++) {
             String fieldName = schema.getFieldName(i);
             String fieldType = schema.getFieldType(i) == FieldType.REFERENCE ? schema.getReferencedType(i) : schema.getFieldType(i).toString();
-            HollowDiffNodeIdentifier fieldIdentifier = memoize(new HollowDiffNodeIdentifier(identifier, fieldName, fieldType));
             Object fieldValue = null;
 
             switch(schema.getFieldType(i)) {
@@ -105,28 +98,28 @@ public class HollowEffigyFactory {
                 fieldValue = typeDataAccess.readString(ordinal, i);
                 break;
             case REFERENCE:
-                fieldValue = effigy(typeDataAccess.getDataAccess(), schema.getReferencedType(i), typeDataAccess.readOrdinal(ordinal, i), fieldIdentifier);
+                fieldValue = effigy(typeDataAccess.getDataAccess(), schema.getReferencedType(i), typeDataAccess.readOrdinal(ordinal, i));
             }
 
-            if(schema.getFieldType(i) == FieldType.REFERENCE)
-                effigy.add(new Field(fieldIdentifier, fieldValue));
-            else
-                effigy.add(memoize(new Field(fieldIdentifier, fieldValue)));
+            Field field = new Field(fieldName, fieldType, fieldValue);
+            if(schema.getFieldType(i) != FieldType.REFERENCE)
+                field = memoize(field);
+            
+            effigy.add(field);
         }
 
         return effigy;
     }
 
-    private HollowEffigy collectionEffigy(HollowCollectionTypeDataAccess typeDataAccess, int ordinal, HollowDiffNodeIdentifier identifier) {
+    private HollowEffigy collectionEffigy(HollowCollectionTypeDataAccess typeDataAccess, int ordinal) {
         HollowCollectionSchema schema = typeDataAccess.getSchema();
-        HollowDiffNodeIdentifier elementFieldIdentifier = memoize(new HollowDiffNodeIdentifier(identifier, "element", schema.getElementType()));
         HollowEffigy effigy = new HollowEffigy(typeDataAccess, ordinal);
 
         HollowOrdinalIterator iter = typeDataAccess.ordinalIterator(ordinal);
         int elementOrdinal = iter.next();
         while(elementOrdinal != NO_MORE_ORDINALS) {
-            HollowEffigy elementEffigy = effigy(typeDataAccess.getDataAccess(), schema.getElementType(), elementOrdinal, elementFieldIdentifier);
-            effigy.add(new Field(elementFieldIdentifier, elementEffigy));
+            HollowEffigy elementEffigy = effigy(typeDataAccess.getDataAccess(), schema.getElementType(), elementOrdinal);
+            effigy.add(new Field("element", elementEffigy));
 
             elementOrdinal = iter.next();
         }
@@ -134,31 +127,19 @@ public class HollowEffigyFactory {
         return effigy;
     }
 
-    private HollowEffigy mapEffigy(HollowMapTypeDataAccess typeDataAccess, int ordinal, HollowDiffNodeIdentifier identifier) {
+    private HollowEffigy mapEffigy(HollowMapTypeDataAccess typeDataAccess, int ordinal) {
         HollowMapSchema schema = typeDataAccess.getSchema();
-        HollowDiffNodeIdentifier entryFieldIdentifier = memoize(new HollowDiffNodeIdentifier(identifier, "entry", "Map.Entry"));
-        HollowDiffNodeIdentifier keyFieldIdentifier = memoize(new HollowDiffNodeIdentifier(identifier, "key", schema.getKeyType()));
-        HollowDiffNodeIdentifier valueFieldIdentifier = memoize(new HollowDiffNodeIdentifier(identifier, "value", schema.getValueType()));
         HollowEffigy effigy = new HollowEffigy(typeDataAccess, ordinal);
 
         HollowMapEntryOrdinalIterator iter = typeDataAccess.ordinalIterator(ordinal);
         while(iter.next()) {
             HollowEffigy entryEffigy = new HollowEffigy("Map.Entry");
-            entryEffigy.add(new Field(keyFieldIdentifier, effigy(typeDataAccess.getDataAccess(), schema.getKeyType(), iter.getKey(), keyFieldIdentifier)));
-            entryEffigy.add(new Field(valueFieldIdentifier, effigy(typeDataAccess.getDataAccess(), schema.getValueType(), iter.getValue(), valueFieldIdentifier)));
-            effigy.add(new Field(entryFieldIdentifier, entryEffigy));
+            entryEffigy.add(new Field("key", effigy(typeDataAccess.getDataAccess(), schema.getKeyType(), iter.getKey())));
+            entryEffigy.add(new Field("value", effigy(typeDataAccess.getDataAccess(), schema.getValueType(), iter.getValue())));
+            effigy.add(new Field("entry", "Map.Entry", entryEffigy));
         }
 
         return effigy;
-    }
-
-    private HollowDiffNodeIdentifier memoize(HollowDiffNodeIdentifier fieldId) {
-        HollowDiffNodeIdentifier canonical = diffNodeIdMemoizer.get(fieldId);
-        if(canonical == null) {
-            diffNodeIdMemoizer.put(fieldId, fieldId);
-            canonical = fieldId;
-        }
-        return canonical;
     }
 
     private HollowEffigy.Field memoize(HollowEffigy.Field field) {

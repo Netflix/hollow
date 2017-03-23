@@ -24,7 +24,6 @@ import com.netflix.hollow.diffview.effigy.HollowEffigyFactory;
 import com.netflix.hollow.diffview.effigy.HollowRecordDiffUI;
 import com.netflix.hollow.diffview.effigy.pairer.HollowEffigyFieldPairer;
 import com.netflix.hollow.diffview.effigy.pairer.HollowEffigyFieldPairer.EffigyFieldPair;
-import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -125,9 +124,8 @@ public class HollowObjectDiffViewGenerator {
     }
 
     private void insertRootRow(List<HollowDiffViewRow> rows, HollowEffigy fromEffigy, HollowEffigy toEffigy) {
-        HollowDiffNodeIdentifier nodeId = new HollowDiffNodeIdentifier(fromEffigy == null ? toEffigy.getObjectType() : fromEffigy.getObjectType());
-        HollowEffigy.Field fromField = fromEffigy == null ? null : new HollowEffigy.Field(nodeId, fromEffigy);
-        HollowEffigy.Field toField = toEffigy == null ? null : new HollowEffigy.Field(nodeId, toEffigy);
+        HollowEffigy.Field fromField = fromEffigy == null ? null : new HollowEffigy.Field(null, fromEffigy);
+        HollowEffigy.Field toField = toEffigy == null ? null : new HollowEffigy.Field(null, toEffigy);
 
         EffigyFieldPair fieldPair = new EffigyFieldPair(fromField, toField, -1, -1);
         boolean moreRows[] = new boolean[] { false };

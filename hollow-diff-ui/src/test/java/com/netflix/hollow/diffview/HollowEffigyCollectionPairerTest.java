@@ -21,18 +21,11 @@ import com.netflix.hollow.diffview.effigy.HollowEffigy;
 import com.netflix.hollow.diffview.effigy.HollowEffigy.Field;
 import com.netflix.hollow.diffview.effigy.pairer.HollowEffigyCollectionPairer;
 import com.netflix.hollow.diffview.effigy.pairer.HollowEffigyFieldPairer.EffigyFieldPair;
-import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class HollowEffigyCollectionPairerTest {
-
-    private final HollowDiffNodeIdentifier elementFieldId = new HollowDiffNodeIdentifier("element");
-
-    private final HollowDiffNodeIdentifier field1Id = new HollowDiffNodeIdentifier("field1");
-    private final HollowDiffNodeIdentifier field2Id = new HollowDiffNodeIdentifier("field2");
-    private final HollowDiffNodeIdentifier field3Id = new HollowDiffNodeIdentifier("field3");
 
     @Test
     public void test() {
@@ -83,16 +76,16 @@ public class HollowEffigyCollectionPairerTest {
     private HollowEffigy list(HollowEffigy... elements) {
         HollowEffigy list = new HollowEffigy("list");
         for(HollowEffigy element : elements) {
-            list.add(new Field(elementFieldId, element));
+            list.add(new Field("element", element));
         }
         return list;
     }
 
     private HollowEffigy element(String field1, int field2, float field3) {
         HollowEffigy eff = new HollowEffigy("element");
-        eff.add(new Field(field1Id, field1));
-        eff.add(new Field(field2Id, field2));
-        eff.add(new Field(field3Id, field3));
+        eff.add(new Field("field1", "STRING", field1));
+        eff.add(new Field("field2", "INT", field2));
+        eff.add(new Field("field3", "FLOAT", field3));
         return eff;
     }
 }

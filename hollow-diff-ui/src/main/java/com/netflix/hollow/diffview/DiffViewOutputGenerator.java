@@ -187,7 +187,7 @@ public class DiffViewOutputGenerator {
         String fieldName = row.getFieldPair().getFrom().getFieldName();
         String fieldValue = row.getFieldPair().isLeafNode() ?
                 row.getFieldPair().getFrom().getValue() == null ? "null" : row.getFieldPair().getFrom().getValue().toString().replace("|", "&#x2502")
-                : "(" + row.getFieldPair().getFrom().getFieldNodeIndex().getNodeName() + ")";
+                : "(" + row.getFieldPair().getFrom().getTypeName() + ")";
         return populatedContent(moreRows, row.getIndentation(), row.getFieldPair().isLeafNode(), fieldName, fieldValue);
     }
 
@@ -202,7 +202,7 @@ public class DiffViewOutputGenerator {
         String fieldName = row.getFieldPair().getTo().getFieldName();
         String fieldValue = row.getFieldPair().isLeafNode() ?
                 row.getFieldPair().getTo().getValue() == null ? "null" : row.getFieldPair().getTo().getValue().toString().replace("|", "&#x2502")
-                : "(" + row.getFieldPair().getTo().getFieldNodeIndex().getNodeName() + ")";
+                : "(" + row.getFieldPair().getTo().getTypeName() + ")";
         return populatedContent(moreRows, row.getIndentation(), row.getFieldPair().isLeafNode(), fieldName, fieldValue);
     }
 
