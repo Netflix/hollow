@@ -17,9 +17,6 @@
  */
 package com.netflix.hollow.tools.diff;
 
-import java.util.HashSet;
-
-import java.util.Set;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.util.LongList;
@@ -31,8 +28,10 @@ import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap;
 import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Obtained via a {@link HollowDiff}, this is a report of the differences in a specific type between two data states. 
@@ -128,7 +127,7 @@ public class HollowTypeDiff {
     public IntList getUnmatchedOrdinalsInTo() {
         return matcher.getExtraInTo();
     }
-    
+
     /**
      * @return The total 'diff score', useful as a very broad measure of the magnitude of the diff.
      */

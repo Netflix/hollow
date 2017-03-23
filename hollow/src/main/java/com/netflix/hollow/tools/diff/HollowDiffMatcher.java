@@ -23,7 +23,6 @@ import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.util.LongList;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 
@@ -40,8 +39,6 @@ public class HollowDiffMatcher {
     private final HollowObjectTypeReadState toTypeState;
 
     private final LongList matchedOrdinals;
-    private final int matchedToOrdinalsByFromOrdinals[];
-    private final int matchedFromOrdinalsByToOrdinals[];
     private final IntList extraInFrom;
     private final IntList extraInTo;
 
@@ -53,13 +50,8 @@ public class HollowDiffMatcher {
         this.fromTypeState = fromTypeState;
         this.toTypeState = toTypeState;
         this.matchedOrdinals = new LongList();
-        this.matchedToOrdinalsByFromOrdinals = new int[fromTypeState.maxOrdinal() + 1];
-        this.matchedFromOrdinalsByToOrdinals = new int[toTypeState.maxOrdinal() + 1];
         this.extraInFrom = new IntList();
         this.extraInTo = new IntList();
-        
-        Arrays.fill(matchedToOrdinalsByFromOrdinals, -1);
-        Arrays.fill(matchedFromOrdinalsByToOrdinals, -1);
     }
 
     public void addMatchPath(String path) {
@@ -87,8 +79,6 @@ public class HollowDiffMatcher {
 
             if(matchedOrdinal != -1) {
                 matchedOrdinals.add(((long)matchedOrdinal << 32) | candidateToMatchOrdinal);
-                matchedToOrdinalsByFromOrdinals[matchedOrdinal] = candidateToMatchOrdinal;
-                matchedFromOrdinalsByToOrdinals[candidateToMatchOrdinal] = matchedOrdinal;
                 fromUnmatchedOrdinals.clear(matchedOrdinal);
             } else {
                 extraInTo.add(candidateToMatchOrdinal);
@@ -102,14 +92,6 @@ public class HollowDiffMatcher {
             extraInFrom.add(unmatchedFromOrdinal);
             unmatchedFromOrdinal = fromUnmatchedOrdinals.nextSetBit(unmatchedFromOrdinal + 1);
         }
-    }
-    
-    public int getMatchedFromOrdinal(int toOrdinal) {
-        return matchedFromOrdinalsByToOrdinals[toOrdinal];
-    }
-    
-    public int getMatchedToOrdinal(int fromOrdinal) {
-        return matchedToOrdinalsByFromOrdinals[fromOrdinal];
     }
 
     public LongList getMatchedOrdinals() {

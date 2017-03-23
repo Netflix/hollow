@@ -21,12 +21,9 @@ import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.schema.HollowSchemaSorter;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -152,18 +149,6 @@ public class HollowDiff {
     private void prepareForDiffCalculation() {
         SimultaneousExecutor executor = new SimultaneousExecutor(1 + typeDiffs.size(), "hollow-diff-prepare");
 
-        Collections.sort(typeDiffs, new Comparator<HollowTypeDiff>() {
-            @Override
-            public int compare(HollowTypeDiff o1, HollowTypeDiff o2) {
-                if(HollowSchemaSorter.typeIsTransitivelyDependent(o1.getFromTypeState().getStateEngine(), o1.getFromTypeState().getSchema().getName(), o2.getFromTypeState().getSchema().getName())) {
-                    return 1;
-                } else if(HollowSchemaSorter.typeIsTransitivelyDependent(o1.getFromTypeState().getStateEngine(), o2.getFromTypeState().getSchema().getName(), o1.getFromTypeState().getSchema().getName())) {
-                    return -1;
-                }
-                return 0;
-            }
-        });
-        
         executor.execute(new Runnable() {
             @Override
             public void run() {
