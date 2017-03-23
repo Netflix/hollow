@@ -17,20 +17,21 @@
  */
 package com.netflix.hollow.tools.diff;
 
-import com.netflix.hollow.core.util.SimultaneousExecutor;
-
+import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.util.LongList;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.tools.diff.count.HollowDiffCountingNode;
 import com.netflix.hollow.tools.diff.count.HollowDiffObjectCountingNode;
 import com.netflix.hollow.tools.diff.count.HollowFieldDiff;
 import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap;
 import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Obtained via a {@link HollowDiff}, this is a report of the differences in a specific type between two data states. 
@@ -46,14 +47,16 @@ public class HollowTypeDiff {
 
     private final String type;
     private List<HollowFieldDiff> calculatedFieldDiffs;
-
-
+    
+    private final Set<String> shortcutTypes;
+    
     HollowTypeDiff(HollowDiff rootDiff, String type, String... matchPaths) {
         this.rootDiff = rootDiff;
         this.type = type;
         this.from = (HollowObjectTypeReadState) rootDiff.getFromStateEngine().getTypeState(type);
         this.to = (HollowObjectTypeReadState) rootDiff.getToStateEngine().getTypeState(type);
         this.matcher = new HollowDiffMatcher(this.from, this.to);
+        this.shortcutTypes = new HashSet<String>();
         
         for(String matchPath : matchPaths) {
             addMatchPath(matchPath);
@@ -73,6 +76,26 @@ public class HollowTypeDiff {
      */
     public void addMatchPath(String path) {
         matcher.addMatchPath(path);
+    }
+    
+    /**
+     * Shortcut the diff detail when encountering a specific type.  This can be done to improve the performance
+     * of diff calculation -- at the expense of some detail.
+     * 
+     * @param type
+     */
+    public void addShortcutType(String type) {
+        shortcutTypes.add(type);
+    }
+    
+    /**
+     * Returns whether or not this type diff will shortcut at the specified type.
+     * 
+     * @param type
+     * @return
+     */
+    public boolean isShortcutType(String type) {
+        return shortcutTypes.contains(type);
     }
 
     /**
@@ -169,7 +192,7 @@ public class HollowTypeDiff {
                 public void run() {
                     try {
                         DiffEqualityMapping equalityMapping = rootDiff.getEqualityMapping();
-                        HollowDiffCountingNode rootNode = new HollowDiffObjectCountingNode(equalityMapping, rootId, from, to);
+                        HollowDiffCountingNode rootNode = new HollowDiffObjectCountingNode(rootDiff, HollowTypeDiff.this, rootId, from, to);
 
                         DiffEqualOrdinalMap rootNodeOrdinalMap = equalityMapping.getEqualOrdinalMap(type);
                         boolean requiresMissingFieldTraversal = equalityMapping.requiresMissingFieldTraversal(type);

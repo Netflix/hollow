@@ -17,15 +17,16 @@
  */
 package com.netflix.hollow.tools.diff.count;
 
-import com.netflix.hollow.core.util.IntList;
+import com.netflix.hollow.tools.diff.HollowTypeDiff;
 
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
-import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalFilter;
-import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.util.IntList;
+import com.netflix.hollow.tools.diff.HollowDiff;
+import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
+import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalFilter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,8 +51,8 @@ public class HollowDiffObjectCountingNode extends HollowDiffCountingNode {
     private final boolean fieldRequiresMissingFieldTraversal[];
     private final DiffEqualOrdinalFilter fieldEqualOrdinalFilters[];
 
-    public HollowDiffObjectCountingNode(DiffEqualityMapping equalityMapping, HollowDiffNodeIdentifier nodeId, HollowObjectTypeReadState fromState, HollowObjectTypeReadState toState) {
-        super(equalityMapping, nodeId);
+    public HollowDiffObjectCountingNode(HollowDiff diff, HollowTypeDiff topLevelTypeDiff, HollowDiffNodeIdentifier nodeId, HollowObjectTypeReadState fromState, HollowObjectTypeReadState toState) {
+        super(diff, topLevelTypeDiff, nodeId);
         this.fromState = fromState;
         this.toState = toState;
         this.fromSchema = fromState == null ? emptySchema(toState.getSchema()) : fromState.getSchema();
@@ -79,7 +80,7 @@ public class HollowDiffObjectCountingNode extends HollowDiffCountingNode {
             } else {
                 HollowDiffNodeIdentifier childNodeId = new HollowDiffNodeIdentifier(nodeId, unionSchema.getFieldName(i), unionSchema.getFieldType(i).toString());
 
-                fieldNodes[i] = new HollowDiffFieldCountingNode(equalityMapping, childNodeId, fromState, toState, unionSchema, i);
+                fieldNodes[i] = new HollowDiffFieldCountingNode(diff, topLevelTypeDiff, childNodeId, fromState, toState, unionSchema, i);
             }
         }
     }
@@ -98,7 +99,9 @@ public class HollowDiffObjectCountingNode extends HollowDiffCountingNode {
     private final IntList traversalToOrdinals = new IntList();
 
     @Override
-    public void traverseDiffs(IntList fromOrdinals, IntList toOrdinals) {
+    public int traverseDiffs(IntList fromOrdinals, IntList toOrdinals) {
+        int score = 0;
+        
         for(int i=0;i<fieldNodes.length;i++) {
             int fromFieldIdx = fromFieldMapping[i];
             int toFieldIdx = toFieldMapping[i];
@@ -129,24 +132,28 @@ public class HollowDiffObjectCountingNode extends HollowDiffCountingNode {
                     fieldEqualOrdinalFilters[i].filter(traversalFromOrdinals, traversalToOrdinals);
 
                     if(fieldEqualOrdinalFilters[i].getUnmatchedFromOrdinals().size() != 0 || fieldEqualOrdinalFilters[i].getUnmatchedToOrdinals().size() != 0)
-                        fieldNodes[i].traverseDiffs(fieldEqualOrdinalFilters[i].getUnmatchedFromOrdinals(), fieldEqualOrdinalFilters[i].getUnmatchedToOrdinals());
+                        score += fieldNodes[i].traverseDiffs(fieldEqualOrdinalFilters[i].getUnmatchedFromOrdinals(), fieldEqualOrdinalFilters[i].getUnmatchedToOrdinals());
                     if(fieldRequiresMissingFieldTraversal[i])
                         if(fieldEqualOrdinalFilters[i].getMatchedFromOrdinals().size() != 0 || fieldEqualOrdinalFilters[i].getMatchedToOrdinals().size() != 0)
-                            fieldNodes[i].traverseMissingFields(fieldEqualOrdinalFilters[i].getMatchedFromOrdinals(), fieldEqualOrdinalFilters[i].getMatchedToOrdinals());
+                            score += fieldNodes[i].traverseMissingFields(fieldEqualOrdinalFilters[i].getMatchedFromOrdinals(), fieldEqualOrdinalFilters[i].getMatchedToOrdinals());
                 }
 
             } else {
                 if(fromFieldIdx == -1)
-                    fieldNodes[i].traverseDiffs(EMPTY_ORDINAL_LIST, toOrdinals);
+                    score += fieldNodes[i].traverseDiffs(EMPTY_ORDINAL_LIST, toOrdinals);
                 else if(toFieldIdx == -1)
-                    fieldNodes[i].traverseDiffs(fromOrdinals, EMPTY_ORDINAL_LIST);
+                    score += fieldNodes[i].traverseDiffs(fromOrdinals, EMPTY_ORDINAL_LIST);
                 else
-                    fieldNodes[i].traverseDiffs(fromOrdinals, toOrdinals);
+                    score += fieldNodes[i].traverseDiffs(fromOrdinals, toOrdinals);
             }
         }
+        
+        return score;
     }
 
-    public void traverseMissingFields(IntList fromOrdinals, IntList toOrdinals) {
+    public int traverseMissingFields(IntList fromOrdinals, IntList toOrdinals) {
+        int score = 0;
+        
         for(int i=0;i<fieldNodes.length;i++) {
             if(fieldRequiresMissingFieldTraversal[i]) {
                 traversalFromOrdinals.clear();
@@ -168,11 +175,13 @@ public class HollowDiffObjectCountingNode extends HollowDiffCountingNode {
                     }
                 }
 
-                fieldNodes[i].traverseMissingFields(traversalFromOrdinals, traversalToOrdinals);
+                score += fieldNodes[i].traverseMissingFields(traversalFromOrdinals, traversalToOrdinals);
             } else if(fieldNodes[i] instanceof HollowDiffFieldCountingNode) {
-                fieldNodes[i].traverseMissingFields(fromOrdinals, toOrdinals);
+                score += fieldNodes[i].traverseMissingFields(fromOrdinals, toOrdinals);
             }
         }
+        
+        return score;
     }
 
     private int[] createFieldMapping(HollowObjectSchema unionSchema, HollowObjectSchema individualSchema) {

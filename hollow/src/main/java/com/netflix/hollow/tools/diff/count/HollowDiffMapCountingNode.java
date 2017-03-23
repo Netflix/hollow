@@ -17,14 +17,15 @@
  */
 package com.netflix.hollow.tools.diff.count;
 
-import com.netflix.hollow.core.util.IntList;
+import com.netflix.hollow.tools.diff.HollowTypeDiff;
 
-import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
-import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalFilter;
-import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
+import com.netflix.hollow.core.util.IntList;
+import com.netflix.hollow.tools.diff.HollowDiff;
+import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
+import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalFilter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,8 +48,8 @@ public class HollowDiffMapCountingNode extends HollowDiffCountingNode {
     private final boolean keyRequiresTraversalForMissingFields;
     private final boolean valueRequiresTraversalForMissingFields;
 
-    public HollowDiffMapCountingNode(DiffEqualityMapping equalityMapping, HollowDiffNodeIdentifier nodeId, HollowMapTypeReadState fromState, HollowMapTypeReadState toState) {
-        super(equalityMapping, nodeId);
+    public HollowDiffMapCountingNode(HollowDiff diff, HollowTypeDiff topLevelTypeDiff, HollowDiffNodeIdentifier nodeId, HollowMapTypeReadState fromState, HollowMapTypeReadState toState) {
+        super(diff, topLevelTypeDiff, nodeId);
         this.fromState = fromState;
         this.toState = toState;
 
@@ -81,30 +82,39 @@ public class HollowDiffMapCountingNode extends HollowDiffCountingNode {
     private final IntList traversalToValueOrdinals = new IntList();
 
     @Override
-    public void traverseDiffs(IntList fromOrdinals, IntList toOrdinals) {
+    public int traverseDiffs(IntList fromOrdinals, IntList toOrdinals) {
         fillTraversalLists(fromOrdinals, toOrdinals);
 
         keyFilter.filter(traversalFromKeyOrdinals, traversalToKeyOrdinals);
         valueFilter.filter(traversalFromValueOrdinals, traversalToValueOrdinals);
+        
+        int score = 0;
 
         if(keyFilter.getUnmatchedFromOrdinals().size() != 0 || keyFilter.getUnmatchedToOrdinals().size() != 0)
-            keyNode.traverseDiffs(keyFilter.getUnmatchedFromOrdinals(), keyFilter.getUnmatchedToOrdinals());
+            score += keyNode.traverseDiffs(keyFilter.getUnmatchedFromOrdinals(), keyFilter.getUnmatchedToOrdinals());
         if(keyRequiresTraversalForMissingFields)
             if(keyFilter.getMatchedFromOrdinals().size() != 0 || keyFilter.getMatchedToOrdinals().size() != 0)
-                keyNode.traverseMissingFields(keyFilter.getMatchedFromOrdinals(), keyFilter.getMatchedToOrdinals());
+                score += keyNode.traverseMissingFields(keyFilter.getMatchedFromOrdinals(), keyFilter.getMatchedToOrdinals());
 
         if(valueFilter.getUnmatchedFromOrdinals().size() != 0 || valueFilter.getUnmatchedToOrdinals().size() != 0)
-            valueNode.traverseDiffs(valueFilter.getUnmatchedFromOrdinals(), valueFilter.getUnmatchedToOrdinals());
+            score += valueNode.traverseDiffs(valueFilter.getUnmatchedFromOrdinals(), valueFilter.getUnmatchedToOrdinals());
         if(valueRequiresTraversalForMissingFields)
             if(valueFilter.getMatchedFromOrdinals().size() != 0 || valueFilter.getMatchedToOrdinals().size() != 0)
-                valueNode.traverseMissingFields(valueFilter.getMatchedFromOrdinals(), valueFilter.getMatchedToOrdinals());
+                score += valueNode.traverseMissingFields(valueFilter.getMatchedFromOrdinals(), valueFilter.getMatchedToOrdinals());
+        
+        return score;
     }
 
     @Override
-    public void traverseMissingFields(IntList fromOrdinals, IntList toOrdinals) {
+    public int traverseMissingFields(IntList fromOrdinals, IntList toOrdinals) {
         fillTraversalLists(fromOrdinals, toOrdinals);
-        keyNode.traverseMissingFields(traversalFromKeyOrdinals, traversalToKeyOrdinals);
-        valueNode.traverseMissingFields(traversalFromValueOrdinals, traversalToValueOrdinals);
+        
+        int score = 0;
+        
+        score += keyNode.traverseMissingFields(traversalFromKeyOrdinals, traversalToKeyOrdinals);
+        score += valueNode.traverseMissingFields(traversalFromValueOrdinals, traversalToValueOrdinals);
+        
+        return score;
     }
 
     @Override

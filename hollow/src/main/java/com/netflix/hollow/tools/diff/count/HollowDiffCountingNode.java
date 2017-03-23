@@ -17,18 +17,16 @@
  */
 package com.netflix.hollow.tools.diff.count;
 
-import com.netflix.hollow.core.util.IntList;
-
-import com.netflix.hollow.core.schema.HollowCollectionSchema;
-import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
-import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 import com.netflix.hollow.core.read.engine.HollowCollectionTypeReadState;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.util.IntList;
+import com.netflix.hollow.tools.diff.HollowDiff;
+import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
+import com.netflix.hollow.tools.diff.HollowTypeDiff;
+import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 import java.util.List;
 
 /**
@@ -41,19 +39,23 @@ public abstract class HollowDiffCountingNode {
 
     protected static final IntList EMPTY_ORDINAL_LIST = new IntList(0);
 
-    private final DiffEqualityMapping equalityMapping;
+    private final HollowDiff diff;
+    private final HollowTypeDiff topLevelTypeDiff;
+    protected final DiffEqualityMapping equalityMapping;
     protected final HollowDiffNodeIdentifier nodeId;
 
 
-    public HollowDiffCountingNode(DiffEqualityMapping equalityMapping, HollowDiffNodeIdentifier nodeId) {
-        this.equalityMapping = equalityMapping;
+    public HollowDiffCountingNode(HollowDiff diff, HollowTypeDiff topLevelTypeDiff, HollowDiffNodeIdentifier nodeId) {
+        this.diff = diff;
+        this.topLevelTypeDiff = topLevelTypeDiff;
+        this.equalityMapping = diff.getEqualityMapping();
         this.nodeId = nodeId;
     }
 
     public abstract void prepare(int topLevelFromOrdinal, int topLevelToOrdinal);
 
-    public abstract void traverseDiffs(IntList fromOrdinals, IntList toOrdinals);
-    public abstract void traverseMissingFields(IntList fromOrdinals, IntList toOrdinals);
+    public abstract int traverseDiffs(IntList fromOrdinals, IntList toOrdinals);
+    public abstract int traverseMissingFields(IntList fromOrdinals, IntList toOrdinals);
 
     public abstract List<HollowFieldDiff> getFieldDiffs();
 
@@ -65,16 +67,20 @@ public abstract class HollowDiffCountingNode {
 
         HollowDiffNodeIdentifier childNodeId = new HollowDiffNodeIdentifier(this.nodeId, viaFieldName, elementSchema.getName());
 
-
-        if(elementSchema instanceof HollowObjectSchema) {
-            return new HollowDiffObjectCountingNode(equalityMapping, childNodeId, (HollowObjectTypeReadState)refFromState, (HollowObjectTypeReadState)refToState);
-        } else if(elementSchema instanceof HollowCollectionSchema) {
-            return new HollowDiffCollectionCountingNode(equalityMapping, childNodeId, (HollowCollectionTypeReadState)refFromState, (HollowCollectionTypeReadState)refToState);
-        } else if(elementSchema instanceof HollowMapSchema) {
-            return new HollowDiffMapCountingNode(equalityMapping, childNodeId, (HollowMapTypeReadState)refFromState, (HollowMapTypeReadState)refToState);
+        if(topLevelTypeDiff.isShortcutType(elementSchema.getName()))
+            return new HollowDiffShortcutTypeCountingNode(diff, topLevelTypeDiff, childNodeId);
+        
+        switch(elementSchema.getSchemaType()) {
+        case OBJECT:
+            return new HollowDiffObjectCountingNode(diff, topLevelTypeDiff, childNodeId, (HollowObjectTypeReadState)refFromState, (HollowObjectTypeReadState)refToState);
+        case LIST:
+        case SET:
+            return new HollowDiffCollectionCountingNode(diff, topLevelTypeDiff, childNodeId, (HollowCollectionTypeReadState)refFromState, (HollowCollectionTypeReadState)refToState);
+        case MAP:
+            return new HollowDiffMapCountingNode(diff, topLevelTypeDiff, childNodeId, (HollowMapTypeReadState)refFromState, (HollowMapTypeReadState)refToState);
         }
 
-        throw new IllegalArgumentException("I don't know how to create a HollowDiffCountingNode for a " + elementSchema.getClass());
+        throw new IllegalArgumentException("I don't know how to create a HollowDiffCountingNode for a " + elementSchema.getSchemaType());
     }
 
 }

@@ -17,10 +17,11 @@
  */
 package com.netflix.hollow.tools.diff.count;
 
-import com.netflix.hollow.core.util.IntList;
+import com.netflix.hollow.tools.diff.HollowTypeDiff;
 
+import com.netflix.hollow.core.util.IntList;
+import com.netflix.hollow.tools.diff.HollowDiff;
 import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
-import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,20 +34,20 @@ import java.util.List;
  */
 public class HollowDiffMissingCountingNode extends HollowDiffCountingNode {
 
-    public static final HollowDiffMissingCountingNode INSTANCE = new HollowDiffMissingCountingNode(null, null);
+    public static final HollowDiffMissingCountingNode INSTANCE = new HollowDiffMissingCountingNode(null, null, null);
 
-    public HollowDiffMissingCountingNode(DiffEqualityMapping equalityMapping, HollowDiffNodeIdentifier nodeId) {
-        super(equalityMapping, nodeId);
+    public HollowDiffMissingCountingNode(HollowDiff diff, HollowTypeDiff topLevelTypeDiff, HollowDiffNodeIdentifier nodeId) {
+        super(diff, topLevelTypeDiff, nodeId);
     }
 
     @Override
     public void prepare(int topLevelFromOrdinal, int topLevelToOrdinal) { }
 
     @Override
-    public void traverseDiffs(IntList fromOrdinals, IntList toOrdinals) { }
+    public int traverseDiffs(IntList fromOrdinals, IntList toOrdinals) { return 0; }
 
     @Override
-    public void traverseMissingFields(IntList fromOrdinals, IntList toOrdinals) { }
+    public int traverseMissingFields(IntList fromOrdinals, IntList toOrdinals) { return 0; }
 
     @Override
     public List<HollowFieldDiff> getFieldDiffs() {

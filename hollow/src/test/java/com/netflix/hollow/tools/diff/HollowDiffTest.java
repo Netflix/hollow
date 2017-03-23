@@ -17,16 +17,13 @@
  */
 package com.netflix.hollow.tools.diff;
 
+import com.netflix.hollow.core.read.engine.HollowBlobReader;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-
-import com.netflix.hollow.tools.diff.HollowDiff;
-import com.netflix.hollow.tools.diff.HollowDiffMatcher;
-import com.netflix.hollow.tools.diff.HollowTypeDiff;
-import com.netflix.hollow.tools.diff.count.HollowFieldDiff;
+import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowListTypeWriteState;
 import com.netflix.hollow.core.write.HollowListWriteRecord;
@@ -37,8 +34,7 @@ import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowSetTypeWriteState;
 import com.netflix.hollow.core.write.HollowSetWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.hollow.core.read.engine.HollowBlobReader;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.tools.diff.count.HollowFieldDiff;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -189,7 +185,7 @@ public class HollowDiffTest {
                 cList(), dSet(), map());
 
 
-        HollowDiff diff = new HollowDiff(readEngine(fromStateEngine), readEngine(toStateEngine));
+        HollowDiff diff = new HollowDiff(readEngine(fromStateEngine), readEngine(toStateEngine), false);
         HollowTypeDiff typeDiff = diff.addTypeDiff("TypeA");
         typeDiff.addMatchPath("a1");
         typeDiff.addMatchPath("a2.b1");

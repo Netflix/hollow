@@ -20,12 +20,13 @@ package com.netflix.hollow.tools.diff.count;
 import static com.netflix.hollow.core.read.HollowReadFieldUtils.fieldHashCode;
 import static com.netflix.hollow.core.read.HollowReadFieldUtils.fieldsAreEqual;
 
-import com.netflix.hollow.core.util.IntList;
+import com.netflix.hollow.tools.diff.HollowTypeDiff;
 
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
-import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.util.IntList;
+import com.netflix.hollow.tools.diff.HollowDiff;
+import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -58,8 +59,8 @@ public class HollowDiffFieldCountingNode extends HollowDiffCountingNode {
 
     private final HollowFieldDiff fieldDiff;
 
-    public HollowDiffFieldCountingNode(DiffEqualityMapping equalityMapping, HollowDiffNodeIdentifier nodeId, HollowObjectTypeReadState fromState, HollowObjectTypeReadState toState, HollowObjectSchema unionSchema, int unionFieldIndex) {
-        super(equalityMapping, nodeId);
+    public HollowDiffFieldCountingNode(HollowDiff diff, HollowTypeDiff topLevelTypeDiff, HollowDiffNodeIdentifier nodeId, HollowObjectTypeReadState fromState, HollowObjectTypeReadState toState, HollowObjectSchema unionSchema, int unionFieldIndex) {
+        super(diff, topLevelTypeDiff, nodeId);
         this.fromState = fromState;
         this.toState = toState;
         String fieldName = unionSchema.getFieldName(unionFieldIndex);
@@ -80,10 +81,9 @@ public class HollowDiffFieldCountingNode extends HollowDiffCountingNode {
     }
 
     @Override
-    public void traverseDiffs(IntList fromOrdinals, IntList toOrdinals) {
+    public int traverseDiffs(IntList fromOrdinals, IntList toOrdinals) {
         if(fromFieldIndex == -1 || toFieldIndex == -1) {
-            traverseMissingFields(fromOrdinals, toOrdinals);
-            return;
+            return traverseMissingFields(fromOrdinals, toOrdinals);
         }
 
         clearHashTable();
@@ -104,14 +104,23 @@ public class HollowDiffFieldCountingNode extends HollowDiffCountingNode {
         if(score != 0) {
             fieldDiff.addDiff(currentTopLevelFromOrdinal, currentTopLevelToOrdinal, score);
         }
+        
+        return score;
     }
 
     @Override
-    public void traverseMissingFields(IntList fromOrdinals, IntList toOrdinals) {
-        if(fromFieldIndex == -1)
+    public int traverseMissingFields(IntList fromOrdinals, IntList toOrdinals) {
+        if(fromFieldIndex == -1) {
             fieldDiff.addDiff(currentTopLevelFromOrdinal, currentTopLevelToOrdinal, toOrdinals.size());
-        else if(toFieldIndex == -1)
+            return toOrdinals.size();
+        }
+        
+        if(toFieldIndex == -1) {
             fieldDiff.addDiff(currentTopLevelFromOrdinal, currentTopLevelToOrdinal, fromOrdinals.size());
+            return fromOrdinals.size();
+        }
+        
+        return 0;
     }
 
     private void clearHashTable() {

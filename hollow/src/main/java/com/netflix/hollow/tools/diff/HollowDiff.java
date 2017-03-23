@@ -17,13 +17,12 @@
  */
 package com.netflix.hollow.tools.diff;
 
-import com.netflix.hollow.core.util.SimultaneousExecutor;
-
+import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +45,7 @@ public class HollowDiff {
     private final DiffEqualityMapping equalityMapping;
 
     private final List<HollowTypeDiff> typeDiffs;
-
+    
     /**
      * Instantiate a HollowDiff.  By default, all OBJECT types with a defined PrimaryKey will be
      * configured to be diffed.
@@ -169,6 +168,8 @@ public class HollowDiff {
         }
 
         executor.awaitUninterruptibly();
+        
+        equalityMapping.markPrepared();
     }
 
 }
