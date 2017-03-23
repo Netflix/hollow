@@ -18,13 +18,13 @@
 package com.netflix.hollow.history.ui;
 
 import static com.netflix.hollow.diff.ui.HollowDiffSession.getSession;
-
+import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.diff.ui.HollowUIRouter;
 import com.netflix.hollow.diffview.DiffViewOutputGenerator;
 import com.netflix.hollow.diffview.HollowHistoryViewProvider;
 import com.netflix.hollow.diffview.HollowObjectViewProvider;
 import com.netflix.hollow.diffview.effigy.CustomHollowEffigyFactory;
-import com.netflix.hollow.diffview.effigy.CustomHollowEffigyFactoryProvider;
+import com.netflix.hollow.diffview.effigy.HollowRecordDiffUI;
 import com.netflix.hollow.history.ui.naming.HollowHistoryRecordNamer;
 import com.netflix.hollow.history.ui.pages.HistoricalObjectDiffPage;
 import com.netflix.hollow.history.ui.pages.HistoryOverviewPage;
@@ -39,7 +39,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class HollowHistoryUI extends HollowUIRouter implements CustomHollowEffigyFactoryProvider {
+public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffUI {
 
     private final HollowHistory history;
 
@@ -55,6 +55,7 @@ public class HollowHistoryUI extends HollowUIRouter implements CustomHollowEffig
 
     private final Map<String, CustomHollowEffigyFactory> customHollowEffigyFactories;
     private final Map<String, HollowHistoryRecordNamer> customHollowRecordNamers;
+    private final Map<String, PrimaryKey> matchHints;
     
     private String[] overviewDisplayHeaders;
 
@@ -74,9 +75,10 @@ public class HollowHistoryUI extends HollowUIRouter implements CustomHollowEffig
 
         this.customHollowEffigyFactories = new HashMap<String, CustomHollowEffigyFactory>();
         this.customHollowRecordNamers = new HashMap<String, HollowHistoryRecordNamer>();
+        this.matchHints = new HashMap<String, PrimaryKey>();
         this.overviewDisplayHeaders = new String[0];
     }
-
+    
     public HollowHistory getHistory() {
         return history;
     }
@@ -141,13 +143,22 @@ public class HollowHistoryUI extends HollowUIRouter implements CustomHollowEffig
         customHollowEffigyFactories.put(typeName, factory);
     }
     
-    public void setOverviewDisplayHeaders(String... displayHeaders) {
-        this.overviewDisplayHeaders = displayHeaders;
-    }
-    
     @Override
     public CustomHollowEffigyFactory getCustomHollowEffigyFactory(String typeName) {
         return customHollowEffigyFactories.get(typeName);
+    }
+    
+    public void addMatchHint(PrimaryKey matchHint) {
+        this.matchHints.put(matchHint.getType(), matchHint);
+    }
+
+    @Override
+    public Map<String, PrimaryKey> getMatchHints() {
+        return matchHints;
+    }
+
+    public void setOverviewDisplayHeaders(String... displayHeaders) {
+        this.overviewDisplayHeaders = displayHeaders;
     }
     
     public HollowHistoryRecordNamer getHistoryRecordNamer(String typeName) {

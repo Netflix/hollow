@@ -17,6 +17,7 @@
  */
 package com.netflix.hollow.diffview.effigy;
 
+import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,36 +26,44 @@ import java.util.List;
  * The HollowEffigy is an Object-based representation of a Hollow record,
  * it is used in creation of the diff HTML, and for holding representations
  * of expired hollow records in a state chain in the diff history.
- *
- * @author dkoszewnik
- *
  */
 public class HollowEffigy {
 
-    private final String type;
-    private final CollectionType collectionType;
+    private final String objectType;
+    private final HollowTypeDataAccess dataAccess;
+    private final int ordinal;
     private final List<Field> fields;
 
     public HollowEffigy(String objectType) {
-        this(objectType, CollectionType.NONE);
+        this.objectType = objectType;
+        this.dataAccess = null;
+        this.ordinal = -1;
+        this.fields = new ArrayList<Field>();
     }
-
-    public HollowEffigy(String objectType, CollectionType collectionType) {
-        this.type = objectType;
-        this.collectionType = collectionType;
+    
+    public HollowEffigy(HollowTypeDataAccess dataAccess, int ordinal) {
+        this.objectType = null;
+        this.dataAccess = dataAccess;
+        this.ordinal = ordinal;
         this.fields = new ArrayList<Field>();
     }
 
     public void add(HollowEffigy.Field field) {
         fields.add(field);
     }
-
+    
     public String getObjectType() {
-        return type;
+        if(objectType != null)
+            return objectType;
+        return dataAccess.getSchema().getName();
     }
-
-    public CollectionType getCollectionType() {
-        return collectionType;
+    
+    public HollowTypeDataAccess getDataAccess() {
+        return dataAccess;
+    }
+    
+    public int getOrdinal() {
+        return ordinal;
     }
 
     public List<Field> getFields() {

@@ -17,6 +17,12 @@
  */
 package com.netflix.hollow.diffview;
 
+import java.util.Collections;
+
+import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.diffview.effigy.CustomHollowEffigyFactory;
+import java.util.Map;
+import com.netflix.hollow.diffview.effigy.HollowRecordDiffUI;
 import com.netflix.hollow.diffview.effigy.HollowEffigy;
 import com.netflix.hollow.tools.diff.HollowDiff;
 import java.io.IOException;
@@ -29,7 +35,7 @@ public class HollowObjectDiffViewGeneratorTest {
     public void test() throws IOException {
         HollowDiff diff = new FakeHollowDiffGenerator().createFakeDiff();
 
-        HollowObjectDiffViewGenerator generator = new HollowObjectDiffViewGenerator(diff.getFromStateEngine(), diff.getToStateEngine(), null, "TypeA", 0, 0);
+        HollowObjectDiffViewGenerator generator = new HollowObjectDiffViewGenerator(diff.getFromStateEngine(), diff.getToStateEngine(), new FakeHollowRecordDiffUI(), "TypeA", 0, 0);
 
         List<HollowDiffViewRow> hollowDiffViewRows = generator.getHollowDiffViewRows();
 
@@ -54,6 +60,20 @@ public class HollowObjectDiffViewGeneratorTest {
             System.out.println(val);
         }
 
+    }
+    
+    private class FakeHollowRecordDiffUI implements HollowRecordDiffUI {
+
+        @Override
+        public Map<String, PrimaryKey> getMatchHints() {
+            return Collections.emptyMap();
+        }
+
+        @Override
+        public CustomHollowEffigyFactory getCustomHollowEffigyFactory(String typeName) {
+            return null;
+        }
+        
     }
 
 }

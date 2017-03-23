@@ -19,9 +19,9 @@ package com.netflix.hollow.diffview;
 
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.diffview.effigy.CustomHollowEffigyFactory;
-import com.netflix.hollow.diffview.effigy.CustomHollowEffigyFactoryProvider;
 import com.netflix.hollow.diffview.effigy.HollowEffigy;
 import com.netflix.hollow.diffview.effigy.HollowEffigyFactory;
+import com.netflix.hollow.diffview.effigy.HollowRecordDiffUI;
 import com.netflix.hollow.diffview.effigy.pairer.HollowEffigyFieldPairer;
 import com.netflix.hollow.diffview.effigy.pairer.HollowEffigyFieldPairer.EffigyFieldPair;
 import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
@@ -34,16 +34,16 @@ public class HollowObjectDiffViewGenerator {
 
     private final HollowDataAccess fromDataAccess;
     private final HollowDataAccess toDataAccess;
-    private final CustomHollowEffigyFactoryProvider customEffigyFactoryProvider;
+    private final HollowRecordDiffUI diffUI;
     private final String typeName;
     private final int fromOrdinal;
     private final int toOrdinal;
     private final long deadlineBeforePairingTimeout;
 
-    public HollowObjectDiffViewGenerator(HollowDataAccess fromDataAccess, HollowDataAccess toDataAccess, CustomHollowEffigyFactoryProvider customEffigyFactoryProvider, String typeName, int fromOrdinal, int toOrdinal) {
+    public HollowObjectDiffViewGenerator(HollowDataAccess fromDataAccess, HollowDataAccess toDataAccess, HollowRecordDiffUI diffUI, String typeName, int fromOrdinal, int toOrdinal) {
         this.fromDataAccess = fromDataAccess;
         this.toDataAccess = toDataAccess;
-        this.customEffigyFactoryProvider = customEffigyFactoryProvider;
+        this.diffUI = diffUI;
         this.typeName = typeName;
         this.fromOrdinal = fromOrdinal;
         this.toOrdinal = toOrdinal;
@@ -53,8 +53,8 @@ public class HollowObjectDiffViewGenerator {
     public List<HollowDiffViewRow> getHollowDiffViewRows() {
         HollowEffigy fromEffigy, toEffigy;
 
-        if(customEffigyFactoryProvider != null && customEffigyFactoryProvider.getCustomHollowEffigyFactory(typeName) != null) {
-            CustomHollowEffigyFactory effigyFactory = customEffigyFactoryProvider.getCustomHollowEffigyFactory(typeName);
+        if(diffUI != null && diffUI.getCustomHollowEffigyFactory(typeName) != null) {
+            CustomHollowEffigyFactory effigyFactory = diffUI.getCustomHollowEffigyFactory(typeName);
             synchronized(effigyFactory) {
                 effigyFactory.setFromHollowRecord(fromDataAccess.getTypeDataAccess(typeName), fromOrdinal);
                 effigyFactory.setToHollowRecord(toDataAccess.getTypeDataAccess(typeName), toOrdinal);
@@ -76,7 +76,7 @@ public class HollowObjectDiffViewGenerator {
     }
 
     private void traverseEffigyToCreateViewRows(List<HollowDiffViewRow> viewRows, HollowEffigy from, HollowEffigy to, int rowId, int indentation, boolean moreFromRows[], boolean moreToRows[]) {
-        List<EffigyFieldPair> pairs = HollowEffigyFieldPairer.pair(from, to, deadlineBeforePairingTimeout);
+        List<EffigyFieldPair> pairs = HollowEffigyFieldPairer.pair(from, to, diffUI.getMatchHints(), deadlineBeforePairingTimeout);
 
         List<HollowDiffViewRow> directChildren = new ArrayList<HollowDiffViewRow>();
 
