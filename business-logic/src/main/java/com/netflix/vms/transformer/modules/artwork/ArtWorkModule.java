@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.modules.artwork;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.UnknownArtworkImageType;
+import com.netflix.vms.transformer.hollowoutput.ArtworkReExploreLongTimestamp;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_IMAGE_FORMAT;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_RECIPE;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_TERRITORY_COUNTRIES;
@@ -365,6 +366,11 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         }
         if (keyListValues.containsKey("PERSON_IDS")) {
             passThrough.personIdStrs = keyListValues.get("PERSON_IDS");
+            setBasicPassThrough = true;
+        }
+        if (keyValues.containsKey("REEXPLORE_TIME")) {
+            long timestamp = Long.valueOf(keyValues.get("REEXPLORE_TIME"));
+            passThrough.reExploreLongTimestamp = new ArtworkReExploreLongTimestamp(timestamp);
             setBasicPassThrough = true;
         }
 
