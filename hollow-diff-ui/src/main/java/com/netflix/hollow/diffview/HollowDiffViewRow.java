@@ -17,78 +17,92 @@
  */
 package com.netflix.hollow.diffview;
 
+import java.util.ArrayList;
+
+import java.util.List;
 import com.netflix.hollow.diffview.effigy.pairer.HollowEffigyFieldPairer.EffigyFieldPair;
 
 public class HollowDiffViewRow {
 
+    private final int[] rowPath;
     private final EffigyFieldPair fieldPair;
-    private final int indentation;
-    private final int numDescendentRows;
-    private final int rowId;
-    private boolean unrolled;
-    private boolean partiallyUnrolled;
-    private boolean visibleForPartialUnroll;
+
+    private boolean isVisible;
+    
+    private final List<HollowDiffViewRow> children;
+    
     private final long moreFromRowsBits;
     private final long moreToRowsBits;
 
-    public HollowDiffViewRow(EffigyFieldPair fieldPair, int rowId, int indentation, int numDescendentRows, boolean[] moreFromRows, boolean[] moreToRows) {
+    public HollowDiffViewRow(EffigyFieldPair fieldPair, int[] rowPath, boolean[] moreFromRows, boolean[] moreToRows) {
         this.fieldPair = fieldPair;
-        this.indentation = indentation;
-        this.numDescendentRows = numDescendentRows;
-        this.rowId = rowId;
+        this.rowPath = rowPath;
 
         long moreFromRowsBits = 0;
         long moreToRowsBits = 0;
 
-        for(int i=0;i<=indentation;i++) {
+        for(int i=0;i<=rowPath.length;i++) {
             if(moreFromRows[i])
                 moreFromRowsBits |= 1 << i;
             if(moreToRows[i])
                 moreToRowsBits |= 1 << i;
         }
 
+        this.children = new ArrayList<HollowDiffViewRow>();
+        this.isVisible = false;
+        
         this.moreFromRowsBits = moreFromRowsBits;
         this.moreToRowsBits = moreToRowsBits;
     }
-
+    
     public EffigyFieldPair getFieldPair() {
         return fieldPair;
     }
 
-    public int getRowId() {
-        return rowId;
+    public int[] getRowPath() {
+        return rowPath;
     }
-
+    
     public int getIndentation() {
-        return indentation;
+        return rowPath.length;
+    }
+    
+    public void setVisibility(boolean isVisible) {
+        this.isVisible = isVisible;
+    }
+    
+    public boolean isVisible() {
+        return isVisible;
+    }
+    
+    public Action getAvailableAction() {
+        if(children.isEmpty())
+            return Action.NONE;
+        
+        boolean foundVisibleChild = false;
+        boolean foundInvisibleChild = false;
+        
+        for(HollowDiffViewRow child : children) {
+            if(child.isVisible()) {
+                if(foundInvisibleChild)
+                    return Action.PARTIAL_UNCOLLAPSE;
+                foundVisibleChild = true;
+            } else {
+                if(foundVisibleChild)
+                    return Action.PARTIAL_UNCOLLAPSE;
+                foundInvisibleChild = true;
+            }
+        }
+        
+        return foundVisibleChild ? Action.COLLAPSE : Action.UNCOLLAPSE;
     }
 
-    public void setUnrolled(boolean unrolled) {
-        this.unrolled = unrolled;
+    void addChild(HollowDiffViewRow child) {
+        children.add(child);
     }
 
-    public boolean isUnrolled() {
-        return unrolled;
-    }
-
-    public void setPartiallyUnrolled(boolean partiallyUnrolled) {
-        this.partiallyUnrolled = partiallyUnrolled;
-    }
-
-    public boolean isPartiallyUnrolled() {
-        return partiallyUnrolled;
-    }
-
-    public void setVisibleForPartialUnroll(boolean visible) {
-        this.visibleForPartialUnroll = visible;
-    }
-
-    public boolean isVisibleForPartialUnroll() {
-        return visibleForPartialUnroll;
-    }
-
-    public int getNumDescendentRows() {
-        return numDescendentRows;
+    public List<HollowDiffViewRow> getChildren() {
+        return children;
     }
 
     public boolean hasMoreFromRows(int indentation) {
@@ -97,5 +111,12 @@ public class HollowDiffViewRow {
 
     public boolean hasMoreToRows(int indentation) {
         return (moreToRowsBits & (1 << indentation)) != 0;
+    }
+    
+    public static enum Action {
+        COLLAPSE,
+        UNCOLLAPSE,
+        PARTIAL_UNCOLLAPSE,
+        NONE
     }
 }

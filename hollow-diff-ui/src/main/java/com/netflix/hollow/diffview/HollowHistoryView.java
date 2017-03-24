@@ -17,7 +17,6 @@
  */
 package com.netflix.hollow.diffview;
 
-import java.util.List;
 
 public class HollowHistoryView extends HollowObjectView {
 
@@ -25,8 +24,8 @@ public class HollowHistoryView extends HollowObjectView {
     private final String type;
     private final int keyOrdinal;
 
-    public HollowHistoryView(long historicalVersion, String type, int keyOrdinal, List<HollowDiffViewRow> rows) {
-        super(rows);
+    public HollowHistoryView(long historicalVersion, String type, int keyOrdinal, HollowDiffViewRow rootRow) {
+        super(rootRow);
         this.historicalVersion = historicalVersion;
         this.type = type;
         this.keyOrdinal = keyOrdinal;

@@ -17,131 +17,114 @@
  */
 package com.netflix.hollow.diffview;
 
-import java.util.List;
 
 public abstract class HollowObjectView {
 
     private static final int MAX_INITIAL_VISIBLE_ROWS_BEFORE_COLLAPSING_DIFFS = 300;
 
-    private final List<HollowDiffViewRow> rows;
+    private final HollowDiffViewRow rootRow;
 
-    public HollowObjectView(List<HollowDiffViewRow> rows) {
-        this.rows = rows;
+    public HollowObjectView(HollowDiffViewRow rootRow) {
+        this.rootRow = rootRow;
     }
 
-    public List<HollowDiffViewRow> getRows() {
-        return rows;
+    public HollowDiffViewRow getRootRow() {
+        return rootRow;
     }
 
     public void resetView() {
-        boolean hasAnyDiff = false;
-
-        for(HollowDiffViewRow row : rows) {
-            if(row.getFieldPair().isDiff()) {
-                row.setVisibleForPartialUnroll(true);
-                row.setUnrolled(true);
-                hasAnyDiff = true;
-            } else if(hasAnyDiffChildren(rows, row.getRowId(), false)) {
-                row.setVisibleForPartialUnroll(true);
-                if(hasAnyNonDiffChildren(rows, row.getRowId(), false)) {
-                    row.setPartiallyUnrolled(true);
-                } else {
-                    row.setUnrolled(true);
+        int totalVisibleRows = resetViewForDiff(rootRow, 0);
+        
+        if(totalVisibleRows > MAX_INITIAL_VISIBLE_ROWS_BEFORE_COLLAPSING_DIFFS) {
+            collapseChildrenUnderRootDiffRows(rootRow);
+        } else if(totalVisibleRows == 0) {
+            totalVisibleRows = resetViewForOrderingChanges(rootRow, 0);
+            if(totalVisibleRows > MAX_INITIAL_VISIBLE_ROWS_BEFORE_COLLAPSING_DIFFS) {
+                collapseChildrenUnderRootOrderingDiffRows(rootRow);
+            }
+        }
+    }
+    
+    private int resetViewForDiff(HollowDiffViewRow row, int runningVisibilityCount) {
+        int branchVisibilityCount = 0;
+        
+        if(row.getFieldPair().isDiff()) {
+            row.setVisibility(true);
+            branchVisibilityCount++;
+            
+            branchVisibilityCount += makeAllChildrenVisible(row, branchVisibilityCount + runningVisibilityCount);
+        } else {
+            for(HollowDiffViewRow child : row.getChildren()) {
+                branchVisibilityCount += resetViewForDiff(child, branchVisibilityCount + runningVisibilityCount);
+                
+                if(branchVisibilityCount > 0) {
+                    row.setVisibility(true);
+                    branchVisibilityCount++;
                 }
             }
         }
-
-        int visibleRows = 1 + countVisibleDescendents(rows, 0);
-
-        if(visibleRows > MAX_INITIAL_VISIBLE_ROWS_BEFORE_COLLAPSING_DIFFS) {
-            for(HollowDiffViewRow row : rows) {
-                if(row.getFieldPair().isDiff()) {
-                    collapseSelfAndAllDescendents(rows, row.getRowId());
-                }
-            }
+        
+        return branchVisibilityCount;
+    }
+    
+    private int makeAllChildrenVisible(HollowDiffViewRow row, int runningVisibilityCount) {
+        int branchVisibilityCount = 0;
+        
+        for(HollowDiffViewRow child : row.getChildren()) {
+            child.setVisibility(true);
+            branchVisibilityCount++;
+            
+            branchVisibilityCount += makeAllChildrenVisible(child, branchVisibilityCount);
         }
-
-        if(!hasAnyDiff) {
-            for(HollowDiffViewRow row : rows) {
-                if(row.getFieldPair().isDiff()) {
-                    row.setVisibleForPartialUnroll(true);
-                    row.setUnrolled(true);
-                    hasAnyDiff = true;
-                } else if(row.getFieldPair().getFromIdx() != row.getFieldPair().getToIdx()) {
-                    row.setVisibleForPartialUnroll(true);
-                } else if(hasAnyDiffChildren(rows, row.getRowId(), true)) {
-                    row.setVisibleForPartialUnroll(true);
-                    if(hasAnyNonDiffChildren(rows, row.getRowId(), true)) {
-                        row.setPartiallyUnrolled(true);
-                    } else {
-                        row.setUnrolled(true);
-                    }
-                }
+        
+        return branchVisibilityCount;
+    }
+    
+    private void collapseChildrenUnderRootDiffRows(HollowDiffViewRow row) {
+        for(HollowDiffViewRow child : row.getChildren()) {
+            if(child.getFieldPair().isDiff()) {
+                makeAllChildrenInvisible(child);
+            } else {
+                collapseChildrenUnderRootDiffRows(child);
             }
         }
     }
 
-    private boolean hasAnyDiffChildren(List<HollowDiffViewRow> rows, int rowId, boolean showOrderingDiffs) {
-        HollowDiffViewRow row = rows.get(rowId);
-        for(int i=rowId + 1;i<=rowId + row.getNumDescendentRows();i++) {
-            if(rows.get(i).getFieldPair().isDiff())
-                return true;
-            if(showOrderingDiffs && rows.get(i).getFieldPair().getFromIdx() != rows.get(i).getFieldPair().getToIdx())
-                return true;
-        }
-        return false;
-    }
+    private int resetViewForOrderingChanges(HollowDiffViewRow row, int runningVisibilityCount) {
+        int branchVisibilityCount = 0;
 
-    private boolean hasAnyNonDiffChildren(List<HollowDiffViewRow> rows, int rowId, boolean showOrderingDiffs) {
-        HollowDiffViewRow parentRow = rows.get(rowId);
-
-        if(parentRow.getFieldPair().isLeafNode())
-            return false;
-
-        for(int i=rowId + 1;i<=rowId + parentRow.getNumDescendentRows();i++) {
-            HollowDiffViewRow currentRow = rows.get(i);
-            if(!currentRow.getFieldPair().isDiff() && !hasAnyDiffChildren(rows, i, showOrderingDiffs)) {
-                if(!showOrderingDiffs || currentRow.getFieldPair().getFromIdx() == currentRow.getFieldPair().getToIdx())
-                    return true;
-            }
-
-            if(!currentRow.getFieldPair().isLeafNode())
-                i += currentRow.getNumDescendentRows();
-        }
-        return false;
-    }
-
-    private int countVisibleDescendents(List<HollowDiffViewRow> rows, int beginRowId) {
-        HollowDiffViewRow parentRow = rows.get(beginRowId);
-        int endRowId = beginRowId + rows.get(beginRowId).getNumDescendentRows();
-
-        int visibleRows = 0;
-
-        for(int i=beginRowId+1;i < endRowId;i++) {
-            HollowDiffViewRow currentRow = rows.get(i);
-            boolean rowIsVisible = parentRow.isUnrolled() || currentRow.isVisibleForPartialUnroll();
-
-            if(rowIsVisible) {
-                if(!currentRow.getFieldPair().isLeafNode()) {
-                    if(currentRow.isUnrolled() || currentRow.isPartiallyUnrolled())
-                        visibleRows += countVisibleDescendents(rows, i);
+        if(row.getFieldPair().isOrderingDiff()) {
+            row.setVisibility(true);
+            branchVisibilityCount++;
+        } else {
+            for(HollowDiffViewRow child : row.getChildren()) {
+                int childBranchVisibilityCount = resetViewForOrderingChanges(child, runningVisibilityCount + branchVisibilityCount);
+                
+                if(childBranchVisibilityCount > 0) {
+                    row.setVisibility(true);
+                    branchVisibilityCount += childBranchVisibilityCount;
                 }
-
-                visibleRows++;
             }
-
-            if(!currentRow.getFieldPair().isLeafNode())
-                i += currentRow.getNumDescendentRows();
         }
-        return visibleRows;
+        
+        return branchVisibilityCount;
     }
-
-    private boolean collapseSelfAndAllDescendents(List<HollowDiffViewRow> rows, int rowId) {
-        HollowDiffViewRow row = rows.get(rowId);
-        for(int i=rowId;i<=rowId + row.getNumDescendentRows();i++) {
-            rows.get(i).setUnrolled(false);
+    
+    private void collapseChildrenUnderRootOrderingDiffRows(HollowDiffViewRow row) {
+        for(HollowDiffViewRow child : row.getChildren()) {
+            if(child.getFieldPair().isOrderingDiff()) {
+                makeAllChildrenInvisible(child);
+            } else {
+                collapseChildrenUnderRootOrderingDiffRows(child);
+            }
         }
-        return false;
+    }
+    
+    private void makeAllChildrenInvisible(HollowDiffViewRow row) {
+        for(HollowDiffViewRow child : row.getChildren()) {
+            child.setVisibility(false);
+            makeAllChildrenInvisible(child);
+        }
     }
 
 }

@@ -19,7 +19,7 @@ package com.netflix.hollow.diffview;
 
 import com.netflix.hollow.diff.ui.HollowDiffSession;
 import java.io.IOException;
-import java.util.List;
+import java.io.Writer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -32,109 +32,85 @@ public class DiffViewOutputGenerator {
     }
 
     public void collapseRow(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        HollowDiffSession session = HollowDiffSession.getSession(req, resp);
-        HollowObjectView objectView = viewProvider.getObjectView(req, session);
-
-        int row = Integer.parseInt(req.getParameter("row"));
-        HollowDiffViewRow collapseRow = objectView.getRows().get(row);
-
-        collapseRow.setUnrolled(false);
-
-        resp.getWriter().write(String.valueOf(collapseRow.getRowId() + collapseRow.getNumDescendentRows() + 1));
-        resp.getWriter().write("|");
-        resp.getWriter().write(String.valueOf(showUncollapseAllButton(collapseRow, objectView.getRows())));
+        HollowDiffViewRow row = findRow(req, resp);
+        
+        for(HollowDiffViewRow child : row.getChildren())
+            child.setVisibility(false);
+        
+        resp.getWriter().write("ok");
     }
-
 
     public void uncollapseRow(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        HollowDiffViewRow row = findRow(req, resp);
+        
+        for(HollowDiffViewRow child : row.getChildren())
+            child.setVisibility(true);
+
+        buildChildRowDisplayData(row, resp.getWriter());
+    }
+    
+    private HollowDiffViewRow findRow(HttpServletRequest req, HttpServletResponse resp) {
         HollowDiffSession session = HollowDiffSession.getSession(req, resp);
         HollowObjectView objectView = viewProvider.getObjectView(req, session);
 
-        boolean uncollapseAll = "true".equals(req.getParameter("all"));
+        int rowPath[] = getRowPath(req.getParameter("row"));
+        HollowDiffViewRow row = objectView.getRootRow();
+        for(int i=0;i<rowPath.length;i++)
+            row = row.getChildren().get(rowPath[i]);
+        return row;
+    }
+    
+    private int[] getRowPath(String rowPathStr) {
+        String rowPathElementStrings[] = rowPathStr.split("\\.");
+        
+        int rowPath[] = new int[rowPathElementStrings.length];
+        
+        for(int i=0;i<rowPathElementStrings.length;i++)
+            rowPath[i] = Integer.parseInt(rowPathElementStrings[i]);
 
-        int row = Integer.parseInt(req.getParameter("row"));
-        objectView.getRows().get(row).setUnrolled(true);
-        objectView.getRows().get(row).setPartiallyUnrolled(false);
-
-        String data = getRowDisplayData(objectView, row, uncollapseAll);
-
-        resp.getWriter().write(data);
+        return rowPath;
     }
 
-    public static String getRowDisplayData(HollowObjectView objectView, int row, boolean uncollapseAll) {
-
-        List<HollowDiffViewRow> rows = objectView.getRows();
-
-        StringBuilder data = new StringBuilder();
-        int numDescendentRows = rows.get(row).getNumDescendentRows();
-
-        int partialUnrollEnd = -1;
-
-        for(int i=row+1;i<=row+numDescendentRows;i++) {
-            HollowDiffViewRow currentRow = rows.get(i);
-
-            if(uncollapseAll && !currentRow.getFieldPair().isLeafNode()) {
-                currentRow.setUnrolled(true);
-                currentRow.setPartiallyUnrolled(false);
-            }
-
-            if(currentRow.isPartiallyUnrolled()) {
-                if(i + currentRow.getNumDescendentRows() > partialUnrollEnd)
-                    partialUnrollEnd = i + currentRow.getNumDescendentRows() + 1;
-            }
-
-            if(i >= partialUnrollEnd || currentRow.isVisibleForPartialUnroll()) {
-                if(i > row+1)
-                    data.append("|");
-                data.append(i).append("|");
-                data.append(showUncollapseButton(currentRow)).append("|");
-                data.append(showUncollapseAllButton(currentRow, rows)).append("|");
-                data.append(showCollapseButton(currentRow)).append("|");
-                data.append(showPartialUnrollButton(currentRow)).append("|");
-                data.append(marginIdx(currentRow.getFieldPair().getFromIdx())).append("|");
-                data.append(fromCellClassname(currentRow)).append("|");
-                data.append(fromContent(currentRow)).append("|");
-                data.append(marginIdx(currentRow.getFieldPair().getToIdx())).append("|");
-                data.append(toCellClassname(currentRow)).append("|");
-                data.append(toContent(currentRow));
-
-                if(!currentRow.getFieldPair().isLeafNode() && !currentRow.isUnrolled() && !currentRow.isPartiallyUnrolled() && !uncollapseAll) {
-                    i += currentRow.getNumDescendentRows();
+    public static void buildChildRowDisplayData(HollowDiffViewRow parentRow, Writer writer) throws IOException {
+        buildChildRowDisplayData(parentRow, writer, true);
+    }
+    
+    private static void buildChildRowDisplayData(HollowDiffViewRow parentRow, Writer writer, boolean firstRow) throws IOException {
+        
+        for(HollowDiffViewRow row : parentRow.getChildren()) {
+            if(row.isVisible()) {
+                if(firstRow) {
+                    firstRow = false;
+                } else {
+                    writer.write("|");
                 }
+                
+                writeRowPathString(row, writer);                          writer.write("|");
+                writer.write(row.getAvailableAction().toString());        writer.write("|");
+                writer.write(marginIdx(row.getFieldPair().getFromIdx())); writer.write("|");
+                writer.write(fromCellClassname(row));                     writer.write("|");
+                writer.write(fromContent(row));                           writer.write("|");
+                writer.write(marginIdx(row.getFieldPair().getToIdx()));   writer.write("|");
+                writer.write(toCellClassname(row));                       writer.write("|");
+                writer.write(toContent(row));
+                
+                buildChildRowDisplayData(row, writer, false);
             }
         }
-        return data.toString();
+    }
+    
+    private static void writeRowPathString(HollowDiffViewRow row, Writer writer) throws IOException {
+        for(int i=0;i<row.getRowPath().length;i++) {
+            if(i > 0)
+                writer.write('.');
+            writer.write(String.valueOf(row.getRowPath()[i]));
+        }
     }
 
     private static String marginIdx(int idx) {
         if(idx == -1)
             return "";
         return String.valueOf(idx);
-    }
-
-    private static boolean showPartialUnrollButton(HollowDiffViewRow currentRow) {
-        return currentRow.isPartiallyUnrolled();
-    }
-
-    private static boolean showUncollapseButton(HollowDiffViewRow currentRow) {
-        return !currentRow.isUnrolled() && !currentRow.isPartiallyUnrolled() && currentRow.getNumDescendentRows() > 0;
-    }
-
-    private static boolean showUncollapseAllButton(HollowDiffViewRow currentRow, List<HollowDiffViewRow> allRows) {
-        if(showUncollapseButton(currentRow)) {
-            int startRow = currentRow.getRowId() + 1;
-            int endRow = startRow + currentRow.getNumDescendentRows();
-            for(int i=startRow;i<endRow;i++) {
-                currentRow = allRows.get(i);
-                if(showUncollapseButton(currentRow) || showPartialUnrollButton(currentRow))
-                    return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean showCollapseButton(HollowDiffViewRow currentRow) {
-        return (currentRow.isUnrolled() && currentRow.getNumDescendentRows() > 0);
     }
 
     private static String fromCellClassname(HollowDiffViewRow currentRow) {

@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.diffview;
 
+import java.util.Arrays;
+
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.diffview.effigy.CustomHollowEffigyFactory;
 import com.netflix.hollow.diffview.effigy.HollowEffigy;
@@ -24,12 +26,11 @@ import com.netflix.hollow.diffview.effigy.HollowEffigyFactory;
 import com.netflix.hollow.diffview.effigy.HollowRecordDiffUI;
 import com.netflix.hollow.diffview.effigy.pairer.HollowEffigyFieldPairer;
 import com.netflix.hollow.diffview.effigy.pairer.HollowEffigyFieldPairer.EffigyFieldPair;
-import java.util.ArrayList;
 import java.util.List;
 
 public class HollowObjectDiffViewGenerator {
 
-    private final long MAX_TIME_BEFORE_PAIRING_TIMEOUT = 15000L;
+    private final long MAX_TIME_BEFORE_PAIRING_TIMEOUT = 150000L;
 
     private final HollowDataAccess fromDataAccess;
     private final HollowDataAccess toDataAccess;
@@ -49,7 +50,7 @@ public class HollowObjectDiffViewGenerator {
         this.deadlineBeforePairingTimeout = System.currentTimeMillis() + MAX_TIME_BEFORE_PAIRING_TIMEOUT;
     }
 
-    public List<HollowDiffViewRow> getHollowDiffViewRows() {
+    public HollowDiffViewRow getHollowDiffViewRows() {
         HollowEffigy fromEffigy, toEffigy;
 
         if(diffUI != null && diffUI.getCustomHollowEffigyFactory(typeName) != null) {
@@ -67,39 +68,36 @@ public class HollowObjectDiffViewGenerator {
             toEffigy = toOrdinal == -1 ? null : effigyFactory.effigy(toDataAccess, typeName, toOrdinal);
         }
 
-        List<HollowDiffViewRow> rows = new ArrayList<HollowDiffViewRow>();
-        traverseEffigyToCreateViewRows(rows, fromEffigy, toEffigy, 0, 1, new boolean[64], new boolean[64]);
-        insertRootRow(rows, fromEffigy, toEffigy);
+        HollowDiffViewRow rootRow = createRootRow(fromEffigy, toEffigy);
+        traverseEffigyToCreateViewRows(rootRow, fromEffigy, toEffigy, new boolean[64], new boolean[64]);
 
-        return rows;
+        return rootRow;
     }
 
-    private void traverseEffigyToCreateViewRows(List<HollowDiffViewRow> viewRows, HollowEffigy from, HollowEffigy to, int rowId, int indentation, boolean moreFromRows[], boolean moreToRows[]) {
+    private void traverseEffigyToCreateViewRows(HollowDiffViewRow parent, HollowEffigy from, HollowEffigy to, boolean moreFromRows[], boolean moreToRows[]) {
         List<EffigyFieldPair> pairs = HollowEffigyFieldPairer.pair(from, to, diffUI.getMatchHints(), deadlineBeforePairingTimeout);
-
-        List<HollowDiffViewRow> directChildren = new ArrayList<HollowDiffViewRow>();
 
         for(int i=0;i<pairs.size();i++) {
             EffigyFieldPair pair = pairs.get(i);
 
+            int indentation = parent.getRowPath().length + 1;
+            
             moreFromRows[indentation] = moreRows(pairs, true, i);
             moreToRows[indentation] = moreRows(pairs, false, i);
 
             HollowDiffViewRow newRow;
 
+            int rowPath[] = Arrays.copyOf(parent.getRowPath(), indentation); 
+            rowPath[rowPath.length - 1] = i; 
+            
             if(pair.isLeafNode()) {
-                newRow = new HollowDiffViewRow(pair, ++rowId, indentation, 0, moreFromRows, moreToRows);
-                viewRows.add(newRow);
+                newRow = new HollowDiffViewRow(pair, rowPath, moreFromRows, moreToRows);
             } else {
-                List<HollowDiffViewRow> descendents = new ArrayList<HollowDiffViewRow>();
-                traverseEffigyToCreateViewRows(descendents, pair, ++rowId, indentation + 1, moreFromRows, moreToRows);
-                newRow = new HollowDiffViewRow(pair, rowId, indentation, descendents.size(), moreFromRows, moreToRows);
-                rowId += descendents.size();
-                viewRows.add(newRow);
-                viewRows.addAll(descendents);
+                newRow = new HollowDiffViewRow(pair, rowPath, moreFromRows, moreToRows);
+                traverseEffigyToCreateViewRows(newRow, pair, moreFromRows, moreToRows);
             }
 
-            directChildren.add(newRow);
+            parent.addChild(newRow);
         }
     }
 
@@ -116,20 +114,20 @@ public class HollowObjectDiffViewGenerator {
         return false;
     }
 
-    private void traverseEffigyToCreateViewRows(List<HollowDiffViewRow> rows, EffigyFieldPair fieldPair, int rowId, int indentation, boolean moreFromRows[], boolean moreToRows[]) {
+    private void traverseEffigyToCreateViewRows(HollowDiffViewRow parent, EffigyFieldPair fieldPair, boolean moreFromRows[], boolean moreToRows[]) {
         HollowEffigy from = fieldPair.getFrom() != null ? (HollowEffigy) fieldPair.getFrom().getValue() : null;
         HollowEffigy to   = fieldPair.getTo()   != null ? (HollowEffigy) fieldPair.getTo().getValue()   : null;
 
-        traverseEffigyToCreateViewRows(rows, from, to, rowId, indentation, moreFromRows, moreToRows);
+        traverseEffigyToCreateViewRows(parent, from, to, moreFromRows, moreToRows);
     }
 
-    private void insertRootRow(List<HollowDiffViewRow> rows, HollowEffigy fromEffigy, HollowEffigy toEffigy) {
+    private HollowDiffViewRow createRootRow(HollowEffigy fromEffigy, HollowEffigy toEffigy) {
         HollowEffigy.Field fromField = fromEffigy == null ? null : new HollowEffigy.Field(null, fromEffigy);
         HollowEffigy.Field toField = toEffigy == null ? null : new HollowEffigy.Field(null, toEffigy);
 
         EffigyFieldPair fieldPair = new EffigyFieldPair(fromField, toField, -1, -1);
         boolean moreRows[] = new boolean[] { false };
-        rows.add(0, new HollowDiffViewRow(fieldPair, 0, 0, rows.size(), moreRows, moreRows));
+        return new HollowDiffViewRow(fieldPair, new int[0], moreRows, moreRows);
     }
 
 }

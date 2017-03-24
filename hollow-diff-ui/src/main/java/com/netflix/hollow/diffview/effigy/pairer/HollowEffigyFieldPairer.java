@@ -83,6 +83,9 @@ public abstract class HollowEffigyFieldPairer {
         public boolean isDiff() {
             return isDiff;
         }
+        public boolean isOrderingDiff() {
+            return fromIdx != toIdx;
+        }
     }
 
     public static List<EffigyFieldPair> pair(HollowEffigy from, HollowEffigy to, Map<String, PrimaryKey> matchHints, long deadlineBeforePairingTimeout) {
