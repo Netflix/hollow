@@ -270,10 +270,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.7"
+            "locked": "4.1.8"
         },
         "netflix:server-context": {
-            "locked": "4.1.7",
+            "locked": "4.1.8",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -711,10 +711,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.7"
+            "locked": "4.1.8"
         },
         "netflix:server-context": {
-            "locked": "4.1.7",
+            "locked": "4.1.8",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1152,10 +1152,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.7"
+            "locked": "4.1.8"
         },
         "netflix:server-context": {
-            "locked": "4.1.7",
+            "locked": "4.1.8",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1593,10 +1593,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.7"
+            "locked": "4.1.8"
         },
         "netflix:server-context": {
-            "locked": "4.1.7",
+            "locked": "4.1.8",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1854,7 +1854,7 @@
     },
     "nebulaRecommenderBom": {
         "netflix:runtime-platform-recommendations": {
-            "locked": "4.1.7",
+            "locked": "4.1.8",
             "requested": "latest.release"
         }
     },
@@ -2139,10 +2139,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.7"
+            "locked": "4.1.8"
         },
         "netflix:server-context": {
-            "locked": "4.1.7",
+            "locked": "4.1.8",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -2580,10 +2580,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.7"
+            "locked": "4.1.8"
         },
         "netflix:server-context": {
-            "locked": "4.1.7",
+            "locked": "4.1.8",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3030,10 +3030,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.7"
+            "locked": "4.1.8"
         },
         "netflix:server-context": {
-            "locked": "4.1.7",
+            "locked": "4.1.8",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3480,10 +3480,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.7"
+            "locked": "4.1.8"
         },
         "netflix:server-context": {
-            "locked": "4.1.7",
+            "locked": "4.1.8",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3930,10 +3930,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.7"
+            "locked": "4.1.8"
         },
         "netflix:server-context": {
-            "locked": "4.1.7",
+            "locked": "4.1.8",
             "transitive": [
                 "netflix:netflix-config"
             ]
