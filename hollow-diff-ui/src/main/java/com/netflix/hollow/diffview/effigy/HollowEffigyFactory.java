@@ -31,8 +31,10 @@ import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.diffview.effigy.HollowEffigy.Field;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.codec.binary.Base64;
 
@@ -51,21 +53,36 @@ public class HollowEffigyFactory {
             return null;
 
         if(typeState instanceof HollowObjectTypeDataAccess) {
-            return objectEffigy((HollowObjectTypeDataAccess) typeState, ordinal);
+            return new HollowEffigy(this, (HollowObjectTypeDataAccess) typeState, ordinal);
         } else if(typeState instanceof HollowCollectionTypeDataAccess) {
-            return collectionEffigy((HollowCollectionTypeDataAccess) typeState, ordinal);
+            return new HollowEffigy(this, (HollowCollectionTypeDataAccess) typeState, ordinal);
         } else if(typeState instanceof HollowMapTypeDataAccess){
-            return mapEffigy((HollowMapTypeDataAccess) typeState, ordinal);
+            return new HollowEffigy(this, (HollowMapTypeDataAccess) typeState, ordinal);
         }
 
         throw new IllegalArgumentException("I don't know how to effigize a " + typeState.getClass());
     }
 
-
-    private HollowEffigy objectEffigy(HollowObjectTypeDataAccess typeDataAccess, int ordinal) {
+    List<Field> createFields(HollowEffigy effigy) {
+        switch(effigy.dataAccess.getSchema().getSchemaType()) {
+        case OBJECT:
+            return createObjectFields(effigy);
+        case LIST:
+        case SET:
+            return createCollectionFields(effigy);
+        case MAP:
+            return createMapFields(effigy);
+        }
+        
+        throw new IllegalArgumentException();
+    }
+    
+    List<Field> createObjectFields(HollowEffigy effigy) {
+        List<Field>fields = new ArrayList<Field>(); 
+        
+        HollowObjectTypeDataAccess typeDataAccess = (HollowObjectTypeDataAccess)effigy.dataAccess;
+        
         HollowObjectSchema schema = typeDataAccess.getSchema();
-        HollowEffigy effigy = new HollowEffigy(typeDataAccess, ordinal);
-
         for(int i=0;i<schema.numFields();i++) {
             String fieldName = schema.getFieldName(i);
             String fieldType = schema.getFieldType(i) == FieldType.REFERENCE ? schema.getReferencedType(i) : schema.getFieldType(i).toString();
@@ -73,73 +90,74 @@ public class HollowEffigyFactory {
 
             switch(schema.getFieldType(i)) {
             case BOOLEAN:
-                fieldValue = typeDataAccess.readBoolean(ordinal, i);
+                fieldValue = typeDataAccess.readBoolean(effigy.ordinal, i);
                 break;
             case BYTES:
-                fieldValue = base64.encodeToString(typeDataAccess.readBytes(ordinal, i));
+                fieldValue = base64.encodeToString(typeDataAccess.readBytes(effigy.ordinal, i));
                 break;
             case DOUBLE:
-                fieldValue = Double.valueOf(typeDataAccess.readDouble(ordinal, i));
+                fieldValue = Double.valueOf(typeDataAccess.readDouble(effigy.ordinal, i));
                 break;
             case FLOAT:
-                fieldValue = Float.valueOf(typeDataAccess.readFloat(ordinal, i));
+                fieldValue = Float.valueOf(typeDataAccess.readFloat(effigy.ordinal, i));
                 break;
             case INT:
-                fieldValue = Integer.valueOf(typeDataAccess.readInt(ordinal, i));
+                fieldValue = Integer.valueOf(typeDataAccess.readInt(effigy.ordinal, i));
                 break;
             case LONG:
-                long longVal = typeDataAccess.readLong(ordinal, i);
+                long longVal = typeDataAccess.readLong(effigy.ordinal, i);
                 if(longVal != Long.MIN_VALUE && "Date".equals(typeDataAccess.getSchema().getName()))
                     fieldValue = new Date(longVal).toString();
                 else
-                    fieldValue = Long.valueOf(typeDataAccess.readLong(ordinal, i));
+                    fieldValue = Long.valueOf(typeDataAccess.readLong(effigy.ordinal, i));
                 break;
             case STRING:
-                fieldValue = typeDataAccess.readString(ordinal, i);
+                fieldValue = typeDataAccess.readString(effigy.ordinal, i);
                 break;
             case REFERENCE:
-                fieldValue = effigy(typeDataAccess.getDataAccess(), schema.getReferencedType(i), typeDataAccess.readOrdinal(ordinal, i));
+                fieldValue = effigy(typeDataAccess.getDataAccess(), schema.getReferencedType(i), typeDataAccess.readOrdinal(effigy.ordinal, i));
             }
 
             Field field = new Field(fieldName, fieldType, fieldValue);
             if(schema.getFieldType(i) != FieldType.REFERENCE)
                 field = memoize(field);
             
-            effigy.add(field);
+            fields.add(field);
         }
-
-        return effigy;
+        
+        return fields;
     }
 
-    private HollowEffigy collectionEffigy(HollowCollectionTypeDataAccess typeDataAccess, int ordinal) {
+    private List<Field> createCollectionFields(HollowEffigy effigy) {
+        List<Field> fields = new ArrayList<Field>();
+        HollowCollectionTypeDataAccess typeDataAccess = (HollowCollectionTypeDataAccess) effigy.dataAccess;
         HollowCollectionSchema schema = typeDataAccess.getSchema();
-        HollowEffigy effigy = new HollowEffigy(typeDataAccess, ordinal);
 
-        HollowOrdinalIterator iter = typeDataAccess.ordinalIterator(ordinal);
+        HollowOrdinalIterator iter = typeDataAccess.ordinalIterator(effigy.ordinal);
         int elementOrdinal = iter.next();
         while(elementOrdinal != NO_MORE_ORDINALS) {
             HollowEffigy elementEffigy = effigy(typeDataAccess.getDataAccess(), schema.getElementType(), elementOrdinal);
-            effigy.add(new Field("element", elementEffigy));
+            fields.add(new Field("element", elementEffigy));
 
             elementOrdinal = iter.next();
         }
-
-        return effigy;
+        
+        return fields;
     }
 
-    private HollowEffigy mapEffigy(HollowMapTypeDataAccess typeDataAccess, int ordinal) {
+    private List<Field> createMapFields(HollowEffigy effigy) {
+        List<Field> fields = new ArrayList<Field>();
+        HollowMapTypeDataAccess typeDataAccess = (HollowMapTypeDataAccess)effigy.dataAccess;
         HollowMapSchema schema = typeDataAccess.getSchema();
-        HollowEffigy effigy = new HollowEffigy(typeDataAccess, ordinal);
-
-        HollowMapEntryOrdinalIterator iter = typeDataAccess.ordinalIterator(ordinal);
+        HollowMapEntryOrdinalIterator iter = typeDataAccess.ordinalIterator(effigy.ordinal);
         while(iter.next()) {
             HollowEffigy entryEffigy = new HollowEffigy("Map.Entry");
             entryEffigy.add(new Field("key", effigy(typeDataAccess.getDataAccess(), schema.getKeyType(), iter.getKey())));
             entryEffigy.add(new Field("value", effigy(typeDataAccess.getDataAccess(), schema.getValueType(), iter.getValue())));
-            effigy.add(new Field("entry", "Map.Entry", entryEffigy));
+            fields.add(new Field("entry", "Map.Entry", entryEffigy));
         }
-
-        return effigy;
+        
+        return fields;
     }
 
     private HollowEffigy.Field memoize(HollowEffigy.Field field) {

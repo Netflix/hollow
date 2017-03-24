@@ -27,23 +27,27 @@ import java.util.List;
  */
 public class HollowEffigy {
 
+    private final HollowEffigyFactory factory;
     private final String objectType;
-    private final HollowTypeDataAccess dataAccess;
-    private final int ordinal;
-    private final List<Field> fields;
+
+    final HollowTypeDataAccess dataAccess;
+    final int ordinal;
+    
+    private List<Field> fields;
 
     public HollowEffigy(String objectType) {
+        this.factory = null;
         this.objectType = objectType;
         this.dataAccess = null;
         this.ordinal = -1;
         this.fields = new ArrayList<Field>();
     }
     
-    public HollowEffigy(HollowTypeDataAccess dataAccess, int ordinal) {
+    public HollowEffigy(HollowEffigyFactory factory, HollowTypeDataAccess dataAccess, int ordinal) {
+        this.factory = factory;
         this.objectType = null;
         this.dataAccess = dataAccess;
         this.ordinal = ordinal;
-        this.fields = new ArrayList<Field>();
     }
 
     public void add(HollowEffigy.Field field) {
@@ -65,6 +69,8 @@ public class HollowEffigy {
     }
 
     public List<Field> getFields() {
+        if(fields == null)
+            fields = factory.createFields(this);
         return fields;
     }
 
