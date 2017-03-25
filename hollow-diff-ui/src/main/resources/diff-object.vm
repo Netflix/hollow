@@ -122,7 +122,7 @@ function httpGet(theUrl) {
 <table class="diff" id="difftable">
 <thead><tr><th/><th/><th class="texttitle">From</th><th/><th/><th class="texttitle">To</th></tr></thead>
 <tbody>
-<tr id="r0"><td class="margin"/><td class="margin"/><td class="equal">.&#x2515;&#x2501;&#x252F;&#x2501;&gt;($typeName)</td><td class="margin"/><td class="margin"/><td class="equal">.&#x2515;&#x2501;&#x252F;&#x2501;&gt;($typeName)</td></tr>
+<tr id="root"><td class="margin"/><td class="margin"/><td class="equal">.&#x2515;&#x2501;&#x252F;&#x2501;&gt;($typeName)</td><td class="margin"/><td class="margin"/><td class="equal">.&#x2515;&#x2501;&#x252F;&#x2501;&gt;($typeName)</td></tr>
 $initialHtml
 </tbody>
 </table>

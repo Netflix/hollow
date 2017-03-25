@@ -17,42 +17,29 @@
  */
 package com.netflix.hollow.diffview;
 
-import java.util.ArrayList;
-
-import java.util.List;
 import com.netflix.hollow.diffview.effigy.pairer.HollowEffigyFieldPairer.EffigyFieldPair;
+import java.util.List;
 
 public class HollowDiffViewRow {
 
     private final int[] rowPath;
     private final EffigyFieldPair fieldPair;
+    private final HollowDiffViewRow parent;
+    private final HollowObjectDiffViewGenerator viewGenerator;
 
     private boolean isVisible;
     
-    private final List<HollowDiffViewRow> children;
-    
-    private final long moreFromRowsBits;
-    private final long moreToRowsBits;
+    private List<HollowDiffViewRow> children;
 
-    public HollowDiffViewRow(EffigyFieldPair fieldPair, int[] rowPath, boolean[] moreFromRows, boolean[] moreToRows) {
+    private long moreFromRowsBits = -1;
+    private long moreToRowsBits = -1;
+
+    public HollowDiffViewRow(EffigyFieldPair fieldPair, int[] rowPath, HollowDiffViewRow parent, HollowObjectDiffViewGenerator viewGenerator) {
         this.fieldPair = fieldPair;
         this.rowPath = rowPath;
-
-        long moreFromRowsBits = 0;
-        long moreToRowsBits = 0;
-
-        for(int i=0;i<=rowPath.length;i++) {
-            if(moreFromRows[i])
-                moreFromRowsBits |= 1 << i;
-            if(moreToRows[i])
-                moreToRowsBits |= 1 << i;
-        }
-
-        this.children = new ArrayList<HollowDiffViewRow>();
+        this.parent = parent;
+        this.viewGenerator = viewGenerator;
         this.isVisible = false;
-        
-        this.moreFromRowsBits = moreFromRowsBits;
-        this.moreToRowsBits = moreToRowsBits;
     }
     
     public EffigyFieldPair getFieldPair() {
@@ -61,6 +48,10 @@ public class HollowDiffViewRow {
 
     public int[] getRowPath() {
         return rowPath;
+    }
+    
+    public HollowDiffViewRow getParent() {
+        return parent;
     }
     
     public int getIndentation() {
@@ -97,20 +88,46 @@ public class HollowDiffViewRow {
         return foundVisibleChild ? Action.COLLAPSE : Action.UNCOLLAPSE;
     }
 
-    void addChild(HollowDiffViewRow child) {
-        children.add(child);
-    }
-
     public List<HollowDiffViewRow> getChildren() {
+        if(children == null) {
+            children = viewGenerator.traverseEffigyToCreateViewRows(this);
+        }
         return children;
     }
 
     public boolean hasMoreFromRows(int indentation) {
+        if(moreFromRowsBits == -1)
+            buildMoreRowsBits();
         return (moreFromRowsBits & (1 << indentation)) != 0;
     }
 
     public boolean hasMoreToRows(int indentation) {
+        if(moreToRowsBits == -1)
+            buildMoreRowsBits();
         return (moreToRowsBits & (1 << indentation)) != 0;
+    }
+    
+    private void buildMoreRowsBits() {
+        HollowDiffViewRow ancestor = this.parent;
+        moreFromRowsBits = 0;
+        moreToRowsBits = 0;
+        
+        for(int i=rowPath.length;i>=1;i--) {
+            if(moreRows(ancestor, rowPath[i-1], true))
+                moreFromRowsBits |= 1 << i;
+            if(moreRows(ancestor, rowPath[i-1], false))
+                moreToRowsBits |= 1 << i;
+            ancestor = ancestor.getParent();
+        }
+    }
+    
+    private boolean moreRows(HollowDiffViewRow parent, int childIdx, boolean from) {
+        for(int i=childIdx+1;i<parent.getChildren().size();i++) {
+            EffigyFieldPair fieldPair = parent.getChildren().get(i).getFieldPair();
+            if((from && fieldPair.getFrom() != null) || (!from && fieldPair.getTo() != null))
+                return true;
+        }
+        return false;
     }
     
     public static enum Action {

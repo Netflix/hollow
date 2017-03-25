@@ -35,6 +35,9 @@ public abstract class HollowObjectView {
     public void resetView() {
         int totalVisibleRows = resetViewForDiff(rootRow, 0);
         
+        for(HollowDiffViewRow child : rootRow.getChildren())
+            child.setVisibility(true);
+        
         if(totalVisibleRows > MAX_INITIAL_VISIBLE_ROWS_BEFORE_COLLAPSING_DIFFS) {
             collapseChildrenUnderRootDiffRows(rootRow);
         } else if(totalVisibleRows == 0) {
