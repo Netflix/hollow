@@ -253,6 +253,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
         if(shards.length > 1)
             throw new UnsupportedOperationException("Cannot directly set data on sharded type state");
         shards[0].setCurrentData(data);
+        maxOrdinal = data.maxOrdinal;
     }
 
     @Override
