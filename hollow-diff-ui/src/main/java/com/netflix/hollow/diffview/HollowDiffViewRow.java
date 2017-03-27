@@ -18,84 +18,126 @@
 package com.netflix.hollow.diffview;
 
 import com.netflix.hollow.diffview.effigy.pairer.HollowEffigyFieldPairer.EffigyFieldPair;
+import java.util.List;
 
 public class HollowDiffViewRow {
 
+    private final int[] rowPath;
     private final EffigyFieldPair fieldPair;
-    private final int indentation;
-    private final int numDescendentRows;
-    private final int rowId;
-    private boolean unrolled;
-    private boolean partiallyUnrolled;
-    private boolean visibleForPartialUnroll;
-    private final long moreFromRowsBits;
-    private final long moreToRowsBits;
+    private final HollowDiffViewRow parent;
+    private final HollowObjectDiffViewGenerator viewGenerator;
 
-    public HollowDiffViewRow(EffigyFieldPair fieldPair, int rowId, int indentation, int numDescendentRows, boolean[] moreFromRows, boolean[] moreToRows) {
+    private boolean isVisible;
+    
+    private List<HollowDiffViewRow> children;
+
+    private long moreFromRowsBits = -1;
+    private long moreToRowsBits = -1;
+
+    public HollowDiffViewRow(EffigyFieldPair fieldPair, int[] rowPath, HollowDiffViewRow parent, HollowObjectDiffViewGenerator viewGenerator) {
         this.fieldPair = fieldPair;
-        this.indentation = indentation;
-        this.numDescendentRows = numDescendentRows;
-        this.rowId = rowId;
-
-        long moreFromRowsBits = 0;
-        long moreToRowsBits = 0;
-
-        for(int i=0;i<=indentation;i++) {
-            if(moreFromRows[i])
-                moreFromRowsBits |= 1 << i;
-            if(moreToRows[i])
-                moreToRowsBits |= 1 << i;
-        }
-
-        this.moreFromRowsBits = moreFromRowsBits;
-        this.moreToRowsBits = moreToRowsBits;
+        this.rowPath = rowPath;
+        this.parent = parent;
+        this.viewGenerator = viewGenerator;
+        this.isVisible = false;
     }
-
+    
+    public boolean areChildrenPopulated() {
+        return children != null;
+    }
+    
     public EffigyFieldPair getFieldPair() {
         return fieldPair;
     }
 
-    public int getRowId() {
-        return rowId;
+    public int[] getRowPath() {
+        return rowPath;
     }
-
+    
+    public HollowDiffViewRow getParent() {
+        return parent;
+    }
+    
     public int getIndentation() {
-        return indentation;
+        return rowPath.length;
+    }
+    
+    public void setVisibility(boolean isVisible) {
+        this.isVisible = isVisible;
+    }
+    
+    public boolean isVisible() {
+        return isVisible;
+    }
+    
+    public Action getAvailableAction() {
+        if(getChildren().isEmpty())
+            return Action.NONE;
+        
+        boolean foundVisibleChild = false;
+        boolean foundInvisibleChild = false;
+        
+        for(HollowDiffViewRow child : children) {
+            if(child.isVisible()) {
+                if(foundInvisibleChild)
+                    return Action.PARTIAL_UNCOLLAPSE;
+                foundVisibleChild = true;
+            } else {
+                if(foundVisibleChild)
+                    return Action.PARTIAL_UNCOLLAPSE;
+                foundInvisibleChild = true;
+            }
+        }
+        
+        return foundVisibleChild ? Action.COLLAPSE : Action.UNCOLLAPSE;
     }
 
-    public void setUnrolled(boolean unrolled) {
-        this.unrolled = unrolled;
-    }
-
-    public boolean isUnrolled() {
-        return unrolled;
-    }
-
-    public void setPartiallyUnrolled(boolean partiallyUnrolled) {
-        this.partiallyUnrolled = partiallyUnrolled;
-    }
-
-    public boolean isPartiallyUnrolled() {
-        return partiallyUnrolled;
-    }
-
-    public void setVisibleForPartialUnroll(boolean visible) {
-        this.visibleForPartialUnroll = visible;
-    }
-
-    public boolean isVisibleForPartialUnroll() {
-        return visibleForPartialUnroll;
-    }
-
-    public int getNumDescendentRows() {
-        return numDescendentRows;
+    public List<HollowDiffViewRow> getChildren() {
+        if(children == null) {
+            children = viewGenerator.traverseEffigyToCreateViewRows(this);
+        }
+        return children;
     }
 
     public boolean hasMoreFromRows(int indentation) {
+        if(moreFromRowsBits == -1)
+            buildMoreRowsBits();
         return (moreFromRowsBits & (1 << indentation)) != 0;
     }
 
     public boolean hasMoreToRows(int indentation) {
+        if(moreToRowsBits == -1)
+            buildMoreRowsBits();
         return (moreToRowsBits & (1 << indentation)) != 0;
+    }
+    
+    private void buildMoreRowsBits() {
+        HollowDiffViewRow ancestor = this.parent;
+        moreFromRowsBits = 0;
+        moreToRowsBits = 0;
+        
+        for(int i=rowPath.length;i>=1;i--) {
+            if(moreRows(ancestor, rowPath[i-1], true))
+                moreFromRowsBits |= 1 << i;
+            if(moreRows(ancestor, rowPath[i-1], false))
+                moreToRowsBits |= 1 << i;
+            ancestor = ancestor.getParent();
+        }
+    }
+    
+    private boolean moreRows(HollowDiffViewRow parent, int childIdx, boolean from) {
+        for(int i=childIdx+1;i<parent.getChildren().size();i++) {
+            EffigyFieldPair fieldPair = parent.getChildren().get(i).getFieldPair();
+            if((from && fieldPair.getFrom() != null) || (!from && fieldPair.getTo() != null))
+                return true;
+        }
+        return false;
+    }
+    
+    public static enum Action {
+        COLLAPSE,
+        UNCOLLAPSE,
+        PARTIAL_UNCOLLAPSE,
+        NONE
     }
 }

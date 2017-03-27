@@ -20,7 +20,6 @@ package com.netflix.hollow.diff.ui;
 import static com.netflix.hollow.diff.ui.HollowDiffSession.getSession;
 
 import com.netflix.hollow.core.index.key.PrimaryKey;
-
 import com.netflix.hollow.diff.ui.pages.DiffFieldPage;
 import com.netflix.hollow.diff.ui.pages.DiffObjectPage;
 import com.netflix.hollow.diff.ui.pages.DiffOverviewPage;
@@ -31,6 +30,8 @@ import com.netflix.hollow.diffview.HollowDiffViewProvider;
 import com.netflix.hollow.diffview.HollowObjectViewProvider;
 import com.netflix.hollow.diffview.effigy.CustomHollowEffigyFactory;
 import com.netflix.hollow.diffview.effigy.HollowRecordDiffUI;
+import com.netflix.hollow.diffview.effigy.pairer.exact.DiffExactRecordMatcher;
+import com.netflix.hollow.diffview.effigy.pairer.exact.ExactRecordMatcher;
 import com.netflix.hollow.tools.diff.HollowDiff;
 import java.io.IOException;
 import java.util.HashMap;
@@ -58,6 +59,7 @@ public class HollowDiffUI implements HollowRecordDiffUI {
 
     private final Map<String, PrimaryKey> matchHints;
     private final Map<String, CustomHollowEffigyFactory> customHollowEffigyFactories;
+    private final ExactRecordMatcher exactRecordMatcher;
 
     HollowDiffUI(String baseURLPath, String diffUIPath, HollowDiff diff, String fromBlobName, String toBlobName, VelocityEngine ve) {
         this.baseURLPath = baseURLPath;
@@ -74,6 +76,7 @@ public class HollowDiffUI implements HollowRecordDiffUI {
         this.diffViewOutputGenerator = new DiffViewOutputGenerator(viewProvider);
         this.customHollowEffigyFactories = new HashMap<String, CustomHollowEffigyFactory>();
         this.matchHints = new HashMap<String, PrimaryKey>();
+        this.exactRecordMatcher = new DiffExactRecordMatcher(diff.getEqualityMapping());
     }
     
     public boolean serveRequest(String pageName, HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -142,6 +145,11 @@ public class HollowDiffUI implements HollowRecordDiffUI {
     @Override
     public Map<String, PrimaryKey> getMatchHints() {
         return matchHints;
+    }
+    
+    @Override
+    public ExactRecordMatcher getExactRecordMatcher() {
+        return exactRecordMatcher;
     }
 
     public HollowObjectViewProvider getHollowObjectViewProvider() {

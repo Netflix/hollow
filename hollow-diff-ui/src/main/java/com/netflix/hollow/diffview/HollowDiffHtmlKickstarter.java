@@ -17,6 +17,10 @@
  */
 package com.netflix.hollow.diffview;
 
+import com.netflix.hollow.diffview.HollowDiffViewRow.Action;
+import java.io.IOException;
+import java.io.StringWriter;
+
 
 public class HollowDiffHtmlKickstarter {
 
@@ -27,17 +31,22 @@ public class HollowDiffHtmlKickstarter {
     }
 
     public String initialHtmlRows(HollowObjectView objectView) {
-        String diffViewOutput = DiffViewOutputGenerator.getRowDisplayData(objectView, 0, false);
+        
+        String diffViewOutput = null;
+        try {
+            StringWriter writer = new StringWriter();
+            DiffViewOutputGenerator.buildChildRowDisplayData(objectView.getRootRow(), writer);
+            diffViewOutput = writer.toString();
+        } catch(IOException unexpected) {
+            throw new RuntimeException(unexpected);
+        }
 
         StringBuilder initialHtml = new StringBuilder();
         StringTokenizer tokenizer = new StringTokenizer(diffViewOutput);
 
         while(tokenizer.hasMoreTokens()) {
-            String rowId = tokenizer.nextToken();
-            String showUncollapse = tokenizer.nextToken();
-            String showUncollapseAll = tokenizer.nextToken();
-            String showCollapseToRow = tokenizer.nextToken();
-            String showPartialUncollapse = tokenizer.nextToken();
+            String rowPath = tokenizer.nextToken();
+            Action action = Action.valueOf(tokenizer.nextToken());
             String origFromIndexValue = tokenizer.nextToken();
             String fromCellClassname = tokenizer.nextToken();
             String fromCellContent = tokenizer.nextToken();
@@ -46,27 +55,21 @@ public class HollowDiffHtmlKickstarter {
             String toCellContent = tokenizer.nextToken();
 
 
-            initialHtml.append("<tr id=\"r").append(rowId).append("\"");
+            initialHtml.append("<tr id=\"r").append(rowPath).append("\"");
 
-            if("true".equals(showPartialUncollapse) || "true".equals(showUncollapse)) {
-                initialHtml.append(" onclick=\"uncollapseRow(" + rowId + ", false)\"");
-            } else if("true".equals(showCollapseToRow)) {
-                initialHtml.append(" onclick=\"collapseRow(" + rowId + ")\"");
+            if(action == Action.PARTIAL_UNCOLLAPSE || action == Action.UNCOLLAPSE) {
+                initialHtml.append(" onclick=\"uncollapseRow('" + rowPath + "')\"");
+            } else if(action == Action.COLLAPSE) {
+                initialHtml.append(" onclick=\"collapseRow('" + rowPath + "')\"");
             }
 
             initialHtml.append(">");
 
-            if("true".equals(showPartialUncollapse)) {
+            if(action == Action.PARTIAL_UNCOLLAPSE) {
                 initialHtml.append("<td class=\"margin\">").append("<img src=\""+baseURL+"/resource/partial_expand.png\"/>").append("</td>");
-            } else if("true".equals(showUncollapse)) {
-                initialHtml.append("<td class=\"margin\">");
-                if("true".equals(showUncollapseAll)) {
-                    initialHtml.append("<img src=\""+baseURL+"/resource/expandall.png\" onclick=\"uncollapseRow(" + rowId + ", true)\"/>");
-                } else {
-                    initialHtml.append("<img src=\""+baseURL+"/resource/expand.png\"/>");
-                }
-                initialHtml.append("</td>");
-            } else if("true".equals(showCollapseToRow)) {
+            } else if(action == Action.UNCOLLAPSE) {
+                initialHtml.append("<td class=\"margin\">").append("<img src=\""+baseURL+"/resource/expand.png\"/>").append("</td>");
+            } else if(action == Action.COLLAPSE) {
                 initialHtml.append("<td class=\"margin\">").append("<img src=\""+baseURL+"/resource/collapse.png\"/>").append("</td>");
             } else {
                 initialHtml.append("<td class=\"margin\"/>");
@@ -80,17 +83,11 @@ public class HollowDiffHtmlKickstarter {
 
             initialHtml.append("<td class=\"").append(fromCellClassname).append("\">").append(fromCellContent).append("</td>");
 
-            if("true".equals(showPartialUncollapse)) {
+            if(action == Action.PARTIAL_UNCOLLAPSE) {
                 initialHtml.append("<td class=\"margin\">").append("<img src=\""+baseURL+"/resource/partial_expand.png\"/>").append("</td>");
-            } else if("true".equals(showUncollapse)) {
-                initialHtml.append("<td class=\"margin\">");
-                if("true".equals(showUncollapseAll)) {
-                    initialHtml.append("<img src=\""+baseURL+"/resource/expandall.png\" onclick=\"uncollapseRow(" + rowId + ", true)\"/>");
-                } else {
-                    initialHtml.append("<img src=\""+baseURL+"/resource/expand.png\"/>");
-                }
-                initialHtml.append("</td>");
-            } else if("true".equals(showCollapseToRow)) {
+            } else if(action == Action.UNCOLLAPSE) {
+                initialHtml.append("<td class=\"margin\">").append("<img src=\""+baseURL+"/resource/expand.png\"/>").append("</td>");
+            } else if(action == Action.COLLAPSE) {
                 initialHtml.append("<td class=\"margin\">").append("<img src=\""+baseURL+"/resource/collapse.png\"/>").append("</td>");
             } else {
                 initialHtml.append("<td class=\"margin\"/>");

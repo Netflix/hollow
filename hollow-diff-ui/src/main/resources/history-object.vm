@@ -18,72 +18,63 @@
 
 <script>
 
-function uncollapseRow(uncollapseRowId, uncollapseAll) {
+function uncollapseRow(uncollapseRowId) {
     var i = uncollapseRowId;
     var table = document.getElementById("difftable");
     var parentRow = document.getElementById("r" + i);
     var rowIndex = parentRow.rowIndex + 1;
     
-    var rowData = httpGet("$basePath/diffrowdata?version=$version&type=$typeName&keyOrdinal=$keyOrdinal&row=" + i + "&all=" + uncollapseAll);
+    var rowData = httpGet("$basePath/diffrowdata?version=$version&type=$typeName&keyOrdinal=$keyOrdinal&row=" + i);
     
     var dataFields = rowData.split("|");
     
-    for(i=0;i<dataFields.length;i+=11) {
+    for(i=0;i<dataFields.length;i+=8) {
         var newRow = table.insertRow(rowIndex++);
         newRow.id = "r" + dataFields[i+0];
         
         if(table.rows[rowIndex] && table.rows[rowIndex].id == newRow.id)
             table.deleteRow(rowIndex);
         
-        if(dataFields[i+1] == "true" || dataFields[i+4] == "true")
+        if(dataFields[i+1] == "UNCOLLAPSE" || dataFields[i+1] == "PARTIAL_UNCOLLAPSE")
             newRow.onclick=(function(rowId) { return function() { uncollapseRow(rowId, false) }; })(dataFields[i+0]);
-        else if(dataFields[i+3] == "true")
+        else if(dataFields[i+1] == "COLLAPSE")
             newRow.onclick=(function(rowId) { return function() { collapseRow(rowId) }; })(dataFields[i+0]);
         
         var cell1 = newRow.insertCell(0);
         cell1.className="margin";
-        if(dataFields[i+4] == "true") {
+        if(dataFields[i+1] == "PARTIAL_UNCOLLAPSE") {
             cell1.innerHTML = "<img src=\"$basePath/resource/partial_expand.png\"/>";
-        } else if(dataFields[i+1] == "true") {
-            if(dataFields[i+2] == "true") {
-                cell1.innerHTML = "<img src=\"$basePath/resource/expandall.png\" onclick=\"uncollapseRow(" + dataFields[i+0] + ", true)\"/>";
-            } else {
-                cell1.innerHTML = "<img src=\"$basePath/resource/expand.png\"/>";
-            }
-        } else if(dataFields[i+3] == "true") {
+        } else if(dataFields[i+1] == "UNCOLLAPSE") {
+            cell1.innerHTML = "<img src=\"$basePath/resource/expand.png\"/>";
+        } else if(dataFields[i+1] == "COLLAPSE") {
             cell1.innerHTML = "<img src=\"$basePath/resource/collapse.png\"/>";
         }
 
         var cell2 = newRow.insertCell(1);
         cell2.className = "margin";
-        cell2.innerHTML = dataFields[i+5];
+        cell2.innerHTML = dataFields[i+2];
 
         var cell3 = newRow.insertCell(2);
-        cell3.className = dataFields[i+6];
-        cell3.innerHTML = dataFields[i+7];
+        cell3.className = dataFields[i+3];
+        cell3.innerHTML = dataFields[i+4];
         
         var cell4 = newRow.insertCell(3);
         cell4.className="margin";
-        if(dataFields[i+4] == "true") {
+        if(dataFields[i+1] == "PARTIAL_UNCOLLAPSE") {
             cell4.innerHTML = "<img src=\"$basePath/resource/partial_expand.png\"/>";
-        } else if(dataFields[i+1] == "true") {
-            if(dataFields[i+2] == "true") {
-                cell4.innerHTML = "<img src=\"$basePath/resource/expandall.png\" onclick=\"uncollapseRow(" + dataFields[i+0] + ", true)\"/>";
-            } else {
-                cell4.innerHTML = "<img src=\"$basePath/resource/expand.png\"/>";
-            }
-        } else if(dataFields[i+3] == "true") {
+        } else if(dataFields[i+1] == "UNCOLLAPSE") {
+            cell4.innerHTML = "<img src=\"$basePath/resource/expand.png\"/>";
+        } else if(dataFields[i+1] == "COLLAPSE") {
             cell4.innerHTML = "<img src=\"$basePath/resource/collapse.png\"/>";
         }
-        
 
         var cell5 = newRow.insertCell(4);
         cell5.className = "margin";
-        cell5.innerHTML = dataFields[i+8];
+        cell5.innerHTML = dataFields[i+5];
 
         var cell6 = newRow.insertCell(5);
-        cell6.className = dataFields[i+9];
-        cell6.innerHTML = dataFields[i+10];
+        cell6.className = dataFields[i+6];
+        cell6.innerHTML = dataFields[i+7];
     }
 
     parentRow.onclick=function() { collapseRow(uncollapseRowId) };
@@ -96,32 +87,25 @@ function uncollapseRow(uncollapseRowId, uncollapseAll) {
 
 function collapseRow(i) {
     var table = document.getElementById("difftable");
+    var collapseBranch = "r" + i;
     var parentRow = document.getElementById("r" + i);
     var collapseResponse = httpGet("$basePath/collapsediffrow?version=$version&type=$typeName&keyOrdinal=$keyOrdinal&row=" + i);
     var responseFields = collapseResponse.split("|");
-    var endCollapseRow = parseInt(responseFields[0]);
-    var showUncollapseAll = responseFields[1];
     
     var deleteRowIndex = parentRow.rowIndex + 1;
     var currentRow = table.rows[deleteRowIndex];
-    var currentRowId = parseInt(currentRow.id.substring(1));
+    var currentRowId = currentRow.id.substring(1);
     
-    while(currentRowId < endCollapseRow) {
+    while(currentRow.id.lastIndexOf(collapseBranch, 0) === 0) {
         table.deleteRow(deleteRowIndex);
         currentRow = table.rows[deleteRowIndex];
         if(!currentRow)
             break;
-        currentRowId = parseInt(currentRow.id.substring(1));
     }
     
     parentRow.onclick=function() { uncollapseRow(i, false) };
-    if(showUncollapseAll == "true") {
-        parentRow.cells[0].innerHTML="<img src=\"$basePath/resource/expandall.png\" onclick=\"uncollapseRow(" + i + "\, true)\"/>"
-        parentRow.cells[3].innerHTML="<img src=\"$basePath/resource/expandall.png\" onclick=\"uncollapseRow(" + i + "\, true)\"/>"
-    } else {
-        parentRow.cells[0].innerHTML="<img src=\"$basePath/resource/expand.png\"/>"
-        parentRow.cells[3].innerHTML="<img src=\"$basePath/resource/expand.png\"/>"
-    }
+    parentRow.cells[0].innerHTML="<img src=\"$basePath/resource/expand.png\"/>"
+    parentRow.cells[3].innerHTML="<img src=\"$basePath/resource/expand.png\"/>"
 }
 
 function httpGet(theUrl) {
@@ -149,7 +133,7 @@ function httpGet(theUrl) {
             <table class="diff" id="difftable">
             <thead><tr><th/><th/><th class="texttitle">From</th><th/><th/><th class="texttitle">To</th></tr></thead>
             <tbody>
-            <tr id="r0"><td class="margin"/><td class="margin"/><td class="equal">.&#x2515;&#x2501;&#x252F;&#x2501;&gt;($typeName)</td><td class="margin"/><td class="margin"/><td class="equal">.&#x2515;&#x2501;&#x252F;&#x2501;&gt;($typeName)</td></tr>
+            <tr id="root"><td class="margin"/><td class="margin"/><td class="equal">.&#x2515;&#x2501;&#x252F;&#x2501;&gt;($typeName)</td><td class="margin"/><td class="margin"/><td class="equal">.&#x2515;&#x2501;&#x252F;&#x2501;&gt;($typeName)</td></tr>
             $initialHtml
             </tbody>
             </table>

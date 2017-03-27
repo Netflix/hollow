@@ -21,7 +21,6 @@ import com.netflix.hollow.diff.ui.HollowDiffSession;
 import com.netflix.hollow.history.ui.HollowHistoryUI;
 import com.netflix.hollow.tools.history.HollowHistoricalState;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateTypeKeyOrdinalMapping;
-import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 public class HollowHistoryViewProvider implements HollowObjectViewProvider {
@@ -57,8 +56,8 @@ public class HollowHistoryViewProvider implements HollowObjectViewProvider {
         int fromOrdinal = typeMapping.findRemovedOrdinal(keyOrdinal);
         int toOrdinal = typeMapping.findAddedOrdinal(keyOrdinal);
 
-        List<HollowDiffViewRow> rows = new HollowObjectDiffViewGenerator(historicalState.getDataAccess(), historicalState.getDataAccess(), historyUI, type, fromOrdinal, toOrdinal).getHollowDiffViewRows();
-        objectView = new HollowHistoryView(version, type, keyOrdinal, rows);
+        HollowDiffViewRow rootRow = new HollowObjectDiffViewGenerator(historicalState.getDataAccess(), historicalState.getDataAccess(), historyUI, type, fromOrdinal, toOrdinal).getHollowDiffViewRows();
+        objectView = new HollowHistoryView(version, type, keyOrdinal, rootRow, historyUI.getExactRecordMatcher());
         objectView.resetView();
         session.setObjectView(objectView);
 

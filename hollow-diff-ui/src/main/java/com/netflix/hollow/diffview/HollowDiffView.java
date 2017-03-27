@@ -17,7 +17,8 @@
  */
 package com.netflix.hollow.diffview;
 
-import java.util.List;
+import com.netflix.hollow.diffview.effigy.pairer.exact.ExactRecordMatcher;
+
 
 public class HollowDiffView extends HollowObjectView {
 
@@ -25,8 +26,8 @@ public class HollowDiffView extends HollowObjectView {
     private final int fromOrdinal;
     private final int toOrdinal;
 
-    public HollowDiffView(String type, int fromOrdinal, int toOrdinal, List<HollowDiffViewRow> rows) {
-        super(rows);
+    public HollowDiffView(String type, int fromOrdinal, int toOrdinal, HollowDiffViewRow rootRow, ExactRecordMatcher exactRecordMatcher) {
+        super(rootRow, exactRecordMatcher);
         this.type = type;
         this.fromOrdinal = fromOrdinal;
         this.toOrdinal = toOrdinal;

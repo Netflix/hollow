@@ -19,7 +19,6 @@ package com.netflix.hollow.diffview;
 
 import com.netflix.hollow.diff.ui.HollowDiffSession;
 import com.netflix.hollow.diff.ui.HollowDiffUI;
-import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 public class HollowDiffViewProvider implements HollowObjectViewProvider {
@@ -50,8 +49,8 @@ public class HollowDiffViewProvider implements HollowObjectViewProvider {
             return objectView;
         }
 
-        List<HollowDiffViewRow> rows = new HollowObjectDiffViewGenerator(diffUI.getDiff().getFromStateEngine(), diffUI.getDiff().getToStateEngine(), diffUI, type, fromOrdinal, toOrdinal).getHollowDiffViewRows();
-        objectView = new HollowDiffView(type, fromOrdinal, toOrdinal, rows);
+        HollowDiffViewRow rootRow = new HollowObjectDiffViewGenerator(diffUI.getDiff().getFromStateEngine(), diffUI.getDiff().getToStateEngine(), diffUI, type, fromOrdinal, toOrdinal).getHollowDiffViewRows();
+        objectView = new HollowDiffView(type, fromOrdinal, toOrdinal, rootRow, diffUI.getExactRecordMatcher());
         objectView.resetView();
         session.setObjectView(objectView);
 
