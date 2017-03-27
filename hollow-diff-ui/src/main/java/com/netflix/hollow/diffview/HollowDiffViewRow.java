@@ -42,6 +42,10 @@ public class HollowDiffViewRow {
         this.isVisible = false;
     }
     
+    public boolean areChildrenPopulated() {
+        return children != null;
+    }
+    
     public EffigyFieldPair getFieldPair() {
         return fieldPair;
     }
@@ -67,7 +71,7 @@ public class HollowDiffViewRow {
     }
     
     public Action getAvailableAction() {
-        if(children.isEmpty())
+        if(getChildren().isEmpty())
             return Action.NONE;
         
         boolean foundVisibleChild = false;

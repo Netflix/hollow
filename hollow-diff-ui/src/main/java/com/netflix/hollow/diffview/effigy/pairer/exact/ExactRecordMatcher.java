@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2016 Netflix, Inc.
+ *  Copyright 2017 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,18 +15,12 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.diffview.effigy;
+package com.netflix.hollow.diffview.effigy.pairer.exact;
 
-import com.netflix.hollow.core.index.key.PrimaryKey;
-import com.netflix.hollow.diffview.effigy.pairer.exact.ExactRecordMatcher;
-import java.util.Map;
+import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 
-
-public interface HollowRecordDiffUI {
-
-    public Map<String, PrimaryKey> getMatchHints();
+public interface ExactRecordMatcher {
     
-    public CustomHollowEffigyFactory getCustomHollowEffigyFactory(String typeName);
+    public boolean isExactMatch(HollowTypeDataAccess fromType, int fromOrdinal, HollowTypeDataAccess toType, int toOrdinal);
     
-    public ExactRecordMatcher getExactRecordMatcher();
 }

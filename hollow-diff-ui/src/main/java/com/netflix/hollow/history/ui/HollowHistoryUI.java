@@ -18,6 +18,7 @@
 package com.netflix.hollow.history.ui;
 
 import static com.netflix.hollow.diff.ui.HollowDiffSession.getSession;
+
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.diff.ui.HollowUIRouter;
 import com.netflix.hollow.diffview.DiffViewOutputGenerator;
@@ -25,6 +26,8 @@ import com.netflix.hollow.diffview.HollowHistoryViewProvider;
 import com.netflix.hollow.diffview.HollowObjectViewProvider;
 import com.netflix.hollow.diffview.effigy.CustomHollowEffigyFactory;
 import com.netflix.hollow.diffview.effigy.HollowRecordDiffUI;
+import com.netflix.hollow.diffview.effigy.pairer.exact.ExactRecordMatcher;
+import com.netflix.hollow.diffview.effigy.pairer.exact.HistoryExactRecordMatcher;
 import com.netflix.hollow.history.ui.naming.HollowHistoryRecordNamer;
 import com.netflix.hollow.history.ui.pages.HistoricalObjectDiffPage;
 import com.netflix.hollow.history.ui.pages.HistoryOverviewPage;
@@ -155,6 +158,10 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
     @Override
     public Map<String, PrimaryKey> getMatchHints() {
         return matchHints;
+    }
+    
+    public ExactRecordMatcher getExactRecordMatcher() {
+        return HistoryExactRecordMatcher.INSTANCE;
     }
 
     public void setOverviewDisplayHeaders(String... displayHeaders) {

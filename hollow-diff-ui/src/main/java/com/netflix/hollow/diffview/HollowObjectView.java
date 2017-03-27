@@ -17,15 +17,20 @@
  */
 package com.netflix.hollow.diffview;
 
+import com.netflix.hollow.diffview.effigy.HollowEffigy;
+import com.netflix.hollow.diffview.effigy.pairer.HollowEffigyFieldPairer.EffigyFieldPair;
+import com.netflix.hollow.diffview.effigy.pairer.exact.ExactRecordMatcher;
 
 public abstract class HollowObjectView {
 
     private static final int MAX_INITIAL_VISIBLE_ROWS_BEFORE_COLLAPSING_DIFFS = 300;
 
     private final HollowDiffViewRow rootRow;
+    private final ExactRecordMatcher exactRecordMatcher;
 
-    public HollowObjectView(HollowDiffViewRow rootRow) {
+    public HollowObjectView(HollowDiffViewRow rootRow, ExactRecordMatcher exactRecordMatcher) {
         this.rootRow = rootRow;
+        this.exactRecordMatcher = exactRecordMatcher;
     }
 
     public HollowDiffViewRow getRootRow() {
@@ -49,6 +54,9 @@ public abstract class HollowObjectView {
     }
     
     private int resetViewForDiff(HollowDiffViewRow row, int runningVisibilityCount) {
+        if(rowIsExactMatch(row))
+            return 0;
+        
         int branchVisibilityCount = 0;
         
         if(row.getFieldPair().isDiff()) {
@@ -84,16 +92,21 @@ public abstract class HollowObjectView {
     }
     
     private void collapseChildrenUnderRootDiffRows(HollowDiffViewRow row) {
-        for(HollowDiffViewRow child : row.getChildren()) {
-            if(child.getFieldPair().isDiff()) {
-                makeAllChildrenInvisible(child);
-            } else {
-                collapseChildrenUnderRootDiffRows(child);
+        if(row.areChildrenPopulated()) {
+            for(HollowDiffViewRow child : row.getChildren()) {
+                if(child.getFieldPair().isDiff()) {
+                    makeAllChildrenInvisible(child);
+                } else {
+                    collapseChildrenUnderRootDiffRows(child);
+                }
             }
         }
     }
 
     private int resetViewForOrderingChanges(HollowDiffViewRow row, int runningVisibilityCount) {
+        if(rowIsExactMatch(row))
+            return 0;
+        
         int branchVisibilityCount = 0;
 
         if(row.getFieldPair().isOrderingDiff()) {
@@ -114,11 +127,13 @@ public abstract class HollowObjectView {
     }
     
     private void collapseChildrenUnderRootOrderingDiffRows(HollowDiffViewRow row) {
-        for(HollowDiffViewRow child : row.getChildren()) {
-            if(child.getFieldPair().isOrderingDiff()) {
-                makeAllChildrenInvisible(child);
-            } else {
-                collapseChildrenUnderRootOrderingDiffRows(child);
+        if(row.areChildrenPopulated()) {
+            for(HollowDiffViewRow child : row.getChildren()) {
+                if(child.getFieldPair().isOrderingDiff()) {
+                    makeAllChildrenInvisible(child);
+                } else {
+                    collapseChildrenUnderRootOrderingDiffRows(child);
+                }
             }
         }
     }
@@ -128,6 +143,17 @@ public abstract class HollowObjectView {
             child.setVisibility(false);
             makeAllChildrenInvisible(child);
         }
+    }
+    
+    private boolean rowIsExactMatch(HollowDiffViewRow row) {
+        EffigyFieldPair fieldPair = row.getFieldPair();
+        if(fieldPair.getFrom() == null || fieldPair.getTo() == null || fieldPair.isLeafNode())
+            return false;
+        
+        HollowEffigy fromEffigy = (HollowEffigy)fieldPair.getFrom().getValue();
+        HollowEffigy toEffigy = (HollowEffigy)fieldPair.getTo().getValue();
+
+        return exactRecordMatcher.isExactMatch(fromEffigy.getDataAccess(), fromEffigy.getOrdinal(), toEffigy.getDataAccess(), toEffigy.getOrdinal());
     }
 
 }

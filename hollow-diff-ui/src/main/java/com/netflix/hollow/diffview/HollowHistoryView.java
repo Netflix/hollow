@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.diffview;
 
+import com.netflix.hollow.diffview.effigy.pairer.exact.ExactRecordMatcher;
+
 
 public class HollowHistoryView extends HollowObjectView {
 
@@ -24,8 +26,8 @@ public class HollowHistoryView extends HollowObjectView {
     private final String type;
     private final int keyOrdinal;
 
-    public HollowHistoryView(long historicalVersion, String type, int keyOrdinal, HollowDiffViewRow rootRow) {
-        super(rootRow);
+    public HollowHistoryView(long historicalVersion, String type, int keyOrdinal, HollowDiffViewRow rootRow, ExactRecordMatcher exactRecordMatcher) {
+        super(rootRow, exactRecordMatcher);
         this.historicalVersion = historicalVersion;
         this.type = type;
         this.keyOrdinal = keyOrdinal;

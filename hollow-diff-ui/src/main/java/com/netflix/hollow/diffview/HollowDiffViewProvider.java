@@ -50,7 +50,7 @@ public class HollowDiffViewProvider implements HollowObjectViewProvider {
         }
 
         HollowDiffViewRow rootRow = new HollowObjectDiffViewGenerator(diffUI.getDiff().getFromStateEngine(), diffUI.getDiff().getToStateEngine(), diffUI, type, fromOrdinal, toOrdinal).getHollowDiffViewRows();
-        objectView = new HollowDiffView(type, fromOrdinal, toOrdinal, rootRow);
+        objectView = new HollowDiffView(type, fromOrdinal, toOrdinal, rootRow, diffUI.getExactRecordMatcher());
         objectView.resetView();
         session.setObjectView(objectView);
 

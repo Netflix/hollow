@@ -24,7 +24,7 @@ function uncollapseRow(uncollapseRowId) {
     var parentRow = document.getElementById("r" + i);
     var rowIndex = parentRow.rowIndex + 1;
     
-    var rowData = httpGet("$path/diffrowdata?type=$typeName&fromOrdinal=$fromOrdinal&toOrdinal=$toOrdinal&row=" + i);
+    var rowData = httpGet("$basePath/diffrowdata?version=$version&type=$typeName&keyOrdinal=$keyOrdinal&row=" + i);
     
     var dataFields = rowData.split("|");
     
@@ -89,7 +89,7 @@ function collapseRow(i) {
     var table = document.getElementById("difftable");
     var collapseBranch = "r" + i;
     var parentRow = document.getElementById("r" + i);
-    var collapseResponse = httpGet("$path/collapsediffrow?type=$typeName&fromOrdinal=$fromOrdinal&toOrdinal=$toOrdinal&row=" + i);
+    var collapseResponse = httpGet("$basePath/collapsediffrow?version=$version&type=$typeName&keyOrdinal=$keyOrdinal&row=" + i);
     var responseFields = collapseResponse.split("|");
     
     var deleteRowIndex = parentRow.rowIndex + 1;

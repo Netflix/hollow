@@ -57,7 +57,7 @@ public class HollowHistoryViewProvider implements HollowObjectViewProvider {
         int toOrdinal = typeMapping.findAddedOrdinal(keyOrdinal);
 
         HollowDiffViewRow rootRow = new HollowObjectDiffViewGenerator(historicalState.getDataAccess(), historicalState.getDataAccess(), historyUI, type, fromOrdinal, toOrdinal).getHollowDiffViewRows();
-        objectView = new HollowHistoryView(version, type, keyOrdinal, rootRow);
+        objectView = new HollowHistoryView(version, type, keyOrdinal, rootRow, historyUI.getExactRecordMatcher());
         objectView.resetView();
         session.setObjectView(objectView);
 

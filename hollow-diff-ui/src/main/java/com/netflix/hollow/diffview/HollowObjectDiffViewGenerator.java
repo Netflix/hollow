@@ -32,7 +32,7 @@ import java.util.List;
 
 public class HollowObjectDiffViewGenerator {
 
-    private final long MAX_TIME_BEFORE_PAIRING_TIMEOUT = 150000L;
+    private final long MAX_TIME_BEFORE_PAIRING_TIMEOUT = 15000L;
 
     private final HollowDataAccess fromDataAccess;
     private final HollowDataAccess toDataAccess;

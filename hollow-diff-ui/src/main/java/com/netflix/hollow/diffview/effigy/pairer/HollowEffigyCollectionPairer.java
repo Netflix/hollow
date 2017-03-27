@@ -95,12 +95,14 @@ public class HollowEffigyCollectionPairer extends HollowEffigyFieldPairer {
             hash &= hashedToFieldIndexes.length-1;
             while(hashedToFieldIndexes[hash] != -1) {
                 int toIdx = hashedToFieldIndexes[hash];
-                HollowEffigy toEffigy = getComparisonEffigy((HollowEffigy) to.getFields().get(toIdx).getValue());
-                if(recordsMatch(fromEffigy, toEffigy, fromFieldPathIndexes, toFieldPathIndexes)) {
-                    fieldPairs.add(new EffigyFieldPair(from.getFields().get(i), to.getFields().get(toIdx), i, toIdx));
-                    
-                    matchedFromElements.set(i);
-                    matchedToElements.set(toIdx);
+                if(!matchedToElements.get(toIdx)) {
+                    HollowEffigy toEffigy = getComparisonEffigy((HollowEffigy) to.getFields().get(toIdx).getValue());
+                    if(recordsMatch(fromEffigy, toEffigy, fromFieldPathIndexes, toFieldPathIndexes)) {
+                        fieldPairs.add(new EffigyFieldPair(from.getFields().get(i), to.getFields().get(toIdx), i, toIdx));
+                        
+                        matchedFromElements.set(i);
+                        matchedToElements.set(toIdx);
+                    }
                 }
                 
                 hash++;
