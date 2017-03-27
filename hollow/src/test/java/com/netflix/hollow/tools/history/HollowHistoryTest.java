@@ -43,6 +43,7 @@ public class HollowHistoryTest extends AbstractStateEngineTest {
 
     private HollowObjectSchema aSchema;
     private HollowObjectSchema bSchema;
+    private HollowObjectSchema emptyTypeSchema;
 
     private static final String B_TYPE = "B";
     private static final String B_FN_PREFIX = "b";
@@ -50,6 +51,9 @@ public class HollowHistoryTest extends AbstractStateEngineTest {
     @Override
     @Before
     public void setUp() {
+        emptyTypeSchema = new HollowObjectSchema("Empty", 1);
+        emptyTypeSchema.addField("value", FieldType.STRING);
+
         aSchema = new HollowObjectSchema("A", 3, "a1");
         aSchema.addField("a1", FieldType.INT);
         aSchema.addField("a2", FieldType.INT);
@@ -94,7 +98,6 @@ public class HollowHistoryTest extends AbstractStateEngineTest {
 
         roundTripSnapshot();
         history.doubleSnapshotOccurred(readStateEngine, 3L);
-
         super.setUp();
 
         //addRecord(3, 4, 7);
@@ -317,6 +320,7 @@ public class HollowHistoryTest extends AbstractStateEngineTest {
     @Override
     protected void initializeTypeStates() {
         writeStateEngine.addTypeState(new HollowObjectTypeWriteState(aSchema));
+        writeStateEngine.addTypeState(new HollowObjectTypeWriteState(emptyTypeSchema));
     }
 
 }
