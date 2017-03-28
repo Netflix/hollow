@@ -188,6 +188,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:chronos-client",
                 "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
@@ -350,6 +351,7 @@
                 "netflix:atlas-plugin",
                 "netflix:base-server",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:common-data-format",
                 "netflix:content-usage-policy",
                 "netflix:cryptexclient-standalone",
@@ -435,6 +437,7 @@
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
                 "netflix:mutation-stream-common",
@@ -602,7 +605,8 @@
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -754,6 +758,12 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
+            ]
+        },
+        "com.netflix.frigga:frigga": {
+            "locked": "0.17.0",
+            "transitive": [
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.governator:governator": {
@@ -1182,6 +1192,7 @@
                 "com.netflix.spectator:spectator-ext-sandbox",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.spectator:spectator-reg-servo",
+                "netflix:chronos-client",
                 "netflix:nimble-int-java",
                 "netflix:platform-core",
                 "netflix:request-expiry-impl",
@@ -1205,7 +1216,8 @@
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
-                "com.netflix.spectator:spectator-nflx-plugin"
+                "com.netflix.spectator:spectator-nflx-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
@@ -2071,6 +2083,12 @@
                 "netflix:streaming-utilities-testing"
             ]
         },
+        "netflix:chronos-client": {
+            "locked": "1.1.50",
+            "transitive": [
+                "netflix:gutenberg-common"
+            ]
+        },
         "netflix:common-data-format": {
             "locked": "1.1464",
             "transitive": [
@@ -2153,26 +2171,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.156",
+            "locked": "1.159",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.191.0",
+            "locked": "1.192.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -3305,6 +3323,7 @@
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
@@ -3584,6 +3603,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:chronos-client",
                 "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
@@ -3746,6 +3766,7 @@
                 "netflix:atlas-plugin",
                 "netflix:base-server",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:common-data-format",
                 "netflix:content-usage-policy",
                 "netflix:cryptexclient-standalone",
@@ -3831,6 +3852,7 @@
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
                 "netflix:mutation-stream-common",
@@ -3998,7 +4020,8 @@
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -4150,6 +4173,12 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
+            ]
+        },
+        "com.netflix.frigga:frigga": {
+            "locked": "0.17.0",
+            "transitive": [
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.governator:governator": {
@@ -4578,6 +4607,7 @@
                 "com.netflix.spectator:spectator-ext-sandbox",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.spectator:spectator-reg-servo",
+                "netflix:chronos-client",
                 "netflix:nimble-int-java",
                 "netflix:platform-core",
                 "netflix:request-expiry-impl",
@@ -4601,7 +4631,8 @@
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
-                "com.netflix.spectator:spectator-nflx-plugin"
+                "com.netflix.spectator:spectator-nflx-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
@@ -5467,6 +5498,12 @@
                 "netflix:streaming-utilities-testing"
             ]
         },
+        "netflix:chronos-client": {
+            "locked": "1.1.50",
+            "transitive": [
+                "netflix:gutenberg-common"
+            ]
+        },
         "netflix:common-data-format": {
             "locked": "1.1464",
             "transitive": [
@@ -5549,26 +5586,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.156",
+            "locked": "1.159",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.191.0",
+            "locked": "1.192.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -6701,6 +6738,7 @@
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
@@ -6980,6 +7018,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:chronos-client",
                 "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
@@ -7142,6 +7181,7 @@
                 "netflix:atlas-plugin",
                 "netflix:base-server",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:common-data-format",
                 "netflix:content-usage-policy",
                 "netflix:cryptexclient-standalone",
@@ -7227,6 +7267,7 @@
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
                 "netflix:mutation-stream-common",
@@ -7394,7 +7435,8 @@
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -7546,6 +7588,12 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
+            ]
+        },
+        "com.netflix.frigga:frigga": {
+            "locked": "0.17.0",
+            "transitive": [
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.governator:governator": {
@@ -7974,6 +8022,7 @@
                 "com.netflix.spectator:spectator-ext-sandbox",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.spectator:spectator-reg-servo",
+                "netflix:chronos-client",
                 "netflix:nimble-int-java",
                 "netflix:platform-core",
                 "netflix:request-expiry-impl",
@@ -7997,7 +8046,8 @@
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
-                "com.netflix.spectator:spectator-nflx-plugin"
+                "com.netflix.spectator:spectator-nflx-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
@@ -8863,6 +8913,12 @@
                 "netflix:streaming-utilities-testing"
             ]
         },
+        "netflix:chronos-client": {
+            "locked": "1.1.50",
+            "transitive": [
+                "netflix:gutenberg-common"
+            ]
+        },
         "netflix:common-data-format": {
             "locked": "1.1464",
             "transitive": [
@@ -8945,26 +9001,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.156",
+            "locked": "1.159",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.191.0",
+            "locked": "1.192.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -10097,6 +10153,7 @@
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
@@ -10376,6 +10433,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:chronos-client",
                 "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
@@ -10538,6 +10596,7 @@
                 "netflix:atlas-plugin",
                 "netflix:base-server",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:common-data-format",
                 "netflix:content-usage-policy",
                 "netflix:cryptexclient-standalone",
@@ -10623,6 +10682,7 @@
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
                 "netflix:mutation-stream-common",
@@ -10790,7 +10850,8 @@
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -10942,6 +11003,12 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
+            ]
+        },
+        "com.netflix.frigga:frigga": {
+            "locked": "0.17.0",
+            "transitive": [
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.governator:governator": {
@@ -11370,6 +11437,7 @@
                 "com.netflix.spectator:spectator-ext-sandbox",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.spectator:spectator-reg-servo",
+                "netflix:chronos-client",
                 "netflix:nimble-int-java",
                 "netflix:platform-core",
                 "netflix:request-expiry-impl",
@@ -11393,7 +11461,8 @@
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
-                "com.netflix.spectator:spectator-nflx-plugin"
+                "com.netflix.spectator:spectator-nflx-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
@@ -12252,6 +12321,12 @@
                 "netflix:streaming-utilities-testing"
             ]
         },
+        "netflix:chronos-client": {
+            "locked": "1.1.50",
+            "transitive": [
+                "netflix:gutenberg-common"
+            ]
+        },
         "netflix:common-data-format": {
             "locked": "1.1464",
             "transitive": [
@@ -12334,26 +12409,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.156",
+            "locked": "1.159",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.191.0",
+            "locked": "1.192.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -13455,6 +13530,7 @@
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
@@ -13790,6 +13866,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:chronos-client",
                 "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
@@ -13953,6 +14030,7 @@
                 "netflix:atlas-plugin",
                 "netflix:base-server",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:common-data-format",
                 "netflix:content-usage-policy",
                 "netflix:cryptexclient-standalone",
@@ -14038,6 +14116,7 @@
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
                 "netflix:mutation-stream-common",
@@ -14205,7 +14284,8 @@
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -14357,6 +14437,12 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
+            ]
+        },
+        "com.netflix.frigga:frigga": {
+            "locked": "0.17.0",
+            "transitive": [
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.governator:governator": {
@@ -14785,6 +14871,7 @@
                 "com.netflix.spectator:spectator-ext-sandbox",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.spectator:spectator-reg-servo",
+                "netflix:chronos-client",
                 "netflix:nimble-int-java",
                 "netflix:platform-core",
                 "netflix:request-expiry-impl",
@@ -14804,11 +14891,12 @@
             ]
         },
         "com.netflix.spectator:spectator-ext-sandbox": {
-            "locked": "0.52.0",
+            "locked": "0.53.0",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
-                "com.netflix.spectator:spectator-nflx-plugin"
+                "com.netflix.spectator:spectator-nflx-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
@@ -15675,6 +15763,12 @@
                 "netflix:streaming-utilities-testing"
             ]
         },
+        "netflix:chronos-client": {
+            "locked": "1.1.50",
+            "transitive": [
+                "netflix:gutenberg-common"
+            ]
+        },
         "netflix:common-data-format": {
             "locked": "1.1464",
             "transitive": [
@@ -15757,26 +15851,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.156",
+            "locked": "1.159",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.191.0",
+            "locked": "1.192.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -16914,6 +17008,7 @@
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
@@ -18285,6 +18380,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:chronos-client",
                 "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
@@ -18447,6 +18543,7 @@
                 "netflix:atlas-plugin",
                 "netflix:base-server",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:common-data-format",
                 "netflix:content-usage-policy",
                 "netflix:cryptexclient-standalone",
@@ -18532,6 +18629,7 @@
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
                 "netflix:mutation-stream-common",
@@ -18699,7 +18797,8 @@
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -18851,6 +18950,12 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
+            ]
+        },
+        "com.netflix.frigga:frigga": {
+            "locked": "0.17.0",
+            "transitive": [
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.governator:governator": {
@@ -19279,6 +19384,7 @@
                 "com.netflix.spectator:spectator-ext-sandbox",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.spectator:spectator-reg-servo",
+                "netflix:chronos-client",
                 "netflix:nimble-int-java",
                 "netflix:platform-core",
                 "netflix:request-expiry-impl",
@@ -19302,7 +19408,8 @@
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
-                "com.netflix.spectator:spectator-nflx-plugin"
+                "com.netflix.spectator:spectator-nflx-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
@@ -20168,6 +20275,12 @@
                 "netflix:streaming-utilities-testing"
             ]
         },
+        "netflix:chronos-client": {
+            "locked": "1.1.50",
+            "transitive": [
+                "netflix:gutenberg-common"
+            ]
+        },
         "netflix:common-data-format": {
             "locked": "1.1464",
             "transitive": [
@@ -20250,26 +20363,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.156",
+            "locked": "1.159",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.191.0",
+            "locked": "1.192.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -21402,6 +21515,7 @@
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
@@ -21684,6 +21798,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:chronos-client",
                 "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
@@ -21847,6 +21962,7 @@
                 "netflix:atlas-plugin",
                 "netflix:base-server",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:common-data-format",
                 "netflix:content-usage-policy",
                 "netflix:cryptexclient-standalone",
@@ -21932,6 +22048,7 @@
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
                 "netflix:mutation-stream-common",
@@ -22099,7 +22216,8 @@
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -22251,6 +22369,12 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
+            ]
+        },
+        "com.netflix.frigga:frigga": {
+            "locked": "0.17.0",
+            "transitive": [
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.governator:governator": {
@@ -22679,6 +22803,7 @@
                 "com.netflix.spectator:spectator-ext-sandbox",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.spectator:spectator-reg-servo",
+                "netflix:chronos-client",
                 "netflix:nimble-int-java",
                 "netflix:platform-core",
                 "netflix:request-expiry-impl",
@@ -22698,11 +22823,12 @@
             ]
         },
         "com.netflix.spectator:spectator-ext-sandbox": {
-            "locked": "0.52.0",
+            "locked": "0.53.0",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
-                "com.netflix.spectator:spectator-nflx-plugin"
+                "com.netflix.spectator:spectator-nflx-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
@@ -23568,6 +23694,12 @@
                 "netflix:streaming-utilities-testing"
             ]
         },
+        "netflix:chronos-client": {
+            "locked": "1.1.50",
+            "transitive": [
+                "netflix:gutenberg-common"
+            ]
+        },
         "netflix:common-data-format": {
             "locked": "1.1464",
             "transitive": [
@@ -23650,26 +23782,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.156",
+            "locked": "1.159",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.191.0",
+            "locked": "1.192.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -24776,6 +24908,7 @@
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
@@ -25068,6 +25201,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:chronos-client",
                 "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
@@ -25237,6 +25371,7 @@
                 "netflix:atlas-plugin",
                 "netflix:base-server",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:common-data-format",
                 "netflix:content-usage-policy",
                 "netflix:cryptexclient-standalone",
@@ -25322,6 +25457,7 @@
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
                 "netflix:mutation-stream-common",
@@ -25506,7 +25642,8 @@
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -25658,6 +25795,12 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
+            ]
+        },
+        "com.netflix.frigga:frigga": {
+            "locked": "0.17.0",
+            "transitive": [
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.governator:governator": {
@@ -26094,6 +26237,7 @@
                 "com.netflix.spectator:spectator-ext-sandbox",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.spectator:spectator-reg-servo",
+                "netflix:chronos-client",
                 "netflix:nimble-int-java",
                 "netflix:platform-core",
                 "netflix:request-expiry-impl",
@@ -26117,7 +26261,8 @@
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
-                "com.netflix.spectator:spectator-nflx-plugin"
+                "com.netflix.spectator:spectator-nflx-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
@@ -27012,6 +27157,12 @@
                 "netflix:streaming-utilities-testing"
             ]
         },
+        "netflix:chronos-client": {
+            "locked": "1.1.50",
+            "transitive": [
+                "netflix:gutenberg-common"
+            ]
+        },
         "netflix:common-data-format": {
             "locked": "1.1464",
             "transitive": [
@@ -27094,26 +27245,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.156",
+            "locked": "1.159",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.191.0",
+            "locked": "1.192.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -28287,6 +28438,7 @@
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
@@ -28583,6 +28735,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:chronos-client",
                 "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
@@ -28752,6 +28905,7 @@
                 "netflix:atlas-plugin",
                 "netflix:base-server",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:common-data-format",
                 "netflix:content-usage-policy",
                 "netflix:cryptexclient-standalone",
@@ -28837,6 +28991,7 @@
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
                 "netflix:mutation-stream-common",
@@ -29021,7 +29176,8 @@
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -29173,6 +29329,12 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
+            ]
+        },
+        "com.netflix.frigga:frigga": {
+            "locked": "0.17.0",
+            "transitive": [
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.governator:governator": {
@@ -29609,6 +29771,7 @@
                 "com.netflix.spectator:spectator-ext-sandbox",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.spectator:spectator-reg-servo",
+                "netflix:chronos-client",
                 "netflix:nimble-int-java",
                 "netflix:platform-core",
                 "netflix:request-expiry-impl",
@@ -29632,7 +29795,8 @@
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
-                "com.netflix.spectator:spectator-nflx-plugin"
+                "com.netflix.spectator:spectator-nflx-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
@@ -30527,6 +30691,12 @@
                 "netflix:streaming-utilities-testing"
             ]
         },
+        "netflix:chronos-client": {
+            "locked": "1.1.50",
+            "transitive": [
+                "netflix:gutenberg-common"
+            ]
+        },
         "netflix:common-data-format": {
             "locked": "1.1464",
             "transitive": [
@@ -30609,26 +30779,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.156",
+            "locked": "1.159",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.191.0",
+            "locked": "1.192.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -31802,6 +31972,7 @@
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
@@ -32098,6 +32269,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:chronos-client",
                 "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
@@ -32267,6 +32439,7 @@
                 "netflix:atlas-plugin",
                 "netflix:base-server",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:common-data-format",
                 "netflix:content-usage-policy",
                 "netflix:cryptexclient-standalone",
@@ -32352,6 +32525,7 @@
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
                 "netflix:mutation-stream-common",
@@ -32536,7 +32710,8 @@
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -32688,6 +32863,12 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
+            ]
+        },
+        "com.netflix.frigga:frigga": {
+            "locked": "0.17.0",
+            "transitive": [
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.governator:governator": {
@@ -33124,6 +33305,7 @@
                 "com.netflix.spectator:spectator-ext-sandbox",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.spectator:spectator-reg-servo",
+                "netflix:chronos-client",
                 "netflix:nimble-int-java",
                 "netflix:platform-core",
                 "netflix:request-expiry-impl",
@@ -33147,7 +33329,8 @@
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
-                "com.netflix.spectator:spectator-nflx-plugin"
+                "com.netflix.spectator:spectator-nflx-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
@@ -34042,6 +34225,12 @@
                 "netflix:streaming-utilities-testing"
             ]
         },
+        "netflix:chronos-client": {
+            "locked": "1.1.50",
+            "transitive": [
+                "netflix:gutenberg-common"
+            ]
+        },
         "netflix:common-data-format": {
             "locked": "1.1464",
             "transitive": [
@@ -34124,26 +34313,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.156",
+            "locked": "1.159",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.191.0",
+            "locked": "1.192.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -35317,6 +35506,7 @@
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
@@ -35613,6 +35803,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:chronos-client",
                 "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
@@ -35782,6 +35973,7 @@
                 "netflix:atlas-plugin",
                 "netflix:base-server",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:common-data-format",
                 "netflix:content-usage-policy",
                 "netflix:cryptexclient-standalone",
@@ -35867,6 +36059,7 @@
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
                 "netflix:mutation-stream-common",
@@ -36051,7 +36244,8 @@
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -36203,6 +36397,12 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
+            ]
+        },
+        "com.netflix.frigga:frigga": {
+            "locked": "0.17.0",
+            "transitive": [
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.governator:governator": {
@@ -36639,6 +36839,7 @@
                 "com.netflix.spectator:spectator-ext-sandbox",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.spectator:spectator-reg-servo",
+                "netflix:chronos-client",
                 "netflix:nimble-int-java",
                 "netflix:platform-core",
                 "netflix:request-expiry-impl",
@@ -36662,7 +36863,8 @@
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
-                "com.netflix.spectator:spectator-nflx-plugin"
+                "com.netflix.spectator:spectator-nflx-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
@@ -37557,6 +37759,12 @@
                 "netflix:streaming-utilities-testing"
             ]
         },
+        "netflix:chronos-client": {
+            "locked": "1.1.50",
+            "transitive": [
+                "netflix:gutenberg-common"
+            ]
+        },
         "netflix:common-data-format": {
             "locked": "1.1464",
             "transitive": [
@@ -37639,26 +37847,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.156",
+            "locked": "1.159",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.191.0",
+            "locked": "1.192.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -38832,6 +39040,7 @@
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
@@ -39128,6 +39337,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:chronos-client",
                 "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
@@ -39297,6 +39507,7 @@
                 "netflix:atlas-plugin",
                 "netflix:base-server",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:common-data-format",
                 "netflix:content-usage-policy",
                 "netflix:cryptexclient-standalone",
@@ -39382,6 +39593,7 @@
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
                 "netflix:mutation-stream-common",
@@ -39566,7 +39778,8 @@
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -39718,6 +39931,12 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
+            ]
+        },
+        "com.netflix.frigga:frigga": {
+            "locked": "0.17.0",
+            "transitive": [
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.governator:governator": {
@@ -40154,6 +40373,7 @@
                 "com.netflix.spectator:spectator-ext-sandbox",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.spectator:spectator-reg-servo",
+                "netflix:chronos-client",
                 "netflix:nimble-int-java",
                 "netflix:platform-core",
                 "netflix:request-expiry-impl",
@@ -40177,7 +40397,8 @@
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
-                "com.netflix.spectator:spectator-nflx-plugin"
+                "com.netflix.spectator:spectator-nflx-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
@@ -41072,6 +41293,12 @@
                 "netflix:streaming-utilities-testing"
             ]
         },
+        "netflix:chronos-client": {
+            "locked": "1.1.50",
+            "transitive": [
+                "netflix:gutenberg-common"
+            ]
+        },
         "netflix:common-data-format": {
             "locked": "1.1464",
             "transitive": [
@@ -41154,26 +41381,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.156",
+            "locked": "1.159",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.191.0",
+            "locked": "1.192.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -42347,6 +42574,7 @@
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
@@ -42643,6 +42871,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:chronos-client",
                 "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
@@ -42812,6 +43041,7 @@
                 "netflix:atlas-plugin",
                 "netflix:base-server",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:common-data-format",
                 "netflix:content-usage-policy",
                 "netflix:cryptexclient-standalone",
@@ -42897,6 +43127,7 @@
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
                 "netflix:mutation-stream-common",
@@ -43081,7 +43312,8 @@
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -43233,6 +43465,12 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
+            ]
+        },
+        "com.netflix.frigga:frigga": {
+            "locked": "0.17.0",
+            "transitive": [
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.governator:governator": {
@@ -43669,6 +43907,7 @@
                 "com.netflix.spectator:spectator-ext-sandbox",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.spectator:spectator-reg-servo",
+                "netflix:chronos-client",
                 "netflix:nimble-int-java",
                 "netflix:platform-core",
                 "netflix:request-expiry-impl",
@@ -43692,7 +43931,8 @@
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
-                "com.netflix.spectator:spectator-nflx-plugin"
+                "com.netflix.spectator:spectator-nflx-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
@@ -44587,6 +44827,12 @@
                 "netflix:streaming-utilities-testing"
             ]
         },
+        "netflix:chronos-client": {
+            "locked": "1.1.50",
+            "transitive": [
+                "netflix:gutenberg-common"
+            ]
+        },
         "netflix:common-data-format": {
             "locked": "1.1464",
             "transitive": [
@@ -44669,26 +44915,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.156",
+            "locked": "1.159",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.191.0",
+            "locked": "1.192.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -45862,6 +46108,7 @@
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
@@ -46158,6 +46405,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:chronos-client",
                 "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
@@ -46327,6 +46575,7 @@
                 "netflix:atlas-plugin",
                 "netflix:base-server",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:common-data-format",
                 "netflix:content-usage-policy",
                 "netflix:cryptexclient-standalone",
@@ -46412,6 +46661,7 @@
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
                 "netflix:mutation-stream-common",
@@ -46596,7 +46846,8 @@
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -46748,6 +46999,12 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
+            ]
+        },
+        "com.netflix.frigga:frigga": {
+            "locked": "0.17.0",
+            "transitive": [
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.governator:governator": {
@@ -47184,6 +47441,7 @@
                 "com.netflix.spectator:spectator-ext-sandbox",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.spectator:spectator-reg-servo",
+                "netflix:chronos-client",
                 "netflix:nimble-int-java",
                 "netflix:platform-core",
                 "netflix:request-expiry-impl",
@@ -47207,7 +47465,8 @@
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
-                "com.netflix.spectator:spectator-nflx-plugin"
+                "com.netflix.spectator:spectator-nflx-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
@@ -48102,6 +48361,12 @@
                 "netflix:streaming-utilities-testing"
             ]
         },
+        "netflix:chronos-client": {
+            "locked": "1.1.50",
+            "transitive": [
+                "netflix:gutenberg-common"
+            ]
+        },
         "netflix:common-data-format": {
             "locked": "1.1464",
             "transitive": [
@@ -48184,26 +48449,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.156",
+            "locked": "1.159",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.191.0",
+            "locked": "1.192.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -49377,6 +49642,7 @@
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
@@ -49673,6 +49939,7 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "netflix:atlas-plugin",
+                "netflix:chronos-client",
                 "netflix:country-launch",
                 "netflix:playback-monkey-model"
             ]
@@ -49842,6 +50109,7 @@
                 "netflix:atlas-plugin",
                 "netflix:base-server",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:common-data-format",
                 "netflix:content-usage-policy",
                 "netflix:cryptexclient-standalone",
@@ -49927,6 +50195,7 @@
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "com.netflix.vms.events:vmsevents-mutation-stream-lifecycle",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:luna-safetynet",
                 "netflix:mutation-stream-common",
@@ -50111,7 +50380,8 @@
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
-                "netflix:atlas-plugin"
+                "netflix:atlas-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -50263,6 +50533,12 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-eureka-client"
+            ]
+        },
+        "com.netflix.frigga:frigga": {
+            "locked": "0.17.0",
+            "transitive": [
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.governator:governator": {
@@ -50699,6 +50975,7 @@
                 "com.netflix.spectator:spectator-ext-sandbox",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.spectator:spectator-reg-servo",
+                "netflix:chronos-client",
                 "netflix:nimble-int-java",
                 "netflix:platform-core",
                 "netflix:request-expiry-impl",
@@ -50722,7 +50999,8 @@
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
-                "com.netflix.spectator:spectator-nflx-plugin"
+                "com.netflix.spectator:spectator-nflx-plugin",
+                "netflix:chronos-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
@@ -51617,6 +51895,12 @@
                 "netflix:streaming-utilities-testing"
             ]
         },
+        "netflix:chronos-client": {
+            "locked": "1.1.50",
+            "transitive": [
+                "netflix:gutenberg-common"
+            ]
+        },
         "netflix:common-data-format": {
             "locked": "1.1464",
             "transitive": [
@@ -51699,26 +51983,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.156",
+            "locked": "1.159",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.157",
+            "locked": "1.160",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.191.0",
+            "locked": "1.192.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -52892,6 +53176,7 @@
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server-plugins",
+                "netflix:chronos-client",
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
