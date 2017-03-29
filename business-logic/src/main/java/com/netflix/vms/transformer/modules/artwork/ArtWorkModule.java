@@ -372,16 +372,16 @@ public abstract class ArtWorkModule extends AbstractTransformModule {
         }
         if (keyValues.containsKey("REEXPLORE_TIME") && keyValues.get("REEXPLORE_TIME") != null) {
             long timestamp = Long.valueOf(keyValues.get("REEXPLORE_TIME"));
-            // not accepting timestamps older than 36 days, since explore (ab testing) of images only spans 35 days at most.
+            // Warn on timestamps older than 36 days, since explore (ab testing) of images only spans 35 days at most.
             // upstream team should clean up older timestamps when generating VideoArtwork.json feed.
-            // upstream team has a check that may have earliest timestamp which is 36 days old, so we can check for 37 days.
+            // upstream team has a check that may have earliest timestamp which is 36 days old, so we can check for 37 days to compensate for delay in receiving this feed.
             long timestamp36DaysBack = Instant.now().getEpochSecond() - (3600 * 24 * 37);
             if (timestamp < timestamp36DaysBack) {
-                ctx.getLogger().warn(ReexploreTags, "found re-explore timestamp={} that is older than 36 days timestamp={}", timestamp, timestamp36DaysBack);
+                // this log statement is only for warning purposes. Ideally this should not warn. If it does with high number, then revisit the window span or contact upstream team.
+                ctx.getLogger().warn(ReexploreTags, "Found re-explore timestamp={} that is older than 36 days timestamp={}, This is stale (dead) data", timestamp, timestamp36DaysBack);
             }
             setBasicPassThrough = true;
             passThrough.reExploreLongTimestamp = new ArtworkReExploreLongTimestamp(timestamp);
-
         }
 
         ArtworkSourcePassthrough sourcePassThrough = new ArtworkSourcePassthrough();
