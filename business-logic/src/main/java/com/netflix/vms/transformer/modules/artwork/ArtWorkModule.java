@@ -374,7 +374,8 @@ public abstract class ArtWorkModule extends AbstractTransformModule {
             long timestamp = Long.valueOf(keyValues.get("REEXPLORE_TIME"));
             // not accepting timestamps older than 36 days, since explore (ab testing) of images only spans 35 days at most.
             // upstream team should clean up older timestamps when generating VideoArtwork.json feed.
-            long timestamp36DaysBack = Instant.now().getEpochSecond() - (3600 * 24 * 36);
+            // upstream team has a check that may have earliest timestamp which is 36 days old, so we can check for 37 days.
+            long timestamp36DaysBack = Instant.now().getEpochSecond() - (3600 * 24 * 37);
             if (timestamp < timestamp36DaysBack) {
                 ctx.getLogger().warn(ReexploreTags, "found re-explore timestamp={} that is older than 36 days timestamp={}", timestamp, timestamp36DaysBack);
             } else {
