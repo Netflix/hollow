@@ -390,6 +390,13 @@ public class DataSlicerImpl implements DataSlicer {
                     return Integer.valueOf((int) inputAPI.getShowCountryLabelHollow(ordinal)._getVideoId());
                 }
             });
+            findIncludedOrdinals(stateEngine, "VideoArtworkSource", videoIdsToInclude, new VideoIdDeriver() {
+                @Override
+                public Integer deriveId(int ordinal) {
+                    return Integer.valueOf((int) inputAPI.getVideoArtworkSourceHollow(ordinal)._getMovieId());
+                }
+            });
+            
             includeAll(stateEngine, "DamMerchStills");
             includeAll(stateEngine, "TopN");
             includeAll(stateEngine, "AltGenres");
@@ -405,6 +412,7 @@ public class DataSlicerImpl implements DataSlicer {
             includeAll(stateEngine, "CertificationSystem");
             includeAll(stateEngine, "Character");
             includeAll(stateEngine, "CharacterArtwork");
+            includeAll(stateEngine, "CharacterArtworkSource");
             includeAll(stateEngine, "Characters");
             includeAll(stateEngine, "ConsolidatedCertificationSystems");
             includeAll(stateEngine, "ConsolidatedVideoRatings");
@@ -415,6 +423,7 @@ public class DataSlicerImpl implements DataSlicer {
             includeAll(stateEngine, "OriginServer");
             includeAll(stateEngine, "PersonAliases");
             includeAll(stateEngine, "PersonArtwork");
+            includeAll(stateEngine, "PersonArtworkSource");
             includeAll(stateEngine, "Persons");
             includeAll(stateEngine, "ProtectionTypes");
             includeAll(stateEngine, "Ratings");
@@ -428,6 +437,7 @@ public class DataSlicerImpl implements DataSlicer {
             includeAll(stateEngine, "PersonBio");
             includeAll(stateEngine, "MovieCharacterPerson");
             includeAll(stateEngine, "VMSAward");
+            includeAll(stateEngine, "IPLArtworkDerivativeSet");
 
             return populateFilteredBlob(stateEngine, ordinalsToInclude);
         }
