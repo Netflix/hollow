@@ -378,11 +378,10 @@ public abstract class ArtWorkModule extends AbstractTransformModule {
             long timestamp36DaysBack = Instant.now().getEpochSecond() - (3600 * 24 * 37);
             if (timestamp < timestamp36DaysBack) {
                 ctx.getLogger().warn(ReexploreTags, "found re-explore timestamp={} that is older than 36 days timestamp={}", timestamp, timestamp36DaysBack);
-            } else {
-                setBasicPassThrough = true;
-                ctx.getLogger().info(ReexploreTags, "Found re-explore timestamp={} for artwork={}", timestamp, desc.sourceFileId.toString());
-                passThrough.reExploreLongTimestamp = new ArtworkReExploreLongTimestamp(timestamp);
             }
+            setBasicPassThrough = true;
+            passThrough.reExploreLongTimestamp = new ArtworkReExploreLongTimestamp(timestamp);
+
         }
 
         ArtworkSourcePassthrough sourcePassThrough = new ArtworkSourcePassthrough();
