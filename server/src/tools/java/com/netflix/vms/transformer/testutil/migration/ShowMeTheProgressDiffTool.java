@@ -1,6 +1,8 @@
 package com.netflix.vms.transformer.testutil.migration;
 
+import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.diff.ui.HollowDiffUI;
 import com.netflix.hollow.diff.ui.jetty.HollowDiffUIServer;
 import com.netflix.hollow.tools.diff.HollowDiff;
 import com.netflix.hollow.tools.diff.HollowTypeDiff;
@@ -46,7 +48,13 @@ public class ShowMeTheProgressDiffTool {
         int port = randomPort();
 
         HollowDiffUIServer server = new HollowDiffUIServer(port);
-        server.addDiff("diff", diff, "EXPECTED", "ACTUAL");
+        HollowDiffUI ui = server.addDiff("diff", diff, "EXPECTED", "ACTUAL");
+        ui.addMatchHint(new PrimaryKey("Artwork", "sourceFileId"));
+        ui.addMatchHint(new PrimaryKey("ArtworkDerivative", "recipeDesc", "type.nameStr", "format.nameStr"));
+        ui.addMatchHint(new PrimaryKey("Integer", "val"));
+        ui.addMatchHint(new PrimaryKey("ArtWorkImageFormatEntry", "nameStr"));
+        ui.addMatchHint(new PrimaryKey("VideoImage", "videoId", "videoMoment.msOffset"));
+        ui.addMatchHint(new PrimaryKey("StreamData", "downloadableId"));
 
         server.start();
 
@@ -59,12 +67,14 @@ public class ShowMeTheProgressDiffTool {
         server.join();
     }
 
-    private static void addTypeDiff(HollowDiff diff, String type, String... keyFields) {
+    private static HollowTypeDiff addTypeDiff(HollowDiff diff, String type, String... keyFields) {
         HollowTypeDiff typeDiff = diff.addTypeDiff(type);
 
         for(String keyField : keyFields) {
             typeDiff.addMatchPath(keyField);
         }
+        
+        return typeDiff;
     }
 
     private static int randomPort() {
