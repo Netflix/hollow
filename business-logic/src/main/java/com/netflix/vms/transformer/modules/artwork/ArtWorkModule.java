@@ -4,8 +4,8 @@ import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_DERIVATIVE_SET
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_IMAGE_FORMAT;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_RECIPE;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_TERRITORY_COUNTRIES;
-
-import com.google.common.collect.ComparisonChain;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
@@ -51,7 +51,6 @@ import com.netflix.vms.transformer.util.NFLocaleUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -123,6 +122,23 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         }
     }
 
+    protected void processCombinedDerivativesAndCdnList(int entityId, String sourceFileId, HollowHashIndexResult inputDerivativesMatches, Artwork artwork) {
+        HollowOrdinalIterator iterator = inputDerivativesMatches.iterator();
+
+        Map<String, IPLDerivativeGroupHollow> groupByType = new HashMap<>();
+        
+        int ordinal = iterator.next();
+        while(ordinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+            IPLDerivativeGroupHollow inputDerivatives = api.getIPLDerivativeGroupHollow(ordinal);
+            groupByType.put(inputDerivatives._getImageType()._getValue(), inputDerivatives);
+            ordinal = iterator.next();
+        }
+        
+        for(Map.Entry<String, IPLDerivativeGroupHollow> entry : groupByType.entrySet()) {
+            processDerivativesAndCdnList(entityId, sourceFileId, entry.getValue(), artwork);
+        }
+    }
+    
     // Process Derivatives
     protected void processDerivativesAndCdnList(int entityId, String sourceFileId, IPLDerivativeGroupHollow inputDerivatives, Artwork artwork) {
         IPLDerivativeSetHollow derivativeSet = inputDerivatives._getDerivatives();
@@ -133,16 +149,38 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         int inputDerivativeSetOrdinal = derivativeSet.getOrdinal();
                 
         ArtworkDerivatives outputDerivatives = cycleConstants.artworkDerivativesCache.getResult(inputDerivativeSetOrdinal);
-        if(outputDerivatives != null) {
-            artwork.derivatives = outputDerivatives;
-            artwork.cdns = cycleConstants.cdnListCache.getResult(inputDerivativeSetOrdinal);
-            return;
+        
+        if(outputDerivatives == null) {
+            buildAndCacheArtworkDerivatives(derivativeSet, imageType, typeEntry, inputDerivativeSetOrdinal);
+            outputDerivatives = cycleConstants.artworkDerivativesCache.getResult(inputDerivativeSetOrdinal);
+        }
+
+        List<ArtworkCdn> cdnList = cycleConstants.cdnListCache.getResult(inputDerivativeSetOrdinal);
+
+        /// combine multiple derivative lists where necessary
+        if(artwork.derivatives != null) {
+            ArtworkDerivativesListMerger merger = new ArtworkDerivativesListMerger(artwork.derivatives.list, outputDerivatives.list, artwork.cdns, cdnList);
+            
+            List<ArtworkDerivative> derivativeList = new ArrayList<>(merger.mergedSize());
+            cdnList = new ArrayList<>(merger.mergedSize());
+            
+            while(merger.next()) {
+                derivativeList.add(merger.getNextArtworkDerivative());
+                cdnList.add(merger.getNextArtworkCdn());
+            }
+            
+            outputDerivatives = artworkDerivatives(derivativeList);
         }
         
+        artwork.cdns = cdnList;
+        artwork.derivatives = outputDerivatives;
+    }
+
+    private void buildAndCacheArtworkDerivatives(IPLDerivativeSetHollow derivativeSet, String imageType, ArtWorkImageTypeEntry typeEntry,int inputDerivativeSetOrdinal) {
         List<ArtworkCdn> cdnList = new ArrayList<>();
         List<ArtworkDerivative> derivativeList = new ArrayList<>();
                 
-        for (IPLArtworkDerivativeHollow derivativeHollow : sortInputDerivatives(derivativeSet)) {
+        for (IPLArtworkDerivativeHollow derivativeHollow : derivativeSet) {
             int inputDerivativeOrdinal = derivativeHollow.getOrdinal();
             
             ArtworkDerivative outputDerivative = cycleConstants.artworkDerivativeCache.getResult(inputDerivativeOrdinal);
@@ -154,17 +192,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
                 ArtWorkImageFormatEntry formatEntry = getImageFormatEntry(imageType, derivativeHollow);
                 ArtWorkImageRecipe recipeEntry = getImageRecipe(derivativeHollow);
                 
-                List<DerivativeTagHollow> modifications = derivativeHollow._getModifications();
-                if(modifications != null && !modifications.isEmpty()) {
-                    derivativeTypeEntry = getModifiedImageTypeEntry(typeEntry, imageType, modifications.get(0)._getValue().toUpperCase());
-                }
-                
-                /*ListOfDerivativeTagHollow overlayTypes = derivativeHollow._getOverlayTypes();
-                if(overlayTypes != null) {
-                    if(determineIfNewEpisodeOverlayType(overlayTypes)) {
-                        imageType appens with new episode 
-                    }
-                }*/
+                derivativeTypeEntry = getModifiedImageTypeEntry(typeEntry, imageType, derivativeHollow);
                 
                 String recipeDescriptor = derivativeHollow._getRecipeDescriptor()._getValue();
                 
@@ -178,31 +206,32 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             
             derivativeList.add(outputDerivative);
             
-
+   
             ArtworkCdn cdn = new ArtworkCdn();
             cdn.cdnId = java.lang.Integer.parseInt(derivativeHollow._getCdnId()._getValue()); // @TODO: Is it Integer or String
             cdn.cdnDirectory = null; //getCdnDirectory(sourceFileId, derivativeHollow);
-
+   
             ArtworkCdn canonicalCdn = cdnLocationCache.get(cdn);
             if(canonicalCdn != null) {
                 cdn = canonicalCdn;
             } else {
                 cdnLocationCache.put(cdn, cdn);
             }
-
+   
             cdnList.add(cdn);
         }
         
-        outputDerivatives = artworkDerivatives(derivativeList);
+        Collections.sort(derivativeList, ArtworkDerivativesListMerger.DERIVATIVE_COMPARATOR);
+        ArtworkDerivatives cacheDerivatives = artworkDerivatives(derivativeList);
         
-        outputDerivatives = cycleConstants.artworkDerivativesCache.setResult(inputDerivativeSetOrdinal, outputDerivatives);
+        cacheDerivatives = cycleConstants.artworkDerivativesCache.setResult(inputDerivativeSetOrdinal, cacheDerivatives);
         cdnList = cycleConstants.cdnListCache.setResult(inputDerivativeSetOrdinal, cdnList);
-        
-        artwork.cdns = cdnList;
-        artwork.derivatives = outputDerivatives;
     }
 
     private boolean determineIfNewEpisodeOverlayType(ListOfDerivativeTagHollow overlayTypes) {
+        if(overlayTypes == null)
+            return false;
+        
         Boolean isNewEpisodeOverlayType = cycleConstants.isNewEpisodeOverlayTypes.getResult(overlayTypes.getOrdinal());
         if(isNewEpisodeOverlayType == null) {
             isNewEpisodeOverlayType = Boolean.FALSE;
@@ -450,16 +479,42 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         return entry;
     }
     
-    protected final ArtWorkImageTypeEntry getModifiedImageTypeEntry(ArtWorkImageTypeEntry unmodifiedEntry, String typeName, String modification) {
-        ModificationKey key = new ModificationKey(typeName, modification);
-        String modifiedTypeName = modifiedImageTypeMap.get(key);
-        if(modifiedTypeName != null) {
+    protected final ArtWorkImageTypeEntry getModifiedImageTypeEntry(ArtWorkImageTypeEntry unmodifiedEntry, String typeName, IPLArtworkDerivativeHollow derivativeInput) {
+        String originalTypeName = typeName;
+        
+        ListOfDerivativeTagHollow modifications = derivativeInput._getModifications();
+        ListOfDerivativeTagHollow overlayTypes = derivativeInput._getOverlayTypes();
+        
+        if(modifications != null && !modifications.isEmpty()) {
+            ModificationKey key = new ModificationKey(typeName, modifications.get(0)._getValue());
+            String modifiedTypeName  = modifiedImageTypeMap.get(key);
+            if(modifiedTypeName != null)
+                typeName = modifiedTypeName;
+        }
+        
+        if(determineIfNewEpisodeOverlayType(overlayTypes)) {
+            if(isAllLowercase(typeName))
+                typeName += "_new_" + derivativeInput._getLanguageCode()._getValue().toLowerCase();
+            else
+                typeName += "_NEW_" + derivativeInput._getLanguageCode()._getValue().toUpperCase();
+        }
+        
+        if(!typeName.equals(originalTypeName)) {
             ArtWorkImageTypeEntry entry = unmodifiedEntry.clone();
-            entry.nameStr = modifiedTypeName.toCharArray();
+            entry.nameStr = typeName.toCharArray();
             
             return entry;
         }
+        
         return unmodifiedEntry;
+    }
+    
+    private boolean isAllLowercase(String str) {
+        for(int i=0;i<str.length();i++) {
+            if(str.charAt(i) >= 'A' && str.charAt(i) <= 'Z')
+                return false;
+        }
+        return true;
     }
 
     protected final ArtWorkImageFormatEntry getImageFormatEntry(String imageType, IPLArtworkDerivativeHollow derivative) {
@@ -532,54 +587,35 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         return artworkSet;
     }
 
-    protected List<IPLArtworkDerivativeHollow> sortInputDerivatives(IPLDerivativeSetHollow derivatives) {
-        List<IPLArtworkDerivativeHollow> sortedDerivativeHollowList = new ArrayList<>();
-        for (IPLArtworkDerivativeHollow derivativeHollow : derivatives) {
-            sortedDerivativeHollowList.add(derivativeHollow);
-        }
-        Collections.sort(sortedDerivativeHollowList, new Comparator<IPLArtworkDerivativeHollow>() {
-            @Override
-            public int compare(IPLArtworkDerivativeHollow o1, IPLArtworkDerivativeHollow o2) {
-                return ComparisonChain.start()
-                        .compare(o1._getTargetWidthInPixels(), o2._getTargetWidthInPixels())
-                        .compare(o1._getTargetHeightInPixels(), o2._getTargetHeightInPixels())
-                        .compare(o1._getRecipeName()._getValue(), o2._getRecipeName()._getValue())
-                        .compare(o1._getRecipeDescriptor()._getValue(), o2._getRecipeDescriptor()._getValue())
-                        .result();
-            }
-        });
-        return sortedDerivativeHollowList;
-    }
-    
-    private static final String IMAGE_TYPE_MODIFICATION_CONFIGS = "TITLE_TREATMENT|CROPPED|TITLE_TREATMENT_CROPPED\n"
-                                                     + "LOGO_STACKED|CROPPED|LOGO_STACKED_CROPPED\n"
-                                                     + "LOGO_HORIZONTAL|CROPPED|LOGO_HORIZONTAL_CROPPED\n"
-                                                     + "NETFLIX_ORIGINAL|CROPPED|NETFLIX_ORIGINAL_CROPPED\n"
-                                                     + "BB2_OG_LOGO|CROPPED|BB2_OG_LOGO_CROPPED\n"
-                                                     + "BB2_OG_LOGO_PLUS|CROPPED|BB2_OG_LOGO_PLUS_CROPPED\n"
-                                                     + "BB2_OG_LOGO_STACKED|CROPPED|BB2_OG_LOGO_STACKED_CROPPED\n"
-                                                     + "OriginalsPostPlayLogoPostPlay|CROPPED|OriginalsPostPlayLogoPostPlay_CROPPED\n"
-                                                     + "OriginalsPostPlayLogoPostTrailer|CROPPED|OriginalsPostPlayLogoPostTrailer_CROPPED\n"
-                                                     + "OriginalsPostPlayLogoPrePlay|CROPPED|OriginalsPostPlayLogoPrePlay_CROPPED\n"
-                                                     + "StoryArt|LEFT_GRADIENT|STORYART_LEFT_GRADIENT\n"
-                                                     + "StoryArt|RIGHT_GRADIENT|STORYART_RIGHT_GRADIENT\n"
-                                                     + "StoryArt|LEFT_GRADIENT_KIDS|STORYART_LEFT_GRADIENT_KIDS\n"
-                                                     + "StoryArt|RIGHT_GRADIENT_KIDS|STORYART_RIGHT_GRADIENT_KIDS\n"
-                                                     + "NSRE_DATE_BADGE|CROPPED|NSRE_DATE_BADGE_CROPPED\n"
-                                                     + "MERCH_STILL|LEFT_GRADIENT|MERCH_STILL_LEFT_GRADIENT\n"
-                                                     + "MERCH_STILL|RIGHT_GRADIENT|MERCH_STILL_RIGHT_GRADIENT\n"
-                                                     + "MERCH_STILL|LEFT_GRADIENT_KIDS|MERCH_STILL_LEFT_GRADIENT_KIDS\n"
-                                                     + "MERCH_STILL|RIGHT_GRADIENT_KIDS|MERCH_STILL_RIGHT_GRADIENT_KIDS\n"
-                                                     + "STORYART_ADDITIONAL|LEFT_GRADIENT|STORYART_ADDITIONAL_LEFT_GRADIENT\n"
-                                                     + "STORYART_ADDITIONAL|RIGHT_GRADIENT|STORYART_ADDITIONAL_RIGHT_GRADIENT\n"
-                                                     + "STORYART_ADDITIONAL|LEFT_GRADIENT_KIDS|STORYART_ADDITIONAL_LEFT_GRADIENT_KIDS\n"
-                                                     + "STORYART_ADDITIONAL|RIGHT_GRADIENT_KIDS|STORYART_ADDITIONAL_RIGHT_GRADIENT_KIDS\n"
-                                                     + "CharacterStoryArt|LEFT_GRADIENT|CHARACTERSTORYART_LEFT_GRADIENT\n"
-                                                     + "CharacterStoryArt|RIGHT_GRADIENT|CHARACTERSTORYART_RIGHT_GRADIENT\n"
-                                                     + "CharacterStoryArt|LEFT_GRADIENT_KIDS|CHARACTERSTORYART_LEFT_GRADIENT_KIDS\n"
-                                                     + "CharacterStoryArt|RIGHT_GRADIENT_KIDS|CHARACTERSTORYART_RIGHT_GRADIENT_KIDS\n"
-                                                     + "BILLBOARD|BOTTOM_GRADIENT|BILLBOARD_BOTTOM_GRADIENT\n"
-                                                     + "NEW_CONTENT_BADGE|CROPPED|NEW_CONTENT_BADGE_CROPPED";
+    private static final String IMAGE_TYPE_MODIFICATION_CONFIGS = "TITLE_TREATMENT|autocrop|TITLE_TREATMENT_CROPPED\n"
+                                                     + "LOGO_STACKED|autocrop|LOGO_STACKED_CROPPED\n"
+                                                     + "LOGO_HORIZONTAL|autocrop|LOGO_HORIZONTAL_CROPPED\n"
+                                                     + "NETFLIX_ORIGINAL|autocrop|NETFLIX_ORIGINAL_CROPPED\n"
+                                                     + "BB2_OG_LOGO|autocrop|BB2_OG_LOGO_CROPPED\n"
+                                                     + "BB2_OG_LOGO_PLUS|autocrop|BB2_OG_LOGO_PLUS_CROPPED\n"
+                                                     + "BB2_OG_LOGO_STACKED|autocrop|BB2_OG_LOGO_STACKED_CROPPED\n"
+                                                     + "OriginalsPostPlayLogoPostPlay|autocrop|OriginalsPostPlayLogoPostPlay_CROPPED\n"
+                                                     + "OriginalsPostPlayLogoPostTrailer|autocrop|OriginalsPostPlayLogoPostTrailer_CROPPED\n"
+                                                     + "OriginalsPostPlayLogoPrePlay|autocrop|OriginalsPostPlayLogoPrePlay_CROPPED\n"
+                                                     + "StoryArt|left_gradient|STORYART_LEFT_GRADIENT\n"
+                                                     + "StoryArt|right_gradient|STORYART_RIGHT_GRADIENT\n"
+                                                     + "StoryArt|left_gradient_kids|STORYART_LEFT_GRADIENT_KIDS\n"
+                                                     + "StoryArt|right_gradient_kids|STORYART_RIGHT_GRADIENT_KIDS\n"
+                                                     + "NSRE_DATE_BADGE|autocrop|NSRE_DATE_BADGE_CROPPED\n"
+                                                     + "MERCH_STILL|left_gradient|MERCH_STILL_LEFT_GRADIENT\n"
+                                                     + "MERCH_STILL|right_gradient|MERCH_STILL_RIGHT_GRADIENT\n"
+                                                     + "MERCH_STILL|left_gradient_kids|MERCH_STILL_LEFT_GRADIENT_KIDS\n"
+                                                     + "MERCH_STILL|right_gradient_kids|MERCH_STILL_RIGHT_GRADIENT_KIDS\n"
+                                                     + "STORYART_ADDITIONAL|left_gradient|STORYART_ADDITIONAL_LEFT_GRADIENT\n"
+                                                     + "STORYART_ADDITIONAL|right_gradient|STORYART_ADDITIONAL_RIGHT_GRADIENT\n"
+                                                     + "STORYART_ADDITIONAL|left_gradient_kids|STORYART_ADDITIONAL_LEFT_GRADIENT_KIDS\n"
+                                                     + "STORYART_ADDITIONAL|right_gradient_kids|STORYART_ADDITIONAL_RIGHT_GRADIENT_KIDS\n"
+                                                     + "CharacterStoryArt|left_gradient|CHARACTERSTORYART_LEFT_GRADIENT\n"
+                                                     + "CharacterStoryArt|right_gradient|CHARACTERSTORYART_RIGHT_GRADIENT\n"
+                                                     + "CharacterStoryArt|left_gradient_kids|CHARACTERSTORYART_LEFT_GRADIENT_KIDS\n"
+                                                     + "CharacterStoryArt|right_gradient_kids|CHARACTERSTORYART_RIGHT_GRADIENT_KIDS\n"
+                                                     + "BILLBOARD|bottom_gradient|BILLBOARD_BOTTOM_GRADIENT\n"
+                                                     + "NEW_CONTENT_BADGE|autocrop|NEW_CONTENT_BADGE_CROPPED";
     
     private static class ModificationKey {
         private final String imageType;
@@ -631,7 +667,6 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             String fields[] = modifiedImageTypeRecord.split("\\|");
             
             modifiedImageTypeMap.put(new ModificationKey(fields[0], fields[1]), fields[2]);
-            
         }
     }
     

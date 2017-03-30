@@ -590,10 +590,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
         
         if(derivativeSetMatches != null) {
             ///TODO: We need to use multiple and account for "submission" number.
-            int firstDerivativeSetMatch = derivativeSetMatches.iterator().next();
-            IPLDerivativeGroupHollow derivativeSet = api.getIPLDerivativeGroupHollow(firstDerivativeSetMatch);
-            
-            processDerivativesAndCdnList(entityId, sourceFileId, derivativeSet, artwork);
+            processCombinedDerivativesAndCdnList(entityId, sourceFileId, derivativeSetMatches, artwork);
         } else {
             return null;
         }
