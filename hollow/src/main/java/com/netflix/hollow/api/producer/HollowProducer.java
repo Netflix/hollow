@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -68,11 +69,11 @@ public class HollowProducer {
     private final Publisher publisher;
     private final Validator validator;
     private final Announcer announcer;
-    private final HollowWriteStateEngine writeEngine;
-    private final HollowObjectMapper objectMapper;
+    private final WriteEngineWrapper writeEngineWrapper;
     private final VersionMinter versionMinter;
     private final ListenerSupport listeners;
     private ReadStateHelper readStates;
+    private boolean isRestoreFailureFatal=false;
 
     public HollowProducer(HollowProducer.Publisher publisher,
             HollowProducer.Announcer announcer) {
@@ -87,8 +88,7 @@ public class HollowProducer {
         this.validator = validator;
         this.announcer = announcer;
 
-        writeEngine = new HollowWriteStateEngine();
-        objectMapper = new HollowObjectMapper(writeEngine);
+        writeEngineWrapper = new WriteEngineWrapper();
         versionMinter = new VersionMinterWithCounter();
         listeners = new ListenerSupport();
         readStates = ReadStateHelper.newDeltaChain();
@@ -96,18 +96,26 @@ public class HollowProducer {
 
     public void initializeDataModel(Class<?>...classes) {
         long start = currentTimeMillis();
-        for(Class<?> c : classes)
-            objectMapper.initializeTypeState(c);
-        listeners.fireProducerInit(currentTimeMillis() - start);
-    }
-    
-    public void initializeDataModel(HollowSchema... schemas) {
-        long start = currentTimeMillis();
-        HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(writeEngine, Arrays.asList(schemas));
+        writeEngineWrapper.initializeDataModel(classes);
         listeners.fireProducerInit(currentTimeMillis() - start);
     }
 
+    public void initializeDataModel(HollowSchema... schemas) {
+        long start = currentTimeMillis();
+        writeEngineWrapper.initializeDataModel(schemas);
+        listeners.fireProducerInit(currentTimeMillis() - start);
+    }
+
+    public void setRestoreFailureFatal(boolean isFatal) {
+        this.isRestoreFailureFatal = isFatal;
+    }
+
     public HollowProducer restore(long versionDesired, HollowBlobRetriever blobRetriever) {
+        restoreAndReturnReadState(versionDesired, blobRetriever);
+        return this;
+    }
+
+    protected HollowConsumer.ReadState restoreAndReturnReadState(long versionDesired, HollowBlobRetriever blobRetriever) {
         long start = currentTimeMillis();
         RestoreStatus status = RestoreStatus.unknownFailure();
         HollowConsumer.ReadState readState = null;
@@ -121,7 +129,10 @@ public class HollowProducer {
                 readState = newReadState(client.getCurrentVersionId(), client.getStateEngine());
                 if(readState.getVersion() == versionDesired) {
                     readStates = ReadStateHelper.restored(readState);
-                    writeEngine.restoreFrom(readStates.current().getStateEngine());
+
+                    // Need to reset for every restore since can't restore to non empty Write State Engine
+                    writeEngineWrapper.reset();
+                    writeEngineWrapper.getWriteEngine().restoreFrom(readStates.current().getStateEngine());
                     status = RestoreStatus.success(versionDesired, readState.getVersion());
                 } else {
                     status = RestoreStatus.fail(versionDesired, readState.getVersion(), null);
@@ -129,10 +140,18 @@ public class HollowProducer {
             }
         } catch(Throwable th) {
             status = RestoreStatus.fail(versionDesired, readState != null ? readState.getVersion() : Long.MIN_VALUE, th);
+            if (isRestoreFailureFatal) throw th;
         } finally {
             listeners.fireProducerRestoreComplete(status, currentTimeMillis() - start);
         }
-        return this;
+        return readState;
+    }
+
+    /**
+     * Provide the metadata used for announcement 
+     */
+    protected Map<String, String> getAnnouncementMetadata(WriteState writeState) {
+        return Collections.emptyMap();
     }
 
     /**
@@ -144,10 +163,12 @@ public class HollowProducer {
         if(!readStates.hasCurrent()) listeners.fireNewDeltaChain(toVersion);
         ProducerStatus.Builder cycleStatus = listeners.fireCycleStart(toVersion);
         Artifacts artifacts = new Artifacts();
+
+        HollowWriteStateEngine writeEngine = writeEngineWrapper.getWriteEngine();
+        HollowObjectMapper objectMapper = writeEngineWrapper.getObjcetMapper();
         try {
             // 1a. Prepare the write state
             writeEngine.prepareForNextCycle();
-            HollowObjectMapper objectMapper = this.objectMapper;
             WriteState writeState = newWriteState(toVersion, objectMapper);
 
             // 2. Populate the state
@@ -174,7 +195,8 @@ public class HollowProducer {
 
                 validate(candidate.pending());
 
-                announce(candidate.pending());
+                Map<String, String> metadata = getAnnouncementMetadata(writeState);
+                announce(candidate.pending(), metadata);
                 readStates = candidate.commit();
                 cycleStatus.version(readStates.current()).success();
             } else {
@@ -218,7 +240,7 @@ public class HollowProducer {
     }
 
     private void publishBlob(WriteState writeState, Artifacts artifacts, Blob.Type blobType) throws IOException {
-        HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
+        HollowBlobWriter writer = new HollowBlobWriter(writeEngineWrapper.getWriteEngine());
         PublishStatus.Builder builder = (new PublishStatus.Builder());
         try {
             switch (blobType) {
@@ -349,10 +371,10 @@ public class HollowProducer {
         }
     }
 
-    private void announce(HollowConsumer.ReadState readState) {
+    private void announce(HollowConsumer.ReadState readState, Map<String, String> metadata) {
         ProducerStatus.Builder status = listeners.fireAnnouncementStart(readState);
         try {
-            announcer.announce(readState.getVersion());
+            announcer.announce(readState.getVersion(), metadata);
             status.success();
         } catch(Throwable th) {
             status.fail(th);
@@ -361,6 +383,48 @@ public class HollowProducer {
             listeners.fireAnnouncementComplete(status);
         }
     }
+
+    private class WriteEngineWrapper {
+        private HollowWriteStateEngine writeEngine;
+        private HollowObjectMapper objectMapper;
+        private Class<?> classes[];
+        private HollowSchema schemas[];
+
+        WriteEngineWrapper() {
+            reset();
+        }
+
+        void reset() {
+            writeEngine = new HollowWriteStateEngine();
+            objectMapper = new HollowObjectMapper(writeEngine);
+            initializeDataModel(classes);
+            initializeDataModel(schemas);
+        }
+
+        HollowWriteStateEngine getWriteEngine() {
+            return writeEngine;
+        }
+
+        HollowObjectMapper getObjcetMapper() {
+            return objectMapper;
+        }
+
+        void initializeDataModel(Class<?>...classes) {
+            if (classes==null) return;
+
+            this.classes = classes;
+            for(Class<?> c : classes)
+                objectMapper.initializeTypeState(c);
+        }
+
+        void initializeDataModel(HollowSchema... schemas) {
+            if (schemas==null) return;
+
+            this.schemas = schemas;
+            HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(writeEngine, Arrays.asList(schemas));
+        }
+    }
+
 
     static interface VersionMinter {
         /**
@@ -563,7 +627,7 @@ public class HollowProducer {
     }
 
     public static interface Announcer {
-        public void announce(long stateVersion);
+        public void announce(long stateVersion, Map<String, String> metadata);
     }
 
     private static final class Artifacts {
