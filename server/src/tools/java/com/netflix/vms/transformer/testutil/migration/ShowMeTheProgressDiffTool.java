@@ -16,8 +16,8 @@ public class ShowMeTheProgressDiffTool {
 
     public static void startTheDiff(HollowReadStateEngine expected, HollowReadStateEngine actual) throws Exception {
         HollowDiff diff = new HollowDiff(expected, actual);
-        addTypeDiff(diff, "CompleteVideo", "id.value", "country.id");
-        addTypeDiff(diff, "FallbackUSArtwork", "id.value");
+        addTypeDiff(diff, "CompleteVideo", "id.value", "country.id").addShortcutType("Artwork");
+        addTypeDiff(diff, "FallbackUSArtwork", "id.value").addShortcutType("Artwork");
         addTypeDiff(diff, "VideoEpisode_CountryList", "country.id", "item.deliverableVideo.value");
         addTypeDiff(diff, "PackageData", "id");
         addTypeDiff(diff, "NamedCollectionHolder", "country.id");
@@ -28,8 +28,8 @@ public class ShowMeTheProgressDiffTool {
         addTypeDiff(diff, "DeploymentIntent", "profileId", "bitrate", "country.id");
         addTypeDiff(diff, "LanguageDescriptor", "languageId");
         addTypeDiff(diff, "GlobalPerson", "id");
-        addTypeDiff(diff, "GlobalVideo", "completeVideo.id.value");
-        addTypeDiff(diff, "PersonImages", "id");
+        addTypeDiff(diff, "GlobalVideo", "completeVideo.id.value").addShortcutType("Artwork");
+        addTypeDiff(diff, "PersonImages", "id").addShortcutType("Artwork");
         addTypeDiff(diff, "ArtWorkImageFormatEntry", "nameStr");
         addTypeDiff(diff, "ArtWorkImageTypeEntry", "nameStr");
         addTypeDiff(diff, "ArtWorkImageRecipe", "recipeNameStr");
@@ -39,7 +39,7 @@ public class ShowMeTheProgressDiffTool {
         addTypeDiff(diff, "DrmSystem", "id");
         addTypeDiff(diff, "L10NResources", "resourceIdStr");
         addTypeDiff(diff, "EncodingProfileGroup", "groupNameStr");
-        addTypeDiff(diff, "CharacterImages", "id");
+        addTypeDiff(diff, "CharacterImages", "id").addShortcutType("Artwork");
         addTypeDiff(diff, "FileEncodingData", "downloadableId");
         addTypeDiff(diff, "RolloutVideo", "video.value");
         addTypeDiff(diff, "TopNVideoData", "countryId");
@@ -50,7 +50,7 @@ public class ShowMeTheProgressDiffTool {
         HollowDiffUIServer server = new HollowDiffUIServer(port);
         HollowDiffUI ui = server.addDiff("diff", diff, "EXPECTED", "ACTUAL");
         ui.addMatchHint(new PrimaryKey("Artwork", "sourceFileId"));
-        ui.addMatchHint(new PrimaryKey("ArtworkDerivative", "recipeDesc", "type.nameStr", "format.nameStr"));
+        ui.addMatchHint(new PrimaryKey("ArtworkDerivative", "recipeDesc"));
         ui.addMatchHint(new PrimaryKey("Integer", "val"));
         ui.addMatchHint(new PrimaryKey("ArtWorkImageFormatEntry", "nameStr"));
         ui.addMatchHint(new PrimaryKey("VideoImage", "videoId", "videoMoment.msOffset"));
