@@ -1,13 +1,15 @@
 package com.netflix.vms.transformer.modules.artwork;
 
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.ReexploreTags;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_DERIVATIVE_SETS;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_IMAGE_FORMAT;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_RECIPE;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_TERRITORY_COUNTRIES;
-import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
-import com.netflix.hollow.core.index.HollowHashIndexResult;
+
 import com.netflix.hollow.core.index.HollowHashIndex;
+import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.NullablePrimitiveBoolean;
 import com.netflix.vms.transformer.ConversionUtils;
@@ -38,6 +40,7 @@ import com.netflix.vms.transformer.hollowoutput.ArtworkBasicPassthrough;
 import com.netflix.vms.transformer.hollowoutput.ArtworkCdn;
 import com.netflix.vms.transformer.hollowoutput.ArtworkDerivative;
 import com.netflix.vms.transformer.hollowoutput.ArtworkDerivatives;
+import com.netflix.vms.transformer.hollowoutput.ArtworkReExploreLongTimestamp;
 import com.netflix.vms.transformer.hollowoutput.ArtworkSourcePassthrough;
 import com.netflix.vms.transformer.hollowoutput.ArtworkSourceString;
 import com.netflix.vms.transformer.hollowoutput.Integer;
@@ -48,6 +51,7 @@ import com.netflix.vms.transformer.hollowoutput.__passthrough_string;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
 import com.netflix.vms.transformer.util.NFLocaleUtil;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -405,6 +409,20 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             passThrough.personIdStrs = keyListValues.get("PERSON_IDS");
             setBasicPassThrough = true;
         }
+        if (keyValues.containsKey("REEXPLORE_TIME") && keyValues.get("REEXPLORE_TIME") != null) {
+            long timestamp = Long.valueOf(keyValues.get("REEXPLORE_TIME"));
+            // Warn on timestamps older than 36 days, since explore (ab testing) of images only spans 35 days at most.
+            // upstream team should clean up older timestamps when generating VideoArtwork.json feed.
+            // upstream team has a check that may have earliest timestamp which is 36 days old, so we can check for 38 days to compensate for delay in receiving this feed.
+            long timestamp38DaysBack = Instant.now().getEpochSecond() - (3600 * 24 * 38);
+            if (timestamp < timestamp38DaysBack) {
+                // this log statement is only for warning purposes. Ideally this should not warn. If it does with high number, then revisit the window span or contact upstream team.
+                ctx.getLogger().warn(ReexploreTags, "Found re-explore timestamp={} that is older than 38 days timestamp={}, This is stale (dead) data", timestamp, timestamp38DaysBack);
+            }
+            setBasicPassThrough = true;
+            passThrough.reExploreLongTimestamp = new ArtworkReExploreLongTimestamp(timestamp);
+        }
+        
 
         ArtworkSourcePassthrough sourcePassThrough = new ArtworkSourcePassthrough();
         sourcePassThrough.source_file_id = getArtworkSourceString("source_file_id", keyValues);
