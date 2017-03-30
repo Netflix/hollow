@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 import com.netflix.hollow.core.write.objectmapper.NullablePrimitiveBoolean;
+
 import java.util.List;
 
 public class ArtworkBasicPassthrough implements Cloneable {
@@ -16,6 +17,7 @@ public class ArtworkBasicPassthrough implements Cloneable {
     public PassthroughString approval_source = null;
     public List<__passthrough_string> personIdStrs = null;
     public NullablePrimitiveBoolean approval_state = null;
+    public ArtworkReExploreLongTimestamp reExploreLongTimestamp = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
@@ -54,6 +56,9 @@ public class ArtworkBasicPassthrough implements Cloneable {
             if(personIdStrs != null) return false;
         } else if(!o.personIdStrs.equals(personIdStrs)) return false;
         if(o.approval_state != approval_state) return false;
+        if (o.reExploreLongTimestamp == null) {
+            if (reExploreLongTimestamp != null) return false;
+        } else if (!o.reExploreLongTimestamp.equals(reExploreLongTimestamp)) return false;
         return true;
     }
 
@@ -70,6 +75,7 @@ public class ArtworkBasicPassthrough implements Cloneable {
         hashCode = hashCode * 31 + (approval_source == null ? 1237 : approval_source.hashCode());
         hashCode = hashCode * 31 + (personIdStrs == null ? 1237 : personIdStrs.hashCode());
         hashCode = hashCode * 31 + (approval_state == null ? 1231 : approval_state.hashCode());
+        hashCode = hashCode * 31 + (reExploreLongTimestamp == null ? 1231 : reExploreLongTimestamp.hashCode());
         return hashCode;
     }
 
@@ -86,6 +92,7 @@ public class ArtworkBasicPassthrough implements Cloneable {
         builder.append(",approval_source=").append(approval_source);
         builder.append(",personIdStrs=").append(personIdStrs);
         builder.append(",approval_state=").append(approval_state);
+        builder.append(",re_explore_timestamp=").append(reExploreLongTimestamp.toString());
         builder.append("}");
         return builder.toString();
     }
