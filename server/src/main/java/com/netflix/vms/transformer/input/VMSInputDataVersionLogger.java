@@ -20,11 +20,18 @@ public class VMSInputDataVersionLogger {
                 String latestColdstartVersion = entry.getValue();
                 String latestEventId = inputBlobHeaders.get(mutationGroup + "_events");
                 String coldstartKeybase = inputBlobHeaders.get(mutationGroup + "_coldstartKeybase");
+
+                // coldstart filename
                 String coldstartFilename = inputBlobHeaders.get(mutationGroup + "_coldstartFile") != null ? inputBlobHeaders.get(mutationGroup + "_coldstartFile") : "null";
-                long publishTime = Long.valueOf(inputBlobHeaders.get(mutationGroup + "_coldstartFilePublishTime"));
-                dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                Date publishDate = new Date(publishTime);
-                String formattedDate = dateFormat.format(publishDate);
+
+                // publish time in filestore
+                String formattedDate = "null";
+                if (inputBlobHeaders.get(mutationGroup + "_coldstartFilePublishTime") != null) {
+                    long publishTime = Long.valueOf(inputBlobHeaders.get(mutationGroup + "_coldstartFilePublishTime"));
+                    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                    Date publishDate = new Date(publishTime);
+                    formattedDate = dateFormat.format(publishDate);
+                }
 
                 logger.info(InputDataVersionIds,
                         "mutationGroup=" + mutationGroup +
