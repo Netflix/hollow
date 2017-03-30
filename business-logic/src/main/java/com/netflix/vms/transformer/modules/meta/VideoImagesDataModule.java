@@ -17,11 +17,11 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.hollowinput.AbsoluteScheduleHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
-import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeSetHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleListHollow;
 import com.netflix.vms.transformer.hollowinput.DamMerchStillsHollow;
 import com.netflix.vms.transformer.hollowinput.FlagsHollow;
+import com.netflix.vms.transformer.hollowinput.IPLDerivativeGroupHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfRightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.LocaleTerritoryCodeHollow;
@@ -50,7 +50,6 @@ import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.artwork.ArtWorkModule;
 import com.netflix.vms.transformer.util.NFLocaleUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -532,8 +531,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
                                   Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap,
                                   Map<String, Map<Integer, Set<SchedulePhaseInfo>>> countrySchedulePhaseMap,
                                   Set<String> merchstillSourceFieldIds,
-                                  Map<String, Set<String>> rolloutImagesByCountry, Map<String,
-            Set<VideoHierarchy>> showHierarchiesByCountry) {
+                                  Map<String, Set<String>> rolloutImagesByCountry, Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
         ArtworkLocaleListHollow locales = artworkHollowInput._getLocales();
         int entityId = (int) artworkHollowInput._getMovieId();
         int videoId = entityId;
@@ -559,7 +557,6 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
         }
 
         ArtworkAttributesHollow attributes = artworkHollowInput._getAttributes();
-        ArtworkDerivativeSetHollow inputDerivatives = artworkHollowInput._getDerivatives();
 
         boolean showLevel = false;
         SingleValuePassthroughMapHollow map = attributes._getPassthrough()._getSingleValues();
@@ -589,7 +586,17 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
         artwork.hasShowLevelTag = showLevel;
 
         // Process list of derivatives
-        processDerivativesAndCdnList(entityId, sourceFileId, inputDerivatives, artwork);
+        HollowHashIndexResult derivativeSetMatches = artworkDerivativeSetIdx.findMatches(artworkHollowInput._getSourceFileId()._getValue());
+        
+        if(derivativeSetMatches != null) {
+            ///TODO: We need to use multiple and account for "submission" number.
+            int firstDerivativeSetMatch = derivativeSetMatches.iterator().next();
+            IPLDerivativeGroupHollow derivativeSet = api.getIPLDerivativeGroupHollow(firstDerivativeSetMatch);
+            
+            processDerivativesAndCdnList(entityId, sourceFileId, derivativeSet, artwork);
+        } else {
+            return null;
+        }
 
         artwork.sourceFileId = new Strings(sourceFileId);
         artwork.seqNum = seqNum;

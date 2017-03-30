@@ -1,11 +1,12 @@
 package com.netflix.vms.transformer.modules.artwork;
 
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.UnknownArtworkImageType;
+import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_DERIVATIVE_SETS;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_IMAGE_FORMAT;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_RECIPE;
 import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_TERRITORY_COUNTRIES;
 
 import com.google.common.collect.ComparisonChain;
+import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.NullablePrimitiveBoolean;
@@ -14,11 +15,14 @@ import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.ArtWorkImageTypeHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
-import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeHollow;
-import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeSetHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleListHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkRecipeHollow;
+import com.netflix.vms.transformer.hollowinput.DerivativeTagHollow;
+import com.netflix.vms.transformer.hollowinput.IPLArtworkDerivativeHollow;
+import com.netflix.vms.transformer.hollowinput.IPLDerivativeGroupHollow;
+import com.netflix.vms.transformer.hollowinput.IPLDerivativeSetHollow;
+import com.netflix.vms.transformer.hollowinput.ListOfDerivativeTagHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
 import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
 import com.netflix.vms.transformer.hollowinput.MultiValuePassthroughMapHollow;
@@ -56,13 +60,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import org.apache.commons.codec.digest.DigestUtils;
 
 public abstract class ArtWorkModule extends AbstractTransformModule{
     protected final String entityType;
     protected final HollowPrimaryKeyIndex imageTypeIdx;
     protected final HollowPrimaryKeyIndex recipeIdx;
     protected final HollowPrimaryKeyIndex territoryIdx;
+    
+    protected final HollowHashIndex artworkDerivativeSetIdx;
+    
     private final ArtWorkComparator artworkComparator;
 
     private final Map<String, ArtWorkImageTypeEntry> imageTypeEntryCache;
@@ -70,10 +76,12 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     private final Map<String, ArtWorkImageRecipe> imageRecipeCache;
     private final Map<ArtworkCdn, ArtworkCdn> cdnLocationCache;
     
-    private final boolean isEnableCdnDirectoryOptimization;
-    private final int computedCdnFolderLen;
-
     private final Set<String> unknownArtworkImageTypes = new HashSet<String>();
+    
+    private final Set<String> variableSizeImageTypes = new HashSet<String>();
+    private final List<String> newEpisodeOverlayTypes = new ArrayList<String>();
+    
+    protected boolean allImagesAreVariableSize = false;
 
     public ArtWorkModule(String entityType, VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
         super(api, ctx, cycleConstants, mapper);
@@ -81,17 +89,20 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         this.imageTypeIdx = indexer.getPrimaryKeyIndex(ARTWORK_IMAGE_FORMAT);
         this.recipeIdx = indexer.getPrimaryKeyIndex(ARTWORK_RECIPE);
         this.territoryIdx = indexer.getPrimaryKeyIndex(ARTWORK_TERRITORY_COUNTRIES);
+        this.artworkDerivativeSetIdx = indexer.getHashIndex(ARTWORK_DERIVATIVE_SETS);
         this.artworkComparator = new ArtWorkComparator(ctx);
         this.imageFormatEntryCache = new HashMap<String, ArtWorkImageFormatEntry>();
         this.imageTypeEntryCache = new HashMap<String, ArtWorkImageTypeEntry>();
         this.imageRecipeCache = new HashMap<String, ArtWorkImageRecipe>();
         this.cdnLocationCache = new HashMap<ArtworkCdn, ArtworkCdn>();
         
-        this.computedCdnFolderLen = ctx.getConfig().getComputedCdnFolderLength();
-        this.isEnableCdnDirectoryOptimization = ctx.getConfig().isEnableCdnDirectoryOptimization();
+        for(String type : ctx.getConfig().getVariableImageTypes().split(","))
+            variableSizeImageTypes.add(type);
+        for(String overlayType : ctx.getConfig().getNewEpisodeOverlayTypes().split(","))
+            newEpisodeOverlayTypes.add(overlayType);
     }
 
-    protected void transformArtworks(int entityId, String sourceFileId, int ordinalPriority, int seqNum, ArtworkAttributesHollow attributes, ArtworkDerivativeSetHollow inputDerivatives, Set<ArtworkLocaleHollow> localeSet, Set<Artwork> artworkSet) {
+    protected void transformArtworks(int entityId, String sourceFileId, int ordinalPriority, int seqNum, ArtworkAttributesHollow attributes, IPLDerivativeGroupHollow inputDerivatives, Set<ArtworkLocaleHollow> localeSet, Set<Artwork> artworkSet) {
         unknownArtworkImageTypes.clear();
 
         Artwork artwork = new Artwork();
@@ -113,8 +124,13 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     }
 
     // Process Derivatives
-    protected void processDerivativesAndCdnList(int entityId, String sourceFileId, ArtworkDerivativeSetHollow inputDerivatives, Artwork artwork) {
-        int inputDerivativeSetOrdinal = inputDerivatives.getOrdinal();
+    protected void processDerivativesAndCdnList(int entityId, String sourceFileId, IPLDerivativeGroupHollow inputDerivatives, Artwork artwork) {
+        IPLDerivativeSetHollow derivativeSet = inputDerivatives._getDerivatives();
+
+        String imageType = inputDerivatives._getImageType()._getValue();
+        ArtWorkImageTypeEntry typeEntry = getImageTypeEntry(imageType);
+        
+        int inputDerivativeSetOrdinal = derivativeSet.getOrdinal();
                 
         ArtworkDerivatives outputDerivatives = cycleConstants.artworkDerivativesCache.getResult(inputDerivativeSetOrdinal);
         if(outputDerivatives != null) {
@@ -126,7 +142,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         List<ArtworkCdn> cdnList = new ArrayList<>();
         List<ArtworkDerivative> derivativeList = new ArrayList<>();
                 
-        for (ArtworkDerivativeHollow derivativeHollow : sortInputDerivatives(inputDerivatives)) {
+        for (IPLArtworkDerivativeHollow derivativeHollow : sortInputDerivatives(derivativeSet)) {
             int inputDerivativeOrdinal = derivativeHollow.getOrdinal();
             
             ArtworkDerivative outputDerivative = cycleConstants.artworkDerivativeCache.getResult(inputDerivativeOrdinal);
@@ -134,22 +150,26 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             if(outputDerivative == null) {
                 outputDerivative = new ArtworkDerivative();
                         
-                ArtWorkImageFormatEntry formatEntry = getImageFormatEntry(derivativeHollow);
-                ArtWorkImageTypeEntry typeEntry = getImageTypeEntry(derivativeHollow);
+                ArtWorkImageTypeEntry derivativeTypeEntry = typeEntry;
+                ArtWorkImageFormatEntry formatEntry = getImageFormatEntry(imageType, derivativeHollow);
                 ArtWorkImageRecipe recipeEntry = getImageRecipe(derivativeHollow);
-                if (typeEntry == null) {
-                    String imageType = derivativeHollow._getImageType()._getValue();
-                    if(!unknownArtworkImageTypes.contains(imageType)) {
-                        ctx.getLogger().warn(UnknownArtworkImageType, "Unknown Image Type for entity={}, id={}, type={}; data will be dropped.", entityType, entityId, imageType);
-                        unknownArtworkImageTypes.add(imageType);
-                    }
-                    continue;
+                
+                List<DerivativeTagHollow> modifications = derivativeHollow._getModifications();
+                if(modifications != null && !modifications.isEmpty()) {
+                    derivativeTypeEntry = getModifiedImageTypeEntry(typeEntry, imageType, modifications.get(0)._getValue().toUpperCase());
                 }
+                
+                /*ListOfDerivativeTagHollow overlayTypes = derivativeHollow._getOverlayTypes();
+                if(overlayTypes != null) {
+                    if(determineIfNewEpisodeOverlayType(overlayTypes)) {
+                        imageType appens with new episode 
+                    }
+                }*/
                 
                 String recipeDescriptor = derivativeHollow._getRecipeDescriptor()._getValue();
                 
                 outputDerivative.format = formatEntry;
-                outputDerivative.type = typeEntry;
+                outputDerivative.type = derivativeTypeEntry;
                 outputDerivative.recipe = recipeEntry;
                 outputDerivative.recipeDesc = new Strings(recipeDescriptor);
                 
@@ -161,7 +181,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
 
             ArtworkCdn cdn = new ArtworkCdn();
             cdn.cdnId = java.lang.Integer.parseInt(derivativeHollow._getCdnId()._getValue()); // @TODO: Is it Integer or String
-            cdn.cdnDirectory = getCdnDirectory(sourceFileId, derivativeHollow);
+            cdn.cdnDirectory = null; //getCdnDirectory(sourceFileId, derivativeHollow);
 
             ArtworkCdn canonicalCdn = cdnLocationCache.get(cdn);
             if(canonicalCdn != null) {
@@ -182,35 +202,24 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         artwork.derivatives = outputDerivatives;
     }
 
-    protected final Strings getCdnDirectory(String sourceId, ArtworkDerivativeHollow derivative) {
-        StringHollow cdnDirString = derivative._getCdnDirectory();
-        if(cdnDirString == null)
-        	return null;
-        
-		String cdnDirectory = cdnDirString._getValue();
-        if (isEnableCdnDirectoryOptimization) {
-            String recipeDescriptor = derivative._getRecipeDescriptor()._getValue();
-            String filename_without_extension = createFilenameWithoutExtension(sourceId, recipeDescriptor);
-
-            String derivedCdnDirectory = getCdnFolderFromFilename(filename_without_extension, computedCdnFolderLen);
-            if (derivedCdnDirectory != null && derivedCdnDirectory.equals(cdnDirectory)) {
-                // cdnFolder is also derivable (client already has this logic) so not need to eat-up blob space
-                return null;
+    private boolean determineIfNewEpisodeOverlayType(ListOfDerivativeTagHollow overlayTypes) {
+        Boolean isNewEpisodeOverlayType = cycleConstants.isNewEpisodeOverlayTypes.getResult(overlayTypes.getOrdinal());
+        if(isNewEpisodeOverlayType == null) {
+            isNewEpisodeOverlayType = Boolean.FALSE;
+            tagloop:
+            for(DerivativeTagHollow tag : overlayTypes) {
+                for(String newEpisodeOverlayType : newEpisodeOverlayTypes) {
+                    if(tag._isValueEqual(newEpisodeOverlayType)) {
+                        isNewEpisodeOverlayType = Boolean.TRUE;
+                        break tagloop;
+                    }
+                }
             }
+
+            cycleConstants.isNewEpisodeOverlayTypes.setResult(overlayTypes.getOrdinal(), isNewEpisodeOverlayType);
         }
-        return new Strings(cdnDirectory);
-    }
-
-    private static String getCdnFolderFromFilename(String filename, int len) {
-        if (len <= 0) return "";
-        if (filename == null || filename.length() <= len) return filename;
-        return filename.substring(filename.length() - len);
-    }
-
-    private static String createFilenameWithoutExtension(String sourceId, String recipeDescriptor) {
-        String filename_work_in_progress = sourceId + "_" + recipeDescriptor;
-        String filename_without_extension = DigestUtils.shaHex(filename_work_in_progress);
-        return filename_without_extension;
+        
+        return isNewEpisodeOverlayType.booleanValue();
     }
 
     private ArtworkDerivatives artworkDerivatives(List<ArtworkDerivative> derivatives) {
@@ -414,11 +423,6 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         return null;
     }
 
-    protected final ArtWorkImageTypeEntry getImageTypeEntry(ArtworkDerivativeHollow derivative) {
-        StringHollow imageTypeHollow = derivative._getImageType();
-        return getImageTypeEntry(imageTypeHollow._getValue());
-    }
-
     protected final ArtWorkImageTypeEntry getImageTypeEntry(String typeName) {
         ArtWorkImageTypeEntry entry = imageTypeEntryCache.get(typeName);
 
@@ -445,10 +449,24 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
 
         return entry;
     }
+    
+    protected final ArtWorkImageTypeEntry getModifiedImageTypeEntry(ArtWorkImageTypeEntry unmodifiedEntry, String typeName, String modification) {
+        ModificationKey key = new ModificationKey(typeName, modification);
+        String modifiedTypeName = modifiedImageTypeMap.get(key);
+        if(modifiedTypeName != null) {
+            ArtWorkImageTypeEntry entry = unmodifiedEntry.clone();
+            entry.nameStr = modifiedTypeName.toCharArray();
+            
+            return entry;
+        }
+        return unmodifiedEntry;
+    }
 
-    protected final ArtWorkImageFormatEntry getImageFormatEntry(ArtworkDerivativeHollow derivative) {
-        int width = (int)derivative._getWidth();
-        int height = (int)derivative._getHeight();
+    protected final ArtWorkImageFormatEntry getImageFormatEntry(String imageType, IPLArtworkDerivativeHollow derivative) {
+        boolean isVariableSizeImage = allImagesAreVariableSize || variableSizeImageTypes.contains(imageType);
+        
+        int width = isVariableSizeImage ? derivative._getWidthInPixels() : derivative._getTargetWidthInPixels();
+        int height = isVariableSizeImage ? derivative._getHeightInPixels() : derivative._getTargetHeightInPixels();
         String formatName = width + "x" + height;
 
         ArtWorkImageFormatEntry entry = imageFormatEntryCache.get(formatName);
@@ -465,7 +483,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         return entry;
     }
 
-    protected final ArtWorkImageRecipe getImageRecipe(ArtworkDerivativeHollow derivative) {
+    protected final ArtWorkImageRecipe getImageRecipe(IPLArtworkDerivativeHollow derivative) {
         String recipeName = derivative._getRecipeName()._getValue();
 
         ArtWorkImageRecipe entry = imageRecipeCache.get(recipeName);
@@ -482,7 +500,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
                 if(hostName != null)
                     entry.hostNameStr = ConversionUtils.getCharArray(hostName);
             }else {
-                entry.cdnFolderStr = ConversionUtils.getCharArray(derivative._getCdnDirectory());
+                entry.cdnFolderStr = null; //ConversionUtils.getCharArray(derivative._getCdnDirectory());
                 entry.extensionStr = recipeName.toCharArray();
                 entry.recipeNameStr = recipeName.toCharArray();
             }
@@ -514,18 +532,17 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         return artworkSet;
     }
 
-    protected List<ArtworkDerivativeHollow> sortInputDerivatives(ArtworkDerivativeSetHollow derivatives) {
-        List<ArtworkDerivativeHollow> sortedDerivativeHollowList = new ArrayList<>();
-        for (ArtworkDerivativeHollow derivativeHollow : derivatives) {
+    protected List<IPLArtworkDerivativeHollow> sortInputDerivatives(IPLDerivativeSetHollow derivatives) {
+        List<IPLArtworkDerivativeHollow> sortedDerivativeHollowList = new ArrayList<>();
+        for (IPLArtworkDerivativeHollow derivativeHollow : derivatives) {
             sortedDerivativeHollowList.add(derivativeHollow);
         }
-        Collections.sort(sortedDerivativeHollowList, new Comparator<ArtworkDerivativeHollow>() {
+        Collections.sort(sortedDerivativeHollowList, new Comparator<IPLArtworkDerivativeHollow>() {
             @Override
-            public int compare(ArtworkDerivativeHollow o1, ArtworkDerivativeHollow o2) {
+            public int compare(IPLArtworkDerivativeHollow o1, IPLArtworkDerivativeHollow o2) {
                 return ComparisonChain.start()
-                        .compare(o1._getImageType()._getValue(), o2._getImageType()._getValue())
-                        .compare(o1._getWidth(), o2._getWidth())
-                        .compare(o1._getHeight(), o2._getHeight())
+                        .compare(o1._getTargetWidthInPixels(), o2._getTargetWidthInPixels())
+                        .compare(o1._getTargetHeightInPixels(), o2._getTargetHeightInPixels())
                         .compare(o1._getRecipeName()._getValue(), o2._getRecipeName()._getValue())
                         .compare(o1._getRecipeDescriptor()._getValue(), o2._getRecipeDescriptor()._getValue())
                         .result();
@@ -533,5 +550,89 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         });
         return sortedDerivativeHollowList;
     }
+    
+    private static final String IMAGE_TYPE_MODIFICATION_CONFIGS = "TITLE_TREATMENT|CROPPED|TITLE_TREATMENT_CROPPED\n"
+                                                     + "LOGO_STACKED|CROPPED|LOGO_STACKED_CROPPED\n"
+                                                     + "LOGO_HORIZONTAL|CROPPED|LOGO_HORIZONTAL_CROPPED\n"
+                                                     + "NETFLIX_ORIGINAL|CROPPED|NETFLIX_ORIGINAL_CROPPED\n"
+                                                     + "BB2_OG_LOGO|CROPPED|BB2_OG_LOGO_CROPPED\n"
+                                                     + "BB2_OG_LOGO_PLUS|CROPPED|BB2_OG_LOGO_PLUS_CROPPED\n"
+                                                     + "BB2_OG_LOGO_STACKED|CROPPED|BB2_OG_LOGO_STACKED_CROPPED\n"
+                                                     + "OriginalsPostPlayLogoPostPlay|CROPPED|OriginalsPostPlayLogoPostPlay_CROPPED\n"
+                                                     + "OriginalsPostPlayLogoPostTrailer|CROPPED|OriginalsPostPlayLogoPostTrailer_CROPPED\n"
+                                                     + "OriginalsPostPlayLogoPrePlay|CROPPED|OriginalsPostPlayLogoPrePlay_CROPPED\n"
+                                                     + "StoryArt|LEFT_GRADIENT|STORYART_LEFT_GRADIENT\n"
+                                                     + "StoryArt|RIGHT_GRADIENT|STORYART_RIGHT_GRADIENT\n"
+                                                     + "StoryArt|LEFT_GRADIENT_KIDS|STORYART_LEFT_GRADIENT_KIDS\n"
+                                                     + "StoryArt|RIGHT_GRADIENT_KIDS|STORYART_RIGHT_GRADIENT_KIDS\n"
+                                                     + "NSRE_DATE_BADGE|CROPPED|NSRE_DATE_BADGE_CROPPED\n"
+                                                     + "MERCH_STILL|LEFT_GRADIENT|MERCH_STILL_LEFT_GRADIENT\n"
+                                                     + "MERCH_STILL|RIGHT_GRADIENT|MERCH_STILL_RIGHT_GRADIENT\n"
+                                                     + "MERCH_STILL|LEFT_GRADIENT_KIDS|MERCH_STILL_LEFT_GRADIENT_KIDS\n"
+                                                     + "MERCH_STILL|RIGHT_GRADIENT_KIDS|MERCH_STILL_RIGHT_GRADIENT_KIDS\n"
+                                                     + "STORYART_ADDITIONAL|LEFT_GRADIENT|STORYART_ADDITIONAL_LEFT_GRADIENT\n"
+                                                     + "STORYART_ADDITIONAL|RIGHT_GRADIENT|STORYART_ADDITIONAL_RIGHT_GRADIENT\n"
+                                                     + "STORYART_ADDITIONAL|LEFT_GRADIENT_KIDS|STORYART_ADDITIONAL_LEFT_GRADIENT_KIDS\n"
+                                                     + "STORYART_ADDITIONAL|RIGHT_GRADIENT_KIDS|STORYART_ADDITIONAL_RIGHT_GRADIENT_KIDS\n"
+                                                     + "CharacterStoryArt|LEFT_GRADIENT|CHARACTERSTORYART_LEFT_GRADIENT\n"
+                                                     + "CharacterStoryArt|RIGHT_GRADIENT|CHARACTERSTORYART_RIGHT_GRADIENT\n"
+                                                     + "CharacterStoryArt|LEFT_GRADIENT_KIDS|CHARACTERSTORYART_LEFT_GRADIENT_KIDS\n"
+                                                     + "CharacterStoryArt|RIGHT_GRADIENT_KIDS|CHARACTERSTORYART_RIGHT_GRADIENT_KIDS\n"
+                                                     + "BILLBOARD|BOTTOM_GRADIENT|BILLBOARD_BOTTOM_GRADIENT\n"
+                                                     + "NEW_CONTENT_BADGE|CROPPED|NEW_CONTENT_BADGE_CROPPED";
+    
+    private static class ModificationKey {
+        private final String imageType;
+        private final String modification;
+        
+        public ModificationKey(String imageType, String modification) {
+            this.imageType = imageType;
+            this.modification = modification;
+        }
 
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result
+                    + ((imageType == null) ? 0 : imageType.hashCode());
+            result = prime * result
+                    + ((modification == null) ? 0 : modification.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            ModificationKey other = (ModificationKey) obj;
+            if (imageType == null) {
+                if (other.imageType != null)
+                    return false;
+            } else if (!imageType.equals(other.imageType))
+                return false;
+            if (modification == null) {
+                if (other.modification != null)
+                    return false;
+            } else if (!modification.equals(other.modification))
+                return false;
+            return true;
+        }
+    }
+    
+    private static Map<ModificationKey, String> modifiedImageTypeMap = new HashMap<>();
+    
+    static {
+        for(String modifiedImageTypeRecord : IMAGE_TYPE_MODIFICATION_CONFIGS.split("\n")) {
+            String fields[] = modifiedImageTypeRecord.split("\\|");
+            
+            modifiedImageTypeMap.put(new ModificationKey(fields[0], fields[1]), fields[2]);
+            
+        }
+    }
+    
 }

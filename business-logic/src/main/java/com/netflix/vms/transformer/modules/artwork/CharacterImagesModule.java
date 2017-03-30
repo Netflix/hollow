@@ -2,15 +2,16 @@ package com.netflix.vms.transformer.modules.artwork;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
 
+import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.OutputTypeConfig;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
-import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeSetHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleListHollow;
 import com.netflix.vms.transformer.hollowinput.CharacterArtworkHollow;
+import com.netflix.vms.transformer.hollowinput.IPLDerivativeGroupHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.Artwork;
 import com.netflix.vms.transformer.hollowoutput.CharacterImages;
@@ -23,6 +24,7 @@ public class CharacterImagesModule extends ArtWorkModule{
 
     public CharacterImagesModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
         super("Character", api, ctx, mapper, cycleConstants, indexer);
+        allImagesAreVariableSize = true;
     }
 
     @Override
@@ -45,10 +47,16 @@ public class CharacterImagesModule extends ArtWorkModule{
             int ordinalPriority = (int) artworkHollowInput._getOrdinalPriority();
             int seqNum = (int) artworkHollowInput._getSeqNum();
             ArtworkAttributesHollow attributes = artworkHollowInput._getAttributes();
-            ArtworkDerivativeSetHollow derivatives = artworkHollowInput._getDerivatives();
-            Set<Artwork> artworkSet = getArtworkSet(entityId, descMap);
-
-            transformArtworks(entityId, sourceFileId, ordinalPriority, seqNum, attributes, derivatives, localeSet, artworkSet);
+            HollowHashIndexResult derivativeSetMatches = artworkDerivativeSetIdx.findMatches(artworkHollowInput._getSourceFileId()._getValue());
+            
+            if(derivativeSetMatches != null) {
+                ///TODO: We need to use multiple and account for "submission" number.
+                int firstDerivativeSetMatch = derivativeSetMatches.iterator().next();
+                IPLDerivativeGroupHollow derivativeSet = api.getIPLDerivativeGroupHollow(firstDerivativeSetMatch);
+                Set<Artwork> artworkSet = getArtworkSet(entityId, descMap);
+                
+                transformArtworks(entityId, sourceFileId, ordinalPriority, seqNum, attributes, derivativeSet, localeSet, artworkSet);
+            }
         }
 
         for (Map.Entry<Integer, Set<Artwork>> entry : descMap.entrySet()) {
