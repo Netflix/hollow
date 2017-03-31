@@ -37,6 +37,8 @@ import sun.misc.Unsafe;
 
 @SuppressWarnings("restriction")
 public class HollowObjectTypeMapper extends HollowTypeMapper {
+    
+    private static final long ASSIGNED_ORDINAL_CYCLE_MASK = 0xFFFFFFFF80000000L;
 
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
     private final HollowObjectMapper parentMapper;
@@ -47,6 +49,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
     private final HollowObjectTypeWriteState writeState;
 
     private final long assignedOrdinalFieldOffset;
+    private final boolean assignedOrdinalIsLong;
 
     private final List<MappedField> mappedFields;
 
@@ -106,11 +109,17 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         this.writeState = existingWriteState != null ? existingWriteState : new HollowObjectTypeWriteState(schema, getNumShards(clazz));
 
         long assignedOrdinalFieldOffset = -1;
+        boolean assignedOrdinalIsLong = false;
         try {
             Field declaredField = clazz.getDeclaredField("__assigned_ordinal");
-            assignedOrdinalFieldOffset = unsafe.objectFieldOffset(declaredField);
+            if(declaredField.getType() == int.class || declaredField.getType() == long.class)
+                assignedOrdinalFieldOffset = unsafe.objectFieldOffset(declaredField);
+            if(declaredField.getType() == long.class)
+                assignedOrdinalIsLong = true;
+            
         } catch (Exception ignore) { }
         this.assignedOrdinalFieldOffset = assignedOrdinalFieldOffset;
+        this.assignedOrdinalIsLong = assignedOrdinalIsLong;
     }
 
     private static String[] getKeyFieldPaths(Class<?> clazz) {
@@ -137,9 +146,16 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
     @Override
     public int write(Object obj) {
         if(assignedOrdinalFieldOffset != -1) {
-            int assignedOrdinal = unsafe.getInt(obj, assignedOrdinalFieldOffset);
-            if(assignedOrdinal != -1)
-                return assignedOrdinal;
+            if(assignedOrdinalIsLong) {
+                long assignedOrdinal = unsafe.getLong(obj, assignedOrdinalFieldOffset);
+                
+                if(assignedOrdinal != -1L && (assignedOrdinal & ASSIGNED_ORDINAL_CYCLE_MASK) == cycleSpecificAssignedOrdinalBits())
+                    return (int)assignedOrdinal & Integer.MAX_VALUE;
+            } else {
+                int assignedOrdinal = unsafe.getInt(obj, assignedOrdinalFieldOffset);
+                if(assignedOrdinal != -1)
+                    return assignedOrdinal;
+            }
         }
 
         if(obj.getClass() != clazz && !clazz.isAssignableFrom(obj.getClass()))
@@ -153,9 +169,17 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
 
         int assignedOrdinal = writeState.add(rec);
         if(assignedOrdinalFieldOffset != -1) {
-            unsafe.putInt(obj, assignedOrdinalFieldOffset, assignedOrdinal);
+            if(assignedOrdinalIsLong) {
+                unsafe.putLong(obj, assignedOrdinalFieldOffset, (long)assignedOrdinal | cycleSpecificAssignedOrdinalBits());
+            } else {
+                unsafe.putInt(obj, assignedOrdinalFieldOffset, assignedOrdinal);
+            }
         }
         return assignedOrdinal;
+    }
+    
+    private long cycleSpecificAssignedOrdinalBits() {
+        return getTypeWriteState().getStateEngine().getNextStateRandomizedTag() & ASSIGNED_ORDINAL_CYCLE_MASK;
     }
 
     public String[] getDefaultElementHashKey() {
