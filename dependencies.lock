@@ -1,11 +1,11 @@
 {
     "resolutionRules": {
         "com.netflix.nebula:gradle-resolution-rules": {
-            "locked": "0.43.0",
+            "locked": "0.45.0",
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
-            "locked": "0.41.0",
+            "locked": "0.42.0",
             "requested": "latest.release"
         }
     }

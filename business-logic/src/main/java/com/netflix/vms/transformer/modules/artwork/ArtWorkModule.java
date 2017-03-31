@@ -1,10 +1,5 @@
 package com.netflix.vms.transformer.modules.artwork;
 
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.UnknownArtworkImageType;
-import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_IMAGE_FORMAT;
-import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_RECIPE;
-import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_TERRITORY_COUNTRIES;
-
 import com.google.common.collect.ComparisonChain;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
@@ -12,6 +7,8 @@ import com.netflix.hollow.core.write.objectmapper.NullablePrimitiveBoolean;
 import com.netflix.vms.transformer.ConversionUtils;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.ReexploreTags;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.UnknownArtworkImageType;
 import com.netflix.vms.transformer.hollowinput.ArtWorkImageTypeHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeHollow;
@@ -34,6 +31,7 @@ import com.netflix.vms.transformer.hollowoutput.ArtworkBasicPassthrough;
 import com.netflix.vms.transformer.hollowoutput.ArtworkCdn;
 import com.netflix.vms.transformer.hollowoutput.ArtworkDerivative;
 import com.netflix.vms.transformer.hollowoutput.ArtworkDerivatives;
+import com.netflix.vms.transformer.hollowoutput.ArtworkReExploreLongTimestamp;
 import com.netflix.vms.transformer.hollowoutput.ArtworkSourcePassthrough;
 import com.netflix.vms.transformer.hollowoutput.ArtworkSourceString;
 import com.netflix.vms.transformer.hollowoutput.Integer;
@@ -41,9 +39,15 @@ import com.netflix.vms.transformer.hollowoutput.PassthroughString;
 import com.netflix.vms.transformer.hollowoutput.PassthroughVideo;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.__passthrough_string;
+import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_IMAGE_FORMAT;
+import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_RECIPE;
+import static com.netflix.vms.transformer.index.IndexSpec.ARTWORK_TERRITORY_COUNTRIES;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
 import com.netflix.vms.transformer.util.NFLocaleUtil;
+import org.apache.commons.codec.digest.DigestUtils;
+
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -56,9 +60,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import org.apache.commons.codec.digest.DigestUtils;
 
-public abstract class ArtWorkModule extends AbstractTransformModule{
+public abstract class ArtWorkModule extends AbstractTransformModule {
     protected final String entityType;
     protected final HollowPrimaryKeyIndex imageTypeIdx;
     protected final HollowPrimaryKeyIndex recipeIdx;
@@ -69,7 +72,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     private final Map<String, ArtWorkImageFormatEntry> imageFormatEntryCache;
     private final Map<String, ArtWorkImageRecipe> imageRecipeCache;
     private final Map<ArtworkCdn, ArtworkCdn> cdnLocationCache;
-    
+
     private final boolean isEnableCdnDirectoryOptimization;
     private final int computedCdnFolderLen;
 
@@ -86,7 +89,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         this.imageTypeEntryCache = new HashMap<String, ArtWorkImageTypeEntry>();
         this.imageRecipeCache = new HashMap<String, ArtWorkImageRecipe>();
         this.cdnLocationCache = new HashMap<ArtworkCdn, ArtworkCdn>();
-        
+
         this.computedCdnFolderLen = ctx.getConfig().getComputedCdnFolderLength();
         this.isEnableCdnDirectoryOptimization = ctx.getConfig().isEnableCdnDirectoryOptimization();
     }
@@ -95,7 +98,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         unknownArtworkImageTypes.clear();
 
         Artwork artwork = new Artwork();
-        
+
         // Process list of derivatives
         processDerivativesAndCdnList(entityId, sourceFileId, inputDerivatives, artwork);
 
@@ -115,56 +118,56 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     // Process Derivatives
     protected void processDerivativesAndCdnList(int entityId, String sourceFileId, ArtworkDerivativeSetHollow inputDerivatives, Artwork artwork) {
         int inputDerivativeSetOrdinal = inputDerivatives.getOrdinal();
-                
+
         ArtworkDerivatives outputDerivatives = cycleConstants.artworkDerivativesCache.getResult(inputDerivativeSetOrdinal);
-        if(outputDerivatives != null) {
+        if (outputDerivatives != null) {
             artwork.derivatives = outputDerivatives;
             artwork.cdns = cycleConstants.cdnListCache.getResult(inputDerivativeSetOrdinal);
             return;
         }
-        
+
         List<ArtworkCdn> cdnList = new ArrayList<>();
         List<ArtworkDerivative> derivativeList = new ArrayList<>();
-                
+
         for (ArtworkDerivativeHollow derivativeHollow : sortInputDerivatives(inputDerivatives)) {
             int inputDerivativeOrdinal = derivativeHollow.getOrdinal();
-            
+
             ArtworkDerivative outputDerivative = cycleConstants.artworkDerivativeCache.getResult(inputDerivativeOrdinal);
-            
-            if(outputDerivative == null) {
+
+            if (outputDerivative == null) {
                 outputDerivative = new ArtworkDerivative();
-                        
+
                 ArtWorkImageFormatEntry formatEntry = getImageFormatEntry(derivativeHollow);
                 ArtWorkImageTypeEntry typeEntry = getImageTypeEntry(derivativeHollow);
                 ArtWorkImageRecipe recipeEntry = getImageRecipe(derivativeHollow);
                 if (typeEntry == null) {
                     String imageType = derivativeHollow._getImageType()._getValue();
-                    if(!unknownArtworkImageTypes.contains(imageType)) {
+                    if (!unknownArtworkImageTypes.contains(imageType)) {
                         ctx.getLogger().warn(UnknownArtworkImageType, "Unknown Image Type for entity={}, id={}, type={}; data will be dropped.", entityType, entityId, imageType);
                         unknownArtworkImageTypes.add(imageType);
                     }
                     continue;
                 }
-                
+
                 String recipeDescriptor = derivativeHollow._getRecipeDescriptor()._getValue();
-                
+
                 outputDerivative.format = formatEntry;
                 outputDerivative.type = typeEntry;
                 outputDerivative.recipe = recipeEntry;
                 outputDerivative.recipeDesc = new Strings(recipeDescriptor);
-                
+
                 outputDerivative = cycleConstants.artworkDerivativeCache.setResult(inputDerivativeOrdinal, outputDerivative);
-            } 
-            
+            }
+
             derivativeList.add(outputDerivative);
-            
+
 
             ArtworkCdn cdn = new ArtworkCdn();
             cdn.cdnId = java.lang.Integer.parseInt(derivativeHollow._getCdnId()._getValue()); // @TODO: Is it Integer or String
             cdn.cdnDirectory = getCdnDirectory(sourceFileId, derivativeHollow);
 
             ArtworkCdn canonicalCdn = cdnLocationCache.get(cdn);
-            if(canonicalCdn != null) {
+            if (canonicalCdn != null) {
                 cdn = canonicalCdn;
             } else {
                 cdnLocationCache.put(cdn, cdn);
@@ -172,22 +175,22 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
 
             cdnList.add(cdn);
         }
-        
+
         outputDerivatives = artworkDerivatives(derivativeList);
-        
+
         outputDerivatives = cycleConstants.artworkDerivativesCache.setResult(inputDerivativeSetOrdinal, outputDerivatives);
         cdnList = cycleConstants.cdnListCache.setResult(inputDerivativeSetOrdinal, cdnList);
-        
+
         artwork.cdns = cdnList;
         artwork.derivatives = outputDerivatives;
     }
 
     protected final Strings getCdnDirectory(String sourceId, ArtworkDerivativeHollow derivative) {
         StringHollow cdnDirString = derivative._getCdnDirectory();
-        if(cdnDirString == null)
-        	return null;
-        
-		String cdnDirectory = cdnDirString._getValue();
+        if (cdnDirString == null)
+            return null;
+
+        String cdnDirectory = cdnDirString._getValue();
         if (isEnableCdnDirectoryOptimization) {
             String recipeDescriptor = derivative._getRecipeDescriptor()._getValue();
             String filename_without_extension = createFilenameWithoutExtension(sourceId, recipeDescriptor);
@@ -299,18 +302,18 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     protected void fillPassThroughData(Artwork desc, ArtworkAttributesHollow attributes) {
         SingleValuePassthroughMapHollow singleValuePassThrough = attributes._getPassthrough()._getSingleValues();
         HashMap<String, String> keyValues = new HashMap<>();
-        for(Entry<MapKeyHollow, StringHollow> entry : singleValuePassThrough.entrySet()) {
+        for (Entry<MapKeyHollow, StringHollow> entry : singleValuePassThrough.entrySet()) {
             keyValues.put(entry.getKey()._getValue(), entry.getValue()._getValue());
         }
 
         HashMap<String, List<__passthrough_string>> keyListValues = new HashMap<>();
         MultiValuePassthroughMapHollow multiValuePassthrough = attributes._getPassthrough()._getMultiValues();
-        for(Entry<MapKeyHollow, ListOfStringHollow> entry : multiValuePassthrough.entrySet()) {
+        for (Entry<MapKeyHollow, ListOfStringHollow> entry : multiValuePassthrough.entrySet()) {
             String key = entry.getKey()._getValue();
             List<__passthrough_string> values = new ArrayList<>();
             ListOfStringHollow listValue = entry.getValue();
             Iterator<StringHollow> iterator = listValue.iterator();
-            while(iterator.hasNext()) {
+            while (iterator.hasNext()) {
                 StringHollow next = iterator.next();
                 values.add(new __passthrough_string(next._getValue()));
             }
@@ -320,34 +323,34 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         ArtworkBasicPassthrough passThrough = new ArtworkBasicPassthrough();
         PassthroughString passThroughString = getPassThroughString("APPROVAL_SOURCE", keyValues);
         boolean setBasicPassThrough = false;
-        if(passThroughString != null) {
+        if (passThroughString != null) {
             passThrough.approval_source = passThroughString;
             setBasicPassThrough = true;
         }
         String approvalState = keyValues.get("APPROVAL_STATE");
-        if(approvalState != null) {
+        if (approvalState != null) {
             // NOTE: Need to manually make approval_state to NullablePrimitiveBoolean (public NullablePrimitiveBoolean approval_state = null)
             passThrough.approval_state = java.lang.Boolean.valueOf(approvalState) ? NullablePrimitiveBoolean.TRUE : NullablePrimitiveBoolean.FALSE;
             setBasicPassThrough = true;
         }
         passThroughString = getPassThroughString("designAttribute", keyValues);
-        if(passThroughString != null) {
+        if (passThroughString != null) {
             passThrough.design_attribute = passThroughString;
             setBasicPassThrough = true;
         }
         passThroughString = getPassThroughString("FOCAL_POINT", keyValues);
-        if(passThroughString != null) {
+        if (passThroughString != null) {
             passThrough.focal_point = passThroughString;
             setBasicPassThrough = true;
         }            // Sort descriptor necessary for client artwork resolver
 
         passThroughString = getPassThroughString("TONE", keyValues);
-        if(passThroughString != null) {
+        if (passThroughString != null) {
             passThrough.tone = passThroughString;
             setBasicPassThrough = true;
         }
         passThroughString = getPassThroughString("GROUP_ID", keyValues);
-        if(passThroughString != null) {
+        if (passThroughString != null) {
             passThrough.group_id = passThroughString;
             setBasicPassThrough = true;
         }
@@ -367,13 +370,27 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             passThrough.personIdStrs = keyListValues.get("PERSON_IDS");
             setBasicPassThrough = true;
         }
+        if (keyValues.containsKey("REEXPLORE_TIME") && keyValues.get("REEXPLORE_TIME") != null) {
+            long timestamp = Long.valueOf(keyValues.get("REEXPLORE_TIME"));
+            // Warn on timestamps older than 36 days, since explore (ab testing) of images only spans 35 days at most.
+            // upstream team should clean up older timestamps when generating VideoArtwork.json feed.
+            // upstream team has a check that may have earliest timestamp which is 36 days old, so we can check for 38 days to compensate for delay in receiving this feed.
+            long timestamp38DaysBack = Instant.now().getEpochSecond() - (3600 * 24 * 38);
+            if (timestamp < timestamp38DaysBack) {
+                // this log statement is only for warning purposes. Ideally this should not warn. If it does with high number, then revisit the window span or contact upstream team.
+                ctx.getLogger().warn(ReexploreTags, "Found re-explore timestamp={} that is older than 38 days timestamp={}, This is stale (dead) data", timestamp, timestamp38DaysBack);
+            }
+            setBasicPassThrough = true;
+            passThrough.reExploreLongTimestamp = new ArtworkReExploreLongTimestamp(timestamp);
+        }
 
         ArtworkSourcePassthrough sourcePassThrough = new ArtworkSourcePassthrough();
         sourcePassThrough.source_file_id = getArtworkSourceString("source_file_id", keyValues);
         sourcePassThrough.original_source_file_id = getArtworkSourceString("original_source_file_id", keyValues);
-        if (sourcePassThrough.original_source_file_id == null) sourcePassThrough.original_source_file_id = sourcePassThrough.source_file_id;
+        if (sourcePassThrough.original_source_file_id == null)
+            sourcePassThrough.original_source_file_id = sourcePassThrough.source_file_id;
 
-        if(setBasicPassThrough) {
+        if (setBasicPassThrough) {
             desc.basic_passthrough = passThrough;
         }
         desc.source = sourcePassThrough;
@@ -392,7 +409,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
 
     private PassthroughString getPassThroughString(String key, HashMap<String, String> keyValues) {
         String value = keyValues.get(key);
-        if(value != null) {
+        if (value != null) {
             return new PassthroughString(value);
         }
         return null;
@@ -408,7 +425,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
 
     private ArtworkSourceString getArtworkSourceString(String key, HashMap<String, String> keyValues) {
         String value = keyValues.get(key);
-        if(value != null) {
+        if (value != null) {
             return new ArtworkSourceString(value);
         }
         return null;
@@ -422,16 +439,16 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     protected final ArtWorkImageTypeEntry getImageTypeEntry(String typeName) {
         ArtWorkImageTypeEntry entry = imageTypeEntryCache.get(typeName);
 
-        if(entry == null) {
+        if (entry == null) {
             int ordinal = imageTypeIdx.getMatchingOrdinal(typeName);
             entry = new ArtWorkImageTypeEntry();
-            if(ordinal != -1) {
+            if (ordinal != -1) {
                 ArtWorkImageTypeHollow artWorkImageTypeHollow = api.getArtWorkImageTypeHollow(ordinal);
                 entry.recipeNameStr = artWorkImageTypeHollow._getRecipe()._getValue().toCharArray();
                 entry.allowMultiples = true;
                 entry.unavailableFileNameStr = "unavailable".toCharArray();
                 entry.nameStr = typeName.toCharArray();
-            }else {
+            } else {
                 // RETURN NULL to be backwards compatible
                 return null;
                 //                entry.recipeNameStr = "jpg".toCharArray();
@@ -447,13 +464,13 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     }
 
     protected final ArtWorkImageFormatEntry getImageFormatEntry(ArtworkDerivativeHollow derivative) {
-        int width = (int)derivative._getWidth();
-        int height = (int)derivative._getHeight();
+        int width = (int) derivative._getWidth();
+        int height = (int) derivative._getHeight();
         String formatName = width + "x" + height;
 
         ArtWorkImageFormatEntry entry = imageFormatEntryCache.get(formatName);
 
-        if(entry == null) {
+        if (entry == null) {
             entry = new ArtWorkImageFormatEntry();
             entry.nameStr = formatName.toCharArray();
             entry.height = height;
@@ -470,18 +487,18 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
 
         ArtWorkImageRecipe entry = imageRecipeCache.get(recipeName);
 
-        if(entry == null) {
+        if (entry == null) {
             int ordinal = recipeIdx.getMatchingOrdinal(recipeName);
             entry = new ArtWorkImageRecipe();
-            if(ordinal != -1) {
+            if (ordinal != -1) {
                 ArtworkRecipeHollow artworkRecipeHollow = api.getArtworkRecipeHollow(ordinal);
                 entry.cdnFolderStr = ConversionUtils.getCharArray(artworkRecipeHollow._getCdnFolder());
                 entry.extensionStr = ConversionUtils.getCharArray(artworkRecipeHollow._getExtension());
                 entry.recipeNameStr = ConversionUtils.getCharArray(artworkRecipeHollow._getRecipeName());
                 StringHollow hostName = artworkRecipeHollow._getHostName();
-                if(hostName != null)
+                if (hostName != null)
                     entry.hostNameStr = ConversionUtils.getCharArray(hostName);
-            }else {
+            } else {
                 entry.cdnFolderStr = ConversionUtils.getCharArray(derivative._getCdnDirectory());
                 entry.extensionStr = recipeName.toCharArray();
                 entry.recipeNameStr = recipeName.toCharArray();
@@ -496,9 +513,9 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     protected Set<ArtworkLocaleHollow> getLocalTerritories(ArtworkLocaleListHollow locales) {
         Set<ArtworkLocaleHollow> artworkLocales = new HashSet<>();
         Iterator<ArtworkLocaleHollow> iterator = locales.iterator();
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             ArtworkLocaleHollow locale = iterator.next();
-            if(locale != null) {
+            if (locale != null) {
                 artworkLocales.add(locale);
             }
         }

@@ -218,7 +218,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -226,20 +226,20 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.3.1",
+            "locked": "2.4.0",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -591,7 +591,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.57.0",
+            "locked": "1.58.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -605,7 +605,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary",
@@ -635,13 +635,13 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -653,7 +653,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -1145,7 +1145,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -1153,20 +1153,20 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.3.1",
+            "locked": "2.4.0",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -1518,7 +1518,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.57.0",
+            "locked": "1.58.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -1532,7 +1532,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary",
@@ -1562,13 +1562,13 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -1580,7 +1580,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -2072,7 +2072,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -2080,20 +2080,20 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.3.1",
+            "locked": "2.4.0",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -2445,7 +2445,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.57.0",
+            "locked": "1.58.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -2459,7 +2459,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary",
@@ -2489,13 +2489,13 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -2507,7 +2507,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -2999,7 +2999,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -3007,20 +3007,20 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.3.1",
+            "locked": "2.4.0",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -3372,7 +3372,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.57.0",
+            "locked": "1.58.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -3386,7 +3386,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary",
@@ -3416,13 +3416,13 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -3434,7 +3434,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -3798,11 +3798,11 @@
     },
     "resolutionRules": {
         "com.netflix.nebula:gradle-resolution-rules": {
-            "locked": "0.43.0",
+            "locked": "0.45.0",
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
-            "locked": "0.41.0",
+            "locked": "0.42.0",
             "requested": "latest.release"
         }
     },
@@ -4025,7 +4025,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -4033,20 +4033,20 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.3.1",
+            "locked": "2.4.0",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -4398,7 +4398,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.57.0",
+            "locked": "1.58.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -4412,7 +4412,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary",
@@ -4442,13 +4442,13 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -4460,7 +4460,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -4954,7 +4954,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -4962,20 +4962,20 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.3.1",
+            "locked": "2.4.0",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -5334,7 +5334,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.57.0",
+            "locked": "1.58.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -5348,7 +5348,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary",
@@ -5378,13 +5378,13 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -5396,7 +5396,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -5911,7 +5911,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -5919,20 +5919,20 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.3.1",
+            "locked": "2.4.0",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -6291,7 +6291,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.57.0",
+            "locked": "1.58.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -6305,7 +6305,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary",
@@ -6335,13 +6335,13 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -6353,7 +6353,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -6868,7 +6868,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -6876,20 +6876,20 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.3.1",
+            "locked": "2.4.0",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -7248,7 +7248,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.57.0",
+            "locked": "1.58.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -7262,7 +7262,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary",
@@ -7292,13 +7292,13 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -7310,7 +7310,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
@@ -7825,7 +7825,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -7833,20 +7833,20 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.15.11",
+            "locked": "1.16.0",
             "transitive": [
                 "com.netflix.governator:governator"
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.3.1",
+            "locked": "2.4.0",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
@@ -8205,7 +8205,7 @@
             ]
         },
         "netflix:basicTypes": {
-            "locked": "1.57.0",
+            "locked": "1.58.0",
             "transitive": [
                 "netflix:nfi18n-core",
                 "netflix:server-context"
@@ -8219,7 +8219,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nflibrary",
@@ -8249,13 +8249,13 @@
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -8267,7 +8267,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.1.7",
+            "locked": "4.1.10",
             "transitive": [
                 "netflix:netflix-config",
                 "netflix:nfi18n-core"
