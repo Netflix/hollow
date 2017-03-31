@@ -29,4 +29,7 @@ public class ArtworkReExploreLongTimestamp {
     public String toString() {
         return String.valueOf(reExploreTimestamp);
     }
+    
+    @SuppressWarnings("unused")
+    private int __assigned_ordinal = -1;
 }

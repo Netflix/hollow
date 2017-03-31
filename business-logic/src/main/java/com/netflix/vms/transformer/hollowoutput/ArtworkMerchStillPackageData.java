@@ -33,4 +33,7 @@ public class ArtworkMerchStillPackageData {
     public String toString() {
         return "ArtworkMerchStillPackageData [packageId=" + packageId + ", offsetMillis=" + offsetMillis + "]";
     }
+    
+    @SuppressWarnings("unused")
+    private int __assigned_ordinal = -1;
 }
