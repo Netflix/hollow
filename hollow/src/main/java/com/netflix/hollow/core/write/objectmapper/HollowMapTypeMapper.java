@@ -18,7 +18,6 @@
 package com.netflix.hollow.core.write.objectmapper;
 
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
-
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.write.HollowMapTypeWriteState;
 import com.netflix.hollow.core.write.HollowMapWriteRecord;
@@ -62,6 +61,13 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
 
     @Override
     protected int write(Object obj) {
+        if(obj instanceof MemoizedMap) {
+            long assignedOrdinal = ((MemoizedMap<?, ?>)obj).__assigned_ordinal;
+            
+            if(assignedOrdinal != -1L && (assignedOrdinal & ASSIGNED_ORDINAL_CYCLE_MASK) == cycleSpecificAssignedOrdinalBits())
+                return (int)assignedOrdinal & Integer.MAX_VALUE;
+        }
+
         Map<?, ?> m = (Map<?, ?>)obj;
 
         HollowMapWriteRecord rec = (HollowMapWriteRecord)writeRecord();
@@ -73,7 +79,13 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
             rec.addEntry(keyOrdinal, valueOrdinal, hashCode);
         }
 
-        return writeState.add(rec);
+        int assignedOrdinal = writeState.add(rec);
+        
+        if(obj instanceof MemoizedMap) {
+            ((MemoizedMap<?, ?>)obj).__assigned_ordinal = (long)assignedOrdinal | cycleSpecificAssignedOrdinalBits();
+        }
+        
+        return assignedOrdinal;
     }
 
     @Override

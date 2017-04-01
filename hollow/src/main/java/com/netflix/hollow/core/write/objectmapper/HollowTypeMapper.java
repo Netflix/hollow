@@ -29,6 +29,8 @@ import java.lang.reflect.Type;
 
 public abstract class HollowTypeMapper {
 
+    protected static final long ASSIGNED_ORDINAL_CYCLE_MASK = 0xFFFFFFFF80000000L;
+
     private final ThreadLocal<HollowWriteRecord> writeRec = new ThreadLocal<HollowWriteRecord>();
 
     protected abstract String getTypeName();
@@ -74,5 +76,9 @@ public abstract class HollowTypeMapper {
             return "MapOf" + getDefaultTypeName(parameterizedType.getActualTypeArguments()[0]) + "To" + getDefaultTypeName(parameterizedType.getActualTypeArguments()[1]);
 
         return clazz.getSimpleName();
+    }
+    
+    protected long cycleSpecificAssignedOrdinalBits() {
+        return getTypeWriteState().getStateEngine().getNextStateRandomizedTag() & ASSIGNED_ORDINAL_CYCLE_MASK;
     }
 }

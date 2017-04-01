@@ -38,8 +38,6 @@ import sun.misc.Unsafe;
 @SuppressWarnings("restriction")
 public class HollowObjectTypeMapper extends HollowTypeMapper {
     
-    private static final long ASSIGNED_ORDINAL_CYCLE_MASK = 0xFFFFFFFF80000000L;
-
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
     private final HollowObjectMapper parentMapper;
 
@@ -176,10 +174,6 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             }
         }
         return assignedOrdinal;
-    }
-    
-    private long cycleSpecificAssignedOrdinalBits() {
-        return getTypeWriteState().getStateEngine().getNextStateRandomizedTag() & ASSIGNED_ORDINAL_CYCLE_MASK;
     }
 
     public String[] getDefaultElementHashKey() {
