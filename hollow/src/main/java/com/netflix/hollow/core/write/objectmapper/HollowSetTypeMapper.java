@@ -17,9 +17,8 @@
  */
 package com.netflix.hollow.core.write.objectmapper;
 
-import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
-
 import com.netflix.hollow.core.schema.HollowSetSchema;
+import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.write.HollowSetTypeWriteState;
 import com.netflix.hollow.core.write.HollowSetWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
@@ -59,6 +58,13 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
 
     @Override
     protected int write(Object obj) {
+        if(obj instanceof MemoizedSet) {
+            long assignedOrdinal = ((MemoizedSet<?>)obj).__assigned_ordinal;
+            
+            if(assignedOrdinal != -1L && (assignedOrdinal & ASSIGNED_ORDINAL_CYCLE_MASK) == cycleSpecificAssignedOrdinalBits())
+                return (int)assignedOrdinal & Integer.MAX_VALUE;
+        }
+        
         Set<?> s = (Set<?>)obj;
 
         HollowSetWriteRecord rec = (HollowSetWriteRecord)writeRecord();
@@ -68,7 +74,13 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
             rec.addElement(ordinal, hashCode);
         }
 
-        return writeState.add(rec);
+        int assignedOrdinal = writeState.add(rec);
+        
+        if(obj instanceof MemoizedSet) {
+            ((MemoizedSet<?>)obj).__assigned_ordinal = (long)assignedOrdinal | cycleSpecificAssignedOrdinalBits();
+        }
+        
+        return assignedOrdinal;
     }
 
     @Override
