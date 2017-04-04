@@ -25,6 +25,7 @@ import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Calculate a detailed accounting for the differences between two data states.
@@ -39,6 +40,7 @@ import java.util.List;
  */
 public class HollowDiff {
 
+    private final Logger log = Logger.getLogger(HollowDiff.class.getName());
     private final HollowReadStateEngine fromStateEngine;
     private final HollowReadStateEngine toStateEngine;
 
@@ -135,7 +137,7 @@ public class HollowDiff {
 
         long endTime = System.currentTimeMillis();
 
-        System.out.println("PREPARED IN " + (endTime - startTime) + "ms");
+        log.info("PREPARED IN " + (endTime - startTime) + "ms");
 
         for(HollowTypeDiff typeDiff : typeDiffs) {
             typeDiff.calculateDiffs();

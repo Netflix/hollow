@@ -24,6 +24,7 @@ import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Parses text representations of {@link HollowSchema}.
@@ -32,6 +33,7 @@ import java.util.List;
  */
 public class HollowSchemaParser {
 
+    private static final Logger log = Logger.getLogger(HollowSchemaParser.class.getName());
     /**
      * Parse a collection of {@link HollowSchema}s from the provided String. 
      */
@@ -147,7 +149,7 @@ public class HollowSchemaParser {
 
         tok = tokenizer.nextToken();
         if(tok != StreamTokenizer.TT_WORD) {
-            System.out.println("Invalid Syntax: Expected element type declaration: " + typeName);
+            log.warning("Invalid Syntax: Expected element type declaration: " + typeName);
         }
 
         String elementType = tokenizer.sval;
@@ -171,7 +173,7 @@ public class HollowSchemaParser {
 
         tok = tokenizer.nextToken();
         if(tok != StreamTokenizer.TT_WORD) {
-            System.out.println("Invalid Syntax: Expected element type declaration: " + typeName);
+            log.warning("Invalid Syntax: Expected element type declaration: " + typeName);
         }
 
         String elementType = tokenizer.sval;
@@ -197,7 +199,7 @@ public class HollowSchemaParser {
 
         tok = tokenizer.nextToken();
         if(tok != StreamTokenizer.TT_WORD) {
-            System.out.println("Invalid Syntax: Expected element type declaration: " + typeName);
+            log.warning("Invalid Syntax: Expected element type declaration: " + typeName);
         }
 
         String keyType = tokenizer.sval;
@@ -208,7 +210,7 @@ public class HollowSchemaParser {
 
         tok = tokenizer.nextToken();
         if(tok != StreamTokenizer.TT_WORD) {
-            System.out.println("Invalid Syntax: Expected value type declaration: " + typeName);
+            log.warning("Invalid Syntax: Expected value type declaration: " + typeName);
         }
 
         String valueType = tokenizer.sval;

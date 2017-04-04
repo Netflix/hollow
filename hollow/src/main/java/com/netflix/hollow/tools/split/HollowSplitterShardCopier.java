@@ -32,9 +32,11 @@ import com.netflix.hollow.core.read.engine.set.HollowSetTypeReadState;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class HollowSplitterShardCopier {
 
+    private final Logger log = Logger.getLogger(HollowSplitterShardCopier.class.getName());
     private final HollowReadStateEngine input;
     private final HollowWriteStateEngine output;
     private final OrdinalRemapper ordinalRemapper;
@@ -57,7 +59,7 @@ public class HollowSplitterShardCopier {
             HollowTypeReadState inputTypeState = input.getTypeState(topLevelType);
 
             if(inputTypeState == null) {
-                System.out.println("Could not find input type state for " + topLevelType);
+                log.warning("Could not find input type state for " + topLevelType);
                 continue;
             }
 

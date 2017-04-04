@@ -34,6 +34,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 /**
  * A {@link HollowWriteStateEngine} is our main handle to a Hollow dataset as a data producer.
@@ -55,6 +56,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * be re-added to the write state engine. 
  */
 public class HollowWriteStateEngine implements HollowStateEngine {
+
+    private final Logger log = Logger.getLogger(HollowWriteStateEngine.class.getName());
 
     private final Map<String, HollowTypeWriteState> writeStates;
     private final Map<String, HollowSchema> hollowSchemas;
@@ -148,7 +151,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
                 executor.execute(new Runnable() {
                     @Override
                     public void run() {
-                        System.out.println("RESTORE: " + typeName);
+                        log.info("RESTORE: " + typeName);
                         writeState.restoreFrom(readState);
                     }
                 });

@@ -50,6 +50,7 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Beta API subject to change.
@@ -62,6 +63,7 @@ public class HollowProducer {
         public void validate(HollowConsumer.ReadState readState) {}
     };
 
+    private final Logger log = Logger.getLogger(HollowProducer.class.getName());
     private final Publisher publisher;
     private final Validator validator;
     private final Announcer announcer;
@@ -299,12 +301,12 @@ public class HollowProducer {
             readSnapshot(artifacts.snapshot, pending);
 
             if(readStates.hasCurrent()) {
-                System.out.println("CHECKSUMS");
+                log.info("CHECKSUMS");
                 HollowChecksum currentChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
-                //out.format("  CUR        %s\n", currentChecksum);
+                log.info("  CUR        " + currentChecksum);
 
                 HollowChecksum pendingChecksum = HollowChecksum.forStateEngineWithCommonSchemas(pending, current);
-                //out.format("         PND %s\n", pendingChecksum);
+                log.info("         PND " + pendingChecksum);
 
                 if(artifacts.hasDelta()) {
                     // FIXME: timt: future cycles will fail unless this delta validates *and* we have a reverse
@@ -406,7 +408,7 @@ public class HollowProducer {
         HollowObjectMapper getObjectMapper();
 
         HollowWriteStateEngine getStateEngine();
-        
+
         ReadState getPriorState();
 
         long getVersion();
