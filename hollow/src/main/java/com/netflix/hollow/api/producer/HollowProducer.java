@@ -26,9 +26,10 @@ import static java.lang.System.currentTimeMillis;
 import com.netflix.hollow.api.client.HollowBlobRetriever;
 import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.consumer.HollowConsumer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
-import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
+import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -38,7 +39,6 @@ import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -60,10 +60,6 @@ public class HollowProducer {
         @Override
         public void validate(HollowConsumer.ReadState readState) {}
     };
-
-    public static WriteState newWriteState(long version, HollowObjectMapper objectMapper) {
-        return new WriteStateImpl(version, objectMapper);
-    }
 
     private final Publisher publisher;
     private final Validator validator;
@@ -148,7 +144,7 @@ public class HollowProducer {
             // 1a. Prepare the write state
             writeEngine.prepareForNextCycle();
             HollowObjectMapper objectMapper = this.objectMapper;
-            WriteState writeState = newWriteState(toVersion, objectMapper);
+            WriteState writeState = new WriteStateImpl(toVersion, objectMapper, readStates.current());
 
             // 2. Populate the state
             ProducerStatus.Builder populateStatus = listeners.firePopulateStart(toVersion);
@@ -383,6 +379,8 @@ public class HollowProducer {
         HollowObjectMapper getObjectMapper();
 
         HollowWriteStateEngine getStateEngine();
+        
+        ReadState getPriorState();
 
         long getVersion();
     }
