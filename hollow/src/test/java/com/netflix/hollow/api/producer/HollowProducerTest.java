@@ -1,0 +1,355 @@
+package com.netflix.hollow.api.producer;
+
+import com.netflix.hollow.api.client.HollowBlob;
+import com.netflix.hollow.api.client.HollowBlobRetriever;
+import com.netflix.hollow.api.consumer.HollowConsumer.ReadState;
+import com.netflix.hollow.api.objects.delegate.HollowObjectGenericDelegate;
+import com.netflix.hollow.api.objects.generic.GenericHollowObject;
+import com.netflix.hollow.api.producer.HollowProducer.Blob;
+import com.netflix.hollow.api.producer.HollowProducer.Blob.Type;
+import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
+import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
+import com.netflix.hollow.api.producer.HollowProducerListener.Status;
+import com.netflix.hollow.api.producer.fs.HollowFilesystemAnnouncer;
+import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+public class HollowProducerTest {
+    private static final String namespace = "hollowProducerTest";
+
+    private File tmpFolder;
+    HollowObjectSchema schema;
+    private HollowBlobRetriever blobRetriever;
+
+    private Map<Long, Blob> blobMap = new HashMap<>();
+    private Map<Long, File> blobFileMap = new HashMap<>();
+    private ProducerStatus lastProducerStatus;
+    private RestoreStatus lastRestoreStatus;
+
+    @Before
+    public void setUp() throws IOException {
+        schema = new HollowObjectSchema("TestPojo", 2, "id");
+        schema.addField("id", FieldType.INT);
+        schema.addField("v1", FieldType.INT);
+
+        tmpFolder = Files.createTempDirectory(null).toFile();
+        blobRetriever = new FakeBlobRetriever(namespace, tmpFolder.getAbsolutePath());
+    }
+
+    private HollowProducer createProducer(File tmpFolder, HollowObjectSchema... schemas) {
+        HollowProducer producer = new HollowProducer(
+                new FakeBlobPublisher(namespace, tmpFolder.getAbsolutePath()),
+                new HollowFilesystemAnnouncer(namespace));
+        producer.initializeDataModel(schemas);
+        producer.addListener(new FakeProducerListener());
+        return producer;
+    }
+
+    public long testPublishV1(HollowProducer producer, final int size, final int valueMultiplier) {
+        producer.runCycle(new HollowProducer.Populator() {
+            public void populate(HollowProducer.WriteState newState) throws Exception {
+                for (int i = 1; i <= size; i++) {
+                    newState.add(new TestPojoV1(i, i * valueMultiplier));
+                }
+            }
+        });
+        Assert.assertNotNull(lastProducerStatus);
+        Assert.assertEquals(Status.SUCCESS, lastProducerStatus.getStatus());
+        return lastProducerStatus.getVersion();
+    }
+
+    public long testPublishV2(HollowProducer producer, final int size, final int valueMultiplier) {
+        producer.runCycle(new HollowProducer.Populator() {
+            public void populate(HollowProducer.WriteState newState) throws Exception {
+                for (int i = 1; i <= size; i++) {
+                    newState.add(new TestPojoV2(i, i * valueMultiplier, i * valueMultiplier));
+                }
+            }
+        });
+        Assert.assertNotNull(lastProducerStatus);
+        Assert.assertEquals(Status.SUCCESS, lastProducerStatus.getStatus());
+        return lastProducerStatus.getVersion();
+    }
+
+    @Test
+    public void testRestoreFatal() {
+        HollowProducer producer = createProducer(tmpFolder, schema);
+        long fakeVersion = 101;
+
+        { // NOT FATAL
+            producer.setRestoreFailureFatal(false);
+            producer.restore(fakeVersion, blobRetriever);
+            Assert.assertNotNull(lastRestoreStatus);
+            Assert.assertEquals(Status.FAIL, lastRestoreStatus.getStatus());
+        }
+
+        Throwable restoreFailure = null;
+        try { // FATAL
+            producer.setRestoreFailureFatal(true);
+            producer.restore(fakeVersion, blobRetriever);
+        } catch (Throwable ex) {
+            restoreFailure = ex;
+        }
+        Assert.assertNotNull(restoreFailure);
+    }
+
+    @Test
+    public void testPublishAndRestore() {
+        HollowProducer producer = createProducer(tmpFolder, schema);
+        long version = testPublishV1(producer, 2, 10);
+
+        producer.restore(version, blobRetriever);
+        Assert.assertNotNull(lastRestoreStatus);
+        Assert.assertEquals(Status.SUCCESS, lastRestoreStatus.getStatus());
+        Assert.assertEquals("Version should be the same", version, lastRestoreStatus.getDesiredVersion());
+    }
+
+    @Test
+    public void testMultipleRestores() {
+        HollowProducer producer = createProducer(tmpFolder, schema);
+
+        System.out.println("\n\n------------ Publish a few versions ------------\n");
+        List<Long> versions = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            int size = i + 1;
+            int valueMultiplier = i + 10;
+            long version = testPublishV1(producer, size, valueMultiplier);
+            versions.add(version);
+        }
+
+        System.out.println("\n\n------------ Restore and validate ------------\n");
+        for (int i = 0; i < versions.size(); i++) {
+            long version = versions.get(i);
+            int size = i + 1;
+            int valueMultiplier = i + 10;
+
+            restoreAndAssert(producer, version, size, valueMultiplier);
+        }
+
+        System.out.println("\n\n------------ Restore in reverse order and validate ------------\n");
+        for (int i = versions.size() - 1; i >= 0; i--) {
+            long version = versions.get(i);
+            int size = i + 1;
+            int valueMultiplier = i + 10;
+
+            restoreAndAssert(producer, version, size, valueMultiplier);
+        }
+    }
+
+    @Test
+    public void testAlternatingPublishAndRestores() {
+        HollowProducer producer = createProducer(tmpFolder, schema);
+
+        List<Long> versions = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            int size = i + 10;
+            int valueMultiplier = i + 10;
+            long version = testPublishV1(producer, size, valueMultiplier);
+            versions.add(version);
+
+            restoreAndAssert(producer, version, size, valueMultiplier);
+        }
+    }
+
+    @Test
+    public void testPublishAndRestoreWithSchemaChanges() {
+        int sizeV1 = 3;
+        int valueMultiplierV1 = 20;
+
+        long v1 = 0;
+        { // Publish V1
+            HollowProducer producer = createProducer(tmpFolder, schema);
+            v1 = testPublishV1(producer, sizeV1, valueMultiplierV1);
+        }
+
+        // Publish V2;
+        int sizeV2 = sizeV1 * 2;
+        int valueMultiplierV2 = valueMultiplierV1 * 2;
+        HollowObjectSchema schemaV2 = new HollowObjectSchema("TestPojo", 3, "id");
+        schemaV2.addField("id", FieldType.INT);
+        schemaV2.addField("v1", FieldType.INT);
+        schemaV2.addField("v2", FieldType.INT);
+        HollowProducer producerV2 = createProducer(tmpFolder, schemaV2);
+        long v2 = testPublishV2(producerV2, sizeV2, valueMultiplierV2);
+
+        { // Restore V1 
+            int valueFieldCount = 1;
+            restoreAndAssert(producerV2, v1, sizeV1, valueMultiplierV1, valueFieldCount);
+        }
+
+        // Publish V3
+        int sizeV3 = sizeV1 * 3;
+        int valueMultiplierV3 = valueMultiplierV1 * 3;
+        long v3 = testPublishV2(producerV2, sizeV3, valueMultiplierV3);
+
+        { // Restore V2 
+            int valueFieldCount = 2;
+            restoreAndAssert(producerV2, v2, sizeV2, valueMultiplierV2, valueFieldCount);
+        }
+
+        { // Restore V3 
+            int valueFieldCount = 2;
+            restoreAndAssert(producerV2, v3, sizeV3, valueMultiplierV3, valueFieldCount);
+        }
+    }
+
+    private void restoreAndAssert(HollowProducer producer, long version, int size, int valueMultiplier) {
+        restoreAndAssert(producer, version, size, valueMultiplier, 1);
+    }
+
+    private void restoreAndAssert(HollowProducer producer, long version, int size, int valueMultiplier, int valueFieldCount) {
+        ReadState readState = producer.restoreAndReturnReadState(version, blobRetriever);
+        Assert.assertNotNull(lastRestoreStatus);
+        Assert.assertEquals(Status.SUCCESS, lastRestoreStatus.getStatus());
+        Assert.assertEquals("Version should be the same", version, lastRestoreStatus.getDesiredVersion());
+
+        HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) readState.getStateEngine().getTypeState("TestPojo");
+        BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
+        Assert.assertEquals(size, populatedOrdinals.cardinality());
+
+        int ordinal = populatedOrdinals.nextSetBit(0);
+        while (ordinal != -1) {
+            GenericHollowObject obj = new GenericHollowObject(new HollowObjectGenericDelegate(typeState), ordinal);
+            System.out.println("ordinal=" + ordinal + obj);
+
+            int id = obj.getInt("id");
+            for (int i = 0; i < valueFieldCount; i++) {
+                String valueFN = "v" + (i + 1);
+                int value = id * valueMultiplier;
+                Assert.assertEquals(valueFN, value, obj.getInt(valueFN));
+            }
+
+            ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
+        }
+        System.out.println("Asserted Correctness of version:" + version + "\n\n");
+    }
+
+    @After
+    public void tierDown() {
+        System.out.println("tierDown");
+
+        for (File file : blobFileMap.values()) {
+            System.out.println("\t deleting: " + file);
+            file.delete();
+        }
+    }
+
+    @SuppressWarnings("unused")
+    @HollowTypeName(name = "TestPojo")
+    private static class TestPojoV1 {
+        public int id;
+        public int v1;
+
+        public TestPojoV1(int id, int v1) {
+            super();
+            this.id = id;
+            this.v1 = v1;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    @HollowTypeName(name = "TestPojo")
+    private static class TestPojoV2 {
+        public int id;
+        public int v1;
+        public int v2;
+
+        public TestPojoV2(int id, int v1, int v2) {
+            this.id = id;
+            this.v1 = v1;
+            this.v2 = v2;
+        }
+    }
+
+    private class FakeProducerListener extends AbstractHollowProducerListener {
+        @Override
+        public void onCycleComplete(ProducerStatus status, long elapsed, TimeUnit unit) {
+            lastProducerStatus = status;
+        }
+
+        @Override
+        public void onProducerRestoreComplete(RestoreStatus status, long elapsed, TimeUnit unit) {
+            lastRestoreStatus = status;
+        }
+    }
+
+    private class FakeBlobPublisher extends HollowProducer.Publisher {
+        public FakeBlobPublisher(String namespace, String dir) {
+            super(namespace, dir);
+        }
+
+        @Override
+        public void publish(Blob blob, Map<String, String> headerTags) {
+            File blobFile = blob.getFile();
+            if (!blobFile.exists()) throw new RuntimeException("File does not existis: " + blobFile);
+
+            if (!blob.getType().equals(Type.SNAPSHOT)) {
+                return; // Only snapshot is needed for smoke Test
+            }
+
+            // Copy file
+            File copiedFile = new File(tmpFolder, "copied_" + blobFile.getName());
+            try {
+                Files.copy(blobFile.toPath(), copiedFile.toPath());
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to publish:" + copiedFile, e);
+            }
+
+            blobMap.put(blob.getToVersion(), blob);
+            blobFileMap.put(blob.getToVersion(), copiedFile);
+            System.out.println("Published:" + copiedFile);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private class FakeBlobRetriever implements HollowBlobRetriever {
+        private String namespace;
+        private String tmpDir;
+
+        FakeBlobRetriever(String namespace, String tmpDir) {
+            this.namespace = namespace;
+            this.tmpDir = tmpDir;
+        }
+
+        @Override
+        public HollowBlob retrieveSnapshotBlob(long desiredVersion) {
+            final File blobFile = blobFileMap.get(desiredVersion);
+            if (blobFile == null) return null;
+
+            System.out.println("Restored: " + blobFile);
+            return new HollowBlob(desiredVersion) {
+                @Override
+                public InputStream getInputStream() throws IOException {
+                    return new FileInputStream(blobFile);
+                }
+            };
+        }
+
+        @Override
+        public HollowBlob retrieveDeltaBlob(long currentVersion) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public HollowBlob retrieveReverseDeltaBlob(long currentVersion) {
+            throw new UnsupportedOperationException();
+        }
+    }
+}
