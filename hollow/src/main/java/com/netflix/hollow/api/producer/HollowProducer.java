@@ -65,11 +65,10 @@ public class HollowProducer {
     private final Publisher publisher;
     private final Validator validator;
     private final Announcer announcer;
-    private final WriteEngineWrapper writeEngineWrapper;
+    private final ProducerDataState producerDataState;
     private final VersionMinter versionMinter;
     private final ListenerSupport listeners;
     private ReadStateHelper readStates;
-    private boolean isRestoreFailureFatal=false;
 
     public HollowProducer(HollowProducer.Publisher publisher,
             HollowProducer.Announcer announcer) {
@@ -84,7 +83,7 @@ public class HollowProducer {
         this.validator = validator;
         this.announcer = announcer;
 
-        writeEngineWrapper = new WriteEngineWrapper();
+        producerDataState = new ProducerDataState();
         versionMinter = new VersionMinterWithCounter();
         listeners = new ListenerSupport();
         readStates = ReadStateHelper.newDeltaChain();
@@ -92,26 +91,27 @@ public class HollowProducer {
 
     public void initializeDataModel(Class<?>...classes) {
         long start = currentTimeMillis();
-        writeEngineWrapper.initializeDataModel(classes);
+        producerDataState.initializeDataModel(classes);
         listeners.fireProducerInit(currentTimeMillis() - start);
     }
 
     public void initializeDataModel(HollowSchema... schemas) {
         long start = currentTimeMillis();
-        writeEngineWrapper.initializeDataModel(schemas);
+        producerDataState.initializeDataModel(schemas);
         listeners.fireProducerInit(currentTimeMillis() - start);
     }
 
-    public void setRestoreFailureFatal(boolean isFatal) {
-        this.isRestoreFailureFatal = isFatal;
-    }
 
     public HollowProducer restore(long versionDesired, HollowBlobRetriever blobRetriever) {
-        restoreAndReturnReadState(versionDesired, blobRetriever);
+        try {
+            restoreAndReturnReadState(versionDesired, blobRetriever);
+        } catch(Exception ex) {
+            // Intentional so that restore by default does not throw exception 
+        }
         return this;
     }
 
-    protected HollowConsumer.ReadState restoreAndReturnReadState(long versionDesired, HollowBlobRetriever blobRetriever) {
+    protected HollowConsumer.ReadState restoreAndReturnReadState(long versionDesired, HollowBlobRetriever blobRetriever) throws Exception {
         long start = currentTimeMillis();
         RestoreStatus status = RestoreStatus.unknownFailure();
         HollowConsumer.ReadState readState = null;
@@ -127,8 +127,8 @@ public class HollowProducer {
                     readStates = ReadStateHelper.restored(readState);
 
                     // Need to reset for every restore since can't restore to non empty Write State Engine
-                    writeEngineWrapper.reset();
-                    writeEngineWrapper.getWriteEngine().restoreFrom(readStates.current().getStateEngine());
+                    producerDataState.reset();
+                    producerDataState.getWriteEngine().restoreFrom(readStates.current().getStateEngine());
                     status = RestoreStatus.success(versionDesired, readState.getVersion());
                 } else {
                     status = RestoreStatus.fail(versionDesired, readState.getVersion(), null);
@@ -136,7 +136,7 @@ public class HollowProducer {
             }
         } catch(Throwable th) {
             status = RestoreStatus.fail(versionDesired, readState != null ? readState.getVersion() : Long.MIN_VALUE, th);
-            if (isRestoreFailureFatal) throw th;
+            throw new Exception("Failed to restore desired version=" + versionDesired, th);
         } finally {
             listeners.fireProducerRestoreComplete(status, currentTimeMillis() - start);
         }
@@ -160,8 +160,8 @@ public class HollowProducer {
         ProducerStatus.Builder cycleStatus = listeners.fireCycleStart(toVersion);
         Artifacts artifacts = new Artifacts();
 
-        HollowWriteStateEngine writeEngine = writeEngineWrapper.getWriteEngine();
-        HollowObjectMapper objectMapper = writeEngineWrapper.getObjcetMapper();
+        HollowWriteStateEngine writeEngine = producerDataState.getWriteEngine();
+        HollowObjectMapper objectMapper = producerDataState.getObjcetMapper();
         try {
             // 1a. Prepare the write state
             writeEngine.prepareForNextCycle();
@@ -236,7 +236,7 @@ public class HollowProducer {
     }
 
     private void publishBlob(WriteState writeState, Artifacts artifacts, Blob.Type blobType) throws IOException {
-        HollowBlobWriter writer = new HollowBlobWriter(writeEngineWrapper.getWriteEngine());
+        HollowBlobWriter writer = new HollowBlobWriter(producerDataState.getWriteEngine());
         PublishStatus.Builder builder = (new PublishStatus.Builder());
         try {
             switch (blobType) {
@@ -380,13 +380,18 @@ public class HollowProducer {
         }
     }
 
-    private class WriteEngineWrapper {
+    /**
+     * Encapsulates the Producer Data State
+     *
+     * Enables management of related object in cases such as data restore
+     */
+    private class ProducerDataState {
         private HollowWriteStateEngine writeEngine;
         private HollowObjectMapper objectMapper;
         private Class<?> classes[];
         private HollowSchema schemas[];
 
-        WriteEngineWrapper() {
+        ProducerDataState() {
             reset();
         }
 

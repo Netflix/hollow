@@ -94,7 +94,6 @@ public class HollowProducerTest {
         long fakeVersion = 101;
 
         { // NOT FATAL
-            producer.setRestoreFailureFatal(false);
             producer.restore(fakeVersion, blobRetriever);
             Assert.assertNotNull(lastRestoreStatus);
             Assert.assertEquals(Status.FAIL, lastRestoreStatus.getStatus());
@@ -102,8 +101,7 @@ public class HollowProducerTest {
 
         Throwable restoreFailure = null;
         try { // FATAL
-            producer.setRestoreFailureFatal(true);
-            producer.restore(fakeVersion, blobRetriever);
+            producer.restoreAndReturnReadState(fakeVersion, blobRetriever);
         } catch (Throwable ex) {
             restoreFailure = ex;
         }
@@ -111,7 +109,7 @@ public class HollowProducerTest {
     }
 
     @Test
-    public void testPublishAndRestore() {
+    public void testPublishAndRestore() throws Exception {
         HollowProducer producer = createProducer(tmpFolder, schema);
         long version = testPublishV1(producer, 2, 10);
 
@@ -122,7 +120,7 @@ public class HollowProducerTest {
     }
 
     @Test
-    public void testMultipleRestores() {
+    public void testMultipleRestores() throws Exception {
         HollowProducer producer = createProducer(tmpFolder, schema);
 
         System.out.println("\n\n------------ Publish a few versions ------------\n");
@@ -154,7 +152,7 @@ public class HollowProducerTest {
     }
 
     @Test
-    public void testAlternatingPublishAndRestores() {
+    public void testAlternatingPublishAndRestores() throws Exception {
         HollowProducer producer = createProducer(tmpFolder, schema);
 
         List<Long> versions = new ArrayList<>();
@@ -169,7 +167,7 @@ public class HollowProducerTest {
     }
 
     @Test
-    public void testPublishAndRestoreWithSchemaChanges() {
+    public void testPublishAndRestoreWithSchemaChanges() throws Exception {
         int sizeV1 = 3;
         int valueMultiplierV1 = 20;
 
@@ -210,11 +208,11 @@ public class HollowProducerTest {
         }
     }
 
-    private void restoreAndAssert(HollowProducer producer, long version, int size, int valueMultiplier) {
+    private void restoreAndAssert(HollowProducer producer, long version, int size, int valueMultiplier) throws Exception {
         restoreAndAssert(producer, version, size, valueMultiplier, 1);
     }
 
-    private void restoreAndAssert(HollowProducer producer, long version, int size, int valueMultiplier, int valueFieldCount) {
+    private void restoreAndAssert(HollowProducer producer, long version, int size, int valueMultiplier, int valueFieldCount) throws Exception {
         ReadState readState = producer.restoreAndReturnReadState(version, blobRetriever);
         Assert.assertNotNull(lastRestoreStatus);
         Assert.assertEquals(Status.SUCCESS, lastRestoreStatus.getStatus());
