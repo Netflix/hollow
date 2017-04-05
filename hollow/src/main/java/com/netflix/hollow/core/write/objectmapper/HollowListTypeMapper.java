@@ -55,6 +55,13 @@ public class HollowListTypeMapper extends HollowTypeMapper {
 
     @Override
     public int write(Object obj) {
+        if(obj instanceof MemoizedList) {
+            long assignedOrdinal = ((MemoizedList<?>)obj).__assigned_ordinal;
+            
+            if(assignedOrdinal != -1L && (assignedOrdinal & ASSIGNED_ORDINAL_CYCLE_MASK) == cycleSpecificAssignedOrdinalBits())
+                return (int)assignedOrdinal & Integer.MAX_VALUE;
+        }
+
         List<?> l = (List<?>)obj;
 
         HollowListWriteRecord rec = (HollowListWriteRecord)writeRecord();
@@ -74,7 +81,13 @@ public class HollowListTypeMapper extends HollowTypeMapper {
             }
         }
 
-        return writeState.add(rec);
+        int assignedOrdinal = writeState.add(rec);
+
+        if(obj instanceof MemoizedList) {
+            ((MemoizedList<?>)obj).__assigned_ordinal = (long)assignedOrdinal | cycleSpecificAssignedOrdinalBits();
+        }
+
+        return assignedOrdinal;
     }
 
     @Override
