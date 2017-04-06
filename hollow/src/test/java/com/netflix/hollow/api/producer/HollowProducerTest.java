@@ -89,23 +89,22 @@ public class HollowProducerTest {
     }
 
     @Test
-    public void testRestoreFatal() {
+    public void testRestoreFailure() {
         HollowProducer producer = createProducer(tmpFolder, schema);
         long fakeVersion = 101;
 
-        { // NOT FATAL
+        {
             producer.restore(fakeVersion, blobRetriever);
             Assert.assertNotNull(lastRestoreStatus);
             Assert.assertEquals(Status.FAIL, lastRestoreStatus.getStatus());
         }
 
-        Throwable restoreFailure = null;
-        try { // FATAL
-            producer.restoreAndReturnReadState(fakeVersion, blobRetriever);
-        } catch (Throwable ex) {
-            restoreFailure = ex;
+        {
+            ReadState readState = producer.restoreAndReturnReadState(fakeVersion, blobRetriever);
+            Assert.assertNull(readState);
+            Assert.assertNotNull(lastRestoreStatus);
+            Assert.assertEquals(Status.FAIL, lastRestoreStatus.getStatus());
         }
-        Assert.assertNotNull(restoreFailure);
     }
 
     @Test

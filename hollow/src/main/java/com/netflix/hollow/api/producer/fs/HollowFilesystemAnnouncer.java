@@ -47,7 +47,7 @@ public class HollowFilesystemAnnouncer implements HollowProducer.Announcer {
     }
 
     @Override
-    public void announce(long stateVersion, Map<String, String> metadata) {
+    public void announce(long stateVersion) {
         BufferedWriter writer = null;
         try {
             createDirectories(publishPath);
