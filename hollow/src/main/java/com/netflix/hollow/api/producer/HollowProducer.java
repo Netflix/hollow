@@ -49,8 +49,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -146,7 +144,7 @@ public class HollowProducer {
     }
 
     private static HollowObjectMapper createNewHollowObjectMapperFromExisting(HollowObjectMapper objectMapper) {
-        List<HollowSchema> schemas = objectMapper.getStateEngine().getSchemas();
+        Collection<HollowSchema> schemas = objectMapper.getStateEngine().getSchemas();
         HollowWriteStateEngine writeEngine = HollowWriteStateCreator.createWithSchemas(schemas);
         return new HollowObjectMapper(writeEngine);
     }
