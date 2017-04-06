@@ -25,7 +25,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
 import com.netflix.hollow.api.producer.HollowProducer;
 
 public class HollowFilesystemAnnouncer implements HollowProducer.Announcer {

@@ -67,9 +67,9 @@ public class HollowProducer {
     private final Publisher publisher;
     private final Validator validator;
     private final Announcer announcer;
+    private HollowObjectMapper objectMapper;
     private final VersionMinter versionMinter;
     private final ListenerSupport listeners;
-    private HollowObjectMapper objectMapper;
     private ReadStateHelper readStates;
 
     public HollowProducer(HollowProducer.Publisher publisher,
@@ -93,7 +93,7 @@ public class HollowProducer {
 
     public void initializeDataModel(Class<?>...classes) {
         long start = currentTimeMillis();
-        for(Class<?> c : classes)  
+        for(Class<?> c : classes)
             objectMapper.initializeTypeState(c);
         listeners.fireProducerInit(currentTimeMillis() - start);
     }
@@ -132,7 +132,7 @@ public class HollowProducer {
                     HollowObjectMapper newObjectMapper = createNewHollowObjectMapperFromExisting(objectMapper);
                     newObjectMapper.getStateEngine().restoreFrom(readStates.current().getStateEngine());
                     status = RestoreStatus.success(versionDesired, readState.getVersion());
-                    objectMapper = newObjectMapper; // Store successful so swap
+                    objectMapper = newObjectMapper; // Restore completed successfully so swap
                 } else {
                     status = RestoreStatus.fail(versionDesired, readState.getVersion(), null);
                 }
@@ -374,7 +374,7 @@ public class HollowProducer {
         }
     }
 
-    protected void announce(HollowConsumer.ReadState readState) {
+    private void announce(HollowConsumer.ReadState readState) {
         ProducerStatus.Builder status = listeners.fireAnnouncementStart(readState);
         try {
             announcer.announce(readState.getVersion());
@@ -386,53 +386,6 @@ public class HollowProducer {
             listeners.fireAnnouncementComplete(status);
         }
     }
-
-    /**
-     * Encapsulates the Producer Data State
-     *
-     * Enables management of related object in cases such as data restore
-     */
-    private class ProducerDataState {
-        private HollowWriteStateEngine writeEngine;
-        private HollowObjectMapper objectMapper;
-        private Class<?> classes[];
-        private HollowSchema schemas[];
-
-        ProducerDataState() {
-            reset();
-        }
-
-        void reset() {
-            writeEngine = new HollowWriteStateEngine();
-            objectMapper = new HollowObjectMapper(writeEngine);
-            initializeDataModel(classes);
-            initializeDataModel(schemas);
-        }
-
-        HollowWriteStateEngine getWriteEngine() {
-            return writeEngine;
-        }
-
-        HollowObjectMapper getObjcetMapper() {
-            return objectMapper;
-        }
-
-        void initializeDataModel(Class<?>...classes) {
-            if (classes==null) return;
-
-            this.classes = classes;
-            for(Class<?> c : classes)
-                objectMapper.initializeTypeState(c);
-        }
-
-        void initializeDataModel(HollowSchema... schemas) {
-            if (schemas==null) return;
-
-            this.schemas = schemas;
-            HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(writeEngine, Arrays.asList(schemas));
-        }
-    }
-
 
     static interface VersionMinter {
         /**
