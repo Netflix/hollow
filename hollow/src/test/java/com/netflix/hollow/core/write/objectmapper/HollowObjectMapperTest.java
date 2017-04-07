@@ -116,6 +116,16 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
     }
 
     @Test
+    public void testMappingInterface() throws IOException {
+        assertExpectedFailureMappingInterfaceType(TestInterface.class, TestInterface.class);
+    }
+
+    @Test
+    public void testMappingClassWithInterface() throws IOException {
+        assertExpectedFailureMappingInterfaceType(TestClassContainingInterface.class, TestInterface.class);
+    }
+
+    @Test
     public void testMappingCircularReference() throws IOException {
         assertExpectedFailureMappingType(DirectCircularReference.class, "child");
     }
@@ -153,6 +163,24 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
             Assert.assertTrue(String.format("missing expected fieldname %s in the message, was %s", expected, e.getMessage()), e.getMessage().contains(expected));
         }
     }
+
+    /**
+     * Convenience method for experimenting with {@link HollowObjectMapper#initializeTypeState(Class)}
+     * on classes we know should fail due to fields that are interfaces, confirming the exception message is correct.
+     *
+     * @param clazz class to initialize
+     * @param interfaceClazz interface class that breaks the initialization
+     */
+    protected void assertExpectedFailureMappingInterfaceType(Class<?> clazz, Class<?> interfaceClazz) {
+        final String expected = "Unexpected interface " + interfaceClazz.getSimpleName() + " passed as field.";
+        try {
+            HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+            mapper.initializeTypeState(clazz);
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue(String.format("trying to generate schema based on interface %s, was %s", interfaceClazz.getSimpleName(), e.getMessage()), e.getMessage().contains(expected));
+        }
+    }
+
     private Map<String, List<Integer>> map(Object... keyValues) {
         Map<String, List<Integer>> map = new HashMap<String, List<Integer>>();
         int i = 0;
@@ -217,5 +245,32 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
             this.transientKeyword = transientKeyword;
             this.annotatedTransient = annotatedTransient;
         }
+    }
+
+    private static class TestClassContainingInterface {
+        int val1;
+        TestInterface val2;
+
+        public TestClassContainingInterface(int val1, TestInterface val2) {
+            this.val1 = val1;
+            this.val2 = val2;
+        }
+    }
+
+    private static class TestClassImplementingInterface implements TestInterface {
+        int val1;
+
+        public TestClassImplementingInterface(int val1) {
+            this.val1 = val1;
+        }
+
+        @Override
+        public int test() {
+            return 0;
+        }
+    }
+
+    public interface TestInterface {
+        int test();
     }
 }
