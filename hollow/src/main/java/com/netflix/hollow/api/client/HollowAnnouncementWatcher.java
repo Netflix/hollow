@@ -58,6 +58,13 @@ public abstract class HollowAnnouncementWatcher {
     }
 
     /**
+     * Will force a double snapshot refresh on the next update.
+     */
+    protected void forceDoubleSnapshotNextUpdate() {
+        client.forceDoubleSnapshotNextUpdate();
+    }
+
+    /**
      * Triggers a refresh in a new thread immediately.
      */
     public void triggerAsyncRefresh() {

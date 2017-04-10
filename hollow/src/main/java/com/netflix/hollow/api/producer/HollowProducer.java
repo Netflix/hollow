@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -64,8 +65,7 @@ public class HollowProducer {
     private final Publisher publisher;
     private final Validator validator;
     private final Announcer announcer;
-    private final HollowWriteStateEngine writeEngine;
-    private final HollowObjectMapper objectMapper;
+    private HollowObjectMapper objectMapper;
     private final VersionMinter versionMinter;
     private final ListenerSupport listeners;
     private ReadStateHelper readStates;
@@ -83,8 +83,7 @@ public class HollowProducer {
         this.validator = validator;
         this.announcer = announcer;
 
-        writeEngine = new HollowWriteStateEngine();
-        objectMapper = new HollowObjectMapper(writeEngine);
+        objectMapper = new HollowObjectMapper(new HollowWriteStateEngine());
         versionMinter = new VersionMinterWithCounter();
         listeners = new ListenerSupport();
         readStates = ReadStateHelper.newDeltaChain();
@@ -96,14 +95,23 @@ public class HollowProducer {
             objectMapper.initializeTypeState(c);
         listeners.fireProducerInit(currentTimeMillis() - start);
     }
-    
+    protected HollowWriteStateEngine getWriteEngine() {
+        return objectMapper.getStateEngine();
+    }
+
     public void initializeDataModel(HollowSchema... schemas) {
         long start = currentTimeMillis();
-        HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(writeEngine, Arrays.asList(schemas));
+        HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(getWriteEngine(), Arrays.asList(schemas));
         listeners.fireProducerInit(currentTimeMillis() - start);
     }
 
+
     public HollowProducer restore(long versionDesired, HollowBlobRetriever blobRetriever) {
+        restoreAndReturnReadState(versionDesired, blobRetriever);
+        return this;
+    }
+
+    protected HollowConsumer.ReadState restoreAndReturnReadState(long versionDesired, HollowBlobRetriever blobRetriever) {
         long start = currentTimeMillis();
         RestoreStatus status = RestoreStatus.unknownFailure();
         HollowConsumer.ReadState readState = null;
@@ -117,8 +125,12 @@ public class HollowProducer {
                 readState = newReadState(client.getCurrentVersionId(), client.getStateEngine());
                 if(readState.getVersion() == versionDesired) {
                     readStates = ReadStateHelper.restored(readState);
-                    writeEngine.restoreFrom(readStates.current().getStateEngine());
+
+                    // Need to restore data to new ObjectMapper since can't restore to non empty Write State Engine
+                    HollowObjectMapper newObjectMapper = createNewHollowObjectMapperFromExisting(objectMapper);
+                    newObjectMapper.getStateEngine().restoreFrom(readStates.current().getStateEngine());
                     status = RestoreStatus.success(versionDesired, readState.getVersion());
+                    objectMapper = newObjectMapper; // Restore completed successfully so swap
                 } else {
                     status = RestoreStatus.fail(versionDesired, readState.getVersion(), null);
                 }
@@ -128,22 +140,38 @@ public class HollowProducer {
         } finally {
             listeners.fireProducerRestoreComplete(status, currentTimeMillis() - start);
         }
-        return this;
+        return readState;
+    }
+
+    private static HollowObjectMapper createNewHollowObjectMapperFromExisting(HollowObjectMapper objectMapper) {
+        Collection<HollowSchema> schemas = objectMapper.getStateEngine().getSchemas();
+        HollowWriteStateEngine writeEngine = HollowWriteStateCreator.createWithSchemas(schemas);
+        return new HollowObjectMapper(writeEngine);
     }
 
     /**
      * Each cycle produces a single data state.
      */
     public void runCycle(Populator task) {
-        // 1. Begin a new cycle
         long toVersion = versionMinter.mint();
+
         if(!readStates.hasCurrent()) listeners.fireNewDeltaChain(toVersion);
         ProducerStatus.Builder cycleStatus = listeners.fireCycleStart(toVersion);
+
+        try {
+            runCycle(task, cycleStatus, toVersion);
+        } finally {
+            listeners.fireCycleComplete(cycleStatus);
+        }
+    }
+
+    protected void runCycle(Populator task, ProducerStatus.Builder cycleStatus, long toVersion) {
+        // 1. Begin a new cycle
         Artifacts artifacts = new Artifacts();
+        HollowWriteStateEngine writeEngine = getWriteEngine();
         try {
             // 1a. Prepare the write state
             writeEngine.prepareForNextCycle();
-            HollowObjectMapper objectMapper = this.objectMapper;
             WriteState writeState = new WriteStateImpl(toVersion, objectMapper, readStates.current());
 
             // 2. Populate the state
@@ -183,7 +211,6 @@ public class HollowProducer {
             cycleStatus.fail(th);
         } finally {
             artifacts.cleanup();
-            listeners.fireCycleComplete(cycleStatus);
         }
     }
 
@@ -214,7 +241,7 @@ public class HollowProducer {
     }
 
     private void publishBlob(WriteState writeState, Artifacts artifacts, Blob.Type blobType) throws IOException {
-        HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
+        HollowBlobWriter writer = new HollowBlobWriter(getWriteEngine());
         PublishStatus.Builder builder = (new PublishStatus.Builder());
         try {
             switch (blobType) {

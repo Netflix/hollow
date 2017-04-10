@@ -275,7 +275,7 @@ public interface HollowProducerListener extends EventListener {
             return readState;
         }
 
-        static final class Builder {
+        public static final class Builder {
             private final long start;
             private long end;
 
