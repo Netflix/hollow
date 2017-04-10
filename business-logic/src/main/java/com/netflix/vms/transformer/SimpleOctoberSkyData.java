@@ -1,12 +1,11 @@
 package com.netflix.vms.transformer;
 
-import java.util.HashMap;
-
-import java.util.Map;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class SimpleOctoberSkyData implements OctoberSkyData {
@@ -30,23 +29,31 @@ public class SimpleOctoberSkyData implements OctoberSkyData {
 
         this.countrySet = spaceDelimitedSet(countryCodes);
         this.countryLocales = new HashMap<>();
-        
+
+        // Duplicate info from OctoberSkyDataImpl
+        // http://go/osui -> {BE=[fr, nl], IL=[ar, he], TH=[th, en], CH=[de, fr], CY=[el, en, tr], MD=[en, ro], LU=[de, fr], GR=[el, en], RO=[en, ro]}
         this.countryLocales.put("BE", spaceDelimitedSet("fr nl"));
         this.countryLocales.put("CH", spaceDelimitedSet("fr de"));
         this.countryLocales.put("LU", spaceDelimitedSet("fr de"));
+        this.countryLocales.put("IL", spaceDelimitedSet("ar he"));
+        this.countryLocales.put("TH", spaceDelimitedSet("th en"));
+        this.countryLocales.put("CY", spaceDelimitedSet("el en tr"));
+        this.countryLocales.put("MD", spaceDelimitedSet("en ro"));
+        this.countryLocales.put("GR", spaceDelimitedSet("el en"));
+        this.countryLocales.put("RO", spaceDelimitedSet("en ro"));
     }
-    
+
     private Set<String> spaceDelimitedSet(String set) {
         return Collections.unmodifiableSet(
                 new HashSet<>(Arrays.asList(set.split(" ")))
-        );
+                );
     }
 
     @Override
     public Set<String> getSupportedCountries() {
         return countrySet;
     }
-    
+
     @Override
     public Set<String> getCatalogLanguages(String country) {
         return countryLocales.get(country);
