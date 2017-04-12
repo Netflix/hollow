@@ -158,8 +158,8 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         try {
             HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
             mapper.initializeTypeState(clazz);
+            Assert.fail("Expected Exception not thrown");
         } catch (IllegalStateException e) {
-
             Assert.assertTrue(String.format("missing expected fieldname %s in the message, was %s", expected, e.getMessage()), e.getMessage().contains(expected));
         }
     }
@@ -176,6 +176,7 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         try {
             HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
             mapper.initializeTypeState(clazz);
+            Assert.fail("Expected Exception not thrown");
         } catch (IllegalArgumentException e) {
             Assert.assertTrue(String.format("trying to generate schema based on interface %s, was %s", interfaceClazz.getSimpleName(), e.getMessage()), e.getMessage().contains(expected));
         }
@@ -247,6 +248,7 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         }
     }
 
+    @SuppressWarnings("unused")
     private static class TestClassContainingInterface {
         int val1;
         TestInterface val2;
@@ -257,6 +259,7 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         }
     }
 
+    @SuppressWarnings("unused")
     private static class TestClassImplementingInterface implements TestInterface {
         int val1;
 
