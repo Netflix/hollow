@@ -74,6 +74,9 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             Class<?> currentClass = clazz;
             
             while(currentClass != Object.class && currentClass != Enum.class) {
+                if(currentClass.isInterface()) {
+                    throw new IllegalArgumentException("Unexpected interface " + currentClass.getSimpleName() + " passed as field.");
+                }
                 Field[] declaredFields = currentClass.getDeclaredFields();
     
                 for(int i=0;i<declaredFields.length;i++) {
@@ -122,7 +125,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
 
     private static String[] getKeyFieldPaths(Class<?> clazz) {
         HollowPrimaryKey primaryKey = clazz.getAnnotation(HollowPrimaryKey.class);
-        while(primaryKey == null && clazz != Object.class) {
+        while(primaryKey == null && clazz != Object.class && clazz.isInterface()) {
             clazz = clazz.getSuperclass();
             primaryKey = clazz.getAnnotation(HollowPrimaryKey.class);
         }
