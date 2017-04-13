@@ -11,7 +11,6 @@ public class Artwork implements Cloneable {
     public int seqNum = java.lang.Integer.MIN_VALUE;
     public int ordinalPriority = java.lang.Integer.MIN_VALUE;
     public ArtworkDerivatives derivatives = null;
-//    public List<ArtworkCdn> cdns = null;
     public PassthroughVideo source_movie_id = null;
     public ArtworkSourcePassthrough source = null;
     public ArtworkBasicPassthrough basic_passthrough = null;

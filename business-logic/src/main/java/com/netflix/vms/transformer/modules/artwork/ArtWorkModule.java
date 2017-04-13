@@ -70,7 +70,6 @@ public abstract class ArtWorkModule extends AbstractTransformModule {
     private final Map<String, ArtWorkImageTypeEntry> imageTypeEntryCache;
     private final Map<String, ArtWorkImageFormatEntry> imageFormatEntryCache;
     private final Map<String, ArtWorkImageRecipe> imageRecipeCache;
-//    private final Map<ArtworkCdn, ArtworkCdn> cdnLocationCache;
 
     private final boolean isEnableCdnDirectoryOptimization;
     private final int computedCdnFolderLen;
@@ -87,7 +86,6 @@ public abstract class ArtWorkModule extends AbstractTransformModule {
         this.imageFormatEntryCache = new HashMap<>();
         this.imageTypeEntryCache = new HashMap<>();
         this.imageRecipeCache = new HashMap<>();
-//        this.cdnLocationCache = new HashMap<ArtworkCdn, ArtworkCdn>();
 
         this.computedCdnFolderLen = ctx.getConfig().getComputedCdnFolderLength();
         this.isEnableCdnDirectoryOptimization = ctx.getConfig().isEnableCdnDirectoryOptimization();
@@ -122,11 +120,9 @@ public abstract class ArtWorkModule extends AbstractTransformModule {
         ArtworkDerivatives outputDerivatives = cycleConstants.artworkDerivativesCache.getResult(inputDerivativeSetOrdinal);
         if (outputDerivatives != null) {
             artwork.derivatives = outputDerivatives;
-//            artwork.cdns = cycleConstants.cdnListCache.getResult(inputDerivativeSetOrdinal);
             return;
         }
 
-//        List<ArtworkCdn> cdnList = new ArrayList<>();
         List<ArtworkDerivative> derivativeList = new ArrayList<>();
 
         for (ArtworkDerivativeHollow derivativeHollow : sortInputDerivatives(inputDerivatives)) {
@@ -161,30 +157,12 @@ public abstract class ArtWorkModule extends AbstractTransformModule {
                 // single derivative cache
                 outputDerivative = cycleConstants.artworkDerivativeCache.setResult(inputDerivativeOrdinal, outputDerivative);
             }
-
             derivativeList.add(outputDerivative);
-
-
-//            ArtworkCdn cdn = new ArtworkCdn();
-//            cdn.cdnId = java.lang.Integer.parseInt(derivativeHollow._getCdnId()._getValue()); // @TODO: Is it Integer or String
-//            cdn.cdnDirectory = getCdnDirectory(sourceFileId, derivativeHollow);
-
-//            ArtworkCdn canonicalCdn = cdnLocationCache.get(cdn);
-//            if (canonicalCdn != null) {
-//                cdn = canonicalCdn;
-//            } else {
-//                cdnLocationCache.put(cdn, cdn);
-//            }
-//
-//            cdnList.add(cdn);
         }
 
         outputDerivatives = artworkDerivatives(derivativeList);
         // all derivative cache
         outputDerivatives = cycleConstants.artworkDerivativesCache.setResult(inputDerivativeSetOrdinal, outputDerivatives);
-        //cdnList = cycleConstants.cdnListCache.setResult(inputDerivativeSetOrdinal, cdnList);
-
-        //artwork.cdns = cdnList;
         artwork.derivatives = outputDerivatives;
     }
 

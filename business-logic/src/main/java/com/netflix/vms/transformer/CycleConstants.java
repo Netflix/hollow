@@ -54,7 +54,6 @@ public class CycleConstants {
     
     public final InputOrdinalResultCache<ArtworkDerivative> artworkDerivativeCache;
     public final InputOrdinalResultCache<ArtworkDerivatives> artworkDerivativesCache;
-//    public final InputOrdinalResultCache<List<ArtworkCdn>> cdnListCache;
     
     public final InputOrdinalResultCache<ContractAsset> rightsContractAssetCache;
     public final MultilanguageCountryDialectOrdinalAssigner dialectOrdinalAssigner = new MultilanguageCountryDialectOrdinalAssigner();
@@ -65,7 +64,6 @@ public class CycleConstants {
     public CycleConstants(HollowReadStateEngine inputStateEngine) {
         this.artworkDerivativeCache = new InputOrdinalResultCache<ArtworkDerivative>(inputStateEngine.getTypeState("ArtworkDerivative").maxOrdinal());
         this.artworkDerivativesCache = new InputOrdinalResultCache<ArtworkDerivatives>(inputStateEngine.getTypeState("ArtworkDerivativeSet").maxOrdinal());
-//        this.cdnListCache = new InputOrdinalResultCache<List<ArtworkCdn>>(inputStateEngine.getTypeState("ArtworkDerivativeSet").maxOrdinal());
         this.rightsContractAssetCache = new InputOrdinalResultCache<ContractAsset>(inputStateEngine.getTypeState("RightsContractAsset").maxOrdinal());
     }
     
