@@ -59,14 +59,17 @@ public class ShowMeTheFastProgress {
     @Test
     public void start() throws Throwable {
         // NOTE: the specified transformerVersion must be valid or already in local HD; otherwise, run  getLatestTransformerVersion();
-        long transformerVersion = 20170207001824278L;
-        int[] topNodes = { 80115503, 70143860 };
+        long transformerVersion = 20170413151148932L;
+        int[] topNodes = { 70220028 };
 
         long start = System.currentTimeMillis();
         setup();
 
-        // Load Expected StateEngine
+        // Setup Context
         SimpleTransformerContext ctx = new SimpleTransformerContext();
+        //ctx.overrideSupportedCountries("US");
+
+        // Load Expected StateEngine
         HollowReadStateEngine expectedOutputStateEngine = loadTransformerEngine(ctx, VIP_NAME, transformerVersion, topNodes);
         String value = expectedOutputStateEngine.getHeaderTag(PUBLISH_CYCLE_DATATS_HEADER);
         long publishCycleDataTS = value != null ? Long.parseLong(value) : System.currentTimeMillis();
