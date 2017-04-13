@@ -22,9 +22,9 @@ import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeHollow;
-import com.netflix.vms.transformer.hollowinput.VideoTypeMediaHollow;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.util.DVDCatalogUtil;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -167,7 +167,7 @@ public class VideoHierarchyInitializer {
         if(isGoLiveOrHasFirstDisplayDate(videoId, countryCode))
             return true;
 
-        if (isDVDData(videoId, countryCode))
+        if (DVDCatalogUtil.inDVDCatalog(api, videoTypeCountryIndex, videoId, countryCode))
             return true;
 
         if (hasCurrentOrFutureRollout(videoId, "DISPLAY_PAGE", countryCode))
@@ -186,22 +186,7 @@ public class VideoHierarchyInitializer {
         return false;
     }
 
-    boolean isDVDData(long videoId, String countryCode) {
-        HollowHashIndexResult queryResult = videoTypeCountryIndex.findMatches(videoId, countryCode);
 
-        int ordinal = queryResult.iterator().next();
-
-        VideoTypeDescriptorHollow countryType = api.getVideoTypeDescriptorHollow(ordinal);
-        if ("US".equals(countryCode) && countryType._getExtended())
-            return true;
-
-        for(VideoTypeMediaHollow media : countryType._getMedia()) {
-            if(media._getValue()._isValueEqual("Plastic"))
-                return true;
-        }
-
-        return false;
-    }
 
     boolean isContentApproved(long videoId, String countryCode) {
         HollowHashIndexResult queryResult = videoTypeCountryIndex.findMatches(videoId, countryCode);
