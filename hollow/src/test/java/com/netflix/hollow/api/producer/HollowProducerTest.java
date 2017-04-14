@@ -11,6 +11,8 @@ import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.Status;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemAnnouncer;
+import com.netflix.hollow.api.producer.fs.HollowFilesystemBlobFactory;
+import com.netflix.hollow.api.producer.fs.HollowFilesystemPublisher;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
@@ -55,7 +57,7 @@ public class HollowProducerTest {
 
     private HollowProducer createProducer(File tmpFolder, HollowObjectSchema... schemas) {
         HollowProducer producer = new HollowProducer(
-                new FakeBlobPublisher(namespace, tmpFolder.getAbsolutePath()),
+                new FakeBlobPublisher(namespace),
                 new HollowFilesystemAnnouncer(namespace));
         producer.initializeDataModel(schemas);
         producer.addListener(new FakeProducerListener());
@@ -287,14 +289,14 @@ public class HollowProducerTest {
         }
     }
 
-    private class FakeBlobPublisher extends HollowProducer.Publisher {
-        public FakeBlobPublisher(String namespace, String dir) {
-            super(namespace, dir);
+    private class FakeBlobPublisher extends HollowFilesystemPublisher {
+        public FakeBlobPublisher(String namespace) {
+            super(namespace);
         }
 
         @Override
         public void publish(Blob blob, Map<String, String> headerTags) {
-            File blobFile = blob.getFile();
+            File blobFile = ((HollowFilesystemBlobFactory.FsBlob) blob).getFile();
             if (!blobFile.exists()) throw new RuntimeException("File does not existis: " + blobFile);
 
             if (!blob.getType().equals(Type.SNAPSHOT)) {
