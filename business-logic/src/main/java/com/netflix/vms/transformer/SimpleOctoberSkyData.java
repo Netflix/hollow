@@ -12,7 +12,7 @@ public class SimpleOctoberSkyData implements OctoberSkyData {
 
     public static SimpleOctoberSkyData INSTANCE = new SimpleOctoberSkyData();
 
-    private final Set<String> countrySet;
+    private Set<String> countrySet;
     private final Map<String, Set<String>> countryLocales;
 
     private SimpleOctoberSkyData() {
@@ -54,14 +54,16 @@ public class SimpleOctoberSkyData implements OctoberSkyData {
         return countrySet;
     }
 
+    public void overrideSupportedCountries(Set<String> countrySet) {
+        this.countrySet = countrySet;
+    }
+
     @Override
     public Set<String> getCatalogLanguages(String country) {
         return countryLocales.get(country);
     }
 
-
     @Override
     public void refresh() { }
-
 
 }
