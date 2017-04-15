@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * The {@link HollowDiff} uses this class to expedite diff processing -- this class determines pairs of records which are exactly equal.
@@ -45,6 +46,7 @@ import java.util.Set;
  */
 public class DiffEqualityMapping {
 
+    private final Logger log = Logger.getLogger(DiffEqualityMapping.class.getName());
     private final HollowReadStateEngine fromState;
     private final HollowReadStateEngine toState;
     private final boolean oneToOne;
@@ -88,9 +90,9 @@ public class DiffEqualityMapping {
         if(fromTypeState == null || toTypeState == null)
             return DiffEqualOrdinalMap.EMPTY_MAP;
 
-        System.out.println("starting to build equality map for " + type);
+        log.info("starting to build equality map for " + type);
         DiffEqualOrdinalMap map = buildMap(fromTypeState, toTypeState);
-        System.out.println("finished building equality map for " + type);
+        log.info("finished building equality map for " + type);
         return map;
     }
 

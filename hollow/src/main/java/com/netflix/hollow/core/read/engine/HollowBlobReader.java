@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 
 /**
  * A HollowBlobReader is used to populate and update data in a {@link HollowReadStateEngine}, via the consumption
@@ -43,6 +44,7 @@ import java.util.TreeSet;
  */
 public class HollowBlobReader {
 
+    private final Logger log = Logger.getLogger(HollowBlobReader.class.getName());
     private final HollowReadStateEngine stateEngine;
     private final HollowBlobHeaderReader headerReader;
 
@@ -88,8 +90,8 @@ public class HollowBlobReader {
 
         long endTime = System.currentTimeMillis();
 
-        System.out.println("SNAPSHOT COMPLETED IN " + (endTime - startTime) + "ms");
-        System.out.format("TYPES: %s\n", typeNames);
+        log.info("SNAPSHOT COMPLETED IN " + (endTime - startTime) + "ms");
+        log.info("TYPES: " + typeNames);
 
         notifyEndUpdate();
 
@@ -121,8 +123,8 @@ public class HollowBlobReader {
 
         long endTime = System.currentTimeMillis();
 
-        System.out.println("DELTA COMPLETED IN " + (endTime - startTime) + "ms");
-        System.out.format("TYPES: %s\n", typeNames);
+        log.info("DELTA COMPLETED IN " + (endTime - startTime) + "ms");
+        log.info("TYPES: " + typeNames);
 
         notifyEndUpdate();
 
