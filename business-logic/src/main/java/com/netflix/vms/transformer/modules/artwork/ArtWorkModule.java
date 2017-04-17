@@ -28,7 +28,6 @@ import com.netflix.vms.transformer.hollowoutput.ArtWorkImageRecipe;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageTypeEntry;
 import com.netflix.vms.transformer.hollowoutput.Artwork;
 import com.netflix.vms.transformer.hollowoutput.ArtworkBasicPassthrough;
-import com.netflix.vms.transformer.hollowoutput.ArtworkCdn;
 import com.netflix.vms.transformer.hollowoutput.ArtworkDerivative;
 import com.netflix.vms.transformer.hollowoutput.ArtworkDerivatives;
 import com.netflix.vms.transformer.hollowoutput.ArtworkReExploreLongTimestamp;
@@ -71,12 +70,11 @@ public abstract class ArtWorkModule extends AbstractTransformModule {
     private final Map<String, ArtWorkImageTypeEntry> imageTypeEntryCache;
     private final Map<String, ArtWorkImageFormatEntry> imageFormatEntryCache;
     private final Map<String, ArtWorkImageRecipe> imageRecipeCache;
-    private final Map<ArtworkCdn, ArtworkCdn> cdnLocationCache;
 
     private final boolean isEnableCdnDirectoryOptimization;
     private final int computedCdnFolderLen;
 
-    private final Set<String> unknownArtworkImageTypes = new HashSet<String>();
+    private final Set<String> unknownArtworkImageTypes = new HashSet<>();
 
     public ArtWorkModule(String entityType, VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
         super(api, ctx, cycleConstants, mapper);
@@ -85,10 +83,9 @@ public abstract class ArtWorkModule extends AbstractTransformModule {
         this.recipeIdx = indexer.getPrimaryKeyIndex(ARTWORK_RECIPE);
         this.territoryIdx = indexer.getPrimaryKeyIndex(ARTWORK_TERRITORY_COUNTRIES);
         this.artworkComparator = new ArtWorkComparator(ctx);
-        this.imageFormatEntryCache = new HashMap<String, ArtWorkImageFormatEntry>();
-        this.imageTypeEntryCache = new HashMap<String, ArtWorkImageTypeEntry>();
-        this.imageRecipeCache = new HashMap<String, ArtWorkImageRecipe>();
-        this.cdnLocationCache = new HashMap<ArtworkCdn, ArtworkCdn>();
+        this.imageFormatEntryCache = new HashMap<>();
+        this.imageTypeEntryCache = new HashMap<>();
+        this.imageRecipeCache = new HashMap<>();
 
         this.computedCdnFolderLen = ctx.getConfig().getComputedCdnFolderLength();
         this.isEnableCdnDirectoryOptimization = ctx.getConfig().isEnableCdnDirectoryOptimization();
@@ -119,14 +116,13 @@ public abstract class ArtWorkModule extends AbstractTransformModule {
     protected void processDerivativesAndCdnList(int entityId, String sourceFileId, ArtworkDerivativeSetHollow inputDerivatives, Artwork artwork) {
         int inputDerivativeSetOrdinal = inputDerivatives.getOrdinal();
 
+        // check cache if output derivatives is computed, then use the cached result and return.
         ArtworkDerivatives outputDerivatives = cycleConstants.artworkDerivativesCache.getResult(inputDerivativeSetOrdinal);
         if (outputDerivatives != null) {
             artwork.derivatives = outputDerivatives;
-            artwork.cdns = cycleConstants.cdnListCache.getResult(inputDerivativeSetOrdinal);
             return;
         }
 
-        List<ArtworkCdn> cdnList = new ArrayList<>();
         List<ArtworkDerivative> derivativeList = new ArrayList<>();
 
         for (ArtworkDerivativeHollow derivativeHollow : sortInputDerivatives(inputDerivatives)) {
@@ -155,33 +151,18 @@ public abstract class ArtWorkModule extends AbstractTransformModule {
                 outputDerivative.type = typeEntry;
                 outputDerivative.recipe = recipeEntry;
                 outputDerivative.recipeDesc = new Strings(recipeDescriptor);
+                outputDerivative.cdnId = java.lang.Integer.parseInt(derivativeHollow._getCdnId()._getValue());
+                outputDerivative.cdnDirectory = getCdnDirectory(sourceFileId, derivativeHollow);
 
+                // single derivative cache
                 outputDerivative = cycleConstants.artworkDerivativeCache.setResult(inputDerivativeOrdinal, outputDerivative);
             }
-
             derivativeList.add(outputDerivative);
-
-
-            ArtworkCdn cdn = new ArtworkCdn();
-            cdn.cdnId = java.lang.Integer.parseInt(derivativeHollow._getCdnId()._getValue()); // @TODO: Is it Integer or String
-            cdn.cdnDirectory = getCdnDirectory(sourceFileId, derivativeHollow);
-
-            ArtworkCdn canonicalCdn = cdnLocationCache.get(cdn);
-            if (canonicalCdn != null) {
-                cdn = canonicalCdn;
-            } else {
-                cdnLocationCache.put(cdn, cdn);
-            }
-
-            cdnList.add(cdn);
         }
 
         outputDerivatives = artworkDerivatives(derivativeList);
-
+        // all derivative cache
         outputDerivatives = cycleConstants.artworkDerivativesCache.setResult(inputDerivativeSetOrdinal, outputDerivatives);
-        cdnList = cycleConstants.cdnListCache.setResult(inputDerivativeSetOrdinal, cdnList);
-
-        artwork.cdns = cdnList;
         artwork.derivatives = outputDerivatives;
     }
 
@@ -290,7 +271,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule {
 
                 Set<ArtWorkImageFormatEntry> set = map.get(imageType);
                 if (set == null) {
-                    set = new HashSet<ArtWorkImageFormatEntry>();
+                    set = new HashSet<>();
                     map.put(imageType, set);
                 }
                 set.addAll(entry.getValue().keySet());
