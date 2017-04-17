@@ -3,7 +3,6 @@ package com.netflix.vms.transformer;
 
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.contract.ContractAsset;
-import com.netflix.vms.transformer.hollowoutput.ArtworkCdn;
 import com.netflix.vms.transformer.hollowoutput.ArtworkDerivative;
 import com.netflix.vms.transformer.hollowoutput.ArtworkDerivatives;
 import com.netflix.vms.transformer.hollowoutput.Date;
@@ -55,7 +54,6 @@ public class CycleConstants {
     
     public final InputOrdinalResultCache<ArtworkDerivative> artworkDerivativeCache;
     public final InputOrdinalResultCache<ArtworkDerivatives> artworkDerivativesCache;
-    public final InputOrdinalResultCache<List<ArtworkCdn>> cdnListCache;
     
     public final InputOrdinalResultCache<ContractAsset> rightsContractAssetCache;
     public final MultilanguageCountryDialectOrdinalAssigner dialectOrdinalAssigner = new MultilanguageCountryDialectOrdinalAssigner();
@@ -66,7 +64,6 @@ public class CycleConstants {
     public CycleConstants(HollowReadStateEngine inputStateEngine) {
         this.artworkDerivativeCache = new InputOrdinalResultCache<ArtworkDerivative>(inputStateEngine.getTypeState("ArtworkDerivative").maxOrdinal());
         this.artworkDerivativesCache = new InputOrdinalResultCache<ArtworkDerivatives>(inputStateEngine.getTypeState("ArtworkDerivativeSet").maxOrdinal());
-        this.cdnListCache = new InputOrdinalResultCache<List<ArtworkCdn>>(inputStateEngine.getTypeState("ArtworkDerivativeSet").maxOrdinal());
         this.rightsContractAssetCache = new InputOrdinalResultCache<ContractAsset>(inputStateEngine.getTypeState("RightsContractAsset").maxOrdinal());
     }
     

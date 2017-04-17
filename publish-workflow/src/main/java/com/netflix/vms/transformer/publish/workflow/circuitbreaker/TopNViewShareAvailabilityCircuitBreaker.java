@@ -17,10 +17,10 @@ public class TopNViewShareAvailabilityCircuitBreaker extends HollowPerCountryTop
 	 */
 	@Override
 	protected int getVideoScore(CompleteVideoHollow cv) {
-		if(!cv._getFacetData()._getVideoMediaData()._getIsGoLive())
+		if(!cv._getData()._getFacetData()._getVideoMediaData()._getIsGoLive())
 			return 0;
 
-		List<VMSAvailabilityWindowHollow> availabilityWindowsHollow = cv._getCountrySpecificData()._getMediaAvailabilityWindows();
+		List<VMSAvailabilityWindowHollow> availabilityWindowsHollow = cv._getData()._getCountrySpecificData()._getAvailabilityWindows();
 		if(availabilityWindowsHollow == null || availabilityWindowsHollow.isEmpty())
 			return 0;
 		
