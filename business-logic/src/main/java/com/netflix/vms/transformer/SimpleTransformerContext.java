@@ -15,6 +15,8 @@ import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.cup.CupLibrary;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -121,5 +123,15 @@ public class SimpleTransformerContext implements TransformerContext {
     @Override
     public Consumer<PublicationHistory> getPublicationHistoryConsumer() {
         throw new UnsupportedOperationException("simple transformer doesn't publish");
+    }
+
+    /**
+     * Override Supported Counties
+     */
+    public void overrideSupportedCountries(String... country) {
+        if (country == null) throw new RuntimeException("country param can't be null");
+
+        Set<String> countrySet = new HashSet<>(Arrays.asList(country));
+        SimpleOctoberSkyData.INSTANCE.overrideSupportedCountries(countrySet);
     }
 }
