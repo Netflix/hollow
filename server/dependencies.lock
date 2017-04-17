@@ -2571,7 +2571,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.51",
+            "locked": "2.52",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -2691,8 +2691,8 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.241",
-            "requested": "latest.release",
+            "locked": "56.1075",
+            "requested": "56.1075",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -5978,7 +5978,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.51",
+            "locked": "2.52",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -6098,8 +6098,8 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.241",
-            "requested": "latest.release",
+            "locked": "56.1075",
+            "requested": "56.1075",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -9385,7 +9385,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.51",
+            "locked": "2.52",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -9505,8 +9505,8 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.241",
-            "requested": "latest.release",
+            "locked": "56.1075",
+            "requested": "56.1075",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -12785,7 +12785,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.51",
+            "locked": "2.52",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -12905,8 +12905,8 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.241",
-            "requested": "latest.release",
+            "locked": "56.1075",
+            "requested": "56.1075",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -16219,7 +16219,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.51",
+            "locked": "2.52",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -16339,8 +16339,8 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.241",
-            "requested": "latest.release",
+            "locked": "56.1075",
+            "requested": "56.1075",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -20723,7 +20723,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.51",
+            "locked": "2.52",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -20843,8 +20843,8 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.241",
-            "requested": "latest.release",
+            "locked": "56.1075",
+            "requested": "56.1075",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -24134,7 +24134,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.51",
+            "locked": "2.52",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -24254,8 +24254,8 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.241",
-            "requested": "latest.release",
+            "locked": "56.1075",
+            "requested": "56.1075",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -27590,7 +27590,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.51",
+            "locked": "2.52",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -27710,8 +27710,8 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.241",
-            "requested": "latest.release",
+            "locked": "56.1075",
+            "requested": "56.1075",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -31116,7 +31116,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.51",
+            "locked": "2.52",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -31236,8 +31236,8 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.241",
-            "requested": "latest.release",
+            "locked": "56.1075",
+            "requested": "56.1075",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -34642,7 +34642,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.51",
+            "locked": "2.52",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -34762,8 +34762,8 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.241",
-            "requested": "latest.release",
+            "locked": "56.1075",
+            "requested": "56.1075",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -38168,7 +38168,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.51",
+            "locked": "2.52",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -38288,8 +38288,8 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.241",
-            "requested": "latest.release",
+            "locked": "56.1075",
+            "requested": "56.1075",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -41694,7 +41694,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.51",
+            "locked": "2.52",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -41814,8 +41814,8 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.241",
-            "requested": "latest.release",
+            "locked": "56.1075",
+            "requested": "56.1075",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -45220,7 +45220,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.51",
+            "locked": "2.52",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -45340,8 +45340,8 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.241",
-            "requested": "latest.release",
+            "locked": "56.1075",
+            "requested": "56.1075",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -48746,7 +48746,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.51",
+            "locked": "2.52",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -48866,8 +48866,8 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.241",
-            "requested": "latest.release",
+            "locked": "56.1075",
+            "requested": "56.1075",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -52272,7 +52272,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.51",
+            "locked": "2.52",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -52392,8 +52392,8 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.241",
-            "requested": "latest.release",
+            "locked": "56.1075",
+            "requested": "56.1075",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
