@@ -70,13 +70,13 @@ public class PackageMomentDataModule {
 
                 if("Start".equals(momentType)) {
                     long offsetMillis = packageMoment._getOffsetMillis();
-                    data.startMomentOffsetInSeconds = offsetMillis / 1000;
+                    data.startMomentOffsetInMillis = offsetMillis;
                     if(endFound)
                         break;
                     startFound = true;
                 } else if("Ending".equals(momentType)) {
                     long offsetMillis = packageMoment._getOffsetMillis();
-                    data.endMomentOffsetInSeconds = offsetMillis / 1000;
+                    data.endMomentOffsetInMillis = offsetMillis;
                     if(startFound)
                         break;
                     endFound = true;
