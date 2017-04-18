@@ -54,7 +54,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- * Beta API subject to change.
+ * WARNING: Beta API subject to change.
  *
  * @author Tim Taylor {@literal<tim@toolbear.io>}
  */
@@ -261,7 +261,7 @@ public class HollowProducer {
                     publisher.publish(artifacts.delta, writeState.getStateEngine().getHeaderTags());
                     break;
                 case REVERSE_DELTA:
-                    artifacts.reverseDelta = publisher.openReverseDelta(readStates.current().getVersion(), writeState.getVersion());
+                    artifacts.reverseDelta = publisher.openReverseDelta(writeState.getVersion(), readStates.current().getVersion());
                     artifacts.reverseDelta.write(writer);
                     builder.blob(artifacts.reverseDelta);
                     publisher.publish(artifacts.reverseDelta, writeState.getStateEngine().getHeaderTags());
@@ -441,7 +441,7 @@ public class HollowProducer {
          * @return a {@link HollowProducer.Blob} representing a snapshot for the {@code version}
          */
         public HollowProducer.Blob openSnapshot(long version) {
-            return Blob.withNamespace(namespace, Long.MIN_VALUE, version, dir, getBlobCompressor(), SNAPSHOT);
+            return new Blob(namespace, Long.MIN_VALUE, version, dir, SNAPSHOT, getBlobCompressor());
         }
 
         /**
@@ -458,7 +458,7 @@ public class HollowProducer {
          * @return a {@link HollowProducer.Blob} representing a snapshot for the {@code version}
          */
         public HollowProducer.Blob openDelta(long fromVersion, long toVersion) {
-            return Blob.withNamespace(namespace, fromVersion, toVersion, dir, getBlobCompressor(), DELTA);
+            return new Blob(namespace, fromVersion, toVersion, dir, DELTA, getBlobCompressor());
         }
 
         /**
@@ -469,13 +469,13 @@ public class HollowProducer {
          *
          * In the delta chain {@code fromVersion} is the older version such that {@code fromVersion < toVersion}.
          *
-         * @param fromVersion version in the delta chain immediately before {@code toVersion}
-         * @param toVersion version in the delta chain immediately after {@code fromVersion}
+         * @param fromVersion version in the delta chain immediately after {@code toVersion}
+         * @param toVersion version in the delta chain immediately before {@code fromVersion}
          *
          * @return a {@link HollowProducer.Blob} representing a snapshot for the {@code version}
          */
         public HollowProducer.Blob openReverseDelta(long fromVersion, long toVersion) {
-            return Blob.withNamespace(namespace, fromVersion, toVersion, dir, getBlobCompressor(), REVERSE_DELTA);
+            return new Blob(namespace, fromVersion, toVersion, dir, REVERSE_DELTA, getBlobCompressor());
         }
 
         /**
@@ -503,7 +503,7 @@ public class HollowProducer {
         public static interface BlobCompressor {
             public static final BlobCompressor NO_COMPRESSION = new BlobCompressor() {
                 public OutputStream compress(OutputStream os) { return os; }
-                
+
                 public InputStream decompress(InputStream is) { return is; }
             };
 
@@ -527,11 +527,7 @@ public class HollowProducer {
 
         private final BlobCompressor compressor;
 
-        static Blob withNamespace(String namespace, long fromVersion, long toVersion, String dir, BlobCompressor compressor, Blob.Type type) {
-            return new Blob(namespace, fromVersion, toVersion, dir, compressor, type);
-        }
-
-        private Blob(String namespace, long fromVersion, long toVersion, String dir, BlobCompressor compressor, Blob.Type type) {
+        Blob(String namespace, long fromVersion, long toVersion, String dir, Blob.Type type, BlobCompressor compressor) {
             this.namespace = namespace;
             this.fromVersion = fromVersion;
             this.toVersion = toVersion;
@@ -544,10 +540,8 @@ public class HollowProducer {
                     this.file = new File(dir, String.format("%s-%s-%d", namespace, type.prefix, toVersion));
                     break;
                 case DELTA:
-                    this.file = new File(dir, String.format("%s-%s-%d-%d", namespace, type.prefix, fromVersion, toVersion));
-                    break;
                 case REVERSE_DELTA:
-                    this.file = new File(dir, String.format("%s-%s-%d-%d", namespace, type.prefix, toVersion, fromVersion));
+                    this.file = new File(dir, String.format("%s-%s-%d-%d", namespace, type.prefix, fromVersion, toVersion));
                     break;
                 default:
                     throw new IllegalStateException("unknown blob type, type=" + type);
