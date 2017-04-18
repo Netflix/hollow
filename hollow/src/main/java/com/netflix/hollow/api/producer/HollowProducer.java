@@ -27,6 +27,7 @@ import com.netflix.hollow.api.client.HollowBlobRetriever;
 import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.ReadState;
+import com.netflix.hollow.api.producer.HollowProducer.Publisher.BlobCompressor;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
@@ -440,7 +441,7 @@ public class HollowProducer {
          * @return a {@link HollowProducer.Blob} representing a snapshot for the {@code version}
          */
         public HollowProducer.Blob openSnapshot(long version) {
-            return Blob.withNamespace(namespace, Long.MIN_VALUE, version, dir, SNAPSHOT);
+            return Blob.withNamespace(namespace, Long.MIN_VALUE, version, dir, getBlobCompressor(), SNAPSHOT);
         }
 
         /**
@@ -457,7 +458,7 @@ public class HollowProducer {
          * @return a {@link HollowProducer.Blob} representing a snapshot for the {@code version}
          */
         public HollowProducer.Blob openDelta(long fromVersion, long toVersion) {
-            return Blob.withNamespace(namespace, fromVersion, toVersion, dir, DELTA);
+            return Blob.withNamespace(namespace, fromVersion, toVersion, dir, getBlobCompressor(), DELTA);
         }
 
         /**
@@ -474,7 +475,7 @@ public class HollowProducer {
          * @return a {@link HollowProducer.Blob} representing a snapshot for the {@code version}
          */
         public HollowProducer.Blob openReverseDelta(long fromVersion, long toVersion) {
-            return Blob.withNamespace(namespace, fromVersion, toVersion, dir, REVERSE_DELTA);
+            return Blob.withNamespace(namespace, fromVersion, toVersion, dir, getBlobCompressor(), REVERSE_DELTA);
         }
 
         /**
@@ -488,6 +489,31 @@ public class HollowProducer {
          * @param headerTags the header tags, in case these should be added as metadata on published artifacts.
          */
         public abstract void publish(HollowProducer.Blob blob, Map<String, String> headerTags);
+
+
+        /**
+         * This method may be overridden to specify a compression algorithm for blob files.
+         *
+         * @return the {@link BlobCompressor} to be used to compress published blobs.
+         */
+        public BlobCompressor getBlobCompressor() {
+            return BlobCompressor.NO_COMPRESSION;
+        }
+
+        public static interface BlobCompressor {
+            public static final BlobCompressor NO_COMPRESSION = new BlobCompressor() {
+                public OutputStream compress(OutputStream os) { return os; }
+                
+                public InputStream decompress(InputStream is) { return is; }
+            };
+
+            /**
+             * This method provides an opportunity to wrap the OutputStream used to write the blob (e.g. with a GZIPOutputStream).
+             */
+            public OutputStream compress(OutputStream is);
+            
+            public InputStream decompress(InputStream is);
+        }
     }
 
     public static class Blob {
@@ -499,16 +525,19 @@ public class HollowProducer {
         protected final Blob.Type type;
         protected final File file;
 
-        static Blob withNamespace(String namespace, long fromVersion, long toVersion, String dir, Blob.Type type) {
-            return new Blob(namespace, fromVersion, toVersion, dir, type);
+        private final BlobCompressor compressor;
+
+        static Blob withNamespace(String namespace, long fromVersion, long toVersion, String dir, BlobCompressor compressor, Blob.Type type) {
+            return new Blob(namespace, fromVersion, toVersion, dir, compressor, type);
         }
 
-        private Blob(String namespace, long fromVersion, long toVersion, String dir, Blob.Type type) {
+        private Blob(String namespace, long fromVersion, long toVersion, String dir, BlobCompressor compressor, Blob.Type type) {
             this.namespace = namespace;
             this.fromVersion = fromVersion;
             this.toVersion = toVersion;
             this.type = type;
             this.dir = dir;
+            this.compressor = compressor;
 
             switch (type) {
                 case SNAPSHOT:
@@ -528,7 +557,7 @@ public class HollowProducer {
         protected void write(HollowBlobWriter writer) throws IOException {
             this.file.getParentFile().mkdirs();
             this.file.createNewFile();
-            try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
+            try (OutputStream os = new BufferedOutputStream(compressor.compress(new FileOutputStream(file)))) {
                 switch (type) {
                     case SNAPSHOT:
                         writer.writeSnapshot(os);
@@ -546,7 +575,7 @@ public class HollowProducer {
         }
 
         protected InputStream newInputStream() throws IOException {
-            return new BufferedInputStream(new FileInputStream(this.file));
+            return new BufferedInputStream(compressor.decompress(new FileInputStream(this.file)));
         }
 
         public File getFile() {
