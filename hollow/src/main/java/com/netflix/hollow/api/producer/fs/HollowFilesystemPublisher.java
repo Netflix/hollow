@@ -18,6 +18,10 @@
 package com.netflix.hollow.api.producer.fs;
 
 import com.netflix.hollow.api.producer.HollowProducer;
+
+import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.DELTA;
+import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.REVERSE_DELTA;
+import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.SNAPSHOT;
 import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -29,12 +33,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class HollowFilesystemPublisher extends HollowProducer.Publisher {
-    private final Path publishPath;
+public class HollowFilesystemPublisher implements HollowProducer.Publisher {
+    protected final Path publishPath;
+    protected final HollowFilesystemBlobFactory blobFactory;
+    protected final String namespace;
+    protected final String dir;
 
     public HollowFilesystemPublisher(String namespace) {
-        super(namespace, FileSystems.getDefault().getPath(System.getProperty("java.io.tmpdir"), namespace).toString());
+        this.namespace = namespace;
+        this.dir = FileSystems.getDefault().getPath(System.getProperty("java.io.tmpdir"), namespace).toString();
         this.publishPath = Paths.get(System.getProperty("java.io.tmpdir"), namespace, "published");
+        this.blobFactory = new HollowFilesystemBlobFactory();
     }
 
     public Path getStagingDir() {
@@ -44,13 +53,28 @@ public class HollowFilesystemPublisher extends HollowProducer.Publisher {
     public Path getPublishDir() {
         return publishPath;
     }
-    
+
+    @Override
+    public HollowProducer.Blob openSnapshot(long version) {
+        return blobFactory.withNamespace(namespace, Long.MIN_VALUE, version, dir, SNAPSHOT);
+    }
+
+    @Override
+    public HollowProducer.Blob openDelta(long fromVersion, long toVersion) {
+        return blobFactory.withNamespace(namespace, fromVersion, toVersion, dir, DELTA);
+    }
+
+    @Override
+    public HollowProducer.Blob openReverseDelta(long fromVersion, long toVersion) {
+        return blobFactory.withNamespace(namespace, fromVersion, toVersion, dir, REVERSE_DELTA);
+    }
+
     @Override
     public void publish(HollowProducer.Blob blob, Map<String, String> headerTags) {
         try {
             Files.createDirectories(publishPath);
 
-            Path source = Paths.get(blob.getFile().getPath());
+            Path source = Paths.get(((HollowFilesystemBlobFactory.FsBlob) blob).getFile().getPath());
             Path filename = source.getFileName();
             Path destination = publishPath.resolve(filename);
             Path intermediate = destination.resolveSibling(filename + ".incomplete");
