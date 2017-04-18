@@ -81,7 +81,7 @@ public class DataSlicerImpl implements DataSlicer {
                     return outputAPI.getCompleteVideoHollow(ordinal)._getId()._getValueBoxed();
                 }
             });
-            
+
             findIncludedOrdinals(stateEngine, "MulticatalogCountryData", videoIdsToInclude, new VideoIdDeriver() {
                 @Override
                 public Integer deriveId(int ordinal) {
@@ -149,8 +149,8 @@ public class DataSlicerImpl implements DataSlicer {
             ordinalsToInclude.put("L10NResources", findIncludedL10NOrdinals(stateEngine, videoIdsToInclude));
 
             joinIncludedOrdinals(stateEngine, packagesToInclude,
-                    "FileEncodingData", "downloadableId",
-                    "PackageData", "streams.element.downloadableId");
+                    "FileEncodingData", "downloadableId.val",
+                    "PackageData", "streams.element.downloadableId.val");
 
             joinIncludedOrdinals(stateEngine, packagesToInclude,
                     "DrmInfoData", "packageId",
