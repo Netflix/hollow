@@ -502,15 +502,17 @@ public class HollowProducer {
 
         public static interface BlobCompressor {
             public static final BlobCompressor NO_COMPRESSION = new BlobCompressor() {
-                public OutputStream compress(OutputStream os) {
-                    return os;
-                }
+                public OutputStream compress(OutputStream os) { return os; }
+                
+                public InputStream decompress(InputStream is) { return is; }
             };
 
             /**
              * This method provides an opportunity to wrap the OutputStream used to write the blob (e.g. with a GZIPOutputStream).
              */
             public OutputStream compress(OutputStream is);
+            
+            public InputStream decompress(InputStream is);
         }
     }
 
@@ -573,7 +575,7 @@ public class HollowProducer {
         }
 
         protected InputStream newInputStream() throws IOException {
-            return new BufferedInputStream(new FileInputStream(this.file));
+            return new BufferedInputStream(compressor.decompress(new FileInputStream(this.file)));
         }
 
         public File getFile() {
