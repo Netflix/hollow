@@ -148,8 +148,8 @@ public class WindowPackageContractInfoModule {
         PackageMomentData packageMomentData = packageMomentDataModule.getWindowPackageMomentData(packageData, inputPackage);
 
         info.videoPackageInfo.trickPlayMap = packageMomentData.trickPlayItemMap;
-        info.videoPackageInfo.startMomentOffsetInSeconds = packageMomentData.startMomentOffsetInSeconds;
-        info.videoPackageInfo.endMomentOffsetInSeconds = packageMomentData.endMomentOffsetInSeconds;
+        info.videoPackageInfo.startMomentOffsetInMillis = packageMomentData.startMomentOffsetInMillis;
+        info.videoPackageInfo.endMomentOffsetInMillis = packageMomentData.endMomentOffsetInMillis;
 
         info.videoPackageInfo.screenFormats = new ArrayList<Strings>(screenFormats.size());
         for(String screenFormat : screenFormats) {

@@ -14,8 +14,8 @@ public class VideoPackageInfo implements Cloneable {
     public List<Strings> soundTypes = null;
     public List<Strings> screenFormats = null;
     public Map<TrickPlayType, TrickPlayItem> trickPlayMap = null;
-    public long startMomentOffsetInSeconds = -1;
-    public long endMomentOffsetInSeconds = -1;
+    public long startMomentOffsetInMillis = -1;
+    public long endMomentOffsetInMillis = -1;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
@@ -38,8 +38,8 @@ public class VideoPackageInfo implements Cloneable {
         if(o.trickPlayMap == null) {
             if(trickPlayMap != null) return false;
         } else if(!o.trickPlayMap.equals(trickPlayMap)) return false;
-        if (o.startMomentOffsetInSeconds!=this.startMomentOffsetInSeconds) return false;
-        if (o.endMomentOffsetInSeconds!=endMomentOffsetInSeconds) return false;
+        if (o.startMomentOffsetInMillis!=this.startMomentOffsetInMillis) return false;
+        if (o.endMomentOffsetInMillis!=endMomentOffsetInMillis) return false;
         if (o.isDefaultPackage!=this.isDefaultPackage) return false;
         return true;
     }
@@ -67,8 +67,8 @@ public class VideoPackageInfo implements Cloneable {
         builder.append(",soundTypes=").append(soundTypes);
         builder.append(",screenFormats=").append(screenFormats);
         builder.append(",trickPlayMap=").append(trickPlayMap);
-        builder.append(",startOffsetInSeconds=").append(startMomentOffsetInSeconds);
-        builder.append(",endOffsetInSeconds=").append(endMomentOffsetInSeconds);
+        builder.append(",startOffsetInMillis=").append(startMomentOffsetInMillis);
+        builder.append(",endOffsetInMillis=").append(endMomentOffsetInMillis);
         builder.append("}");
         return builder.toString();
     }

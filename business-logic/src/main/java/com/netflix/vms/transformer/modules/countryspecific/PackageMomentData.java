@@ -9,7 +9,7 @@ public class PackageMomentData {
 
     public Map<TrickPlayType, TrickPlayItem> trickPlayItemMap = new HashMap<TrickPlayType, TrickPlayItem>();
     
-    public long startMomentOffsetInSeconds;
-    public long endMomentOffsetInSeconds;
+    public long startMomentOffsetInMillis;
+    public long endMomentOffsetInMillis;
 
 }

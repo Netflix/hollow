@@ -78,9 +78,6 @@ public interface TransformerConfig {
     String getConverterVipToKeybaseMap();
 
 
-    @DefaultValue("true")
-    boolean isMerchstillsSortedDescending();
-
     @DefaultValue("false")
     boolean isMerchstillEpisodeLiveCheckEnabled();
 

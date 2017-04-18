@@ -89,7 +89,6 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
         masterScheduleIndex = indexer.getHashIndex(IndexSpec.MASTER_SCHEDULE_BY_TAG_SHOW);
         absoluteScheduleIndex = indexer.getHashIndex(IndexSpec.ABSOLUTE_SCHEDULE_BY_VIDEO_ID_TAG);
 
-        ctx.getLogger().info(TransformerLogTag.TransformInfo, "MerchStill descSorting=" + ctx.getConfig().isMerchstillsSortedDescending() + ", edEpisode=" + ctx.getConfig().isMerchstillEpisodeLiveCheckEnabled());
     }
 
     // constructor only for test purposes
@@ -140,11 +139,8 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
             }
         }
 
-        if (ctx.getConfig().isMerchstillsSortedDescending()) {
-            rollupMerchstillsDescOrder(rollupSourceFieldIds, showHierarchiesByCountry, merchstillSourceFieldIds, countryArtworkMap, this, MIN_ROLLUP_SIZE);
-        } else {
-            rollupMerchstills(rollupMerchstillVideoIds, rollupSourceFieldIds, showHierarchiesByCountry, merchstillSourceFieldIds, countryArtworkMap);
-        }
+
+        rollupMerchstillsDescOrder(rollupSourceFieldIds, showHierarchiesByCountry, merchstillSourceFieldIds, countryArtworkMap, this, MIN_ROLLUP_SIZE);
 
         // Create VideoImages
         Map<String, Map<Integer, VideoImages>> countryImagesMap = new HashMap<>();
@@ -240,115 +236,6 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
         return rolloutAppliesToCountryAtHand;
     }
 
-    private void rollupMerchstills(Set<Integer> rollupMerchstillVideoIds /* in */, Set<String> rollupSourceFieldIds /* in */, Map<String, Set<VideoHierarchy>> showHierarchiesByCountry/* in */,
-                                   Set<String> merchstillSourceFieldIds /* in */, Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap /* out */) {
-
-        for (String countryCode : showHierarchiesByCountry.keySet()) {
-            Map<Integer, Set<Artwork>> artworkMap = countryArtworkMap.get(countryCode);
-            if (artworkMap == null) {
-                continue;
-            }
-
-            for (VideoHierarchy hierarchy : showHierarchiesByCountry.get(countryCode)) {
-                int topNodeId = hierarchy.getTopNodeId();
-                Set<Artwork> showArtwork = artworkMap.get(topNodeId);
-                boolean showAttached = true;
-                if (showArtwork == null) {
-                    showArtwork = new LinkedHashSet<>();
-                    showAttached = false;
-                }
-                List<Artwork> showBackFillArtwork = new ArrayList<>();
-                int showMerchstillsCount = 0;
-
-                int episodeSeqNum = 0;
-                for (int iseason = 0; iseason < hierarchy.getSeasonIds().length; iseason++) {
-                    int seasonId = hierarchy.getSeasonIds()[iseason];
-                    Set<Artwork> seasonArtwork = artworkMap.get(seasonId);
-                    boolean seasonAttached = true;
-                    if (seasonArtwork == null) {
-                        seasonArtwork = new LinkedHashSet<>();
-                        seasonAttached = false;
-                    }
-
-                    List<Artwork> seasonBackFillArtwork = new ArrayList<>();
-                    int seasonMerchstillsCount = 0;
-
-                    for (int iepisode = 0; iepisode < hierarchy.getEpisodeIds()[iseason].length; iepisode++) {
-                        episodeSeqNum++;
-                        int episodeId = hierarchy.getEpisodeIds()[iseason][iepisode];
-                        if (isAvailableForED(episodeId, countryCode)) {
-                            Set<Artwork> episodeArtwork = artworkMap.get(episodeId);
-
-                            if (episodeArtwork != null && !episodeArtwork.isEmpty()) {
-                                for (Artwork artwork : episodeArtwork) {
-                                    String sourceFieldId = artwork.sourceFileId == null ? null : new String(artwork.sourceFileId.value);
-                                    if (rollupMerchstillVideoIds.contains(episodeId) && artwork.sourceFileId != null && rollupSourceFieldIds.contains(sourceFieldId)) {
-                                        Artwork seasonArt = artwork.clone();
-                                        Artwork showArt = artwork.clone();
-                                        seasonArt.seqNum = episodeSeqNum;
-                                        showArt.seqNum = episodeSeqNum;
-                                        seasonArtwork.add(seasonArt);
-                                        showArtwork.add(showArt);
-                                        seasonMerchstillsCount++;
-                                        showMerchstillsCount++;
-                                    } else {  // artwork is not "rollup", potential backfill
-                                        if (artwork.sourceFileId != null && merchstillSourceFieldIds.contains(sourceFieldId)) {
-                                            if (seasonBackFillArtwork.size() < MIN_ROLLUP_SIZE) {
-                                                seasonBackFillArtwork.add(artwork.clone());
-                                            }
-                                            if (showBackFillArtwork.size() < MIN_ROLLUP_SIZE) {
-                                                showBackFillArtwork.add(artwork.clone());
-                                            }
-                                        }
-                                    }// backfill
-                                }
-                            }
-                        }
-                    }
-
-                    if (seasonArtwork.isEmpty() && seasonBackFillArtwork.isEmpty()) {
-                        // don't attach an empty map
-                    } else { // add backfill, if needed
-                        int max_seqNum = 0;
-                        for (Artwork seasonArt : seasonArtwork) {
-                            if (seasonArt.seqNum > max_seqNum) max_seqNum = seasonArt.seqNum;
-                        }
-                        int num_add = MIN_ROLLUP_SIZE - seasonMerchstillsCount;
-                        for (int iadd = 0; iadd < num_add && iadd < seasonBackFillArtwork.size(); iadd++) {
-                            Artwork seasonFallback = seasonBackFillArtwork.get(iadd);
-                            seasonFallback.seqNum = ++max_seqNum;
-                            seasonArtwork.add(seasonFallback);
-                        }
-                    }
-
-                    if (!seasonAttached && !seasonArtwork.isEmpty()) {
-                        artworkMap.put(seasonId, seasonArtwork);
-                    }
-                } // all seasons within a hierarchy
-
-                if (showArtwork.isEmpty() && showBackFillArtwork.isEmpty()) {
-                    // don't attach
-                } else { // add backfill, if needed
-                    int max_seqNum = 0;
-                    for (Artwork showArt : showArtwork) {
-                        if (showArt.seqNum > max_seqNum) max_seqNum = showArt.seqNum;
-                    }
-
-                    int num_add = MIN_ROLLUP_SIZE - showMerchstillsCount;
-                    for (int iadd = 0; iadd < num_add && iadd < showBackFillArtwork.size(); iadd++) {
-                        Artwork fallback = showBackFillArtwork.get(iadd);
-                        fallback.seqNum = ++max_seqNum;
-                        showArtwork.add(fallback);
-                    }
-                }
-
-                if (!showAttached && !showArtwork.isEmpty()) {
-                    artworkMap.put(topNodeId, showArtwork);
-                }
-            } // for all video-hierarchies
-        } // accross all countries
-
-    }
 
     // Ref: https://docs.google.com/document/d/1paFkF8WyWJ6dB1Rh7lWZ_y8hk1WwjPoXt-TD0hzc-z0
     static void rollupMerchstillsDescOrder(
