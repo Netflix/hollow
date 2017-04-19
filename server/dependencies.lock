@@ -2304,14 +2304,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -2320,7 +2320,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -5711,14 +5711,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -5727,7 +5727,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -9118,14 +9118,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -9134,7 +9134,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -12518,14 +12518,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -12534,7 +12534,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -15952,14 +15952,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -15968,7 +15968,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -20456,14 +20456,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -20472,7 +20472,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -23867,14 +23867,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -23883,7 +23883,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -27322,14 +27322,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -27338,7 +27338,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -30848,14 +30848,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -30864,7 +30864,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -34374,14 +34374,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -34390,7 +34390,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -37900,14 +37900,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -37916,7 +37916,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -41426,14 +41426,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -41442,7 +41442,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -44952,14 +44952,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -44968,7 +44968,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -48478,14 +48478,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -48494,7 +48494,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
@@ -52004,14 +52004,14 @@
             ]
         },
         "netflix:nf-eventbus": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
@@ -52020,7 +52020,7 @@
             ]
         },
         "netflix:nf-eventbus-guice": {
-            "locked": "1.31.0",
+            "locked": "1.32.0",
             "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
