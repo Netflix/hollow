@@ -134,7 +134,13 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         int ordinal = iterator.next();
         while(ordinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
             IPLDerivativeGroupHollow inputDerivatives = api.getIPLDerivativeGroupHollow(ordinal);
-            groupByType.put(inputDerivatives._getImageType()._getValue(), inputDerivatives);
+            String type = inputDerivatives._getImageType()._getValue();
+            
+            IPLDerivativeGroupHollow iplDerivativeGroupHollow = groupByType.get(type);
+            if(iplDerivativeGroupHollow == null || iplDerivativeGroupHollow._getSubmission() < inputDerivatives._getSubmission()) {
+                groupByType.put(type, inputDerivatives);
+            }
+            
             ordinal = iterator.next();
         }
         
