@@ -41,7 +41,7 @@ public enum OutputTypeConfig {
 
     //---------------
     private final static EnumSet<OutputTypeConfig> VIDEO_RELATED_TYPES_ENUMSET = EnumSet.of(
-            CompleteVideo, MulticatalogCountryData, VideoEpisode_CountryList, RolloutVideo, GlobalVideo, FallbackUSArtwork, LanguageRights, VideoPackageData, PackageData);
+            CompleteVideo, MulticatalogCountryData, VideoEpisode_CountryList, RolloutVideo, GlobalVideo, FallbackUSArtwork, LanguageRights, VideoPackageData, PackageData, L10NResources);
     public final static Set<OutputTypeConfig> VIDEO_RELATED_TYPES = Collections.unmodifiableSet(VIDEO_RELATED_TYPES_ENUMSET);
     public final static Set<OutputTypeConfig> NON_VIDEO_RELATED_TYPES = Collections.unmodifiableSet(EnumSet.complementOf(VIDEO_RELATED_TYPES_ENUMSET));
 

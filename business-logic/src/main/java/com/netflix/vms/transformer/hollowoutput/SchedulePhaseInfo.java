@@ -43,4 +43,7 @@ public class SchedulePhaseInfo implements Cloneable{
 		result = 31 * result + sourceVideoId;
 		return result;
 	}
+	
+    @SuppressWarnings("unused")
+    private int __assigned_ordinal = -1;
 }

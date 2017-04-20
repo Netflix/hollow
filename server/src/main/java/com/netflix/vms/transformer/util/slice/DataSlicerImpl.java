@@ -438,6 +438,7 @@ public class DataSlicerImpl implements DataSlicer {
             includeAll(stateEngine, "MovieCharacterPerson");
             includeAll(stateEngine, "VMSAward");
             includeAll(stateEngine, "IPLArtworkDerivativeSet");
+            includeAll(stateEngine, "AbsoluteSchedule");
 
             return populateFilteredBlob(stateEngine, ordinalsToInclude);
         }
