@@ -21,7 +21,6 @@ import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleListHollow;
 import com.netflix.vms.transformer.hollowinput.DamMerchStillsHollow;
 import com.netflix.vms.transformer.hollowinput.FlagsHollow;
-import com.netflix.vms.transformer.hollowinput.IPLDerivativeGroupHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfRightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.LocaleTerritoryCodeHollow;
@@ -40,7 +39,7 @@ import com.netflix.vms.transformer.hollowinput.StatusHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.TerritoryCountriesHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
-import com.netflix.vms.transformer.hollowinput.VideoArtworkHollow;
+import com.netflix.vms.transformer.hollowinput.VideoArtworkSourceHollow;
 import com.netflix.vms.transformer.hollowoutput.Artwork;
 import com.netflix.vms.transformer.hollowoutput.ArtworkMerchStillPackageData;
 import com.netflix.vms.transformer.hollowoutput.SchedulePhaseInfo;
@@ -79,7 +78,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
     public VideoImagesDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
         super("Video", api, ctx, mapper, cycleConstants, indexer);
 
-        this.videoArtworkIndex = indexer.getHashIndex(IndexSpec.ARTWORK_BY_VIDEO_ID);
+        this.videoArtworkIndex = indexer.getHashIndex(IndexSpec.ARTWORK_SOURCE_BY_VIDEO_ID);
         this.damMerchStillsIdx = indexer.getPrimaryKeyIndex(IndexSpec.DAM_MERCHSTILLS);
         this.videoStatusIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_STATUS);
         this.rolloutIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
@@ -128,7 +127,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
                 HollowOrdinalIterator iter = matches.iterator();
                 int videoArtworkOrdinal = iter.next();
                 while (videoArtworkOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
-                    VideoArtworkHollow artworkHollowInput = api.getVideoArtworkHollow(videoArtworkOrdinal);
+                    VideoArtworkSourceHollow artworkHollowInput = api.getVideoArtworkSourceHollow(videoArtworkOrdinal);
                     String rollupSourceFileId = processArtwork(showHierarchiesByCountry.keySet(), artworkHollowInput, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry);
                     if (rollupSourceFileId != null) {
                         rollupMerchstillVideoIds.add(videoId);
@@ -527,7 +526,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
         throw new UnsupportedOperationException("Use buildVideoImagesByCountry");
     }
 
-    private String processArtwork(Set<String> countrySet, VideoArtworkHollow artworkHollowInput,
+    private String processArtwork(Set<String> countrySet, VideoArtworkSourceHollow artworkHollowInput,
                                   Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap,
                                   Map<String, Map<Integer, Set<SchedulePhaseInfo>>> countrySchedulePhaseMap,
                                   Set<String> merchstillSourceFieldIds,
@@ -735,7 +734,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
      * @return Null if phase tags list is null or no matching schedule is present for given phase tag.
      * Else a set of schedule information. Note empty set is never returned.
      */
-    Set<SchedulePhaseInfo> getAllScheduleInfo(VideoArtworkHollow videoArtworkHollow, int videoId) {
+    Set<SchedulePhaseInfo> getAllScheduleInfo(VideoArtworkSourceHollow videoArtworkHollow, int videoId) {
         Set<SchedulePhaseInfo> schedulePhaseInfos = null;
         boolean isSmoky = videoArtworkHollow._getIsSmoky();
 
@@ -833,7 +832,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
     /**
      * Check phase tag list, if null then return null, else return the list itself.
      */
-    private PhaseTagListHollow checkPhaseTagList(PhaseTagListHollow phaseTagListHollow, VideoArtworkHollow videoArtworkHollow, int videoId) {
+    private PhaseTagListHollow checkPhaseTagList(PhaseTagListHollow phaseTagListHollow, VideoArtworkSourceHollow videoArtworkHollow, int videoId) {
         if (phaseTagListHollow == null) {
             String sourceFileId = videoArtworkHollow._getSourceFileId()._getValue();
             ctx.getLogger().info(InvalidPhaseTagForArtwork, "PhaseTagList is null in VideoArtwork for videoId={} sourceFileId={} " +

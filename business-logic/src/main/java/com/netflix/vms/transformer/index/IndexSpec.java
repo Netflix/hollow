@@ -34,7 +34,7 @@ public enum IndexSpec {
     L10N_EPISODES(PRIMARY_KEY, "Episodes", "movieId"),
     L10N_LOCALIZEDMETADATA_BY_VIDEO(HASH, "LocalizedMetadata", "", "movieId"),
 
-    ARTWORK_BY_VIDEO_ID(HASH, "VideoArtwork", "", "movieId"),
+    ARTWORK_SOURCE_BY_VIDEO_ID(HASH, "VideoArtworkSource", "", "movieId"),
     ARTWORK_DERIVATIVE_SETS(HASH, "IPLDerivativeGroup", "", "externalId.value"),
     SHOW_SEASON_EPISODE(HASH, "ShowSeasonEpisode", "", "movieId"),
     VIDEO_DATE(HASH, "VideoDate", "window.element", "videoId", "window.element.countryCode.value"),
