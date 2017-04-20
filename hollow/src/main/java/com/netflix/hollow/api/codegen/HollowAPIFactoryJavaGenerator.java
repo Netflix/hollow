@@ -77,7 +77,7 @@ public class HollowAPIFactoryJavaGenerator implements HollowJavaFileGenerator {
         
         builder.append("    @Override\n");
         builder.append("    public HollowAPI createAPI(HollowDataAccess dataAccess) {\n");
-        builder.append("        return new ").append(apiClassname).append("(dataAccess);\n");
+        builder.append("        return new ").append(apiClassname).append("(dataAccess, cachedTypes);\n");
         builder.append("    }\n\n");
         
         builder.append("    @Override\n");
