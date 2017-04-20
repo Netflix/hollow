@@ -1,7 +1,5 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-import java.util.GregorianCalendar;
-
 public class SchedulePhaseInfo implements Cloneable{
 	public static final long FAR_FUTURE_DATE = 32506358400000L;
 	
