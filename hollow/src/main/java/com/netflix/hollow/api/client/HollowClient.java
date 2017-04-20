@@ -20,9 +20,7 @@ package com.netflix.hollow.api.client;
 import static com.netflix.hollow.api.client.HollowAPIFactory.DEFAULT_FACTORY;
 import static com.netflix.hollow.api.client.HollowClientMemoryConfig.DEFAULT_CONFIG;
 import static com.netflix.hollow.api.client.HollowUpdateListener.DEFAULT_LISTENER;
-
 import com.netflix.hollow.api.custom.HollowAPI;
-
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.util.DefaultHashCodeFinder;
 import com.netflix.hollow.api.codegen.HollowAPIClassJavaGenerator;
@@ -196,6 +194,52 @@ public class HollowClient {
      */
     public long getCurrentVersionId() {
         return updater.getCurrentVersionId();
+    }
+    
+    
+    public static class Builder {
+        private HollowBlobRetriever blobRetriever = null;
+        private HollowAnnouncementWatcher announcementWatcher = new HollowAnnouncementWatcher.DefaultWatcher();
+        private HollowUpdateListener updateListener = DEFAULT_LISTENER;
+        private HollowAPIFactory apiFactory = DEFAULT_FACTORY;
+        private HollowClientMemoryConfig memoryConfig = DEFAULT_CONFIG;
+        
+        public HollowClient.Builder withBlobRetriever(HollowBlobRetriever blobRetriever) {
+            this.blobRetriever = blobRetriever;
+            return this;
+        }
+        
+        public HollowClient.Builder withAnnouncementWatcher(HollowAnnouncementWatcher announcementWatcher) {
+            this.announcementWatcher = announcementWatcher;
+            return this;
+        }
+        
+        public HollowClient.Builder withUpdateListener(HollowUpdateListener updateListener) {
+            this.updateListener = updateListener;
+            return this;
+        }
+        
+        public HollowClient.Builder withAPIFactory(HollowAPIFactory apiFactory) {
+            this.apiFactory = apiFactory;
+            return this;
+        }
+        
+        public <T extends HollowAPI> HollowClient.Builder withGeneratedAPIClass(Class<T> generatedAPIClass) {
+            this.apiFactory = new HollowAPIFactory.ForGeneratedAPI<T>(generatedAPIClass);
+            return this;
+        }
+        
+        public HollowClient.Builder withMemoryConfig(HollowClientMemoryConfig memoryConfig) {
+            this.memoryConfig = memoryConfig;
+            return this;
+        }
+        
+        public HollowClient build() {
+            if(blobRetriever == null) 
+                throw new IllegalArgumentException("A HollowBlobRetriever must be specified when building a HollowClient");
+            
+            return new HollowClient(blobRetriever, announcementWatcher, updateListener, apiFactory, memoryConfig);
+        }
     }
 
 }
