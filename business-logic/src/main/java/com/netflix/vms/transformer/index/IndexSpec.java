@@ -29,12 +29,16 @@ public enum IndexSpec {
     PERSON_BIO(PRIMARY_KEY, "PersonBio", "personId"),
     MOVIE_CHARACTER_PERSON(PRIMARY_KEY, "MovieCharacterPerson", "movieId"),
 
+    VIDEO_ARTWORK_SOURCE_BY_SOURCE_ID(PRIMARY_KEY, "VideoArtworkSource", "sourceFileId"),
+    PERSON_ARTWORK_SOURCE_BY_SOURCE_ID(PRIMARY_KEY, "PersonArtworkSource", "sourceFileId"),
+    CHARACTER_ARTWORK_SOURCE_BY_SOURCE_ID(PRIMARY_KEY, "CharacterArtworkSource", "sourceFileId"),
+    
     L10N_STORIES_SYNOPSES(PRIMARY_KEY, "StoriesSynopses", "movieId"),
     L10N_MOVIES(PRIMARY_KEY, "Movies", "movieId"),
     L10N_EPISODES(PRIMARY_KEY, "Episodes", "movieId"),
     L10N_LOCALIZEDMETADATA_BY_VIDEO(HASH, "LocalizedMetadata", "", "movieId"),
 
-    ARTWORK_SOURCE_BY_VIDEO_ID(HASH, "VideoArtworkSource", "", "movieId"),
+    VIDEO_ARTWORK_SOURCE_BY_VIDEO_ID(HASH, "VideoArtworkSource", "", "movieId"),
     ARTWORK_DERIVATIVE_SETS(HASH, "IPLDerivativeGroup", "", "externalId.value"),
     SHOW_SEASON_EPISODE(HASH, "ShowSeasonEpisode", "", "movieId"),
     VIDEO_DATE(HASH, "VideoDate", "window.element", "videoId", "window.element.countryCode.value"),

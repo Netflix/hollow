@@ -105,13 +105,13 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             newEpisodeOverlayTypes.add(overlayType);
     }
 
-    protected void transformArtworks(int entityId, String sourceFileId, int ordinalPriority, int seqNum, ArtworkAttributesHollow attributes, IPLDerivativeGroupHollow inputDerivatives, Set<ArtworkLocaleHollow> localeSet, Set<Artwork> artworkSet) {
+    protected void transformArtworks(int entityId, String sourceFileId, int ordinalPriority, int seqNum, ArtworkAttributesHollow attributes, HollowHashIndexResult inputDerivativesMatches, Set<ArtworkLocaleHollow> localeSet, Set<Artwork> artworkSet) {
         unknownArtworkImageTypes.clear();
 
         Artwork artwork = new Artwork();
         
         // Process list of derivatives
-        processDerivativesAndCdnList(entityId, sourceFileId, inputDerivatives, artwork);
+        processCombinedDerivativesAndCdnList(entityId, sourceFileId, inputDerivativesMatches, artwork);
 
         artwork.sourceFileId = new Strings(sourceFileId);
         artwork.seqNum = seqNum;
@@ -187,7 +187,6 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     }
 
     private void buildAndCacheArtworkDerivatives(IPLDerivativeSetHollow derivativeSet, String imageType, ArtWorkImageTypeEntry typeEntry,int inputDerivativeSetOrdinal) {
-        List<ArtworkCdn> cdnList = new ArrayList<>();
         List<ArtworkDerivative> derivativeList = new ArrayList<>();
                 
         for (IPLArtworkDerivativeHollow derivativeHollow : derivativeSet) {
@@ -210,15 +209,21 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
                 outputDerivative.type = derivativeTypeEntry;
                 outputDerivative.recipe = recipeEntry;
                 outputDerivative.recipeDesc = new Strings(recipeDescriptor);
+                outputDerivative.cdnId = java.lang.Integer.parseInt(derivativeHollow._getCdnId()._getValue()); // @TODO: Is it Integer or String
                 
                 outputDerivative = cycleConstants.artworkDerivativeCache.setResult(inputDerivativeOrdinal, outputDerivative);
             } 
             
             derivativeList.add(outputDerivative);
             
-   
+        }
+
+        Collections.sort(derivativeList, ArtworkDerivativesListMerger.DERIVATIVE_COMPARATOR);  /// cannot sort derivatives but not CDNs
+
+        List<ArtworkCdn> cdnList = new ArrayList<>(derivativeList.size());
+        for(ArtworkDerivative derivative : derivativeList) {
             ArtworkCdn cdn = new ArtworkCdn();
-            cdn.cdnId = java.lang.Integer.parseInt(derivativeHollow._getCdnId()._getValue()); // @TODO: Is it Integer or String
+            cdn.cdnId = derivative.cdnId; 
             cdn.cdnDirectory = null; //getCdnDirectory(sourceFileId, derivativeHollow);
    
             ArtworkCdn canonicalCdn = cdnLocationCache.get(cdn);
@@ -230,8 +235,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
    
             cdnList.add(cdn);
         }
-        
-        Collections.sort(derivativeList, ArtworkDerivativesListMerger.DERIVATIVE_COMPARATOR);
+
         ArtworkDerivatives cacheDerivatives = artworkDerivatives(derivativeList);
         
         cacheDerivatives = cycleConstants.artworkDerivativesCache.setResult(inputDerivativeSetOrdinal, cacheDerivatives);

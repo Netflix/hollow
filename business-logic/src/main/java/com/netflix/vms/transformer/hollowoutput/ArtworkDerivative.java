@@ -7,6 +7,7 @@ public class ArtworkDerivative implements Cloneable {
     public ArtWorkImageTypeEntry type = null;
     public ArtWorkImageRecipe recipe = null;
     public Strings recipeDesc = null;
+    public transient int cdnId;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
