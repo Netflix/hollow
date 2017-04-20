@@ -17,10 +17,15 @@
  */
 package com.netflix.hollow.api.client;
 
-import com.netflix.hollow.api.custom.HollowAPI;
-
 import com.netflix.hollow.api.codegen.HollowAPIClassJavaGenerator;
+import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
+import java.lang.reflect.Constructor;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * An interface which can be implemented and passed to a {@link HollowClient} to inject the {@link HollowAPI} creation behavior.
@@ -53,6 +58,41 @@ public interface HollowAPIFactory {
         }
 
     };
+    
+    public static class ForGeneratedAPI<T extends HollowAPI> implements HollowAPIFactory {
 
+        private final Class<T> generatedAPIClass;
+        private final Set<String> cachedTypes;
+        
+        public ForGeneratedAPI(Class<T> generatedAPIClass) {
+            this(generatedAPIClass, new String[0]);
+        }
+        
+        public ForGeneratedAPI(Class<T> generatedAPIClass, String... cachedTypes) {
+            this.generatedAPIClass = generatedAPIClass;
+            this.cachedTypes = new HashSet<String>(Arrays.asList(cachedTypes));
+        }
+
+        
+        @Override
+        public T createAPI(HollowDataAccess dataAccess) {
+            try {
+                Constructor<T> constructor = generatedAPIClass.getConstructor(HollowDataAccess.class, Set.class);
+                return constructor.newInstance(dataAccess, cachedTypes);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public T createAPI(HollowDataAccess dataAccess, HollowAPI previousCycleAPI) {
+            try {
+                Constructor<T> constructor = generatedAPIClass.getConstructor(HollowDataAccess.class, Set.class, Map.class, generatedAPIClass);
+                return constructor.newInstance(dataAccess, cachedTypes, Collections.emptyMap(), previousCycleAPI);
+            } catch(Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 
 }
