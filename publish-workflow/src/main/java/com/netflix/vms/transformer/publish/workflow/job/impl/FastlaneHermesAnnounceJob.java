@@ -3,14 +3,13 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.AnnouncementFailure;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.AnnouncementSuccess;
 
-import java.util.List;
-
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob.PublishType;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
+import java.util.List;
 
 public class FastlaneHermesAnnounceJob extends PublishWorkflowPublicationJob {
 
@@ -53,7 +52,7 @@ public class FastlaneHermesAnnounceJob extends PublishWorkflowPublicationJob {
     private void logResult(boolean success) {
         // These log error codes will be used in dashboard to mark that version as failed.
         // TODO: need to figure out a way to expose this message in Errors tab.
-        String format = "Hollow data announce %s: for version %s for vip %s region %s";
+        String format = "Hollow data announce {}: for version {} for vip {} region {}";
         if(success){
             ctx.getLogger().info(AnnouncementSuccess, format, "success", getCycleVersion(), vip, region);
         } else {
@@ -62,7 +61,7 @@ public class FastlaneHermesAnnounceJob extends PublishWorkflowPublicationJob {
     }
 
     @Override
-	public boolean isEligible() {
+    public boolean isEligible() {
         if(previousAnnounceJobFinished()) {
             if(jobExistsAndCompletedSuccessfully(snapshotPublishJob))
                 return true;
