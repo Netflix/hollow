@@ -15,12 +15,13 @@ import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.io.LZ4VMSInputStream;
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -144,12 +145,13 @@ public class ShowMeTheProgress {
 
     private HollowReadStateEngine roundTripOutputStateEngine(HollowWriteStateEngine stateEngine) throws IOException {
         HollowBlobWriter writer = new HollowBlobWriter(stateEngine);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        writer.writeSnapshot(baos);
+        try (OutputStream os = new BufferedOutputStream(new FileOutputStream(new File(ROOT_DATA_DIR, "actual-output")))) {
+            writer.writeSnapshot(os);
+        }
 
         HollowReadStateEngine actualOutputStateEngine = new HollowReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(actualOutputStateEngine);
-        reader.readSnapshot(new ByteArrayInputStream(baos.toByteArray()));
+        reader.readSnapshot(new BufferedInputStream(new FileInputStream(new File(ROOT_DATA_DIR, "actual-output"))));
         return actualOutputStateEngine;
     }
 
