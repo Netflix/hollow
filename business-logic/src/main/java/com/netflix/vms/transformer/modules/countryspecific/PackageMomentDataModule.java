@@ -84,15 +84,20 @@ public class PackageMomentDataModule {
         if (momentListHollow != null) {
             for (PackageMomentHollow packageMomentHollow : momentListHollow) {
                 String momentType = packageMomentHollow._getMomentType()._getValue();
-                VideoMoment videoMoment = videoMomentModule.createVideoMoment(packageData.id, packageMomentHollow, momentType);
-                videoMoments.add(videoMoment);
+                if (momentType.equals("SnackMoment") && packageMomentHollow._getClipSpecRuntimeMillis() != Long.MIN_VALUE) {
+                    VideoMoment videoMoment = videoMomentModule.createVideoMoment(packageData.id, packageMomentHollow, momentType);
+                    packageMomentData.phoneSnackMoments.add(videoMoment);
+                } else {
+                    VideoMoment videoMoment = videoMomentModule.createVideoMoment(packageData.id, packageMomentHollow, momentType);
+                    videoMoments.add(videoMoment);
 
-                // find and set start and ending moment offsets.
-                long offset = packageMomentHollow._getOffsetMillis();
-                if (momentType.equals("Start") && offset != Long.MIN_VALUE) {
-                    packageMomentData.startMomentOffsetInSeconds = offset / 1000;
-                } else if (momentType.equals("Ending") && offset != Long.MIN_VALUE)
-                    packageMomentData.endMomentOffsetInSeconds = offset / 1000;
+                    // find and set start and ending moment offsets.
+                    long offset = packageMomentHollow._getOffsetMillis();
+                    if (momentType.equals("Start") && offset != Long.MIN_VALUE) {
+                        packageMomentData.startMomentOffsetInSeconds = offset / 1000;
+                    } else if (momentType.equals("Ending") && offset != Long.MIN_VALUE)
+                        packageMomentData.endMomentOffsetInSeconds = offset / 1000;
+                }
             }
         }
         return videoMoments;
