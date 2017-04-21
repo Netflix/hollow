@@ -16,6 +16,7 @@ public class PackageMomentData {
 
     public List<VideoMoment> phoneSnackMoments = new ArrayList<>();
 
+    public Map<Long, VideoMoment> downloadableIdsToVideoMoments = new HashMap<>();
     public Map<VideoMoment, List<ImageDownloadable>> videoMomentToDownloadableListMap = new HashMap<>();
     public Map<TrickPlayType, TrickPlayItem> trickPlayItemMap = new HashMap<>();
     public Map<Strings, List<VideoImage>> stillImagesMap;
