@@ -13,6 +13,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoEpisode;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoNodeType;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
+import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import java.util.Calendar;
 import java.util.Collections;
@@ -171,6 +172,12 @@ public class VideoNamedListModule {
 
             if(isAvailableForED && isAvailableInHDR && isViewable)
                 addToList(VideoNamedListType.ED_HDR_VIDEOS);
+
+            for(VideoSetType setType : video.data.facetData.videoMetaData.videoSetTypes) {
+                if(setType == constants.PRESENT || setType == constants.PAST || setType == constants.FUTURE) {
+                    addToList(VideoNamedListType.VALID_ED_VIDEOS);
+                }
+            }
 
             boolean isOriginal = video.data.facetData.videoMediaData != null && video.data.facetData.videoMediaData.isOriginal;
 
