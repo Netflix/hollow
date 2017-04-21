@@ -59,7 +59,7 @@ public class WindowPackageContractInfoModule {
         this.ctx = ctx;
         this.cycleConstants = cycleConstants;
 
-        this.packageMomentDataModule = new PackageMomentDataModule(api, indexer);
+        this.packageMomentDataModule = new PackageMomentDataModule(api, cycleConstants, indexer);
 
         this.packageIdx = indexer.getPrimaryKeyIndex(IndexSpec.PACKAGES);
         this.deployablePackageIdx = indexer.getPrimaryKeyIndex(IndexSpec.DEPLOYABLE_PACKAGES);
