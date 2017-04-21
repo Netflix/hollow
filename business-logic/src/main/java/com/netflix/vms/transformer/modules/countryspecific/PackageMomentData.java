@@ -20,7 +20,7 @@ public class PackageMomentData {
     public Map<TrickPlayType, TrickPlayItem> trickPlayItemMap = new HashMap<>();
     public Map<Strings, List<VideoImage>> stillImagesMap;
 
-    public long startMomentOffsetInMillis;
-    public long endMomentOffsetInMillis;
+    public long startMomentOffsetInSeconds = -1;
+    public long endMomentOffsetInSeconds = -1;
 
 }

@@ -90,9 +90,9 @@ public class PackageMomentDataModule {
                 // find and set start and ending moment offsets.
                 long offset = packageMomentHollow._getOffsetMillis();
                 if (momentType.equals("Start") && offset != Long.MIN_VALUE) {
-                    packageMomentData.startMomentOffsetInMillis = offset;
+                    packageMomentData.startMomentOffsetInSeconds = offset / 1000;
                 } else if (momentType.equals("Ending") && offset != Long.MIN_VALUE)
-                    packageMomentData.endMomentOffsetInMillis = packageMomentHollow._getOffsetMillis();
+                    packageMomentData.endMomentOffsetInSeconds = offset / 1000;
             }
         }
         return videoMoments;
