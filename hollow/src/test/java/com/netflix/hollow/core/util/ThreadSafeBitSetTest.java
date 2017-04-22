@@ -27,7 +27,7 @@ public class ThreadSafeBitSetTest {
     @Test
     public void testEquality() {
         ThreadSafeBitSet set1 = new ThreadSafeBitSet();
-        ThreadSafeBitSet set2 = new ThreadSafeBitSet();
+        ThreadSafeBitSet set2 = new ThreadSafeBitSet(14, 16385);
 
         set1.set(100);
 
