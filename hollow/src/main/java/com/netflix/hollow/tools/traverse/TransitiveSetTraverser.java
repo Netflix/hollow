@@ -103,7 +103,8 @@ public class TransitiveSetTraverser {
                     if(referencerSchema == referencedSchema)
                         break;
 
-                    traverseReferencesOutsideClosure(stateEngine, referencerSchema.getName(), referencedSchema.getName(), matches, REMOVE_REFERENCED_OUTSIDE_CLOSURE);
+                    if(matches.containsKey(referencedSchema.getName()) && matches.get(referencedSchema.getName()).cardinality() > 0)
+                        traverseReferencesOutsideClosure(stateEngine, referencerSchema.getName(), referencedSchema.getName(), matches, REMOVE_REFERENCED_OUTSIDE_CLOSURE);
                 }
             }
         }
@@ -121,7 +122,7 @@ public class TransitiveSetTraverser {
                 if(referencedSchema == referencerSchema)
                     break;
 
-                if(matches.containsKey(referencedSchema.getName()))
+                if(matches.containsKey(referencedSchema.getName()) && matches.get(referencedSchema.getName()).cardinality() > 0)
                     traverseReferencesOutsideClosure(stateEngine, referencerSchema.getName(), referencedSchema.getName(), matches, ADD_REFERENCING_OUTSIDE_CLOSURE);
             }
         }
@@ -243,9 +244,6 @@ public class TransitiveSetTraverser {
         HollowObjectSchema schema = referencerTypeState.getSchema();
         BitSet referencedClosureMatches = getOrCreateBitSet(closureMatches, referencedType, stateEngine.getTypeState(referencedType).maxOrdinal());
         BitSet referencerClosureMatches = getOrCreateBitSet(closureMatches, schema.getName(), referencerTypeState.maxOrdinal());
-        if(referencerClosureMatches == null)
-            referencerClosureMatches = new BitSet(0);
-
 
         for(int i=0;i<schema.numFields();i++) {
             if(schema.getFieldType(i) == FieldType.REFERENCE && referencedType.equals(schema.getReferencedType(i))) {
@@ -276,8 +274,6 @@ public class TransitiveSetTraverser {
 
         BitSet referencedClosureMatches = getOrCreateBitSet(closureMatches, referencedType, stateEngine.getTypeState(referencedType).maxOrdinal());
         BitSet referencerClosureMatches = getOrCreateBitSet(closureMatches, schema.getName(), referencerTypeState.maxOrdinal());
-        if(referencerClosureMatches == null)
-            referencerClosureMatches = new BitSet(0);
 
         BitSet allReferencerOrdinals = getPopulatedOrdinals(referencerTypeState);
 
@@ -303,8 +299,6 @@ public class TransitiveSetTraverser {
 
         BitSet referencedClosureMatches = getOrCreateBitSet(closureMatches, referencedType, stateEngine.getTypeState(referencedType).maxOrdinal());
         BitSet referencerClosureMatches = getOrCreateBitSet(closureMatches, schema.getName(), referencerTypeState.maxOrdinal());
-        if(referencerClosureMatches == null)
-            referencerClosureMatches = new BitSet(0);
 
         BitSet allReferencerOrdinals = getPopulatedOrdinals(referencerTypeState);
 
