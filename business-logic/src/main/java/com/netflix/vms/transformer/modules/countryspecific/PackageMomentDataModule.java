@@ -97,11 +97,13 @@ public class PackageMomentDataModule {
                     long offset = packageMoment._getOffsetMillis();
                     if (!startOffsetFound && momentType.equals("Start") && offset != Long.MIN_VALUE) {
                         startOffsetFound = true;
-                        data.startMomentOffsetInSeconds = offset / 1000;
+                        if (offset > 0) data.startMomentOffsetInSeconds = offset / 1000;
+                        else data.startMomentOffsetInSeconds = 0L;
                     }
                     if (!endOffsetFound && momentType.equals("Ending") && offset != Long.MIN_VALUE) {
                         endOffsetFound = true;
-                        data.endMomentOffsetInSeconds = offset / 1000;
+                        if (offset > 0) data.endMomentOffsetInSeconds = offset / 1000;
+                        else data.endMomentOffsetInSeconds = 0L;
                     }
 
                     List<DownloadableIdHollow> downloadableIdList = packageMoment._getDownloadableIds();
