@@ -103,6 +103,8 @@
             
                 <li class="toctree-l3"><a href="#insight-tools">Insight Tools</a></li>
                 
+                    <li><a class="toctree-l4" href="#hollow-explorer">Hollow Explorer</a></li>
+                
                     <li><a class="toctree-l4" href="#history-tool">History tool</a></li>
                 
                     <li><a class="toctree-l4" href="#diff-tool">Diff Tool</a></li>
@@ -215,6 +217,24 @@
               
                 <p>This section describes the usage of some of the tooling which ships with Hollow, but the tools described here are by no means a comprehensive accounting of the things you can do with your data once it's Hollow.  We hope that you'll find it straightforward to use the basic building blocks provided by the Hollow framework in different ways to create new tooling — and then contribute back any tools which you develop for your use case and find useful.</p>
 <h1 id="insight-tools">Insight Tools</h1>
+<h2 id="hollow-explorer">Hollow Explorer</h2>
+<p>Hollow ships with a UI which can be used to browse and search records within any dataset.</p>
+<p>The <code>HollowExplorerUI</code> class in the <em>hollow-diff-ui</em> project is instantiated using either a <code>HollowReadStateEngine</code> or a <a href="../producer-consumer/#consumer-framework"><code>HollowClient</code></a> and a base URL path.  Incoming requests should be sent to the handle method:</p>
+<pre><code class="java">public boolean handle(String target, 
+                      HttpServletRequest req, 
+                      HttpServletResponse resp) throws IOException
+</code></pre>
+
+<p>The <code>HollowHistoryUI</code> can be used in the context of an existing web container, or can be invoked via the included <code>HollowHistoryUIServer</code>, which uses the Jetty HTTP Servlet Server:</p>
+<pre><code class="java">HollowClient client = /// your consumer
+
+HollowExplorerUIServer server = new HollowExplorerUIServer(client, 8080);
+
+server.start();
+server.join();
+</code></pre>
+
+<p>While the above code is running, you can point a browser to <em>http://localhost:8080</em> to explore your data.</p>
 <h2 id="history-tool">History tool</h2>
 <p>Hollow provides the ability to retain, in memory, the changes in a dataset over many states, and to easily access historical data.  This is accomplished via the  <code>HollowHistory</code> class:</p>
 <pre><code class="java">public HollowHistory(HollowReadStateEngine initialHollowStateEngine, 

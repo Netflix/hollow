@@ -275,13 +275,14 @@ writeEngine.restoreFrom(readEngine);
 <li>At initialization time, they will load a snapshot, which is an entire copy of the dataset to be forklifted into memory.</li>
 <li>After initialization time, they will keep their local copy of the dataset current by applying delta transitions, which are the differences between adjacent data states.</li>
 </ul>
-<p>The <code>HollowClient</code> encapsulates the details of initializing and keeping a dataset up to date.  In order to accomplish this task, a few infrastructure hooks must be injected:</p>
-<pre><code class="java">public HollowClient(HollowBlobRetriever blobRetriever,
-                    HollowAnnouncementWatcher announcementWatcher,
-                    HollowUpdateListener updateListener,
-                    HollowAPIFactory apiFactory,
-                    HollowObjectHashCodeFinder hashCodeFinder,
-                    HollowClientMemoryConfig memoryConfig)
+<p>The <code>HollowClient</code> encapsulates the details of initializing and keeping a dataset up to date.  In order to accomplish this task, a few infrastructure hooks should be injected:</p>
+<pre><code class="java">new HollowClient.Builder()
+    .withBlobRetriever(blobRetriever)
+    .withAnnouncementWatcher(announcementWatcher)
+    .withUpdateListener(updateListener)
+    .withGeneratedAPIClass(MyGeneratedAPI.class)
+    .withMemoryConfig(memoryConfig)
+    .build();
 </code></pre>
 
 <p>Let's examine each the injected hooks to the <code>HollowClient</code>:</p>
@@ -293,6 +294,7 @@ writeEngine.restoreFrom(readEngine);
 <li><code>HollowClientMemoryConfig</code>: Defines advanced settings related to object longevity and double snapshots.</li>
 </ul>
 <p>Each time the identifier of the currently announced state changes, <code>triggerRefresh()</code> should be called on the <code>HollowClient</code>.  This will bring the data up to date.</p>
+<p>In general, the only requirement for getting Hollow consumers to work with your specific infrastructure is to implement a <code>HollowBlobRetriever</code> and <code>HollowAnnouncementWatcher</code>, and use them with a <code>HollowClient</code>.</p>
 <h2 id="pinning-consumers">Pinning Consumers</h2>
 <p>Mistakes happen.  What's important is that we can recover from them quickly.  If you accidentally publish bad data, you should be able to revert those changes quickly.  If you give your <code>HollowAnnouncementWatcher</code> implementation an alternate location to read the announcement from, which <em>overrides</em> the announcement from the consumer, then you can use this to quickly force clients to go back to any arbitrary state in the past.  We call setting a state version in this alternate location <em>pinning</em> the consumers.</p>
 <p>Implementing a pinning mechanism is extremely useful and highly recommended.  You can operationally reverse data issues immediately upon discovery, so that symptoms go away while you diagnose exactly what went wrong.  This can save an enormous amount of stress and money.</p>
