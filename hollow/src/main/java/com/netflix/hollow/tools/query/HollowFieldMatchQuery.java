@@ -17,7 +17,6 @@
  */
 package com.netflix.hollow.tools.query;
 
-import com.netflix.hollow.core.memory.ThreadSafeBitSet;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
@@ -25,12 +24,9 @@ import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
-import com.netflix.hollow.core.util.SimultaneousExecutor;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class HollowFieldMatchQuery {
     
@@ -126,135 +122,6 @@ public class HollowFieldMatchQuery {
                 typeQueryMatches.set(ordinal);
             ordinal = populatedOrdinals.nextSetBit(ordinal+1);
         }
-        return typeQueryMatches;
-    }
-
-    public Map<String, ThreadSafeBitSet> findMatchingRecords(String fieldName, String fieldValue, SimultaneousExecutor executor) {
-        Map<String, ThreadSafeBitSet> matches = new HashMap<String, ThreadSafeBitSet>();
-        
-        try {
-            for(HollowTypeReadState typeState : readEngine.getTypeStates()) {
-                
-                if(typeState.getSchema().getSchemaType() == SchemaType.OBJECT) {
-                    HollowObjectSchema schema = (HollowObjectSchema)typeState.getSchema();
-                    
-                    for(int i=0;i<schema.numFields();i++) {
-                        if(schema.getFieldName(i).equals(fieldName)) {
-                            HollowObjectTypeReadState objState = (HollowObjectTypeReadState)typeState;
-                            
-                            ThreadSafeBitSet typeQueryMatches = null;
-                            
-                            if(schema.getFieldType(i) == FieldType.REFERENCE) {
-                                typeQueryMatches = attemptReferenceTraversalQuery(objState, i, fieldValue, executor);
-                            } else {
-                                Object queryValue = castQueryValue(fieldValue, schema.getFieldType(i));
-                                
-                                if(queryValue != null) {
-                                    typeQueryMatches = queryBasedOnValueMatches(objState, i, queryValue, executor);
-                                }
-                            }
-                            
-                            if(typeQueryMatches != null && typeQueryMatches.cardinality() > 0)
-                                matches.put(typeState.getSchema().getName(), typeQueryMatches);
-                        }
-                    }
-                }
-            }
-        } catch(Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        return matches;
-    }
-    
-    private ThreadSafeBitSet attemptReferenceTraversalQuery(HollowObjectTypeReadState typeState, int fieldIdx, String fieldValue, SimultaneousExecutor executor) throws InterruptedException, ExecutionException {
-        HollowTypeReadState referencedTypeState = typeState.getSchema().getReferencedTypeState(fieldIdx);
-        
-        if(referencedTypeState.getSchema().getSchemaType() == SchemaType.OBJECT) {
-            HollowObjectTypeReadState refObjTypeState = (HollowObjectTypeReadState)referencedTypeState;
-            HollowObjectSchema refSchema = refObjTypeState.getSchema();
-            
-            if(refSchema.numFields() == 1) {
-                if(refSchema.getFieldType(0) == FieldType.REFERENCE) {
-                    ThreadSafeBitSet refQueryMatches = attemptReferenceTraversalQuery(refObjTypeState, 0, fieldValue, executor);
-                    if(refQueryMatches != null)
-                        return queryBasedOnMatchedReferences(typeState, fieldIdx, refQueryMatches, executor);
-                } else {
-                    Object queryValue = castQueryValue(fieldValue, refSchema.getFieldType(0));
-                    
-                    if(queryValue != null) {
-                        ThreadSafeBitSet refQueryMatches = queryBasedOnValueMatches(refObjTypeState, 0, queryValue, executor);
-                        if(refQueryMatches.cardinality() > 0)
-                            return queryBasedOnMatchedReferences(typeState, fieldIdx, refQueryMatches, executor);
-                    }
-                }
-            }
-        }
-        
-        return null;
-    }
-    
-    private ThreadSafeBitSet queryBasedOnMatchedReferences(final HollowObjectTypeReadState typeState, final int referenceFieldPosition, final ThreadSafeBitSet matchedReferences, SimultaneousExecutor executor) throws InterruptedException, ExecutionException {
-        final BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
-        final ThreadSafeBitSet typeQueryMatches = new ThreadSafeBitSet(14, populatedOrdinals.length());
-      
-        final AtomicInteger atomicOrdinal = new AtomicInteger(0);
-        final int bitSetLength = populatedOrdinals.length();
-        
-        for(int i=0;i<executor.getCorePoolSize();i++) {
-            executor.execute(new Runnable() {
-                public void run() {
-                    int ordinal = atomicOrdinal.getAndAdd(256);
-                    int endChunkOrdinal = ordinal + 256;
-                    while(ordinal < bitSetLength) {
-                        ordinal = populatedOrdinals.nextSetBit(ordinal);
-                        while(ordinal < endChunkOrdinal && ordinal != -1) {
-                            int refOrdinal = typeState.readOrdinal(ordinal, referenceFieldPosition);
-                            if(refOrdinal != -1 && matchedReferences.get(refOrdinal))
-                                typeQueryMatches.set(ordinal);
-                            ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
-                        }
-                        ordinal = atomicOrdinal.getAndAdd(256);
-                        endChunkOrdinal = ordinal + 256;
-                    }
-                    
-                }
-            });
-        }
-        
-        executor.awaitSuccessfulCompletionOfCurrentTasks();
-        
-        return typeQueryMatches;
-    }
-    
-    private ThreadSafeBitSet queryBasedOnValueMatches(final HollowObjectTypeReadState typeState, final int fieldPosition, final Object queryValue, SimultaneousExecutor executor) throws InterruptedException, ExecutionException {
-        final BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
-        final ThreadSafeBitSet typeQueryMatches = new ThreadSafeBitSet(14, populatedOrdinals.length());
-
-        final AtomicInteger atomicOrdinal = new AtomicInteger(0);
-        final int bitSetLength = populatedOrdinals.length();
-
-        for(int i=0;i<executor.getCorePoolSize();i++) {
-            executor.execute(new Runnable() {
-                public void run() {
-                    int ordinal = atomicOrdinal.getAndAdd(256);
-                    int endChunkOrdinal = ordinal + 256;
-                    while(ordinal < bitSetLength) {
-                        ordinal = populatedOrdinals.nextSetBit(ordinal);
-                        while(ordinal < endChunkOrdinal && ordinal != -1) {
-                            if(HollowReadFieldUtils.fieldValueEquals(typeState, ordinal, fieldPosition, queryValue))
-                                typeQueryMatches.set(ordinal);
-                            ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
-                        }
-                        ordinal = atomicOrdinal.getAndAdd(256);
-                        endChunkOrdinal = ordinal + 256;
-                    }
-                }
-            });
-        }
-
-        executor.awaitSuccessfulCompletionOfCurrentTasks();
-
         return typeQueryMatches;
     }
 
