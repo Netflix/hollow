@@ -18,13 +18,13 @@
 package com.netflix.hollow.history.ui.pages;
 
 import com.google.gson.Gson;
-import com.netflix.hollow.diff.ui.HollowDiffSession;
 import com.netflix.hollow.history.ui.HollowHistoryUI;
 import com.netflix.hollow.history.ui.model.HistoryStateTypeChanges;
 import com.netflix.hollow.history.ui.model.RecordDiff;
 import com.netflix.hollow.history.ui.model.RecordDiffTreeNode;
 import com.netflix.hollow.history.ui.naming.HollowHistoryRecordNamer;
 import com.netflix.hollow.tools.history.HollowHistoricalState;
+import com.netflix.hollow.ui.HollowUISession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class HistoryStateTypePage extends HistoryPage {
     }
 
     @Override
-    protected void setUpContext(HttpServletRequest req, HollowDiffSession session, VelocityContext ctx) {
+    protected void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx) {
         long version = Long.parseLong(req.getParameter("version"));
         HistoryStateTypeChanges typeChange = getStateTypeChanges(req, session, ui);
         HollowHistoricalState historicalState = ui.getHistory().getHistoricalState(version);
@@ -59,7 +59,7 @@ public class HistoryStateTypePage extends HistoryPage {
         ctx.put("groupByOptions", groupByOptions);
     }
     
-    public void sendJson(HttpServletRequest request, HollowDiffSession session, HttpServletResponse response) {
+    public void sendJson(HttpServletRequest request, HollowUISession session, HttpServletResponse response) {
     	long version = Long.parseLong(request.getParameter("version"));
     	HistoryStateTypeChanges typeChange = getStateTypeChanges(request, session, ui);
     	HollowHistoricalState historicalState = ui.getHistory().getHistoricalState(version);
@@ -160,7 +160,7 @@ public class HistoryStateTypePage extends HistoryPage {
     	
     }
     
-    public static HistoryStateTypeChanges getStateTypeChanges(HttpServletRequest req, HollowDiffSession session, HollowHistoryUI ui) {
+    public static HistoryStateTypeChanges getStateTypeChanges(HttpServletRequest req, HollowUISession session, HollowHistoryUI ui) {
         HistoryStateTypeChanges typeChanges = (HistoryStateTypeChanges) session.getAttribute(STATE_TYPE_CHANGES_SESSION_ATTRIBUTE_NAME);
         long version = Long.parseLong(req.getParameter("version"));
         String type = req.getParameter("type");

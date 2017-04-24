@@ -18,12 +18,12 @@
 package com.netflix.hollow.history.ui.pages;
 
 import com.google.gson.Gson;
-import com.netflix.hollow.diff.ui.HollowDiffSession;
 import com.netflix.hollow.history.ui.HollowHistoryUI;
 import com.netflix.hollow.history.ui.VersionTimestampConverter;
 import com.netflix.hollow.history.ui.model.HistoryOverviewRow;
 import com.netflix.hollow.tools.history.HollowHistoricalState;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateTypeKeyOrdinalMapping;
+import com.netflix.hollow.ui.HollowUISession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class HistoryOverviewPage extends HistoryPage {
     }
 
     @Override
-    protected void setUpContext(HttpServletRequest req, HollowDiffSession session, VelocityContext ctx) {
+    protected void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx) {
         List<HistoryOverviewRow> rows = getHistoryOverview();
         
         ctx.put("overviewDisplayHeaders", ui.getOverviewDisplayHeaders());

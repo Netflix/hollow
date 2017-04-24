@@ -17,7 +17,6 @@
  */
 package com.netflix.hollow.history.ui.pages;
 
-import com.netflix.hollow.diff.ui.HollowDiffSession;
 import com.netflix.hollow.diffview.HollowDiffHtmlKickstarter;
 import com.netflix.hollow.diffview.HollowObjectView;
 import com.netflix.hollow.history.ui.HollowHistoryUI;
@@ -26,6 +25,7 @@ import com.netflix.hollow.history.ui.model.HistoricalObjectChangeVersion;
 import com.netflix.hollow.tools.history.HollowHistoricalState;
 import com.netflix.hollow.tools.history.HollowHistory;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateTypeKeyOrdinalMapping;
+import com.netflix.hollow.ui.HollowUISession;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -38,7 +38,7 @@ public class HistoricalObjectDiffPage extends HistoryPage {
     }
 
     @Override
-    protected void setUpContext(HttpServletRequest req, HollowDiffSession session, VelocityContext ctx) {
+    protected void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx) {
         long version = Long.parseLong(req.getParameter("version"));
         String type = req.getParameter("type");
         int keyOrdinal = Integer.parseInt(req.getParameter("keyOrdinal"));

@@ -17,10 +17,10 @@
  */
 package com.netflix.hollow.diffview;
 
-import com.netflix.hollow.diff.ui.HollowDiffSession;
 import com.netflix.hollow.history.ui.HollowHistoryUI;
 import com.netflix.hollow.tools.history.HollowHistoricalState;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateTypeKeyOrdinalMapping;
+import com.netflix.hollow.ui.HollowUISession;
 import javax.servlet.http.HttpServletRequest;
 
 public class HollowHistoryViewProvider implements HollowObjectViewProvider {
@@ -32,7 +32,7 @@ public class HollowHistoryViewProvider implements HollowObjectViewProvider {
     }
 
     @Override
-    public HollowHistoryView getObjectView(HttpServletRequest req, HollowDiffSession session) {
+    public HollowHistoryView getObjectView(HttpServletRequest req, HollowUISession session) {
         long version = Long.parseLong(req.getParameter("version"));
         String type = req.getParameter("type");
         int keyOrdinal = Integer.parseInt(req.getParameter("keyOrdinal"));
@@ -41,8 +41,8 @@ public class HollowHistoryViewProvider implements HollowObjectViewProvider {
         return objectView;
     }
 
-    private HollowHistoryView getObjectView(HollowDiffSession session, long version, String type, int keyOrdinal) {
-        HollowHistoryView objectView = (HollowHistoryView) session.getObjectView();
+    private HollowHistoryView getObjectView(HollowUISession session, long version, String type, int keyOrdinal) {
+        HollowHistoryView objectView = (HollowHistoryView) session.getAttribute("hollow-history-view");
 
         if(objectView != null
                 && objectView.getHistoricalVersion() == version
@@ -59,7 +59,7 @@ public class HollowHistoryViewProvider implements HollowObjectViewProvider {
         HollowDiffViewRow rootRow = new HollowObjectDiffViewGenerator(historicalState.getDataAccess(), historicalState.getDataAccess(), historyUI, type, fromOrdinal, toOrdinal).getHollowDiffViewRows();
         objectView = new HollowHistoryView(version, type, keyOrdinal, rootRow, historyUI.getExactRecordMatcher());
         objectView.resetView();
-        session.setObjectView(objectView);
+        session.setAttribute("hollow-history-view", objectView);
 
         return objectView;
     }

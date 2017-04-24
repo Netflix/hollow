@@ -17,7 +17,7 @@
  */
 package com.netflix.hollow.diff.ui;
 
-import static com.netflix.hollow.diff.ui.HollowDiffSession.getSession;
+import static com.netflix.hollow.ui.HollowUISession.getSession;
 
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.diff.ui.pages.DiffFieldPage;

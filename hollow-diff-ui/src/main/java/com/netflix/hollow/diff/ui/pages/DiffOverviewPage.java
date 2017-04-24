@@ -17,10 +17,10 @@
  */
 package com.netflix.hollow.diff.ui.pages;
 
-import com.netflix.hollow.diff.ui.HollowDiffSession;
 import com.netflix.hollow.diff.ui.HollowDiffUI;
 import com.netflix.hollow.diff.ui.model.HollowDiffOverviewTypeEntry;
 import com.netflix.hollow.tools.diff.HollowTypeDiff;
+import com.netflix.hollow.ui.HollowUISession;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,7 +35,7 @@ public class DiffOverviewPage extends DiffPage {
     }
 
     @Override
-    protected void setUpContext(HttpServletRequest req, HollowDiffSession session, VelocityContext ctx) {
+    protected void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx) {
         String sortBy = param(req, session, "overview", "sortBy", "diffs");
 
         ctx.put("typeOverviewEntries", getTypeEntries(sortBy));

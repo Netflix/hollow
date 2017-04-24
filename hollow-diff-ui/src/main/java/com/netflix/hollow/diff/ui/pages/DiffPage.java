@@ -17,11 +17,11 @@
  */
 package com.netflix.hollow.diff.ui.pages;
 
-import com.netflix.hollow.diff.ui.HollowDiffSession;
 import com.netflix.hollow.diff.ui.HollowDiffUI;
 import com.netflix.hollow.diff.ui.model.HollowHeaderEntry;
 import com.netflix.hollow.tools.diff.HollowDiff;
 import com.netflix.hollow.tools.diff.HollowTypeDiff;
+import com.netflix.hollow.ui.HollowUISession;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -50,7 +50,7 @@ public abstract class DiffPage {
         this.footerTemplate = diffUI.getVelocity().getTemplate("diff-footer.vm");
     }
 
-    public void render(HttpServletRequest req, HollowDiffSession session, Writer writer) {
+    public void render(HttpServletRequest req, HollowUISession session, Writer writer) {
         processCookies(req);
 
         VelocityContext ctx = new VelocityContext();
@@ -89,21 +89,21 @@ public abstract class DiffPage {
         }
     }
 
-    protected abstract void setUpContext(HttpServletRequest req, HollowDiffSession session, VelocityContext ctx);
+    protected abstract void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx);
 
     protected HollowDiff getDiff() {
         return diffUI.getDiff();
     }
 
-    protected int intParam(HttpServletRequest req, HollowDiffSession session, String ctx, String paramName, int defaultValue) {
+    protected int intParam(HttpServletRequest req, HollowUISession session, String ctx, String paramName, int defaultValue) {
         return Integer.parseInt(param(req, session, ctx, paramName, String.valueOf(defaultValue)));
     }
 
-    protected boolean boolParam(HttpServletRequest req, HollowDiffSession session, String ctx, String paramName, boolean defaultValue) {
+    protected boolean boolParam(HttpServletRequest req, HollowUISession session, String ctx, String paramName, boolean defaultValue) {
         return Boolean.parseBoolean(param(req, session, ctx, paramName, String.valueOf(defaultValue)));
     }
 
-    protected String param(HttpServletRequest req, HollowDiffSession session, String ctx, String paramName, String defaultValue) {
+    protected String param(HttpServletRequest req, HollowUISession session, String ctx, String paramName, String defaultValue) {
         String sessionParamName = ctx + "_" + paramName;
         String reqParam = req.getParameter(paramName);
 

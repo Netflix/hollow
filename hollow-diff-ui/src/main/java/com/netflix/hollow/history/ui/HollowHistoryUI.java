@@ -17,8 +17,7 @@
  */
 package com.netflix.hollow.history.ui;
 
-import static com.netflix.hollow.diff.ui.HollowDiffSession.getSession;
-
+import static com.netflix.hollow.ui.HollowUISession.getSession;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.diffview.DiffViewOutputGenerator;
 import com.netflix.hollow.diffview.HollowHistoryViewProvider;

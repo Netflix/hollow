@@ -15,9 +15,8 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.diff.ui;
+package com.netflix.hollow.ui;
 
-import com.netflix.hollow.diffview.HollowObjectView;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
@@ -27,15 +26,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Response;
 
-public class HollowDiffSession {
+public class HollowUISession {
 
     private static final long SESSION_ABANDONMENT_MILLIS = 60 * 60 * 1000;
 
     private final Map<String, Object> sessionParams;
-    private HollowObjectView currentObjectView;
     private long lastAccessed;
 
-    public HollowDiffSession() {
+    public HollowUISession() {
         this.sessionParams = new ConcurrentHashMap<String, Object>();
     }
 
@@ -47,21 +45,13 @@ public class HollowDiffSession {
         return sessionParams.get(param);
     }
 
-    public void setObjectView(HollowObjectView view) {
-        this.currentObjectView = view;
-    }
-
-    public HollowObjectView getObjectView() {
-        return currentObjectView;
-    }
-
     public void updateLastAccessed() {
         lastAccessed = System.currentTimeMillis();
     }
 
-    private static final ConcurrentHashMap<Long, HollowDiffSession> sessions = new ConcurrentHashMap<Long, HollowDiffSession>();
+    private static final ConcurrentHashMap<Long, HollowUISession> sessions = new ConcurrentHashMap<Long, HollowUISession>();
 
-    public static HollowDiffSession getSession(HttpServletRequest req, HttpServletResponse resp) {
+    public static HollowUISession getSession(HttpServletRequest req, HttpServletResponse resp) {
         Long sessionId = null;
 
         if(req.getCookies() != null) {
@@ -79,10 +69,10 @@ public class HollowDiffSession {
             resp.addCookie(cookie);
         }
 
-        HollowDiffSession session = sessions.get(sessionId);
+        HollowUISession session = sessions.get(sessionId);
         if(session == null) {
-            session = new HollowDiffSession();
-            HollowDiffSession existingSession = sessions.putIfAbsent(sessionId, session);
+            session = new HollowUISession();
+            HollowUISession existingSession = sessions.putIfAbsent(sessionId, session);
             if(existingSession != null)
                 session = existingSession;
         }
@@ -93,9 +83,9 @@ public class HollowDiffSession {
     static {
         Thread sessionCleanupThread = new Thread(new Runnable() {
             public void run() {
-                Iterator<Map.Entry<Long, HollowDiffSession>> iter = sessions.entrySet().iterator();
+                Iterator<Map.Entry<Long, HollowUISession>> iter = sessions.entrySet().iterator();
                 while(iter.hasNext()) {
-                    Map.Entry<Long, HollowDiffSession> entry = iter.next();
+                    Map.Entry<Long, HollowUISession> entry = iter.next();
                     if(entry.getValue().lastAccessed + SESSION_ABANDONMENT_MILLIS < System.currentTimeMillis())
                         iter.remove();
                 }

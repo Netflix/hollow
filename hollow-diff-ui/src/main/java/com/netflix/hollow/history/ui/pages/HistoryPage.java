@@ -17,10 +17,10 @@
  */
 package com.netflix.hollow.history.ui.pages;
 
-import com.netflix.hollow.diff.ui.HollowDiffSession;
 import com.netflix.hollow.diff.ui.model.HollowHeaderEntry;
 import com.netflix.hollow.history.ui.HollowHistoryUI;
 import com.netflix.hollow.tools.history.HollowHistoricalState;
+import com.netflix.hollow.ui.HollowUISession;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -45,7 +45,7 @@ public abstract class HistoryPage {
         this.footerTemplate = ui.getVelocityEngine().getTemplate("history-footer.vm");
     }
 
-    public void render(HttpServletRequest req, HollowDiffSession session, Writer writer) {
+    public void render(HttpServletRequest req, HollowUISession session, Writer writer) {
         VelocityContext ctx = new VelocityContext();
 
         ctx.put("showHomeLink", !(this instanceof HistoryOverviewPage));
@@ -60,7 +60,7 @@ public abstract class HistoryPage {
             footerTemplate.merge(ctx, writer);
     }
 
-    protected abstract void setUpContext(HttpServletRequest req, HollowDiffSession session, VelocityContext ctx);
+    protected abstract void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx);
 
     protected List<HollowHeaderEntry> getHeaderEntries(HollowHistoricalState state) {
         Map<String, String> fromTags = state.getHeaderEntries();
