@@ -17,11 +17,11 @@
  */
 package com.netflix.hollow.explorer.ui;
 
-import com.netflix.hollow.explorer.ui.pages.BrowseSchemaPage;
-
 import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.explorer.ui.pages.BrowseSchemaPage;
 import com.netflix.hollow.explorer.ui.pages.BrowseSelectedTypePage;
+import com.netflix.hollow.explorer.ui.pages.QueryPage;
 import com.netflix.hollow.explorer.ui.pages.ShowAllTypesPage;
 import com.netflix.hollow.ui.HollowUIRouter;
 import com.netflix.hollow.ui.HollowUISession;
@@ -39,6 +39,7 @@ public class HollowExplorerUI extends HollowUIRouter {
     private final ShowAllTypesPage showAllTypesPage;
     private final BrowseSelectedTypePage browseTypePage;
     private final BrowseSchemaPage browseSchemaPage;
+    private final QueryPage queryPage;
     
     public HollowExplorerUI(String baseUrlPath, HollowClient client) {
         this(baseUrlPath, client, null);
@@ -56,6 +57,7 @@ public class HollowExplorerUI extends HollowUIRouter {
         this.showAllTypesPage = new ShowAllTypesPage(this);
         this.browseTypePage = new BrowseSelectedTypePage(this);
         this.browseSchemaPage = new BrowseSchemaPage(this);
+        this.queryPage = new QueryPage(this);
     }
 
     public boolean handle(String target, HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -72,6 +74,9 @@ public class HollowExplorerUI extends HollowUIRouter {
             return true;
         } else if("schema".equals(pageName)) {
             browseSchemaPage.render(req, session, resp.getWriter());
+            return true;
+        } else if("query".equals(pageName)) {
+            queryPage.render(req, session, resp.getWriter());
             return true;
         }
         

@@ -40,35 +40,47 @@ public class HollowFieldMatchQuery {
         Map<String, BitSet> matches = new HashMap<String, BitSet>();
         
         for(HollowTypeReadState typeState : readEngine.getTypeStates()) {
-            
-            if(typeState.getSchema().getSchemaType() == SchemaType.OBJECT) {
-                HollowObjectSchema schema = (HollowObjectSchema)typeState.getSchema();
-                
-                for(int i=0;i<schema.numFields();i++) {
-                    if(schema.getFieldName(i).equals(fieldName)) {
-                        HollowObjectTypeReadState objState = (HollowObjectTypeReadState)typeState;
-                        
-                        BitSet typeQueryMatches = null;
-                        
-                        if(schema.getFieldType(i) == FieldType.REFERENCE) {
-                            typeQueryMatches = attemptReferenceTraversalQuery(objState, i, fieldValue);
-                        } else {
-                            Object queryValue = castQueryValue(fieldValue, schema.getFieldType(i));
-                            
-                            if(queryValue != null) {
-                                typeQueryMatches = queryBasedOnValueMatches(objState, i, queryValue);
-                            }
-                        }
-                        
-                        if(typeQueryMatches != null && typeQueryMatches.cardinality() > 0)
-                            matches.put(typeState.getSchema().getName(), typeQueryMatches);
-                    }
-                }
-            }
-            
+            augmentMatchingRecords(typeState, fieldName, fieldValue, matches);
         }
 
         return matches;
+    }
+    
+    public Map<String, BitSet> findMatchingRecords(String typeName, String fieldName, String fieldValue) {
+        Map<String, BitSet> matches = new HashMap<String, BitSet>();
+
+        HollowTypeReadState typeState = readEngine.getTypeState(typeName);
+        if(typeState != null)
+            augmentMatchingRecords(typeState, fieldName, fieldValue, matches);
+        
+        return matches;
+    }
+
+    private void augmentMatchingRecords(HollowTypeReadState typeState, String fieldName, String fieldValue, Map<String, BitSet> matches) {
+        if(typeState.getSchema().getSchemaType() == SchemaType.OBJECT) {
+            HollowObjectSchema schema = (HollowObjectSchema)typeState.getSchema();
+            
+            for(int i=0;i<schema.numFields();i++) {
+                if(schema.getFieldName(i).equals(fieldName)) {
+                    HollowObjectTypeReadState objState = (HollowObjectTypeReadState)typeState;
+                    
+                    BitSet typeQueryMatches = null;
+                    
+                    if(schema.getFieldType(i) == FieldType.REFERENCE) {
+                        typeQueryMatches = attemptReferenceTraversalQuery(objState, i, fieldValue);
+                    } else {
+                        Object queryValue = castQueryValue(fieldValue, schema.getFieldType(i));
+                        
+                        if(queryValue != null) {
+                            typeQueryMatches = queryBasedOnValueMatches(objState, i, queryValue);
+                        }
+                    }
+                    
+                    if(typeQueryMatches != null && typeQueryMatches.cardinality() > 0)
+                        matches.put(typeState.getSchema().getName(), typeQueryMatches);
+                }
+            }
+        }
     }
     
     private BitSet attemptReferenceTraversalQuery(HollowObjectTypeReadState typeState, int fieldIdx, String fieldValue) {

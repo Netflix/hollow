@@ -14,6 +14,11 @@
  *     limitations under the License.
 *#
 
+
+#if($filteredByQuery)
+NOTE: Results are filtered by query <span style="font-family: monospace;">$filteredByQuery</span>.  <a href="$basePath/type?type=$type&key=$key&ordinal=$ordinal&display=$display&clearQuery=true">clear</a>
+#end
+
 <!-- navigation -->
 <table>
 	<tr>

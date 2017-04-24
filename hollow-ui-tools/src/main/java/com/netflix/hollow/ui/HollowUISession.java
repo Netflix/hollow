@@ -37,6 +37,10 @@ public class HollowUISession {
         this.sessionParams = new ConcurrentHashMap<String, Object>();
     }
 
+    public void clearAttribute(String param) {
+        sessionParams.remove(param);
+    }
+    
     public void setAttribute(String param, Object value) {
         sessionParams.put(param, value);
     }

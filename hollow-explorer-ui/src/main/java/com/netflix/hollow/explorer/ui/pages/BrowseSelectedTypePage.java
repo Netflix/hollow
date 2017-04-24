@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.explorer.ui.pages;
 
+import com.netflix.hollow.explorer.ui.model.QueryResult;
+
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
@@ -45,7 +47,6 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
 
     @Override
     protected void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx) {
-        
         HollowTypeReadState typeState = ui.getStateEngine().getTypeState(req.getParameter("type"));
         
         HollowPrimaryKeyIndex idx = findPrimaryKeyIndex(typeState);
@@ -56,11 +57,23 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
         
         String displayFormat = "json".equals(req.getParameter("display")) ? "json" : "text";
         
-        BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
-        int currentOrdinal = populatedOrdinals.nextSetBit(0);
+        BitSet selectedOrdinals = typeState.getPopulatedOrdinals();
+
+        if("true".equals(req.getParameter("clearQuery")))
+            session.clearAttribute("query-result");
+
+        if(session.getAttribute("query-result") != null) {
+            QueryResult queryResult = (QueryResult) session.getAttribute("query-result");
+            selectedOrdinals = queryResult.getQueryMatches().get(typeState.getSchema().getName());
+            if(selectedOrdinals == null)
+                selectedOrdinals = new BitSet();
+            
+            ctx.put("filteredByQuery", queryResult.getQueryDisplayString());
+        }
         
+        int currentOrdinal = selectedOrdinals.nextSetBit(0);
         for(int i=0;i<startRec;i++) {
-            currentOrdinal = populatedOrdinals.nextSetBit(currentOrdinal+1);
+            currentOrdinal = selectedOrdinals.nextSetBit(currentOrdinal+1);
         }
         
         PrimaryKey primaryKey = getPrimaryKey(typeState.getSchema());
@@ -70,7 +83,7 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
         
         for(int i=0;i<pageSize && currentOrdinal != -1;i++) {
             keys.add(getKey(startRec + i, typeState, currentOrdinal, fieldPathIndexes));
-            currentOrdinal = populatedOrdinals.nextSetBit(currentOrdinal+1);
+            currentOrdinal = selectedOrdinals.nextSetBit(currentOrdinal+1);
         }
 
         
@@ -88,7 +101,7 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
             if(fieldPathIndexes != null)
                 key = getKey(-1, typeState, ordinal, fieldPathIndexes).getKey();
         } else if(!"".equals(key)) {
-            if(ordinal != -1 && populatedOrdinals.get(ordinal) && recordKeyEquals(typeState, ordinal, parsedKey, fieldPathIndexes)) {
+            if(ordinal != -1 && selectedOrdinals.get(ordinal) && recordKeyEquals(typeState, ordinal, parsedKey, fieldPathIndexes)) {
                 displayRecord(ctx, displayFormat, typeState, ordinal);
             } else {
                 if(idx != null) {
@@ -99,20 +112,20 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
                         ctx.put("selectedRecordData", "ERROR: Key " + key + " was not found!");
                 } else {
                     /// scan through all records
-                    ordinal = populatedOrdinals.nextSetBit(0);
+                    ordinal = selectedOrdinals.nextSetBit(0);
                     while(ordinal != -1) {
                         if(recordKeyEquals(typeState, ordinal, parsedKey, fieldPathIndexes)) {
                             displayRecord(ctx, displayFormat, typeState, ordinal);
                             break;
                         }
                         
-                        ordinal = populatedOrdinals.nextSetBit(ordinal+1);
+                        ordinal = selectedOrdinals.nextSetBit(ordinal+1);
                     }
                 }
             }
         }
         
-        int numRecords = populatedOrdinals.cardinality();
+        int numRecords = selectedOrdinals.cardinality();
 
         ctx.put("keys", keys);
         ctx.put("page", page);
