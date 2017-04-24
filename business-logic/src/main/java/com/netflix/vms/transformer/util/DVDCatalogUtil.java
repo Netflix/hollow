@@ -10,7 +10,7 @@ public class DVDCatalogUtil {
     /**
      * Determine whether a video / country is in DVD catalog
      */
-    public static boolean inDVDCatalog(VMSHollowInputAPI api, HollowHashIndex videoTypeCountryIndex, long videoId, String countryCode) {
+    public static boolean isVideoInDVDCatalog(VMSHollowInputAPI api, HollowHashIndex videoTypeCountryIndex, long videoId, String countryCode) {
         HollowHashIndexResult queryResult = videoTypeCountryIndex.findMatches(videoId, countryCode);
 
         int ordinal = queryResult.iterator().next();

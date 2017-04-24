@@ -351,7 +351,7 @@ public class CountrySpecificDataModule {
         Long firstPhaseStartDate = getFirstPhaseStartDate(videoId, countryCode);
 
         Set<VideoSetType> videoSetTypes = VideoSetTypeUtil.computeSetTypes(videoId, countryCode, api, ctx, constants, indexer);
-        boolean inDVDCatalog = DVDCatalogUtil.inDVDCatalog(api, videoTypeCountryIndex, videoId, countryCode);
+        boolean inDVDCatalog = DVDCatalogUtil.isVideoInDVDCatalog(api, videoTypeCountryIndex, videoId, countryCode);
         data.metadataAvailabilityDate = SensitiveVideoServerSideUtil.getMetadataAvailabilityDate(inDVDCatalog, videoSetTypes, firstDisplayDate, firstPhaseStartDate,
                 availabilityDate, prePromoDays, metadataReleaseDays, constants, earliestPhaseDate);
         data.isSensitiveMetaData = SensitiveVideoServerSideUtil.isSensitiveMetaData(data.metadataAvailabilityDate, ctx);

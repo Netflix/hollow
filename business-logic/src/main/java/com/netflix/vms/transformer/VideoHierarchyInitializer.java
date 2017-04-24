@@ -167,7 +167,7 @@ public class VideoHierarchyInitializer {
         if(isGoLiveOrHasFirstDisplayDate(videoId, countryCode))
             return true;
 
-        if (DVDCatalogUtil.inDVDCatalog(api, videoTypeCountryIndex, videoId, countryCode))
+        if (DVDCatalogUtil.isVideoInDVDCatalog(api, videoTypeCountryIndex, videoId, countryCode))
             return true;
 
         if (hasCurrentOrFutureRollout(videoId, "DISPLAY_PAGE", countryCode))
