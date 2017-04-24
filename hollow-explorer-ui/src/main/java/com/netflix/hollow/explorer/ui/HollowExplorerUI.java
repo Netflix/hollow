@@ -17,12 +17,14 @@
  */
 package com.netflix.hollow.explorer.ui;
 
-import com.netflix.hollow.api.client.HollowClient;
+import com.netflix.hollow.explorer.ui.pages.BrowseSchemaPage;
 
-import com.netflix.hollow.explorer.ui.pages.BrowseSelectedTypePage;
+import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.explorer.ui.pages.BrowseSelectedTypePage;
 import com.netflix.hollow.explorer.ui.pages.ShowAllTypesPage;
 import com.netflix.hollow.ui.HollowUIRouter;
+import com.netflix.hollow.ui.HollowUISession;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,6 +38,7 @@ public class HollowExplorerUI extends HollowUIRouter {
     
     private final ShowAllTypesPage showAllTypesPage;
     private final BrowseSelectedTypePage browseTypePage;
+    private final BrowseSchemaPage browseSchemaPage;
     
     public HollowExplorerUI(String baseUrlPath, HollowClient client) {
         this(baseUrlPath, client, null);
@@ -52,17 +55,23 @@ public class HollowExplorerUI extends HollowUIRouter {
         
         this.showAllTypesPage = new ShowAllTypesPage(this);
         this.browseTypePage = new BrowseSelectedTypePage(this);
+        this.browseSchemaPage = new BrowseSchemaPage(this);
     }
 
     public boolean handle(String target, HttpServletRequest req, HttpServletResponse resp) throws IOException {
         
         String pageName = getTargetRootPath(target);
         
+        HollowUISession session = HollowUISession.getSession(req, resp);
+        
         if("".equals(pageName) || "home".equals(pageName)) {
-            showAllTypesPage.render(req, resp.getWriter());
+            showAllTypesPage.render(req, session, resp.getWriter());
             return true;
         } else if("type".equals(pageName)) {
-            browseTypePage.render(req, resp.getWriter());
+            browseTypePage.render(req, session, resp.getWriter());
+            return true;
+        } else if("schema".equals(pageName)) {
+            browseSchemaPage.render(req, session, resp.getWriter());
             return true;
         }
         

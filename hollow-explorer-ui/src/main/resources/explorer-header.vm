@@ -27,12 +27,13 @@
 			#if($headerDisplayString)
 				<td class="nav">[ $headerDisplayString ]</td>
 			#end
-			#if($type)
-				<td class="nav">[ Type: <a href="$basePath/type?type=$type">$type</a> ]</td>
-			#end
 			#if($stateVersion)
 				<td class="nav">[ State Version: $stateVersion ]</td>
 			#end			
+			#if($type)
+				<td class="nav">[ Type: <span style="font-family: monospace;">$type</span> ]</td>
+				<td class="nav">[ <a href="$basePath/type?type=$type">Browse Data</a> | <a href="$basePath/schema?type=$type">Browse Schema</a> ]</td>
+			#end
 		</tr>
 	</table>
 	<hr/>

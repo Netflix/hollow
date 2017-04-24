@@ -24,6 +24,7 @@ import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 import com.netflix.hollow.explorer.ui.HollowExplorerUI;
 import com.netflix.hollow.explorer.ui.model.TypeOverview;
+import com.netflix.hollow.ui.HollowUISession;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,7 +39,7 @@ public class ShowAllTypesPage extends HollowExplorerPage {
     }
 
     @Override
-    protected void setUpContext(HttpServletRequest req, VelocityContext ctx) {
+    protected void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx) {
         
         String sort = req.getParameter("sort") == null ? "primaryKey" : req.getParameter("sort");
         

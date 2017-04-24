@@ -17,20 +17,20 @@
  */
 package com.netflix.hollow.explorer.ui.pages;
 
-import com.netflix.hollow.tools.stringifier.HollowRecordJsonStringifier;
-
-import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
-import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.explorer.ui.model.TypeKey;
-import com.netflix.hollow.core.read.HollowReadFieldUtils;
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.read.HollowReadFieldUtils;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
+import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 import com.netflix.hollow.explorer.ui.HollowExplorerUI;
+import com.netflix.hollow.explorer.ui.model.TypeKey;
+import com.netflix.hollow.tools.stringifier.HollowRecordJsonStringifier;
+import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
+import com.netflix.hollow.ui.HollowUISession;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -44,7 +44,7 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
     }
 
     @Override
-    protected void setUpContext(HttpServletRequest req, VelocityContext ctx) {
+    protected void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx) {
         
         HollowTypeReadState typeState = ui.getStateEngine().getTypeState(req.getParameter("type"));
         
