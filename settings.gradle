@@ -1,6 +1,8 @@
 rootProject.name = 'hollow-root'
 
 include 'hollow'
+include 'hollow-ui-tools'
 include 'hollow-diff-ui'
+include 'hollow-explorer-ui'
 include 'hollow-jsonadapter'
 include 'hollow-zenoadapter'

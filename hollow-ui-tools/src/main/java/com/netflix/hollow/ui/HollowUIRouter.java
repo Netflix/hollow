@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.diff.ui;
+package com.netflix.hollow.ui;
 
 import java.io.InputStream;
 import javax.servlet.http.HttpServletRequest;

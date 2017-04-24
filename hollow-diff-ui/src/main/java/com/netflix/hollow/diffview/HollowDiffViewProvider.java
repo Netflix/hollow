@@ -17,8 +17,8 @@
  */
 package com.netflix.hollow.diffview;
 
-import com.netflix.hollow.diff.ui.HollowDiffSession;
 import com.netflix.hollow.diff.ui.HollowDiffUI;
+import com.netflix.hollow.ui.HollowUISession;
 import javax.servlet.http.HttpServletRequest;
 
 public class HollowDiffViewProvider implements HollowObjectViewProvider {
@@ -30,7 +30,7 @@ public class HollowDiffViewProvider implements HollowObjectViewProvider {
     }
 
     @Override
-    public HollowDiffView getObjectView(HttpServletRequest req, HollowDiffSession session) {
+    public HollowDiffView getObjectView(HttpServletRequest req, HollowUISession session) {
         String type = req.getParameter("type");
         int fromOrdinal = Integer.parseInt(req.getParameter("fromOrdinal"));
         int toOrdinal = Integer.parseInt(req.getParameter("toOrdinal"));
@@ -39,8 +39,8 @@ public class HollowDiffViewProvider implements HollowObjectViewProvider {
         return objectView;
     }
 
-    private HollowDiffView getObjectView(HollowDiffSession session, String type, int fromOrdinal, int toOrdinal) {
-        HollowDiffView objectView = (HollowDiffView) session.getObjectView();
+    private HollowDiffView getObjectView(HollowUISession session, String type, int fromOrdinal, int toOrdinal) {
+        HollowDiffView objectView = (HollowDiffView) session.getAttribute("hollow-diff-view");
 
         if(objectView != null
                 && objectView.getType().equals(type)
@@ -52,7 +52,7 @@ public class HollowDiffViewProvider implements HollowObjectViewProvider {
         HollowDiffViewRow rootRow = new HollowObjectDiffViewGenerator(diffUI.getDiff().getFromStateEngine(), diffUI.getDiff().getToStateEngine(), diffUI, type, fromOrdinal, toOrdinal).getHollowDiffViewRows();
         objectView = new HollowDiffView(type, fromOrdinal, toOrdinal, rootRow, diffUI.getExactRecordMatcher());
         objectView.resetView();
-        session.setObjectView(objectView);
+        session.setAttribute("hollow-diff-view", objectView);
 
         return objectView;
     }

@@ -18,13 +18,13 @@
 package com.netflix.hollow.history.ui.pages;
 
 import com.netflix.hollow.core.util.IntList;
-import com.netflix.hollow.diff.ui.HollowDiffSession;
 import com.netflix.hollow.history.ui.HollowHistoryUI;
 import com.netflix.hollow.history.ui.VersionTimestampConverter;
 import com.netflix.hollow.history.ui.model.HistoryStateQueryMatches;
 import com.netflix.hollow.tools.history.HollowHistoricalState;
 import com.netflix.hollow.tools.history.HollowHistory;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoryTypeKeyIndex;
+import com.netflix.hollow.ui.HollowUISession;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +39,7 @@ public class HistoryQueryPage extends HistoryPage {
     }
 
     @Override
-    protected void setUpContext(HttpServletRequest req, HollowDiffSession session, VelocityContext ctx) {
+    protected void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx) {
         HollowHistory history = ui.getHistory();
 
         String query = req.getParameter("query");

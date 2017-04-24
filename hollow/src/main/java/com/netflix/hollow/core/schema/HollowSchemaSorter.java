@@ -74,7 +74,13 @@ public class HollowSchemaSorter {
         }
 
         public boolean hasMoreTypes() {
-            return !dependencyIndex.isEmpty();
+            for(Map.Entry<String, Set<String>> entry : dependencyIndex.entrySet()) {
+                if(entry.getValue().isEmpty()) {
+                    return true;
+                }
+            }
+            
+            return false;
         }
 
         public String getNextType() {

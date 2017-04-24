@@ -43,15 +43,22 @@ public class ThreadSafeBitSet {
     }
 
     public ThreadSafeBitSet(int log2SegmentSizeInBits) {
+        this(log2SegmentSizeInBits, 0);
+    }
+    
+    public ThreadSafeBitSet(int log2SegmentSizeInBits, int numBitsToPreallocate) {
         if(log2SegmentSizeInBits < 6)
             throw new IllegalArgumentException("Cannot specify fewer than 64 bits in each segment!");
 
         this.log2SegmentSize = log2SegmentSizeInBits;
         this.numLongsPerSegment = (1 << (log2SegmentSizeInBits - 6));
         this.segmentMask = numLongsPerSegment - 1;
+        
+        long numBitsPerSegment = numLongsPerSegment * 64;
+        int numSegmentsToPreallocate = numBitsToPreallocate == 0 ? 1 : (int)(((numBitsToPreallocate - 1) / numBitsPerSegment) + 1);
 
         segments = new AtomicReference<ThreadSafeBitSetSegments>();
-        segments.set(new ThreadSafeBitSetSegments(1, numLongsPerSegment));
+        segments.set(new ThreadSafeBitSetSegments(numSegmentsToPreallocate, numLongsPerSegment));
     }
 
     public void set(int position) {

@@ -17,10 +17,11 @@
  */
 package com.netflix.hollow.diffview;
 
-import com.netflix.hollow.diff.ui.HollowDiffSession;
+import com.netflix.hollow.ui.HollowUISession;
+
 import javax.servlet.http.HttpServletRequest;
 
 public interface HollowObjectViewProvider {
 
-    public HollowObjectView getObjectView(HttpServletRequest req, HollowDiffSession session);
+    public HollowObjectView getObjectView(HttpServletRequest req, HollowUISession session);
 }

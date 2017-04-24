@@ -17,10 +17,8 @@
  */
 package com.netflix.hollow.history.ui;
 
-import static com.netflix.hollow.diff.ui.HollowDiffSession.getSession;
-
+import static com.netflix.hollow.ui.HollowUISession.getSession;
 import com.netflix.hollow.core.index.key.PrimaryKey;
-import com.netflix.hollow.diff.ui.HollowUIRouter;
 import com.netflix.hollow.diffview.DiffViewOutputGenerator;
 import com.netflix.hollow.diffview.HollowHistoryViewProvider;
 import com.netflix.hollow.diffview.HollowObjectViewProvider;
@@ -36,6 +34,7 @@ import com.netflix.hollow.history.ui.pages.HistoryStatePage;
 import com.netflix.hollow.history.ui.pages.HistoryStateTypeExpandGroupPage;
 import com.netflix.hollow.history.ui.pages.HistoryStateTypePage;
 import com.netflix.hollow.tools.history.HollowHistory;
+import com.netflix.hollow.ui.HollowUIRouter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;

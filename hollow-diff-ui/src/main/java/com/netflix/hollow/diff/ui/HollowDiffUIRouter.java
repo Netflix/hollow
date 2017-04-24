@@ -18,6 +18,7 @@
 package com.netflix.hollow.diff.ui;
 
 import com.netflix.hollow.tools.diff.HollowDiff;
+import com.netflix.hollow.ui.HollowUIRouter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;

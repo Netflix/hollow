@@ -1,0 +1,40 @@
+#**
+ *  Copyright 2017 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+*#
+
+<html>
+<head>
+	<style>
+		.nav { text-align: left; padding-left: 5px; padding-right: 80px; border-left:1px solid #DCDCDC; }
+	</style>
+</head>
+<body>
+	<table>
+		<tr>
+			<td class="nav"><a href="$basePath/home">[ Hollow Data Explorer ]</a></td>
+			#if($headerDisplayString)
+				<td class="nav">[ $headerDisplayString ]</td>
+			#end
+			#if($stateVersion)
+				<td class="nav">[ State Version: $stateVersion ]</td>
+			#end			
+			#if($type)
+				<td class="nav">[ Type: <span style="font-family: monospace;">$type</span> ]</td>
+				<td class="nav">[ <a href="$basePath/type?type=$type">Browse Data</a> | <a href="$basePath/schema?type=$type">Browse Schema</a> ]</td>
+			#end
+			<td class="nav">[ <a href="$basePath/query">QUERY</a> ]</td>
+		</tr>
+	</table>
+	<hr/>

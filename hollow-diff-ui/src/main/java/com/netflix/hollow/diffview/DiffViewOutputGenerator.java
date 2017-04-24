@@ -17,7 +17,7 @@
  */
 package com.netflix.hollow.diffview;
 
-import com.netflix.hollow.diff.ui.HollowDiffSession;
+import com.netflix.hollow.ui.HollowUISession;
 import java.io.IOException;
 import java.io.Writer;
 import javax.servlet.http.HttpServletRequest;
@@ -50,7 +50,7 @@ public class DiffViewOutputGenerator {
     }
     
     private HollowDiffViewRow findRow(HttpServletRequest req, HttpServletResponse resp) {
-        HollowDiffSession session = HollowDiffSession.getSession(req, resp);
+        HollowUISession session = HollowUISession.getSession(req, resp);
         HollowObjectView objectView = viewProvider.getObjectView(req, session);
 
         int rowPath[] = getRowPath(req.getParameter("row"));

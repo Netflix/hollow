@@ -1,0 +1,121 @@
+#**
+ *  Copyright 2017 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+*#
+
+
+#if($filteredByQuery)
+NOTE: Results are filtered by query <span style="font-family: monospace;">$filteredByQuery</span>.  <a href="$basePath/type?type=$type&key=$key&ordinal=$ordinal&display=$display&clearQuery=true">clear</a>
+#end
+
+<!-- navigation -->
+<table>
+	<tr>
+		<td class="nav">SIZE: $numRecords</td>
+		<td class="nav">PAGE: [$page / $numPages] </td>
+		<td class="nav"> 
+			#if($page != 0)
+				#set($prevPage = $page - 1)
+				<a href="$basePath/type?type=$type&key=$key&ordinal=$ordinal&display=$display&page=$prevPage&pageSize=$pageSize">PREV</a>
+			#end
+			#set($lastPage = $numPages - 1)
+			#if($page != 0 && $page < $lastPage) 
+				-
+			#end
+			#if($page < $lastPage) 
+				#set($nextPage = $page + 1)
+				<a href="$basePath/type?type=$type&key=$key&ordinal=$ordinal&display=$display&page=$nextPage&pageSize=$pageSize">NEXT</a>
+			#end
+		</td>
+		#if($selectedRecordData)
+			<td class="nav">
+				FORMAT: 
+				<a href="$basePath/type?type=$type&key=$key&ordinal=$ordinal&page=$page&pageSize=$pageSize&display=text">text</a> 
+				-
+				<a href="$basePath/type?type=$type&key=$key&ordinal=$ordinal&page=$page&pageSize=$pageSize&display=json">json</a> 
+				 
+			</td>
+		#end
+	</tr>
+</table>
+
+<table border=0 width=100%>
+	<tr valign=top>
+		<td width=5%>
+
+			<!-- Record keys --> 
+
+			<table border="1">
+				<tr>
+					<th>#</th>
+					<th>Key[DownloadableId]</th>
+				</tr>
+				
+				#foreach($key in $keys)
+					<tr>
+						<td>$key.getIdx()</td>
+						<td nowrap><a href="$basePath/type?type=$type&page=$page&pageSize=$pageSize&display=$display&ordinal=$key.getOrdinal()&key=$key.getKey()">$key.getKeyDisplay()</a></td>
+					</tr>
+				#end
+			</table>
+			
+		</td>
+		<td>
+		
+			<!-- Record Display -->
+			
+			<table border=1 cellpadding=5 cellspacing=1 width=100%>
+				<tr valign=top>
+					<th align=right nowrap>Find Key: </th>
+					<td>
+						<form id="fRec" method="get">
+							<input type="hidden" name="type" value="$type">
+							<input type="hidden" name="page" value="$page">
+							<input type="hidden" name="pageSize" value="$pageSize">
+							<input type="hidden" name="display" value="$display">
+							<input type="hidden" name="ordinal" value="$ordinal">
+							<input type="text" name="key" value="$key" size="120">
+							<input type="submit" value="Match">
+						</form>
+					</td>
+				</tr>
+				#if($selectedRecordData)
+					<tr valign=top>
+						<th align=right nowrap>Showing Record: </th>
+						<td id="recLink">
+							ordinal: $ordinal
+							#if($key && !$key.isEmpty())
+								<br/>key: $key
+							#end
+						</td>
+					</tr>
+				#end
+				<tr valign=top>
+					<th align=right nowrap>
+						Record Data: 
+					</th>
+					<td>
+						<div style="min-height:400px">
+							#if($selectedRecordData)
+								<pre>
+$selectedRecordData
+								</pre>
+							#end
+						</div>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>

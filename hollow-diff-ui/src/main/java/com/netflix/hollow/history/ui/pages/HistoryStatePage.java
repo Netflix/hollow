@@ -18,12 +18,12 @@
 package com.netflix.hollow.history.ui.pages;
 
 import com.google.gson.Gson;
-import com.netflix.hollow.diff.ui.HollowDiffSession;
 import com.netflix.hollow.diff.ui.model.HollowHeaderEntry;
 import com.netflix.hollow.history.ui.HollowHistoryUI;
 import com.netflix.hollow.history.ui.model.HistoryStateTypeChangeSummary;
 import com.netflix.hollow.tools.history.HollowHistoricalState;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateTypeKeyOrdinalMapping;
+import com.netflix.hollow.ui.HollowUISession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class HistoryStatePage extends HistoryPage {
     }
 
     @Override
-    protected void setUpContext(HttpServletRequest req, HollowDiffSession session, VelocityContext ctx) {
+    protected void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx) {
         HollowHistoricalState historicalState = ui.getHistory().getHistoricalState(Long.parseLong(req.getParameter("version")));
         
         long nextStateVersion = getNextStateVersion(historicalState);

@@ -17,12 +17,11 @@
  */
 package com.netflix.hollow.diff.ui.jetty;
 
-import com.netflix.hollow.diff.ui.jetty.HollowDiffUIServer.UIServer;
 import com.netflix.hollow.ui.jetty.AbstractOptionalDependencyHelper;
 
 final class OptionalDependencyHelper extends AbstractOptionalDependencyHelper {
-    UIServer.Factory uiServerFactory() {
-        return (UIServer.Factory)newFactory(
+    HollowDiffUIServer.UIServer.Factory uiServerFactory() {
+        return (HollowDiffUIServer.UIServer.Factory)newFactory(
                 "com.netflix.hollow.diff.ui.jetty.JettyBasedUIServer$Factory",
                 "org.eclipse.jetty.server.Server",
                 "please add jetty-server (org.eclipse.jetty:jetty-server) to your dependencies");

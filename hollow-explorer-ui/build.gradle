@@ -1,0 +1,24 @@
+apply plugin: 'java'
+
+sourceSets {
+    tools {
+        compileClasspath += main.output
+        runtimeClasspath += main.output
+    }
+}
+ 
+dependencies {
+    compile project(':hollow')
+    compile project(':hollow-ui-tools')
+
+    compileOnly 'org.eclipse.jetty:jetty-server:9.4.3.v20170317'
+
+    testCompile 'junit:junit:4.11'
+
+    toolsCompile configurations.compile
+    toolsRuntime configurations.runtime
+}
+
+configurations {
+    toolsCompile.extendsFrom compile
+}
