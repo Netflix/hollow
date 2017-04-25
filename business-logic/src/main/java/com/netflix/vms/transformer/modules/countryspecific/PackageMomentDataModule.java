@@ -64,7 +64,7 @@ public class PackageMomentDataModule {
         if(moments != null) {
             boolean startFound = false;
             boolean endFound = false;
-            
+
             for(PackageMomentHollow packageMoment : inputPackage._getMoments()) {
                 String momentType = packageMoment._getMomentType()._getValue();
 
@@ -121,7 +121,7 @@ public class PackageMomentDataModule {
             originServerNames.add(new Strings(deployment._getOriginServer()._getValue()));
         }
     }
-    
+
     private Map<Integer, TrickPlayType> getTrickPlayTypeMap() {
         Map<Integer, TrickPlayType> map = new HashMap<Integer, TrickPlayType>();
 

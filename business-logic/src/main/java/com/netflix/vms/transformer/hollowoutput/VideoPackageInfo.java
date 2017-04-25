@@ -48,7 +48,7 @@ public class VideoPackageInfo implements Cloneable {
         int hashCode = 1;
         hashCode = hashCode * 31 + packageId;
         hashCode = hashCode * 31 + (formats == null ? 1237 : formats.hashCode());
-        hashCode = hashCode * 31 + (isAvailableIn3D? 1231 : 1237);
+        hashCode = hashCode * 31 + (isAvailableIn3D ? 1231 : 1237);
         hashCode = hashCode * 31 + runtimeInSeconds;
         hashCode = hashCode * 31 + (soundTypes == null ? 1237 : soundTypes.hashCode());
         hashCode = hashCode * 31 + (screenFormats == null ? 1237 : screenFormats.hashCode());

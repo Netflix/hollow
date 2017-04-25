@@ -8,7 +8,7 @@ import java.util.Map;
 public class PackageMomentData {
 
     public Map<TrickPlayType, TrickPlayItem> trickPlayItemMap = new HashMap<TrickPlayType, TrickPlayItem>();
-    
+
     public long startMomentOffsetInMillis;
     public long endMomentOffsetInMillis;
 

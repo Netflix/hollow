@@ -66,7 +66,7 @@ dependencies {
     compile project(':vmstransformer-business-logic')
     compile project(':vmstransformer-publish-workflow')
     compile 'com.netflix.vms.logging:vmslogging-slf4j:latest.release'
-    compile 'netflix:vms-hollow-generated-notemplate:56.1075'
+    compile 'netflix:vms-hollow-generated-notemplate:56.1076'
     
     // httpclient
     compile 'org.apache.httpcomponents:httpclient:4.3.4'

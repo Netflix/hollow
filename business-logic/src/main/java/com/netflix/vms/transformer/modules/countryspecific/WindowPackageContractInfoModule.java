@@ -45,7 +45,7 @@ public class WindowPackageContractInfoModule {
     private final HollowPrimaryKeyIndex deployablePackageIdx;
     private final HollowPrimaryKeyIndex streamProfileIdx;
     private final HollowPrimaryKeyIndex videoGeneralIdx;
-    
+
     private final PackageMomentDataModule packageMomentDataModule;
 
     private final Map<Integer, Strings> soundTypesMap;
@@ -178,7 +178,7 @@ public class WindowPackageContractInfoModule {
                 hdrProfileIds.add(Integer.valueOf((int)id._getValue()));
             }
         }
-        
+
         ordinal = primaryKeyIndex.getMatchingOrdinal("4K");
         if(ordinal != -1) {
             StreamProfileGroupsHollow group = api.getStreamProfileGroupsHollow(ordinal);
