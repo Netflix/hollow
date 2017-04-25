@@ -835,7 +835,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -4242,7 +4242,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -7649,7 +7649,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -11056,7 +11056,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -14482,7 +14482,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -18987,7 +18987,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -22398,7 +22398,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -25258,6 +25258,7 @@
             "locked": "2.8.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
@@ -25816,9 +25817,10 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
@@ -25826,8 +25828,14 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "requested": "2.+"
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "locked": "2.5.0",
+            "transitive": [
+                "com.netflix.hollow:hollow-diff-ui"
+            ]
         },
         "com.netflix.hystrix:hystrix-core": {
             "locked": "1.5.9",
@@ -26517,7 +26525,7 @@
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "commons-httpclient:commons-httpclient",
@@ -26592,7 +26600,7 @@
         "commons-io:commons-io": {
             "locked": "2.5",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -27985,7 +27993,7 @@
         "org.apache.velocity:velocity": {
             "locked": "1.7",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui"
+                "com.netflix.hollow:hollow-ui-tools"
             ]
         },
         "org.apache.zookeeper:zookeeper": {
@@ -28784,6 +28792,7 @@
             "locked": "2.8.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
@@ -29342,9 +29351,10 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
@@ -29352,8 +29362,14 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "requested": "2.+"
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "locked": "2.5.0",
+            "transitive": [
+                "com.netflix.hollow:hollow-diff-ui"
+            ]
         },
         "com.netflix.hystrix:hystrix-core": {
             "locked": "1.5.9",
@@ -30043,7 +30059,7 @@
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "commons-httpclient:commons-httpclient",
@@ -30118,7 +30134,7 @@
         "commons-io:commons-io": {
             "locked": "2.5",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -31511,7 +31527,7 @@
         "org.apache.velocity:velocity": {
             "locked": "1.7",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui"
+                "com.netflix.hollow:hollow-ui-tools"
             ]
         },
         "org.apache.zookeeper:zookeeper": {
@@ -32310,6 +32326,7 @@
             "locked": "2.8.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
@@ -32868,9 +32885,10 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
@@ -32878,8 +32896,14 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "requested": "2.+"
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "locked": "2.5.0",
+            "transitive": [
+                "com.netflix.hollow:hollow-diff-ui"
+            ]
         },
         "com.netflix.hystrix:hystrix-core": {
             "locked": "1.5.9",
@@ -33569,7 +33593,7 @@
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "commons-httpclient:commons-httpclient",
@@ -33644,7 +33668,7 @@
         "commons-io:commons-io": {
             "locked": "2.5",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -35037,7 +35061,7 @@
         "org.apache.velocity:velocity": {
             "locked": "1.7",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui"
+                "com.netflix.hollow:hollow-ui-tools"
             ]
         },
         "org.apache.zookeeper:zookeeper": {
@@ -35836,6 +35860,7 @@
             "locked": "2.8.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
@@ -36394,9 +36419,10 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
@@ -36404,8 +36430,14 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "requested": "2.+"
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "locked": "2.5.0",
+            "transitive": [
+                "com.netflix.hollow:hollow-diff-ui"
+            ]
         },
         "com.netflix.hystrix:hystrix-core": {
             "locked": "1.5.9",
@@ -37095,7 +37127,7 @@
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "commons-httpclient:commons-httpclient",
@@ -37170,7 +37202,7 @@
         "commons-io:commons-io": {
             "locked": "2.5",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -38563,7 +38595,7 @@
         "org.apache.velocity:velocity": {
             "locked": "1.7",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui"
+                "com.netflix.hollow:hollow-ui-tools"
             ]
         },
         "org.apache.zookeeper:zookeeper": {
@@ -39362,6 +39394,7 @@
             "locked": "2.8.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
@@ -39920,9 +39953,10 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
@@ -39930,8 +39964,14 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "requested": "2.+"
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "locked": "2.5.0",
+            "transitive": [
+                "com.netflix.hollow:hollow-diff-ui"
+            ]
         },
         "com.netflix.hystrix:hystrix-core": {
             "locked": "1.5.9",
@@ -40621,7 +40661,7 @@
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "commons-httpclient:commons-httpclient",
@@ -40696,7 +40736,7 @@
         "commons-io:commons-io": {
             "locked": "2.5",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -42089,7 +42129,7 @@
         "org.apache.velocity:velocity": {
             "locked": "1.7",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui"
+                "com.netflix.hollow:hollow-ui-tools"
             ]
         },
         "org.apache.zookeeper:zookeeper": {
@@ -42888,6 +42928,7 @@
             "locked": "2.8.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
@@ -43446,9 +43487,10 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
@@ -43456,8 +43498,14 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "requested": "2.+"
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "locked": "2.5.0",
+            "transitive": [
+                "com.netflix.hollow:hollow-diff-ui"
+            ]
         },
         "com.netflix.hystrix:hystrix-core": {
             "locked": "1.5.9",
@@ -44147,7 +44195,7 @@
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "commons-httpclient:commons-httpclient",
@@ -44222,7 +44270,7 @@
         "commons-io:commons-io": {
             "locked": "2.5",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -45615,7 +45663,7 @@
         "org.apache.velocity:velocity": {
             "locked": "1.7",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui"
+                "com.netflix.hollow:hollow-ui-tools"
             ]
         },
         "org.apache.zookeeper:zookeeper": {
@@ -46414,6 +46462,7 @@
             "locked": "2.8.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
@@ -46972,9 +47021,10 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
@@ -46982,8 +47032,14 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "requested": "2.+"
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "locked": "2.5.0",
+            "transitive": [
+                "com.netflix.hollow:hollow-diff-ui"
+            ]
         },
         "com.netflix.hystrix:hystrix-core": {
             "locked": "1.5.9",
@@ -47673,7 +47729,7 @@
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "commons-httpclient:commons-httpclient",
@@ -47748,7 +47804,7 @@
         "commons-io:commons-io": {
             "locked": "2.5",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -49141,7 +49197,7 @@
         "org.apache.velocity:velocity": {
             "locked": "1.7",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui"
+                "com.netflix.hollow:hollow-ui-tools"
             ]
         },
         "org.apache.zookeeper:zookeeper": {
@@ -49940,6 +49996,7 @@
             "locked": "2.8.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
@@ -50498,9 +50555,10 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
@@ -50508,8 +50566,14 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "requested": "2.+"
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "locked": "2.5.0",
+            "transitive": [
+                "com.netflix.hollow:hollow-diff-ui"
+            ]
         },
         "com.netflix.hystrix:hystrix-core": {
             "locked": "1.5.9",
@@ -51199,7 +51263,7 @@
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "commons-httpclient:commons-httpclient",
@@ -51274,7 +51338,7 @@
         "commons-io:commons-io": {
             "locked": "2.5",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -52667,7 +52731,7 @@
         "org.apache.velocity:velocity": {
             "locked": "1.7",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui"
+                "com.netflix.hollow:hollow-ui-tools"
             ]
         },
         "org.apache.zookeeper:zookeeper": {
