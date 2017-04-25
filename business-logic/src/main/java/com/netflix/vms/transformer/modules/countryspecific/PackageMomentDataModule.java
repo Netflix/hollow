@@ -30,6 +30,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoResolution;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.VideoFormatDescriptorIdentifier;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -63,7 +64,7 @@ public class PackageMomentDataModule {
 
     public PackageMomentData getWindowPackageMomentData(PackageData packageData, PackageHollow inputPackage) {
         PackageMomentData packageMomentData = packageMomentDataByPackageId.get(Integer.valueOf(packageData.id));
-        if(packageMomentData != null)
+        if (packageMomentData != null)
             return packageMomentData;
 
         packageMomentData = buildDownloadableIdsToVideoMomentsMap(packageData, inputPackage);
@@ -80,22 +81,39 @@ public class PackageMomentDataModule {
 
         PackageMomentListHollow moments = inputPackage._getMoments();
 
-        if(moments != null) {
-            for(PackageMomentHollow packageMoment : inputPackage._getMoments()) {
+        boolean startOffsetFound = false;
+        boolean endOffsetFound = false;
+
+        if (moments != null) {
+            for (PackageMomentHollow packageMoment : inputPackage._getMoments()) {
                 String momentType = packageMoment._getMomentType()._getValue();
 
-                if("SnackMoment".equals(momentType) && packageMoment._getClipSpecRuntimeMillis() != Long.MIN_VALUE) {
+                if ("SnackMoment".equals(momentType) && packageMoment._getClipSpecRuntimeMillis() != Long.MIN_VALUE) {
                     VideoMoment videoMoment = videoMomentModule.createVideoMoment(packageData.id, packageMoment, momentType);
                     data.phoneSnackMoments.add(videoMoment);
                 } else {
+
+                    // check for start and end offsets and set them
+                    long offset = packageMoment._getOffsetMillis();
+                    if (!startOffsetFound && momentType.equals("Start") && offset != Long.MIN_VALUE) {
+                        startOffsetFound = true;
+                        if (offset > 0) data.startMomentOffsetInSeconds = offset / 1000;
+                        else if (offset == 0) data.startMomentOffsetInSeconds = 0L;
+                    }
+                    if (!endOffsetFound && momentType.equals("Ending") && offset != Long.MIN_VALUE) {
+                        endOffsetFound = true;
+                        if (offset > 0) data.endMomentOffsetInSeconds = offset / 1000;
+                        else if (offset == 0) data.endMomentOffsetInSeconds = 0L;
+                    }
+
                     List<DownloadableIdHollow> downloadableIdList = packageMoment._getDownloadableIds();
 
-                    if(downloadableIdList != null) {
+                    if (downloadableIdList != null) {
                         VideoMoment videoMoment = videoMomentModule.createVideoMoment(packageData.id, packageMoment, momentType);
 
-                        for(DownloadableIdHollow id : downloadableIdList) {
+                        for (DownloadableIdHollow id : downloadableIdList) {
                             Long downloadableId = id._getValueBoxed();
-                            if(!data.downloadableIdsToVideoMoments.containsKey(downloadableId)) {
+                            if (!data.downloadableIdsToVideoMoments.containsKey(downloadableId)) {
                                 data.downloadableIdsToVideoMoments.put(downloadableId, videoMoment);
                             }
                             //list.add(videoMoment);
@@ -109,14 +127,14 @@ public class PackageMomentDataModule {
 
     private void buildIndexedPackageImageResult(PackageHollow inputPackage, PackageMomentData packageMomentData) {
 
-        for(PackageStreamHollow stream : inputPackage._getDownloadables()) {
+        for (PackageStreamHollow stream : inputPackage._getDownloadables()) {
             long streamProfileId = stream._getStreamProfileId();
             int streamProfileOrdinal = streamProfileIdx.getMatchingOrdinal(streamProfileId);
             StreamProfilesHollow profile = api.getStreamProfilesHollow(streamProfileOrdinal);
             String streamProfileType = profile._getProfileType()._getValue();
 
-            if("MERCHSTILL".equals(streamProfileType)) {
-                if(stream._getNonImageInfo() != null && stream._getNonImageInfo()._getRuntimeSeconds() != Long.MIN_VALUE)
+            if ("MERCHSTILL".equals(streamProfileType)) {
+                if (stream._getNonImageInfo() != null && stream._getNonImageInfo()._getRuntimeSeconds() != Long.MIN_VALUE)
                     continue;
 
                 ImageDownloadable downloadable = new ImageDownloadable();
@@ -131,7 +149,7 @@ public class PackageMomentDataModule {
                 downloadable.descriptor.videoFormat = videoFormatIdentifier.selectVideoFormatDescriptor(stream);
 
                 StreamDimensionsHollow dimensions = stream._getDimensions();
-                if(dimensions != null) {
+                if (dimensions != null) {
                     downloadable.descriptor.videoResolution = new VideoResolution();
                     downloadable.descriptor.targetDimensions = new TargetDimensions();
                     downloadable.descriptor.videoResolution.height = dimensions._getHeightInPixels();
@@ -141,24 +159,24 @@ public class PackageMomentDataModule {
                 }
 
                 VideoMoment moment = packageMomentData.downloadableIdsToVideoMoments.get(stream._getDownloadableId());
-                if(moment != null) {
+                if (moment != null) {
                     ListOfStringHollow modifications = stream._getModifications();
-                    if(modifications != null && !modifications.isEmpty()) {
+                    if (modifications != null && !modifications.isEmpty()) {
                         moment = moment.clone();
                         moment.videoMomentTypeName = buildModifiedVideoMomentTypeName(moment.videoMomentTypeName, modifications);
                     }
 
                     List<ImageDownloadable> list = packageMomentData.videoMomentToDownloadableListMap.get(moment);
-                    if(list == null) {
+                    if (list == null) {
                         list = new ArrayList<ImageDownloadable>();
                         packageMomentData.videoMomentToDownloadableListMap.put(moment, list);
                     }
                     list.add(downloadable);
                 }
-            } else if("TRICKPLAY".equals(streamProfileType)) {
+            } else if ("TRICKPLAY".equals(streamProfileType)) {
                 TrickPlayItem trickplay = new TrickPlayItem();
                 trickplay.imageCount = stream._getImageInfo()._getImageCount();
-                trickplay.videoId = new Video((int)inputPackage._getMovieId());
+                trickplay.videoId = new Video((int) inputPackage._getMovieId());
                 trickplay.trickPlayDownloadable = new TrickPlayDownloadable();
                 trickplay.trickPlayDownloadable.fileName = new Strings(stream._getFileIdentification()._getFilename());
                 trickplay.trickPlayDownloadable.descriptor = new TrickPlayDescriptor();
@@ -166,7 +184,7 @@ public class PackageMomentDataModule {
                 trickplay.trickPlayDownloadable.descriptor.width = stream._getDimensions()._getWidthInPixels();
                 trickplay.trickPlayDownloadable.baseDownloadable = new BaseDownloadable();
                 trickplay.trickPlayDownloadable.baseDownloadable.downloadableId = stream._getDownloadableId();
-                trickplay.trickPlayDownloadable.baseDownloadable.streamProfileId = (int)streamProfileId;
+                trickplay.trickPlayDownloadable.baseDownloadable.streamProfileId = (int) streamProfileId;
                 trickplay.trickPlayDownloadable.baseDownloadable.originServerNames = new ArrayList<Strings>();
 
                 convertCdnDeploymentsAndAddToList(stream, trickplay.trickPlayDownloadable.baseDownloadable.originServerNames);
@@ -184,14 +202,14 @@ public class PackageMomentDataModule {
 
     private Strings buildModifiedVideoMomentTypeName(Strings originalTypeName, ListOfStringHollow modifications) {
         ModifiedVideoMomentTypeNameKey cacheKey = new ModifiedVideoMomentTypeNameKey(originalTypeName, modifications.getOrdinal());
-        
+
         Strings tag = modifiedVideoMomentTypeNameByModificationsOrdinal.get(cacheKey);
-        if(tag != null)
+        if (tag != null)
             return tag;
 
         StringBuilder builder = new StringBuilder(new String(originalTypeName.value).toUpperCase());
 
-        for(StringHollow modification : modifications) {
+        for (StringHollow modification : modifications) {
             builder.append('_');
             builder.append(modification._getValue().toUpperCase());
         }
@@ -200,46 +218,46 @@ public class PackageMomentDataModule {
         modifiedVideoMomentTypeNameByModificationsOrdinal.put(cacheKey, tag);
         return tag;
     }
-    
+
     private class ModifiedVideoMomentTypeNameKey {
         private final Strings videoMomentTypeName;
         private final int modificationsOrdinal;
         private final int hashCode;
-        
+
         public ModifiedVideoMomentTypeNameKey(Strings videoMomentTypeName, int modificationsOrdinal) {
             this.videoMomentTypeName = videoMomentTypeName;
             this.modificationsOrdinal = modificationsOrdinal;
             this.hashCode = videoMomentTypeName.hashCode() * 997 + modificationsOrdinal;
         }
-        
+
         public int hashCode() {
             return hashCode;
         }
-        
+
         public boolean equals(Object other) {
-            if(other instanceof ModifiedVideoMomentTypeNameKey) {
-                return ((ModifiedVideoMomentTypeNameKey) other).modificationsOrdinal == modificationsOrdinal 
+            if (other instanceof ModifiedVideoMomentTypeNameKey) {
+                return ((ModifiedVideoMomentTypeNameKey) other).modificationsOrdinal == modificationsOrdinal
                         && Arrays.equals(((ModifiedVideoMomentTypeNameKey) other).videoMomentTypeName.value, videoMomentTypeName.value);
             }
             return false;
         }
-        
+
     }
 
     private void convertCdnDeploymentsAndAddToList(PackageStreamHollow stream, List<Strings> originServerNames) {
         Set<CdnDeploymentHollow> cdnDeployments = stream._getDeployment()._getDeploymentInfo()._getCdnDeployments();
-        for(CdnDeploymentHollow deployment : cdnDeployments) {
+        for (CdnDeploymentHollow deployment : cdnDeployments) {
             originServerNames.add(new Strings(deployment._getOriginServer()._getValue()));
         }
     }
 
     private void buildStillImagesMap(PackageData packageData, PackageMomentData packageMomentData) {
         packageMomentData.stillImagesMap = new HashMap<Strings, List<VideoImage>>();
-        for(Map.Entry<VideoMoment, List<ImageDownloadable>> entry : packageMomentData.videoMomentToDownloadableListMap.entrySet()) {
+        for (Map.Entry<VideoMoment, List<ImageDownloadable>> entry : packageMomentData.videoMomentToDownloadableListMap.entrySet()) {
             VideoMoment moment = entry.getKey();
 
             List<VideoImage> list = packageMomentData.stillImagesMap.get(moment.videoMomentTypeName);
-            if(list == null) {
+            if (list == null) {
                 list = new ArrayList<VideoImage>();
                 packageMomentData.stillImagesMap.put(moment.videoMomentTypeName, list);
             }
@@ -248,17 +266,17 @@ public class PackageMomentDataModule {
             image.videoId = packageData.video;
             image.videoMoment = moment;
             image.downloadableList = entry.getValue();
-            
+
             Collections.sort(image.downloadableList, IMAGE_DOWNLOADABLE_COMPARATOR);
 
             list.add(image);
         }
-        
-        for(Map.Entry<Strings, List<VideoImage>> entry : packageMomentData.stillImagesMap.entrySet()) {
+
+        for (Map.Entry<Strings, List<VideoImage>> entry : packageMomentData.stillImagesMap.entrySet()) {
             Collections.sort(entry.getValue(), VIDEO_IMAGE_COMPARATOR);
         }
     }
-    
+
     private static final Comparator<ImageDownloadable> IMAGE_DOWNLOADABLE_COMPARATOR = new Comparator<ImageDownloadable>() {
         public int compare(ImageDownloadable o1, ImageDownloadable o2) {
             return Long.compare(o1.downloadableId, o2.downloadableId);
@@ -270,7 +288,7 @@ public class PackageMomentDataModule {
             return Integer.compare(o1.videoMoment.sequenceNumber, o2.videoMoment.sequenceNumber);
         }
     };
-    
+
     private Map<Integer, TrickPlayType> getTrickPlayTypeMap() {
         Map<Integer, TrickPlayType> map = new HashMap<Integer, TrickPlayType>();
 

@@ -3,17 +3,14 @@ package com.netflix.vms.transformer.modules.countryspecific;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.hollowinput.ContractHollow;
 import com.netflix.vms.transformer.hollowinput.DeployablePackagesHollow;
-import com.netflix.vms.transformer.hollowinput.ListOfPackageTagsHollow;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.RightsContractAssetHollow;
 import com.netflix.vms.transformer.hollowinput.RightsContractHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfileGroupsHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfileIdHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
-import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowoutput.ContractRestriction;
@@ -24,12 +21,12 @@ import com.netflix.vms.transformer.hollowoutput.StreamData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoContractInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
-import com.netflix.vms.transformer.hollowoutput.VideoImage;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoResolution;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,13 +45,13 @@ public class WindowPackageContractInfoModule {
     private final HollowPrimaryKeyIndex deployablePackageIdx;
     private final HollowPrimaryKeyIndex streamProfileIdx;
     private final HollowPrimaryKeyIndex videoGeneralIdx;
-    
+
     private final PackageMomentDataModule packageMomentDataModule;
 
     private final Map<Integer, Strings> soundTypesMap;
     private Map<Float, String> screenFormatCache = new HashMap<Float, String>();
     private Set<Integer> fourKProfileIds = new HashSet<>();
-    private Set<Integer> hdrProfileIds= new HashSet<>();
+    private Set<Integer> hdrProfileIds = new HashSet<>();
     private final VideoPackageInfo FILTERED_VIDEO_PACKAGE_INFO;
 
     public WindowPackageContractInfoModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
@@ -95,7 +92,7 @@ public class WindowPackageContractInfoModule {
 
         int deployablePackageOrdinal = deployablePackageIdx.getMatchingOrdinal((long) packageData.id);
         DeployablePackagesHollow deployablePackage = deployablePackageOrdinal == -1 ? null : api.getDeployablePackagesHollow(deployablePackageOrdinal);
-        if(deployablePackage != null) {
+        if (deployablePackage != null) {
             info.videoPackageInfo.isDefaultPackage = deployablePackage._getDefaultPackage();
         }
         Set<com.netflix.vms.transformer.hollowoutput.Long> excludedDownloadables = findRelevantExcludedDownloadables(packageData, country);
@@ -105,36 +102,36 @@ public class WindowPackageContractInfoModule {
 
         long longestRuntimeInSeconds = 0;
 
-        for(StreamData streamData : packageData.streams) {
+        for (StreamData streamData : packageData.streams) {
             int encodingProfileId = streamData.downloadDescriptor.encodingProfileId;
             int streamProfileOrdinal = streamProfileIdx.getMatchingOrdinal((long) encodingProfileId);  /// TODO: Map of encodingProfileID to encoding profile data.
             StreamProfilesHollow profile = api.getStreamProfilesHollow(streamProfileOrdinal);
             String streamProfileType = profile._getProfileType()._getValue();
 
-            if(hdrProfileIds.contains(encodingProfileId)) {
+            if (hdrProfileIds.contains(encodingProfileId)) {
                 info.videoPackageInfo.formats.add(cycleConstants.HDR);
             }
-            if(fourKProfileIds.contains(encodingProfileId)) {
+            if (fourKProfileIds.contains(encodingProfileId)) {
                 info.videoPackageInfo.formats.add(cycleConstants.FOUR_K);
             }
 
-            if("VIDEO".equals(streamProfileType) || "MUXED".equals(streamProfileType)) {
+            if ("VIDEO".equals(streamProfileType) || "MUXED".equals(streamProfileType)) {
                 /// TODO: Why don't MUXED streams contribute to the package info's videoFormatDescriptors?
-                if("VIDEO".equals(streamProfileType)) {
+                if ("VIDEO".equals(streamProfileType)) {
                     /// add the videoFormatDescriptor
                     VideoFormatDescriptor descriptor = streamData.downloadDescriptor.videoFormatDescriptor;
-                    if(descriptor.id == 1 || descriptor.id == 3 || descriptor.id == 4) {  // Only interested in HD or better
+                    if (descriptor.id == 1 || descriptor.id == 3 || descriptor.id == 4) {  // Only interested in HD or better
                         info.videoPackageInfo.formats.add(descriptor);
                     }
                 }
 
-                if(streamData.streamDataDescriptor.runTimeInSeconds > longestRuntimeInSeconds && "VIDEO".equals(streamProfileType))
+                if (streamData.streamDataDescriptor.runTimeInSeconds > longestRuntimeInSeconds && "VIDEO".equals(streamProfileType))
                     longestRuntimeInSeconds = streamData.streamDataDescriptor.runTimeInSeconds;
 
                 PixelAspect pixelAspect = streamData.streamDataDescriptor.pixelAspect;
                 VideoResolution videoResolution = streamData.streamDataDescriptor.videoResolution;
 
-                if(pixelAspect != null && videoResolution != null && videoResolution.height != 0 && videoResolution.width != 0) {
+                if (pixelAspect != null && videoResolution != null && videoResolution.height != 0 && videoResolution.width != 0) {
                     int parHeight = Math.max(pixelAspect.height, 1);
                     int parWidth = Math.max(pixelAspect.width, 1);
 
@@ -142,9 +139,9 @@ public class WindowPackageContractInfoModule {
                     screenFormats.add(getScreenFormat(screenFormat));
                 }
 
-            } else if("AUDIO".equals(streamProfileType)) {
-                if(excludedDownloadables != null && !excludedDownloadables.contains(new com.netflix.vms.transformer.hollowoutput.Long(streamData.downloadableId)))
-                    soundTypesAudioChannels.add(Integer.valueOf((int)profile._getAudioChannelCount()));
+            } else if ("AUDIO".equals(streamProfileType)) {
+                if (excludedDownloadables != null && !excludedDownloadables.contains(new com.netflix.vms.transformer.hollowoutput.Long(streamData.downloadableId)))
+                    soundTypesAudioChannels.add(Integer.valueOf((int) profile._getAudioChannelCount()));
             }
         }
 
@@ -153,18 +150,18 @@ public class WindowPackageContractInfoModule {
         info.videoPackageInfo.stillImagesMap = packageMomentData.stillImagesMap;
         info.videoPackageInfo.phoneSnacks = packageMomentData.phoneSnackMoments;
         info.videoPackageInfo.trickPlayMap = packageMomentData.trickPlayItemMap;
-        info.videoPackageInfo.startMomentOffsetInSeconds = getOffset(VideoMomentModule.START_MOMENT_KEY, packageMomentData.stillImagesMap);
-        info.videoPackageInfo.endMomentOffsetInSeconds = getOffset(VideoMomentModule.END_MOMENT_KEY, packageMomentData.stillImagesMap);
+        info.videoPackageInfo.startMomentOffsetInSeconds = packageMomentData.startMomentOffsetInSeconds;
+        info.videoPackageInfo.endMomentOffsetInSeconds = packageMomentData.endMomentOffsetInSeconds;
 
         info.videoPackageInfo.screenFormats = new ArrayList<Strings>(screenFormats.size());
-        for(String screenFormat : screenFormats) {
+        for (String screenFormat : screenFormats) {
             info.videoPackageInfo.screenFormats.add(new Strings(screenFormat));
         }
 
         info.videoPackageInfo.soundTypes = new ArrayList<Strings>(soundTypesAudioChannels.size());
-        for(Integer soundType : soundTypesAudioChannels) {
-            Strings soundTypeStr= soundTypesMap.get(soundType);
-            if(soundTypeStr != null)
+        for (Integer soundType : soundTypesAudioChannels) {
+            Strings soundTypeStr = soundTypesMap.get(soundType);
+            if (soundTypeStr != null)
                 info.videoPackageInfo.soundTypes.add(soundTypeStr);
         }
 
@@ -173,54 +170,30 @@ public class WindowPackageContractInfoModule {
         return info;
     }
 
-    /**
-     * Get start and end offset in seconds from video moments data.
-     *
-     * @param momentKey
-     * @param stillImageMap
-     * @return value in seconds, if value not available then default value is -1
-     */
-    private long getOffset(Strings momentKey, Map<Strings, List<VideoImage>> stillImageMap) {
-        long offset = -1;
-
-        if (stillImageMap == null || stillImageMap.isEmpty()) return offset;
-        List<VideoImage> videoImages = stillImageMap.get(momentKey);
-        if (videoImages == null || videoImages.isEmpty()) return offset;
-
-        // There is only 1 or 0 Start/End moments for the video, hence looking up the first VideoImage in list.
-        VideoImage videoImage = videoImages.get(0);
-        if (videoImage == null || videoImage.videoMoment == null) return offset;
-
-        Long msOffset = videoImage.videoMoment.msOffset;
-        if (msOffset == null || msOffset.longValue() <= 0) return offset;
-
-        return msOffset.longValue() / 1000;
-    }
-
     private void populateEncodingProfileIdSets(VMSHollowInputAPI api, HollowPrimaryKeyIndex primaryKeyIndex) {
 
         int ordinal = primaryKeyIndex.getMatchingOrdinal("HDR");
-        if(ordinal != -1) {
+        if (ordinal != -1) {
             StreamProfileGroupsHollow group = api.getStreamProfileGroupsHollow(ordinal);
-            List<StreamProfileIdHollow>idList = group._getStreamProfileIds();
-            for(StreamProfileIdHollow id : idList) {
-                hdrProfileIds.add(Integer.valueOf((int)id._getValue()));
+            List<StreamProfileIdHollow> idList = group._getStreamProfileIds();
+            for (StreamProfileIdHollow id : idList) {
+                hdrProfileIds.add(Integer.valueOf((int) id._getValue()));
             }
         }
-        
+
         ordinal = primaryKeyIndex.getMatchingOrdinal("4K");
-        if(ordinal != -1) {
+        if (ordinal != -1) {
             StreamProfileGroupsHollow group = api.getStreamProfileGroupsHollow(ordinal);
-            List<StreamProfileIdHollow>idList = group._getStreamProfileIds();
-            for(StreamProfileIdHollow id : idList) {
-                fourKProfileIds.add(Integer.valueOf((int)id._getValue()));
+            List<StreamProfileIdHollow> idList = group._getStreamProfileIds();
+            for (StreamProfileIdHollow id : idList) {
+                fourKProfileIds.add(Integer.valueOf((int) id._getValue()));
             }
         }
     }
 
     private String getScreenFormat(Float screenFormat) {
         String formatStr = screenFormatCache.get(screenFormat);
-        if(formatStr == null) {
+        if (formatStr == null) {
             formatStr = String.format("%.2f:1", screenFormat);
             screenFormatCache.put(screenFormat, formatStr);
         }
@@ -278,7 +251,7 @@ public class WindowPackageContractInfoModule {
     private Set<com.netflix.vms.transformer.hollowoutput.Long> findRelevantExcludedDownloadables(PackageData packageData, String country) {
         Set<ContractRestriction> countryContractRestrictions = packageData.contractRestrictions.get(cycleConstants.getISOCountry(country));
 
-        if(countryContractRestrictions == null)
+        if (countryContractRestrictions == null)
             return null;
 
         long now = ctx.getNowMillis();
@@ -286,11 +259,11 @@ public class WindowPackageContractInfoModule {
         Set<com.netflix.vms.transformer.hollowoutput.Long> nextExcludedDownloadables = Collections.emptySet();
         long nextStartDate = Long.MAX_VALUE;
 
-        for(ContractRestriction restriction : countryContractRestrictions) {
-            if(now > restriction.availabilityWindow.startDate.val && now < restriction.availabilityWindow.endDate.val) {
+        for (ContractRestriction restriction : countryContractRestrictions) {
+            if (now > restriction.availabilityWindow.startDate.val && now < restriction.availabilityWindow.endDate.val) {
                 return restriction.excludedDownloadables;
-            } else if(now < restriction.availabilityWindow.startDate.val) {
-                if(nextStartDate > restriction.availabilityWindow.startDate.val) {
+            } else if (now < restriction.availabilityWindow.startDate.val) {
+                if (nextStartDate > restriction.availabilityWindow.startDate.val) {
                     nextStartDate = restriction.availabilityWindow.startDate.val;
                     nextExcludedDownloadables = restriction.excludedDownloadables;
                 }
