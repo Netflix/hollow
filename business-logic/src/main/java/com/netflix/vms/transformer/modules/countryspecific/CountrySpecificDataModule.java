@@ -478,9 +478,10 @@ public class CountrySpecificDataModule {
 
     private Integer getMetaDataReleaseDays(long videoId) {
         int ordinal = videoGeneralIdx.getMatchingOrdinal(videoId);
-        VideoGeneralHollow general = api.getVideoGeneralHollow(ordinal);
-        if (general != null)
+        if(ordinal != -1) {
+            VideoGeneralHollow general = api.getVideoGeneralHollow(ordinal);
             return general._getMetadataReleaseDaysBoxed();
+        }
         return null;
     }
 
