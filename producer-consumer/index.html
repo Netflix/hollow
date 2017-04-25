@@ -277,11 +277,11 @@ writeEngine.restoreFrom(readEngine);
 </ul>
 <p>The <code>HollowClient</code> encapsulates the details of initializing and keeping a dataset up to date.  In order to accomplish this task, a few infrastructure hooks should be injected:</p>
 <pre><code class="java">new HollowClient.Builder()
-    .withBlobRetriever(blobRetriever)
-    .withAnnouncementWatcher(announcementWatcher)
-    .withUpdateListener(updateListener)
-    .withGeneratedAPIClass(MyGeneratedAPI.class)
-    .withMemoryConfig(memoryConfig)
+    .withBlobRetriever(blobRetriever)             /// required: a HollowBlobRetriever
+    .withAnnouncementWatcher(announcementWatcher) /// optional: a HollowAnnouncementWatcher
+    .withUpdateListener(updateListener)           /// optional: a HollowUpdateListener
+    .withGeneratedAPIClass(MyGeneratedAPI.class)  /// optional: a generated client API class
+    .withMemoryConfig(memoryConfig)               /// optional: a HollowClientMemoryConfig
     .build();
 </code></pre>
 
@@ -290,11 +290,22 @@ writeEngine.restoreFrom(readEngine);
 <li><code>HollowBlobRetriever</code>: The interface to the blob store.  This is the only hook for which a custom implementation is required.  Each of the other hooks have default implementations which may be used.</li>
 <li><code>HollowAnnouncementWatcher</code>: Provides an interface to the state announcement mechanism.  Often, announcement polling logic is encapsulated inside implementations.</li>
 <li><code>HollowUpdateListener</code>: Provides hooks so that actions may be taken during and after updates (e.g. indexing).</li>
-<li><code>HollowAPIFactory</code>: Allows users to specify a custom-generated Hollow API to use.</li>
+<li><strong>Generated API Class</strong>: Specifies a custom-generated Hollow API to use.</li>
 <li><code>HollowClientMemoryConfig</code>: Defines advanced settings related to object longevity and double snapshots.</li>
 </ul>
 <p>Each time the identifier of the currently announced state changes, <code>triggerRefresh()</code> should be called on the <code>HollowClient</code>.  This will bring the data up to date.</p>
 <p>In general, the only requirement for getting Hollow consumers to work with your specific infrastructure is to implement a <code>HollowBlobRetriever</code> and <code>HollowAnnouncementWatcher</code>, and use them with a <code>HollowClient</code>.</p>
+<div class="admonition hint">
+<p class="admonition-title">Triggering Refresh</p>
+<p>When implementing a <code>HollowAnnouncementWatcher</code>, you will need to implement the method <code>subscribeToEvents()</code>.  In this method, 
+you'll subscribe to your announcement mechanism, and in doing so you'll define what to do when an announcement is updated.<br />
+Most likely, the action you define will:</p>
+<ol>
+<li>Update the value to be returned from <code>getLatestVersion()</code> (e.g. in an instance field)</li>
+<li>call <code>triggerAsyncRefresh()</code></li>
+</ol>
+<p>In this way, your <code>HollowClient</code> injected with this <code>HollowAnnouncementWatcher</code> implementation will be automatically kept up-to-date.</p>
+</div>
 <h2 id="pinning-consumers">Pinning Consumers</h2>
 <p>Mistakes happen.  What's important is that we can recover from them quickly.  If you accidentally publish bad data, you should be able to revert those changes quickly.  If you give your <code>HollowAnnouncementWatcher</code> implementation an alternate location to read the announcement from, which <em>overrides</em> the announcement from the consumer, then you can use this to quickly force clients to go back to any arbitrary state in the past.  We call setting a state version in this alternate location <em>pinning</em> the consumers.</p>
 <p>Implementing a pinning mechanism is extremely useful and highly recommended.  You can operationally reverse data issues immediately upon discovery, so that symptoms go away while you diagnose exactly what went wrong.  This can save an enormous amount of stress and money.</p>

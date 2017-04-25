@@ -219,14 +219,20 @@
 <h1 id="insight-tools">Insight Tools</h1>
 <h2 id="hollow-explorer">Hollow Explorer</h2>
 <p>Hollow ships with a UI which can be used to browse and search records within any dataset.</p>
-<p>The <code>HollowExplorerUI</code> class in the <em>hollow-diff-ui</em> project is instantiated using either a <code>HollowReadStateEngine</code> or a <a href="../producer-consumer/#consumer-framework"><code>HollowClient</code></a> and a base URL path.  Incoming requests should be sent to the handle method:</p>
+<p>The <code>HollowExplorerUI</code> class in the <em>hollow-diff-ui</em> project is instantiated using either a <code>HollowReadStateEngine</code> or a <a href="../producer-consumer/#consumer-framework"><code>HollowClient</code></a> and a base URL path:</p>
+<pre><code class="java">HollowReadStateEngine readEngine = /// or your HollowClient
+
+HollowExplorerUI ui = new HollowExplorerUI(&quot;&quot;, readEngine);
+</code></pre>
+
+<p>Incoming requests should be sent to the <code>handle</code> method in your <code>HollowExplorerUI</code> instance:</p>
 <pre><code class="java">public boolean handle(String target, 
                       HttpServletRequest req, 
                       HttpServletResponse resp) throws IOException
 </code></pre>
 
-<p>The <code>HollowHistoryUI</code> can be used in the context of an existing web container, or can be invoked via the included <code>HollowHistoryUIServer</code>, which uses the Jetty HTTP Servlet Server:</p>
-<pre><code class="java">HollowClient client = /// your consumer
+<p>The <code>HollowExplorerUI</code> can be used in the context of an existing web container, or can be invoked via the included <code>HollowExplorerUIServer</code>, which uses the Jetty HTTP Servlet Server:</p>
+<pre><code class="java">HollowReadStateEngine readEngine = /// or your HollowClient
 
 HollowExplorerUIServer server = new HollowExplorerUIServer(client, 8080);
 
@@ -234,7 +240,12 @@ server.start();
 server.join();
 </code></pre>
 
-<p>While the above code is running, you can point a browser to <em>http://localhost:8080</em> to explore your data.</p>
+<p>The above call to <code>server.join()</code> will block forever.  While the above code is running, you can point a browser to <em>http://localhost:8080</em> to explore your data.</p>
+<div class="admonition warning">
+<p class="admonition-title">Jetty: Optional Dependency</p>
+<p>If using the <code>HollowExplorerUIServer</code>, you'll need to include a dependency on Jetty.  For example, with a Gradle build you may add the dependency: </p>
+<p><code>compile 'org.eclipse.jetty:jetty-server:9.4.3.v20170317'</code></p>
+</div>
 <h2 id="history-tool">History tool</h2>
 <p>Hollow provides the ability to retain, in memory, the changes in a dataset over many states, and to easily access historical data.  This is accomplished via the  <code>HollowHistory</code> class:</p>
 <pre><code class="java">public HollowHistory(HollowReadStateEngine initialHollowStateEngine, 
