@@ -19,7 +19,7 @@ Binaries are available from Maven Central and jcenter.
 
 |GroupID/Org|ArtifactID/Name|Latest Stable Version|
 |-----------|---------------|---------------------|
-|com.netflix.hollow|hollow|2.4.3|
+|com.netflix.hollow|hollow|2.5.0|
 
 In a Maven .pom file:
 
@@ -27,7 +27,7 @@ In a Maven .pom file:
         <dependency>
                 <groupId>com.netflix.hollow</groupId>
                 <artifactId>hollow</artifactId>
-                <version>2.4.3</version>
+                <version>2.5.0</version>
         </dependency>
         ...
 
