@@ -41,6 +41,9 @@ import java.util.TreeSet;
 
 public class WindowPackageContractInfoModule {
 
+	// Alternate implementation where we check for specific stream profile Id
+	//private static final int ATMOS_PROFILE_ID = 58;
+	
     private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
     private final CycleConstants cycleConstants;
@@ -55,6 +58,7 @@ public class WindowPackageContractInfoModule {
     private Map<Float, String> screenFormatCache = new HashMap<Float, String>();
     private Set<Integer> fourKProfileIds = new HashSet<>();
     private Set<Integer> hdrProfileIds= new HashSet<>();
+    private Set<Integer> atmosStreamProfileIds = new HashSet<>();
     private final VideoPackageInfo FILTERED_VIDEO_PACKAGE_INFO;
 
     public WindowPackageContractInfoModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
@@ -70,6 +74,7 @@ public class WindowPackageContractInfoModule {
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
         this.soundTypesMap = getSoundTypesMap();
         populateEncodingProfileIdSets(api, indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE_GROUP));
+        populateAtmosStreamProfileIds(api, streamProfileIdx);
         FILTERED_VIDEO_PACKAGE_INFO = newEmptyVideoPackageInfo();
     }
 
@@ -116,6 +121,14 @@ public class WindowPackageContractInfoModule {
             }
             if(fourKProfileIds.contains(encodingProfileId)) {
                 info.videoPackageInfo.formats.add(cycleConstants.FOUR_K);
+            }
+            // Alternate implementation where we check for profileId 58 directly
+            // instead of building the atmosprofileIds list and then adding if the 
+            // downloadable's stream profileId is one from the above list.
+            //if(encodingProfileId == ATMOS_PROFILE_ID)
+            //	info.videoPackageInfo.formats.add(cycleConstants.ATMOS);
+            if(atmosStreamProfileIds.contains(encodingProfileId)) {
+            	info.videoPackageInfo.formats.add(cycleConstants.ATMOS);
             }
 
             if("VIDEO".equals(streamProfileType) || "MUXED".equals(streamProfileType)) {
@@ -197,6 +210,14 @@ public class WindowPackageContractInfoModule {
         return msOffset.longValue() / 1000;
     }
 
+    private void populateAtmosStreamProfileIds(VMSHollowInputAPI api, HollowPrimaryKeyIndex streamProfileIdx) {
+    	for(StreamProfilesHollow profile : api.getAllStreamProfilesHollow()) {
+    		if(profile._getDescription()._getValue().toLowerCase().contains("atmos"))
+    			atmosStreamProfileIds.add((int)profile._getId());
+    	}
+    }
+
+    
     private void populateEncodingProfileIdSets(VMSHollowInputAPI api, HollowPrimaryKeyIndex primaryKeyIndex) {
 
         int ordinal = primaryKeyIndex.getMatchingOrdinal("HDR");
