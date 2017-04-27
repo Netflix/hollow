@@ -55,6 +55,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -82,6 +83,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -2163,26 +2165,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -3462,6 +3464,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -3489,6 +3492,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -5570,26 +5574,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -6869,6 +6873,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -6896,6 +6901,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -8977,26 +8983,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -10276,6 +10282,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -10303,6 +10310,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -12377,26 +12385,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -13698,6 +13706,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -13710,7 +13719,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.49",
+            "locked": "1.11.105",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
@@ -13722,9 +13731,10 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.49",
+            "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -15811,26 +15821,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -18207,6 +18217,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -18234,6 +18245,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -20315,26 +20327,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -21614,6 +21626,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -21626,7 +21639,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.49",
+            "locked": "1.11.105",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
@@ -21638,9 +21651,10 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.49",
+            "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -23726,26 +23740,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -24999,6 +25013,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -25026,6 +25041,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -27189,26 +27205,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -28533,6 +28549,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -28560,6 +28577,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -30723,26 +30741,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -32067,6 +32085,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -32094,6 +32113,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -34257,26 +34277,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -35601,6 +35621,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -35628,6 +35649,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -37791,26 +37813,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -39135,6 +39157,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -39162,6 +39185,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -41325,26 +41349,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -42669,6 +42693,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -42696,6 +42721,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -44859,26 +44885,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -46203,6 +46229,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -46230,6 +46257,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -48393,26 +48421,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -49737,6 +49765,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -49764,6 +49793,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -51927,26 +51957,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
