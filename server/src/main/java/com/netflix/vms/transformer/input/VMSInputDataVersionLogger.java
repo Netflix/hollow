@@ -10,7 +10,7 @@ import java.util.TimeZone;
 import com.netflix.vms.logging.TaggingLogger;
 
 public class VMSInputDataVersionLogger {
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz");
 
 
     public static void logInputVersions(Map<String, String> inputBlobHeaders, TaggingLogger logger) {

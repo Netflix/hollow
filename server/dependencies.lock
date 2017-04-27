@@ -55,6 +55,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -82,6 +83,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -835,7 +837,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -2163,26 +2165,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -2571,7 +2573,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.52",
+            "locked": "2.53",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -2691,14 +2693,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.243",
+            "locked": "59.247",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.243",
+            "locked": "59.247",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -3462,6 +3464,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -3489,6 +3492,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -4242,7 +4246,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -5570,26 +5574,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -5978,7 +5982,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.52",
+            "locked": "2.53",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -6098,14 +6102,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.243",
+            "locked": "59.247",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.243",
+            "locked": "59.247",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -6869,6 +6873,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -6896,6 +6901,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -7649,7 +7655,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -8977,26 +8983,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -9385,7 +9391,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.52",
+            "locked": "2.53",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -9505,14 +9511,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.243",
+            "locked": "59.247",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.243",
+            "locked": "59.247",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -10276,6 +10282,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -10303,6 +10310,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -11056,7 +11064,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -12377,26 +12385,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -12785,7 +12793,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.52",
+            "locked": "2.53",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -12905,14 +12913,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.243",
+            "locked": "59.247",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.243",
+            "locked": "59.247",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -13698,6 +13706,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -13710,7 +13719,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.49",
+            "locked": "1.11.105",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
@@ -13722,9 +13731,10 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.49",
+            "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -14482,7 +14492,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -15811,26 +15821,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -16219,7 +16229,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.52",
+            "locked": "2.53",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -16339,14 +16349,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.243",
+            "locked": "59.247",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.243",
+            "locked": "59.247",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -18143,11 +18153,11 @@
     },
     "resolutionRules": {
         "com.netflix.nebula:gradle-resolution-rules": {
-            "locked": "0.45.0",
+            "locked": "0.46.0",
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
-            "locked": "0.43.0",
+            "locked": "0.44.0",
             "requested": "latest.release"
         }
     },
@@ -18207,6 +18217,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -18234,6 +18245,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -18987,7 +18999,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -20315,26 +20327,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -20723,7 +20735,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.52",
+            "locked": "2.53",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -20843,14 +20855,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.243",
+            "locked": "59.247",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.243",
+            "locked": "59.247",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -21614,6 +21626,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -21626,7 +21639,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.49",
+            "locked": "1.11.105",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
@@ -21638,9 +21651,10 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.49",
+            "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -22398,7 +22412,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -23726,26 +23740,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -24134,7 +24148,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.52",
+            "locked": "2.53",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -24254,14 +24268,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.243",
+            "locked": "59.247",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.243",
+            "locked": "59.247",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -24999,6 +25013,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -25026,6 +25041,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -25258,6 +25274,7 @@
             "locked": "2.8.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
@@ -25816,9 +25833,10 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
@@ -25826,8 +25844,14 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "requested": "2.+"
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "locked": "2.5.0",
+            "transitive": [
+                "com.netflix.hollow:hollow-diff-ui"
+            ]
         },
         "com.netflix.hystrix:hystrix-core": {
             "locked": "1.5.9",
@@ -26517,7 +26541,7 @@
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "commons-httpclient:commons-httpclient",
@@ -26592,7 +26616,7 @@
         "commons-io:commons-io": {
             "locked": "2.5",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -27181,26 +27205,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -27590,7 +27614,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.52",
+            "locked": "2.53",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -27710,14 +27734,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.243",
+            "locked": "59.247",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.243",
+            "locked": "59.247",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -27985,7 +28009,7 @@
         "org.apache.velocity:velocity": {
             "locked": "1.7",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui"
+                "com.netflix.hollow:hollow-ui-tools"
             ]
         },
         "org.apache.zookeeper:zookeeper": {
@@ -28525,6 +28549,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -28552,6 +28577,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -28784,6 +28810,7 @@
             "locked": "2.8.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
@@ -29342,9 +29369,10 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
@@ -29352,8 +29380,14 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "requested": "2.+"
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "locked": "2.5.0",
+            "transitive": [
+                "com.netflix.hollow:hollow-diff-ui"
+            ]
         },
         "com.netflix.hystrix:hystrix-core": {
             "locked": "1.5.9",
@@ -30043,7 +30077,7 @@
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "commons-httpclient:commons-httpclient",
@@ -30118,7 +30152,7 @@
         "commons-io:commons-io": {
             "locked": "2.5",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -30707,26 +30741,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -31116,7 +31150,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.52",
+            "locked": "2.53",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -31236,14 +31270,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.243",
+            "locked": "59.247",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.243",
+            "locked": "59.247",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -31511,7 +31545,7 @@
         "org.apache.velocity:velocity": {
             "locked": "1.7",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui"
+                "com.netflix.hollow:hollow-ui-tools"
             ]
         },
         "org.apache.zookeeper:zookeeper": {
@@ -32051,6 +32085,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -32078,6 +32113,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -32310,6 +32346,7 @@
             "locked": "2.8.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
@@ -32868,9 +32905,10 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
@@ -32878,8 +32916,14 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "requested": "2.+"
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "locked": "2.5.0",
+            "transitive": [
+                "com.netflix.hollow:hollow-diff-ui"
+            ]
         },
         "com.netflix.hystrix:hystrix-core": {
             "locked": "1.5.9",
@@ -33569,7 +33613,7 @@
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "commons-httpclient:commons-httpclient",
@@ -33644,7 +33688,7 @@
         "commons-io:commons-io": {
             "locked": "2.5",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -34233,26 +34277,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -34642,7 +34686,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.52",
+            "locked": "2.53",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -34762,14 +34806,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.243",
+            "locked": "59.247",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.243",
+            "locked": "59.247",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -35037,7 +35081,7 @@
         "org.apache.velocity:velocity": {
             "locked": "1.7",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui"
+                "com.netflix.hollow:hollow-ui-tools"
             ]
         },
         "org.apache.zookeeper:zookeeper": {
@@ -35577,6 +35621,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -35604,6 +35649,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -35836,6 +35882,7 @@
             "locked": "2.8.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
@@ -36394,9 +36441,10 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
@@ -36404,8 +36452,14 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "requested": "2.+"
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "locked": "2.5.0",
+            "transitive": [
+                "com.netflix.hollow:hollow-diff-ui"
+            ]
         },
         "com.netflix.hystrix:hystrix-core": {
             "locked": "1.5.9",
@@ -37095,7 +37149,7 @@
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "commons-httpclient:commons-httpclient",
@@ -37170,7 +37224,7 @@
         "commons-io:commons-io": {
             "locked": "2.5",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -37759,26 +37813,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -38168,7 +38222,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.52",
+            "locked": "2.53",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -38288,14 +38342,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.243",
+            "locked": "59.247",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.243",
+            "locked": "59.247",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -38563,7 +38617,7 @@
         "org.apache.velocity:velocity": {
             "locked": "1.7",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui"
+                "com.netflix.hollow:hollow-ui-tools"
             ]
         },
         "org.apache.zookeeper:zookeeper": {
@@ -39103,6 +39157,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -39130,6 +39185,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -39362,6 +39418,7 @@
             "locked": "2.8.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
@@ -39920,9 +39977,10 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
@@ -39930,8 +39988,14 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "requested": "2.+"
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "locked": "2.5.0",
+            "transitive": [
+                "com.netflix.hollow:hollow-diff-ui"
+            ]
         },
         "com.netflix.hystrix:hystrix-core": {
             "locked": "1.5.9",
@@ -40621,7 +40685,7 @@
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "commons-httpclient:commons-httpclient",
@@ -40696,7 +40760,7 @@
         "commons-io:commons-io": {
             "locked": "2.5",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -41285,26 +41349,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -41694,7 +41758,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.52",
+            "locked": "2.53",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -41814,14 +41878,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.243",
+            "locked": "59.247",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.243",
+            "locked": "59.247",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -42089,7 +42153,7 @@
         "org.apache.velocity:velocity": {
             "locked": "1.7",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui"
+                "com.netflix.hollow:hollow-ui-tools"
             ]
         },
         "org.apache.zookeeper:zookeeper": {
@@ -42629,6 +42693,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -42656,6 +42721,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -42888,6 +42954,7 @@
             "locked": "2.8.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
@@ -43446,9 +43513,10 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
@@ -43456,8 +43524,14 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "requested": "2.+"
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "locked": "2.5.0",
+            "transitive": [
+                "com.netflix.hollow:hollow-diff-ui"
+            ]
         },
         "com.netflix.hystrix:hystrix-core": {
             "locked": "1.5.9",
@@ -44147,7 +44221,7 @@
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "commons-httpclient:commons-httpclient",
@@ -44222,7 +44296,7 @@
         "commons-io:commons-io": {
             "locked": "2.5",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -44811,26 +44885,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -45220,7 +45294,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.52",
+            "locked": "2.53",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -45340,14 +45414,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.243",
+            "locked": "59.247",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.243",
+            "locked": "59.247",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -45615,7 +45689,7 @@
         "org.apache.velocity:velocity": {
             "locked": "1.7",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui"
+                "com.netflix.hollow:hollow-ui-tools"
             ]
         },
         "org.apache.zookeeper:zookeeper": {
@@ -46155,6 +46229,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -46182,6 +46257,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -46414,6 +46490,7 @@
             "locked": "2.8.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
@@ -46972,9 +47049,10 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
@@ -46982,8 +47060,14 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "requested": "2.+"
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "locked": "2.5.0",
+            "transitive": [
+                "com.netflix.hollow:hollow-diff-ui"
+            ]
         },
         "com.netflix.hystrix:hystrix-core": {
             "locked": "1.5.9",
@@ -47673,7 +47757,7 @@
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "commons-httpclient:commons-httpclient",
@@ -47748,7 +47832,7 @@
         "commons-io:commons-io": {
             "locked": "2.5",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -48337,26 +48421,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -48746,7 +48830,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.52",
+            "locked": "2.53",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -48866,14 +48950,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.243",
+            "locked": "59.247",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.243",
+            "locked": "59.247",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -49141,7 +49225,7 @@
         "org.apache.velocity:velocity": {
             "locked": "1.7",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui"
+                "com.netflix.hollow:hollow-ui-tools"
             ]
         },
         "org.apache.zookeeper:zookeeper": {
@@ -49681,6 +49765,7 @@
                 "com.amazonaws:aws-java-sdk-s3",
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
+                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-core"
@@ -49708,6 +49793,7 @@
             "locked": "1.11.105",
             "transitive": [
                 "netflix:cryptexclient-standalone",
+                "netflix:gutenberg-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -49940,6 +50026,7 @@
             "locked": "2.8.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
@@ -50498,9 +50585,10 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
@@ -50508,8 +50596,14 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.4.4",
+            "locked": "2.5.0",
             "requested": "2.+"
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "locked": "2.5.0",
+            "transitive": [
+                "com.netflix.hollow:hollow-diff-ui"
+            ]
         },
         "com.netflix.hystrix:hystrix-core": {
             "locked": "1.5.9",
@@ -51199,7 +51293,7 @@
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "commons-httpclient:commons-httpclient",
@@ -51274,7 +51368,7 @@
         "commons-io:commons-io": {
             "locked": "2.5",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -51863,26 +51957,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.164",
+            "locked": "1.173",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.165",
+            "locked": "1.174",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.194.0",
+            "locked": "1.195.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -52272,7 +52366,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.52",
+            "locked": "2.53",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -52392,14 +52486,14 @@
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
-            "locked": "59.243",
+            "locked": "59.247",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.243",
+            "locked": "59.247",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -52667,7 +52761,7 @@
         "org.apache.velocity:velocity": {
             "locked": "1.7",
             "transitive": [
-                "com.netflix.hollow:hollow-diff-ui"
+                "com.netflix.hollow:hollow-ui-tools"
             ]
         },
         "org.apache.zookeeper:zookeeper": {
