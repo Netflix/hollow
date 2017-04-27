@@ -24,10 +24,31 @@ import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
+import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A HollowFieldMatchQuery can be used to scan through all records in a dataset to match specific field name/value combinations.
+ * <p>
+ * Results are returned in the form of a Map<String, BitSet>.  Each type for which any records matched will have an entry in the 
+ * returned Map, keyed by type name.  The corresponding value is a BitSet which is set at the positions of the ordinals of 
+ * the matched records.
+ * <p>
+ * <b>Hint:</b> The returned Map<String, BitSet> may be in turn passed to the {@link TransitiveSetTraverser} to be augmented with any records
+ * which reference matched records.  For example, we can imagine a data model for which the following code would provide a 
+ * selection which includes the Actor record for "Tom Hanks", plus any Movie records in which he stars:
+ * <p>
+ * <pre>
+ * {@code
+ * HollowFieldMatchQuery query = new HollowFieldMatchQuery(myStateEngine);
+ * Map&lt;String, BitSet&gt; selection = query.findMatchingRecords("actorName", "Tom Hanks");
+ *  
+ * TransitiveSetTraverser.addReferencingOutsideClosure(myStateEngine, selection);
+ * }
+ * </pre>
+ */
 public class HollowFieldMatchQuery {
     
     private final HollowReadStateEngine readEngine;
@@ -36,6 +57,11 @@ public class HollowFieldMatchQuery {
         this.readEngine = readEngine;
     }
     
+    /**
+     * Match any records which include a field with the provided fieldName and value.
+     * 
+     * The fieldValue is provided as a String, but will be parsed as the type of the field to match.
+     */
     public Map<String, BitSet> findMatchingRecords(String fieldName, String fieldValue) {
         Map<String, BitSet> matches = new HashMap<String, BitSet>();
         
@@ -46,6 +72,11 @@ public class HollowFieldMatchQuery {
         return matches;
     }
     
+    /**
+     * Match any records of the specified type, which have the specified field set to the specified value.
+     * 
+     * The fieldValue is provided as a String, but will be parsed as the type of the field to match.
+     */
     public Map<String, BitSet> findMatchingRecords(String typeName, String fieldName, String fieldValue) {
         Map<String, BitSet> matches = new HashMap<String, BitSet>();
 
