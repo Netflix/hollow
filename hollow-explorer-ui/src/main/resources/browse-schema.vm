@@ -18,7 +18,7 @@
 
 #showSchema($schemaDisplay "")
 
-#macro(showSchema $schemaDisplay $fp)
+#macro(showSchema $schemaDisplay)
 	
 	#set($typeName = "$schemaDisplay.getTypeName()")
 
@@ -28,9 +28,9 @@
 				<span style="font-family: monospace;">
 					#if($field.getReferencedType())
 						#if($field.getReferencedType().isExpanded())
-							<a href="$basePath/schema?type=$type&collapse=$fp.$field.getFieldName()">$field.getFieldName()</a>
+							<a href="$basePath/schema?type=$type&collapse=$field.getFieldPath()">$field.getFieldName()</a>
 						#else
-							<a href="$basePath/schema?type=$type&expand=$fp.$field.getFieldName()">$field.getFieldName()</a>
+							<a href="$basePath/schema?type=$type&expand=$field.getFieldPath()">$field.getFieldName()</a>
 						#end
 						
 						($field.getReferencedType().getTypeName() - $field.getReferencedType().getSchema().getSchemaType())
@@ -44,8 +44,7 @@
 				</span>
 				
 				#if($field.getReferencedType() && $field.getReferencedType().isExpanded())
-					#set($childFp = "$fp.$field.getFieldName()")
-					#showSchema($field.getReferencedType() $childFp)
+					#showSchema($field.getReferencedType())
 				#end
 			</li>
 		#end

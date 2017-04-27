@@ -59,7 +59,7 @@ NOTE: Results are filtered by query <span style="font-family: monospace;">$filte
 			<table border="1">
 				<tr>
 					<th>#</th>
-					<th>Key[DownloadableId]</th>
+					<th>Key</th>
 				</tr>
 				
 				#foreach($key in $keys)

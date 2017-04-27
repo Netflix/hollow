@@ -26,30 +26,34 @@ import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 public class SchemaDisplayField {
     
     private final String fieldName;
+    private final String fieldPath;
     private final FieldType fieldType;
     private final boolean isSearchable;
     
     private final SchemaDisplay referencedType;
     
-    public SchemaDisplayField(HollowCollectionSchema parentSchema) {
+    public SchemaDisplayField(String fieldPath, HollowCollectionSchema parentSchema) {
+        this.fieldPath = fieldPath;
         this.fieldName = "element";
         this.fieldType = FieldType.REFERENCE;
         this.isSearchable = false;
-        this.referencedType = new SchemaDisplay(parentSchema.getElementTypeState().getSchema());
+        this.referencedType = new SchemaDisplay(parentSchema.getElementTypeState().getSchema(), fieldPath);
     }
     
-    public SchemaDisplayField(HollowMapSchema parentSchema, int fieldNumber) {
+    public SchemaDisplayField(String fieldPath, HollowMapSchema parentSchema, int fieldNumber) {
+        this.fieldPath = fieldPath;
         this.fieldName = fieldNumber == 0 ? "key" : "value";
         this.fieldType = FieldType.REFERENCE;
         this.isSearchable = false;
-        this.referencedType = fieldNumber == 0 ? new SchemaDisplay(parentSchema.getKeyTypeState().getSchema()) : new SchemaDisplay(parentSchema.getValueTypeState().getSchema());
+        this.referencedType = fieldNumber == 0 ? new SchemaDisplay(parentSchema.getKeyTypeState().getSchema(), fieldPath) : new SchemaDisplay(parentSchema.getValueTypeState().getSchema(), fieldPath);
     }
     
-    public SchemaDisplayField(HollowObjectSchema parentSchema, int fieldNumber) {
+    public SchemaDisplayField(String fieldPath, HollowObjectSchema parentSchema, int fieldNumber) {
+        this.fieldPath = fieldPath;
         this.fieldName = parentSchema.getFieldName(fieldNumber);
         this.fieldType = parentSchema.getFieldType(fieldNumber);
         this.isSearchable = isSearchable(parentSchema, fieldNumber);
-        this.referencedType = fieldType == FieldType.REFERENCE ? new SchemaDisplay(parentSchema.getReferencedTypeState(fieldNumber).getSchema()) : null;
+        this.referencedType = fieldType == FieldType.REFERENCE ? new SchemaDisplay(parentSchema.getReferencedTypeState(fieldNumber).getSchema(), fieldPath) : null;
     }
     
     private boolean isSearchable(HollowObjectSchema schema, int fieldNumber) {
@@ -78,6 +82,10 @@ public class SchemaDisplayField {
         return isSearchable;
     }
     
+    public String getFieldPath() {
+        return fieldPath;
+    }
+
     public SchemaDisplay getReferencedType() {
         return referencedType;
     }
