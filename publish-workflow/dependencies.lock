@@ -12716,7 +12716,7 @@
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
-            "locked": "0.43.0",
+            "locked": "0.44.0",
             "requested": "latest.release"
         }
     },
