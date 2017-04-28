@@ -34,7 +34,7 @@
 				<td class="nav">[ Type: <span style="font-family: monospace;">$type</span> ]</td>
 				<td class="nav">[ <a href="$basePath/type?type=$type">Browse Data</a> | <a href="$basePath/schema?type=$type">Browse Schema</a> ]</td>
 			#end
-			<td class="nav">[ <a href="$basePath/query">QUERY</a> ]</td>
+			<td class="nav">[ <a href="$basePath/query">SEARCH</a> ]</td>
 		</tr>
 	</table>
 	<hr/>

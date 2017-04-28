@@ -15,24 +15,35 @@
 *#
 
 #if($queryResult)
-	Augment Current Query:
+	<b>Augment Current Query:</b>
 #else
-	Search:
+	<b>Search:</b>
 #end
 
 <form action="$basePath/query">
-	<select name="type">
-		<option>ANY TYPE</option>
-		#foreach($type in $allTypes)
-			<option#if($type.equals($selectedType)) selected#end>$type</option>
-		#end
-	</select>
 	
-	<input type="text" name="field"#if($selectedField) value="$selectedField"#end>
+	<table>
+		<tr>
+			<th>Type:</th>
+			<th>Field Name:</th>
+			<th>Field Value:</th>
+			<td />
+		</tr>
+		<tr>
+			<td>
+				<select name="type">
+					<option>ANY TYPE</option>
+					#foreach($type in $allTypes)
+						<option#if($type.equals($selectedType)) selected#end>$type</option>
+					#end
+				</select>
+			</td>
+			<td><input type="text" name="field"#if($selectedField) value="$selectedField"#end></td>
+			<td><input type="text" name="queryValue" size="85"></td>
+			<td><input type="submit"></td>
+		</tr>
+	</table>
 	
-	<input type="text" name="queryValue">
-	
-	<input type="submit">
 </form>
 
 #if($queryResult)

@@ -39,7 +39,7 @@
 					#end
 					
 					#if($field.isSearchable())
-						<a href="$basePath/query?type=$typeName&field=$field.getFieldName()">query</a>
+						<a href="$basePath/query?type=$typeName&field=$field.getFieldName()">search</a>
 					#end
 				</span>
 				
