@@ -35,9 +35,6 @@ import com.netflix.hollow.api.objects.delegate.HollowSetLookupDelegate;
 
 /**
  * A class containing convenience methods for the {@link HollowAPIGenerator}.  Not intended for external consumption.
- * 
- * @author dkoszewnik
- *
  */
 public class HollowCodeGenerationUtils {
 
@@ -46,15 +43,15 @@ public class HollowCodeGenerationUtils {
     }
 
     public static String hollowFactoryClassname(String typeName) {
-        return hollowImplClassname(typeName) + "Factory";
+        return hollowImplClassname(typeName, "Hollow") + "Factory";
     }
 
     public static String hollowObjectProviderName(String typeName) {
         return substituteInvalidChars(lowercase(typeName)) + "Provider";
     }
 
-    public static String hollowImplClassname(String typeName) {
-        return substituteInvalidChars(uppercase(typeName)) + "Hollow";
+    public static String hollowImplClassname(String typeName, String classPostfix) {
+        return substituteInvalidChars(uppercase(typeName)) + classPostfix;
     }
 
     public static String delegateInterfaceName(String typeName) {

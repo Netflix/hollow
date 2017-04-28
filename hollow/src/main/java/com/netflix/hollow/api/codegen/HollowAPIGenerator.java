@@ -56,6 +56,9 @@ public class HollowAPIGenerator {
     private final HollowDataset dataset;
     private final Set<String> parameterizedTypes;
     private final boolean parameterizeClassNames;
+    
+    private String classPostfix = "Hollow";
+    private String getterPrefix = "_";
 
     /**
      * @param apiClassname the class name of the generated implementation of {@link HollowAPI}
@@ -96,6 +99,20 @@ public class HollowAPIGenerator {
         this.parameterizedTypes = parameterizedTypes;
         this.parameterizeClassNames = parameterizeAllClassNames;
     }
+    
+    /**
+     * Use this method to override the default postfix "Hollow" for all generated Hollow object classes. 
+     */
+    public void setClassPostfix(String classPostfix) {
+        this.classPostfix = classPostfix;
+    }
+    
+    /**
+     * Use this method to override the default prefix "_" for all getters on all generated Hollow object classes. 
+     */
+    public void setGetterPrefix(String getterPrefix) {
+        this.getterPrefix = getterPrefix;
+    }
 
     
     public void generateFiles(String directory) throws IOException {
@@ -105,7 +122,7 @@ public class HollowAPIGenerator {
     public void generateFiles(File directory) throws IOException {
         directory.mkdirs();
         
-        HollowAPIClassJavaGenerator apiClassGenerator = new HollowAPIClassJavaGenerator(packageName, apiClassname, dataset, parameterizeClassNames);
+        HollowAPIClassJavaGenerator apiClassGenerator = new HollowAPIClassJavaGenerator(packageName, apiClassname, dataset, parameterizeClassNames, classPostfix);
         HollowAPIFactoryJavaGenerator apiFactoryGenerator = new HollowAPIFactoryJavaGenerator(packageName, apiClassname);
 
         generateFile(directory, apiClassGenerator);
@@ -150,20 +167,20 @@ public class HollowAPIGenerator {
 
     private HollowJavaFileGenerator getHollowObjectGenerator(HollowSchema schema) {
         if(schema instanceof HollowObjectSchema) {
-            return new HollowObjectJavaGenerator(packageName, apiClassname, (HollowObjectSchema) schema, parameterizedTypes, parameterizeClassNames);
+            return new HollowObjectJavaGenerator(packageName, apiClassname, (HollowObjectSchema) schema, parameterizedTypes, parameterizeClassNames, classPostfix, getterPrefix);
         } else if(schema instanceof HollowListSchema) {
-            return new HollowListJavaGenerator(packageName, apiClassname, (HollowListSchema) schema, parameterizedTypes, parameterizeClassNames);
+            return new HollowListJavaGenerator(packageName, apiClassname, (HollowListSchema) schema, parameterizedTypes, parameterizeClassNames, classPostfix);
         } else if(schema instanceof HollowSetSchema) {
-            return new HollowSetJavaGenerator(packageName, apiClassname, (HollowSetSchema) schema, parameterizedTypes, parameterizeClassNames);
+            return new HollowSetJavaGenerator(packageName, apiClassname, (HollowSetSchema) schema, parameterizedTypes, parameterizeClassNames, classPostfix);
         } else if(schema instanceof HollowMapSchema) {
-            return new HollowMapJavaGenerator(packageName, apiClassname, (HollowMapSchema) schema, dataset, parameterizedTypes, parameterizeClassNames);
+            return new HollowMapJavaGenerator(packageName, apiClassname, (HollowMapSchema) schema, dataset, parameterizedTypes, parameterizeClassNames, classPostfix);
         }
 
         throw new UnsupportedOperationException("What kind of schema is a " + schema.getClass().getName() + "?");
     }
 
     private HollowFactoryJavaGenerator getHollowFactoryGenerator(HollowSchema schema) {
-        return new HollowFactoryJavaGenerator(packageName, schema);
+        return new HollowFactoryJavaGenerator(packageName, schema, classPostfix);
     }
 
 }
