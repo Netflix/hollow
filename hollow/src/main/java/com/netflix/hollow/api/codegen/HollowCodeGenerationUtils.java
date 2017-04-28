@@ -17,12 +17,14 @@
  */
 package com.netflix.hollow.api.codegen;
 
+import java.util.Map;
+
+import java.util.HashMap;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
-
 import com.netflix.hollow.api.objects.delegate.HollowListCachedDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowListLookupDelegate;
@@ -37,6 +39,17 @@ import com.netflix.hollow.api.objects.delegate.HollowSetLookupDelegate;
  * A class containing convenience methods for the {@link HollowAPIGenerator}.  Not intended for external consumption.
  */
 public class HollowCodeGenerationUtils {
+    
+    private static final Map<String,String> CLASS_NAME_SUBSTITUTIONS = new HashMap<String,String>();
+    
+    static {
+        CLASS_NAME_SUBSTITUTIONS.put("String", "HString");
+        CLASS_NAME_SUBSTITUTIONS.put("Integer", "HInteger");
+        CLASS_NAME_SUBSTITUTIONS.put("Long", "HLong");
+        CLASS_NAME_SUBSTITUTIONS.put("Float", "HFloat");
+        CLASS_NAME_SUBSTITUTIONS.put("Double", "HDouble");
+        CLASS_NAME_SUBSTITUTIONS.put("Boolean", "HBoolean");
+    }
 
     public static String typeAPIClassname(String typeName) {
         return uppercase(typeName) + "TypeAPI";
@@ -51,7 +64,13 @@ public class HollowCodeGenerationUtils {
     }
 
     public static String hollowImplClassname(String typeName, String classPostfix) {
-        return substituteInvalidChars(uppercase(typeName)) + classPostfix;
+        String classname = substituteInvalidChars(uppercase(typeName)) + classPostfix;
+        
+        String sub = CLASS_NAME_SUBSTITUTIONS.get(classname);
+        if(sub != null)
+            return sub;
+        
+        return classname;
     }
 
     public static String delegateInterfaceName(String typeName) {
