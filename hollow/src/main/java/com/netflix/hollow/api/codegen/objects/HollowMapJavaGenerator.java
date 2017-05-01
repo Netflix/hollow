@@ -37,8 +37,6 @@ import java.util.Set;
  * 
  * @see HollowAPIGenerator
  * 
- * @author dkoszewnik
- *
  */
 public class HollowMapJavaGenerator implements HollowJavaFileGenerator {
 
@@ -53,14 +51,14 @@ public class HollowMapJavaGenerator implements HollowJavaFileGenerator {
     private final boolean parameterizeKey;
     private final boolean parameterizeValue;
 
-    public HollowMapJavaGenerator(String packageName, String apiClassname, HollowMapSchema schema, HollowDataset dataset, Set<String> parameterizedTypes, boolean parameterizeClassNames) {
+    public HollowMapJavaGenerator(String packageName, String apiClassname, HollowMapSchema schema, HollowDataset dataset, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix) {
         this.packageName = packageName;
         this.apiClassname = apiClassname;
         this.schema = schema;
         this.dataset = dataset;
-        this.className = hollowImplClassname(schema.getName());
-        this.keyClassName = hollowImplClassname(schema.getKeyType());
-        this.valueClassName = hollowImplClassname(schema.getValueType());
+        this.className = hollowImplClassname(schema.getName(), classPostfix);
+        this.keyClassName = hollowImplClassname(schema.getKeyType(), classPostfix);
+        this.valueClassName = hollowImplClassname(schema.getValueType(), classPostfix);
         this.parameterizeKey = parameterizeClassNames || parameterizedTypes.contains(schema.getKeyType());
         this.parameterizeValue = parameterizeClassNames || parameterizedTypes.contains(schema.getValueType());
     }

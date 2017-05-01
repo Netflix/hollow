@@ -35,8 +35,6 @@ import java.util.Set;
  * 
  * @see HollowAPIGenerator
  * 
- * @author dkoszewnik
- *
  */
 public class HollowListJavaGenerator implements HollowJavaFileGenerator {
 
@@ -47,12 +45,12 @@ public class HollowListJavaGenerator implements HollowJavaFileGenerator {
     private final String elementClassName;
     private final boolean parameterize;
 
-    public HollowListJavaGenerator(String packageName, String apiClassname, HollowListSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames) {
+    public HollowListJavaGenerator(String packageName, String apiClassname, HollowListSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix) {
         this.packageName = packageName;
         this.apiClassname = apiClassname;
         this.schema = schema;
-        this.className = hollowImplClassname(schema.getName());
-        this.elementClassName = hollowImplClassname(schema.getElementType());
+        this.className = hollowImplClassname(schema.getName(), classPostfix);
+        this.elementClassName = hollowImplClassname(schema.getElementType(), classPostfix);
         this.parameterize = parameterizeClassNames || parameterizedTypes.contains(schema.getElementType());
     }
 

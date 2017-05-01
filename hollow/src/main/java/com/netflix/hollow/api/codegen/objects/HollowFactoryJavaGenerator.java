@@ -42,8 +42,6 @@ import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
  * 
  * @see HollowAPIGenerator
  * 
- * @author dkoszewnik
- *
  */
 public class HollowFactoryJavaGenerator implements HollowJavaFileGenerator {
 
@@ -52,9 +50,9 @@ public class HollowFactoryJavaGenerator implements HollowJavaFileGenerator {
     private final String className;
     private final HollowSchema schema;
 
-    public HollowFactoryJavaGenerator(String packageName, HollowSchema schema) {
+    public HollowFactoryJavaGenerator(String packageName, HollowSchema schema, String classPostfix) {
         this.packageName = packageName;
-        this.objectClassName = hollowImplClassname(schema.getName());
+        this.objectClassName = hollowImplClassname(schema.getName(), classPostfix);
         this.className = hollowFactoryClassname(schema.getName());
         this.schema = schema;
     }
