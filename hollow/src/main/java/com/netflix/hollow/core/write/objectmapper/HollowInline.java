@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2016 Netflix, Inc.
+ *  Copyright 2017 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,15 +17,13 @@
  */
 package com.netflix.hollow.core.write.objectmapper;
 
-/**
- * @deprecated Use the @HollowInline annotation with a Boolean field instead. 
- */
-@Deprecated
-public enum NullablePrimitiveBoolean {
-    TRUE,
-    FALSE;
+import java.lang.annotation.ElementType;
 
-    public boolean getBooleanValue() {
-        return this == TRUE;
-    }
+import java.lang.annotation.Target;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.FIELD })
+public @interface HollowInline {
 }

@@ -17,18 +17,18 @@
  */
 package com.netflix.hollow.core.write.objectmapper;
 
-import java.io.ByteArrayOutputStream;
-import java.util.Date;
-import com.netflix.hollow.core.AbstractStateEngineTest;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.tools.stringifier.HollowRecordJsonStringifier;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
+import com.netflix.hollow.core.AbstractStateEngineTest;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.tools.stringifier.HollowRecordJsonStringifier;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -49,9 +49,48 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
 
         roundTripSnapshot();
 
-        System.out.println(new HollowRecordJsonStringifier(false, true).stringify(readStateEngine, "TypeA", 0));
-        System.out.println("---------------------------------");
-        System.out.println(new HollowRecordJsonStringifier().stringify(readStateEngine, "TypeA", 1));
+        
+        Assert.assertEquals("{\"a1\": \"two\",\"a2\": 2,\"b\": {\"b1\": 20,\"b2\": 20000000,\"b3\": 2.2,\"b4\": \"two\",\"b5\": [2, 2, 2]},\"cList\": []}",
+                                    new HollowRecordJsonStringifier(false, true).stringify(readStateEngine, "TypeA", 0));
+        
+        //System.out.println("---------------------------------");
+        //System.out.println(new HollowRecordJsonStringifier(false, true).stringify(readStateEngine, "TypeA", 1));
+    }
+    
+    @Test
+    public void testAllFieldTypes() throws IOException{
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        
+        mapper.add(new TypeWithAllFieldTypes(1));
+        mapper.add(new TypeWithAllFieldTypes(2));
+        
+        TypeWithAllFieldTypes t = new TypeWithAllFieldTypes(3);
+        t.nullFirstHalf();
+        mapper.add(t);
+        
+        t = new TypeWithAllFieldTypes(4);
+        t.nullSecondHalf();
+        mapper.add(t);
+        
+        roundTripSnapshot();
+        
+        TypeWithAllFieldTypes expected = new TypeWithAllFieldTypes(1);
+        TypeWithAllFieldTypes actual = new TypeWithAllFieldTypes(new GenericHollowObject(readStateEngine, "TypeWithAllFieldTypes", 0));
+        Assert.assertEquals(expected, actual);
+
+        expected = new TypeWithAllFieldTypes(2);
+        actual = new TypeWithAllFieldTypes(new GenericHollowObject(readStateEngine, "TypeWithAllFieldTypes", 1));
+        Assert.assertEquals(expected, actual);
+
+        expected = new TypeWithAllFieldTypes(3);
+        expected.nullFirstHalf();
+        actual = new TypeWithAllFieldTypes(new GenericHollowObject(readStateEngine, "TypeWithAllFieldTypes", 2));
+        Assert.assertEquals(expected, actual);
+
+        expected = new TypeWithAllFieldTypes(4);
+        expected.nullSecondHalf();
+        actual = new TypeWithAllFieldTypes(new GenericHollowObject(readStateEngine, "TypeWithAllFieldTypes", 3));
+        Assert.assertEquals(expected, actual);
     }
     
     @Test
