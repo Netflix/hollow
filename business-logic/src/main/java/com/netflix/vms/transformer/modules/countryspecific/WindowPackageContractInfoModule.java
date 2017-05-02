@@ -184,30 +184,6 @@ public class WindowPackageContractInfoModule {
         return info;
     }
 
-    /**
-     * Get start and end offset in seconds from video moments data.
-     *
-     * @param momentKey
-     * @param stillImageMap
-     * @return value in seconds, if value not available then default value is -1
-     */
-    private long getOffset(Strings momentKey, Map<Strings, List<VideoImage>> stillImageMap) {
-        long offset = -1;
-
-        if (stillImageMap == null || stillImageMap.isEmpty()) return offset;
-        List<VideoImage> videoImages = stillImageMap.get(momentKey);
-        if (videoImages == null || videoImages.isEmpty()) return offset;
-
-        // There is only 1 or 0 Start/End moments for the video, hence looking up the first VideoImage in list.
-        VideoImage videoImage = videoImages.get(0);
-        if (videoImage == null || videoImage.videoMoment == null) return offset;
-
-        Long msOffset = videoImage.videoMoment.msOffset;
-        if (msOffset == null || msOffset.longValue() <= 0) return offset;
-
-        return msOffset.longValue() / 1000;
-    }
-
     private void populateAtmosStreamProfileIds(VMSHollowInputAPI api, HollowPrimaryKeyIndex streamProfileIdx) {
     	for(StreamProfilesHollow profile : api.getAllStreamProfilesHollow()) {
     		if(profile._getDescription()._getValue().toLowerCase().contains("atmos"))
