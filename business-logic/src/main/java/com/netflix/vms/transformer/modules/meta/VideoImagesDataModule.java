@@ -5,6 +5,18 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidPha
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
@@ -50,18 +62,6 @@ import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.artwork.ArtWorkModule;
 import com.netflix.vms.transformer.util.NFLocaleUtil;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabilityChecker {
 
@@ -151,7 +151,6 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
         for (Map.Entry<String, Map<Integer, Set<Artwork>>> countryEntry : countryArtworkMap.entrySet()) {
             String countryCode = countryEntry.getKey();
             Map<Integer, Set<Artwork>> artMap = countryEntry.getValue();
-            Map<Integer, Set<SchedulePhaseInfo>> videoSchedulePhaseMap = countrySchedulePhaseMap.get(countryCode);
 
             Map<Integer, VideoImages> imagesMap = new HashMap<>();
             countryImagesMap.put(countryCode, imagesMap);
@@ -160,18 +159,37 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
                 VideoImages images = new VideoImages();
                 Integer id = entry.getKey();
 
-                // get schedule phase for artworks for the given video Id above
-                if (videoSchedulePhaseMap != null) {
-                    Set<SchedulePhaseInfo> schedulePhaseInfoList = videoSchedulePhaseMap.get(id);
-                    if (schedulePhaseInfoList != null) images.imageAvailabilityWindows = schedulePhaseInfoList;
-                }
-
                 Set<Artwork> artworkSet = entry.getValue();
                 images.artworks = createArtworkByTypeMap(artworkSet);
                 images.artworkFormatsByType = createFormatByTypeMap(artworkSet);
 
                 imagesMap.put(id, images);
             }
+        }
+        
+        /**
+         * Iterate over what is left in countrySchedulePhaseMap. 
+         * Iterating over countryArtworkMap and  countrySchedulePhaseMap is done separately to handle cases where some videos might not have
+         * images but still have schedule phase info. Ex: child nodes like season. The schedule phase windows including ones at child level are used by Asset Validator.
+         */
+        for (Map.Entry<String, Map<Integer, Set<SchedulePhaseInfo>>> countrySchedulePhaseEntry : countrySchedulePhaseMap.entrySet()) {
+            String countryCode = countrySchedulePhaseEntry.getKey();
+            Map<Integer, Set<SchedulePhaseInfo>> videoSchedulePhaseMap = countrySchedulePhaseEntry.getValue();
+            Map<Integer, VideoImages> videoImagesMap = countryImagesMap.get(countryCode);
+            for(Entry<Integer, Set<SchedulePhaseInfo>> entry: videoSchedulePhaseMap.entrySet()){
+            	Integer id = entry.getKey();
+                // get schedule phase for artworks for the given video Id above
+                if (videoSchedulePhaseMap != null) {
+                	VideoImages images = videoImagesMap.get(id);
+                	if(images == null){
+                		images = new VideoImages();
+                		videoImagesMap.put(id, images);
+                	}
+                    Set<SchedulePhaseInfo> schedulePhaseInfoList = videoSchedulePhaseMap.get(id);
+                    if (schedulePhaseInfoList != null) images.imageAvailabilityWindows = schedulePhaseInfoList;
+                }
+            }
+
         }
 
         return countryImagesMap;
