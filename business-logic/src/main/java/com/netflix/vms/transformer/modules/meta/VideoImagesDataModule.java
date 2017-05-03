@@ -183,6 +183,10 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
                 	VideoImages images = videoImagesMap.get(id);
                 	if(images == null){
                 		images = new VideoImages();
+                		// VMS client side code assumes that if VideoImages object exists, then artworkFormatsByType and artworks not to be null. 
+                		// For this reason initialize them with empty maps. 
+                		images.artworkFormatsByType = Collections.emptyMap();
+                		images.artworks = Collections.emptyMap();
                 		videoImagesMap.put(id, images);
                 	}
                     Set<SchedulePhaseInfo> schedulePhaseInfoList = videoSchedulePhaseMap.get(id);
