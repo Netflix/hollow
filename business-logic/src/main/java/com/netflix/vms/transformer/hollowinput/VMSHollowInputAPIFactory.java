@@ -21,7 +21,7 @@ public class VMSHollowInputAPIFactory implements HollowAPIFactory {
 
     @Override
     public HollowAPI createAPI(HollowDataAccess dataAccess) {
-        return new VMSHollowInputAPI(dataAccess);
+        return new VMSHollowInputAPI(dataAccess, cachedTypes);
     }
 
     @Override
