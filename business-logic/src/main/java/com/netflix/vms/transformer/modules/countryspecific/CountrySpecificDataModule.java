@@ -1,11 +1,5 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
@@ -42,9 +36,15 @@ import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.util.DVDCatalogUtil;
 import com.netflix.vms.transformer.util.SensitiveVideoServerSideUtil;
 import com.netflix.vms.transformer.util.VideoDateUtil;
 import com.netflix.vms.transformer.util.VideoSetTypeUtil;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class CountrySpecificDataModule {
 
@@ -59,10 +59,11 @@ public class CountrySpecificDataModule {
     private final HollowPrimaryKeyIndex videoStatusIdx;
     private final HollowPrimaryKeyIndex videoGeneralIdx;
     private final HollowHashIndex rolloutVideoTypeIndex;
+    private final HollowHashIndex videoTypeCountryIndex;
 
     private final CertificationListsModule certificationListsModule;
     private final VMSAvailabilityWindowModule availabilityWindowModule;
-	private Map<String, Map<Integer, VideoImages>> imagesDataByCountry = null;
+    private Map<String, Map<Integer, VideoImages>> imagesDataByCountry = null;
 
     public CountrySpecificDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, CycleConstants constants, VMSTransformerIndexer indexer) {
         this.api = api;
@@ -73,11 +74,12 @@ public class CountrySpecificDataModule {
         this.videoStatusIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_STATUS);
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
         this.rolloutVideoTypeIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
+        this.videoTypeCountryIndex = indexer.getHashIndex(IndexSpec.VIDEO_TYPE_COUNTRY);
 
         this.certificationListsModule = new CertificationListsModule(api, constants, indexer);
         this.availabilityWindowModule = new VMSAvailabilityWindowModule(api, ctx, constants, indexer);
     }
-    
+
     @VisibleForTesting
     CountrySpecificDataModule(TransformerContext ctx){
         this.api = null;
@@ -88,16 +90,17 @@ public class CountrySpecificDataModule {
         this.videoStatusIdx = null;
         this.videoGeneralIdx = null;
         this.rolloutVideoTypeIndex = null;
+        this.videoTypeCountryIndex = null;
 
         this.certificationListsModule = null;
         this.availabilityWindowModule = null;
     }
 
-    public Map<String, Map<Integer, CompleteVideoCountrySpecificData>> buildCountrySpecificDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, 
-    		Map<Integer, VideoPackageData> transformedPackageData, Map<String, Map<Integer, VideoImages>> imagesDataByCountry) {
-    	this.availabilityWindowModule.setTransformedPackageData(transformedPackageData);
-    	this.imagesDataByCountry = imagesDataByCountry;
-    	
+    public Map<String, Map<Integer, CompleteVideoCountrySpecificData>> buildCountrySpecificDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry,
+            Map<Integer, VideoPackageData> transformedPackageData, Map<String, Map<Integer, VideoImages>> imagesDataByCountry) {
+        this.availabilityWindowModule.setTransformedPackageData(transformedPackageData);
+        this.imagesDataByCountry = imagesDataByCountry;
+
         Map<String, Map<Integer, CompleteVideoCountrySpecificData>> allCountrySpecificDataMap = new HashMap<String, Map<Integer,CompleteVideoCountrySpecificData>>();
         CountrySpecificRollupValues rollup = new CountrySpecificRollupValues();
 
@@ -343,13 +346,14 @@ public class CountrySpecificDataModule {
         Integer prePromoDays = packageContractInfo == null ? null : packageContractInfo.videoContractInfo.prePromotionDays;
         Long availabilityDate = firstWindow != null ? firstWindow.startDate.val : null;
         Long earliestPhaseDate = getEarliestSchedulePhaseDate(videoId, imagesDataByCountry.get(countryCode), availabilityDate);
-        
+
         Integer metadataReleaseDays = getMetaDataReleaseDays(videoId);
         Long firstPhaseStartDate = getFirstPhaseStartDate(videoId, countryCode);
 
         Set<VideoSetType> videoSetTypes = VideoSetTypeUtil.computeSetTypes(videoId, countryCode, api, ctx, constants, indexer);
-        data.metadataAvailabilityDate = SensitiveVideoServerSideUtil.getMetadataAvailabilityDate(videoSetTypes, firstDisplayDate, firstPhaseStartDate, 
-        									availabilityDate, prePromoDays, metadataReleaseDays, constants, earliestPhaseDate);
+        boolean inDVDCatalog = DVDCatalogUtil.isVideoInDVDCatalog(api, videoTypeCountryIndex, videoId, countryCode);
+        data.metadataAvailabilityDate = SensitiveVideoServerSideUtil.getMetadataAvailabilityDate(inDVDCatalog, videoSetTypes, firstDisplayDate, firstPhaseStartDate,
+                availabilityDate, prePromoDays, metadataReleaseDays, constants, earliestPhaseDate);
         data.isSensitiveMetaData = SensitiveVideoServerSideUtil.isSensitiveMetaData(data.metadataAvailabilityDate, ctx);
     }
 
@@ -358,39 +362,39 @@ public class CountrySpecificDataModule {
         Long earliestStart = null;
 
         // Check if the feature is turned on.
-        if (!ctx.getConfig().isUseSchedulePhasesInAvailabilityDateCalc()) 
+        if (!ctx.getConfig().isUseSchedulePhasesInAvailabilityDateCalc())
             return earliestStart;
 
-        if (videoImagesByVideoMap == null) 
+        if (videoImagesByVideoMap == null)
             return earliestStart;
 
-        // TODO: videoImages data uses video id as int but this code uses long and hence the conversion. 
+        // TODO: videoImages data uses video id as int but this code uses long and hence the conversion.
         // Needs a better fix.
         int intVideoId = (int) videoId;
         VideoImages videoImages = videoImagesByVideoMap.get(intVideoId);
-        if (videoImages == null) 
+        if (videoImages == null)
             return earliestStart;
 
         Set<SchedulePhaseInfo> schedulePhaseInfoWindows = videoImages.imageAvailabilityWindows;
-        if (schedulePhaseInfoWindows == null) 
+        if (schedulePhaseInfoWindows == null)
             return earliestStart;
 
         for (SchedulePhaseInfo info : schedulePhaseInfoWindows) {
             // Only offsets from images associated to current video should count for earliest offset.
-            // In some cases (topNodes) image windows from child video are rolled up. In that case, 
+            // In some cases (topNodes) image windows from child video are rolled up. In that case,
             // source video will be child video which should be ignored.
             if (info.sourceVideoId != intVideoId)
                 continue;
-            
+
             // If phase has offset and availability date is null, cannot calculate a date.
             // So needs to be ignored.
             if(!info.isAbsolute && availabilityDate == null)
                 continue;
-            
+
             //If absolute, use start as is. Else add it to availability date.
             Long currentOffsetDate = (info.isAbsolute)? info.start : info.start + availabilityDate;
 
-            if (earliestStart == null || earliestStart > currentOffsetDate) 
+            if (earliestStart == null || earliestStart > currentOffsetDate)
                 earliestStart = currentOffsetDate;
         }
         return earliestStart;
@@ -475,9 +479,10 @@ public class CountrySpecificDataModule {
 
     private Integer getMetaDataReleaseDays(long videoId) {
         int ordinal = videoGeneralIdx.getMatchingOrdinal(videoId);
-        VideoGeneralHollow general = api.getVideoGeneralHollow(ordinal);
-        if (general != null)
+        if(ordinal != -1) {
+            VideoGeneralHollow general = api.getVideoGeneralHollow(ordinal);
             return general._getMetadataReleaseDaysBoxed();
+        }
         return null;
     }
 

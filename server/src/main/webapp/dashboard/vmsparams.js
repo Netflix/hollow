@@ -82,6 +82,7 @@ RegexParserMapper.prototype.getInputDataRegexInfo = function() {
     fieldRegex["coldstartVersionId"] = [ /^coldstartVersionId=(.*)/, 1 ];
     fieldRegex["coldstartKeybase"] = [ /^coldstartKeybase=(.*)/, 1 ];
     fieldRegex["coldstartS3Filename"] = [ /^coldstartS3Filename=(.*)/, 1 ];
+    fieldRegex["coldstartFilePublishDate"] = [ /^coldstartFilePublishDate=(.*)/, 1 ];
     return fieldRegex;
 };
 
