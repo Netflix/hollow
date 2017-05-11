@@ -18,6 +18,7 @@
 package com.netflix.hollow.explorer.ui.jetty;
 
 import com.netflix.hollow.api.client.HollowClient;
+import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.explorer.ui.HollowExplorerUI;
 
@@ -29,6 +30,10 @@ public class HollowExplorerUIServer {
 
     public HollowExplorerUIServer(HollowReadStateEngine readEngine, int port) {
         this(new HollowExplorerUI("", readEngine), port);
+    }
+
+    public HollowExplorerUIServer(HollowConsumer consumer, int port) {
+        this(new HollowExplorerUI("", consumer), port);
     }
 
     public HollowExplorerUIServer(HollowClient client, int port) {

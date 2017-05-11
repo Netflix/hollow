@@ -17,15 +17,14 @@
  */
 package com.netflix.hollow.core.read.filter;
 
+import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.core.read.engine.HollowBlobReader;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowCollectionSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-
-import com.netflix.hollow.api.client.HollowClient;
-import com.netflix.hollow.core.read.engine.HollowBlobReader;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.schema.HollowSchema;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,7 +42,7 @@ import java.util.Set;
  * all fields are excluded by default and only the identified fields are included.
  * <p>
  * A HollowFilterConfig can be used to reduce the heap footprint on consumers, either with 
- * {@link HollowClient#setFilter(HollowFilterConfig)} if using a {@link HollowClient} or with
+ * {@link HollowConsumer.Builder#withFilterConfig(HollowFilterConfig)} if using a {@link HollowConsumer} or with
  * {@link HollowBlobReader#readSnapshot(java.io.InputStream, HollowFilterConfig)} if using a {@link HollowReadStateEngine}
  * directly.
  * <p>

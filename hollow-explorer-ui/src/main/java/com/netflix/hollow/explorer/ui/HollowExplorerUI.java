@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.explorer.ui;
 
+import com.netflix.hollow.api.consumer.HollowConsumer;
+
 import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.explorer.ui.pages.BrowseSchemaPage;
@@ -31,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public class HollowExplorerUI extends HollowUIRouter {
     
+    private final HollowConsumer consumer;
     private final HollowClient client;
     private final HollowReadStateEngine stateEngine;
     
@@ -41,16 +44,21 @@ public class HollowExplorerUI extends HollowUIRouter {
     private final BrowseSchemaPage browseSchemaPage;
     private final QueryPage queryPage;
     
+    public HollowExplorerUI(String baseUrlPath, HollowConsumer consumer) {
+        this(baseUrlPath, consumer, null, null);
+    }
+    
     public HollowExplorerUI(String baseUrlPath, HollowClient client) {
-        this(baseUrlPath, client, null);
+        this(baseUrlPath, null, client, null);
     }
     
     public HollowExplorerUI(String baseUrlPath, HollowReadStateEngine stateEngine) {
-        this(baseUrlPath, null, stateEngine);
+        this(baseUrlPath, null, null, stateEngine);
     }
     
-    private HollowExplorerUI(String baseUrlPath, HollowClient client, HollowReadStateEngine stateEngine) {
+    private HollowExplorerUI(String baseUrlPath, HollowConsumer consumer, HollowClient client, HollowReadStateEngine stateEngine) {
         super(baseUrlPath);
+        this.consumer = consumer;
         this.client = client;
         this.stateEngine = stateEngine;
         
@@ -90,9 +98,12 @@ public class HollowExplorerUI extends HollowUIRouter {
     }
     
     public HollowReadStateEngine getStateEngine() {
-        if(client == null)
-            return stateEngine;
-        return client.getStateEngine();
+        if(consumer == null) {
+            if(client == null)
+                return stateEngine;
+            return client.getStateEngine();
+        }
+        return consumer.getStateEngine();
     }
     
     public void setHeaderDisplayString(String str) {
