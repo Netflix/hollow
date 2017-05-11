@@ -429,6 +429,8 @@ public class DataSlicerImpl implements DataSlicer {
             includeAll(stateEngine, "MovieCharacterPerson");
             includeAll(stateEngine, "VMSAward");
             includeAll(stateEngine, "AbsoluteSchedule");
+            includeAll(stateEngine, "MasterSchedule");
+            includeAll(stateEngine, "OverrideSchedule");
 
             return populateFilteredBlob(stateEngine, ordinalsToInclude);
         }
