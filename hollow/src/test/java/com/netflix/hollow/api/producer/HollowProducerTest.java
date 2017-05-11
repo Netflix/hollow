@@ -1,12 +1,12 @@
 package com.netflix.hollow.api.producer;
 
 import com.netflix.hollow.api.client.HollowBlob;
-import com.netflix.hollow.api.client.HollowBlobRetriever;
-import com.netflix.hollow.api.consumer.HollowConsumer.ReadState;
+import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.objects.delegate.HollowObjectGenericDelegate;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
 import com.netflix.hollow.api.producer.HollowProducer.Blob.Type;
+import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.Status;
@@ -36,7 +36,7 @@ public class HollowProducerTest {
 
     private File tmpFolder;
     HollowObjectSchema schema;
-    private HollowBlobRetriever blobRetriever;
+    private HollowConsumer.BlobRetriever blobRetriever;
 
     private Map<Long, Blob> blobMap = new HashMap<>();
     private Map<Long, File> blobFileMap = new HashMap<>();
@@ -100,7 +100,7 @@ public class HollowProducerTest {
         }
 
         {
-            ReadState readState = producer.restoreAndReturnReadState(fakeVersion, blobRetriever);
+            ReadState readState = producer.restore(fakeVersion, blobRetriever);
             Assert.assertNull(readState);
             Assert.assertNotNull(lastRestoreStatus);
             Assert.assertEquals(Status.FAIL, lastRestoreStatus.getStatus());
@@ -212,7 +212,7 @@ public class HollowProducerTest {
     }
 
     private void restoreAndAssert(HollowProducer producer, long version, int size, int valueMultiplier, int valueFieldCount) throws Exception {
-        ReadState readState = producer.restoreAndReturnReadState(version, blobRetriever);
+        ReadState readState = producer.restore(version, blobRetriever);
         Assert.assertNotNull(lastRestoreStatus);
         Assert.assertEquals(Status.SUCCESS, lastRestoreStatus.getStatus());
         Assert.assertEquals("Version should be the same", version, lastRestoreStatus.getDesiredVersion());
@@ -316,7 +316,7 @@ public class HollowProducerTest {
     }
 
     @SuppressWarnings("unused")
-    private class FakeBlobRetriever implements HollowBlobRetriever {
+    private class FakeBlobRetriever implements HollowConsumer.BlobRetriever {
         private String namespace;
         private String tmpDir;
 

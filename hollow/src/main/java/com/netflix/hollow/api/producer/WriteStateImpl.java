@@ -17,7 +17,6 @@
  */
 package com.netflix.hollow.api.producer;
 
-import com.netflix.hollow.api.consumer.HollowConsumer.ReadState;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 
@@ -29,9 +28,9 @@ import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 final class WriteStateImpl implements HollowProducer.WriteState {
     private final long version;
     private final HollowObjectMapper objectMapper;
-    private final ReadState priorReadState;
+    private final HollowProducer.ReadState priorReadState;
 
-    protected WriteStateImpl(long version, HollowObjectMapper objectMapper, ReadState priorReadState) {
+    protected WriteStateImpl(long version, HollowObjectMapper objectMapper, HollowProducer.ReadState priorReadState) {
         this.version = version;
         this.objectMapper = objectMapper;
         this.priorReadState = priorReadState;
@@ -58,7 +57,7 @@ final class WriteStateImpl implements HollowProducer.WriteState {
     }
 
     @Override
-    public ReadState getPriorState() {
+    public HollowProducer.ReadState getPriorState() {
         return priorReadState;
     }
 }

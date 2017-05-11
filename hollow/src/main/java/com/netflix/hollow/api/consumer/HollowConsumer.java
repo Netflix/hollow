@@ -66,7 +66,8 @@ public class HollowConsumer {
         updater.setFilter(dataFilter);
         this.announcementWatcher = announcementWatcher;
         this.refreshExecutor = refreshExecutor;
-        announcementWatcher.subscribeToEvents(this);
+        if(announcementWatcher != null)
+            announcementWatcher.subscribeToEvents(this);
     }
     
     /**
@@ -473,6 +474,10 @@ public class HollowConsumer {
 
     }
     
+    public static HollowConsumer.Builder withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
+        HollowConsumer.Builder builder = new Builder();
+        return builder.withBlobRetriever(blobRetriever);
+    }
     
     public static class Builder {
         private HollowConsumer.BlobRetriever blobRetriever = null;
@@ -570,14 +575,4 @@ public class HollowConsumer {
         }
     }
     
-    @Deprecated
-    public static ReadState newReadState(long version, HollowReadStateEngine stateEngine) {
-        return new ReadStateImpl(version, stateEngine);
-    }
-
-    @Deprecated
-    public static interface ReadState {
-        long getVersion();
-        HollowReadStateEngine getStateEngine();
-    }
 }

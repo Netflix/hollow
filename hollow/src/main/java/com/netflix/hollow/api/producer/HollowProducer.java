@@ -17,16 +17,12 @@
  */
 package com.netflix.hollow.api.producer;
 
-import static com.netflix.hollow.api.consumer.HollowConsumer.newReadState;
 import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.DELTA;
 import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.REVERSE_DELTA;
 import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.SNAPSHOT;
 import static java.lang.System.currentTimeMillis;
 
-import com.netflix.hollow.api.client.HollowBlobRetriever;
-import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.consumer.HollowConsumer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducer.Publisher.BlobCompressor;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
@@ -61,7 +57,7 @@ import java.util.logging.Logger;
 public class HollowProducer {
     public static final Validator NO_VALIDATIONS = new Validator(){
         @Override
-        public void validate(HollowConsumer.ReadState readState) {}
+        public void validate(HollowProducer.ReadState readState) {}
     };
 
     private final Logger log = Logger.getLogger(HollowProducer.class.getName());
@@ -108,24 +104,18 @@ public class HollowProducer {
         listeners.fireProducerInit(currentTimeMillis() - start);
     }
 
-
-    public HollowProducer restore(long versionDesired, HollowBlobRetriever blobRetriever) {
-        restoreAndReturnReadState(versionDesired, blobRetriever);
-        return this;
-    }
-
-    protected HollowConsumer.ReadState restoreAndReturnReadState(long versionDesired, HollowBlobRetriever blobRetriever) {
+    protected HollowProducer.ReadState restore(long versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
         long start = currentTimeMillis();
         RestoreStatus status = RestoreStatus.unknownFailure();
-        HollowConsumer.ReadState readState = null;
+        ReadState readState = null;
 
         try {
             listeners.fireProducerRestoreStart(versionDesired);
             if(versionDesired != Long.MIN_VALUE) {
 
-                HollowClient client = new HollowClient(blobRetriever);
+                HollowConsumer client = HollowConsumer.withBlobRetriever(blobRetriever).build();
                 client.triggerRefreshTo(versionDesired);
-                readState = newReadState(client.getCurrentVersionId(), client.getStateEngine());
+                readState = ReadStateHelper.newReadState(client.getCurrentVersionId(), client.getStateEngine());
                 if(readState.getVersion() == versionDesired) {
                     readStates = ReadStateHelper.restored(readState);
 
@@ -362,7 +352,7 @@ public class HollowProducer {
         }
     }
 
-    private void validate(HollowConsumer.ReadState readState) {
+    private void validate(HollowProducer.ReadState readState) {
         ProducerStatus.Builder status = listeners.fireValidationStart(readState);
         try {
             validator.validate(readState);
@@ -375,7 +365,7 @@ public class HollowProducer {
         }
     }
 
-    private void announce(HollowConsumer.ReadState readState) {
+    private void announce(HollowProducer.ReadState readState) {
         ProducerStatus.Builder status = listeners.fireAnnouncementStart(readState);
         try {
             announcer.announce(readState.getVersion());
@@ -413,6 +403,12 @@ public class HollowProducer {
         ReadState getPriorState();
 
         long getVersion();
+    }
+    
+    public static interface ReadState {
+        public long getVersion();
+
+        public HollowReadStateEngine getStateEngine();
     }
 
     public static abstract class Publisher {
@@ -609,7 +605,7 @@ public class HollowProducer {
     }
 
     public static interface Validator {
-        void validate(HollowConsumer.ReadState readState);
+        void validate(HollowProducer.ReadState readState);
     }
 
     public static interface Announcer {
