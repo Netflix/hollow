@@ -17,10 +17,7 @@
  */
 package com.netflix.hollow.api.client;
 
-import com.netflix.hollow.api.client.HollowUpdatePlan;
-import com.netflix.hollow.api.client.HollowUpdatePlanner;
-import com.netflix.hollow.api.client.HollowBlob;
-
+import com.netflix.hollow.api.consumer.HollowConsumer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +30,17 @@ public class HollowUpdatePlannerTest {
     @Before
     public void setUp() {
         mockTransitionCreator = new FakeHollowBlobRetriever();
-        planner = new HollowUpdatePlanner(mockTransitionCreator, 3);
+        planner = new HollowUpdatePlanner(mockTransitionCreator, new HollowConsumer.DoubleSnapshotConfig() {
+            @Override
+            public int maxDeltasBeforeDoubleSnapshot() {
+                return 3;
+            }
+            
+            @Override
+            public boolean allowDoubleSnapshot() {
+                return true;
+            }
+        });
     }
 
     @Test
@@ -252,7 +259,7 @@ public class HollowUpdatePlannerTest {
     }
 
 
-    private void assertTransition(HollowBlob transition, long expectedFrom, long expectedTo) {
+    private void assertTransition(HollowConsumer.Blob transition, long expectedFrom, long expectedTo) {
         Assert.assertEquals(transition.getFromVersion(), expectedFrom);
         Assert.assertEquals(transition.getToVersion(), expectedTo);
     }

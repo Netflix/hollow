@@ -17,15 +17,15 @@
  */
 package com.netflix.hollow.api.client;
 
+import com.netflix.hollow.api.consumer.HollowConsumer;
+
 /**
  * An interface which defines the necessary interactions of a {@link HollowClient} with a blob data store. 
  * 
  * Implementations will define how to retrieve blob data from a data store.
- * 
- * @author dkoszewnik
  *
  */
-public interface HollowBlobRetriever {
+public interface HollowBlobRetriever extends HollowConsumer.BlobRetriever {
 
     /**
      * Returns the snapshot for the state with an identifier equal to or less than the desired version

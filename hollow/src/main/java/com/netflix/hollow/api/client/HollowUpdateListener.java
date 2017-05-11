@@ -17,8 +17,8 @@
  */
 package com.netflix.hollow.api.client;
 
+import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
-
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
 /**
@@ -27,10 +27,8 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
  * 
  * A default implementation, which does nothing, is available: {@link HollowUpdateListener#DEFAULT_LISTENER}.
  * 
- * @author dkoszewnik
- *
  */
-public interface HollowUpdateListener {
+public interface HollowUpdateListener extends HollowConsumer.ObjectLongevityDetector {
 
     /**
      * Called whenever a state engine is initialized (either because the first snapshot was applied, or because a
@@ -89,21 +87,6 @@ public interface HollowUpdateListener {
      */
     public void transitionApplied(HollowBlob transition);
 
-    /**
-     * Stale reference detection hint.  This will be called every ~30 seconds.
-     *
-     * This signal can be noisy, and indicates that some reference to stale data exists somewhere.
-     */
-    public void staleReferenceExistenceDetected(int count);
-
-    /**
-     * Stale reference USAGE detection.  This will be called every ~30 seconds.
-     *
-     * This signal is noiseless, and indicates that some reference to stale data is USED somewhere.
-     */
-    public void staleReferenceUsageDetected(int count);
-
-
     public static HollowUpdateListener DEFAULT_LISTENER = new HollowUpdateListener() {
         @Override public void dataInitialized(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception { }
         @Override public void dataUpdated(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception { }
@@ -114,4 +97,5 @@ public interface HollowUpdateListener {
         @Override public void staleReferenceExistenceDetected(int count) { }
         @Override public void staleReferenceUsageDetected(int count) { }
     };
+    
 }

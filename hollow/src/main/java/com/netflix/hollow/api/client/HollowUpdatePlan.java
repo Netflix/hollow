@@ -17,48 +17,47 @@
  */
 package com.netflix.hollow.api.client;
 
+import com.netflix.hollow.api.consumer.HollowConsumer;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 /**
- * A plan, containing one or more {@link HollowBlob}s, which will be used to update the current data state to a desired data state.
- * 
- * @author dkoszewnik
- *
+ * A plan, containing one or more {@link HollowConsumer.Blob}s, which will be used to update the current data state to a desired data state.
  */
-public class HollowUpdatePlan implements Iterable<HollowBlob> {
+public class HollowUpdatePlan implements Iterable<HollowConsumer.Blob> {
 
-    public static HollowUpdatePlan DO_NOTHING = new HollowUpdatePlan(Collections.<HollowBlob>emptyList());
+    public static HollowUpdatePlan DO_NOTHING = new HollowUpdatePlan(Collections.<HollowConsumer.Blob>emptyList());
 
-    private final List<HollowBlob> transitions;
+    private final List<HollowConsumer.Blob> transitions;
 
-    private HollowUpdatePlan(List<HollowBlob> transitions) {
+    private HollowUpdatePlan(List<HollowConsumer.Blob> transitions) {
         this.transitions = transitions;
     }
 
     public HollowUpdatePlan() {
-        this.transitions = new ArrayList<HollowBlob>();
+        this.transitions = new ArrayList<HollowConsumer.Blob>();
     }
 
     public boolean isSnapshotPlan() {
         return !transitions.isEmpty() && transitions.get(0).isSnapshot();
     }
 
-    public HollowBlob getSnapshotTransition() {
+    public HollowConsumer.Blob getSnapshotTransition() {
         if(!isSnapshotPlan())
             return null;
         return transitions.get(0);
     }
 
-    public List<HollowBlob> getDeltaTransitions() {
+    public List<HollowConsumer.Blob> getDeltaTransitions() {
         if(!isSnapshotPlan())
             return transitions;
         return transitions.subList(1, transitions.size());
     }
 
-    public HollowBlob getTransition(int index) {
+    public HollowConsumer.Blob getTransition(int index) {
         return transitions.get(index);
     }
 
@@ -73,7 +72,7 @@ public class HollowUpdatePlan implements Iterable<HollowBlob> {
         if(transitions.isEmpty())
             return Long.MIN_VALUE;
 
-        HollowBlob lastTransition = transitions.get(transitions.size() - 1);
+        HollowConsumer.Blob lastTransition = transitions.get(transitions.size() - 1);
         return lastTransition.getToVersion();
     }
 
@@ -81,7 +80,7 @@ public class HollowUpdatePlan implements Iterable<HollowBlob> {
         return transitions.size();
     }
 
-    public void add(HollowBlob transition) {
+    public void add(HollowConsumer.Blob transition) {
         transitions.add(transition);
     }
 
@@ -90,7 +89,7 @@ public class HollowUpdatePlan implements Iterable<HollowBlob> {
     }
 
     @Override
-    public Iterator<HollowBlob> iterator() {
+    public Iterator<HollowConsumer.Blob> iterator() {
         return transitions.iterator();
     }
 }

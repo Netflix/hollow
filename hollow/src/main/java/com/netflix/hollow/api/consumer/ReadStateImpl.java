@@ -21,9 +21,8 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
 /**
  * Alpha API subject to change.
- *
- * @author Tim Taylor {@literal<tim@toolbear.io>}
  */
+@Deprecated
 class ReadStateImpl implements HollowConsumer.ReadState {
     private final long version;
     private final HollowReadStateEngine stateEngine;

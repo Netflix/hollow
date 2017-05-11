@@ -20,12 +20,18 @@ package com.netflix.hollow.api.client;
 import static com.netflix.hollow.api.client.HollowAPIFactory.DEFAULT_FACTORY;
 import static com.netflix.hollow.api.client.HollowClientMemoryConfig.DEFAULT_CONFIG;
 import static com.netflix.hollow.api.client.HollowUpdateListener.DEFAULT_LISTENER;
-import com.netflix.hollow.api.custom.HollowAPI;
-import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
-import com.netflix.hollow.core.util.DefaultHashCodeFinder;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import java.util.Collections;
 import com.netflix.hollow.api.codegen.HollowAPIClassJavaGenerator;
-import com.netflix.hollow.core.read.filter.HollowFilterConfig;
+import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.filter.HollowFilterConfig;
+import com.netflix.hollow.core.util.DefaultHashCodeFinder;
+import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 
 /**
  * A HollowClient is the top-level class used by consumers of HollowData to initialize and keep up-to-date a local in-memory 
@@ -63,14 +69,14 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
  * 
  * Only an implementation of the HollowBlobRetriever is required to be injected, the other components may use default
  * implementations. 
- * 
- * @author dkoszewnik
  *
  */
 public class HollowClient {
 
     protected final HollowAnnouncementWatcher announcementWatcher;
     protected final HollowClientUpdater updater;
+    
+    private final HollowClientDoubleSnapshotConfig doubleSnapshotConfig;
 
     public HollowClient(HollowBlobRetriever blobRetriever) {
         this(blobRetriever, new HollowAnnouncementWatcher.DefaultWatcher(), DEFAULT_LISTENER, DEFAULT_FACTORY, new DefaultHashCodeFinder(), DEFAULT_CONFIG);
@@ -92,7 +98,14 @@ public class HollowClient {
                         HollowAPIFactory apiFactory,
                         HollowObjectHashCodeFinder hashCodeFinder,
                         HollowClientMemoryConfig memoryConfig) {
-        this.updater = new HollowClientUpdater(blobRetriever, updateListener, apiFactory, hashCodeFinder, memoryConfig);
+        this.doubleSnapshotConfig = new HollowClientDoubleSnapshotConfig(memoryConfig);
+        this.updater = new HollowClientUpdater(blobRetriever, 
+                                               Collections.singletonList(consumerRefreshListenerFor(updateListener)), 
+                                               apiFactory,
+                                               doubleSnapshotConfig, 
+                                               hashCodeFinder, 
+                                               memoryConfig,
+                                               updateListener);
         this.announcementWatcher = announcementWatcher;
         announcementWatcher.setClientToNotify(this);
     }
@@ -161,7 +174,7 @@ public class HollowClient {
      * </ul>
      */
     public void setMaxDeltas(int maxDeltas) {
-        updater.setMaxDeltas(maxDeltas);
+        doubleSnapshotConfig.setMaxDeltasBeforeDoubleSnapshot(maxDeltas);
     }
     
     /**
@@ -196,6 +209,73 @@ public class HollowClient {
         return updater.getCurrentVersionId();
     }
     
+    private static class HollowClientDoubleSnapshotConfig implements HollowConsumer.DoubleSnapshotConfig {
+        
+        private final HollowClientMemoryConfig clientMemCfg;
+        private int maxDeltasBeforeDoubleSnapshot = 32;
+        
+        public HollowClientDoubleSnapshotConfig(HollowClientMemoryConfig clientMemCfg) {
+            this.clientMemCfg = clientMemCfg;
+        }
+        
+        @Override
+        public boolean allowDoubleSnapshot() {
+            return clientMemCfg.allowDoubleSnapshot();
+        }
+
+        @Override
+        public int maxDeltasBeforeDoubleSnapshot() {
+            return maxDeltasBeforeDoubleSnapshot;
+        }
+        
+        public void setMaxDeltasBeforeDoubleSnapshot(int maxDeltas) {
+            this.maxDeltasBeforeDoubleSnapshot = maxDeltas;
+        }
+        
+    }
+    
+    private static HollowConsumer.RefreshListener consumerRefreshListenerFor(final HollowUpdateListener listener) {
+        return new HollowConsumer.RefreshListener() {
+            
+            @Override
+            public void refreshStarted(long currentVersion, long requestedVersion) {
+                listener.refreshStarted(currentVersion, requestedVersion);
+            }
+
+            @Override
+            public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
+                listener.dataInitialized(api, stateEngine, version);
+            }
+            
+            @Override
+            public void blobLoaded(final HollowConsumer.Blob transition) {
+                if(transition instanceof HollowBlob)
+                    listener.transitionApplied((HollowBlob)transition);
+                else
+                    listener.transitionApplied(new HollowBlob(transition.getFromVersion(), transition.getToVersion()) {
+                        @Override
+                        public InputStream getInputStream() throws IOException {
+                            return transition.getInputStream();
+                        }
+                    });
+            }
+
+            @Override
+            public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
+                listener.dataUpdated(api, stateEngine, version);
+            }
+
+            @Override
+            public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
+                listener.refreshCompleted(beforeVersion, afterVersion, requestedVersion);
+            }
+            
+            @Override
+            public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) {
+                listener.refreshFailed(beforeVersion, afterVersion, requestedVersion, failureCause);
+            }
+        };
+    }
     
     public static class Builder {
         private HollowBlobRetriever blobRetriever = null;
