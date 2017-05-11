@@ -39,9 +39,6 @@ import java.util.TreeSet;
 
 public class WindowPackageContractInfoModule {
 
-	// Alternate implementation where we check for specific stream profile Id
-	//private static final int ATMOS_PROFILE_ID = 58;
-	
     private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
     private final CycleConstants cycleConstants;
@@ -120,11 +117,6 @@ public class WindowPackageContractInfoModule {
             if (fourKProfileIds.contains(encodingProfileId)) {
                 info.videoPackageInfo.formats.add(cycleConstants.FOUR_K);
             }
-            // Alternate implementation where we check for profileId 58 directly
-            // instead of building the atmosprofileIds list and then adding if the 
-            // downloadable's stream profileId is one from the above list.
-            //if(encodingProfileId == ATMOS_PROFILE_ID)
-            //	info.videoPackageInfo.formats.add(cycleConstants.ATMOS);
             if(atmosStreamProfileIds.contains(encodingProfileId)) {
             	info.videoPackageInfo.formats.add(cycleConstants.ATMOS);
             }
