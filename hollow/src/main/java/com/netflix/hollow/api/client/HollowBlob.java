@@ -37,7 +37,10 @@ import java.io.InputStream;
  *      <dd>Implementations will define how to retrieve the actual blob data for this specific blob from a data store as an InputStream.</dd>
  * </dl>
  * 
+ * @deprecated Extend the {@link HollowConsumer.Blob} for use with the {@link HollowConsumer.BlobRetriever} instead.
+ * 
  */
+@Deprecated
 public abstract class HollowBlob extends HollowConsumer.Blob {
 
     /**

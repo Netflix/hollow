@@ -27,7 +27,11 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
  * 
  * A default implementation, which does nothing, is available: {@link HollowUpdateListener#DEFAULT_LISTENER}.
  * 
+ * @deprecated Implement the {@link HollowConsumer.RefreshListener} and/or {@link HollowConsumer.ObjectLongevityDetector} for 
+ * use with the {@link HollowConsumer} instead.
+ * 
  */
+@Deprecated
 public interface HollowUpdateListener extends HollowConsumer.ObjectLongevityDetector {
 
     /**

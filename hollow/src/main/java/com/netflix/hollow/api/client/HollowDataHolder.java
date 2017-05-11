@@ -32,7 +32,7 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
- * A class comprising much of the internal state of a HollowConsumer.  Not intended for external consumption.
+ * A class comprising much of the internal state of a {@link HollowConsumer}.  Not intended for external consumption.
  */
 public class HollowDataHolder {
 

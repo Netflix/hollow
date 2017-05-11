@@ -27,7 +27,7 @@ import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 
 /**
- * A class comprising much of the internal state of a HollowClient.  Not intended for external consumption.
+ * A class comprising much of the internal state of a {@link HollowConsumer}.  Not intended for external consumption.
  */
 public class HollowClientUpdater {
 

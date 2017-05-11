@@ -69,8 +69,11 @@ import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
  * 
  * Only an implementation of the HollowBlobRetriever is required to be injected, the other components may use default
  * implementations. 
+ * 
+ * @deprecated Use the {@link HollowConsumer} API instead.
  *
  */
+@Deprecated
 public class HollowClient {
 
     protected final HollowAnnouncementWatcher announcementWatcher;

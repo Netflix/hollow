@@ -24,6 +24,9 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
  * 
  * Implementations are often a {@link SpecifiedConfig}.
  * 
+ * @deprecated Implement the {@link HollowConsumer.ObjectLongevityConfig} and/or {@link HollowConsumer.DoubleSnapshotConfig} for use 
+ * with the {@link HollowConsumer} instead.
+ * 
  */
 public interface HollowClientMemoryConfig extends HollowConsumer.ObjectLongevityConfig {
 
