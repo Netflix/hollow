@@ -71,26 +71,31 @@ public class HollowProducer {
 
     public HollowProducer(Publisher publisher,
                           Announcer announcer) {
-        this(publisher, Collections.<Validator>emptyList(), announcer);
+        this(publisher, announcer, Collections.<Validator>emptyList(), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter());
     }
 
     public HollowProducer(Publisher publisher,
                           Validator validator,
                           Announcer announcer) {
-        this(publisher, Collections.singletonList(validator), announcer);
+        this(publisher, announcer, Collections.singletonList(validator), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter());
     }
 
     public HollowProducer(Publisher publisher,
+                          Announcer announcer,
                           List<Validator> validators,
-                          Announcer announcer) {
+                          List<HollowProducerListener> listeners,
+                          VersionMinter versionMinter) {
         this.publisher = publisher;
         this.validators = validators;
         this.announcer = announcer;
+        this.versionMinter = versionMinter;
 
-        objectMapper = new HollowObjectMapper(new HollowWriteStateEngine());
-        versionMinter = new VersionMinterWithCounter();
-        listeners = new ListenerSupport();
-        readStates = ReadStateHelper.newDeltaChain();
+        this.objectMapper = new HollowObjectMapper(new HollowWriteStateEngine());
+        this.listeners = new ListenerSupport();
+        this.readStates = ReadStateHelper.newDeltaChain();
+        
+        for(HollowProducerListener listener : listeners)
+            this.listeners.add(listener);
     }
 
     public void initializeDataModel(Class<?>...classes) {
@@ -386,15 +391,17 @@ public class HollowProducer {
     }
 
     private void announce(HollowProducer.ReadState readState) {
-        ProducerStatus.Builder status = listeners.fireAnnouncementStart(readState);
-        try {
-            announcer.announce(readState.getVersion());
-            status.success();
-        } catch(Throwable th) {
-            status.fail(th);
-            throw th;
-        } finally {
-            listeners.fireAnnouncementComplete(status);
+        if(announcer != null) {
+            ProducerStatus.Builder status = listeners.fireAnnouncementStart(readState);
+            try {
+                announcer.announce(readState.getVersion());
+                status.success();
+            } catch(Throwable th) {
+                status.fail(th);
+                throw th;
+            } finally {
+                listeners.fireAnnouncementComplete(status);
+            }
         }
     }
 
@@ -685,4 +692,59 @@ public class HollowProducer {
             return reverseDelta != null;
         }
     }
+    
+    public static HollowProducer.Builder withPublisher(HollowProducer.Publisher publisher) {
+        Builder builder = new Builder();
+        return builder.withPublisher(publisher);
+    }
+    
+    public static class Builder {
+        private Publisher publisher;
+        private Announcer announcer;
+        private List<Validator> validators = new ArrayList<Validator>();
+        private List<HollowProducerListener> listeners = new ArrayList<HollowProducerListener>();
+        private VersionMinter versionMinter;
+        
+        public Builder withPublisher(HollowProducer.Publisher publisher) {
+            this.publisher = publisher; 
+            return this;
+        }
+        
+        public Builder withAnnouncer(HollowProducer.Announcer announcer) {
+            this.announcer = announcer;
+            return this;
+        }
+        
+        public Builder withValidator(HollowProducer.Validator validator) {
+            this.validators.add(validator);
+            return this;
+        }
+        
+        public Builder withValidators(HollowProducer.Validator... validators) {
+            for(Validator validator : validators)
+                this.validators.add(validator);
+            return this;
+        }
+        
+        public Builder withListener(HollowProducerListener listener) {
+            this.listeners.add(listener);
+            return this;
+        }
+        
+        public Builder withListeners(HollowProducerListener... listeners) {
+            for(HollowProducerListener listener : listeners)
+                this.listeners.add(listener);
+            return this;
+        }
+        
+        public Builder withVersionMinter(HollowProducer.VersionMinter versionMinter) {
+            this.versionMinter = versionMinter;
+            return this;
+        }
+        
+        public HollowProducer build() {
+            return new HollowProducer(publisher, announcer, validators, listeners, versionMinter);
+        }
+    }
+    
 }
