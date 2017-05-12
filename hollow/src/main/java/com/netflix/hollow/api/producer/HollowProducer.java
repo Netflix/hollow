@@ -51,6 +51,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -68,27 +70,38 @@ public class HollowProducer {
     private final VersionMinter versionMinter;
     private final ListenerSupport listeners;
     private ReadStateHelper readStates;
+    private final Executor snapshotPublishExecutor;
+    private final int numStatesBetweenSnapshots;
+    private int numStatesSinceLastSnapshot;
 
     public HollowProducer(Publisher publisher,
                           Announcer announcer) {
-        this(publisher, announcer, Collections.<Validator>emptyList(), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter());
+        this(publisher, announcer, Collections.<Validator>emptyList(), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0);
     }
 
     public HollowProducer(Publisher publisher,
                           Validator validator,
                           Announcer announcer) {
-        this(publisher, announcer, Collections.singletonList(validator), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter());
+        this(publisher, announcer, Collections.singletonList(validator), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0);
     }
 
-    public HollowProducer(Publisher publisher,
-                          Announcer announcer,
-                          List<Validator> validators,
-                          List<HollowProducerListener> listeners,
-                          VersionMinter versionMinter) {
+    protected HollowProducer(Publisher publisher,
+                             Announcer announcer,
+                             List<Validator> validators,
+                             List<HollowProducerListener> listeners,
+                             VersionMinter versionMinter,
+                             Executor snapshotPublishExecutor,
+                             int numStatesBetweenSnapshots) {
         this.publisher = publisher;
         this.validators = validators;
         this.announcer = announcer;
         this.versionMinter = versionMinter;
+        this.snapshotPublishExecutor = snapshotPublishExecutor == null ? new Executor() {
+            public void execute(Runnable command) {
+                command.run();
+            }
+        } : snapshotPublishExecutor;
+        this.numStatesBetweenSnapshots = numStatesBetweenSnapshots;
 
         this.objectMapper = new HollowObjectMapper(new HollowWriteStateEngine());
         this.listeners = new ListenerSupport();
@@ -114,7 +127,7 @@ public class HollowProducer {
         listeners.fireProducerInit(currentTimeMillis() - start);
     }
 
-    protected HollowProducer.ReadState restore(long versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
+    public HollowProducer.ReadState restore(long versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
         long start = currentTimeMillis();
         RestoreStatus status = RestoreStatus.unknownFailure();
         ReadState readState = null;
@@ -225,14 +238,33 @@ public class HollowProducer {
         listeners.remove(listener);
     }
 
-    private void publish(WriteState writeState, Artifacts artifacts) throws IOException {
+    private void publish(final WriteState writeState, final Artifacts artifacts) throws IOException {
         ProducerStatus.Builder psb = listeners.firePublishStart(writeState.getVersion());
         try {
+            stageBlob(writeState, artifacts, Blob.Type.SNAPSHOT);
+            
             if (readStates.hasCurrent()) {
+                stageBlob(writeState, artifacts, Blob.Type.DELTA);
+                stageBlob(writeState, artifacts, Blob.Type.REVERSE_DELTA);
                 publishBlob(writeState, artifacts, Blob.Type.DELTA);
                 publishBlob(writeState, artifacts, Blob.Type.REVERSE_DELTA);
+                
+                if(++numStatesSinceLastSnapshot > numStatesBetweenSnapshots) {
+                    snapshotPublishExecutor.execute(new Runnable() {
+                        public void run() {
+                            try {
+                                publishBlob(writeState, artifacts, Blob.Type.SNAPSHOT);
+                            } catch(IOException e) {
+                                log.log(Level.WARNING, "Snapshot publish failed", e);
+                            }
+                        }
+                    });
+                    numStatesSinceLastSnapshot = 0;
+                }
+            } else {
+                publishBlob(writeState, artifacts, Blob.Type.SNAPSHOT);
             }
-            publishBlob(writeState, artifacts, Blob.Type.SNAPSHOT);
+            
             psb.success();
 
         } catch (Throwable throwable) {
@@ -242,27 +274,45 @@ public class HollowProducer {
             listeners.firePublishComplete(psb);
         }
     }
-
-    private void publishBlob(WriteState writeState, Artifacts artifacts, Blob.Type blobType) throws IOException {
+    
+    private void stageBlob(WriteState writeState, Artifacts artifacts, Blob.Type blobType) throws IOException {
         HollowBlobWriter writer = new HollowBlobWriter(getWriteEngine());
-        PublishStatus.Builder builder = (new PublishStatus.Builder());
         try {
             switch (blobType) {
                 case SNAPSHOT:
                     artifacts.snapshot = publisher.openSnapshot(writeState.getVersion());
                     artifacts.snapshot.write(writer);
-                    builder.blob(artifacts.snapshot);
-                    publisher.publish(artifacts.snapshot, writeState.getStateEngine().getHeaderTags());
                     break;
                 case DELTA:
                     artifacts.delta = publisher.openDelta(readStates.current().getVersion(), writeState.getVersion());
                     artifacts.delta.write(writer);
-                    builder.blob(artifacts.delta);
-                    publisher.publish(artifacts.delta, writeState.getStateEngine().getHeaderTags());
                     break;
                 case REVERSE_DELTA:
                     artifacts.reverseDelta = publisher.openReverseDelta(writeState.getVersion(), readStates.current().getVersion());
                     artifacts.reverseDelta.write(writer);
+                    break;
+                default:
+                    throw new IllegalStateException("unknown type, type=" + blobType);
+            }
+
+        } catch (Throwable th) {
+            throw th;
+        }
+    }
+
+    private void publishBlob(WriteState writeState, Artifacts artifacts, Blob.Type blobType) throws IOException {
+        PublishStatus.Builder builder = (new PublishStatus.Builder());
+        try {
+            switch (blobType) {
+                case SNAPSHOT:
+                    builder.blob(artifacts.snapshot);
+                    publisher.publish(artifacts.snapshot, writeState.getStateEngine().getHeaderTags());
+                    break;
+                case DELTA:
+                    builder.blob(artifacts.delta);
+                    publisher.publish(artifacts.delta, writeState.getStateEngine().getHeaderTags());
+                    break;
+                case REVERSE_DELTA:
                     builder.blob(artifacts.reverseDelta);
                     publisher.publish(artifacts.reverseDelta, writeState.getStateEngine().getHeaderTags());
                     break;
@@ -443,6 +493,16 @@ public class HollowProducer {
         protected String namespace;
         protected String dir;
 
+        /**
+         * Constructor to create a new Publisher with disk path for Hollow blobs.
+         *
+         * @param namespace typically project namespace
+         * @param dir       directory to use to write hollow blob files.
+         */
+        public Publisher(String dir) {
+            this(null, dir);
+        }
+        
         /**
          * Constructor to create a new Publisher with namespace &amp; disk path for Hollow blobs.
          *
@@ -703,7 +763,9 @@ public class HollowProducer {
         private Announcer announcer;
         private List<Validator> validators = new ArrayList<Validator>();
         private List<HollowProducerListener> listeners = new ArrayList<HollowProducerListener>();
-        private VersionMinter versionMinter;
+        private VersionMinter versionMinter = new VersionMinterWithCounter();
+        private Executor snapshotPublishExecutor = null;
+        private int numStatesBetweenSnapshots = 0;
         
         public Builder withPublisher(HollowProducer.Publisher publisher) {
             this.publisher = publisher; 
@@ -742,8 +804,18 @@ public class HollowProducer {
             return this;
         }
         
+        public Builder withSnapshotPublishExecutor(Executor executor) {
+            this.snapshotPublishExecutor = executor;
+            return this;
+        }
+        
+        public Builder withNumStatesBetweenSnapshots(int numStatesBetweenSnapshots) {
+            this.numStatesBetweenSnapshots = numStatesBetweenSnapshots;
+            return this;
+        }
+        
         public HollowProducer build() {
-            return new HollowProducer(publisher, announcer, validators, listeners, versionMinter);
+            return new HollowProducer(publisher, announcer, validators, listeners, versionMinter, snapshotPublishExecutor, numStatesBetweenSnapshots);
         }
     }
     

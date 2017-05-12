@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
@@ -93,9 +93,9 @@ import java.util.concurrent.ThreadFactory;
  *      <dt>{@link HollowConsumer.ObjectLongevityDetector}</dt>
  *      <dd>Implementations of this config will be notified when usage of expired Hollow object references is attempted.</dd>
  *      
- *      <dt>An ExecutorService</dt>
- *      <dd>The ExecutorService which will be used to perform updates when {@link #triggerAsyncRefresh()} is called.  This will
- *          default to a new thread pool with a single refresh thread.</dd>
+ *      <dt>An Executor</dt>
+ *      <dd>The Executor which will be used to perform updates when {@link #triggerAsyncRefresh()} is called.  This will
+ *          default to a new fixed thread pool with a single refresh thread.</dd>
  *      
  *          
  *      
@@ -106,7 +106,7 @@ public class HollowConsumer {
     protected final AnnouncementWatcher announcementWatcher;
     protected final HollowClientUpdater updater;
     
-    private final ExecutorService refreshExecutor;
+    private final Executor refreshExecutor;
 
     protected HollowConsumer(BlobRetriever blobRetriever,
                              AnnouncementWatcher announcementWatcher,
@@ -117,7 +117,7 @@ public class HollowConsumer {
                              ObjectLongevityDetector objectLongevityDetector,
                              DoubleSnapshotConfig doubleSnapshotConfig,
                              HollowObjectHashCodeFinder hashCodeFinder,
-                             ExecutorService refreshExecutor) {
+                             Executor refreshExecutor) {
         
         this.updater = new HollowClientUpdater(blobRetriever, 
                                                updateListeners, 
@@ -556,7 +556,7 @@ public class HollowConsumer {
         private HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig = DoubleSnapshotConfig.DEFAULT_CONFIG;
         private HollowConsumer.ObjectLongevityConfig objectLongevityConfig = ObjectLongevityConfig.DEFAULT_CONFIG;
         private HollowConsumer.ObjectLongevityDetector objectLongevityDetector = ObjectLongevityDetector.DEFAULT_DETECTOR;
-        private ExecutorService refreshExecutor = null;
+        private Executor refreshExecutor = null;
         
         public HollowConsumer.Builder withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
             this.blobRetriever = blobRetriever;
@@ -604,7 +604,7 @@ public class HollowConsumer {
             return this;
         }
         
-        public HollowConsumer.Builder withRefreshExecutor(ExecutorService refreshExecutor) {
+        public HollowConsumer.Builder withRefreshExecutor(Executor refreshExecutor) {
             this.refreshExecutor = refreshExecutor;
             return this;
         }
@@ -620,7 +620,7 @@ public class HollowConsumer {
                 throw new IllegalArgumentException("A HollowBlobRetriever must be specified when building a HollowClient");
             
             if(refreshExecutor == null)
-                refreshExecutor = Executors.newFixedThreadPool(1, new ThreadFactory() {
+                refreshExecutor = Executors.newSingleThreadExecutor(new ThreadFactory() {
                     public Thread newThread(Runnable r) {
                         Thread t = new Thread(r);
                         t.setDaemon(true);
