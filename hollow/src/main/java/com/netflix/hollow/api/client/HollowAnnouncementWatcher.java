@@ -34,7 +34,7 @@ import java.util.concurrent.ThreadFactory;
  * is used, calling {@link HollowClient#triggerRefresh()} will always attempt to get to the latest state, unless an 
  * explicit state was specified via {@link HollowClient#triggerRefreshTo(long)}.
  * 
- * @deprecated Implement the {@link HollowConsumer.AnnouncementWatcher} for use with the {@link HollowConsumer} instead.  This should be a drop-in replacement.
+ * @deprecated Implement the {@link HollowConsumer.AnnouncementWatcher} for use with the {@link HollowConsumer} instead.
  *
  */
 @Deprecated
