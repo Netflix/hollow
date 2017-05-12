@@ -17,50 +17,30 @@
  */
 package com.netflix.hollow.api.producer.fs;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.nio.file.Files.createDirectories;
-import static java.nio.file.Files.newBufferedWriter;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import com.netflix.hollow.api.producer.HollowProducer;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class HollowFilesystemAnnouncer implements HollowProducer.Announcer {
-    private final Path publishPath;
-    private final Path annnouncementPath;
+    
+    public static final String ANNOUNCEMENT_FILENAME = "announced.version";
+    
+    private final File publishDir;
 
-    public HollowFilesystemAnnouncer(String namespace) {
-        this(namespace, "announced.version");
-    }
-
-    public HollowFilesystemAnnouncer(String namespace, String announcementFilename) {
-        this(Paths.get(System.getProperty("java.io.tmpdir"), namespace, "published"),
-                announcementFilename);
-    }
-
-    public HollowFilesystemAnnouncer(Path publishDir, String announcementFilename) {
-        this.publishPath = publishDir;
-        annnouncementPath = publishPath.resolve(announcementFilename);
+    public HollowFilesystemAnnouncer(File publishDir) {
+        this.publishDir = publishDir;
     }
 
     @Override
     public void announce(long stateVersion) {
-        BufferedWriter writer = null;
-        try {
-            createDirectories(publishPath);
-            writer = newBufferedWriter(annnouncementPath, UTF_8);
+        File announceFile = new File(publishDir, ANNOUNCEMENT_FILENAME);
+        
+        try (FileWriter writer = new FileWriter(announceFile)){
             writer.write(String.valueOf(stateVersion));
         } catch(IOException ex) {
             throw new RuntimeException("Unable to write to announcement file", ex);
-        } finally {
-            try {
-                if(writer != null) writer.close();
-            } catch(IOException ex) {
-                ex.printStackTrace();
-            }
         }
     }
+
 }

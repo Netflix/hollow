@@ -18,47 +18,47 @@
 package com.netflix.hollow.api.producer.fs;
 
 import com.netflix.hollow.api.producer.HollowProducer;
-import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-
-import java.nio.file.FileSystems;
-import java.util.Map;
-
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-public class HollowFilesystemPublisher extends HollowProducer.Publisher {
-    private final Path publishPath;
-
-    public HollowFilesystemPublisher(String namespace) {
-        super(namespace, FileSystems.getDefault().getPath(System.getProperty("java.io.tmpdir"), namespace).toString());
-        this.publishPath = Paths.get(System.getProperty("java.io.tmpdir"), namespace, "published");
-    }
-
-    public Path getStagingDir() {
-        return publishPath;
-    }
+public class HollowFilesystemPublisher implements HollowProducer.Publisher {
     
-    public Path getPublishDir() {
-        return publishPath;
+    private final File blobStoreDir;
+
+    public HollowFilesystemPublisher(File blobStoreDir) {
+        this.blobStoreDir = blobStoreDir;
+        
+        blobStoreDir.mkdirs();
     }
-    
+
     @Override
-    public void publish(HollowProducer.Blob blob, Map<String, String> headerTags) {
-        try {
-            Files.createDirectories(publishPath);
-
-            Path source = Paths.get(blob.getFile().getPath());
-            Path filename = source.getFileName();
-            Path destination = publishPath.resolve(filename);
-            Path intermediate = destination.resolveSibling(filename + ".incomplete");
-            Files.copy(source, intermediate, REPLACE_EXISTING);
-            Files.move(intermediate, destination, ATOMIC_MOVE);
-
-        } catch(IOException ex) {
-            throw new RuntimeException("Unable to publish file!", ex);
+    public void publish(HollowProducer.Blob blob) {
+        File destination = null;
+        
+        switch(blob.getType()) {
+        case SNAPSHOT:
+            destination = new File(blobStoreDir, String.format("%s-%d", blob.getType().prefix, blob.getToVersion()));
+            break;
+        case DELTA:
+        case REVERSE_DELTA:
+            destination = new File(blobStoreDir, String.format("%s-%d-%d", blob.getType().prefix, blob.getFromVersion(), blob.getToVersion()));
+            break;
         }
+            
+        try(
+                InputStream is = blob.newInputStream();
+                OutputStream os = new FileOutputStream(destination);
+        ) {
+            byte buf[] = new byte[4096];
+            int n = 0;
+            while (-1 != (n = is.read(buf)))
+                os.write(buf, 0, n);
+        } catch(IOException e) {
+            throw new RuntimeException("Unable to publish file!", e);
+        }
+
     }
 }
