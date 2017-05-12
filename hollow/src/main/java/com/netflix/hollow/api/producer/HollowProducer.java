@@ -24,6 +24,7 @@ import static java.lang.System.currentTimeMillis;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer.Publisher.BlobCompressor;
+import com.netflix.hollow.api.producer.HollowProducer.Validator.ValidationException;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
@@ -44,8 +45,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -55,31 +59,32 @@ import java.util.logging.Logger;
  * @author Tim Taylor {@literal<tim@toolbear.io>}
  */
 public class HollowProducer {
-    public static final Validator NO_VALIDATIONS = new Validator(){
-        @Override
-        public void validate(HollowProducer.ReadState readState) {}
-    };
 
     private final Logger log = Logger.getLogger(HollowProducer.class.getName());
     private final Publisher publisher;
-    private final Validator validator;
+    private final List<Validator> validators;
     private final Announcer announcer;
     private HollowObjectMapper objectMapper;
     private final VersionMinter versionMinter;
     private final ListenerSupport listeners;
     private ReadStateHelper readStates;
 
-    public HollowProducer(HollowProducer.Publisher publisher,
-            HollowProducer.Announcer announcer) {
-        this(publisher, NO_VALIDATIONS, announcer);
+    public HollowProducer(Publisher publisher,
+                          Announcer announcer) {
+        this(publisher, Collections.<Validator>emptyList(), announcer);
     }
 
-    public HollowProducer(
-            Publisher publisher,
-            Validator validator,
-            Announcer announcer) {
+    public HollowProducer(Publisher publisher,
+                          Validator validator,
+                          Announcer announcer) {
+        this(publisher, Collections.singletonList(validator), announcer);
+    }
+
+    public HollowProducer(Publisher publisher,
+                          List<Validator> validators,
+                          Announcer announcer) {
         this.publisher = publisher;
-        this.validator = validator;
+        this.validators = validators;
         this.announcer = announcer;
 
         objectMapper = new HollowObjectMapper(new HollowWriteStateEngine());
@@ -355,7 +360,22 @@ public class HollowProducer {
     private void validate(HollowProducer.ReadState readState) {
         ProducerStatus.Builder status = listeners.fireValidationStart(readState);
         try {
-            validator.validate(readState);
+            List<Throwable> validationFailures = new ArrayList<Throwable>();
+            
+            for(Validator validator : validators) {
+                try {
+                    validator.validate(readState);
+                } catch(Throwable th) {
+                    validationFailures.add(th);
+                }
+            }
+            
+            if(!validationFailures.isEmpty()) {
+                ValidationException ex = new ValidationException("Validation Failed", validationFailures.get(0));
+                ex.setIndividualFailures(validationFailures);
+                throw ex;
+            }
+            
             status.success();
         } catch (Throwable th) {
             status.fail(th);
@@ -606,6 +626,31 @@ public class HollowProducer {
 
     public static interface Validator {
         void validate(HollowProducer.ReadState readState);
+    
+        @SuppressWarnings("serial")
+        public static class ValidationException extends RuntimeException {
+            private List<Throwable> individualFailures;
+            
+            public ValidationException() {
+                super();
+            }
+            
+            public ValidationException(String msg) {
+                super(msg);
+            }
+            
+            public ValidationException(String msg, Throwable cause) {
+                super(msg, cause);
+            }
+            
+            public void setIndividualFailures(List<Throwable> individualFailures) {
+                this.individualFailures = individualFailures;
+            }
+            
+            public List<Throwable> getIndividualFailures() {
+                return individualFailures;
+            }
+        }
     }
 
     public static interface Announcer {

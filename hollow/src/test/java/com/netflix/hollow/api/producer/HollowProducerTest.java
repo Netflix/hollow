@@ -1,6 +1,5 @@
 package com.netflix.hollow.api.producer;
 
-import com.netflix.hollow.api.client.HollowBlob;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.objects.delegate.HollowObjectGenericDelegate;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
@@ -326,12 +325,12 @@ public class HollowProducerTest {
         }
 
         @Override
-        public HollowBlob retrieveSnapshotBlob(long desiredVersion) {
+        public HollowConsumer.Blob retrieveSnapshotBlob(long desiredVersion) {
             final File blobFile = blobFileMap.get(desiredVersion);
             if (blobFile == null) return null;
 
             System.out.println("Restored: " + blobFile);
-            return new HollowBlob(desiredVersion) {
+            return new HollowConsumer.Blob(desiredVersion) {
                 @Override
                 public InputStream getInputStream() throws IOException {
                     return new FileInputStream(blobFile);
@@ -340,12 +339,12 @@ public class HollowProducerTest {
         }
 
         @Override
-        public HollowBlob retrieveDeltaBlob(long currentVersion) {
+        public HollowConsumer.Blob retrieveDeltaBlob(long currentVersion) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public HollowBlob retrieveReverseDeltaBlob(long currentVersion) {
+        public HollowConsumer.Blob retrieveReverseDeltaBlob(long currentVersion) {
             throw new UnsupportedOperationException();
         }
     }
