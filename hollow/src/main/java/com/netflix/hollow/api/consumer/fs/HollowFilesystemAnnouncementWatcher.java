@@ -68,7 +68,7 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
         File f = new File(publishDir, HollowFilesystemAnnouncer.ANNOUNCEMENT_FILENAME);
         
         if(!f.exists())
-            return Long.MIN_VALUE;
+            return NO_ANNOUNCEMENT_AVAILABLE;
         
         try(BufferedReader reader = new BufferedReader(new FileReader(f))) {
             return Long.parseLong(reader.readLine());

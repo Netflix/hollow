@@ -22,12 +22,14 @@ import com.netflix.hollow.api.client.HollowAPIFactory;
 import com.netflix.hollow.api.client.HollowClientUpdater;
 import com.netflix.hollow.api.client.StaleHollowReferenceDetector;
 import com.netflix.hollow.api.codegen.HollowAPIClassJavaGenerator;
+import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.util.DefaultHashCodeFinder;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.tools.history.HollowHistory;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -324,6 +326,10 @@ public class HollowConsumer {
         public boolean isReverseDelta() {
             return toVersion < fromVersion;
         }
+        
+        public boolean isDelta() {
+            return !isSnapshot() && !isReverseDelta(); 
+        }
 
         public long getFromVersion() {
             return fromVersion;
@@ -343,6 +349,8 @@ public class HollowConsumer {
      * If an AnnouncementWatcher is provided to a HollowConsumer, then calling HollowConsumer#triggerRefreshTo() is unsupported.
      */
     public static interface AnnouncementWatcher {
+        
+        public static final long NO_ANNOUNCEMENT_AVAILABLE = Long.MIN_VALUE;
 
         /**
          * Return the latest announced version.
@@ -546,6 +554,11 @@ public class HollowConsumer {
         return builder.withBlobRetriever(blobRetriever);
     }
     
+    public static HollowConsumer.Builder withLocalBlobStore(File localBlobStoreDir) {
+        HollowConsumer.Builder builder = new Builder();
+        return builder.withLocalBlobStore(localBlobStoreDir);
+    }
+    
     public static class Builder {
         private HollowConsumer.BlobRetriever blobRetriever = null;
         private HollowConsumer.AnnouncementWatcher announcementWatcher = null;
@@ -556,10 +569,16 @@ public class HollowConsumer {
         private HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig = DoubleSnapshotConfig.DEFAULT_CONFIG;
         private HollowConsumer.ObjectLongevityConfig objectLongevityConfig = ObjectLongevityConfig.DEFAULT_CONFIG;
         private HollowConsumer.ObjectLongevityDetector objectLongevityDetector = ObjectLongevityDetector.DEFAULT_DETECTOR;
+        private File localBlobStoreDir = null;
         private Executor refreshExecutor = null;
         
         public HollowConsumer.Builder withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
             this.blobRetriever = blobRetriever;
+            return this;
+        }
+        
+        public HollowConsumer.Builder withLocalBlobStore(File localBlobStoreDir) {
+            this.localBlobStoreDir = localBlobStoreDir;
             return this;
         }
         
@@ -616,8 +635,12 @@ public class HollowConsumer {
         }
         
         public HollowConsumer build() {
-            if(blobRetriever == null) 
-                throw new IllegalArgumentException("A HollowBlobRetriever must be specified when building a HollowClient");
+            if(blobRetriever == null && localBlobStoreDir == null) 
+                throw new IllegalArgumentException("A HollowBlobRetriever or local blob store directory must be specified when building a HollowClient");
+            
+            BlobRetriever blobRetriever = this.blobRetriever;
+            if(localBlobStoreDir != null)
+                blobRetriever = new HollowFilesystemBlobRetriever(localBlobStoreDir, blobRetriever);
             
             if(refreshExecutor == null)
                 refreshExecutor = Executors.newSingleThreadExecutor(new ThreadFactory() {

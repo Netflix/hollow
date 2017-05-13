@@ -59,6 +59,5 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
         } catch(IOException e) {
             throw new RuntimeException("Unable to publish file!", e);
         }
-
     }
 }
