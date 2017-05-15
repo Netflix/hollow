@@ -28,8 +28,13 @@ public class HollowUpdatePlanner {
     private final HollowConsumer.BlobRetriever transitionCreator;
     private final HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig;
     
-    public HollowUpdatePlanner(HollowConsumer.BlobRetriever transitionCreator) {
-        this(transitionCreator, new HollowConsumer.DoubleSnapshotConfig() {
+    @Deprecated
+    public HollowUpdatePlanner(HollowBlobRetriever blobRetriever) {
+        this(HollowClientConsumerBridge.consumerBlobRetrieverFor(blobRetriever));
+    }
+    
+    public HollowUpdatePlanner(HollowConsumer.BlobRetriever blobRetriever) {
+        this(blobRetriever, new HollowConsumer.DoubleSnapshotConfig() {
             @Override
             public int maxDeltasBeforeDoubleSnapshot() {
                 return 32;

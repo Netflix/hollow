@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2016 Netflix, Inc.
+ *  Copyright 2017 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,50 +15,49 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.api.client;
+package com.netflix.hollow.api.consumer;
 
-import com.netflix.hollow.api.client.HollowBlobRetriever;
-import com.netflix.hollow.api.client.HollowBlob;
-
+import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
+import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FakeHollowBlobRetriever implements HollowBlobRetriever {
+public class FakeBlobRetriever implements BlobRetriever {
 
-    private final Map<Long, HollowBlob> snapshots;
-    private final Map<Long, HollowBlob> deltas;
-    private final Map<Long, HollowBlob> reverseDeltas;
+    private final Map<Long, Blob> snapshots;
+    private final Map<Long, Blob> deltas;
+    private final Map<Long, Blob> reverseDeltas;
 
-    public FakeHollowBlobRetriever() {
-        this.snapshots = new HashMap<Long, HollowBlob>();
-        this.deltas = new HashMap<Long, HollowBlob>();
-        this.reverseDeltas = new HashMap<Long, HollowBlob>();
+    public FakeBlobRetriever() {
+        this.snapshots = new HashMap<Long, Blob>();
+        this.deltas = new HashMap<Long, Blob>();
+        this.reverseDeltas = new HashMap<Long, Blob>();
     }
 
     @Override
-    public HollowBlob retrieveSnapshotBlob(long desiredVersion) {
+    public Blob retrieveSnapshotBlob(long desiredVersion) {
         return snapshots.get(desiredVersion);
     }
 
     @Override
-    public HollowBlob retrieveDeltaBlob(long currentVersion) {
+    public Blob retrieveDeltaBlob(long currentVersion) {
         return deltas.get(currentVersion);
     }
 
     @Override
-    public HollowBlob retrieveReverseDeltaBlob(long currentVersion) {
+    public Blob retrieveReverseDeltaBlob(long currentVersion) {
         return reverseDeltas.get(currentVersion);
     }
 
-    public void addSnapshot(long desiredVersion, HollowBlob transition) {
+    public void addSnapshot(long desiredVersion, Blob transition) {
         snapshots.put(desiredVersion, transition);
     }
 
-    public void addDelta(long currentVersion, HollowBlob transition) {
+    public void addDelta(long currentVersion, Blob transition) {
         deltas.put(currentVersion, transition);
     }
 
-    public void addReverseDelta(long currentVersion, HollowBlob transition) {
+    public void addReverseDelta(long currentVersion, Blob transition) {
         reverseDeltas.put(currentVersion, transition);
     }
 

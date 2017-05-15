@@ -18,7 +18,6 @@
 package com.netflix.hollow.api.client;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
-
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -41,20 +40,24 @@ import java.io.InputStream;
  * 
  */
 @Deprecated
-public abstract class HollowBlob extends HollowConsumer.Blob {
+public abstract class HollowBlob {
+
+    private final long fromVersion;
+    private final long toVersion;
 
     /**
      * Instantiate a snapshot to a specified data state version.
      */
     public HollowBlob(long toVersion) {
-        super(toVersion);
+        this(Long.MIN_VALUE, toVersion);
     }
 
     /**
      * Instantiate a delta from one data state version to another. 
      */
     public HollowBlob(long fromVersion, long toVersion) {
-        super(fromVersion, toVersion);
+        this.fromVersion = fromVersion;
+        this.toVersion = toVersion;
     }
 
     /**
@@ -69,18 +72,18 @@ public abstract class HollowBlob extends HollowConsumer.Blob {
     public abstract InputStream getInputStream() throws IOException;
 
     public boolean isSnapshot() {
-        return super.isSnapshot();
+        return fromVersion == Long.MIN_VALUE;
     }
 
     public boolean isReverseDelta() {
-        return super.isReverseDelta();
+        return toVersion < fromVersion;
     }
 
     public long getFromVersion() {
-        return super.getFromVersion();
+        return fromVersion;
     }
 
     public long getToVersion() {
-        return super.getToVersion();
+        return toVersion;
     }
 }

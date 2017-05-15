@@ -27,7 +27,7 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
  * @deprecated Implement the {@link HollowConsumer.BlobRetriever} for use with the {@link HollowConsumer} instead.
  */
 @Deprecated
-public interface HollowBlobRetriever extends HollowConsumer.BlobRetriever {
+public interface HollowBlobRetriever {
 
     /**
      * Returns the snapshot for the state with an identifier equal to or less than the desired version

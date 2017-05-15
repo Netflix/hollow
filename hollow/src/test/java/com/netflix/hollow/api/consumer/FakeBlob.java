@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2016 Netflix, Inc.
+ *  Copyright 2017 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,20 +15,20 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.api.client;
+package com.netflix.hollow.api.consumer;
 
-import com.netflix.hollow.api.client.HollowBlob;
+import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-class FakeHollowUpdateTransition extends HollowBlob {
+class FakeBlob extends Blob {
 
-    public FakeHollowUpdateTransition(long toVersion) {
+    public FakeBlob(long toVersion) {
         super(toVersion);
     }
 
-    public FakeHollowUpdateTransition(long fromVersion, long toVersion) {
+    public FakeBlob(long fromVersion, long toVersion) {
         super(fromVersion, toVersion);
     }
 
