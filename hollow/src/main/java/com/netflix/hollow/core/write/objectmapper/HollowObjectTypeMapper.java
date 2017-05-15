@@ -76,6 +76,8 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             while(currentClass != Object.class && currentClass != Enum.class) {
                 if(currentClass.isInterface()) {
                     throw new IllegalArgumentException("Unexpected interface " + currentClass.getSimpleName() + " passed as field.");
+                } if (currentClass.isArray()) {
+                    throw new IllegalArgumentException("Unexpected array " + currentClass.getSimpleName() + " passed as field. Consider using collections or marking as transient.");
                 }
                 Field[] declaredFields = currentClass.getDeclaredFields();
     
