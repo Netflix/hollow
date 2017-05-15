@@ -42,38 +42,38 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
     public void testBasic() throws IOException {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
 
-        mapper.add(new TypeA("two", 2, new TypeB((short)20, 20000000L, 2.2f, "two".toCharArray(), new byte[] { 2, 2, 2 }),
+        mapper.add(new TypeA("two", 2, new TypeB((short) 20, 20000000L, 2.2f, "two".toCharArray(), new byte[]{2, 2, 2}),
                 Collections.<TypeC>emptySet()));
-        mapper.add(new TypeA("one", 1, new TypeB((short)10, 10000000L, 1.1f, "one".toCharArray(), new byte[] { 1, 1, 1 }),
+        mapper.add(new TypeA("one", 1, new TypeB((short) 10, 10000000L, 1.1f, "one".toCharArray(), new byte[]{1, 1, 1}),
                 new HashSet<TypeC>(Arrays.asList(new TypeC('d', map("one.1", 1, "one.2", 1, 1, "one.3", 1, 2, 3))))));
 
         roundTripSnapshot();
 
-        
+
         Assert.assertEquals("{\"a1\": \"two\",\"a2\": 2,\"b\": {\"b1\": 20,\"b2\": 20000000,\"b3\": 2.2,\"b4\": \"two\",\"b5\": [2, 2, 2]},\"cList\": []}",
-                                    new HollowRecordJsonStringifier(false, true).stringify(readStateEngine, "TypeA", 0));
-        
+                new HollowRecordJsonStringifier(false, true).stringify(readStateEngine, "TypeA", 0));
+
         //System.out.println("---------------------------------");
         //System.out.println(new HollowRecordJsonStringifier(false, true).stringify(readStateEngine, "TypeA", 1));
     }
-    
+
     @Test
-    public void testAllFieldTypes() throws IOException{
+    public void testAllFieldTypes() throws IOException {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        
+
         mapper.add(new TypeWithAllFieldTypes(1));
         mapper.add(new TypeWithAllFieldTypes(2));
-        
+
         TypeWithAllFieldTypes t = new TypeWithAllFieldTypes(3);
         t.nullFirstHalf();
         mapper.add(t);
-        
+
         t = new TypeWithAllFieldTypes(4);
         t.nullSecondHalf();
         mapper.add(t);
-        
+
         roundTripSnapshot();
-        
+
         TypeWithAllFieldTypes expected = new TypeWithAllFieldTypes(1);
         TypeWithAllFieldTypes actual = new TypeWithAllFieldTypes(new GenericHollowObject(readStateEngine, "TypeWithAllFieldTypes", 0));
         Assert.assertEquals(expected, actual);
@@ -92,45 +92,45 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         actual = new TypeWithAllFieldTypes(new GenericHollowObject(readStateEngine, "TypeWithAllFieldTypes", 3));
         Assert.assertEquals(expected, actual);
     }
-    
+
     @Test
     public void testEnumAndInlineClass() throws IOException {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        
+
         mapper.add(TestEnum.ONE);
         mapper.add(TestEnum.TWO);
         mapper.add(TestEnum.THREE);
-        
+
         roundTripSnapshot();
-        
+
         HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(readStateEngine, new PrimaryKey("TestEnum", "_name"));
-        
+
         int twoOrdinal = idx.getMatchingOrdinal("TWO");
-        
+
         GenericHollowObject obj = new GenericHollowObject(readStateEngine, "TestEnum", twoOrdinal);
-        
+
         Assert.assertEquals("TWO", obj.getString("_name"));
-        
+
         GenericHollowObject subObj = obj.getObject("testClass");
-        
+
         Assert.assertEquals(2, subObj.getInt("val1"));
         Assert.assertEquals(3, subObj.getInt("val2"));
     }
-    
+
     @Test
     public void testDate() throws IOException {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        
+
         long time = System.currentTimeMillis();
-        
+
         mapper.add(new Date(time));
-        
+
         roundTripSnapshot();
-        
+
         int theOrdinal = readStateEngine.getTypeState("Date").maxOrdinal();
-        
+
         GenericHollowObject obj = new GenericHollowObject(readStateEngine, "Date", theOrdinal);
-        
+
         Assert.assertEquals(time, obj.getLong("value"));
     }
 
@@ -165,21 +165,70 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
     }
 
     @Test
+    public void testMappingClassWithArray() throws IOException {
+        assertExpectedFailureMappingArraysType(TestClassContainingArray.class, int[].class);
+    }
+
+    @Test
+    public void testMappingClassWithTransientArray() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+
+        mapper.initializeTypeState(TestClassContainingTransientArray.class);
+        mapper.add(new TestClassContainingTransientArray(new int[]{1, 2}));
+
+        roundTripSnapshot();
+
+        HollowSchema schema = readStateEngine.getSchema("TestClassContainingTransientArray");
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        schema.writeTo(baos);
+
+        String schemeText = baos.toString();
+        Assert.assertTrue(schemeText.contains("TestClassContainingTransientArray"));
+        Assert.assertFalse(schemeText.contains("int[]"));
+        Assert.assertFalse(schemeText.contains("intArray"));
+    }
+
+    @Test
+    public void testMappingClassWithHollowTransientArray() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+
+        mapper.initializeTypeState(TestClassContainingHollowTransientArray.class);
+        mapper.add(new TestClassContainingTransientArray(new int[]{1, 2}));
+
+        roundTripSnapshot();
+
+        HollowSchema schema = readStateEngine.getSchema("TestClassContainingHollowTransientArray");
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        schema.writeTo(baos);
+
+        String schemeText = baos.toString();
+        Assert.assertTrue(schemeText.contains("TestClassContainingHollowTransientArray"));
+        Assert.assertFalse(schemeText.contains("int[]"));
+        Assert.assertFalse(schemeText.contains("intArray"));
+    }
+
+    @Test
     public void testMappingCircularReference() throws IOException {
         assertExpectedFailureMappingType(DirectCircularReference.class, "child");
     }
+
     @Test
     public void testMappingCircularReferenceList() throws IOException {
         assertExpectedFailureMappingType(DirectListCircularReference.class, "children");
     }
+
     @Test
     public void testMappingCircularReferenceSet() throws IOException {
         assertExpectedFailureMappingType(DirectSetCircularReference.class, "children");
     }
+
     @Test
     public void testMappingCircularReferenceMap() throws IOException {
         assertExpectedFailureMappingType(DirectMapCircularReference.class, "children");
     }
+
     @Test
     public void testMappingIndirectircularReference() throws IOException {
         assertExpectedFailureMappingType(IndirectCircularReference.TypeE.class, "f");
@@ -189,7 +238,7 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
      * Convenience method for experimenting with {@link HollowObjectMapper#initializeTypeState(Class)}
      * on classes we know should fail due to circular references, confirming the exception message is correct.
      *
-     * @param clazz class to initialize
+     * @param clazz     class to initialize
      * @param fieldName the name of the field that should trip the circular reference detection
      */
     protected void assertExpectedFailureMappingType(Class<?> clazz, String fieldName) {
@@ -207,7 +256,7 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
      * Convenience method for experimenting with {@link HollowObjectMapper#initializeTypeState(Class)}
      * on classes we know should fail due to fields that are interfaces, confirming the exception message is correct.
      *
-     * @param clazz class to initialize
+     * @param clazz          class to initialize
      * @param interfaceClazz interface class that breaks the initialization
      */
     protected void assertExpectedFailureMappingInterfaceType(Class<?> clazz, Class<?> interfaceClazz) {
@@ -221,16 +270,34 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         }
     }
 
+    /**
+     * Convenience method for experimenting with {@link HollowObjectMapper#initializeTypeState(Class)}
+     * on classes we know should fail due to fields that are arrays, confirming the exception message is correct.
+     *
+     * @param clazz      class to initialize
+     * @param arrayClass interface class that breaks the initialization
+     */
+    protected void assertExpectedFailureMappingArraysType(Class<?> clazz, Class<?> arrayClass) {
+        final String expected = "Unexpected array " + arrayClass.getSimpleName() + " passed as field. Consider using collections or marking as transient.";
+        try {
+            HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+            mapper.initializeTypeState(clazz);
+            Assert.fail("Expected Exception not thrown");
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue(String.format("trying to generate schema based on array %s, was %s", arrayClass.getSimpleName(), e.getMessage()), e.getMessage().contains(expected));
+        }
+    }
+
     private Map<String, List<Integer>> map(Object... keyValues) {
         Map<String, List<Integer>> map = new HashMap<String, List<Integer>>();
         int i = 0;
 
-        while(i < keyValues.length) {
-            String key = (String)keyValues[i];
+        while (i < keyValues.length) {
+            String key = (String) keyValues[i];
             List<Integer> values = new ArrayList<Integer>();
             i++;
-            while(i < keyValues.length && keyValues[i] instanceof Integer) {
-                values.add((Integer)keyValues[i]);
+            while (i < keyValues.length && keyValues[i] instanceof Integer) {
+                values.add((Integer) keyValues[i]);
                 i++;
             }
 
@@ -241,37 +308,41 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
     }
 
     @Override
-    protected void initializeTypeStates() {  }
-    
+    protected void initializeTypeStates() {
+    }
+
     @SuppressWarnings("unused")
     private static enum TestEnum {
         ONE(1),
         TWO(2),
         THREE(3);
-        
+
         int value;
         TestClass<TypeA> testClass;
-        
+
         private TestEnum(int value) {
             this.value = value;
-            this.testClass = new TestClass<TypeA>(value, value+1) {
-                
+            this.testClass = new TestClass<TypeA>(value, value + 1) {
+
             };
         }
-        
+
     }
-    
+
+    public interface TestInterface {
+        int test();
+    }
+
     @SuppressWarnings("unused")
     private static abstract class TestClass<T> {
         int val1;
         int val2;
-        
+
         public TestClass(int val1, int val2) {
             this.val1 = val1;
             this.val2 = val2;
         }
     }
-
 
     @SuppressWarnings("unused")
     private static class TestTransientClass {
@@ -299,6 +370,35 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
     }
 
     @SuppressWarnings("unused")
+    private static class TestClassContainingArray {
+        int[] intArray;
+
+        public TestClassContainingArray(int[] intArray) {
+            this.intArray = intArray;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class TestClassContainingTransientArray {
+        transient int[] intArray;
+
+        public TestClassContainingTransientArray(int[] intArray) {
+            this.intArray = intArray;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class TestClassContainingHollowTransientArray {
+        @HollowTransient
+        int[] intArray;
+
+        public TestClassContainingHollowTransientArray(int[] intArray) {
+            this.intArray = intArray;
+        }
+    }
+
+
+    @SuppressWarnings("unused")
     private static class TestClassImplementingInterface implements TestInterface {
         int val1;
 
@@ -310,9 +410,5 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         public int test() {
             return 0;
         }
-    }
-
-    public interface TestInterface {
-        int test();
     }
 }
