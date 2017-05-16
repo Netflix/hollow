@@ -141,7 +141,7 @@ public abstract class HollowAnnouncementWatcher {
 
     private HollowClient client;
 
-    HollowClient getClientToNotify() {
+    protected HollowClient getClientToNotify() {
         return client;
     }
 
