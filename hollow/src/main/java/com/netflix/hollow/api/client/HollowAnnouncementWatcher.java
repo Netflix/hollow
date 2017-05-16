@@ -85,6 +85,7 @@ public abstract class HollowAnnouncementWatcher {
      * Will force a double snapshot refresh on the next update.
      */
     protected void forceDoubleSnapshotNextUpdate() {
+        if (client==null) return;
         client.forceDoubleSnapshotNextUpdate();
     }
 
@@ -118,6 +119,8 @@ public abstract class HollowAnnouncementWatcher {
      *
      */
     public void triggerAsyncRefreshWithDelay(int delayMillis) {
+        if (client==null) return;
+
         final HollowClient client = this.client;
         final long targetBeginTime = System.currentTimeMillis() + delayMillis;
 
@@ -137,6 +140,10 @@ public abstract class HollowAnnouncementWatcher {
 
 
     private HollowClient client;
+
+    HollowClient getClientToNotify() {
+        return client;
+    }
 
     void setClientToNotify(HollowClient client) {
         this.client = client;
