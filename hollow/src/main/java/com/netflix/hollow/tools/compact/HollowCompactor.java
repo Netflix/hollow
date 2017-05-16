@@ -51,8 +51,6 @@ import java.util.Set;
  * in referencing states (since they will point to new ordinals).  In a single delta transition, the HollowCompactor will
  * only attempt to compact a set of types which are not referencing each other (either directly or transitively).
  * 
- * @author dkoszewnik
- *
  */
 public class HollowCompactor {
     
@@ -66,9 +64,20 @@ public class HollowCompactor {
      * Provide the state engines on which to operate, and the criteria to identify when a compaction is necessary 
      * 
      * @param writeEngine the HollowWriteStateEngine to compact
-     * @param readEngine a HollowReadStateEngine at the same data state as the writeEngine
+     * @param readEngine  a HollowReadStateEngine at the same data state as the writeEngine
+     * @param config      The criteria to identify when a compaction is necessary. 
+     */
+    public HollowCompactor(HollowWriteStateEngine writeEngine, HollowReadStateEngine readEngine, CompactionConfig config) {
+        this(writeEngine, readEngine, config.getMinCandidateHoleCostInBytes(), config.getMinCandidateHolePercentage());
+    }
+    
+    /**
+     * Provide the state engines on which to operate, and the criteria to identify when a compaction is necessary 
+     * 
+     * @param writeEngine                 the HollowWriteStateEngine to compact
+     * @param readEngine                  a HollowReadStateEngine at the same data state as the writeEngine
      * @param minCandidateHoleCostInBytes identify a type as a candidate for compaction only when the bytes used by ordinal holes exceeds this value 
-     * @param minCandidateHolePercentage identify a type as a candidate for compaction only when the percentage of space used by ordinal holes exceeds this value
+     * @param minCandidateHolePercentage  identify a type as a candidate for compaction only when the percentage of space used by ordinal holes exceeds this value
      */
     public HollowCompactor(HollowWriteStateEngine writeEngine, HollowReadStateEngine readEngine, long minCandidateHoleCostInBytes, int minCandidateHolePercentage) {
         this.writeEngine = writeEngine;
@@ -223,6 +232,34 @@ public class HollowCompactor {
             return readEngine.getTypesWithDefinedHashCodes().contains(((HollowSetSchema)schema).getElementType());
         default:
             return false;
+        }
+    }
+    
+    /**
+     * A configuration that specifies when a type is a candidate for compaction.
+     */
+    public static class CompactionConfig {
+        private final long minCandidateHoleCostInBytes;
+        private final int minCandidateHolePercentage;
+        
+        /**
+         * Create a new compaction.  Both of the criteria specified by the following parameters must be met in order for a type
+         * to be considered a candidate for compaction.
+         * 
+         * @param minCandidateHoleCostInBytes identify a type as a candidate for compaction only when the bytes used by ordinal holes exceeds this value 
+         * @param minCandidateHolePercentage identify a type as a candidate for compaction only when the percentage of space used by ordinal holes exceeds this value
+         */
+        public CompactionConfig(long minCandidateHoleCostInBytes, int minCandidateHolePercentage) {
+            this.minCandidateHoleCostInBytes = minCandidateHoleCostInBytes;
+            this.minCandidateHolePercentage = minCandidateHolePercentage;
+        }
+
+        public long getMinCandidateHoleCostInBytes() {
+            return minCandidateHoleCostInBytes;
+        }
+
+        public int getMinCandidateHolePercentage() {
+            return minCandidateHolePercentage;
         }
     }
 }

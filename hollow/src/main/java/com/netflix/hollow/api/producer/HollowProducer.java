@@ -34,6 +34,7 @@ import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
+import com.netflix.hollow.tools.compact.HollowCompactor;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -177,6 +178,24 @@ public class HollowProducer {
         }
     }
 
+    public boolean runCompactionCycle(HollowCompactor.CompactionConfig config) {
+        if(config != null && readStates.hasCurrent()) {
+            final HollowCompactor compactor = new HollowCompactor(getWriteEngine(), readStates.current().getStateEngine(), config);
+            if(compactor.needsCompaction()) {
+                runCycle(new Populator() {
+                    @Override
+                    public void populate(WriteState newState) throws Exception {
+                        compactor.compact();
+                    }
+                });
+                
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
     protected void runCycle(Populator task, ProducerStatus.Builder cycleStatus, long toVersion) {
         // 1. Begin a new cycle
         Artifacts artifacts = new Artifacts();
@@ -197,7 +216,6 @@ public class HollowProducer {
             } finally {
                 listeners.firePopulateComplete(populateStatus);
             }
-
 
             // 3. Produce a new state if there's work to do
             if(writeEngine.hasChangedSinceLastCycle()) {
