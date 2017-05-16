@@ -137,6 +137,8 @@ public abstract class HollowAnnouncementWatcher {
 
 
     private HollowClient client;
+    
+    protected HollowClient getClientToNotify() { return client; } 
 
     void setClientToNotify(HollowClient client) {
         this.client = client;
