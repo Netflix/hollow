@@ -107,6 +107,9 @@
                 <li class="toctree-l3"><a href="#inlined-vs-referenced-fields">Inlined vs Referenced Fields</a></li>
                 
             
+                <li class="toctree-l3"><a href="#namespaced-record-type-names">Namespaced Record Type Names</a></li>
+                
+            
                 <li class="toctree-l3"><a href="#grouping-associated-fields">Grouping Associated Fields</a></li>
                 
             
@@ -308,7 +311,8 @@ System.out.println(&quot;Actor with ID 104: &quot; + actor._getActorName()._getV
 <p>A <code>REFERENCE</code> field isn't free, and therefore we shouldn't necessarily try to encapsulate fields inside their own record types where we won't benefit from deduplication.  These fields should instead be <em>inlined</em>.</p>
 </div>
 <p>We refer to fields which are defined with native Hollow types as <em>inlined</em> fields, and fields which are defined as references to types with a single field as <em>referenced</em> fields.</p>
-<p>In order to be very efficient, referenced fields sometimes need to be <em>namespaced</em> so that fields with like values may use the same type, but referenced fields of the same type elsewhere in the data model use different types.  For example, consider our Award type again, but this time, we’ll reference a type called <code>AwardName</code>, instead of <code>String</code>:</p>
+<h1 id="namespaced-record-type-names">Namespaced Record Type Names</h1>
+<p>In order to be very efficient, referenced types sometimes need to be <em>namespaced</em> so that fields with like values may reference the same record type, but reference fields of the same primitive type elsewhere in the data model use different record types.  For example, consider our <code>Award</code> type again, but this time, we’ll reference a type called <code>AwardName</code>, instead of <code>String</code>:</p>
 <pre><code>Award {
     AwardName awardName;
     long movieId;
@@ -393,7 +397,7 @@ public class Actor {
 <p>Upon observing the <code>Movie</code> and <code>Actor</code> classes, the <code>HollowObjectMapper</code> will add a type for each into its <code>HollowWriteStateEngine</code>, each with an <code>Object</code> schema type.  Each of these references a <code>String</code> field.  Just as in Java, a <code>String</code> references a separate <code>Object</code>, and the <code>HollowObjectMapper</code> will add an <code>Object</code> schema for a type named <code>String</code> to assign to these references.</p>
 <div class="admonition note">
 <p class="admonition-title">Inlined Strings in the HollowObjectMapper</p>
-<p>To define an inlined String with the <code>HollowObjectMapper</code>, define string references as <code>char[]</code>.</p>
+<p>To define an inlined String with the <code>HollowObjectMapper</code>, annotate a String field in your POJO with <code>@HollowInline</code>.</p>
 </div>
               
             </div>

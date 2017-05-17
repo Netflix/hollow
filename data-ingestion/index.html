@@ -82,6 +82,12 @@
             
                 <li class="toctree-l3"><a href="#hollowobjectmapper">HollowObjectMapper</a></li>
                 
+                    <li><a class="toctree-l4" href="#specifying-type-names-in-the-hollowobjectmapper">Specifying type names in the HollowObjectMapper</a></li>
+                
+                    <li><a class="toctree-l4" href="#inlining-fields-in-the-hollowobjectmapper">Inlining fields in the HollowObjectMapper</a></li>
+                
+                    <li><a class="toctree-l4" href="#memoizing-pojos-in-the-hollowobjectmapper">Memoizing POJOs in the HollowObjectMapper</a></li>
+                
             
                 <li class="toctree-l3"><a href="#json-to-hollow-adapter">JSON to Hollow Adapter</a></li>
                 
@@ -204,27 +210,72 @@ mapper.initializeTypeState(Movie.class);
 mapper.initializeTypeState(Show.class);
 </code></pre>
 
-<p>The schemas will be assumed based on the field and type names in the POJOs.  Any referenced types will also be traversed and included in the derived data model.  The name of a type may be explicitly defined as something other than the class name using the <code>@HollowTypeName</code> annotation.</p>
-<p>If an integer field named <code>__assigned_ordinal</code> is defined in POJOs, the <code>HollowObjectMapper</code> will use this field to memoize the assigned ordinal for instances.  Upon addition of an object which already has this value memoized, the <code>HollowObjectMapper</code> will short-circuit retrieving the assigned ordinal.  The field should be initialized to -1.  The field may be, but does not have to be, private and/or final.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>If the <code>__assigned_ordinal</code> optimization is used, and field values inside POJOs with this optimization are modified subsequent to their addition to a state engine, then the subsequent modifications will be ignored and any references to these POJOs will always point to the <em>originally</em> added record.</p>
-<p>Additionally, if this optimization is used then POJOs should not be reused between cycles.</p>
+<p>Schemas will be assumed based on the field and type names in the POJOs.  Any referenced types will also be traversed and included in the derived data model.</p>
+<div class="admonition hint">
+<p class="admonition-title">Thread Safety</p>
+<p>The <code>HollowObjectMapper</code> is thread-safe; multiple threads may add Objects at the same time.</p>
 </div>
-<p>The following example <code>Award</code> class will reference a type <code>AwardName</code>, which will contain a single string value.  The class will also employ the <code>__assigned_ordinal</code> shortcut:</p>
+<h2 id="specifying-type-names-in-the-hollowobjectmapper">Specifying type names in the HollowObjectMapper</h2>
+<p>By default, type names are equal to the names of classes added to the <code>HollowObjectMapper</code>.  Alternatively, the name of a type may be explicitly defined by using the <code>@HollowTypeName</code> annotation.  This annotation can be added at either the class or field level.</p>
+<p>The following example <code>Award</code> class will reference a type <code>AwardName</code>, which will contain a single string value:</p>
 <pre><code class="java">public class Award {
     long id;
 
     @HollowTypeName(name=&quot;AwardName&quot;)
     String name;
-
-    private final int __assigned_ordinal = -1;
 }
 </code></pre>
 
-<div class="admonition hint">
-<p class="admonition-title">Thread Safety</p>
-<p>The <code>HollowObjectMapper</code> is thread-safe; multiple threads may add Objects at the same time.</p>
+<p>The following example <code>Category</code> class will be added as the type <code>Genre</code>, where not otherwise specified by referencing fields:</p>
+<pre><code class="java">@HollowTypeName(name=&quot;Genre&quot;)
+public class Category {
+   ...
+}
+</code></pre>
+
+<div class="admonition note">
+<p class="admonition-title">Namespaced fields</p>
+<p>Using the <code>@HollowTypeName</code> attribute is a convenient way to add appropriate <a href="../data-modeling/#namespaced-record-type-names">record type namespacing</a> into your data model.</p>
+</div>
+<h2 id="inlining-fields-in-the-hollowobjectmapper">Inlining fields in the HollowObjectMapper</h2>
+<p>You can <a href="../data-modeling/#inlined-vs-referenced-fields">inline</a> fields in the <code>HollowObjectMapper</code> by annotating them with <code>@HollowInline</code>.  The following example <code>Creator</code> class inlines the field <code>creatorName</code>:</p>
+<pre><code class="java">public class Creator {
+    long id;
+
+    @HollowInline
+    String creatorName;
+}
+</code></pre>
+
+<p>The following <code>java.lang.*</code> types can be inlined:</p>
+<ul>
+<li><code>String</code></li>
+<li><code>Boolean</code></li>
+<li><code>Integer</code></li>
+<li><code>Long</code></li>
+<li><code>Double</code></li>
+<li><code>Float</code></li>
+<li><code>Short</code></li>
+<li><code>Byte</code></li>
+<li><code>Character</code></li>
+</ul>
+<h2 id="memoizing-pojos-in-the-hollowobjectmapper">Memoizing POJOs in the HollowObjectMapper</h2>
+<p>If a long field named <code>__assigned_ordinal</code> is defined in a POJO class, then <code>HollowObjectMapper</code> will use this field to record the assigned ordinal when Objects of this class are added to the state engine.  </p>
+<p>When the <code>HollowObjectMapper</code> sees this POJO again, it will short-circuit writing to the state engine and discovering or assigning an ordinal -- it will instead return the previously recorded ordinal.  If during processing you can reuse duplicate referenced POJOs, then you can use this effect to greatly speed up adding records to the state engine.</p>
+<p>If the <code>__assigned_ordinal</code> field is present, it should be initialized to -1.  The field may be (but does not have to be) private and/or final.</p>
+<p>The following example <code>Director</code> class uses the <code>__assigned_ordinal</code> optimization:</p>
+<pre><code class="java">public class Director {
+    long id;
+    String directorName;
+
+    private final int __assigned_ordinal = -1L;
+}
+
+</code></pre>
+
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If the <code>__assigned_ordinal</code> optimization is used, POJOs should <em>not be modified</em> after they are added to the state engine.  Any modifications after the first time a memoized POJO is added to the state engine will be ignored and any references to these POJOs will always point to the <em>originally</em> added record.</p>
 </div>
 <h1 id="json-to-hollow-adapter">JSON to Hollow Adapter</h1>
 <p>The project <em>hollow-jsonadapter</em> contains a component which will automatically parse json into a <code>HollowWriteStateEngine</code>.  The expected format of the json will be defined by the schemas in the <code>HollowWriteStateEngine</code>.  The data model must be pre-initialized.  See the <a href="../advanced-topics/#schema-parser">Schema Parser</a> topic in this document for an easy way to configure the schemas with a text document.</p>
