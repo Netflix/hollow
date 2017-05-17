@@ -23,25 +23,25 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.AnnouncementWatcher {
 
     private final File publishDir;
+    private final List<HollowConsumer> subscribedConsumers;
     
     private long latestVersion;
     
     public HollowFilesystemAnnouncementWatcher(File publishDir) {
         this.publishDir = publishDir;
+        this.subscribedConsumers = new ArrayList<HollowConsumer>();
         this.latestVersion = readLatestVersion();
+        
+        setupPolling();
     }
     
-    @Override
-    public long getLatestVersion() {
-        return latestVersion;
-    }
-
-    @Override
-    public void subscribeToEvents(final HollowConsumer consumer) {
+    private void setupPolling() {
         Thread t = new Thread(new Runnable() {
             public void run() {
                 while(true) {
@@ -49,7 +49,8 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
                         long currentVersion = readLatestVersion();
                         if(latestVersion != currentVersion) {
                             latestVersion = currentVersion;
-                            consumer.triggerAsyncRefresh();
+                            for(HollowConsumer consumer : subscribedConsumers)
+                                consumer.triggerAsyncRefresh();
                         }
                         
                             Thread.sleep(1000);
@@ -62,6 +63,16 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
         
         t.setDaemon(true);
         t.start();
+    }
+    
+    @Override
+    public long getLatestVersion() {
+        return latestVersion;
+    }
+
+    @Override
+    public void subscribeToUpdates(final HollowConsumer consumer) {
+        subscribedConsumers.add(consumer);
     }
     
     public long readLatestVersion() {

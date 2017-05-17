@@ -132,7 +132,7 @@ public class HollowConsumer {
         this.announcementWatcher = announcementWatcher;
         this.refreshExecutor = refreshExecutor;
         if(announcementWatcher != null)
-            announcementWatcher.subscribeToEvents(this);
+            announcementWatcher.subscribeToUpdates(this);
     }
     
     /**
@@ -359,13 +359,12 @@ public class HollowConsumer {
         public long getLatestVersion();
 
         /**
-         * If some push announcement mechanism is to be provided by this AnnouncementWatcher, subscribe here.
-         * Alternatively, if some polling announcement mechanism is to be provided, setup the polling cycle here.
-         *
-         * When announcements are received, or polling reveals a new version, a call should be placed to one
-         * of the flavors of {@link HollowConsumer#triggerRefresh()}.
+         * Implementations of this method should subscribe a HollowConsumer to updates to announced versions.
+         * 
+         * When announcements are received via a push mechanism, or polling reveals a new version, a call should be placed to one
+         * of the flavors of {@link HollowConsumer#triggerRefresh()} on the provided HollowConsumer.
          */
-        public abstract void subscribeToEvents(HollowConsumer consumer);
+        public abstract void subscribeToUpdates(HollowConsumer consumer);
     }
     
     public static interface DoubleSnapshotConfig {
