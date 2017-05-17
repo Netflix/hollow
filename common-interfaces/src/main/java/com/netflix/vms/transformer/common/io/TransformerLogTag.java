@@ -25,6 +25,7 @@ public enum TransformerLogTag implements LogTag {
     StateEngineCompaction,
     HideCycleFromDashboard,
     DroppedTopNodeOnFloor,
+    ArtworkFallbackMissing,
 
 
     //// TRANSFORMATION ERRORS ////

@@ -1,10 +1,10 @@
 package com.netflix.vms.transformer.modules.meta;
 
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.ArtworkFallbackMissing;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidImagesTerritoryCode;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidPhaseTagForArtwork;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
@@ -568,6 +568,8 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
                 if(fallbackOrdinal != -1) {
                     VideoArtworkSourceHollow fallback = api.getVideoArtworkSourceHollow(fallbackOrdinal);
                     return processArtworkWithFallback(countrySet, fallback, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry);
+                } else {
+                    ctx.getLogger().warn(ArtworkFallbackMissing, "Artwork source " + artworkHollowInput._getSourceFileId()._getValue() + " needed to use fallback, but source data is missing: " + fallbackSourceId._getValue());
                 }
             }
         }
