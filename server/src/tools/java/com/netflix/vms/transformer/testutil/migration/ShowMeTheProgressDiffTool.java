@@ -1,6 +1,8 @@
 package com.netflix.vms.transformer.testutil.migration;
 
+import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.diff.ui.HollowDiffUI;
 import com.netflix.hollow.diff.ui.jetty.HollowDiffUIServer;
 import com.netflix.hollow.tools.diff.HollowDiff;
 import com.netflix.hollow.tools.diff.HollowTypeDiff;
@@ -14,8 +16,8 @@ public class ShowMeTheProgressDiffTool {
 
     public static void startTheDiff(HollowReadStateEngine expected, HollowReadStateEngine actual) throws Exception {
         HollowDiff diff = new HollowDiff(expected, actual);
-        addTypeDiff(diff, "CompleteVideo", "id.value", "country.id");
-        addTypeDiff(diff, "FallbackUSArtwork", "id.value");
+        addTypeDiff(diff, "CompleteVideo", "id.value", "country.id").addShortcutType("Artwork");
+        addTypeDiff(diff, "FallbackUSArtwork", "id.value").addShortcutType("Artwork");
         addTypeDiff(diff, "VideoEpisode_CountryList", "country.id", "item.deliverableVideo.value");
         addTypeDiff(diff, "PackageData", "id");
         addTypeDiff(diff, "NamedCollectionHolder", "country.id");
@@ -26,8 +28,8 @@ public class ShowMeTheProgressDiffTool {
         addTypeDiff(diff, "DeploymentIntent", "profileId", "bitrate", "country.id");
         addTypeDiff(diff, "LanguageDescriptor", "languageId");
         addTypeDiff(diff, "GlobalPerson", "id");
-        addTypeDiff(diff, "GlobalVideo", "completeVideo.id.value");
-        addTypeDiff(diff, "PersonImages", "id");
+        addTypeDiff(diff, "GlobalVideo", "completeVideo.id.value").addShortcutType("Artwork");
+        addTypeDiff(diff, "PersonImages", "id").addShortcutType("Artwork");
         addTypeDiff(diff, "ArtWorkImageFormatEntry", "nameStr");
         addTypeDiff(diff, "ArtWorkImageTypeEntry", "nameStr");
         addTypeDiff(diff, "ArtWorkImageRecipe", "recipeNameStr");
@@ -37,7 +39,7 @@ public class ShowMeTheProgressDiffTool {
         addTypeDiff(diff, "DrmSystem", "id");
         addTypeDiff(diff, "L10NResources", "resourceIdStr");
         addTypeDiff(diff, "EncodingProfileGroup", "groupNameStr");
-        addTypeDiff(diff, "CharacterImages", "id");
+        addTypeDiff(diff, "CharacterImages", "id").addShortcutType("Artwork");
         addTypeDiff(diff, "FileEncodingData", "downloadableId");
         addTypeDiff(diff, "RolloutVideo", "video.value");
         addTypeDiff(diff, "TopNVideoData", "countryId");
@@ -46,7 +48,13 @@ public class ShowMeTheProgressDiffTool {
         int port = randomPort();
 
         HollowDiffUIServer server = new HollowDiffUIServer(port);
-        server.addDiff("diff", diff, "EXPECTED", "ACTUAL");
+        HollowDiffUI ui = server.addDiff("diff", diff, "EXPECTED", "ACTUAL");
+        ui.addMatchHint(new PrimaryKey("Artwork", "sourceFileId"));
+        ui.addMatchHint(new PrimaryKey("ArtworkDerivative", "recipeDesc"));
+        ui.addMatchHint(new PrimaryKey("Integer", "val"));
+        ui.addMatchHint(new PrimaryKey("ArtWorkImageFormatEntry", "nameStr"));
+        ui.addMatchHint(new PrimaryKey("VideoImage", "videoId", "videoMoment.msOffset"));
+        ui.addMatchHint(new PrimaryKey("StreamData", "downloadableId"));
 
         server.start();
 
@@ -59,12 +67,14 @@ public class ShowMeTheProgressDiffTool {
         server.join();
     }
 
-    private static void addTypeDiff(HollowDiff diff, String type, String... keyFields) {
+    private static HollowTypeDiff addTypeDiff(HollowDiff diff, String type, String... keyFields) {
         HollowTypeDiff typeDiff = diff.addTypeDiff(type);
 
         for(String keyField : keyFields) {
             typeDiff.addMatchPath(keyField);
         }
+        
+        return typeDiff;
     }
 
     private static int randomPort() {

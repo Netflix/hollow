@@ -118,12 +118,6 @@ public interface TransformerConfig {
     @DefaultValue("true")
     public boolean shouldProcessExtraNonVideoGeneralVideoIds();
 
-    @DefaultValue("true")
-    public boolean isEnableCdnDirectoryOptimization();
-
-    @DefaultValue("5")
-    public int getComputedCdnFolderLength();
-
     @DefaultValue("ja-Hira,ja-Kana,ja-Latn")
     public String getTransliteratedPersonLocales();
 
@@ -201,4 +195,10 @@ public interface TransformerConfig {
     
     @DefaultValue("true")
     public boolean isUseSchedulePhasesInAvailabilityDateCalc();
+    
+    @DefaultValue("TITLE_TREATMENT,LOGO_STACKED,LOGO_HORIZONTAL,NETFLIX_ORIGINAL,MOVIE_PERSON_STILL,BB2_OG_LOGO,BB2_OG_LOGO_STACKED,OriginalsPostPlayLogoPostPlay,OriginalsPostPlayLogoPostTrailer,OriginalsPostPlayLogoPrePlay,BB2_OG_LOGO_PLUS,VERTICAL_STORY_ART,MERCH_STILL,MERCH_STILL_4_3,NEW_CONTENT_BADGE,PORTRAIT")
+    public String getVariableImageTypes();
+    
+    @DefaultValue("NEW_EPISODE,NEW_EPISODE_V2,NEW_EPISODE_GLOBAL")
+    public String getNewEpisodeOverlayTypes();
 }

@@ -5,18 +5,6 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidPha
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
@@ -29,7 +17,6 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.hollowinput.AbsoluteScheduleHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
-import com.netflix.vms.transformer.hollowinput.ArtworkDerivativeSetHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleListHollow;
 import com.netflix.vms.transformer.hollowinput.DamMerchStillsHollow;
@@ -52,7 +39,7 @@ import com.netflix.vms.transformer.hollowinput.StatusHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.TerritoryCountriesHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
-import com.netflix.vms.transformer.hollowinput.VideoArtworkHollow;
+import com.netflix.vms.transformer.hollowinput.VideoArtworkSourceHollow;
 import com.netflix.vms.transformer.hollowoutput.Artwork;
 import com.netflix.vms.transformer.hollowoutput.ArtworkMerchStillPackageData;
 import com.netflix.vms.transformer.hollowoutput.SchedulePhaseInfo;
@@ -62,10 +49,22 @@ import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.artwork.ArtWorkModule;
 import com.netflix.vms.transformer.util.NFLocaleUtil;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabilityChecker {
 
     private final HollowHashIndex videoArtworkIndex;
+    private final HollowPrimaryKeyIndex videoArtworkBySourceFileIdIndex;
     private final HollowPrimaryKeyIndex damMerchStillsIdx;
     private final HollowPrimaryKeyIndex videoStatusIdx;
     private HollowHashIndex rolloutIndex;
@@ -80,7 +79,8 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
     public VideoImagesDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
         super("Video", api, ctx, mapper, cycleConstants, indexer);
 
-        this.videoArtworkIndex = indexer.getHashIndex(IndexSpec.ARTWORK_BY_VIDEO_ID);
+        this.videoArtworkIndex = indexer.getHashIndex(IndexSpec.VIDEO_ARTWORK_SOURCE_BY_VIDEO_ID);
+        this.videoArtworkBySourceFileIdIndex = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_ARTWORK_SOURCE_BY_SOURCE_ID);
         this.damMerchStillsIdx = indexer.getPrimaryKeyIndex(IndexSpec.DAM_MERCHSTILLS);
         this.videoStatusIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_STATUS);
         this.rolloutIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
@@ -93,7 +93,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
     }
 
     // constructor only for test purposes
-    VideoImagesDataModule(TransformerContext context, HollowHashIndex overrideIndex, HollowHashIndex masterIndex,
+    /*VideoImagesDataModule(TransformerContext context, HollowHashIndex overrideIndex, HollowHashIndex masterIndex,
                           HollowHashIndex absoluteIndex, VMSHollowInputAPI api, HollowObjectMapper mapper, CycleConstants cycleConstants,
                           VMSTransformerIndexer indexer) {
         super("Video", api, context, mapper, cycleConstants, indexer);
@@ -104,7 +104,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
         this.videoArtworkIndex = null;
         this.damMerchStillsIdx = null;
         this.videoStatusIdx = null;
-    }
+    }*/
 
     public Map<String, Map<Integer, VideoImages>> buildVideoImagesByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
         Set<Integer> ids = new HashSet<>();
@@ -129,11 +129,13 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
                 HollowOrdinalIterator iter = matches.iterator();
                 int videoArtworkOrdinal = iter.next();
                 while (videoArtworkOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
-                    VideoArtworkHollow artworkHollowInput = api.getVideoArtworkHollow(videoArtworkOrdinal);
-                    String rollupSourceFileId = processArtwork(showHierarchiesByCountry.keySet(), artworkHollowInput, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry);
-                    if (rollupSourceFileId != null) {
-                        rollupMerchstillVideoIds.add(videoId);
-                        rollupSourceFieldIds.add(rollupSourceFileId);
+                    VideoArtworkSourceHollow artworkHollowInput = api.getVideoArtworkSourceHollow(videoArtworkOrdinal);
+                    if(!artworkHollowInput._getIsFallback()) {
+                        String rollupSourceFileId = processArtworkWithFallback(showHierarchiesByCountry.keySet(), artworkHollowInput, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry);
+                        if(rollupSourceFileId != null) {
+                            rollupMerchstillVideoIds.add(videoId);
+                            rollupSourceFieldIds.add(rollupSourceFileId);
+                        }
                     }
                     videoArtworkOrdinal = iter.next();
                 }
@@ -549,13 +551,33 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
     public void transform() {
         throw new UnsupportedOperationException("Use buildVideoImagesByCountry");
     }
+    
+    private String processArtworkWithFallback(Set<String> countrySet, VideoArtworkSourceHollow artworkHollowInput,
+            Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap,
+            Map<String, Map<Integer, Set<SchedulePhaseInfo>>> countrySchedulePhaseMap,
+            Set<String> merchstillSourceFieldIds,
+            Map<String, Set<String>> rolloutImagesByCountry, Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
+    
+        String rollupSourceFileId = processArtwork(showHierarchiesByCountry.keySet(), artworkHollowInput, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry);
+        if (rollupSourceFileId != null) {
+            return rollupSourceFileId;
+        } else {
+            StringHollow fallbackSourceId = artworkHollowInput._getFallbackSourceFileId();
+            if(fallbackSourceId != null) {
+                int fallbackOrdinal = videoArtworkBySourceFileIdIndex.getMatchingOrdinal(fallbackSourceId._getValue());
+                VideoArtworkSourceHollow fallback = api.getVideoArtworkSourceHollow(fallbackOrdinal);
+                return processArtworkWithFallback(countrySet, fallback, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry);
+            }
+        }
 
-    private String processArtwork(Set<String> countrySet, VideoArtworkHollow artworkHollowInput,
+        return null;
+    }
+
+    private String processArtwork(Set<String> countrySet, VideoArtworkSourceHollow artworkHollowInput,
                                   Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap,
                                   Map<String, Map<Integer, Set<SchedulePhaseInfo>>> countrySchedulePhaseMap,
                                   Set<String> merchstillSourceFieldIds,
-                                  Map<String, Set<String>> rolloutImagesByCountry, Map<String,
-            Set<VideoHierarchy>> showHierarchiesByCountry) {
+                                  Map<String, Set<String>> rolloutImagesByCountry, Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
         ArtworkLocaleListHollow locales = artworkHollowInput._getLocales();
         int entityId = (int) artworkHollowInput._getMovieId();
         int videoId = entityId;
@@ -565,6 +587,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
             ctx.getLogger().error(MissingLocaleForArtwork, "Missing artwork locale for {} with id={}; data will be dropped.", entityType, entityId);
             return null;
         }
+        
         String sourceFileId = artworkHollowInput._getSourceFileId()._getValue();
         int ordinalPriority = (int) artworkHollowInput._getOrdinalPriority();
         int seqNum = (int) artworkHollowInput._getSeqNum();
@@ -581,7 +604,6 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
         }
 
         ArtworkAttributesHollow attributes = artworkHollowInput._getAttributes();
-        ArtworkDerivativeSetHollow inputDerivatives = artworkHollowInput._getDerivatives();
 
         boolean showLevel = false;
         SingleValuePassthroughMapHollow map = attributes._getPassthrough()._getSingleValues();
@@ -611,7 +633,13 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
         artwork.hasShowLevelTag = showLevel;
 
         // Process list of derivatives
-        processDerivativesAndCdnList(entityId, sourceFileId, inputDerivatives, artwork);
+        HollowHashIndexResult derivativeSetMatches = artworkDerivativeSetIdx.findMatches(artworkHollowInput._getSourceFileId()._getValue());
+        
+        if(derivativeSetMatches != null) {
+            processCombinedDerivativesAndCdnList(entityId, sourceFileId, derivativeSetMatches, artwork);
+        } else {
+            return null;
+        }
 
         artwork.sourceFileId = new Strings(sourceFileId);
         artwork.seqNum = seqNum;
@@ -753,7 +781,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
      * @return Null if phase tags list is null or no matching schedule is present for given phase tag.
      * Else a set of schedule information. Note empty set is never returned.
      */
-    Set<SchedulePhaseInfo> getAllScheduleInfo(VideoArtworkHollow videoArtworkHollow, int videoId) {
+    Set<SchedulePhaseInfo> getAllScheduleInfo(VideoArtworkSourceHollow videoArtworkHollow, int videoId) {
         Set<SchedulePhaseInfo> schedulePhaseInfos = null;
         boolean isSmoky = videoArtworkHollow._getIsSmoky();
 
@@ -851,7 +879,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
     /**
      * Check phase tag list, if null then return null, else return the list itself.
      */
-    private PhaseTagListHollow checkPhaseTagList(PhaseTagListHollow phaseTagListHollow, VideoArtworkHollow videoArtworkHollow, int videoId) {
+    private PhaseTagListHollow checkPhaseTagList(PhaseTagListHollow phaseTagListHollow, VideoArtworkSourceHollow videoArtworkHollow, int videoId) {
         if (phaseTagListHollow == null) {
             String sourceFileId = videoArtworkHollow._getSourceFileId()._getValue();
             ctx.getLogger().info(InvalidPhaseTagForArtwork, "PhaseTagList is null in VideoArtwork for videoId={} sourceFileId={} " +
