@@ -24,6 +24,7 @@ public enum VideoNamedListType {
     AVAILABLE_FOR_DOWNLOAD_VIDEOS,
     ED_4K_VIDEOS,
     ED_HDR_VIDEOS,
+    ED_ATMOS_VIDEOS,
 
     ED_NEW_RELEASES,
 

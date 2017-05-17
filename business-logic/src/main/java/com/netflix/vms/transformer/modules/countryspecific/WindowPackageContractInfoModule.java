@@ -52,6 +52,7 @@ public class WindowPackageContractInfoModule {
     private Map<Float, String> screenFormatCache = new HashMap<Float, String>();
     private Set<Integer> fourKProfileIds = new HashSet<>();
     private Set<Integer> hdrProfileIds= new HashSet<>();
+    private Set<Integer> atmosStreamProfileIds = new HashSet<>();
     private final VideoPackageInfo FILTERED_VIDEO_PACKAGE_INFO;
 
     public WindowPackageContractInfoModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
@@ -67,6 +68,7 @@ public class WindowPackageContractInfoModule {
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
         this.soundTypesMap = getSoundTypesMap();
         populateEncodingProfileIdSets(api, indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE_GROUP));
+        populateAtmosStreamProfileIds(api, streamProfileIdx);
         FILTERED_VIDEO_PACKAGE_INFO = newEmptyVideoPackageInfo();
     }
 
@@ -113,6 +115,9 @@ public class WindowPackageContractInfoModule {
             }
             if(fourKProfileIds.contains(encodingProfileId)) {
                 info.videoPackageInfo.formats.add(cycleConstants.FOUR_K);
+            }
+            if(atmosStreamProfileIds.contains(encodingProfileId)) {
+            	info.videoPackageInfo.formats.add(cycleConstants.ATMOS);
             }
 
             if("VIDEO".equals(streamProfileType) || "MUXED".equals(streamProfileType)) {
@@ -168,6 +173,14 @@ public class WindowPackageContractInfoModule {
         return info;
     }
 
+    private void populateAtmosStreamProfileIds(VMSHollowInputAPI api, HollowPrimaryKeyIndex streamProfileIdx) {
+    	for(StreamProfilesHollow profile : api.getAllStreamProfilesHollow()) {
+    		if(profile._getDescription()._getValue().toLowerCase().contains("atmos"))
+    			atmosStreamProfileIds.add((int)profile._getId());
+    	}
+    }
+
+    
     private void populateEncodingProfileIdSets(VMSHollowInputAPI api, HollowPrimaryKeyIndex primaryKeyIndex) {
 
         int ordinal = primaryKeyIndex.getMatchingOrdinal("HDR");

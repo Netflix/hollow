@@ -82,6 +82,7 @@ public class VideoNamedListModule {
         private boolean isAvailableForDownload;
         private boolean isAvailableInHDR;
         private boolean isAvailableIn4K;
+        private boolean isAvailableInAtmos;
         private long currentAvailabilityDate;
         private final Calendar calendar = new GregorianCalendar();
 
@@ -172,6 +173,9 @@ public class VideoNamedListModule {
 
             if(isAvailableForED && isAvailableInHDR && isViewable)
                 addToList(VideoNamedListType.ED_HDR_VIDEOS);
+            
+            if(isAvailableForED && isAvailableInAtmos && isViewable)
+            	addToList(VideoNamedListType.ED_ATMOS_VIDEOS);
 
             for(VideoSetType setType : video.data.facetData.videoMetaData.videoSetTypes) {
                 if(setType == constants.PRESENT || setType == constants.PAST || setType == constants.FUTURE) {
@@ -292,6 +296,7 @@ public class VideoNamedListModule {
             isAvailableForED = false;
             isAvailableForUltraHDForCE = false;
             isAvailableForDownload = false;
+            isAvailableInAtmos = false;
             currentAvailabilityDate = 0;
 
             if(video.data.facetData.videoMediaData != null && video.data.facetData.videoMediaData.isGoLive) {
@@ -324,6 +329,7 @@ public class VideoNamedListModule {
                             isAvailableForDownload = maxVideoContractInfo.isAvailableForDownload;
                             isAvailableIn4K = maxPackageInfo.formats.contains(constants.FOUR_K);
                             isAvailableInHDR = maxPackageInfo.formats.contains(constants.HDR);
+                            isAvailableInAtmos = maxPackageInfo.formats.contains(constants.ATMOS);
                         }
 
                         currentAvailabilityDate = window.startDate.val;

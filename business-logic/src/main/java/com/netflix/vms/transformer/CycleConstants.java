@@ -46,6 +46,7 @@ public class CycleConstants {
     public final VideoFormatDescriptor ULTRA_HD = videoFormatDescriptor(4, "Ultra_HD", "Ultra HiDefinition");
     public final VideoFormatDescriptor FOUR_K = videoFormatDescriptor(5, "4K", "4K For Search");
     public final VideoFormatDescriptor HDR = videoFormatDescriptor(6, "HDR", "HDR For Search");
+    public final VideoFormatDescriptor ATMOS = videoFormatDescriptor(7, "ATMOS", "Dolby Atmos For Search");
     public final int ULTRA_HD_MIN_HEIGHT = 1081;
 
     public final VideoImages EMPTY_VIDEO_IMAGES = emptyVideoImages();
@@ -54,6 +55,7 @@ public class CycleConstants {
     
     public final InputOrdinalResultCache<ArtworkDerivative> artworkDerivativeCache;
     public final InputOrdinalResultCache<ArtworkDerivatives> artworkDerivativesCache;
+    public final InputOrdinalResultCache<Boolean> isNewEpisodeOverlayTypes;
     
     public final InputOrdinalResultCache<ContractAsset> rightsContractAssetCache;
     public final MultilanguageCountryDialectOrdinalAssigner dialectOrdinalAssigner = new MultilanguageCountryDialectOrdinalAssigner();
@@ -62,9 +64,10 @@ public class CycleConstants {
     
     
     public CycleConstants(HollowReadStateEngine inputStateEngine) {
-        this.artworkDerivativeCache = new InputOrdinalResultCache<ArtworkDerivative>(inputStateEngine.getTypeState("ArtworkDerivative").maxOrdinal());
-        this.artworkDerivativesCache = new InputOrdinalResultCache<ArtworkDerivatives>(inputStateEngine.getTypeState("ArtworkDerivativeSet").maxOrdinal());
+        this.artworkDerivativeCache = new InputOrdinalResultCache<ArtworkDerivative>(inputStateEngine.getTypeState("IPLArtworkDerivative").maxOrdinal());
+        this.artworkDerivativesCache = new InputOrdinalResultCache<ArtworkDerivatives>(inputStateEngine.getTypeState("IPLDerivativeSet").maxOrdinal());
         this.rightsContractAssetCache = new InputOrdinalResultCache<ContractAsset>(inputStateEngine.getTypeState("RightsContractAsset").maxOrdinal());
+        this.isNewEpisodeOverlayTypes = new InputOrdinalResultCache<Boolean>(inputStateEngine.getTypeState("ListOfDerivativeTag").maxOrdinal());
     }
     
     public ISOCountry getISOCountry(String countryId) {
