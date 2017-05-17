@@ -565,8 +565,10 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
             StringHollow fallbackSourceId = artworkHollowInput._getFallbackSourceFileId();
             if(fallbackSourceId != null) {
                 int fallbackOrdinal = videoArtworkBySourceFileIdIndex.getMatchingOrdinal(fallbackSourceId._getValue());
-                VideoArtworkSourceHollow fallback = api.getVideoArtworkSourceHollow(fallbackOrdinal);
-                return processArtworkWithFallback(countrySet, fallback, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry);
+                if(fallbackOrdinal != -1) {
+                    VideoArtworkSourceHollow fallback = api.getVideoArtworkSourceHollow(fallbackOrdinal);
+                    return processArtworkWithFallback(countrySet, fallback, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry);
+                }
             }
         }
 
