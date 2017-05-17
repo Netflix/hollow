@@ -58,7 +58,7 @@ public class HollowListTypeMapper extends HollowTypeMapper {
         if(obj instanceof MemoizedList) {
             long assignedOrdinal = ((MemoizedList<?>)obj).__assigned_ordinal;
             
-            if(assignedOrdinal != -1L && (assignedOrdinal & ASSIGNED_ORDINAL_CYCLE_MASK) == cycleSpecificAssignedOrdinalBits())
+            if((assignedOrdinal & ASSIGNED_ORDINAL_CYCLE_MASK) == cycleSpecificAssignedOrdinalBits())
                 return (int)assignedOrdinal & Integer.MAX_VALUE;
         }
 

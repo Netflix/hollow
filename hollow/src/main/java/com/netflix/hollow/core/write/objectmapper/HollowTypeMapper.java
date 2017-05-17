@@ -29,7 +29,7 @@ import java.lang.reflect.Type;
 
 public abstract class HollowTypeMapper {
 
-    protected static final long ASSIGNED_ORDINAL_CYCLE_MASK = 0xFFFFFFFF80000000L;
+    public static final long ASSIGNED_ORDINAL_CYCLE_MASK = 0xFFFFFFFF00000000L;
 
     private final ThreadLocal<HollowWriteRecord> writeRec = new ThreadLocal<HollowWriteRecord>();
 

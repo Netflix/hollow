@@ -46,8 +46,8 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
     private final HollowObjectSchema schema;
     private final HollowObjectTypeWriteState writeState;
 
+    private final AssignedOrdinalType assignedOrdinalType;
     private final long assignedOrdinalFieldOffset;
-    private final boolean assignedOrdinalIsLong;
 
     private final List<MappedField> mappedFields;
 
@@ -111,18 +111,20 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         HollowObjectTypeWriteState existingWriteState = (HollowObjectTypeWriteState) parentMapper.getStateEngine().getTypeState(typeName);
         this.writeState = existingWriteState != null ? existingWriteState : new HollowObjectTypeWriteState(schema, getNumShards(clazz));
 
+        AssignedOrdinalType assignedOrdinalType = AssignedOrdinalType.NONE;
         long assignedOrdinalFieldOffset = -1;
-        boolean assignedOrdinalIsLong = false;
         try {
             Field declaredField = clazz.getDeclaredField("__assigned_ordinal");
             if(declaredField.getType() == int.class || declaredField.getType() == long.class)
                 assignedOrdinalFieldOffset = unsafe.objectFieldOffset(declaredField);
             if(declaredField.getType() == long.class)
-                assignedOrdinalIsLong = true;
+                assignedOrdinalType = AssignedOrdinalType.LONG;
+            else if(declaredField.getType() == int.class)
+                assignedOrdinalType = AssignedOrdinalType.INT;
             
         } catch (Exception ignore) { }
         this.assignedOrdinalFieldOffset = assignedOrdinalFieldOffset;
-        this.assignedOrdinalIsLong = assignedOrdinalIsLong;
+        this.assignedOrdinalType = assignedOrdinalType;
     }
 
     private static String[] getKeyFieldPaths(Class<?> clazz) {
@@ -148,17 +150,19 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
 
     @Override
     public int write(Object obj) {
-        if(assignedOrdinalFieldOffset != -1) {
-            if(assignedOrdinalIsLong) {
-                long assignedOrdinal = unsafe.getLong(obj, assignedOrdinalFieldOffset);
-                
-                if(assignedOrdinal != -1L && (assignedOrdinal & ASSIGNED_ORDINAL_CYCLE_MASK) == cycleSpecificAssignedOrdinalBits())
-                    return (int)assignedOrdinal & Integer.MAX_VALUE;
-            } else {
-                int assignedOrdinal = unsafe.getInt(obj, assignedOrdinalFieldOffset);
-                if(assignedOrdinal != -1)
-                    return assignedOrdinal;
-            }
+        switch(assignedOrdinalType) {
+        case LONG:
+            long assignedOrdinal = unsafe.getLong(obj, assignedOrdinalFieldOffset);
+            if((assignedOrdinal & ASSIGNED_ORDINAL_CYCLE_MASK) == cycleSpecificAssignedOrdinalBits())
+                return (int)assignedOrdinal & Integer.MAX_VALUE;
+            break;
+        case INT:
+            int intAssignedOrdinal = unsafe.getInt(obj, assignedOrdinalFieldOffset);
+            if(intAssignedOrdinal != -1)
+                return intAssignedOrdinal;
+            break;
+        case NONE:
+            break;
         }
 
         if(obj.getClass() != clazz && !clazz.isAssignableFrom(obj.getClass()))
@@ -171,12 +175,15 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         }
 
         int assignedOrdinal = writeState.add(rec);
-        if(assignedOrdinalFieldOffset != -1) {
-            if(assignedOrdinalIsLong) {
-                unsafe.putLong(obj, assignedOrdinalFieldOffset, (long)assignedOrdinal | cycleSpecificAssignedOrdinalBits());
-            } else {
-                unsafe.putInt(obj, assignedOrdinalFieldOffset, assignedOrdinal);
-            }
+        switch(assignedOrdinalType) {
+        case LONG:
+            unsafe.putLong(obj, assignedOrdinalFieldOffset, (long)assignedOrdinal | cycleSpecificAssignedOrdinalBits());
+            break;
+        case INT:
+            unsafe.putInt(obj, assignedOrdinalFieldOffset, assignedOrdinal);
+            break;
+        case NONE:
+            break;
         }
         return assignedOrdinal;
     }
@@ -428,6 +435,12 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             }
         }
         
+    }
+    
+    private static enum AssignedOrdinalType {
+        INT,
+        LONG,
+        NONE
     }
 
     private static enum MappedFieldType {

@@ -85,7 +85,6 @@ public class HollowBlobHeaderTest {
     }
 
     private void roundTripSnapshot() throws IOException {
-        writeStateEngine.prepareForWrite();
         blobWriter.writeSnapshot(baos);
         writeStateEngine.prepareForNextCycle();
         blobReader.readSnapshot(new ByteArrayInputStream(baos.toByteArray()));
@@ -93,7 +92,10 @@ public class HollowBlobHeaderTest {
     }
 
     private void roundTripDelta() throws IOException {
-        writeStateEngine.prepareForWrite();
+        blobWriter.writeSnapshot(baos);
+        writeStateEngine.prepareForNextCycle();
+        blobReader.readSnapshot(new ByteArrayInputStream(baos.toByteArray()));
+        baos.reset();
         blobWriter.writeDelta(baos);
         writeStateEngine.prepareForNextCycle();
         blobReader.applyDelta(new ByteArrayInputStream(baos.toByteArray()));

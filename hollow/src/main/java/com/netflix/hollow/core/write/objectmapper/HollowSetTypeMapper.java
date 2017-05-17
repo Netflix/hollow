@@ -61,7 +61,7 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
         if(obj instanceof MemoizedSet) {
             long assignedOrdinal = ((MemoizedSet<?>)obj).__assigned_ordinal;
             
-            if(assignedOrdinal != -1L && (assignedOrdinal & ASSIGNED_ORDINAL_CYCLE_MASK) == cycleSpecificAssignedOrdinalBits())
+            if((assignedOrdinal & ASSIGNED_ORDINAL_CYCLE_MASK) == cycleSpecificAssignedOrdinalBits())
                 return (int)assignedOrdinal & Integer.MAX_VALUE;
         }
         

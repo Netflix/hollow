@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.core.write;
 
+import com.netflix.hollow.core.write.objectmapper.HollowTypeMapper;
+
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.util.DefaultHashCodeFinder;
@@ -70,7 +72,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
 
     private List<String> restoredStates;
     private boolean preparedForNextCycle = true;
-    private long previousStateRandomizedTag;
+    private long previousStateRandomizedTag = -1L;
     private long nextStateRandomizedTag;
 
     public HollowWriteStateEngine() {
@@ -82,7 +84,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         this.hollowSchemas = new HashMap<String, HollowSchema>();
         this.orderedTypeStates = new ArrayList<HollowTypeWriteState>();
         this.hashCodeFinder = hasher;
-        this.nextStateRandomizedTag = new Random().nextLong();
+        this.nextStateRandomizedTag = mintNewRandomizedStateTag();
     }
 
     /**
@@ -159,7 +161,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         }
 
         previousStateRandomizedTag = readStateEngine.getCurrentRandomizedTag();
-        nextStateRandomizedTag = new Random().nextLong();
+        nextStateRandomizedTag = mintNewRandomizedStateTag();
 
         try {
             executor.awaitSuccessfulCompletion();
@@ -205,7 +207,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
             return;
 
         previousStateRandomizedTag = nextStateRandomizedTag;
-        nextStateRandomizedTag = new Random().nextLong();
+        nextStateRandomizedTag = mintNewRandomizedStateTag();
 
         try {
             SimultaneousExecutor executor = new SimultaneousExecutor();
@@ -264,7 +266,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         }
         
         /// recreate a new randomized tag, to avoid any potential conflict with aborted versions
-        nextStateRandomizedTag = new Random().nextLong();
+        nextStateRandomizedTag = mintNewRandomizedStateTag();
         preparedForNextCycle = true;
         
     }
@@ -381,6 +383,16 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     
     long getTargetMaxTypeShardSize() {
         return targetMaxTypeShardSize;
+    }
+    
+    private long mintNewRandomizedStateTag() {
+        Random rand = new Random();
+        
+        long newTag = rand.nextLong();
+        while((newTag & HollowTypeMapper.ASSIGNED_ORDINAL_CYCLE_MASK) == (previousStateRandomizedTag & HollowTypeMapper.ASSIGNED_ORDINAL_CYCLE_MASK))
+            newTag = rand.nextLong();
+        
+        return newTag;
     }
 
     private void addTypeNamesWithDefinedHashCodesToHeader() {

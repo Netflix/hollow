@@ -48,6 +48,7 @@ public class ReuseMemoizedObjectsAcrossCyclesTest {
         Assert.assertEquals(0, mapper.add(a1));
         Assert.assertEquals(2, mapper.add(new TypeA(3)));
         Assert.assertEquals(1, mapper.add(a2));
+        Assert.assertEquals(1, mapper.add(a2));
 
         StateEngineRoundTripper.roundTripDelta(writeEngine, readEngine);
 
