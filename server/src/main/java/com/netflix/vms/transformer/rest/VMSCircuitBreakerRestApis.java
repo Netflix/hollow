@@ -257,6 +257,8 @@ public class VMSCircuitBreakerRestApis {
 		List<String> exclusions = new ArrayList<String>();
 		for(String country : exclusionCountries) {
 			JsonArray videoIds = obj.get(country).getAsJsonArray();
+			// If there are no videos for this country in the exclusion list, ignore it
+			if(videoIds.size() == 0) continue;
 			List<Integer> videos = new ArrayList<Integer>();
 			for(int i = 0; i < videoIds.size(); i++)
 				videos.add(videoIds.get(i).getAsInt());

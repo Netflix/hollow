@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 import com.netflix.hollow.core.write.objectmapper.NullablePrimitiveBoolean;
-
 import java.util.List;
 
 public class ArtworkBasicPassthrough implements Cloneable {
@@ -18,6 +17,7 @@ public class ArtworkBasicPassthrough implements Cloneable {
     public List<__passthrough_string> personIdStrs = null;
     public NullablePrimitiveBoolean approval_state = null;
     public ArtworkReExploreLongTimestamp reExploreLongTimestamp = null;
+    public ArtworkScreensaverPassthrough screensaverPassthrough = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
@@ -59,6 +59,9 @@ public class ArtworkBasicPassthrough implements Cloneable {
         if (o.reExploreLongTimestamp == null) {
             if (reExploreLongTimestamp != null) return false;
         } else if (!o.reExploreLongTimestamp.equals(reExploreLongTimestamp)) return false;
+        if (o.screensaverPassthrough == null) {
+            if (screensaverPassthrough != null) return false;
+        } else if (!o.screensaverPassthrough.equals(screensaverPassthrough)) return false;
         return true;
     }
 
@@ -76,6 +79,7 @@ public class ArtworkBasicPassthrough implements Cloneable {
         hashCode = hashCode * 31 + (personIdStrs == null ? 1237 : personIdStrs.hashCode());
         hashCode = hashCode * 31 + (approval_state == null ? 1231 : approval_state.hashCode());
         hashCode = hashCode * 31 + (reExploreLongTimestamp == null ? 1231 : reExploreLongTimestamp.hashCode());
+        hashCode = hashCode * 31 + (screensaverPassthrough == null ? 1231 : screensaverPassthrough.hashCode());
         return hashCode;
     }
 
@@ -93,6 +97,7 @@ public class ArtworkBasicPassthrough implements Cloneable {
         builder.append(",personIdStrs=").append(personIdStrs);
         builder.append(",approval_state=").append(approval_state);
         builder.append(",re_explore_timestamp=").append(reExploreLongTimestamp.toString());
+        builder.append(",screensaverPassthrough=").append(screensaverPassthrough);
         builder.append("}");
         return builder.toString();
     }
