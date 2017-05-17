@@ -1,5 +1,8 @@
 package com.netflix.vms.transformer.modules.artwork;
 
+import com.netflix.vms.transformer.common.io.TransformerLogTag;
+
+import com.netflix.vms.transformer.hollowoutput.ArtworkScreensaverPassthrough;
 import com.google.common.collect.ComparisonChain;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
@@ -46,7 +49,6 @@ import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
 import com.netflix.vms.transformer.util.NFLocaleUtil;
 import org.apache.commons.codec.digest.DigestUtils;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -382,6 +384,21 @@ public abstract class ArtWorkModule extends AbstractTransformModule {
             }
             setBasicPassThrough = true;
             passThrough.reExploreLongTimestamp = new ArtworkReExploreLongTimestamp(timestamp);
+        }
+        
+        String startX = keyValues.get("SCREENSAVER_START_X");
+        String endX = keyValues.get("SCREENSAVER_START_Y");
+        String offsetY = keyValues.get("SCREENSAVER_OFFSET_Y");
+        if(startX != null || endX != null || offsetY != null) {
+            passThrough.screensaverPassthrough = new ArtworkScreensaverPassthrough();
+            try {
+                if(startX != null)  passThrough.screensaverPassthrough.startX = java.lang.Integer.parseInt(startX);
+                if(endX != null)    passThrough.screensaverPassthrough.endX = java.lang.Integer.parseInt(endX);
+                if(offsetY != null) passThrough.screensaverPassthrough.offsetY = java.lang.Integer.parseInt(offsetY);
+                setBasicPassThrough = true;
+            } catch(NumberFormatException unexpected) { 
+                ctx.getLogger().error(TransformerLogTag.UnexpectedError, "Failed to parse artwork SCREENSAVER attributes", unexpected);
+            }
         }
 
         ArtworkSourcePassthrough sourcePassThrough = new ArtworkSourcePassthrough();
