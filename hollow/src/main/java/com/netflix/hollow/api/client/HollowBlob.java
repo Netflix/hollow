@@ -17,6 +17,7 @@
  */
 package com.netflix.hollow.api.client;
 
+import com.netflix.hollow.api.consumer.HollowConsumer;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -35,9 +36,10 @@ import java.io.InputStream;
  *      <dd>Implementations will define how to retrieve the actual blob data for this specific blob from a data store as an InputStream.</dd>
  * </dl>
  * 
- * @author dkoszewnik
- *
+ * @deprecated Extend the {@link HollowConsumer.Blob} for use with the {@link HollowConsumer.BlobRetriever} instead.
+ * 
  */
+@Deprecated
 public abstract class HollowBlob {
 
     private final long fromVersion;

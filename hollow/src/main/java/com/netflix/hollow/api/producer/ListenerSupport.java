@@ -19,14 +19,11 @@ package com.netflix.hollow.api.producer;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
+import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
+import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
+import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-
-import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.consumer.HollowConsumer.ReadState;
-import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
-import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
-import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
 
 /**
  * Beta API subject to change.
@@ -106,7 +103,7 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) l.onArtifactPublish(status, builder.elapsed(), MILLISECONDS);
     }
 
-    ProducerStatus.Builder fireIntegrityCheckStart(ReadState readState) {
+    ProducerStatus.Builder fireIntegrityCheckStart(HollowProducer.ReadState readState) {
         ProducerStatus.Builder psb = new ProducerStatus.Builder().version(readState);
         for(final HollowProducerListener l : listeners) l.onIntegrityCheckStart(psb.version());
         return psb;
@@ -117,7 +114,7 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) l.onIntegrityCheckComplete(st, psb.elapsed(), MILLISECONDS);
     }
 
-    ProducerStatus.Builder fireValidationStart(HollowConsumer.ReadState readState) {
+    ProducerStatus.Builder fireValidationStart(HollowProducer.ReadState readState) {
         ProducerStatus.Builder psb = new ProducerStatus.Builder().version(readState);
         for(final HollowProducerListener l : listeners) l.onValidationStart(psb.version());
         return psb;
@@ -128,7 +125,7 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) l.onValidationComplete(st, psb.elapsed(), MILLISECONDS);
     }
 
-    ProducerStatus.Builder fireAnnouncementStart(HollowConsumer.ReadState readState) {
+    ProducerStatus.Builder fireAnnouncementStart(HollowProducer.ReadState readState) {
         ProducerStatus.Builder psb = new ProducerStatus.Builder().version(readState);
         for(final HollowProducerListener l : listeners) l.onAnnouncementStart(psb.version());
         return psb;

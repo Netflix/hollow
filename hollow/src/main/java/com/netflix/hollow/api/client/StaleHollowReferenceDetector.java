@@ -17,13 +17,13 @@
  */
 package com.netflix.hollow.api.client;
 
+import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
-
-import com.netflix.hollow.tools.history.HollowHistoricalStateDataAccess;
 import com.netflix.hollow.api.sampling.EnabledSamplingDirector;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.proxy.HollowProxyDataAccess;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.tools.history.HollowHistoricalStateDataAccess;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -39,8 +39,6 @@ import java.util.List;
  * so they do not hang on to the entire historical data store beyond some length of time.
  *
  * This class is also responsible for notifying the HollowUpdateListener if stale references or usage is detected.
- *
- * @author dkoszewnik
  */
 public class StaleHollowReferenceDetector {
 
@@ -54,16 +52,16 @@ public class StaleHollowReferenceDetector {
 
     private final List<HollowWeakReferenceHandle> handles;
 
-    private final HollowClientMemoryConfig memoryConfig;
+    private final HollowConsumer.ObjectLongevityConfig config;
 
-    private final HollowUpdateListener listener;
+    private final HollowConsumer.ObjectLongevityDetector detector;
 
     private final StackTraceRecorder stackTraceRecorder;
 
-    public StaleHollowReferenceDetector(HollowClientMemoryConfig memoryConfig, HollowUpdateListener listener) {
+    public StaleHollowReferenceDetector(HollowConsumer.ObjectLongevityConfig config, HollowConsumer.ObjectLongevityDetector detector) {
         this.handles = new ArrayList<HollowWeakReferenceHandle>();
-        this.memoryConfig = memoryConfig;
-        this.listener = listener;
+        this.config = config;
+        this.detector = detector;
         this.stackTraceRecorder = new StackTraceRecorder(25);
     }
 
@@ -121,8 +119,8 @@ public class StaleHollowReferenceDetector {
                     } catch (InterruptedException e) { }
                     housekeeping();
 
-                    listener.staleReferenceExistenceDetected(countStaleReferenceExistenceSignals());
-                    listener.staleReferenceUsageDetected(countStaleReferenceUsageSignals());
+                    detector.staleReferenceExistenceDetected(countStaleReferenceExistenceSignals());
+                    detector.staleReferenceUsageDetected(countStaleReferenceUsageSignals());
                 }
             }
         });
@@ -178,10 +176,10 @@ public class StaleHollowReferenceDetector {
         }
 
         private boolean shouldDetach() {
-            if(!detached && System.currentTimeMillis() > (gracePeriodBeginTimestamp + memoryConfig.gracePeriodMillis() + memoryConfig.usageDetectionPeriodMillis())) {
-                if(memoryConfig.forceDropData()) {
+            if(!detached && System.currentTimeMillis() > (gracePeriodBeginTimestamp + config.gracePeriodMillis() + config.usageDetectionPeriodMillis())) {
+                if(config.forceDropData()) {
                     return true;
-                } else if(memoryConfig.dropDataAutomatically()) {
+                } else if(config.dropDataAutomatically()) {
                     if(usageDetected)
                         return false;
 
@@ -218,7 +216,7 @@ public class StaleHollowReferenceDetector {
         }
 
         private boolean shouldBeginUsageDetectionPeriod() {
-            return sibling != null && System.currentTimeMillis() > (gracePeriodBeginTimestamp + memoryConfig.gracePeriodMillis());
+            return sibling != null && System.currentTimeMillis() > (gracePeriodBeginTimestamp + config.gracePeriodMillis());
         }
 
         private void beginUsageDetectionPeriod() {
@@ -237,7 +235,7 @@ public class StaleHollowReferenceDetector {
                 if(dataAccess instanceof HollowProxyDataAccess) {
                     HollowDataAccess proxiedDataAccess = ((HollowProxyDataAccess) dataAccess).getProxiedDataAccess();
                     if(proxiedDataAccess instanceof HollowHistoricalStateDataAccess)
-                        ((HollowHistoricalStateDataAccess)proxiedDataAccess).setStackTraceRecorder(memoryConfig.enableExpiredUsageStackTraces() ? stackTraceRecorder : null);
+                        ((HollowHistoricalStateDataAccess)proxiedDataAccess).setStackTraceRecorder(config.enableExpiredUsageStackTraces() ? stackTraceRecorder : null);
                 }
             }
         }

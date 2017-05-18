@@ -17,25 +17,39 @@
  */
 package com.netflix.hollow.api.client;
 
+import com.netflix.hollow.api.consumer.HollowConsumer;
+
 /**
  * The HollowUpdatePlanner defines the logic responsible for interacting with a {@link HollowBlobRetriever} 
  * to create a {@link HollowUpdatePlan}.
- * 
- * @author dkoszewnik
- *
  */
 public class HollowUpdatePlanner {
 
-    private final HollowBlobRetriever transitionCreator;
-    private int maxAllowableDeltas;
-
-    public HollowUpdatePlanner(HollowBlobRetriever transitionCreator) {
-        this(transitionCreator, 32);
+    private final HollowConsumer.BlobRetriever transitionCreator;
+    private final HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig;
+    
+    @Deprecated
+    public HollowUpdatePlanner(HollowBlobRetriever blobRetriever) {
+        this(HollowClientConsumerBridge.consumerBlobRetrieverFor(blobRetriever));
+    }
+    
+    public HollowUpdatePlanner(HollowConsumer.BlobRetriever blobRetriever) {
+        this(blobRetriever, new HollowConsumer.DoubleSnapshotConfig() {
+            @Override
+            public int maxDeltasBeforeDoubleSnapshot() {
+                return 32;
+            }
+            
+            @Override
+            public boolean allowDoubleSnapshot() {
+                return true;
+            }
+        });
     }
 
-    public HollowUpdatePlanner(HollowBlobRetriever transitionCreator, int maxAllowableDeltas) {
+    public HollowUpdatePlanner(HollowConsumer.BlobRetriever transitionCreator, HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig) {
         this.transitionCreator = transitionCreator;
-        this.maxAllowableDeltas = maxAllowableDeltas;
+        this.doubleSnapshotConfig = doubleSnapshotConfig;
     }
 
     /**
@@ -61,7 +75,7 @@ public class HollowUpdatePlanner {
         if(currentVersion == Long.MIN_VALUE)
             return snapshotPlan(desiredVersion);
 
-        HollowUpdatePlan deltaPlan = deltaPlan(currentVersion, desiredVersion, maxAllowableDeltas);
+        HollowUpdatePlan deltaPlan = deltaPlan(currentVersion, desiredVersion, doubleSnapshotConfig.maxDeltasBeforeDoubleSnapshot());
 
         long deltaDestinationVersion = deltaPlan.destinationVersion(currentVersion);
 
@@ -77,10 +91,6 @@ public class HollowUpdatePlanner {
         }
 
         return deltaPlan;
-    }
-
-    public void setMaxDeltas(int maxDeltas) {
-        this.maxAllowableDeltas = maxDeltas;
     }
 
     private HollowUpdatePlan snapshotPlan(long desiredVersion) {
@@ -134,7 +144,7 @@ public class HollowUpdatePlanner {
      * Includes the next delta only if it will not take us *after* the desired version
      */
     private long includeNextDelta(HollowUpdatePlan plan, long currentVersion, long desiredVersion) {
-        HollowBlob transition = transitionCreator.retrieveDeltaBlob(currentVersion);
+        HollowConsumer.Blob transition = transitionCreator.retrieveDeltaBlob(currentVersion);
 
         if(transition != null) {
             if(transition.getToVersion() <= desiredVersion) {
@@ -148,7 +158,7 @@ public class HollowUpdatePlanner {
     }
 
     private long includeNextReverseDelta(HollowUpdatePlan plan, long currentVersion) {
-        HollowBlob transition = transitionCreator.retrieveReverseDeltaBlob(currentVersion);
+        HollowConsumer.Blob transition = transitionCreator.retrieveReverseDeltaBlob(currentVersion);
         if(transition != null) {
             plan.add(transition);
             return transition.getToVersion();
@@ -158,7 +168,7 @@ public class HollowUpdatePlanner {
     }
 
     private long includeNearestSnapshot(HollowUpdatePlan plan, long desiredVersion) {
-        HollowBlob transition = transitionCreator.retrieveSnapshotBlob(desiredVersion);
+        HollowConsumer.Blob transition = transitionCreator.retrieveSnapshotBlob(desiredVersion);
         if(transition != null) {
             plan.add(transition);
             return transition.getToVersion();

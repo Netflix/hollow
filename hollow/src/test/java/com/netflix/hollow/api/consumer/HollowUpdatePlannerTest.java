@@ -15,25 +15,34 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.api.client;
+package com.netflix.hollow.api.consumer;
 
 import com.netflix.hollow.api.client.HollowUpdatePlan;
 import com.netflix.hollow.api.client.HollowUpdatePlanner;
-import com.netflix.hollow.api.client.HollowBlob;
-
+import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 public class HollowUpdatePlannerTest {
 
-    FakeHollowBlobRetriever mockTransitionCreator;
+    FakeBlobRetriever mockTransitionCreator;
     HollowUpdatePlanner planner;
 
     @Before
     public void setUp() {
-        mockTransitionCreator = new FakeHollowBlobRetriever();
-        planner = new HollowUpdatePlanner(mockTransitionCreator, 3);
+        mockTransitionCreator = new FakeBlobRetriever();
+        planner = new HollowUpdatePlanner(mockTransitionCreator, new HollowConsumer.DoubleSnapshotConfig() {
+            @Override
+            public int maxDeltasBeforeDoubleSnapshot() {
+                return 3;
+            }
+            
+            @Override
+            public boolean allowDoubleSnapshot() {
+                return true;
+            }
+        });
     }
 
     @Test
@@ -252,26 +261,26 @@ public class HollowUpdatePlannerTest {
     }
 
 
-    private void assertTransition(HollowBlob transition, long expectedFrom, long expectedTo) {
+    private void assertTransition(HollowConsumer.Blob transition, long expectedFrom, long expectedTo) {
         Assert.assertEquals(transition.getFromVersion(), expectedFrom);
         Assert.assertEquals(transition.getToVersion(), expectedTo);
     }
 
 
     private void addMockSnapshot(long desiredVersion, long actualVersion) {
-        HollowBlob result = new FakeHollowUpdateTransition(Long.MIN_VALUE, actualVersion);
+        Blob result = new FakeBlob(Long.MIN_VALUE, actualVersion);
 
         mockTransitionCreator.addSnapshot(desiredVersion, result);
     }
 
     private void addMockDelta(long fromVersion, long toVersion) {
-        HollowBlob result = new FakeHollowUpdateTransition(fromVersion, toVersion);
+        Blob result = new FakeBlob(fromVersion, toVersion);
 
         mockTransitionCreator.addDelta(fromVersion, result);
     }
 
     private void addMockReverseDelta(long fromVersion, long toVersion) {
-        HollowBlob result = new FakeHollowUpdateTransition(fromVersion, toVersion);
+        Blob result = new FakeBlob(fromVersion, toVersion);
 
         mockTransitionCreator.addReverseDelta(fromVersion, result);
     }

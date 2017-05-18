@@ -17,9 +17,7 @@
  */
 package com.netflix.hollow.api.producer;
 
-import static com.netflix.hollow.api.consumer.HollowConsumer.newReadState;
-
-import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
 /**
@@ -36,14 +34,28 @@ final class ReadStateHelper {
         return new ReadStateHelper(null, null);
     }
 
-    static ReadStateHelper restored(HollowConsumer.ReadState state) {
+    static ReadStateHelper restored(ReadState state) {
         return new ReadStateHelper(state, null);
     }
+    
+    static ReadState newReadState(final long version, final HollowReadStateEngine stateEngine) {
+        return new HollowProducer.ReadState() {
+            @Override
+            public long getVersion() {
+                return version;
+            }
 
-    private final HollowConsumer.ReadState current;
-    private final HollowConsumer.ReadState pending;
+            @Override
+            public HollowReadStateEngine getStateEngine() {
+                return stateEngine;
+            }
+        };
+    }
 
-    private ReadStateHelper(HollowConsumer.ReadState current, HollowConsumer.ReadState pending) {
+    private final ReadState current;
+    private final ReadState pending;
+
+    private ReadStateHelper(ReadState current, ReadState pending) {
         this.current = current;
         this.pending = pending;
     }
@@ -69,7 +81,7 @@ final class ReadStateHelper {
         return new ReadStateHelper(this.pending, null);
     }
 
-    HollowConsumer.ReadState current() {
+    ReadState current() {
         return current;
     }
 
@@ -77,7 +89,7 @@ final class ReadStateHelper {
         return current != null;
     }
 
-    HollowConsumer.ReadState pending() {
+    ReadState pending() {
         return pending;
     }
 

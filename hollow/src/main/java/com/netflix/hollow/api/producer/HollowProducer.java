@@ -17,20 +17,14 @@
  */
 package com.netflix.hollow.api.producer;
 
-import static com.netflix.hollow.api.consumer.HollowConsumer.newReadState;
-import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.DELTA;
-import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.REVERSE_DELTA;
-import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.SNAPSHOT;
 import static java.lang.System.currentTimeMillis;
 
-import com.netflix.hollow.api.client.HollowBlobRetriever;
-import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.consumer.HollowConsumer.ReadState;
-import com.netflix.hollow.api.producer.HollowProducer.Publisher.BlobCompressor;
+import com.netflix.hollow.api.producer.HollowProducer.Validator.ValidationException;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
+import com.netflix.hollow.api.producer.fs.HollowFilesystemBlobStager;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -40,17 +34,19 @@ import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
+import com.netflix.hollow.tools.compact.HollowCompactor;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -59,37 +55,57 @@ import java.util.logging.Logger;
  * @author Tim Taylor {@literal<tim@toolbear.io>}
  */
 public class HollowProducer {
-    public static final Validator NO_VALIDATIONS = new Validator(){
-        @Override
-        public void validate(HollowConsumer.ReadState readState) {}
-    };
 
     private final Logger log = Logger.getLogger(HollowProducer.class.getName());
+    private final BlobStager blobStager;
     private final Publisher publisher;
-    private final Validator validator;
+    private final List<Validator> validators;
     private final Announcer announcer;
     private HollowObjectMapper objectMapper;
     private final VersionMinter versionMinter;
     private final ListenerSupport listeners;
     private ReadStateHelper readStates;
+    private final Executor snapshotPublishExecutor;
+    private final int numStatesBetweenSnapshots;
+    private int numStatesUntilNextSnapshot;
 
-    public HollowProducer(HollowProducer.Publisher publisher,
-            HollowProducer.Announcer announcer) {
-        this(publisher, NO_VALIDATIONS, announcer);
+    public HollowProducer(Publisher publisher,
+                          Announcer announcer) {
+        this(new HollowFilesystemBlobStager(), publisher, announcer, Collections.<Validator>emptyList(), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0);
     }
 
-    public HollowProducer(
-            Publisher publisher,
-            Validator validator,
-            Announcer announcer) {
-        this.publisher = publisher;
-        this.validator = validator;
-        this.announcer = announcer;
+    public HollowProducer(Publisher publisher,
+                          Validator validator,
+                          Announcer announcer) {
+        this(new HollowFilesystemBlobStager(), publisher, announcer, Collections.singletonList(validator), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0);
+    }
 
-        objectMapper = new HollowObjectMapper(new HollowWriteStateEngine());
-        versionMinter = new VersionMinterWithCounter();
-        listeners = new ListenerSupport();
-        readStates = ReadStateHelper.newDeltaChain();
+    protected HollowProducer(BlobStager blobStager,
+                             Publisher publisher,
+                             Announcer announcer,
+                             List<Validator> validators,
+                             List<HollowProducerListener> listeners,
+                             VersionMinter versionMinter,
+                             Executor snapshotPublishExecutor,
+                             int numStatesBetweenSnapshots) {
+        this.publisher = publisher;
+        this.validators = validators;
+        this.announcer = announcer;
+        this.versionMinter = versionMinter;
+        this.blobStager = blobStager;
+        this.snapshotPublishExecutor = snapshotPublishExecutor == null ? new Executor() {
+            public void execute(Runnable command) {
+                command.run();
+            }
+        } : snapshotPublishExecutor;
+        this.numStatesBetweenSnapshots = numStatesBetweenSnapshots;
+
+        this.objectMapper = new HollowObjectMapper(new HollowWriteStateEngine());
+        this.listeners = new ListenerSupport();
+        this.readStates = ReadStateHelper.newDeltaChain();
+        
+        for(HollowProducerListener listener : listeners)
+            this.listeners.add(listener);
     }
 
     public void initializeDataModel(Class<?>...classes) {
@@ -108,24 +124,18 @@ public class HollowProducer {
         listeners.fireProducerInit(currentTimeMillis() - start);
     }
 
-
-    public HollowProducer restore(long versionDesired, HollowBlobRetriever blobRetriever) {
-        restoreAndReturnReadState(versionDesired, blobRetriever);
-        return this;
-    }
-
-    protected HollowConsumer.ReadState restoreAndReturnReadState(long versionDesired, HollowBlobRetriever blobRetriever) {
+    public HollowProducer.ReadState restore(long versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
         long start = currentTimeMillis();
         RestoreStatus status = RestoreStatus.unknownFailure();
-        HollowConsumer.ReadState readState = null;
+        ReadState readState = null;
 
         try {
             listeners.fireProducerRestoreStart(versionDesired);
             if(versionDesired != Long.MIN_VALUE) {
 
-                HollowClient client = new HollowClient(blobRetriever);
+                HollowConsumer client = HollowConsumer.withBlobRetriever(blobRetriever).build();
                 client.triggerRefreshTo(versionDesired);
-                readState = newReadState(client.getCurrentVersionId(), client.getStateEngine());
+                readState = ReadStateHelper.newReadState(client.getCurrentVersionId(), client.getStateEngine());
                 if(readState.getVersion() == versionDesired) {
                     readStates = ReadStateHelper.restored(readState);
 
@@ -168,6 +178,24 @@ public class HollowProducer {
         }
     }
 
+    public boolean runCompactionCycle(HollowCompactor.CompactionConfig config) {
+        if(config != null && readStates.hasCurrent()) {
+            final HollowCompactor compactor = new HollowCompactor(getWriteEngine(), readStates.current().getStateEngine(), config);
+            if(compactor.needsCompaction()) {
+                runCycle(new Populator() {
+                    @Override
+                    public void populate(WriteState newState) throws Exception {
+                        compactor.compact();
+                    }
+                });
+                
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
     protected void runCycle(Populator task, ProducerStatus.Builder cycleStatus, long toVersion) {
         // 1. Begin a new cycle
         Artifacts artifacts = new Artifacts();
@@ -188,7 +216,6 @@ public class HollowProducer {
             } finally {
                 listeners.firePopulateComplete(populateStatus);
             }
-
 
             // 3. Produce a new state if there's work to do
             if(writeEngine.hasChangedSinceLastCycle()) {
@@ -225,14 +252,38 @@ public class HollowProducer {
         listeners.remove(listener);
     }
 
-    private void publish(WriteState writeState, Artifacts artifacts) throws IOException {
+    private void publish(final WriteState writeState, final Artifacts artifacts) throws IOException {
         ProducerStatus.Builder psb = listeners.firePublishStart(writeState.getVersion());
         try {
+            stageBlob(writeState, artifacts, Blob.Type.SNAPSHOT);
+            
             if (readStates.hasCurrent()) {
+                stageBlob(writeState, artifacts, Blob.Type.DELTA);
+                stageBlob(writeState, artifacts, Blob.Type.REVERSE_DELTA);
                 publishBlob(writeState, artifacts, Blob.Type.DELTA);
                 publishBlob(writeState, artifacts, Blob.Type.REVERSE_DELTA);
+                
+                if(--numStatesUntilNextSnapshot < 0) {
+                    snapshotPublishExecutor.execute(new Runnable() {
+                        public void run() {
+                            try {
+                                publishBlob(writeState, artifacts, Blob.Type.SNAPSHOT);
+                                artifacts.markSnapshotPublishComplete();
+                            } catch(IOException e) {
+                                log.log(Level.WARNING, "Snapshot publish failed", e);
+                            }
+                        }
+                    });
+                    numStatesUntilNextSnapshot = numStatesBetweenSnapshots;
+                } else {
+                    artifacts.markSnapshotPublishComplete();
+                }
+            } else {
+                publishBlob(writeState, artifacts, Blob.Type.SNAPSHOT);
+                artifacts.markSnapshotPublishComplete();
+                numStatesUntilNextSnapshot = numStatesBetweenSnapshots;
             }
-            publishBlob(writeState, artifacts, Blob.Type.SNAPSHOT);
+            
             psb.success();
 
         } catch (Throwable throwable) {
@@ -242,29 +293,47 @@ public class HollowProducer {
             listeners.firePublishComplete(psb);
         }
     }
+    
+    private void stageBlob(WriteState writeState, Artifacts artifacts, Blob.Type blobType) throws IOException {
+        HollowBlobWriter writer = new HollowBlobWriter(getWriteEngine());
+        try {
+            switch (blobType) {
+                case SNAPSHOT:
+                    artifacts.snapshot = blobStager.openSnapshot(writeState.getVersion());
+                    artifacts.snapshot.write(writer);
+                    break;
+                case DELTA:
+                    artifacts.delta = blobStager.openDelta(readStates.current().getVersion(), writeState.getVersion());
+                    artifacts.delta.write(writer);
+                    break;
+                case REVERSE_DELTA:
+                    artifacts.reverseDelta = blobStager.openReverseDelta(writeState.getVersion(), readStates.current().getVersion());
+                    artifacts.reverseDelta.write(writer);
+                    break;
+                default:
+                    throw new IllegalStateException("unknown type, type=" + blobType);
+            }
+
+        } catch (Throwable th) {
+            throw th;
+        }
+    }
 
     private void publishBlob(WriteState writeState, Artifacts artifacts, Blob.Type blobType) throws IOException {
-        HollowBlobWriter writer = new HollowBlobWriter(getWriteEngine());
         PublishStatus.Builder builder = (new PublishStatus.Builder());
         try {
             switch (blobType) {
                 case SNAPSHOT:
-                    artifacts.snapshot = publisher.openSnapshot(writeState.getVersion());
-                    artifacts.snapshot.write(writer);
                     builder.blob(artifacts.snapshot);
-                    publisher.publish(artifacts.snapshot, writeState.getStateEngine().getHeaderTags());
+                    publisher.publish(artifacts.snapshot);
                     break;
                 case DELTA:
-                    artifacts.delta = publisher.openDelta(readStates.current().getVersion(), writeState.getVersion());
-                    artifacts.delta.write(writer);
                     builder.blob(artifacts.delta);
-                    publisher.publish(artifacts.delta, writeState.getStateEngine().getHeaderTags());
+                    publisher.publish(artifacts.delta);
                     break;
                 case REVERSE_DELTA:
-                    artifacts.reverseDelta = publisher.openReverseDelta(writeState.getVersion(), readStates.current().getVersion());
-                    artifacts.reverseDelta.write(writer);
                     builder.blob(artifacts.reverseDelta);
-                    publisher.publish(artifacts.reverseDelta, writeState.getStateEngine().getHeaderTags());
+                    publisher.publish(artifacts.reverseDelta);
                     break;
                 default:
                     throw new IllegalStateException("unknown type, type=" + blobType);
@@ -315,14 +384,14 @@ public class HollowProducer {
                     applyDelta(artifacts.delta, current);
                     HollowChecksum forwardChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
                     //out.format("  CUR => PND %s\n", forwardChecksum);
-                    if(!forwardChecksum.equals(pendingChecksum)) throw new ChecksumValidationException(DELTA);
+                    if(!forwardChecksum.equals(pendingChecksum)) throw new ChecksumValidationException(Blob.Type.DELTA);
                 }
 
                 if(artifacts.hasReverseDelta()) {
                     applyDelta(artifacts.reverseDelta, pending);
                     HollowChecksum reverseChecksum = HollowChecksum.forStateEngineWithCommonSchemas(pending, current);
                     //out.format("  CUR <= PND %s\n", reverseChecksum);
-                    if(!reverseChecksum.equals(currentChecksum)) throw new ChecksumValidationException(REVERSE_DELTA);
+                    if(!reverseChecksum.equals(currentChecksum)) throw new ChecksumValidationException(Blob.Type.REVERSE_DELTA);
                     result = readStates.swap();
                 }
             }
@@ -362,10 +431,25 @@ public class HollowProducer {
         }
     }
 
-    private void validate(HollowConsumer.ReadState readState) {
+    private void validate(HollowProducer.ReadState readState) {
         ProducerStatus.Builder status = listeners.fireValidationStart(readState);
         try {
-            validator.validate(readState);
+            List<Throwable> validationFailures = new ArrayList<Throwable>();
+            
+            for(Validator validator : validators) {
+                try {
+                    validator.validate(readState);
+                } catch(Throwable th) {
+                    validationFailures.add(th);
+                }
+            }
+            
+            if(!validationFailures.isEmpty()) {
+                ValidationException ex = new ValidationException("Validation Failed", validationFailures.get(0));
+                ex.setIndividualFailures(validationFailures);
+                throw ex;
+            }
+            
             status.success();
         } catch (Throwable th) {
             status.fail(th);
@@ -375,16 +459,18 @@ public class HollowProducer {
         }
     }
 
-    private void announce(HollowConsumer.ReadState readState) {
-        ProducerStatus.Builder status = listeners.fireAnnouncementStart(readState);
-        try {
-            announcer.announce(readState.getVersion());
-            status.success();
-        } catch(Throwable th) {
-            status.fail(th);
-            throw th;
-        } finally {
-            listeners.fireAnnouncementComplete(status);
+    private void announce(HollowProducer.ReadState readState) {
+        if(announcer != null) {
+            ProducerStatus.Builder status = listeners.fireAnnouncementStart(readState);
+            try {
+                announcer.announce(readState.getVersion());
+                status.success();
+            } catch(Throwable th) {
+                status.fail(th);
+                throw th;
+            } finally {
+                listeners.fireAnnouncementComplete(status);
+            }
         }
     }
 
@@ -414,23 +500,15 @@ public class HollowProducer {
 
         long getVersion();
     }
+    
+    public static interface ReadState {
+        public long getVersion();
 
-    public static abstract class Publisher {
-
-        protected String namespace;
-        protected String dir;
-
-        /**
-         * Constructor to create a new Publisher with namespace &amp; disk path for Hollow blobs.
-         *
-         * @param namespace typically project namespace
-         * @param dir       directory to use to write hollow blob files.
-         */
-        public Publisher(String namespace, String dir) {
-            this.namespace = namespace;
-            this.dir = dir;
-        }
-
+        public HollowReadStateEngine getStateEngine();
+    }
+    
+    
+    public static interface BlobStager {
         /**
          * Returns a blob with which a {@code HollowProducer} will write a snapshot for the version specified.<p>
          *
@@ -440,10 +518,8 @@ public class HollowProducer {
          *
          * @return a {@link HollowProducer.Blob} representing a snapshot for the {@code version}
          */
-        public HollowProducer.Blob openSnapshot(long version) {
-            return new Blob(namespace, Long.MIN_VALUE, version, dir, SNAPSHOT, getBlobCompressor());
-        }
-
+        public HollowProducer.Blob openSnapshot(long version);
+        
         /**
          * Returns a blob with which a {@code HollowProducer} will write a forward delta from the version specified to
          * the version specified, i.e. {@code fromVersion => toVersion}.<p>
@@ -457,10 +533,8 @@ public class HollowProducer {
          *
          * @return a {@link HollowProducer.Blob} representing a snapshot for the {@code version}
          */
-        public HollowProducer.Blob openDelta(long fromVersion, long toVersion) {
-            return new Blob(namespace, fromVersion, toVersion, dir, DELTA, getBlobCompressor());
-        }
-
+        public HollowProducer.Blob openDelta(long fromVersion, long toVersion);
+        
         /**
          * Returns a blob with which a {@code HollowProducer} will write a reverse delta from the version specified to
          * the version specified, i.e. {@code fromVersion <= toVersion}.<p>
@@ -474,9 +548,30 @@ public class HollowProducer {
          *
          * @return a {@link HollowProducer.Blob} representing a snapshot for the {@code version}
          */
-        public HollowProducer.Blob openReverseDelta(long fromVersion, long toVersion) {
-            return new Blob(namespace, fromVersion, toVersion, dir, REVERSE_DELTA, getBlobCompressor());
-        }
+        public HollowProducer.Blob openReverseDelta(long fromVersion, long toVersion);
+    }
+    
+    public static interface BlobCompressor {
+        public static final BlobCompressor NO_COMPRESSION = new BlobCompressor() {
+            public OutputStream compress(OutputStream os) { return os; }
+
+            public InputStream decompress(InputStream is) { return is; }
+        };
+
+        /**
+         * This method provides an opportunity to wrap the OutputStream used to write the blob (e.g. with a GZIPOutputStream).
+         */
+        public OutputStream compress(OutputStream is);
+        
+        /**
+         * This method provides an opportunity to wrap the InputStream used to write the blob (e.g. with a GZIPInputStream).
+         */
+        public InputStream decompress(InputStream is);
+    }
+
+    
+
+    public static interface Publisher {
 
         /**
          * Publish the blob specified to this publisher's blobstore.<p>
@@ -486,94 +581,32 @@ public class HollowProducer {
          * {@link Publisher#openReverseDelta(long,long)} on this publisher.
          *
          * @param blob the blob to publish
-         * @param headerTags the header tags, in case these should be added as metadata on published artifacts.
          */
-        public abstract void publish(HollowProducer.Blob blob, Map<String, String> headerTags);
+        public abstract void publish(HollowProducer.Blob blob);
 
-
-        /**
-         * This method may be overridden to specify a compression algorithm for blob files.
-         *
-         * @return the {@link BlobCompressor} to be used to compress published blobs.
-         */
-        public BlobCompressor getBlobCompressor() {
-            return BlobCompressor.NO_COMPRESSION;
-        }
-
-        public static interface BlobCompressor {
-            public static final BlobCompressor NO_COMPRESSION = new BlobCompressor() {
-                public OutputStream compress(OutputStream os) { return os; }
-
-                public InputStream decompress(InputStream is) { return is; }
-            };
-
-            /**
-             * This method provides an opportunity to wrap the OutputStream used to write the blob (e.g. with a GZIPOutputStream).
-             */
-            public OutputStream compress(OutputStream is);
-            
-            public InputStream decompress(InputStream is);
-        }
     }
 
-    public static class Blob {
+    public static abstract class Blob {
 
-        protected final String namespace;
         protected final long fromVersion;
         protected final long toVersion;
-        protected final String dir;
         protected final Blob.Type type;
-        protected final File file;
 
-        private final BlobCompressor compressor;
 
-        Blob(String namespace, long fromVersion, long toVersion, String dir, Blob.Type type, BlobCompressor compressor) {
-            this.namespace = namespace;
+        protected Blob(long fromVersion, long toVersion, Blob.Type type) {
             this.fromVersion = fromVersion;
             this.toVersion = toVersion;
             this.type = type;
-            this.dir = dir;
-            this.compressor = compressor;
-
-            switch (type) {
-                case SNAPSHOT:
-                    this.file = new File(dir, String.format("%s-%s-%d", namespace, type.prefix, toVersion));
-                    break;
-                case DELTA:
-                case REVERSE_DELTA:
-                    this.file = new File(dir, String.format("%s-%s-%d-%d", namespace, type.prefix, fromVersion, toVersion));
-                    break;
-                default:
-                    throw new IllegalStateException("unknown blob type, type=" + type);
-            }
         }
 
-        protected void write(HollowBlobWriter writer) throws IOException {
-            this.file.getParentFile().mkdirs();
-            this.file.createNewFile();
-            try (OutputStream os = new BufferedOutputStream(compressor.compress(new FileOutputStream(file)))) {
-                switch (type) {
-                    case SNAPSHOT:
-                        writer.writeSnapshot(os);
-                        break;
-                    case DELTA:
-                        writer.writeDelta(os);
-                        break;
-                    case REVERSE_DELTA:
-                        writer.writeReverseDelta(os);
-                        break;
-                    default:
-                        throw new IllegalStateException("unknown type, type=" + type);
-                }
-            }
-        }
+        protected abstract void write(HollowBlobWriter writer) throws IOException;
 
-        protected InputStream newInputStream() throws IOException {
-            return new BufferedInputStream(compressor.decompress(new FileInputStream(this.file)));
-        }
+        public abstract InputStream newInputStream() throws IOException;
+
+        public abstract void cleanup();
 
         public File getFile() {
-            return this.file;
+            throw new UnsupportedOperationException("File is not available");
         }
 
         public Type getType() {
@@ -586,10 +619,6 @@ public class HollowProducer {
 
         public long getToVersion() {
             return this.toVersion;
-        }
-
-        public void cleanup() {
-            if (this.file != null) this.file.delete();
         }
 
         /**
@@ -609,7 +638,32 @@ public class HollowProducer {
     }
 
     public static interface Validator {
-        void validate(HollowConsumer.ReadState readState);
+        void validate(HollowProducer.ReadState readState);
+    
+        @SuppressWarnings("serial")
+        public static class ValidationException extends RuntimeException {
+            private List<Throwable> individualFailures;
+            
+            public ValidationException() {
+                super();
+            }
+            
+            public ValidationException(String msg) {
+                super(msg);
+            }
+            
+            public ValidationException(String msg, Throwable cause) {
+                super(msg, cause);
+            }
+            
+            public void setIndividualFailures(List<Throwable> individualFailures) {
+                this.individualFailures = individualFailures;
+            }
+            
+            public List<Throwable> getIndividualFailures() {
+                return individualFailures;
+            }
+        }
     }
 
     public static interface Announcer {
@@ -620,12 +674,15 @@ public class HollowProducer {
         Blob snapshot = null;
         Blob delta = null;
         Blob reverseDelta = null;
+        
+        boolean cleanupCalled;
+        boolean snapshotPublishComplete;
 
-        void cleanup() {
-            if(snapshot != null) {
-                snapshot.cleanup();
-                snapshot = null;
-            }
+        synchronized void cleanup() {
+            cleanupCalled = true;
+            
+            cleanupSnapshot();
+            
             if(delta != null) {
                 delta.cleanup();
                 delta = null;
@@ -633,6 +690,19 @@ public class HollowProducer {
             if(reverseDelta != null) {
                 reverseDelta.cleanup();
                 reverseDelta = null;
+            }
+        }
+        
+        synchronized void markSnapshotPublishComplete() {
+            snapshotPublishComplete = true;
+            
+            cleanupSnapshot();
+        }
+        
+        private void cleanupSnapshot() {
+            if(cleanupCalled && snapshotPublishComplete && snapshot != null) {
+                snapshot.cleanup();
+                snapshot = null;
             }
         }
 
@@ -644,4 +714,101 @@ public class HollowProducer {
             return reverseDelta != null;
         }
     }
+    
+    public static HollowProducer.Builder withPublisher(HollowProducer.Publisher publisher) {
+        Builder builder = new Builder();
+        return builder.withPublisher(publisher);
+    }
+    
+    public static class Builder {
+        private BlobStager stager;
+        private BlobCompressor compressor;
+        private File stagingDir;
+        private Publisher publisher;
+        private Announcer announcer;
+        private List<Validator> validators = new ArrayList<Validator>();
+        private List<HollowProducerListener> listeners = new ArrayList<HollowProducerListener>();
+        private VersionMinter versionMinter = new VersionMinterWithCounter();
+        private Executor snapshotPublishExecutor = null;
+        private int numStatesBetweenSnapshots = 0;
+        
+        public Builder withBlobStager(HollowProducer.BlobStager stager) {
+            this.stager = stager;
+            return this;
+        }
+        
+        public Builder withBlobCompressor(HollowProducer.BlobCompressor compressor) {
+            this.compressor = compressor;
+            return this;
+        }
+        
+        public Builder withBlobStagingDir(File stagingDir) {
+            this.stagingDir = stagingDir;
+            return this;
+        }
+        
+        public Builder withPublisher(HollowProducer.Publisher publisher) {
+            this.publisher = publisher; 
+            return this;
+        }
+        
+        public Builder withAnnouncer(HollowProducer.Announcer announcer) {
+            this.announcer = announcer;
+            return this;
+        }
+        
+        public Builder withValidator(HollowProducer.Validator validator) {
+            this.validators.add(validator);
+            return this;
+        }
+        
+        public Builder withValidators(HollowProducer.Validator... validators) {
+            for(Validator validator : validators)
+                this.validators.add(validator);
+            return this;
+        }
+        
+        public Builder withListener(HollowProducerListener listener) {
+            this.listeners.add(listener);
+            return this;
+        }
+        
+        public Builder withListeners(HollowProducerListener... listeners) {
+            for(HollowProducerListener listener : listeners)
+                this.listeners.add(listener);
+            return this;
+        }
+        
+        public Builder withVersionMinter(HollowProducer.VersionMinter versionMinter) {
+            this.versionMinter = versionMinter;
+            return this;
+        }
+        
+        public Builder withSnapshotPublishExecutor(Executor executor) {
+            this.snapshotPublishExecutor = executor;
+            return this;
+        }
+        
+        public Builder withNumStatesBetweenSnapshots(int numStatesBetweenSnapshots) {
+            this.numStatesBetweenSnapshots = numStatesBetweenSnapshots;
+            return this;
+        }
+        
+        public HollowProducer build() {
+            if(stager != null && compressor != null)
+                throw new IllegalArgumentException("Both a custom BlobStager and BlobCompressor were specified -- please specify only one of these.");
+            if(stager != null && stagingDir != null)
+                throw new IllegalArgumentException("Both a custom BlobStager and a staging directory were specified -- please specify only one of these.");
+            
+            BlobStager stager = this.stager;
+            if(stager == null) {
+                BlobCompressor compressor = this.compressor != null ? this.compressor : BlobCompressor.NO_COMPRESSION;
+                File stagingDir = this.stagingDir != null ? this.stagingDir : new File(System.getProperty("java.io.tmpdir"));
+                stager = new HollowFilesystemBlobStager(stagingDir, compressor);
+            }
+            
+            return new HollowProducer(stager, publisher, announcer, validators, listeners, versionMinter, snapshotPublishExecutor, numStatesBetweenSnapshots);
+        }
+    }
+    
 }

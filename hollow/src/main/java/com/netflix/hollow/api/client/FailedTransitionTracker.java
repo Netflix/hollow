@@ -17,14 +17,13 @@
  */
 package com.netflix.hollow.api.client;
 
+import com.netflix.hollow.api.consumer.HollowConsumer;
+
 import java.util.HashSet;
 
 /**
  * Tracks the blobs which failed to be successfully applied by a HollowClient.  Blobs logged in this
  * tracker will not be attempted again.
- * 
- * @author dkoszewnik
- *
  */
 public class FailedTransitionTracker {
 
@@ -37,11 +36,11 @@ public class FailedTransitionTracker {
     }
 
     public void markAllTransitionsAsFailed(HollowUpdatePlan plan) {
-        for(HollowBlob transition : plan)
+        for(HollowConsumer.Blob transition : plan)
             markFailedTransition(transition);
     }
 
-    public void markFailedTransition(HollowBlob transition) {
+    public void markFailedTransition(HollowConsumer.Blob transition) {
         if(transition.isSnapshot()) {
             failedSnapshotTransitions.add(transition.getToVersion());
         } else {
@@ -50,7 +49,7 @@ public class FailedTransitionTracker {
     }
 
     public boolean anyTransitionWasFailed(HollowUpdatePlan plan) {
-        for(HollowBlob transition : plan) {
+        for(HollowConsumer.Blob transition : plan) {
             if(transitionWasFailed(transition))
                 return true;
         }
@@ -62,14 +61,14 @@ public class FailedTransitionTracker {
         failedDeltaTransitions.clear();
     }
 
-    private boolean transitionWasFailed(HollowBlob transition) {
+    private boolean transitionWasFailed(HollowConsumer.Blob transition) {
         if(transition.isSnapshot())
             return failedSnapshotTransitions.contains(transition.getToVersion());
 
         return failedDeltaTransitions.contains(delta(transition));
     }
 
-    private DeltaTransition delta(HollowBlob transition) {
+    private DeltaTransition delta(HollowConsumer.Blob transition) {
         return new DeltaTransition(transition.getFromVersion(), transition.getToVersion());
     }
 

@@ -51,4 +51,5 @@ public class AbstractHollowProducerListener implements HollowProducerListener {
 
     @Override public void onAnnouncementStart(long version) {}
     @Override public void onAnnouncementComplete(ProducerStatus status, long elapsed, TimeUnit unit) {}
+
 }

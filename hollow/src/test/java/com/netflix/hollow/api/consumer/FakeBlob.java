@@ -17,33 +17,22 @@
  */
 package com.netflix.hollow.api.consumer;
 
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
 
-/**
- * Alpha API subject to change.
- *
- * @author Tim Taylor {@literal<tim@toolbear.io>}
- */
-class ReadStateImpl implements HollowConsumer.ReadState {
-    private final long version;
-    private final HollowReadStateEngine stateEngine;
+import java.io.IOException;
+import java.io.InputStream;
 
+class FakeBlob extends Blob {
 
-
-    // TODO: timt: should be package protected
-    public ReadStateImpl(long version, HollowReadStateEngine stateEngine) {
-        this.version = version;
-        this.stateEngine = stateEngine;
+    public FakeBlob(long toVersion) {
+        super(toVersion);
     }
 
-
-    @Override
-    public long getVersion() {
-        return version;
+    public FakeBlob(long fromVersion, long toVersion) {
+        super(fromVersion, toVersion);
     }
 
-    @Override
-    public HollowReadStateEngine getStateEngine() {
-        return stateEngine;
+    public InputStream getInputStream() throws IOException {
+        return null;
     }
 }

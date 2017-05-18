@@ -17,8 +17,11 @@
  */
 package com.netflix.hollow.api.codegen;
 
-import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.api.codegen.indexes.HollowHashIndexGenerator;
 
+import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
+import com.netflix.hollow.api.codegen.indexes.HollowPrimaryKeyIndexGenerator;
+import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -137,10 +140,12 @@ public class HollowAPIGenerator {
             generateFile(directory, getHollowObjectGenerator(schema));
             generateFile(directory, getHollowFactoryGenerator(schema));
 
-            if(schema instanceof HollowObjectSchema) {
+            if(schema.getSchemaType() == SchemaType.OBJECT) {
                 generateFile(directory, new HollowObjectDelegateInterfaceGenerator(packageName, (HollowObjectSchema)schema));
                 generateFile(directory, new HollowObjectDelegateCachedImplGenerator(packageName, (HollowObjectSchema)schema));
                 generateFile(directory, new HollowObjectDelegateLookupImplGenerator(packageName, (HollowObjectSchema)schema));
+                generateFile(directory, new HollowPrimaryKeyIndexGenerator(packageName, apiClassname, classPostfix, (HollowObjectSchema)schema));
+                generateFile(directory, new HollowHashIndexGenerator(packageName, apiClassname, classPostfix, (HollowObjectSchema)schema));
             }
         }
     }

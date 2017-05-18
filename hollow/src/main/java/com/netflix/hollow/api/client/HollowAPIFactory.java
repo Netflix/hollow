@@ -34,8 +34,6 @@ import java.util.Set;
  * to conform to a specific data model. 
  * 
  * A default implementation, which will create a default {@link HollowAPI} is available at {@link HollowAPIFactory#DEFAULT_FACTORY}.
- * 
- * @author dkoszewnik
  *
  */
 public interface HollowAPIFactory {

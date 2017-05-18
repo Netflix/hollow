@@ -15,25 +15,22 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.api.client;
+package com.netflix.hollow.api.consumer;
 
 import com.netflix.hollow.api.client.HollowUpdatePlan;
-
 import org.junit.Assert;
 import org.junit.Test;
-
-
 
 public class HollowUpdatePlanTest {
 
     @Test
     public void testIsSnapshot() {
         HollowUpdatePlan plan = new HollowUpdatePlan();
-        plan.add(new FakeHollowUpdateTransition(1));
+        plan.add(new FakeBlob(1));
 
         Assert.assertTrue(plan.isSnapshotPlan());
 
-        plan.add(new FakeHollowUpdateTransition(1, 2));
+        plan.add(new FakeBlob(1, 2));
 
         Assert.assertTrue(plan.isSnapshotPlan());
 
@@ -41,40 +38,40 @@ public class HollowUpdatePlanTest {
 
         Assert.assertFalse(plan.isSnapshotPlan());
 
-        plan.add(new FakeHollowUpdateTransition(1, 2));
+        plan.add(new FakeBlob(1, 2));
 
         Assert.assertFalse(plan.isSnapshotPlan());
     }
 
     @Test
     public void testGetSnapshotTransition() {
-        FakeHollowUpdateTransition snapshotTransition = new FakeHollowUpdateTransition(1);
+        FakeBlob snapshotTransition = new FakeBlob(1);
 
         HollowUpdatePlan plan = new HollowUpdatePlan();
         plan.add(snapshotTransition);
 
         Assert.assertSame(snapshotTransition, plan.getSnapshotTransition());
 
-        plan.add(new FakeHollowUpdateTransition(1, 2));
+        plan.add(new FakeBlob(1, 2));
 
         Assert.assertSame(snapshotTransition, plan.getSnapshotTransition());
     }
 
     @Test
     public void testGetDeltaTransitionsForSnapshotPlan() {
-        FakeHollowUpdateTransition snapshotTransition = new FakeHollowUpdateTransition(1);
+        FakeBlob snapshotTransition = new FakeBlob(1);
 
         HollowUpdatePlan plan = new HollowUpdatePlan();
         plan.add(snapshotTransition);
 
         Assert.assertTrue(plan.getDeltaTransitions().isEmpty());
 
-        FakeHollowUpdateTransition delta1 = new FakeHollowUpdateTransition(1, 2);
+        FakeBlob delta1 = new FakeBlob(1, 2);
         plan.add(delta1);
 
         Assert.assertEquals(1, plan.getDeltaTransitions().size());
 
-        FakeHollowUpdateTransition delta2 = new FakeHollowUpdateTransition(2, 3);
+        FakeBlob delta2 = new FakeBlob(2, 3);
         plan.add(delta2);
 
         Assert.assertEquals(2, plan.getDeltaTransitions().size());
@@ -89,12 +86,12 @@ public class HollowUpdatePlanTest {
 
         Assert.assertTrue(plan.getDeltaTransitions().isEmpty());
 
-        FakeHollowUpdateTransition delta1 = new FakeHollowUpdateTransition(1, 2);
+        FakeBlob delta1 = new FakeBlob(1, 2);
         plan.add(delta1);
 
         Assert.assertEquals(1, plan.getDeltaTransitions().size());
 
-        FakeHollowUpdateTransition delta2 = new FakeHollowUpdateTransition(2, 3);
+        FakeBlob delta2 = new FakeBlob(2, 3);
         plan.add(delta2);
 
         Assert.assertEquals(2, plan.getDeltaTransitions().size());

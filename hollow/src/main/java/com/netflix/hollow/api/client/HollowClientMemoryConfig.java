@@ -17,71 +17,23 @@
  */
 package com.netflix.hollow.api.client;
 
-import com.netflix.hollow.api.custom.HollowAPI;
-
-import com.netflix.hollow.tools.history.HollowHistory;
+import com.netflix.hollow.api.consumer.HollowConsumer;
 
 /**
  * Defines various aspects of data access guarantees and update behavior which impact the heap footprint/GC behavior of hollow.
  * 
  * Implementations are often a {@link SpecifiedConfig}.
  * 
- * @author dkoszewnik
- *
+ * @deprecated Implement the {@link HollowConsumer.ObjectLongevityConfig} and/or {@link HollowConsumer.DoubleSnapshotConfig} for use 
+ * with the {@link HollowConsumer} instead.
+ * 
  */
-public interface HollowClientMemoryConfig {
+public interface HollowClientMemoryConfig extends HollowConsumer.ObjectLongevityConfig {
 
     public static final long ONE_HOUR = 60 * 60 * 1000;
 
     public static final HollowClientMemoryConfig DEFAULT_CONFIG = new SpecifiedConfig(false, false, ONE_HOUR, ONE_HOUR);
 
-    /**
-     * Whether or not long-lived object support is enabled.
-     * 
-     * Because Hollow reuses pooled memory, if references to Hollow records are held too long, the underlying data may
-     * be overwritten.  When long-lived object support is enabled, Hollow records referenced via a {@link HollowAPI} will,
-     * after an update, be backed by a reserved copy of the data at the time the reference was created.  This guarantees
-     * that even if a reference is held for a long time, it will continue to return the same data when interrogated.
-     * 
-     * These reserved copies are backed by the {@link HollowHistory} data structure.
-     */
-    public boolean enableLongLivedObjectSupport();
-
-    public boolean enableExpiredUsageStackTraces();
-
-    /**
-     * If long-lived object support is enabled, this returns the number of milliseconds before the {@link StaleHollowReferenceDetector}
-     * will begin flagging usage of stale objects.
-     * 
-     * @return
-     */
-    public long gracePeriodMillis();
-
-    /**
-     * If long-lived object support is enabled, this defines the number of milliseconds, after the grace period, during which
-     * data is still available in stale references, but usage will be flagged by the {@link StaleHollowReferenceDetector}.
-     * 
-     * After the grace period + usage detection period have expired, the data from stale references will become inaccessible if
-     * dropDataAutomatically() is enabled.
-     * 
-     * @return
-     */
-    public long usageDetectionPeriodMillis();
-
-    /**
-     * Whether or not to drop data behind stale references after the grace period + usage detection period has elapsed, assuming
-     * that no usage was detected during the usage detection period. 
-     * 
-     * @return
-     */
-    public boolean dropDataAutomatically();
-
-    /**
-     * Drop data even if flagged during the usage detection period.
-     * @return
-     */
-    public boolean forceDropData();
-    
     /**
      * Whether or not a double snapshot will ever be attempted by the {@link HollowClient}
      * @return

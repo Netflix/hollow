@@ -1,12 +1,28 @@
+/*
+ *
+ *  Copyright 2017 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
 package com.netflix.hollow.api.producer;
 
-import com.netflix.hollow.api.client.HollowBlob;
-import com.netflix.hollow.api.client.HollowBlobRetriever;
-import com.netflix.hollow.api.consumer.HollowConsumer.ReadState;
+import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.objects.delegate.HollowObjectGenericDelegate;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
 import com.netflix.hollow.api.producer.HollowProducer.Blob.Type;
+import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.Status;
@@ -36,7 +52,7 @@ public class HollowProducerTest {
 
     private File tmpFolder;
     HollowObjectSchema schema;
-    private HollowBlobRetriever blobRetriever;
+    private HollowConsumer.BlobRetriever blobRetriever;
 
     private Map<Long, Blob> blobMap = new HashMap<>();
     private Map<Long, File> blobFileMap = new HashMap<>();
@@ -54,9 +70,10 @@ public class HollowProducerTest {
     }
 
     private HollowProducer createProducer(File tmpFolder, HollowObjectSchema... schemas) {
-        HollowProducer producer = new HollowProducer(
-                new FakeBlobPublisher(namespace, tmpFolder.getAbsolutePath()),
-                new HollowFilesystemAnnouncer(namespace));
+        HollowProducer producer = HollowProducer.withPublisher(new FakeBlobPublisher())
+                                                .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder))
+                                                .build();
+                
         producer.initializeDataModel(schemas);
         producer.addListener(new FakeProducerListener());
         return producer;
@@ -100,7 +117,7 @@ public class HollowProducerTest {
         }
 
         {
-            ReadState readState = producer.restoreAndReturnReadState(fakeVersion, blobRetriever);
+            ReadState readState = producer.restore(fakeVersion, blobRetriever);
             Assert.assertNull(readState);
             Assert.assertNotNull(lastRestoreStatus);
             Assert.assertEquals(Status.FAIL, lastRestoreStatus.getStatus());
@@ -212,7 +229,7 @@ public class HollowProducerTest {
     }
 
     private void restoreAndAssert(HollowProducer producer, long version, int size, int valueMultiplier, int valueFieldCount) throws Exception {
-        ReadState readState = producer.restoreAndReturnReadState(version, blobRetriever);
+        ReadState readState = producer.restore(version, blobRetriever);
         Assert.assertNotNull(lastRestoreStatus);
         Assert.assertEquals(Status.SUCCESS, lastRestoreStatus.getStatus());
         Assert.assertEquals("Version should be the same", version, lastRestoreStatus.getDesiredVersion());
@@ -239,8 +256,8 @@ public class HollowProducerTest {
     }
 
     @After
-    public void tierDown() {
-        System.out.println("tierDown");
+    public void tearDown() {
+        System.out.println("tearDown");
 
         for (File file : blobFileMap.values()) {
             System.out.println("\t deleting: " + file);
@@ -287,13 +304,9 @@ public class HollowProducerTest {
         }
     }
 
-    private class FakeBlobPublisher extends HollowProducer.Publisher {
-        public FakeBlobPublisher(String namespace, String dir) {
-            super(namespace, dir);
-        }
-
+    private class FakeBlobPublisher implements HollowProducer.Publisher {
         @Override
-        public void publish(Blob blob, Map<String, String> headerTags) {
+        public void publish(Blob blob) {
             File blobFile = blob.getFile();
             if (!blobFile.exists()) throw new RuntimeException("File does not existis: " + blobFile);
 
@@ -316,7 +329,7 @@ public class HollowProducerTest {
     }
 
     @SuppressWarnings("unused")
-    private class FakeBlobRetriever implements HollowBlobRetriever {
+    private class FakeBlobRetriever implements HollowConsumer.BlobRetriever {
         private String namespace;
         private String tmpDir;
 
@@ -326,12 +339,12 @@ public class HollowProducerTest {
         }
 
         @Override
-        public HollowBlob retrieveSnapshotBlob(long desiredVersion) {
+        public HollowConsumer.Blob retrieveSnapshotBlob(long desiredVersion) {
             final File blobFile = blobFileMap.get(desiredVersion);
             if (blobFile == null) return null;
 
             System.out.println("Restored: " + blobFile);
-            return new HollowBlob(desiredVersion) {
+            return new HollowConsumer.Blob(desiredVersion) {
                 @Override
                 public InputStream getInputStream() throws IOException {
                     return new FileInputStream(blobFile);
@@ -340,12 +353,12 @@ public class HollowProducerTest {
         }
 
         @Override
-        public HollowBlob retrieveDeltaBlob(long currentVersion) {
+        public HollowConsumer.Blob retrieveDeltaBlob(long currentVersion) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public HollowBlob retrieveReverseDeltaBlob(long currentVersion) {
+        public HollowConsumer.Blob retrieveReverseDeltaBlob(long currentVersion) {
             throw new UnsupportedOperationException();
         }
     }

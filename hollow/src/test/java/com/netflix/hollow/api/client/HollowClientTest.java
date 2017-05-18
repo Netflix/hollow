@@ -18,22 +18,13 @@
 package com.netflix.hollow.api.client;
 
 import com.netflix.hollow.api.custom.HollowAPI;
-
-import com.netflix.hollow.core.util.DefaultHashCodeFinder;
+import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-import com.netflix.hollow.api.client.HollowAPIFactory;
-import com.netflix.hollow.api.client.HollowClient;
-import com.netflix.hollow.api.client.HollowClientMemoryConfig;
-import com.netflix.hollow.api.client.HollowAnnouncementWatcher;
-import com.netflix.hollow.api.client.HollowBlobRetriever;
-import com.netflix.hollow.api.client.HollowUpdateListener;
-import com.netflix.hollow.api.client.HollowBlob;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -42,6 +33,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+@SuppressWarnings("deprecation")
 public class HollowClientTest {
 
     private HollowWriteStateEngine writeEngine;
@@ -74,12 +66,10 @@ public class HollowClientTest {
         delta2.reset();
         delta3.reset();
 
-        client = new HollowClient(new FakeHollowBlobRetriever(),
-                new HollowAnnouncementWatcher.DefaultWatcher(),
-                HollowUpdateListener.DEFAULT_LISTENER,
-                HollowAPIFactory.DEFAULT_FACTORY,
-                new DefaultHashCodeFinder(),
-                new HollowClientMemoryConfig.SpecifiedConfig(true, false, 10000L, 10000L));
+        client = new HollowClient.Builder()
+                              .withBlobRetriever(new FakeHollowBlobRetriever())
+                              .withMemoryConfig(new HollowClientMemoryConfig.SpecifiedConfig(true, false, 10000L, 10000L))
+                              .build();
 
         createChain();
     }

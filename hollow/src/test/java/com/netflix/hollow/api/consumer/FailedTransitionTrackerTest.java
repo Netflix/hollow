@@ -15,13 +15,13 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.api.client;
+package com.netflix.hollow.api.consumer;
 
 
 import com.netflix.hollow.api.client.FailedTransitionTracker;
 import com.netflix.hollow.api.client.HollowUpdatePlan;
-import com.netflix.hollow.api.client.HollowBlob;
 
+import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
 import java.io.IOException;
 import java.io.InputStream;
 import org.junit.Assert;
@@ -31,7 +31,6 @@ import org.junit.Test;
 public class FailedTransitionTrackerTest {
 
     private FailedTransitionTracker tracker;
-
 
     @Before
     public void setUp() {
@@ -80,7 +79,7 @@ public class FailedTransitionTrackerTest {
     }
 
 
-    static class FakeHollowBlob extends HollowBlob {
+    static class FakeHollowBlob extends Blob {
         public FakeHollowBlob(long toVersion) {
             super(toVersion);
         }

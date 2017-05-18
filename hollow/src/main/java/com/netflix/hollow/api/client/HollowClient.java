@@ -18,14 +18,20 @@
 package com.netflix.hollow.api.client;
 
 import static com.netflix.hollow.api.client.HollowAPIFactory.DEFAULT_FACTORY;
+import static com.netflix.hollow.api.client.HollowClientConsumerBridge.consumerBlobRetrieverFor;
+import static com.netflix.hollow.api.client.HollowClientConsumerBridge.consumerRefreshListenerFor;
 import static com.netflix.hollow.api.client.HollowClientMemoryConfig.DEFAULT_CONFIG;
 import static com.netflix.hollow.api.client.HollowUpdateListener.DEFAULT_LISTENER;
-import com.netflix.hollow.api.custom.HollowAPI;
-import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
-import com.netflix.hollow.core.util.DefaultHashCodeFinder;
+
+import com.netflix.hollow.api.client.HollowClientConsumerBridge.HollowClientDoubleSnapshotConfig;
 import com.netflix.hollow.api.codegen.HollowAPIClassJavaGenerator;
-import com.netflix.hollow.core.read.filter.HollowFilterConfig;
+import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.filter.HollowFilterConfig;
+import com.netflix.hollow.core.util.DefaultHashCodeFinder;
+import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
+import java.util.Collections;
 
 /**
  * A HollowClient is the top-level class used by consumers of HollowData to initialize and keep up-to-date a local in-memory 
@@ -64,13 +70,16 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
  * Only an implementation of the HollowBlobRetriever is required to be injected, the other components may use default
  * implementations. 
  * 
- * @author dkoszewnik
+ * @deprecated Use the {@link HollowConsumer} API instead.
  *
  */
+@Deprecated
 public class HollowClient {
 
     protected final HollowAnnouncementWatcher announcementWatcher;
     protected final HollowClientUpdater updater;
+    
+    private final HollowClientDoubleSnapshotConfig doubleSnapshotConfig;
 
     public HollowClient(HollowBlobRetriever blobRetriever) {
         this(blobRetriever, new HollowAnnouncementWatcher.DefaultWatcher(), DEFAULT_LISTENER, DEFAULT_FACTORY, new DefaultHashCodeFinder(), DEFAULT_CONFIG);
@@ -92,7 +101,14 @@ public class HollowClient {
                         HollowAPIFactory apiFactory,
                         HollowObjectHashCodeFinder hashCodeFinder,
                         HollowClientMemoryConfig memoryConfig) {
-        this.updater = new HollowClientUpdater(blobRetriever, updateListener, apiFactory, hashCodeFinder, memoryConfig);
+        this.doubleSnapshotConfig = HollowClientConsumerBridge.doubleSnapshotConfigFor(memoryConfig);
+        this.updater = new HollowClientUpdater(consumerBlobRetrieverFor(blobRetriever), 
+                                               Collections.singletonList(consumerRefreshListenerFor(updateListener)), 
+                                               apiFactory,
+                                               doubleSnapshotConfig, 
+                                               hashCodeFinder, 
+                                               memoryConfig,
+                                               updateListener);
         this.announcementWatcher = announcementWatcher;
         announcementWatcher.setClientToNotify(this);
     }
@@ -161,7 +177,7 @@ public class HollowClient {
      * </ul>
      */
     public void setMaxDeltas(int maxDeltas) {
-        updater.setMaxDeltas(maxDeltas);
+        doubleSnapshotConfig.setMaxDeltasBeforeDoubleSnapshot(maxDeltas);
     }
     
     /**
@@ -195,7 +211,6 @@ public class HollowClient {
     public long getCurrentVersionId() {
         return updater.getCurrentVersionId();
     }
-    
     
     public static class Builder {
         private HollowBlobRetriever blobRetriever = null;
