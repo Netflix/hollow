@@ -891,7 +891,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -4396,7 +4396,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -7901,7 +7901,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -11406,7 +11406,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -14930,7 +14930,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -18633,7 +18633,7 @@
     },
     "resolutionRules": {
         "com.netflix.nebula:gradle-resolution-rules": {
-            "locked": "0.46.0",
+            "locked": "0.47.0",
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
@@ -19533,7 +19533,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -23042,7 +23042,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -26559,7 +26559,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
@@ -26570,11 +26570,11 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui"
             ]
@@ -30191,7 +30191,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
@@ -30202,11 +30202,11 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui"
             ]
@@ -33823,7 +33823,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
@@ -33834,11 +33834,11 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui"
             ]
@@ -37455,7 +37455,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
@@ -37466,11 +37466,11 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui"
             ]
@@ -41087,7 +41087,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
@@ -41098,11 +41098,11 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui"
             ]
@@ -44719,7 +44719,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
@@ -44730,11 +44730,11 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui"
             ]
@@ -48351,7 +48351,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
@@ -48362,11 +48362,11 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui"
             ]
@@ -51983,7 +51983,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
@@ -51994,11 +51994,11 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.5.3",
+            "locked": "2.5.4",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui"
             ]
