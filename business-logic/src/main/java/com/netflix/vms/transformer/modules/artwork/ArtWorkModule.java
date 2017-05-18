@@ -436,7 +436,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         }
         
         String startX = keyValues.get("SCREENSAVER_START_X");
-        String endX = keyValues.get("SCREENSAVER_START_Y");
+        String endX = keyValues.get("SCREENSAVER_END_X");
         String offsetY = keyValues.get("SCREENSAVER_OFFSET_Y");
         if(startX != null || endX != null || offsetY != null) {
             passThrough.screensaverPassthrough = new ArtworkScreensaverPassthrough();
