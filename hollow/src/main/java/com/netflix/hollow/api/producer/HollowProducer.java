@@ -51,7 +51,68 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * WARNING: Beta API subject to change.
+ * 
+ * A HollowProducer is the top-level class used by producers of Hollow data to populate, publish, and announce data states. 
+ * The interactions between the "blob" store and announcement mechanism are defined by this class, and the implementations 
+ * of the data publishing and announcing are abstracted in interfaces which are provided to this class.
+ * 
+ * To obtain a HollowProducer, you should use a builder pattern, for example:
+ * 
+ * <pre>
+ * {@code
+ * 
+ * HollowProducer producer = HollowProducer.withPublisher(publisher)
+ *                                         .withAnnouncer(announcer)
+ *                                         .build();
+ * }
+ * </pre>
+ * 
+ * The following components are injectable, but only an implementation of the HollowProducer.Publisher is 
+ * required to be injected, all other components are optional. :     
+ * 
+ * <dl>
+ *      <dt>{@link HollowProducer.Publisher}</dt>
+ *      <dd>Implementations of this class define how to publish blob data to the blob store.</dd>
+ *      
+ *      <dt>{@link HollowProducer.Announcer}</dt>
+ *      <dd>Implementations of this class define the announcement mechanism, which is used to track the version of the 
+ *          currently announced state.</dd>
+ *
+ *      <dt>One or more {@link HollowProducer.Validator}</dt>
+ *      <dd>Implementations of this class allow for semantic validation of the data contained in a state prior to announcement.
+ *          If an Exception is thrown during validation, the state will not be announced, and the producer will be automatically 
+ *          rolled back to the prior state.</dd>
+ *      
+ *      <dt>One or more {@link HollowProducerListener}</dt>
+ *      <dd>Listeners are notified about the progress and status of producer cycles throughout the various cycle stages.</dd>
+ * 
+ *      <dt>A Blob staging directory</dt>
+ *      <dd>Before blobs are published, they must be written and inspected/validated.  A directory may be specified as a File to which
+ *          these "staged" blobs will be written prior to publish.  Staged blobs will be cleaned up automatically after publish.</dd>
+ *          
+ *      <dt>{@link HollowProducer.BlobCompressor}</dt>
+ *      <dd>Implementations of this class intercept blob input/output streams to allow for compression in the blob store.</dd>
+ *      
+ *      <dt>{@link HollowProducer.BlobStager}</dt>
+ *      <dd>Implementations will define how to stage blobs, if the default behavior of staging blobs on local disk is not desirable.
+ *          If a {@link BlobStager} is provided, then neither a blob staging directory or {@link BlobCompressor} should be provided.</dd> 
+ *      
+ *      <dt>An Executor for publishing snapshots</dt>
+ *      <dd>When consumers start up, if the latest announced version does not have a snapshot, they can load an earlier snapshot 
+ *          and follow deltas to get up-to-date.  A state can therefore be available and announced prior to the availability of 
+ *          the snapshot.  If an Executor is supplied here, then it will be used to publish snapshots.  This can be useful if 
+ *          snapshot publishing takes a long time -- subsequent cycles may proceed while snapshot uploads are still in progress.</dd>
+ * 
+ *      <dt>Number of cycles between snapshots</dt>
+ *      <dd>Because snapshots are not necessary for a data state to be announced, they need not be published every cycle.
+ *          If this parameter is specified, then a snapshot will be produced only every (n+1)th cycle.</dd>
+ *          
+ *      <dt>{@link HollowProducer.VersionMinter}</dt>
+ *      <dd>Allows for a custom version identifier minting strategy.</dd>
+ *      
+ *      <dt>Target max type shard size</dt>
+ *      <dd>Specify a target max type shard size.  Defaults to 16MB.  See http://hollow.how/advanced-topics/#type-sharding</dd>
+ *</dl>
  *
  * @author Tim Taylor {@literal<tim@toolbear.io>}
  */
