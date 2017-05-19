@@ -17,6 +17,7 @@
  */
 package com.netflix.hollow.api.producer;
 
+import static com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE;
 import static java.lang.System.currentTimeMillis;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
@@ -170,8 +171,10 @@ public class HollowProducer {
 
     /**
      * Each cycle produces a single data state.
+     * 
+     * @return the version identifier of the produced state.
      */
-    public void runCycle(Populator task) {
+    public long runCycle(Populator task) {
         long toVersion = versionMinter.mint();
 
         if(!readStates.hasCurrent()) listeners.fireNewDeltaChain(toVersion);
@@ -182,24 +185,32 @@ public class HollowProducer {
         } finally {
             listeners.fireCycleComplete(cycleStatus);
         }
+        
+        return toVersion;
     }
 
-    public boolean runCompactionCycle(HollowCompactor.CompactionConfig config) {
+    /**
+     * Run a compaction cycle, will produce a data state with exactly the same data as currently, but 
+     * reorganized so that ordinal holes are filled.  This may need to be run multiple times to arrive
+     * at an optimal state.
+     * 
+     * @param config specifies what criteria to use to determine whether a compaction is necessary
+     * @return the version identifier of the produced state, or AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE if compaction was unnecessary.
+     */
+    public long runCompactionCycle(HollowCompactor.CompactionConfig config) {
         if(config != null && readStates.hasCurrent()) {
             final HollowCompactor compactor = new HollowCompactor(getWriteEngine(), readStates.current().getStateEngine(), config);
             if(compactor.needsCompaction()) {
-                runCycle(new Populator() {
+                return runCycle(new Populator() {
                     @Override
                     public void populate(WriteState newState) throws Exception {
                         compactor.compact();
                     }
                 });
-                
-                return true;
             }
         }
         
-        return false;
+        return NO_ANNOUNCEMENT_AVAILABLE;
     }
 
     protected void runCycle(Populator task, ProducerStatus.Builder cycleStatus, long toVersion) {
@@ -245,6 +256,10 @@ public class HollowProducer {
         } catch(Throwable th) {
             writeEngine.resetToLastPrepareForNextCycle();
             cycleStatus.fail(th);
+            
+            if(th instanceof RuntimeException)
+                throw (RuntimeException)th;
+            throw new RuntimeException(th);
         } finally {
             artifacts.cleanup();
         }
