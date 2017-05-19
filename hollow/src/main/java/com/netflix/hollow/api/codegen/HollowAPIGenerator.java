@@ -187,5 +187,58 @@ public class HollowAPIGenerator {
     private HollowFactoryJavaGenerator getHollowFactoryGenerator(HollowSchema schema) {
         return new HollowFactoryJavaGenerator(packageName, schema, classPostfix);
     }
+    
+    public static class Builder {
+        private String apiClassname;
+        private String packageName;
+        private HollowDataset dataset;
+        private Set<String> parameterizedTypes = Collections.emptySet();
+        private boolean parameterizeAllClassnames = false;
+        private String classPostfix = "";
+        private String getterPrefix = "";
+        
+        public Builder withAPIClassname(String apiClassname) {
+            this.apiClassname = apiClassname;
+            return this;
+        }
+        
+        public Builder withPackageName(String packageName) {
+            this.packageName = packageName;
+            return this;
+        }
+        
+        public Builder withDataModel(HollowDataset dataset) {
+            this.dataset = dataset;
+            return this;
+        }
+        
+        public Builder withParameterizedTypes(Set<String> parameterizedTypes) {
+            this.parameterizedTypes = parameterizedTypes;
+            return this;
+        }
+        
+        public Builder withParameterizeAllClassNames(boolean parameterizeAllClassnames) {
+            this.parameterizeAllClassnames = parameterizeAllClassnames;
+            return this;
+        }
+        
+        public Builder withClassPostfix(String classPostfix) {
+            this.classPostfix = classPostfix;
+            return this;
+        }
+        
+        public Builder withGetterPrefix(String getterPrefix) {
+            this.getterPrefix = getterPrefix;
+            return this;
+        }
+        
+        public HollowAPIGenerator build() {
+            HollowAPIGenerator generator = new HollowAPIGenerator(apiClassname, packageName, dataset, parameterizedTypes, parameterizeAllClassnames);
+            generator.setClassPostfix(classPostfix);
+            generator.setGetterPrefix(getterPrefix);
+            return generator;
+        }
+        
+    }
 
 }
