@@ -56,6 +56,8 @@ import java.util.logging.Logger;
  */
 public class HollowProducer {
 
+    private static final long DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE = 16L * 1024L * 1024L;
+
     private final Logger log = Logger.getLogger(HollowProducer.class.getName());
     private final BlobStager blobStager;
     private final Publisher publisher;
@@ -71,13 +73,13 @@ public class HollowProducer {
 
     public HollowProducer(Publisher publisher,
                           Announcer announcer) {
-        this(new HollowFilesystemBlobStager(), publisher, announcer, Collections.<Validator>emptyList(), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0);
+        this(new HollowFilesystemBlobStager(), publisher, announcer, Collections.<Validator>emptyList(), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0, DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE);
     }
 
     public HollowProducer(Publisher publisher,
                           Validator validator,
                           Announcer announcer) {
-        this(new HollowFilesystemBlobStager(), publisher, announcer, Collections.singletonList(validator), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0);
+        this(new HollowFilesystemBlobStager(), publisher, announcer, Collections.singletonList(validator), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0, DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE);
     }
 
     protected HollowProducer(BlobStager blobStager,
@@ -87,7 +89,8 @@ public class HollowProducer {
                              List<HollowProducerListener> listeners,
                              VersionMinter versionMinter,
                              Executor snapshotPublishExecutor,
-                             int numStatesBetweenSnapshots) {
+                             int numStatesBetweenSnapshots,
+                             long targetMaxTypeShardSize) {
         this.publisher = publisher;
         this.validators = validators;
         this.announcer = announcer;
@@ -100,7 +103,10 @@ public class HollowProducer {
         } : snapshotPublishExecutor;
         this.numStatesBetweenSnapshots = numStatesBetweenSnapshots;
 
-        this.objectMapper = new HollowObjectMapper(new HollowWriteStateEngine());
+        HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+        writeEngine.setTargetMaxTypeShardSize(targetMaxTypeShardSize);
+
+        this.objectMapper = new HollowObjectMapper(writeEngine);
         this.listeners = new ListenerSupport();
         this.readStates = ReadStateHelper.newDeltaChain();
         
@@ -731,6 +737,7 @@ public class HollowProducer {
         private VersionMinter versionMinter = new VersionMinterWithCounter();
         private Executor snapshotPublishExecutor = null;
         private int numStatesBetweenSnapshots = 0;
+        private long targetMaxTypeShardSize = DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE;
         
         public Builder withBlobStager(HollowProducer.BlobStager stager) {
             this.stager = stager;
@@ -794,6 +801,11 @@ public class HollowProducer {
             return this;
         }
         
+        public Builder withTargetMaxTypeShardSize(long targetMaxTypeShardSize) {
+            this.targetMaxTypeShardSize = targetMaxTypeShardSize;
+            return this;
+        }
+        
         public HollowProducer build() {
             if(stager != null && compressor != null)
                 throw new IllegalArgumentException("Both a custom BlobStager and BlobCompressor were specified -- please specify only one of these.");
@@ -807,7 +819,7 @@ public class HollowProducer {
                 stager = new HollowFilesystemBlobStager(stagingDir, compressor);
             }
             
-            return new HollowProducer(stager, publisher, announcer, validators, listeners, versionMinter, snapshotPublishExecutor, numStatesBetweenSnapshots);
+            return new HollowProducer(stager, publisher, announcer, validators, listeners, versionMinter, snapshotPublishExecutor, numStatesBetweenSnapshots, targetMaxTypeShardSize);
         }
     }
     
