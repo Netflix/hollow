@@ -389,6 +389,10 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             passThrough.design_attribute = passThroughString;
             setBasicPassThrough = true;
         }
+        
+        if("bcc2d2d0-3a87-11e7-af12-123a833aeda8".equals(new String(desc.sourceFileId.value)))
+            System.out.println("asdf");
+        
         passThroughString = getPassThroughString("FOCAL_POINT", keyValues);
         if(passThroughString != null) {
             passThrough.focal_point = passThroughString;

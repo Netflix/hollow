@@ -5,6 +5,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidIma
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidPhaseTagForArtwork;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
@@ -18,7 +19,6 @@ import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.hollowinput.AbsoluteScheduleHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
-import com.netflix.vms.transformer.hollowinput.ArtworkLocaleListHollow;
 import com.netflix.vms.transformer.hollowinput.DamMerchStillsHollow;
 import com.netflix.vms.transformer.hollowinput.FlagsHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
@@ -130,10 +130,9 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
                 int videoArtworkOrdinal = iter.next();
                 while (videoArtworkOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
                     VideoArtworkSourceHollow artworkHollowInput = api.getVideoArtworkSourceHollow(videoArtworkOrdinal);
-                    if("784f3fe0-10c9-11e7-8d60-0e267b4ec2ba".equals(artworkHollowInput._getSourceFileId()._getValue()))
-                        System.out.println("watch");
                     if(!artworkHollowInput._getIsFallback()) {
-                        ArtworkProcessResult processResult = processArtworkWithFallback(showHierarchiesByCountry.keySet(), artworkHollowInput, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry);
+                        Set<ArtworkLocaleHollow> localTerritories = getLocalTerritories(artworkHollowInput._getLocales());
+                        ArtworkProcessResult processResult = processArtworkWithFallback(showHierarchiesByCountry.keySet(), artworkHollowInput, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry, localTerritories);
                         if(processResult != null && processResult.isMerchStillRollup) {
                             rollupMerchstillVideoIds.add(videoId);
                             rollupSourceFieldIds.add(processResult.sourceFileId);
@@ -558,9 +557,10 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
                                                             Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap,
                                                             Map<String, Map<Integer, Set<SchedulePhaseInfo>>> countrySchedulePhaseMap,
                                                             Set<String> merchstillSourceFieldIds,
-                                                            Map<String, Set<String>> rolloutImagesByCountry, Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
+                                                            Map<String, Set<String>> rolloutImagesByCountry, Map<String, Set<VideoHierarchy>> showHierarchiesByCountry,
+                                                            Set<ArtworkLocaleHollow> originalNonFallbackLocaleSet) {
     
-        ArtworkProcessResult result = processArtwork(showHierarchiesByCountry.keySet(), artworkHollowInput, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry);
+        ArtworkProcessResult result = processArtwork(showHierarchiesByCountry.keySet(), artworkHollowInput, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry, originalNonFallbackLocaleSet);
         if (result != null) {
             return result;
         } else {
@@ -569,7 +569,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
                 int fallbackOrdinal = videoArtworkBySourceFileIdIndex.getMatchingOrdinal(fallbackSourceId._getValue());
                 if(fallbackOrdinal != -1) {
                     VideoArtworkSourceHollow fallback = api.getVideoArtworkSourceHollow(fallbackOrdinal);
-                    return processArtworkWithFallback(countrySet, fallback, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry);
+                    return processArtworkWithFallback(countrySet, fallback, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry, originalNonFallbackLocaleSet);
                 } else {
                     ctx.getLogger().warn(ArtworkFallbackMissing, "Artwork source " + artworkHollowInput._getSourceFileId()._getValue() + " needed to use fallback, but source data is missing: " + fallbackSourceId._getValue());
                 }
@@ -583,12 +583,11 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
                                                 Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap,
                                                 Map<String, Map<Integer, Set<SchedulePhaseInfo>>> countrySchedulePhaseMap,
                                                 Set<String> merchstillSourceFieldIds,
-                                                Map<String, Set<String>> rolloutImagesByCountry, Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
-        ArtworkLocaleListHollow locales = artworkHollowInput._getLocales();
+                                                Map<String, Set<String>> rolloutImagesByCountry, Map<String, Set<VideoHierarchy>> showHierarchiesByCountry,
+                                                Set<ArtworkLocaleHollow> localeSet) {
         int entityId = (int) artworkHollowInput._getMovieId();
         int videoId = entityId;
 
-        Set<ArtworkLocaleHollow> localeSet = getLocalTerritories(locales);
         if (localeSet.isEmpty()) {
             ctx.getLogger().error(MissingLocaleForArtwork, "Missing artwork locale for {} with id={}; data will be dropped.", entityType, entityId);
             return null;
@@ -648,10 +647,6 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
         }
 
         artwork.sourceFileId = new Strings(sourceFileId);
-        if("784f3fe0-10c9-11e7-8d60-0e267b4ec2ba".equals(sourceFileId))
-            System.out.println("ASDF");
-        
-        
         artwork.seqNum = seqNum;
         artwork.ordinalPriority = ordinalPriority;
         fillPassThroughData(artwork, attributes);
