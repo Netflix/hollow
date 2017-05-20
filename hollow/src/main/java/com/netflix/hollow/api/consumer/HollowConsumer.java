@@ -32,11 +32,14 @@ import com.netflix.hollow.tools.history.HollowHistory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 /**
@@ -107,6 +110,7 @@ public class HollowConsumer {
     
     protected final AnnouncementWatcher announcementWatcher;
     protected final HollowClientUpdater updater;
+    protected final ReadWriteLock refreshLock;
     
     private final Executor refreshExecutor;
 
@@ -131,6 +135,7 @@ public class HollowConsumer {
         updater.setFilter(dataFilter);
         this.announcementWatcher = announcementWatcher;
         this.refreshExecutor = refreshExecutor;
+        this.refreshLock = new ReentrantReadWriteLock();
         if(announcementWatcher != null)
             announcementWatcher.subscribeToUpdates(this);
     }
@@ -145,10 +150,13 @@ public class HollowConsumer {
      * This is a blocking call.
      */
     public void triggerRefresh() {
+        refreshLock.writeLock().lock();
         try {
             updater.updateTo(announcementWatcher == null ? Long.MAX_VALUE : announcementWatcher.getLatestVersion());
         } catch(Throwable th) {
             throw new RuntimeException(th);
+        } finally {
+            refreshLock.writeLock().unlock();
         }
     }
 
@@ -174,7 +182,6 @@ public class HollowConsumer {
      *
      */
     public void triggerAsyncRefreshWithDelay(int delayMillis) {
-        final HollowConsumer consumer = this;
         final long targetBeginTime = System.currentTimeMillis() + delayMillis;
 
         refreshExecutor.execute(new Runnable() {
@@ -183,7 +190,7 @@ public class HollowConsumer {
                     long delay = targetBeginTime - System.currentTimeMillis();
                     if(delay > 0)
                         Thread.sleep(delay);
-                    consumer.triggerRefresh();
+                    triggerRefresh();
                 } catch(Throwable th) {
                     th.printStackTrace();
                 }
@@ -245,6 +252,22 @@ public class HollowConsumer {
      */
     public void clearFailedTransitions() {
         updater.clearFailedTransitions();
+    }
+    
+    /**
+     * Returns a {@link ReadWriteLock#readLock()}, the corresponding writeLock() of which is used to synchronize refreshes.
+     * 
+     * This is useful if performing long-running operations which require a consistent view of the entire dataset in a single data state, to guarantee that updates do not happen while the operation runs.
+     */
+    public Lock getRefreshLock() {
+        return refreshLock.readLock();
+    }
+    
+    /**
+     * Add a {@link RefreshListener} to this consumer.
+     */
+    public void addRefreshListener(RefreshListener listener) {
+        updater.addRefreshListener(listener);
     }
 
     /**
@@ -562,7 +585,7 @@ public class HollowConsumer {
         private HollowConsumer.BlobRetriever blobRetriever = null;
         private HollowConsumer.AnnouncementWatcher announcementWatcher = null;
         private HollowFilterConfig filterConfig = null;
-        private List<HollowConsumer.RefreshListener> refreshListeners = new ArrayList<HollowConsumer.RefreshListener>();
+        private List<HollowConsumer.RefreshListener> refreshListeners = new CopyOnWriteArrayList<HollowConsumer.RefreshListener>();
         private HollowAPIFactory apiFactory = HollowAPIFactory.DEFAULT_FACTORY;
         private HollowObjectHashCodeFinder hashCodeFinder = new DefaultHashCodeFinder();
         private HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig = DoubleSnapshotConfig.DEFAULT_CONFIG;

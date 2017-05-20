@@ -105,6 +105,10 @@ public class HollowClientUpdater {
             throw th;
         }
     }
+    
+    public void addRefreshListener(HollowConsumer.RefreshListener refreshListener) {
+        refreshListeners.add(refreshListener);
+    }
 
     public long getCurrentVersionId() {
         if(hollowDataHolder != null)

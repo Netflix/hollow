@@ -23,8 +23,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.AnnouncementWatcher {
 
@@ -35,7 +35,7 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
     
     public HollowFilesystemAnnouncementWatcher(File publishDir) {
         this.publishDir = publishDir;
-        this.subscribedConsumers = new ArrayList<HollowConsumer>();
+        this.subscribedConsumers = new CopyOnWriteArrayList<HollowConsumer>();
         this.latestVersion = readLatestVersion();
         
         setupPolling();
