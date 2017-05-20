@@ -17,17 +17,6 @@
  */
 package com.netflix.hollow.api.codegen;
 
-import com.netflix.hollow.api.codegen.indexes.HollowHashIndexGenerator;
-
-import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
-import com.netflix.hollow.api.codegen.indexes.HollowPrimaryKeyIndexGenerator;
-import com.netflix.hollow.api.custom.HollowAPI;
-import com.netflix.hollow.core.schema.HollowListSchema;
-import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.schema.HollowSetSchema;
-import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.api.codegen.api.TypeAPIListJavaGenerator;
 import com.netflix.hollow.api.codegen.api.TypeAPIMapJavaGenerator;
 import com.netflix.hollow.api.codegen.api.TypeAPIObjectJavaGenerator;
@@ -35,11 +24,21 @@ import com.netflix.hollow.api.codegen.api.TypeAPISetJavaGenerator;
 import com.netflix.hollow.api.codegen.delegate.HollowObjectDelegateCachedImplGenerator;
 import com.netflix.hollow.api.codegen.delegate.HollowObjectDelegateInterfaceGenerator;
 import com.netflix.hollow.api.codegen.delegate.HollowObjectDelegateLookupImplGenerator;
+import com.netflix.hollow.api.codegen.indexes.HollowHashIndexGenerator;
+import com.netflix.hollow.api.codegen.indexes.HollowPrimaryKeyIndexGenerator;
 import com.netflix.hollow.api.codegen.objects.HollowFactoryJavaGenerator;
 import com.netflix.hollow.api.codegen.objects.HollowListJavaGenerator;
 import com.netflix.hollow.api.codegen.objects.HollowMapJavaGenerator;
 import com.netflix.hollow.api.codegen.objects.HollowObjectJavaGenerator;
 import com.netflix.hollow.api.codegen.objects.HollowSetJavaGenerator;
+import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.core.HollowDataset;
+import com.netflix.hollow.core.schema.HollowListSchema;
+import com.netflix.hollow.core.schema.HollowMapSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
+import com.netflix.hollow.core.schema.HollowSetSchema;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -127,9 +126,11 @@ public class HollowAPIGenerator {
         
         HollowAPIClassJavaGenerator apiClassGenerator = new HollowAPIClassJavaGenerator(packageName, apiClassname, dataset, parameterizeClassNames, classPostfix);
         HollowAPIFactoryJavaGenerator apiFactoryGenerator = new HollowAPIFactoryJavaGenerator(packageName, apiClassname);
+        HollowHashIndexGenerator hashIndexGenerator = new HollowHashIndexGenerator(packageName, apiClassname, classPostfix, dataset);
 
         generateFile(directory, apiClassGenerator);
         generateFile(directory, apiFactoryGenerator);
+        generateFile(directory, hashIndexGenerator);
 
         generateFilesForHollowSchemas(directory);
     }
@@ -145,7 +146,6 @@ public class HollowAPIGenerator {
                 generateFile(directory, new HollowObjectDelegateCachedImplGenerator(packageName, (HollowObjectSchema)schema));
                 generateFile(directory, new HollowObjectDelegateLookupImplGenerator(packageName, (HollowObjectSchema)schema));
                 generateFile(directory, new HollowPrimaryKeyIndexGenerator(packageName, apiClassname, classPostfix, (HollowObjectSchema)schema));
-                generateFile(directory, new HollowHashIndexGenerator(packageName, apiClassname, classPostfix, (HollowObjectSchema)schema));
             }
         }
     }

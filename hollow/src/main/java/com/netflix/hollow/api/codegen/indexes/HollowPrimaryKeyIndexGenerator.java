@@ -77,12 +77,16 @@ public class HollowPrimaryKeyIndexGenerator implements HollowJavaFileGenerator {
         builder.append("    }\n\n");
         
         builder.append("    public " + classname + "(HollowConsumer consumer, String... fieldPaths) {\n");
-        builder.append("        this.idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), \"" + schema.getName() + "\", fieldPaths);\n");
-        builder.append("        idx.listenForDeltaUpdates();\n");
+        builder.append("        consumer.getRefreshLock().lock();\n");
         builder.append("        try {\n");
         builder.append("            this.api = (" + apiClassname + ")consumer.getAPI();\n");
+        builder.append("            this.idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), \"" + schema.getName() + "\", fieldPaths);\n");
+        builder.append("            idx.listenForDeltaUpdates();\n");
+        builder.append("            consumer.addRefreshListener(this);\n");
         builder.append("        } catch(ClassCastException cce) {\n");
         builder.append("            throw new ClassCastException(\"The HollowConsumer provided was not created with the " + apiClassname + " generated API class.\");\n");
+        builder.append("        } finally {\n");
+        builder.append("            consumer.getRefreshLock().unlock();\n");
         builder.append("        }\n");
         builder.append("    }\n\n");
 

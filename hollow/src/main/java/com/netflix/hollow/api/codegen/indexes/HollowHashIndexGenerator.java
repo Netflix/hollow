@@ -18,18 +18,22 @@
 package com.netflix.hollow.api.codegen.indexes;
 
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowImplClassname;
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substituteInvalidChars;
 
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.codegen.HollowJavaFileGenerator;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.schema.HollowSchemaSorter;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
@@ -43,14 +47,14 @@ public class HollowHashIndexGenerator implements HollowJavaFileGenerator {
     private final String classname;
     private final String apiClassname;
     private final String classPostfix;
-    private final HollowObjectSchema schema;
+    private final HollowDataset dataset;
     
-    public HollowHashIndexGenerator(String packageName, String apiClassname, String classPostfix, HollowObjectSchema schema) {
-        this.classname = schema.getName() + "HashIndex";
+    public HollowHashIndexGenerator(String packageName, String apiClassname, String classPostfix, HollowDataset dataset) {
+        this.classname = apiClassname + "HashIndex";
         this.apiClassname = apiClassname;
         this.packageName = packageName;
         this.classPostfix = classPostfix;
-        this.schema = schema;
+        this.dataset = dataset;
     }
 
     @Override
@@ -60,6 +64,8 @@ public class HollowHashIndexGenerator implements HollowJavaFileGenerator {
 
     @Override
     public String generate() {
+        List<HollowSchema> schemaList = HollowSchemaSorter.dependencyOrderedSchemaList(dataset);
+        
         StringBuilder builder = new StringBuilder();
         
         builder.append("package " + packageName + ";\n\n");
@@ -78,44 +84,52 @@ public class HollowHashIndexGenerator implements HollowJavaFileGenerator {
 
         builder.append("    private HollowHashIndex idx;\n");
         builder.append("    private " + apiClassname + " api;\n");
+        builder.append("    private final String queryType;");
         builder.append("    private final String selectFieldPath;\n");
         builder.append("    private final String matchFieldPaths[];\n\n");
         
-        builder.append("    public " + classname + "(HollowConsumer consumer, String selectFieldPath, String... matchFieldPaths) {\n");
+        builder.append("    public " + classname + "(HollowConsumer consumer, String queryType, String selectFieldPath, String... matchFieldPaths) {\n");
+        builder.append("        this.queryType = queryType;");
         builder.append("        this.selectFieldPath = selectFieldPath;\n");
         builder.append("        this.matchFieldPaths = matchFieldPaths;\n");
-        builder.append("        this.idx = new HollowHashIndex(consumer.getStateEngine(), \"" + schema.getName() + "\", selectFieldPath, matchFieldPaths);\n");
+        builder.append("        consumer.getRefreshLock().lock();\n");
         builder.append("        try {\n");
         builder.append("            this.api = (" + apiClassname + ")consumer.getAPI();\n");
+        builder.append("            this.idx = new HollowHashIndex(consumer.getStateEngine(), queryType, selectFieldPath, matchFieldPaths);\n");
+        builder.append("            consumer.addRefreshListener(this);\n");
         builder.append("        } catch(ClassCastException cce) {\n");
         builder.append("            throw new ClassCastException(\"The HollowConsumer provided was not created with the " + apiClassname + " generated API class.\");\n");
+        builder.append("        } finally {\n");
+        builder.append("            consumer.getRefreshLock().unlock();\n");
         builder.append("        }\n");
         builder.append("    }\n\n");
         
-        builder.append("    public Iterable<" + hollowImplClassname(schema.getName(), classPostfix) + "> findMatches(Object... keys) {\n");
-        builder.append("        HollowHashIndexResult matches = idx.findMatches(keys);\n");
-        builder.append("        if(matches == null)\n");
-        builder.append("            return Collections.emptySet();\n\n");
-        builder.append("        final HollowOrdinalIterator iter = matches.iterator();\n\n");
-        builder.append("        return new Iterable<" + hollowImplClassname(schema.getName(), classPostfix) + ">() {\n");
-        builder.append("            public Iterator<" + hollowImplClassname(schema.getName(), classPostfix) + "> iterator() {\n");
-        builder.append("                return new Iterator<" + hollowImplClassname(schema.getName(), classPostfix) + ">() {\n\n");
-        builder.append("                    private int next = iter.next();\n\n");
-        builder.append("                    public boolean hasNext() {\n");
-        builder.append("                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;\n");
-        builder.append("                    }\n\n");
-        builder.append("                    public " + hollowImplClassname(schema.getName(), classPostfix) + " next() {\n");
-        builder.append("                        " + hollowImplClassname(schema.getName(), classPostfix) + " obj = api.get" + hollowImplClassname(schema.getName(), classPostfix) + "(next);\n");
-        builder.append("                        next = iter.next();\n");
-        builder.append("                        return obj;\n");
-        builder.append("                    }\n\n");
-        builder.append("                    public void remove() {\n");
-        builder.append("                        throw new UnsupportedOperationException();\n");
-        builder.append("                    }\n");
-        builder.append("                };\n");
-        builder.append("            }\n");
-        builder.append("        };\n");
-        builder.append("    }\n\n");
+        for(HollowSchema schema : schemaList) {
+            builder.append("    public Iterable<" + hollowImplClassname(schema.getName(), classPostfix) + "> find" + substituteInvalidChars(schema.getName()) + "Matches(Object... keys) {\n");
+            builder.append("        HollowHashIndexResult matches = idx.findMatches(keys);\n");
+            builder.append("        if(matches == null)\n");
+            builder.append("            return Collections.emptySet();\n\n");
+            builder.append("        final HollowOrdinalIterator iter = matches.iterator();\n\n");
+            builder.append("        return new Iterable<" + hollowImplClassname(schema.getName(), classPostfix) + ">() {\n");
+            builder.append("            public Iterator<" + hollowImplClassname(schema.getName(), classPostfix) + "> iterator() {\n");
+            builder.append("                return new Iterator<" + hollowImplClassname(schema.getName(), classPostfix) + ">() {\n\n");
+            builder.append("                    private int next = iter.next();\n\n");
+            builder.append("                    public boolean hasNext() {\n");
+            builder.append("                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;\n");
+            builder.append("                    }\n\n");
+            builder.append("                    public " + hollowImplClassname(schema.getName(), classPostfix) + " next() {\n");
+            builder.append("                        " + hollowImplClassname(schema.getName(), classPostfix) + " obj = api.get" + hollowImplClassname(schema.getName(), classPostfix) + "(next);\n");
+            builder.append("                        next = iter.next();\n");
+            builder.append("                        return obj;\n");
+            builder.append("                    }\n\n");
+            builder.append("                    public void remove() {\n");
+            builder.append("                        throw new UnsupportedOperationException();\n");
+            builder.append("                    }\n");
+            builder.append("                };\n");
+            builder.append("            }\n");
+            builder.append("        };\n");
+            builder.append("    }\n\n");
+        }
         
         builder.append("    @Override public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {\n"); 
         builder.append("        reindex(stateEngine, api);\n");
@@ -126,7 +140,7 @@ public class HollowHashIndexGenerator implements HollowJavaFileGenerator {
         builder.append("    }\n\n");
 
         builder.append("    private void reindex(HollowReadStateEngine stateEngine, HollowAPI api) {\n");
-        builder.append("        this.idx = new HollowHashIndex(stateEngine, \"" + schema.getName() + "\", selectFieldPath, matchFieldPaths);\n");
+        builder.append("        this.idx = new HollowHashIndex(stateEngine, queryType, selectFieldPath, matchFieldPaths);\n");
         builder.append("        this.api = (" + apiClassname + ") api;\n");
         builder.append("    }\n\n");
 
