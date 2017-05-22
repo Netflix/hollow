@@ -233,6 +233,13 @@ public class HollowAPIGenerator {
         }
         
         public HollowAPIGenerator build() {
+            if(apiClassname == null)
+                throw new IllegalStateException("Please specify an API classname (.withAPIClassname()) before calling .build()");
+            if(packageName == null)
+                throw new IllegalStateException("Please specify a package name (.withPackageName()) before calling .build()");
+            if(dataset == null)
+                throw new IllegalStateException("Please specify a data model (.withDataModel()) before calling .build()");
+            
             HollowAPIGenerator generator = new HollowAPIGenerator(apiClassname, packageName, dataset, parameterizedTypes, parameterizeAllClassnames);
             generator.setClassPostfix(classPostfix);
             generator.setGetterPrefix(getterPrefix);
