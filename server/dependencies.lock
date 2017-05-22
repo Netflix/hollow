@@ -2292,7 +2292,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -5798,7 +5798,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -9304,7 +9304,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -12803,7 +12803,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -16336,7 +16336,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -18638,7 +18638,7 @@
     },
     "resolutionRules": {
         "com.netflix.nebula:gradle-resolution-rules": {
-            "locked": "0.47.0",
+            "locked": "0.48.0",
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
@@ -20939,7 +20939,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -24449,7 +24449,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -28011,7 +28011,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -31644,7 +31644,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -35277,7 +35277,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -38910,7 +38910,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -42543,7 +42543,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -46176,7 +46176,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -49809,7 +49809,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -53442,7 +53442,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
