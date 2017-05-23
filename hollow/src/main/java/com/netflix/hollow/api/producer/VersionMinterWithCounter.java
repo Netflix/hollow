@@ -17,17 +17,18 @@
  */
 package com.netflix.hollow.api.producer;
 
+import com.netflix.hollow.api.producer.HollowProducer.VersionMinter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Beta API subject to change.
+ * A {@link VersionMinter}, which combines a timestamp with a repeating 3-digit sequence number
  *
  * @author Tim Taylor {@literal<tim@toolbear.io>}
  */
-class VersionMinterWithCounter implements HollowProducer.VersionMinter {
+public class VersionMinterWithCounter implements HollowProducer.VersionMinter {
 
     private static AtomicInteger versionCounter = new AtomicInteger();
 

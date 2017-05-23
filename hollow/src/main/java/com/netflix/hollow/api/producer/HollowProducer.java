@@ -556,7 +556,7 @@ public class HollowProducer {
         }
     }
 
-    static interface VersionMinter {
+    public static interface VersionMinter {
         /**
          * Create a new state version.<p>
          *
