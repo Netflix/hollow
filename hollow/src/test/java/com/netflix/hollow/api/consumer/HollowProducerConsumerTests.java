@@ -22,6 +22,7 @@ import com.netflix.hollow.api.producer.HollowProducer.Populator;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducer.Validator;
 import com.netflix.hollow.api.producer.HollowProducer.Validator.ValidationException;
+import com.netflix.hollow.api.producer.HollowProducer.VersionMinter;
 import com.netflix.hollow.api.producer.HollowProducer.WriteState;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
@@ -200,6 +201,27 @@ public class HollowProducerConsumerTests {
         Assert.assertEquals(v1, blobStore.retrieveSnapshotBlob(v2).getToVersion());
         Assert.assertEquals(v1, blobStore.retrieveSnapshotBlob(v3).getToVersion());
         Assert.assertEquals(v1, blobStore.retrieveSnapshotBlob(v4).getToVersion());
+    }
+    
+    @Test
+    public void producerUsesCustomVersionMinter() {
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                                                .withBlobStager(new HollowInMemoryBlobStager())
+                                                .withVersionMinter(new VersionMinter() {
+                                                    long counter = 0;
+                                                    public long mint() {
+                                                        return ++counter;
+                                                    }
+                                                })
+                                                .build();
+        
+        long v1 = runCycle(producer, 1);
+        long v2 = runCycle(producer, 2);
+        long v3 = runCycle(producer, 3);
+        
+        Assert.assertEquals(1, v1);
+        Assert.assertEquals(2, v2);
+        Assert.assertEquals(3, v3);
     }
     
     @Test
