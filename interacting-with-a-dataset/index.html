@@ -34,8 +34,8 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-      <div class="wy-side-nav-search" style="background-color:#000000">
-        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#000000;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
+      <div class="wy-side-nav-search" style="background-color:#ffffff">
+        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#ffffff;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -63,6 +63,34 @@
             <li>
     <li class="toctree-l1 ">
         <a class="" href="../getting-started/">Getting Started</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../indexing-querying/">Indexing/Querying</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-modeling/">Data Modeling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../tooling/">Tooling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../diving-deeper/">Diving Deeper</a>
         
     </li>
 <li>
@@ -96,21 +124,7 @@
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../data-modeling/">Data Modeling</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
         <a class="" href="../producer-consumer/">Producers and Consumers</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../tooling/">Tooling</a>
         
     </li>
 <li>
@@ -158,7 +172,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" style="background:#000000" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" style="background:#ffffff" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
         <a href="..">Hollow (Netflix OSS)</a>
       </nav>
@@ -187,28 +201,19 @@
             <div class="section">
               
                 <h1 id="generated-object-api">Generated Object API</h1>
-<p>Each of the examples provided thus far have focused on interaction with the Hollow data set via the generated Hollow Objects API.  Interacting with this API starts with an ordinal (likely obtained from a <code>HollowPrimaryKeyIndex</code>):</p>
-<pre><code class="java">int movieOrdinal = movieIdx.getMatchingOrdinal(6);
-
-MovieHollow movie = movieApi.getMovieHollow(movieOrdinal);
-
-for(ActorHollow actor : movie._getActors()) {
-    System.out.println(&quot;Starring &quot; + actor._getActorName()._getValue());
-}
-</code></pre>
-
+<p>Each of the examples provided thus far have focused on interaction with the Hollow data set via the generated Hollow Objects API.  </p>
 <p><em>Hollow Objects</em> are instantiated at the time they are requested.  Each Hollow Object references a single record of a specific type, and holds two things:</p>
 <ul>
 <li>A reference to the Hollow data store for the type</li>
-<li>An ordinal</li>
+<li>An <a href="../diving-deeper/#ordinals">ordinal</a></li>
 </ul>
-<p>A Hollow Object contains methods to retrieve each of its type's fields in the data model from which the API was generated.  Each field retrieval method is prefixed with an underscore.  Each time a field retrieval method is called on a Hollow Object, the data is retrieved directly from the Hollow data store.</p>
+<p>A Hollow Object contains methods to retrieve each of its type's fields in the data model from which the API was generated.  Each time a field retrieval method is called on a Hollow Object, the data is retrieved directly from the Hollow data store.</p>
 <div class="admonition note">
 <p class="admonition-title">Hollow Objects are 'hollow'</p>
 <p>The name Hollow is derived from the fact that these objects are 'hollow' -- they <em>appear</em> to contain field accessors, but those are just facades which access the underlying data store.</p>
 </div>
 <h1 id="generated-type-api">Generated Type API</h1>
-<p>At times, using the Hollow Object API can result in a high rate of Object allocation.  All generated Hollow APIs also provide a way to interact with the data without creating Objects.  This is accomplished by using record ordinals to query the data store directly.  For example:</p>
+<p>At times, using the Hollow Object API can result in a high rate of Object allocation.  All generated Hollow APIs also provide a way to interact with the data without creating Objects.  This is accomplished by using record <a href="../diving-deeper/#ordinals">ordinals</a> to query the data store directly.  For example:</p>
 <pre><code class="java">MovieTypeAPI movieTypeAPI = movieAPI.getMovieTypeAPI();
 ListOfActorTypeAPI listOfActorTypeAPI = movieAPI.getListOfActorTypeAPI();
 ActorTypeAPI actorTypeAPI = movieAPI.getActorTypeAPI();
@@ -257,7 +262,7 @@ for(GenericHollowObject actor : movie.getList(&quot;actors&quot;).objects()) {
         <a href="../data-ingestion/" class="btn btn-neutral float-right" title="Data Ingestion">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../getting-started/" class="btn btn-neutral" title="Getting Started"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../diving-deeper/" class="btn btn-neutral" title="Diving Deeper"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -284,7 +289,7 @@ for(GenericHollowObject actor : movie.getList(&quot;actors&quot;).objects()) {
           <a href="https://github.com/Netflix/hollow" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../getting-started/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../diving-deeper/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
         <span style="margin-left: 15px"><a href="../data-ingestion/" style="color: #fcfcfc">Next &raquo;</a></span>

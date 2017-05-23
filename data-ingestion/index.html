@@ -34,8 +34,8 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-      <div class="wy-side-nav-search" style="background-color:#000000">
-        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#000000;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
+      <div class="wy-side-nav-search" style="background-color:#ffffff">
+        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#ffffff;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -63,6 +63,34 @@
             <li>
     <li class="toctree-l1 ">
         <a class="" href="../getting-started/">Getting Started</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../indexing-querying/">Indexing/Querying</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-modeling/">Data Modeling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../tooling/">Tooling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../diving-deeper/">Diving Deeper</a>
         
     </li>
 <li>
@@ -102,21 +130,7 @@
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../data-modeling/">Data Modeling</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
         <a class="" href="../producer-consumer/">Producers and Consumers</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../tooling/">Tooling</a>
         
     </li>
 <li>
@@ -164,7 +178,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" style="background:#000000" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" style="background:#ffffff" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
         <a href="..">Hollow (Netflix OSS)</a>
       </nav>
@@ -194,7 +208,7 @@
               
                 <p>Hollow includes a few ready-made data ingestion mechanisms.  Additionally, custom data ingestion mechanisms can be created relatively easily using the <a href="../advanced-topics/#low-level-input-api">Low Level Input API</a>.</p>
 <h1 id="hollowobjectmapper">HollowObjectMapper</h1>
-<p>The <code>HollowObjectMapper</code> will add POJOs into a <code>HollowWriteStateEngine</code>:</p>
+<p>When using a <code>HollowProducer</code>, each call to <code>state.add(obj)</code> is delegated to a <code>HollowObjectMapper</code>.  The <code>HollowObjectMapper</code> is used to add POJOs into a <code>HollowWriteStateEngine</code>:</p>
 <pre><code class="java">HollowWriteStateEngine engine = /// a state engine
 HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
 
@@ -323,7 +337,7 @@ jsonAdapter.populate(reader);
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../data-modeling/" class="btn btn-neutral float-right" title="Data Modeling">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../producer-consumer/" class="btn btn-neutral float-right" title="Producers and Consumers">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../interacting-with-a-dataset/" class="btn btn-neutral" title="Interacting with a Hollow Dataset"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -356,7 +370,7 @@ jsonAdapter.populate(reader);
         <span><a href="../interacting-with-a-dataset/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../data-modeling/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../producer-consumer/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

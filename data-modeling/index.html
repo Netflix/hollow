@@ -34,8 +34,8 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-      <div class="wy-side-nav-search" style="background-color:#000000">
-        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#000000;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
+      <div class="wy-side-nav-search" style="background-color:#ffffff">
+        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#ffffff;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -69,14 +69,7 @@
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../interacting-with-a-dataset/">Interacting with a Hollow Dataset</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../data-ingestion/">Data Ingestion</a>
+        <a class="" href="../indexing-querying/">Indexing/Querying</a>
         
     </li>
 <li>
@@ -126,14 +119,35 @@
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../producer-consumer/">Producers and Consumers</a>
+        <a class="" href="../tooling/">Tooling</a>
         
     </li>
 <li>
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../tooling/">Tooling</a>
+        <a class="" href="../diving-deeper/">Diving Deeper</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../interacting-with-a-dataset/">Interacting with a Hollow Dataset</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-ingestion/">Data Ingestion</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../producer-consumer/">Producers and Consumers</a>
         
     </li>
 <li>
@@ -181,7 +195,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" style="background:#000000" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" style="background:#ffffff" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
         <a href="..">Hollow (Netflix OSS)</a>
       </nav>
@@ -249,39 +263,7 @@
 <p>Entries in <code>Map</code> records can be hashed by some specific key fields for O(1) retrieval of the keys, values, and/or entries.  In order to enable this feature, a <code>Map</code> schema will define an optional <em>hash key</em>, which defines how its entries are hashed/indexed.</p>
 <h1 id="hash-keys">Hash Keys</h1>
 <p>Each <code>Map</code> and <code>Set</code> schema may optionally define a <em>hash key</em>.  A <em>hash key</em> specifies one or more user-defined fields used to hash entries into the collection.  When a hash key is defined on a <code>Set</code>, each set record becomes like a primary key index; records in the set can be efficiently retrieved by matching the specified <em>hash key</em> fields.  Similarly, when a hash key is defined on a <code>Map</code>, each map record becomes like an index over the keys in the key/value pairs contained in the map record.</p>
-<p>If using the <code>HollowObjectMapper</code>, hash keys will be automatically selected if an element or key type contain a single non-reference field.  Addionally, if a <code>Set</code> or <code>Map</code> references <code>Object</code> elements with a defined <em>primary key</em>, then the <em>hash key</em> will default to the <em>primary key</em> of the element type.  </p>
-<p>Alternatively, <em>hash keys</em> can be explicitly defined using the <code>@HollowHashKey</code> annotation in POJOs for <code>Set</code> schemas by specifying one or more fields from the element type, or for <code>Map</code> schemas by specifying one or more fields from the key type:</p>
-<pre><code class="java">public class Movie {
-    long id;
-    String title;
-    @HollowHashKey(fields=&quot;actorId&quot;)
-    Set&lt;Actor&gt; actors;
-
-    ...
-}
-</code></pre>
-
-<p>The consumers, via the generated API, will have the ability to retrieve elements from <code>Set</code> records by the <em>hash key</em>:</p>
-<pre><code class="java">MovieHollow movie = api.getMovieHollow(ordinal);
-HollowSet&lt;ActorHollow&gt; actors = movie._getActors();
-ActorHollow actor = actors.findElement(104);
-
-System.out.println(&quot;Actor with ID 104: &quot; + actor._getActorName()._getValue());
-</code></pre>
-
-<p>The consumers will have the ability to retrieve keys, values, and entries from the map by the <em>hash key</em>:</p>
-<pre><code class="java">MovieHollow movie = api.getMovieHollow(ordinal);
-HollowMap&lt;ActorHollow, CharacterHollow&gt; actors = movie._getActors();
-
-ActorHollow actor = actors.findKey(104);
-CharacteroHollow character = actors.findValue(104);
-/// alternatively: Map.Entry&lt;ActorHollow, CharacterHollow&gt; entry = actors.findEntry(104);
-
-System.out.println(&quot;Actor with ID 104: &quot; + actor._getActorName()._getValue() + 
-         &quot; played character &quot; + character._getCharacterName()._getValue());
-</code></pre>
-
-<p>We can define more than one field in the <code>@HollowHashKey</code> declaration if our key spans multiple fields.  Each field may be multiple levels deep in a hierarchical data model, expressed via dot notation (e.g. <code>actorName.value</code>).</p>
+<p>See <a href="../indexing-querying/#hash-keys">Hash Keys</a> for a detailed discussion of hash keys.</p>
 <h1 id="circular-references">Circular References</h1>
 <p>Circular references are not allowed in Hollow.  A type may not reference itself, either directly or transitively.</p>
 <h1 id="inlined-vs-referenced-fields">Inlined vs Referenced Fields</h1>
@@ -406,10 +388,10 @@ public class Actor {
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../producer-consumer/" class="btn btn-neutral float-right" title="Producers and Consumers">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../tooling/" class="btn btn-neutral float-right" title="Tooling">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../data-ingestion/" class="btn btn-neutral" title="Data Ingestion"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../indexing-querying/" class="btn btn-neutral" title="Indexing/Querying"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -436,10 +418,10 @@ public class Actor {
           <a href="https://github.com/Netflix/hollow" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../data-ingestion/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../indexing-querying/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../producer-consumer/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../tooling/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

@@ -34,8 +34,8 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-      <div class="wy-side-nav-search" style="background-color:#000000">
-        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#000000;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
+      <div class="wy-side-nav-search" style="background-color:#ffffff">
+        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#ffffff;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -69,6 +69,34 @@
           
             <li>
     <li class="toctree-l1 ">
+        <a class="" href="../indexing-querying/">Indexing/Querying</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-modeling/">Data Modeling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../tooling/">Tooling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../diving-deeper/">Diving Deeper</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
         <a class="" href="../interacting-with-a-dataset/">Interacting with a Hollow Dataset</a>
         
     </li>
@@ -83,21 +111,7 @@
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../data-modeling/">Data Modeling</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
         <a class="" href="../producer-consumer/">Producers and Consumers</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../tooling/">Tooling</a>
         
     </li>
 <li>
@@ -190,7 +204,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" style="background:#000000" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" style="background:#ffffff" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
         <a href="..">Hollow (Netflix OSS)</a>
       </nav>
@@ -342,7 +356,7 @@ HollowMapWriteRecord mapRec = new HollowMapWriteRecord();
 <h1 id="hollow-heap-effects">Hollow Heap Effects</h1>
 <h2 id="double-snapshots">Double Snapshots</h2>
 <p>At times, a new state may be produced to which there is no available delta from the previous state.  When this <em>broken delta chain</em> scenario occurs, consumers will by default attempt to load a snapshot to the latest state.  If a consumer loads a snapshot when it currently has a state loaded for the same dataset, we call this a <em>double snapshot</em>.  Double snapshots result in a doubling of the heap usage of your dataset.  This is because Hollow assumes that consumers may be actively using the current state, and it therefore must retain the current state to provide data while the next state is loaded.  Only after the next state is fully loaded can the old state be dropped.</p>
-<p>If using the <a href="../producer-consumer/#consumer-framework"><code>Hollow Client</code></a>, you can configure consumers to never attempt a double snapshot.  This is accomplished with a custom <code>HollowClientMemoryConfig</code>.  In this case, you should check for 'stuck' clients in a <code>HollowUpdateListener</code>, so that you may take the appropriate operational action.</p>
+<p>If using the <a href="../producer-consumer/#consumer-framework"><code>Hollow Consumer</code></a>, you can configure consumers to never attempt a double snapshot.  This is accomplished with a custom <code>DoubleSnapshotConfig</code>.  In this case, you should check for 'stuck' clients in a <code>RefreshListener</code>, so that you may take the appropriate operational action.</p>
 <p>If a dataset is large, double snapshots should be avoided for performance reasons.  Double snapshots can be entirely avoided by <a href="../producer-consumer/#restoring-at-startup">restoring</a> a <code>HollowWriteStateEngine</code> at producer initialization time, and, if necessary, using the <a href="../tooling/#patching"><code>HollowStateDeltaPatcher</code></a> to operationally fill lost or missing deltas in the event an unforeseen issue occurs.  </p>
 <h2 id="type-sharding">Type Sharding</h2>
 <p>During a delta transition each individual record type builds the entire next state of the type in memory while the current state is retained to answer requests.  This means that the memory pool Hollow reserves needs to be large enough to compose an extra copy of the largest type.  This is a miniaturized version of the <a href="./#double-snapshots">double snapshot</a> problem.</p>
@@ -370,7 +384,7 @@ this default will be changed to 25MB.</p>
 <li>a usage detection period.  </li>
 </ul>
 <p>The grace period is defined by its duration, in milliseconds, after a reference becomes stale.  During the grace period, usage of stale references is acceptable.  The usage detection period is defined by its duration, in milliseconds, after the grace period has expired.  During the usage detection period, usage of stale references is unexpected, but will not result in failed interrogations of Hollow objects.  After the usage detection period expires, data will be dropped if no usage was detected in the usage detection period.  If stale references are interrogated <em>after</em> their backing data is dropped, then Exceptions will be thrown.</p>
-<p>The <code>HollowClientMemoryConfig</code>, injected into the <code>HollowClient</code> constructor, contains a few methods which are used to configure object longevity behavior:</p>
+<p>The <code>ObjectLongevityConfig</code>, injected into the <code>HollowConsumer</code> constructor, contains a few methods which are used to configure object longevity behavior:</p>
 <ul>
 <li><code>boolean enableLongLivedObjectSupport()</code>: Whether or not object longevity is enabled.</li>
 <li><code>long gracePeriodMillis()</code>: If object longevity is enabled, this returns the number of milliseconds before the usage of stale objects gets flagged.</li>
@@ -378,7 +392,7 @@ this default will be changed to 25MB.</p>
 <li><code>boolean dropDataAutomatically()</code>: Returns whether or not to drop data behind stale references after the grace period + usage detection period has elapsed, as long as no usage was detected during the usage detection period.  This can be used to avoid memory leaks when long lived object support is enabled and stale references are cached, but unused.</li>
 <li><code>boolean forceDropData()</code>: Returns whether or not to drop data behind stale references after the grace period + usage detection period has elapsed, even if usage was detected during the usage detection period.  This can be used to avoid memory leaks when long lived object support is enabled and stale references are cached and used.</li>
 </ul>
-<p>Your implementation of the <code>HollowClientMemoryConfig</code> may be backed by a dynamic configuration and safely change on live running consumers.  For example, <code>forceDropData()</code> may be operationally useful for boxes that are exhibiting memory leaks due to non-critical cached Hollow objects.</p>
+<p>Your implementation of the <code>ObjectLongevityConfig</code> may be backed by a dynamic configuration and safely change on live running consumers.  For example, <code>forceDropData()</code> may be operationally useful for boxes that are exhibiting memory leaks due to non-critical cached Hollow objects.</p>
 <div class="admonition hint">
 <p class="admonition-title">How It Works</p>
 <p>When enabled, object longevity is achieved using the <code>HollowHistory</code> data structure, which results in a minimal heap overhead. </p>
@@ -386,7 +400,7 @@ this default will be changed to 25MB.</p>
 <h2 id="memory-pooling">Memory Pooling</h2>
 <p>Hollow pools and reuses memory to minimize GC effects while updating data.  This pool of memory is kept arrays on the heap.  Each array in the pool has a fixed length.  When a long array or a byte array is required in Hollow, it will stitch together pooled array segments as a <code>SegmentedByteArray</code> or <code>SegmentedLongArray</code>.  These classes encapsulate the details of treating segmented arrays as contiguous ranges of values.</p>
 <h1 id="delta-based-producer-input">Delta-Based Producer Input</h1>
-<p><a href="../producer-consumer/#the-producer-cycle">The Producer Cycle</a> section in this documentation describes a Hollow producer which every so often reads the entire dataset from some source of truth, adds it to a <code>HollowWriteStateEngine</code>, then produces a delta based on the differences in the dataset since the last cycle.  It is possible, however, that a producer may <em>receive</em> an incoming stream of events which directly indicate the changes to a dataset, obviating the need to scan through the entire source of truth and re-add the entire dataset on each cycle.</p>
+<p>The <a href="../getting-started/">Getting Started</a> section of this documentation describes a producer which every so often reads the <em>entire dataset</em> from some source of truth, re-adds all records to a <code>HollowWriteStateEngine</code>, then produces a delta based on the automatically discovered differences in the dataset since the prior cycle.  It is possible, however, that a producer may <em>receive</em> an incoming stream of events which directly indicate the changes to a dataset, obviating the need to scan through the entire source of truth and re-add the entire dataset on each cycle.</p>
 <p>If desired, a <code>HollowWriteStateEngine</code>’s state can be explicitly modified, rather than recreated, each cycle.  We start such a cycle by re-adding all of the records from the previous cycle to the state engine:</p>
 <pre><code class="java">HollowWriteStateEngine writeEngine = /// the state engine
 
@@ -494,7 +508,7 @@ for(Map.Entry&lt;String, BitSet&gt; entry : removeRecords) {
         <a href="../glossary/" class="btn btn-neutral float-right" title="Glossary">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../tooling/" class="btn btn-neutral" title="Tooling"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../producer-consumer/" class="btn btn-neutral" title="Producers and Consumers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -521,7 +535,7 @@ for(Map.Entry&lt;String, BitSet&gt; entry : removeRecords) {
           <a href="https://github.com/Netflix/hollow" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../tooling/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../producer-consumer/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
         <span style="margin-left: 15px"><a href="../glossary/" style="color: #fcfcfc">Next &raquo;</a></span>

@@ -34,8 +34,8 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-      <div class="wy-side-nav-search" style="background-color:#000000">
-        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#000000;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
+      <div class="wy-side-nav-search" style="background-color:#ffffff">
+        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#ffffff;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -90,7 +90,38 @@
                 <li class="toctree-l3"><a href="#hierarchical-data-models">Hierarchical Data Models</a></li>
                 
             
+                <li class="toctree-l3"><a href="#restoring-at-startup">Restoring at Startup</a></li>
+                
+            
             </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../indexing-querying/">Indexing/Querying</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-modeling/">Data Modeling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../tooling/">Tooling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../diving-deeper/">Diving Deeper</a>
         
     </li>
 <li>
@@ -111,21 +142,7 @@
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../data-modeling/">Data Modeling</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
         <a class="" href="../producer-consumer/">Producers and Consumers</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../tooling/">Tooling</a>
         
     </li>
 <li>
@@ -173,7 +190,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" style="background:#000000" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" style="background:#ffffff" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
         <a href="..">Hollow (Netflix OSS)</a>
       </nav>
@@ -204,7 +221,6 @@
                 <p>In the <a href="../quick-start/">Quick Start</a> guide, we got a reference implementation of Hollow up and running, with a mock data model that can be easily modified to suit any use case.  After reading this section, you'll have an understanding of the basic usage patterns for Hollow, and how each of the core pieces fit together.</p>
 <h1 id="core-concepts">Core Concepts</h1>
 <p>Hollow manages datasets which are built by a single <em>producer</em>, and disseminated to one or many <em>consumers</em> for read-only access.  A dataset changes over time.  The timeline for a changing dataset can be broken down into discrete <em>data states</em>, each of which is a complete snapshot of the data at a particular point in time.</p>
-<p>Both the producer and consumers handle datasets with a <em>state engine</em>.  A state engine can be transitioned between data states.  A producer uses a <em>write state engine</em> and a consumer uses a <em>read state engine</em>.</p>
 <h1 id="producing-a-data-snapshot">Producing a Data Snapshot</h1>
 <p>Let's assume we have a POJO class <code>Movie</code>:</p>
 <pre><code class="java">public class Movie {
@@ -229,53 +245,82 @@
 </code></pre>
 
 <p>We'll need a data <em>producer</em> to create a data state which will be transmitted to consumers:</p>
-<pre><code class="java">HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
-HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
+<pre><code class="java">File localPublishDir = new File(&quot;/path/to/local/disk/publish/dir&quot;);
 
-for(Movie movie : movies)
-    mapper.addObject(movie);
+HollowFilesystemPublisher publisher = new HollowFilesystemPublisher(localPublishDir);
+HollowFilesystemAnnouncer announcer = new HollowFilesystemAnnouncer(localPublishDir);
 
-OutputStream os = ...; /// where to write the blob
-HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
-writer.writeSnapshot(os);
+HollowProducer producer = HollowProducer.withPublisher(publisher)
+                                        .withAnnouncer(announcer)
+                                        .build();
+
+producer.runCycle(new Populator() {
+    public void populate(HollowProducer.WriteState state) {
+        for(Movie movie : movies)
+            state.add(movie);
+    }
+});
+
 </code></pre>
 
-<p>A <code>HollowWriteStateEngine</code> is the main handle to a Hollow dataset for a data producer.  A <code>HollowObjectMapper</code> is one of a few different ways to populate a <code>HollowWriteStateEngine</code> with data.  When starting with POJOs, it's the easiest way.</p>
-<p>We'll use a <code>HollowBlobWriter</code> to write the current state of a <code>HollowWriteStateEngine</code> to an <code>OutputStream</code>.  We call the data which gets written to the <code>OutputStream</code> a <em>blob</em>.  </p>
+<p>Or, if you prefer, using Java 8:</p>
+<pre><code class="java">producer.runCycle(state -&gt; {
+    for(Movie movie : movies)
+        state.add(movie);
+});
+</code></pre>
+
+<p>This producer runs a single <em>cycle</em> and produces a data state.  Once this runs, you should have a <em>snapshot</em> blob file on your local disk.  </p>
 <div class="admonition note">
 <p class="admonition-title">Publishing Blobs</p>
-<p>For the purposes of testing, this blob can be written to local disk.  In a production scenario, it can be written to a remote file store such as Amazon S3 for retrieval by consumers.</p>
+<p>Note that the example code above is writing data to local disk.  This is a great way to start testing.  In a production scenario, data can be written to a remote file store such as Amazon S3 for retrieval by consumers.  See the <a href="https://github.com/Netflix/hollow-reference-implementation">reference implementation</a> and the <a href="../quick-start/">quick start guide</a> for a scalable example using AWS.</p>
 </div>
 <h1 id="consumer-api-generation">Consumer API Generation</h1>
-<p>Once the data has been populated into a state engine, that state engine is aware of the data model, and can be used to automatically produce a client API:</p>
-<pre><code class="java">HollowAPIGenerator generator = 
-       new HollowAPIGenerator(
-           &quot;MovieAPI&quot;,                    /// A name for the API
-           &quot;com.netflix.hollow.example&quot;,  /// A package where the API will live
-           writeEngine                    /// our state engine
-       );
+<p>Once the data has been populated into a producer, that producer's <em>state engine</em> is aware of the data model, and can be used to automatically produce a client API.  We can also initialize the data model from a brand new <em>state engine</em> using our POJOs:</p>
+<pre><code class="java">HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
+mapper.initializeTypeState(Movie.class);
 
-generator.generateFiles(&quot;/path/to/files&quot;);
+HollowAPIGenerator generator = 
+       new HollowAPIGenerator.Builder().withAPIClassname(&quot;MovieAPI&quot;)
+                                       .withPackageName(&quot;how.hollow.example&quot;)
+                                       .withDataModel(writeEngine)
+                                       .build();
+
+generator.generateFiles(&quot;/path/to/java/api/files&quot;);
 </code></pre>
 
-<p>After this code executes, an set of Java files will be written to the location <code>/path/to/files</code>.  These java files will be a generated API based on the data model defined by the schemas in our state engine, and will provide convenient methods to access that data.</p>
+<p>After this code executes, an set of Java files will be written to the location <code>/path/to/java/api/files</code>.  These java files will be a generated API based on the data model defined by the schemas in our state engine, and will provide convenient methods to access that data.</p>
+<div class="admonition hint">
+<p class="admonition-title">Initializing multiple types</p>
+<p>If we have multiple top-level types, we should call <code>initializeTypeState()</code> multiple times, once for each class.</p>
+</div>
 <h1 id="consuming-a-data-snapshot">Consuming a Data Snapshot</h1>
 <p>A data consumer can load a snapshot created by the producer into memory:</p>
-<pre><code class="java">HollowReadStateEngine readEngine = new HollowReadStateEngine();
-HollowBlobReader reader = new HollowBlobReader(readEngine);
+<pre><code class="java">File localPublishDir = new File(&quot;/path/to/local/disk/publish/dir&quot;);
 
-InputStream is = /// where to load the snapshot from
-reader.readSnapshot(is);
+HollowFilesystemBlobRetriever blobRetriever = 
+                                new HollowFilesystemBlobRetriever(localPublishDir);
+
+HollowFilesystemAnnouncementWatcher announcementWatcher = 
+                                new HollowFilesystemAnnouncementWatcher(localPublishDir);
+
+HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever)
+                                        .withAnnouncementWatcher(announcementWatcher)
+                                        .withGeneratedAPIClass(MovieAPI.class)
+                                        .build();
+
+consumer.triggerRefresh();
 </code></pre>
 
-<p>A <code>HollowReadStateEngine</code> is our main handle to a Hollow dataset as a consumer.  A <code>HollowBlobReader</code> is used to consume blobs into a <code>HollowReadStateEngine</code>.  Above, we're consuming a snapshot blob in order to initialize our state engine.  </p>
-<p>Once this dataset is loaded into memory, we can access the data for any records using our generated API:</p>
-<pre><code class="java">MovieAPI movieApi = new MovieAPI(readEngine);
+<p>The <code>HollowConsumer</code> will retrieve data using the provided <code>BlobRetrievier</code>, and will load the latest <em>data state</em> currently announced by the <code>AnnouncementWatcher</code>.</p>
+<p>Once this dataset is loaded into memory, we can access the data for any records using our generated API.  Below, we're iterating over all records:</p>
+<pre><code class="java">MovieAPI movieApi = (MovieAPI)consumer.getAPI();
 
 for(MovieHollow movie : movieApi.getAllMovieHollow()) {
-    System.out.println(movie._getId() + &quot;, &quot; + 
-                       movie._getTitle()._getValue() + &quot;, &quot; + 
-                       movie._getReleaseYear());
+    System.out.println(movie.getId() + &quot;, &quot; + 
+                       movie.getTitle().getValue() + &quot;, &quot; + 
+                       movie.getReleaseYear());
 }
 </code></pre>
 
@@ -285,6 +330,15 @@ for(MovieHollow movie : movieApi.getAllMovieHollow()) {
 3, Pulp Fiction, 1994
 </code></pre>
 
+<div class="admonition note">
+<p class="admonition-title">Integrating with Infrastructure</p>
+<p>In order to integrate with your infrastructure, you only need to provide Hollow with four implementations of simple interfaces: </p>
+<ul>
+<li>The <code>HollowProducer</code> needs a <code>Publisher</code> and <code>Announcer</code></li>
+<li>The <code>HollowConsumer</code> needs a <code>BlobRetriever</code> and <code>AnnouncementWatcher</code></li>
+</ul>
+<p>Your <code>BlobRetriever</code> and <code>AnnouncementWatcher</code> implementations should be mirror your <code>Publisher</code> and <code>Announcer</code> interfaces.   Here, we're publishing and retrieving from local disk.  In production, we'll be publishing to and retrieving from a remote file store.  See the <a href="https://github.com/Netflix/hollow-reference-implementation">reference implementation</a> and the <a href="../quick-start/">quick start guide</a> for a scalable example using AWS.</p>
+</div>
 <h1 id="producing-a-delta">Producing a Delta</h1>
 <p>Some time has passed and the dataset has evolved.  It now contains these records:</p>
 <pre><code class="java">List&lt;Movie&gt; movies = Arrays.asList(
@@ -295,19 +349,17 @@ for(MovieHollow movie : movieApi.getAllMovieHollow()) {
 );
 </code></pre>
 
-<p>The producer, with the same <code>HollowWriteStateEngine</code> in memory, needs to communicate this updated dataset to consumers.  The data for the new state must be added to the state engine, after which a transition from the previous state to the new state can be written as a <em>delta</em> blob:</p>
-<pre><code class="java">writeEngine.prepareForNextCycle();
-
-for(Movie movie : movies)
-    mapper.addObject(movie);
-
-OutputStream os = ....; /// where to write the delta blob
-writer.writeDelta(os);
+<p>The producer, needs to communicate this updated dataset to consumers.  We're going to create a brand new state, and the entirety of the data for the new state must be added to the state engine in a new <em>cycle</em>.   When the cycle runs, a new data state will be <em>published</em>, and the new data state's (automatically generated) version identifier will be <em>announced</em>.</p>
+<p>Using the same <code>HollowProducer</code> in memory, we can use the following code:</p>
+<pre><code class="java">producer.runCycle(state -&gt; {
+    for(Movie movie : movies)
+        state.add(movie);
+});
 </code></pre>
 
-<p>Let's take a closer look at what the above code does.  The same <code>HollowWriteStateEngine</code> which was used to produce the <em>snapshot</em> blob is used -- it already knows everything about the prior state and can be transitioned to the next state.  We call <code>prepareForNextCycle()</code> to inform the state engine that the writing of blobs from the prior state is complete, and populating data into the next state is about to begin.  When creating a new state, all of the movies currently in our dataset are re-added again.  It's not necessary to figure out which records were added, removed, or modified -- that's Hollow's job.</p>
-<p>We can (but don't have to) use the same <code>HollowObjectMapper</code> and/or <code>HollowBlobWriter</code> as we used in the prior <em>cycle</em> to create the initial snapshot.  </p>
-<p>The call to <code>writeDelta()</code> records a <em>delta</em> blob to the <code>OutputStream</code>.  Encoded into the delta is a set of instructions to update a consumer’s read state engine from the previous state to the current state.</p>
+<p>Let's take a closer look at what the above code does.  The same <code>HollowProducer</code> which was used to produce the <em>snapshot</em> blob is used -- it already knows everything about the prior state and can be transitioned to the next state.  When creating a new state, <strong>all of the movies currently in our dataset are re-added again.</strong>  It's not necessary to figure out which records were added, removed, or modified -- that's Hollow's job.</p>
+<p>Each time we call <code>runCycle</code> we will be producing a <em>data state</em>.  For each state after the first, the <code>HollowProducer</code> will publish three artifacts: a <em>snapshot</em>, a <em>delta</em>, and a <em>reverse delta</em>.  Encoded into the <em>delta</em> is a set of instructions to update a consumer’s data store from the previous state to the current state.  Inversely, encoded into each <em>reverse delta</em> is a set of instructions to update a consumer in reverse -- from the current state to the previous state.  Consumers may use the <em>reverse delta</em> later if we need to <a href="http://localhost:8000/producer-consumer/#pinning-consumers">pin</a>.</p>
+<p>When consumers initialize, they will use the most recent <em>snapshot</em> to initialize their data store.  After initialization, consumers will keep up to date using <em>deltas</em>.</p>
 <div class="admonition note">
 <p class="admonition-title">Producer Cycles</p>
 <p>We call what the producer does to create a data state a <em>cycle</em>.  During each <em>cycle</em>, we </p>
@@ -317,13 +369,11 @@ writer.writeDelta(os);
 </ol>
 </div>
 <h1 id="consuming-a-delta">Consuming a Delta</h1>
-<p>Once a delta is announced the HollowReadStateEngine can be updated on the client:</p>
-<pre><code class="java">InputStream is = /// where to load the delta from
-HollowBlobReader reader = new HollowBlobReader(readEngine);
-reader.applyDelta(is);
-</code></pre>
-
-<p>The same <code>HollowReadStateEngine</code> into which our snapshot was consumed must be reused to consume a <em>delta</em> blob.  This state engine knows everything about the current state and can use the instructions in a delta to transition to the next state.  We can (but don't have to) reuse the same <code>HollowBlobReader</code>.</p>
+<p>No manual intervention is necessary to consume the delta you produced.  The <code>HollowConsumer</code> will automatically stay up-to-date.  </p>
+<div class="admonition hint">
+<p class="admonition-title">Announcements keep consumers updated</p>
+<p>When the producer runs a cycle, it <em>announces</em> the latest version.  The <code>AnnouncementWatcher</code> implementation provided to the <code>HollowConsumer</code> will listen for changes to the announced version -- and when updates occur notify the <code>HollowConsumer</code> by calling <code>triggerAsyncRefresh()</code>.  See the source of the <code>HollowFilesystemAnnouncementWatcher</code>, or the <a href="https://github.com/Netflix/hollow-reference-implementation/blob/master/src/main/java/how/hollow/consumer/infrastructure/S3AnnouncementWatcher.java">two</a> separate <a href="https://github.com/Netflix/hollow-reference-implementation/blob/master/src/main/java/how/hollow/consumer/infrastructure/DynamoDBAnnouncementWatcher.java">examples</a> in the reference implementation.</p>
+</div>
 <p>After this delta has been applied, the read state engine is at the new state.  If the generated API is used to iterate over the movies again as shown in the prior consumer example, the new output will be:</p>
 <pre><code>1, The Matrix, 1999
 2, Beasts of No Nation, 2015
@@ -333,54 +383,44 @@ reader.applyDelta(is);
 
 <div class="admonition hint">
 <p class="admonition-title">Thread Safety</p>
-<p>It is safe to use the HollowReadStateEngine to retrieve data while a delta transition is in progress.</p>
+<p>It is safe to use Hollow to retrieve data while a delta transition is in progress.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Adjacent States</p>
 <p>We refer to states which are directly connected via single delta transitions as <em>adjacent</em> states, and a continuous set of adjacent states as a <em>delta chain</em></p>
 </div>
-<div class="admonition danger">
-<p class="admonition-title">Delta Mismatch</p>
-<p>If a delta application is attempted onto a <code>HollowReadStateEngine</code> which is at a state from which the delta did not originate, then an exception is thrown and the state engine remains safely unchanged.</p>
-</div>
 <h1 id="indexing-data-for-retrieval">Indexing Data for Retrieval</h1>
 <p>In prior examples the generated Hollow API was used by the data consumer to iterate over all <code>Movie</code> records in the dataset.  Most often, however, it isn’t desirable to iterate over the entire dataset — instead, specific records will be accessed based on some known key.  Let’s assume that the <code>Movie</code>’s id is a known key.</p>
-<p>After consumers have populated a <code>HollowReadStateEngine</code>, the data can be indexed:</p>
-<pre><code class="java">HollowPrimaryKeyIndex idx = 
-                      new HollowPrimaryKeyIndex(readEngine, &quot;Movie&quot;, &quot;id&quot;);
+<p>After a <code>HollowConsumer</code> has been initialized, any type can be indexed.  For example, we can index <code>Movie</code> records by <code>id</code>:</p>
+<pre><code class="java">HollowConsumer consumer = ...;
 
-idx.listenForDeltaUpdates();
+consumer.triggerRefresh();
+
+MoviePrimaryKeyIndex idx = new MoviePrimaryKeyIdx(consumer, &quot;id&quot;);
+HollowPrimaryKeyIndex idx = 
+                      new HollowPrimaryKeyIndex(readEngine, &quot;Movie&quot;, &quot;id&quot;);
 </code></pre>
 
 <p>This index can be held in memory and then used in conjunction with the generated Hollow API to retrieve Movie records by id:</p>
-<pre><code>int movieOrdinal = idx.getMatchingOrdinal(2);
-if(movieOrdinal != -1) {
-    MovieHollow movie = movieApi.getMovieHollow(movieOrdinal);
-    System.out.println(&quot;Found Movie: &quot; + movie._getTitle()._getValue());
-}
+<pre><code>Movie movie = idx.findMatch(2);
+if(movie != null)
+    System.out.println(&quot;Found Movie: &quot; + movie.getTitle().getValue());
 </code></pre>
 
 <p>Which outputs:</p>
 <pre><code>Found Movie: Beasts of No Nation
 </code></pre>
 
-<div class="admonition warning">
-<p class="admonition-title">Keeping an Index Up To Date</p>
-<p>The call to <code>listenForDeltaUpdates()</code> will cause a <code>HollowPrimaryKeyIndex</code> to automatically stay updated when deltas are applied to the indexed <code>HollowReadStateEngine</code>, but this should only be called if you intend to keep the index around.  See the Indexing / Querying section for usage details.</p>
+<p>In our generated API, each type in our data model has a generated index class.  We can index by any field, or multiple fields.</p>
+<div class="admonition hint">
+<p class="admonition-title">Reuse Indexes</p>
+<p>Retrieval from an index is extremely cheap, and indexing is (relatively) expensive.  You should create your indexes when the <code>HollowConsumer</code> is initialized and share them thereafter.  Indexes will automatically stay up-to-date with the <code>HollowConsumer</code>.</p>
 </div>
 <div class="admonition hint">
 <p class="admonition-title">Thread Safety</p>
-<p>Retrievals from a <code>HollowPrimaryKeyIndex</code> are thread-safe.  It is safe to use a <code>HollowPrimaryKeyIndex</code> from multiple threads, and it is safe to query while a transition is in progress.</p>
+<p>Retrievals from Hollow indexes are thread-safe.  They are safe to use across multiple threads, and it is safe to query while a transition is in progress.</p>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Ordinals</p>
-<p>Each record is assigned to a specific <em>ordinal</em>, which is an integer value. An <em>ordinal</em>:</p>
-<ul>
-<li>is a unique identifier of the record within a type.</li>
-<li>is sufficient to locate the record within a type.</li>
-</ul>
-<p>Ordinals are automatically assigned by Hollow. They lie in the range of 0-n, where n is generally not much larger than the total number of records for the type.</p>
-</div>
+<p>We've just begun to scratch the surface of what indexes can do.  See <a href="../indexing-querying/">Indexing/Querying</a> for an in-depth exploration of this topic.</p>
 <h1 id="hierarchical-data-models">Hierarchical Data Models</h1>
 <p>Our data models can be much richer than in the prior example.  Assume an updated <code>Movie</code> class:</p>
 <pre><code class="java">public class Movie {
@@ -410,7 +450,7 @@ if(movieOrdinal != -1) {
 }
 </code></pre>
 
-<p>Some records are added to a <code>HollowWriteStateEngine</code> on the producer:</p>
+<p>Some records are added to a <code>HollowProducer</code>:</p>
 <pre><code class="java">List&lt;Movie&gt; movies = Arrays.asList(
         new Movie(1, &quot;The Matrix&quot;, 1999, Arrays.asList(
                 new Actor(101, &quot;Keanu Reeves&quot;),
@@ -424,33 +464,57 @@ if(movieOrdinal != -1) {
         ))
 );
 
-
-for(Movie movie : movies)
-    mapper.addObject(movie);
+producer.runCycle(state -&gt; {
+    for(Movie movie : movies)
+        state.addObject(movie);
+});
 </code></pre>
 
-<p>When we add these movies to the dataset, the <code>HollowObjectMapper</code> will traverse everything referenced by the provided records and add them to the state as well.  Consequently, both a type <code>Movie</code> and a type <code>Actor</code> will exist in the data model after the above code runs.  </p>
+<p>When we add these movies to the dataset, Hollow will traverse everything referenced by the provided records and add them to the state as well.  Consequently, both a type <code>Movie</code> and a type <code>Actor</code> will exist in the data model after the above code runs.  </p>
 <div class="admonition hint">
 <p class="admonition-title">Deduplication</p>
 <p>Laurence Fishburne starred in both of these films.  Rather than creating two <code>Actor</code> records for Mr. Fishburne, a single record will be created and assigned to both of our <code>Movie</code> records.  This <em>deduplication</em> happens automatically by virtue of having the exact same data contained in both Actor inputs.</p>
 </div>
-<p>Consumers of this dataset may want to also create an index for <code>Actor</code> records:</p>
-<pre><code class="java">HollowPrimaryKeyIndex actorIdx = 
-                    new HollowPrimaryKeyIndex(readEngine, &quot;Actor&quot;, &quot;actorId&quot;);
-actorIdx.listenForDeltaUpdates();
+<p>Consumers of this dataset may want to also create an index for <code>Actor</code> records.  For example:</p>
+<pre><code class="java">ActorPrimaryKeyIndex actorIdx = new ActorPrimaryKeyIndex(consumer, &quot;actorId&quot;);
+
+Actor actor = actorIdx.getMatchingOrdinal(102);
+if(actor != null)
+    System.out.println(&quot;Found Actor: &quot; + actor.getActorName().getValue());
 </code></pre>
 
-<p>This index can be used in the same way as the <code>Movie</code> index to retrieve <code>Actor</code> records:</p>
-<pre><code class="java">int actorOrdinal = actorIdx.getMatchingOrdinal(102);
-if(actorOrdinal != -1) {
-    ActorHollow actor = movieApi.getActorHollow(actorOrdinal);
-    System.out.println(&quot;Found Actor: &quot; + actor._getActorName()._getValue());
-}
-</code></pre>
-
-<p>Which outputs:</p>
+<p>Outputs:</p>
 <pre><code>Found Actor: Laurence Fishburne
 </code></pre>
+
+<h1 id="restoring-at-startup">Restoring at Startup</h1>
+<p>From time to time, we need to redeploy our producer.  When we first create a <code>HollowProducer</code> and run a cycle it will not be able to produce a delta, because it does not know anything about the prior <em>data state</em>.  If no action is taken, a new state with only a snapshot will be produced and announced, and clients will load that data state with an operation called a <a href="../advanced-topics/#double-snapshot">double snapshot</a>, which has potentially undesirable performance characteristics.  </p>
+<p>We can remedy this situation by <em>restoring</em> our newly created producer with the last announced data state.  For example:</p>
+<pre><code class="java">Publisher publisher = ...
+Announcer announcer = ...
+BlobRetriever blobRetriever = ...
+AnnouncementWatcher announcementWatcher = ...
+
+HollowProducer producer = HollowProducer.withPublisher(publisher)
+                                        .withAnnouncer(announcer)
+                                        .build();
+
+producer.initializeDataModel(Movie.class);
+
+long latestAnnouncedVersion = announcementWatcher.getLatestVersion();
+producer.restore(latestAnnouncedVersion, blobRetriever);
+
+producer.runCycle(new Populator() {
+   ...
+});
+
+</code></pre>
+
+<p>In the above code, we first <em>initialize</em> the data model by providing the set of classes we will add during the cycle.  After that, we <em>restore</em> by providing our <code>BlobRetriever</code> implementation, along with the version which should be restored.  The <code>HollowProducer</code> will will use the <code>BlobRetriever</code> to load the desired state, then use it to <em>restore</em> itself.  In this way, a delta can be produced at startup, and consumers will not have to load a snapshot to get up-to-date.</p>
+<div class="admonition hint">
+<p class="admonition-title">Initializing the data model</p>
+<p>Before <em>restoring</em>, we must always <em>initialize</em> our data model.  When a data model changes between deployments, Hollow will automatically merge records of types which have changed.  In order to do this correctly, Hollow needs to know about the current data model before the restore operation begins.</p>
+</div>
               
             </div>
           </div>
@@ -458,7 +522,7 @@ if(actorOrdinal != -1) {
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../interacting-with-a-dataset/" class="btn btn-neutral float-right" title="Interacting with a Hollow Dataset">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../indexing-querying/" class="btn btn-neutral float-right" title="Indexing/Querying">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../quick-start/" class="btn btn-neutral" title="Quick Start"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -491,7 +555,7 @@ if(actorOrdinal != -1) {
         <span><a href="../quick-start/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../interacting-with-a-dataset/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../indexing-querying/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

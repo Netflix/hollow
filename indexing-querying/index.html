@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Indexing/Querying - Hollow (Netflix OSS)</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Indexing/Querying";
+    var mkdocs_page_input_path = "indexing-querying.md";
+    var mkdocs_page_url = "/indexing-querying/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search" style="background-color:#ffffff">
+        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#ffffff;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">Introduction</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../quick-start/">Quick Start</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../getting-started/">Getting Started</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">Indexing/Querying</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#a-data-model">A Data Model</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#primary-key-indexes">Primary Key Indexes</a></li>
+                
+                    <li><a class="toctree-l4" href="#default-primary-keys">Default Primary Keys</a></li>
+                
+                    <li><a class="toctree-l4" href="#consumer-specified-primary-keys">Consumer-specified Primary Keys</a></li>
+                
+                    <li><a class="toctree-l4" href="#compound-primary-keys">Compound Primary Keys</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#hash-indexes">Hash Indexes</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#field-paths">Field Paths</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#hash-keys">Hash Keys</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#field-match-scan-queries">Field Match Scan Queries</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#diving-deeper">Diving Deeper</a></li>
+                
+                    <li><a class="toctree-l4" href="#primary-keys">Primary Keys</a></li>
+                
+                    <li><a class="toctree-l4" href="#hash-indexes_1">Hash Indexes</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-modeling/">Data Modeling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../tooling/">Tooling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../diving-deeper/">Diving Deeper</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../interacting-with-a-dataset/">Interacting with a Hollow Dataset</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-ingestion/">Data Ingestion</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../producer-consumer/">Producers and Consumers</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../advanced-topics/">Advanced Topics</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../glossary/">Glossary</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../community/">Community</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../acknowledgements/">Acknowledgements</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../license/">License</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" style="background:#ffffff" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Hollow (Netflix OSS)</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Indexing/Querying</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="http://gitter.im/Netflix/hollow" class="icon fa-comment"> Gitter</a>
+      
+        <a href="https://github.com/Netflix/hollow"
+          class="icon icon-github"> GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="a-data-model">A Data Model</h1>
+<p>For the purposes of these examples, let's imagine we have a data model defined by the following Objects:</p>
+<pre><code class="java">@HollowPrimaryKey(fields=&quot;id&quot;)
+public class Movie {
+    int id;
+    String title;
+
+    @HollowHashKey(fields=&quot;actor.actorId&quot;)
+    Set&lt;ActorRole&gt; cast;
+}
+
+public class ActorRole {
+    Actor actor;
+    int movieId;
+    String characterName;
+}
+
+@HollowPrimaryKey(fields=&quot;actorId&quot;)
+public class Actor {
+    int actorId;
+    String name;
+}
+</code></pre>
+
+<h1 id="primary-key-indexes">Primary Key Indexes</h1>
+<p>When we <a href="../getting-started/#consumer-api-generation">generate a client API</a>, each type in our data model gets a custom index class called <code>&lt;typename&gt;PrimaryKeyIndex</code>.  We can use these classes to look up records based on <em>primary key</em> values.</p>
+<h2 id="default-primary-keys">Default Primary Keys</h2>
+<p>Once we have loaded a dataset into a <code>HollowConsumer</code>, we can use the <code>Movie</code> index to retrieve data by the default primary key <code>id</code>:</p>
+<pre><code class="java">
+HollowConsumer consumer = ...;
+
+MoviePrimaryKeyIndex idx = new MoviePrimaryKeyIndex(consumer);
+
+int knownMovieId = ...;
+
+Movie movie = idx.findMatch(knownMovieId);
+
+</code></pre>
+
+<p>Just as the <code>HollowConsumer</code> will automatically stay up-to-date as your dataset updates, a primary key index will also stay up-to-date with the <code>HollowConsumer</code> with which it is backed.</p>
+<div class="admonition hint">
+<p class="admonition-title">Share Indexes</p>
+<p>Queries to indexes are thread-safe.  We should create each of the indexes we need only once, and share them everywhere they are needed.</p>
+</div>
+<h2 id="consumer-specified-primary-keys">Consumer-specified Primary Keys</h2>
+<p>In the prior example, our primary key index was using the default primary key defined in the data model.  A primary key index is not restricted to just default primary keys.  For example, we could <em>also</em> index movies by their title:</p>
+<pre><code class="java">MoviePrimaryKeyIndex idx = new MoviePrimaryKeyIndex(consumer, &quot;title&quot;);
+
+String knownMovieTitle = ...;
+
+Movie movie = idx.findMatch(knownMovieTitle);
+
+</code></pre>
+
+<div class="admonition note">
+<p class="admonition-title">Primary Keys</p>
+<p>A primary key index should be used when there is a one-to-one mapping between records and key values.  A primary key can only return one record per key, and if multiple records exist for a given key, then an arbitrary match will be returned.</p>
+</div>
+<h2 id="compound-primary-keys">Compound Primary Keys</h2>
+<p>A primary key index may also be specified over multiple fields.  For example, we can define a primary key index for the <code>ActorRole</code> type above:</p>
+<pre><code class="java">ActorRolePrimaryKeyIndex idx = new ActorRolePrimaryKeyIndex(consumer, &quot;actor.id&quot;, &quot;movieId&quot;);
+
+int knownActorId = ...;
+int knownMovieId = ...;
+
+ActorRole actorRoleInMovie = idx.findMatch(knownActorId, knownMovieId);
+</code></pre>
+
+<p>In the above example, we are looking for the actor role which matches <em>both</em> the actor ID and the movie ID.  Note that the actor id was specified with dot-notation as <code>actor.id</code>.  This is a <em>field path</em>, and indicates that the actual value we're indexing belongs to a <em>referenced</em> record.  Note that for a primary key index, we can only traverse through referenced <code>Object</code> records, not <code>List</code>, <code>Set</code>, or <code>Map</code> records.  We'll cover more about field paths <a href="#field-paths">a bit further down</a>.</p>
+<h1 id="hash-indexes">Hash Indexes</h1>
+<p>If we want to find records based on keys for which there is not a one-to-one mapping between records and key values, we want a <em>hash index</em>.  With our generated client API, we have a single class <code>&lt;API classname&gt;HashIndex</code>.  We can use instances of this class to specify hash indexes.  A hash index must specify each of a <em>query type</em>, a <em>select field</em>, and one or more <em>match fields</em>.  If we want to <em>select</em> the same type we are using to search, we should specify our <em>select field</em> as and empty String <code>""</code>.</p>
+<p>For example, if we want to match <code>Movie</code> records which had characters with some name, we can use the following:</p>
+<pre><code class="java">MovieAPIHashIndex idx = new MovieAPIHashIndex(&quot;Movie&quot;, &quot;&quot;, &quot;cast.element.characterName.value&quot;);
+
+String knownCharacterName = ...;
+
+for(Movie movie : idx.findMovieMatches(knownCharacterName)) {
+    System.out.println(&quot;The movie &quot; + movie.getTitle().getValue() + 
+                       &quot; has a character named &quot; + knownCharacterName);
+}
+</code></pre>
+
+<p>Above, we are <em>selecting</em> the same type from which our query is derived.  However, if we wanted to find <code>Actor</code> records which starred in <code>Movie</code> records that have a specific title, we need to formulate our query at the <code>Movie</code> level, but we are <em>selecting</em> a different node:</p>
+<pre><code class="java">MovieAPIHashIndex idx = new MovieAPIHashIndex(&quot;Movie&quot;, &quot;cast.element.actor&quot;, &quot;title.value&quot;);
+
+String knownMovieTitle = ...;
+
+for(Actor actor : idx.findActorMatches(knownMovieTitle)) {
+    System.out.println(&quot;The actor &quot; + actor.getName().getValue() +
+                       &quot; starred in &quot; + knownMovieTitle);
+}
+</code></pre>
+
+<p>We can also match at multiple places in a type hierarchy.  For example, if we want to find the <code>ActorRole</code> by actor id and movie title, we can use the following:</p>
+<pre><code class="java">MovieAPIHashIndex idx = new MovieAPIHashIndex(&quot;Movie&quot;, &quot;cast.element&quot;, 
+                                              &quot;cast.element.actor.actorId&quot;, &quot;title.value&quot;);
+
+String knownMovieTitle = ...;
+int knownActorId = ...;
+
+for(ActorRole role : idx.findActorRoleMatches(knownActorId, knownMovieTitle)) {
+    System.out.println(&quot;The actor &quot; + role.getActor().getName().getValue() +
+                       &quot; starred in &quot; + knownMovieTitle + 
+                       &quot; as &quot; + role.getCharacterName().getValue());
+}
+
+</code></pre>
+
+<h1 id="field-paths">Field Paths</h1>
+<p>A field path indicates how to traverse through a type hierarchy. It contains multiple parts delimited by <code>.</code>, and we need one part per type through which we're traversing. Each part corresponding to an <code>OBJECT</code> type should be equal to the name of a field in that type. </p>
+<p>Primary key field paths may only span through <code>OBJECT</code> types.  These field paths will be automatically expanded if they end in a <code>REFERENCE</code> field which points to a type that has only a single field, or a type which has a primary key with only a single field defined.  If auto-expansion is not desired, the field path should terminate with a <code>!</code> character.  For example, in our data model example above, the following field paths for the type <code>Movie</code> are equivalent: <code>title</code>, <code>title.value</code>.  If we actually want the field path to terminate at the <code>REFERENCE</code> field <code>title</code>, we can specify the field path as <code>title!</code>.</p>
+<p>Hash key field paths may span through any type.  Each part corresponding to a <code>LIST</code> or <code>SET</code> type should be specified as <code>element</code>. Similarly, each part corresponding to a <code>MAP</code> type should be specified as either <code>key</code> or <code>value</code>.  Hash key field paths are never auto-expanded.</p>
+<h1 id="hash-keys">Hash Keys</h1>
+<p>Notice that in the POJOs of our data model defined at the beginning of this topic, we annotated the <code>Set&lt;ActorRole&gt;</code> in the <code>Movie</code> type with <code>@HollowHashKey(fields="actor.actorId")</code>.  This means that for each of these sets, the data will be hashed by the actor ID in the contained record.  In our generated API, we can easily find any record by actor ID using the <code>findElement()</code> method.  For example:</p>
+<pre><code class="java">Movie movie = ...;
+int knownActorId = ...;
+
+ActorRole role = movie.getCast().findElement(knownActorId);
+</code></pre>
+
+<p>In this way, each of our set records can be indexed by any field, or combination of fields, for O(1) retrieval of contained records.  The rules for defining a hash key are similar to the rules for defining a primary key:</p>
+<ul>
+<li>Compound hash keys may be defined by specifying multiple fields.</li>
+<li>Field paths may only span through <code>OBJECT</code> types.</li>
+<li>Field paths will be auto-expanded if they terminate in a <code>REFERENCE</code> field.</li>
+<li>Should be used when there is a one-to-one mapping between records and keys <em>per set</em>.  If duplicates exist, an arbitrary valid match will be returned.</li>
+</ul>
+<p>If defined on a <strong>set</strong> type, hash key field paths should be defined starting from the element type.</p>
+<p>Hash keys may also be defined on <strong>map</strong> record types.  When defined on a <strong>map</strong> record, the field paths should be defined starting from the key type.  The methods <code>findKey()</code>, <code>findValue()</code>, and <code>findElement()</code> are available on <strong>map</strong> types in the generated API for consumers to look up records by hash key values.  </p>
+<p>If using the <code>HollowObjectMapper</code>, unspecified hash keys will be automatically selected if an element or key type contain a single non-reference field.  Addionally, if a <code>Set</code> or <code>Map</code> references <code>Object</code> elements with a defined <em>primary key</em>, then the <em>hash key</em> will default to the <em>primary key</em> of the element type.  Alternatively, <em>hash keys</em> can be explicitly defined using the <code>@HollowHashKey</code> annotation in POJOs for <code>Set</code> schemas by specifying one or more fields from the element type, or for <code>Map</code> schemas by specifying one or more fields from the key type.  See our <a href="#a-data-model">data model example</a> at the beginning of this section for an example.</p>
+<h1 id="field-match-scan-queries">Field Match Scan Queries</h1>
+<p>Each of the examples above pre-index your dataset to achieve O(1) lookup times.  These are very efficient, but require pre-knowledge of what you're searching for. Given that all of hollow datasets exist in memory, for some use cases it is reasonable to scan through the entire dataset looking for matches. </p>
+<p>The <code>HollowFieldMatchQuery</code> can be used to accommodate these use cases.  The Hollow Explorer UI, for example, uses this mechanism to provide a powerful "search-for-anything" capability with reasonable response times for low-volume query traffic.</p>
+<h1 id="diving-deeper">Diving Deeper</h1>
+<p>The following uses the lower-level interfaces to index data in the absence of a generated API.  The generated API uses these constructs under the hood.</p>
+<h2 id="primary-keys">Primary Keys</h2>
+<p>We can create a lower-level <code>HollowPrimaryKeyIndex</code> which will allow us to query for <code>Movie</code> records by id:</p>
+<pre><code class="java">HollowPrimaryKeyIndex idx = 
+                      new HollowPrimaryKeyIndex(readEngine, &quot;Movie&quot;, &quot;id&quot;);
+idx.listenForDeltaUpdates();
+</code></pre>
+
+<p>In the above example, the primary key is defined for <code>Movie</code> as its <code>id</code> field.  A primary key can also be defined over multiple and/or hierarchical fields.  Imagine that <code>Movie</code> additionally had a <code>country</code> field defined in its schema, and that across countries, <code>Movie</code> <code>id</code>s may be duplicated, but that there will never exist two <code>Movie</code> records with the same id and country:</p>
+<pre><code class="java">@HollowPrimaryKey(fields={&quot;id&quot;, &quot;country.id&quot;})
+public class Movie {
+    long id;
+    Country country;
+    ...
+}
+
+@HollowPrimaryKey(fields={&quot;id&quot;})
+public class Country {
+    String id;
+    String name;
+}
+</code></pre>
+
+<p>A <code>HollowPrimaryKeyIndex</code> can be defined with a primary key consisting of both fields:</p>
+<pre><code class="java">HollowPrimaryKeyIndex idx = 
+            new HollowPrimaryKeyIndex(readEngine, &quot;Movie&quot;, &quot;id&quot;, &quot;country.id.value&quot;);
+idx.listenForDeltaUpdates();
+</code></pre>
+
+<p>And to query for a <code>Movie</code> based on its id and country:</p>
+<pre><code class="java">int movieOrdinal = idx.getMatchingOrdinal(2, &quot;US&quot;);
+if(movieOrdinal != -1) {
+    Movie movie = movieApi.getMovie(movieOrdinal);
+    System.out.println(&quot;Found Movie: &quot; + movie.getTitle().getValue());
+}
+</code></pre>
+
+<p>Notice that <code>Movie</code>’s country field in the above example is actually a <code>REFERENCE</code> field.  The defined key includes the id of the movie, and the value of the id String of the referenced country.  We denote this traversal using dot notation in the primary key definition.  The field definitions can be multiple references deep.</p>
+<p>The requirement for a primary key definition is that no duplicates should exist for the defined combination of fields.  If this rule is violated, an arbitrary match will be returned for queries when multiple matches exist.  </p>
+<div class="admonition note">
+<p class="admonition-title">Primary Key Violations</p>
+<p>Violations of the "no duplicate" primary key rule can be detected using the <code>getDuplicateKeys()</code> method on a <code>HollowPrimaryKeyIndex</code>, which returns a <code>Collection&lt;Object[]&gt;</code>.  If no duplicate keys exist, the returned Collection will be empty.  If they do, the returned values will indicate the keys for which duplicate records exist.</p>
+</div>
+<p>If a <code>HollowPrimaryKeyIndex</code> will be retained for a long duration, they should be kept updated as deltas are applied to the underlying <code>HollowReadStateEngine</code>.  This is accomplished with a single call after instantiation to the <code>listenForDeltaUpdates()</code> method. </p>
+<div class="admonition warning">
+<p class="admonition-title">Detaching Primary Key Indexes</p>
+<p>If <code>listenForDeltaUpdates()</code> is called on a primary key index, then it cannot be garbage collected.  If you intend to drop an index which is listening for updates, first call <code>detachFromDeltaUpdates()</code> to prevent a memory leak.</p>
+</div>
+<p>Indexes which are listening for delta updates are updated after a dataset is updated.  In the brief interim time between when a dataset is updated and the index is updated, the index will point to the <em>ghost records</em> located at tombstoned ordinals.  This helps guarantee that all in-flight operations will observe correct data.</p>
+<h2 id="hash-indexes_1">Hash Indexes</h2>
+<p>It is sometimes desirable to index records by fields other than primary keys.  The <code>HollowHashIndex</code> allows for indexing records by fields or combinations of fields for which values may match multiple records, and records may match multiple values.</p>
+<p>In our <code>Movie</code>/<code>Actor</code> example, we may want to index movies by their starring actors:</p>
+<pre><code class="java">HollowHashIndex idx = 
+            new HollowHashIndex(readEngine, &quot;Movie&quot;, &quot;&quot;, &quot;cast.element.actor.actorId&quot;);
+</code></pre>
+
+<p>The <code>HollowHashIndex</code> expects in its constructor arguments a query start type, a select field, and a set of match fields.  The constructor arguments above indicate that queries will start with the <code>Movie</code> type, select the root of the query (indicated by the empty string), and match the id of any <code>Actor</code> record in the actors list.</p>
+<p>To query this index:</p>
+<pre><code class="java">HollowHashIndexResult result = idx.findMatches(102);
+
+if(result != null) {
+    System.out.println(&quot;Found matches: &quot; + result.numResults());
+
+    HollowOrdinalIterator iter = result.iterator();
+    int matchedOrdinal = iter.next();
+    while(matchedOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+        Movie movie = api.getMovie(matchedOrdinal);
+        System.out.println(&quot;Starred in: &quot; + movie.getTitle().getValue());
+        matchedOrdinal = iter.next();
+    }
+}
+</code></pre>
+
+<p>Alternatively, if the data model included the nationality of actors, and we needed to index actors by nationality and the titles of movies in which they starred:</p>
+<pre><code class="java">HollowHashIndex idx = 
+            new HollowHashIndex(readEngine, &quot;Movie&quot;, &quot;cast.element.actor&quot;,
+                                            &quot;title.value&quot;,
+                                            &quot;cast.element.actor.nationality.id.value&quot;);
+</code></pre>
+
+<p>In this case, the query start type is still <code>Movie</code>, but we’re selecting related <code>Actor</code> records.  Matches are selected based on the <code>Movie</code>’s title, and the actor’s nationality.  Using this index, one can query for Brazilian actors who starred in movies titled “Narcos”:</p>
+<pre><code class="java">HollowHashIndexResult result = idx.findMatches(&quot;Narcos&quot;, &quot;BR&quot;);
+
+if(result != null) {
+    HollowOrdinalIterator iter = result.iterator();
+    int matchedOrdinal = iter.next();
+    while(matchedOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+        Actor actor = api.getMovie(matchedOrdinal);
+        System.out.println(&quot;Matched actor: &quot; + 
+                                      actor.getActorName().getValue());
+        matchedOrdinal = iter.next();
+    }
+}
+</code></pre>
+
+<p>The <code>HollowHashIndex</code> does not yet have a facility for listening for delta updates.  If an index is necessary across multiple states, currently the index must be recreated on each update.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../data-modeling/" class="btn btn-neutral float-right" title="Data Modeling">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../getting-started/" class="btn btn-neutral" title="Getting Started"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/Netflix/hollow" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../getting-started/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../data-modeling/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>

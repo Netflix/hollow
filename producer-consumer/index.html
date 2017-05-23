@@ -34,8 +34,8 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-      <div class="wy-side-nav-search" style="background-color:#000000">
-        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#000000;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
+      <div class="wy-side-nav-search" style="background-color:#ffffff">
+        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#ffffff;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -69,6 +69,34 @@
           
             <li>
     <li class="toctree-l1 ">
+        <a class="" href="../indexing-querying/">Indexing/Querying</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-modeling/">Data Modeling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../tooling/">Tooling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../diving-deeper/">Diving Deeper</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
         <a class="" href="../interacting-with-a-dataset/">Interacting with a Hollow Dataset</a>
         
     </li>
@@ -82,19 +110,15 @@
 <li>
           
             <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../data-modeling/">Data Modeling</a>
-        
-    </li>
-<li>
-          
-            <li>
     <li class="toctree-l1 current">
         <a class="current" href="./">Producers and Consumers</a>
         
             <ul>
             
-                <li class="toctree-l3"><a href="#the-producer-cycle">The Producer Cycle</a></li>
+                <li class="toctree-l3"><a href="#the-hollowproducer">The HollowProducer</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#the-hollowconsumer">The HollowConsumer</a></li>
                 
                     <li><a class="toctree-l4" href="#storing-the-blobs">Storing the Blobs</a></li>
                 
@@ -106,23 +130,17 @@
                 
                     <li><a class="toctree-l4" href="#validating-data">Validating Data</a></li>
                 
-            
-                <li class="toctree-l3"><a href="#consumer-framework">Consumer Framework</a></li>
+                    <li><a class="toctree-l4" href="#compacting-data">Compacting Data</a></li>
                 
                     <li><a class="toctree-l4" href="#pinning-consumers">Pinning Consumers</a></li>
+                
+                    <li><a class="toctree-l4" href="#dataset-consistency">Dataset Consistency</a></li>
                 
             
                 <li class="toctree-l3"><a href="#blob-namespaces">Blob Namespaces</a></li>
                 
             
             </ul>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../tooling/">Tooling</a>
         
     </li>
 <li>
@@ -170,7 +188,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" style="background:#000000" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" style="background:#ffffff" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
         <a href="..">Hollow (Netflix OSS)</a>
       </nav>
@@ -200,119 +218,139 @@
               
                 <p>Hollow provides the mechanism for maintaining the state of data, serializing data, reading and accessing data, and a comprehensive set of tooling for manipulating and investigating data.  </p>
 <p>Hollow does <em>not</em> provide or specify the infrastructure for actually disseminating the produced blobs from the producer to the consumers.  This section will describe the infrastructure needed for a usual production deployment of Hollow.  It’s entirely possible to wield the Hollow framework in ways which differ from the usage described here.  </p>
-<h1 id="the-producer-cycle">The Producer Cycle</h1>
-<p>Generally, a producer runs a repeating <em>cycle</em>.  During each cycle, the producer goes through two distinct phases:</p>
-<ol>
-<li>Adding all of the data for a state to a <code>HollowWriteStateEngine</code></li>
-<li>Writing <em>blobs</em> from a <code>HollowWriteStateEngine</code></li>
-</ol>
-<p>To transition back and forth between these phases, two method calls on the <code>HollowWriteStateEngine</code> are used.  To transition to the first phase, <code>prepareForNextCycle()</code> must be called.  To transition to the second phase, <code>prepareForWrite()</code> must be called.</p>
-<p>Each new generated state is assigned a unique, monotonically increasing 64-bit identifier.  State identifiers impose an ordering over states.  Later states have greater identifiers than earlier states.  The identifier is used to both identify the state and index the blobs in the published blob store.  </p>
-<div class="admonition note">
-<p class="admonition-title">State Identifiers</p>
-<p>Tip: it is useful to derive these identifiers based on the current timestamp.</p>
-</div>
-<p>At the end of each cycle, the producer publishes up to three types of blobs for the resulting state -- a snapshot, a delta, and a <em>reverse delta</em>.</p>
-<div class="admonition hint">
-<p class="admonition-title">Reverse Deltas</p>
-<p>Just as a delta transitions between an earlier state and an adjacent later state, a reverse delta transitions between a later state and an earlier adjacent state.  A reverse delta is created by simply calling <code>writeReverseDelta(OutputStream)</code> on a <code>HollowBlobWriter</code>.</p>
-</div>
-<h2 id="storing-the-blobs">Storing the Blobs</h2>
-<p>Blobs are published to a file store which is accessible by consumers.  From this blob store, consumers must be able to query for and retrieve blobs in the following ways:</p>
-<ul>
-<li><strong>Snapshots</strong>: Must be queryable based on the state identifier.  If a blob store is queried for a snapshot with an identifier which does not exist, the snapshot with the greatest identifier prior to the queried identifier should be retrieved.</li>
-<li><strong>Deltas</strong>: Must be queryable based on the state identifier <strong>to which</strong> a delta should be applied.</li>
-<li><strong>Reverse Deltas</strong>: Must be queryable based on the state identifier <strong>to which</strong> a reverse delta should be applied.</li>
-</ul>
-<h2 id="announcing-the-state">Announcing the State</h2>
-<p>Once the necessary transitions to bring clients up to date have been written to the blob store, the availability of the state must be <em>announced</em> to clients.  This simply means that a centralized location must be maintained and updated by the producer which indicates the version of the currently available state.  </p>
-<p>When this announced state is updated, usually it is desirable to have consumers realize this update as quickly as possible.  This can be accomplished either via a push notification to all consumers, or via frequent polling by consumers.</p>
-<h2 id="restoring-at-startup">Restoring At Startup</h2>
-<p>The examples of writing blobs thus far have assumed that the same <code>HollowWriteStateEngine</code> is held in memory for the duration of a dataset’s delta chain.  However, this isn’t always possible; the producer will need to be restarted from time to time due to deployment or other operational circumstances.</p>
-<p>In order to produce a delta between states produced by one <code>HollowWriteStateEngine</code> and another, the producer can <em>restore</em> the prior state upon restart, which will allow a delta and reverse delta to be produced:</p>
-<pre><code class="java">HollowReadStateEngine readEngine = /// the most recent state
-
-HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
-
-
-/// initialize the data model
-HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
-mapper.initialize(Movie.class);
-
-writeEngine.restoreFrom(readEngine);
+<h1 id="the-hollowproducer">The HollowProducer</h1>
+<p>Generally, a producer runs a repeating <em>cycle</em>.  At the end of each cycle, the producer has created a <em>data state</em>, published the artifacts necessary for consumers to bring their in-memory data stores to that <em>data state</em>, and announced the availability of the <em>state</em>.</p>
+<p>The <code>HollowProducer</code> encapsulates the details of publishing, announcing, validating, and (if necessary) rollback of data states.  In order to accomplish this, a few infrastructure hooks should be injected:</p>
+<pre><code class="java">HollowProducer
+   .withPublisher(publisher)         /// required: a BlobPublisher
+   .withAnnouncer(announcer)         /// optional: an Announcer
+   .withValidators(validators)       /// optional: one or more Validator
+   .withListeners(listeners)         /// optional: one or more HollowProducerListeners
+   .withBlobStagingDir(dir)          /// optional: a java.io.File
+   .withBlobCompressor(compressor)   /// optional: a BlobCompressor
+   .withBlobStager(stager)           /// optional: a BlobStager
+   .withSnapshotPublishExecutor(e)   /// optional: a java.util.concurrent.Executor
+   .withNumStatesBetweenSnapshots(n) /// optional: an int
+   .withTargetMaxTypeShardSize(size) /// optional: a long
 </code></pre>
 
-<p>Once we have <em>restored</em> the prior state, we can produce a delta from our producer's first cycle.  The delta will be applicable to any consumers which are on the state from which we restored.  </p>
-<p>Note that prior to restore, a <code>HollowWriteStateEngine</code> must be initialized with the schemas for its data model.  This is because the restore operation does not require that schemas exactly match between the restored state and the new state; it is legal to add or remove types and fields.</p>
-<p>When a delta is produced from a restored state after schemas have been updated, records for which all of the common fields between both schemas are unchanged will be assigned to the same ordinal and will be considered unmodified. If multiple such record pairs exist, the records to be considered unmodified will be selected arbitrarily among those pairs.</p>
-<div class="admonition hint">
-<p class="admonition-title">Initializing Before Restore</p>
-<p>A <code>HollowWriteStateEngine</code>'s data model may be initialized:</p>
+<p>Let's examine each of the injected configurations into the <code>HollowProducer</code>:</p>
 <ul>
-<li>via the <code>HollowObjectMapper</code> by calling <code>initTypeState()</code> with all top-level classes</li>
-<li>via a set of schemas <a href="../advanced-topics/#schema-parser">loaded from a text file</a> using the <code>HollowSchemaParser</code> and <code>HollowWriteStateCreator</code></li>
+<li><code>BlobPublisher</code>: Implementations of this class define how to publish blob data to the blob store.</li>
+<li><code>Announcer</code>: Implementations of this class define the announcement mechanism, which is used to track the version of the currently announced state.</li>
+<li><code>Validator</code>: Implementations of this class allow for semantic validation of the data contained in a state prior to announcement.  If an Exception is thrown during validation, the state will not be announced, and the producer will be automatically rolled back to the prior state.</li>
+<li><code>HollowProducerListener</code>: Listeners are notified about the progress and status of producer cycles throughout the various cycle stages.</li>
+<li><strong>Blob staging directory</strong>: Before blobs are published, they must be written and inspected/validated.  A directory may be specified as a File to which these "staged" blobs will be written prior to publish.  Staged blobs will be cleaned up automatically after publish.</li>
+<li><code>BlobCompressor</code>: Implementations of this class intercept blob input/output streams to allow for compression in the blob store.</li>
+<li><code>BlobStager</code>: Implementations will define how to stage blobs, if the default behavior of staging blobs on local disk is not desirable.  If a custom <code>BlobStager</code> is provided, then neither a blob staging directory or <code>BlobCompressor</code> should be provided.</li>
+<li><strong>Snapshot publish</strong> <code>Executor</code>: When consumers start up, if the latest announced version does not have a snapshot, they can load an earlier snapshot and follow deltas to get up-to-date.  A state can therefore be available and announced prior to the availability of the snapshot.  If an Executor is supplied here, then it will be used to publish snapshots.  This can be useful if snapshot publishing takes a long time -- subsequent cycles may proceed while snapshot uploads are still in progress.</li>
+<li><strong>Number of cycles between snapshots</strong>: Because snapshots are not necessary for a data state to be available and announced, they need not be published every cycle.  If this parameter is specified, then a snapshot will be produced only every <code>(n+1)th</code> cycle.</li>
+<li><code>VersionMinter</code>: Allows for a custom version identifier minting strategy.</li>
+<li><strong>Target max type shard size</strong>: Specify a <a href="../advanced-topics/#type-sharding">target max type shard size</a>.  Defaults to 16MB.</li>
 </ul>
-</div>
-<h2 id="rolling-back">Rolling Back</h2>
-<p>While producing a new state, it is possible to roll back a <code>HollowWriteStateEngine</code> to the previous time <code>prepareForNextCycle()</code> was called:</p>
-<pre><code class="java">public void runTheCycle(HollowWriteStateEngine writeEngine) {
-    writeEngine.prepareForNextCycle();
-    try {
-        addAllData(writeEngine);
-    } catch(Throwable unexpected) {
-        writeEngine.resetToLastPrepareForNextCycle();
-    }
-}
-</code></pre>
-
-<p>When this method is called, it’s as if none of the additions/removals since the last call to <code>prepareForNextCycle()</code> ever happened.  This action is available right up until the next call to <code>prepareForNextCycle()</code> is called.</p>
-<p>It’s best practice to wrap the code which adds data to a state engine with a try/catch block shown above.  This will cover any scenario in which a producer runs into an unexpected Exception due to an unforeseen bug in the code.  </p>
-<h2 id="validating-data">Validating Data</h2>
-<p>It likely makes sense to perform some basic <em>validation</em> on your produced data states before announcing them to clients.  This usually takes the form of loading the data into a <code>HollowReadStateEngine</code> on the producer, then gathering and checking some heuristics-based metrics on the data before announcement.  These validation rules will be specific to the semantics of the dataset.  If a problem is detected, send an alert and roll back the write engine, rather than announcing.  This way a delta may be produced from the previous good state.  </p>
-<h1 id="consumer-framework">Consumer Framework</h1>
+<p>Each time a new <em>data state</em> should be produced, users should call <code>.runCycle(Populator)</code>.  See <a href="../getting-started/">Getting Started</a> for more basic usage details.</p>
+<h1 id="the-hollowconsumer">The HollowConsumer</h1>
 <p>Data consumers keep their local copy of a dataset current by ensuring that their state engine is always at the latest <em>announced</em> data state. Consumers can arrive at a particular data state in a couple of different ways:</p>
 <ul>
 <li>At initialization time, they will load a snapshot, which is an entire copy of the dataset to be forklifted into memory.</li>
 <li>After initialization time, they will keep their local copy of the dataset current by applying delta transitions, which are the differences between adjacent data states.</li>
 </ul>
-<p>The <code>HollowClient</code> encapsulates the details of initializing and keeping a dataset up to date.  In order to accomplish this task, a few infrastructure hooks should be injected:</p>
-<pre><code class="java">new HollowClient.Builder()
-    .withBlobRetriever(blobRetriever)             /// required: a HollowBlobRetriever
-    .withAnnouncementWatcher(announcementWatcher) /// optional: a HollowAnnouncementWatcher
-    .withUpdateListener(updateListener)           /// optional: a HollowUpdateListener
-    .withGeneratedAPIClass(MyGeneratedAPI.class)  /// optional: a generated client API class
-    .withMemoryConfig(memoryConfig)               /// optional: a HollowClientMemoryConfig
-    .build();
+<p>The <code>HollowConsumer</code> encapsulates the details of initializing and keeping a dataset up to date.  In order to accomplish this task, a few infrastructure hooks should be injected:</p>
+<pre><code class="java">HollowConsumer
+   .withBlobRetriever(blobRetriever)              /// required: a BlobRetriever
+   .withLocalBlobStore(localDiskDir)              /// optional: a local disk location
+   .withAnnouncementWatcher(announcementWatcher)  /// optional: a AnnouncementWatcher
+   .withRefreshListener(refreshListener)          /// optional: a RefreshListener
+   .withGeneratedAPIClass(MyGeneratedAPI.class)   /// optional: a generated client API class
+   .withFilterConfig(filterConfig)                /// optional: a HollowFilterConfig
+   .withDoubleSnapshotConfig(doubleSnapshotCfg)   /// optional: a DoubleSnapshotConfig
+   .withObjectLongevityConfig(objectLongevityCfg) /// optional: an ObjectLongevityConfig
+   .withObjectLongevityDetector(detector)         /// optional: an ObjectLongevityDetector
+   .withRefreshExecutor(refreshExecutor)          /// optional: an Executor
+   .build();
 </code></pre>
 
-<p>Let's examine each the injected hooks to the <code>HollowClient</code>:</p>
+<p>Let's examine each the injected hooks to the <code>HollowConsumer</code>:</p>
 <ul>
-<li><code>HollowBlobRetriever</code>: The interface to the blob store.  This is the only hook for which a custom implementation is required.  Each of the other hooks have default implementations which may be used.</li>
-<li><code>HollowAnnouncementWatcher</code>: Provides an interface to the state announcement mechanism.  Often, announcement polling logic is encapsulated inside implementations.</li>
-<li><code>HollowUpdateListener</code>: Provides hooks so that actions may be taken during and after updates (e.g. indexing).</li>
-<li><strong>Generated API Class</strong>: Specifies a custom-generated Hollow API to use.</li>
-<li><code>HollowClientMemoryConfig</code>: Defines advanced settings related to object longevity and double snapshots.</li>
+<li><code>BlobRetriever</code>: The interface to the blob store.  This is the only hook for which a custom implementation is required.  Each of the other hooks have default implementations which may be used.  The <code>BlobRetriever</code> may be omitted only if a previously-populated local blob store is specified.</li>
+<li><strong>Local blob store</strong>: A <code>File</code> which indicates where to record downloaded blobs and find previously downloaded blobs.  If specified along with a <code>BlobRetriever</code>, the <code>HollowConsumer</code> will prefer to use previously downloaded blobs where applicable, and otherwise write newly downloaded blobs to the specified directory.  If specified <em>without</em> a <code>BlobRetriever</code>, only previously downloaded blobs will be available. </li>
+<li><code>AnnouncementWatcher</code>: Provides an interface to the state announcement mechanism.  Often, announcement polling logic is encapsulated inside implementations.</li>
+<li><code>RefreshListener</code>: Provides hooks so that actions may be taken during and after updates (e.g. indexing).</li>
+<li><strong>Generated API Class</strong>: Specifies a <a href="../getting-started/#consumer-api-generation">custom-generated Hollow API</a> to use.</li>
+<li><code>HollowFilterConfig</code>: </li>
+<li><code>DoubleSnapshotConfig</code>: Defines advanced settings related to <a href="../advanced-topics/#double-snapshots">double snapshots</a>.</li>
+<li><code>ObjectLongevityConfig</code>: Defines advanced settings related to <a href="../advanced-topics/#object-longevity">object longevity</a>.</li>
+<li><code>ObjectLongevityDetector</code>: Implementations are notified when stale hollow object existence and usage is detected.</li>
+<li><code>RefreshExecutor</code>: An <code>Executor</code> to use when asynchronous updates are called via <code>triggerAsyncRefresh()</code>.</li>
 </ul>
-<p>Each time the identifier of the currently announced state changes, <code>triggerRefresh()</code> should be called on the <code>HollowClient</code>.  This will bring the data up to date.</p>
-<p>In general, the only requirement for getting Hollow consumers to work with your specific infrastructure is to implement a <code>HollowBlobRetriever</code> and <code>HollowAnnouncementWatcher</code>, and use them with a <code>HollowClient</code>.</p>
+<p>Each time the identifier of the currently announced state changes, <code>triggerRefresh()</code> should be called on the <code>HollowConsumer</code>.  This will bring the data up to date.</p>
+<p>In general, the only requirement for getting Hollow consumers to work with your specific infrastructure is to implement a <code>BlobRetriever</code> and <code>AnnouncementWatcher</code>, and use them with a <code>HollowConsumer</code>.</p>
 <div class="admonition hint">
 <p class="admonition-title">Triggering Refresh</p>
-<p>When implementing a <code>HollowAnnouncementWatcher</code>, you will need to implement the method <code>subscribeToEvents()</code>.  In this method, 
-you'll subscribe to your announcement mechanism, and in doing so you'll define what to do when an announcement is updated.<br />
-Most likely, the action you define will:</p>
-<ol>
-<li>Update the value to be returned from <code>getLatestVersion()</code> (e.g. in an instance field)</li>
-<li>call <code>triggerAsyncRefresh()</code></li>
-</ol>
-<p>In this way, your <code>HollowClient</code> injected with this <code>HollowAnnouncementWatcher</code> implementation will be automatically kept up-to-date.</p>
+<p>When implementing a <code>AnnouncementWatcher</code>, you will need to implement the method <code>subscribeToUpdates(HollowConsumer consumer)</code>.  When you
+create a <code>HollowConsumer</code> with an <code>AnnouncementWatcher</code>, it will automatically call back to this method with itself as the argument.  </p>
+<p>You should track all <code>HollowConsumer</code>s received by calls to this method.  When your announcement mechanism provides an updated value, 
+you should notify each <code>HollowConsumer</code> via the <code>triggerAsyncRefresh()</code> method.</p>
+<p>In this way, your <code>HollowConsumer</code> injected with this <code>HollowAnnouncementWatcher</code> implementation will be automatically kept up-to-date.</p>
 </div>
+<h2 id="storing-the-blobs">Storing the Blobs</h2>
+<p>Blobs are published to a file store which is accessible by consumers.  From this blob store, consumers must be able to query for and retrieve blobs in the following ways:</p>
+<ul>
+<li><strong>Snapshots</strong>: Must be queryable based on the state identifier.  If a blob store is queried for a snapshot with an identifier which does not exist, the snapshot with the greatest identifier prior to the queried identifier should be retrieved.</li>
+<li><strong>Deltas</strong>: Must be queryable based on the state identifier to which a delta should be applied (e.g. the delta's <strong>from</strong> state identifier).</li>
+<li><strong>Reverse Deltas</strong>: Must be queryable based on the state identifier to which a reverse delta should be applied (e.g. the reverse delta's <strong>from</strong> state identifier).</li>
+</ul>
+<p>If a <strong>delta</strong> or <strong>reverse delta</strong> is requested to be published with a <strong>from</strong> state identifier for which a corresponding artifact already exists, it must <em>overwrite</em> the existing artifact previously published.  This happens when a data state fails for any reason.</p>
+<p>The details of how these properties are accomplished using your specific infrastructure should be embodied in your <code>Publisher</code> and <code>BlobRetriever</code> implementations.</p>
+<h2 id="announcing-the-state">Announcing the State</h2>
+<p>Once the necessary transitions to bring clients up to date have been written to the blob store, the availability of the state must be <em>announced</em> to clients.  This simply means that a centralized location must be maintained and updated by the producer which indicates the version of the currently available state.  </p>
+<p>When this announced state is updated, usually it is desirable to have consumers realize this update as quickly as possible.  This can be accomplished either via a push notification to all consumers, or via frequent polling by consumers.</p>
+<p>The details of how announcement works using your specific infrastructure should be embodied in your <code>Announcer</code> and <code>AnnouncementWatcher</code> implementations.</p>
+<h2 id="restoring-at-startup">Restoring At Startup</h2>
+<p>The examples of writing blobs thus far have assumed that the same <code>HollowProducer</code> is held in memory for the duration of a dataset’s delta chain.  However, this isn’t always possible; the producer will need to be restarted from time to time due to deployment or other operational circumstances.</p>
+<p>In order to produce a delta between states produced by one <code>HollowProducer</code> and another, the producer can <em>restore</em> the prior state upon restart, which will allow a delta and reverse delta to be produced.  See <a href="../getting-started/#restoring-at-startup">Restoring at Startup</a> for usage.</p>
+<p>Once we have <em>restored</em> the prior state, we can produce a delta from our producer's first cycle.  The delta will be applicable to any consumers which are on the state from which we restored.  </p>
+<div class="admonition hint">
+<p class="admonition-title">Initializing Before Restore</p>
+<p>A <code>HollowProducer</code>'s data model may be initialized:</p>
+<ul>
+<li>via the <code>HollowObjectMapper</code> by calling <code>initTypeState()</code> with all top-level classes</li>
+<li>via a set of schemas <a href="../advanced-topics/#schema-parser">loaded from a text file</a> using the <code>HollowSchemaParser</code> and <code>HollowWriteStateCreator</code></li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Truncating a Delta Chain</p>
+<p>If a problem occurs and you need to <a href="#pinning-consumers">pin back</a> consumers, you <em>may</em> want to restart your producer and explicitly restore from the pinned state.  Once the producer's first cycle completes, it will publish a delta from the pinned state to the newly produced state, <em>overwriting</em> the previous delta from the pinned state.  In this way, when you unpin, consumers will automatically follow the <em>new</em> delta, and the old forward-path from the pinned state will be <em>truncated</em>.</p>
+<p>If any consumers somehow did happen to remain on a <em>truncated</em> state, the reverse delta out of the truncated chain is still intact -- they could be manually pinned back to the restored state, then unpinned to get back up-to-date.</p>
+</div>
+<h2 id="rolling-back">Rolling Back</h2>
+<p>While producing a new state, if the <code>HollowProducer</code> encounters an error during data state population or validation fails, the current <em>data state</em> will be aborted and the underlying <em>state engine</em> will be rolled back to the previous data state.  Any delta produced on the next cycle will be from the last <em>successful</em> data state.</p>
+<h2 id="validating-data">Validating Data</h2>
+<p>It likely makes sense to perform some basic <em>validation</em> on your produced data states before announcing them to clients.  This usually takes the form of loading the data into a <code>HollowReadStateEngine</code> on the producer, then gathering and checking some heuristics-based metrics on the data before announcement.  These validation rules will be specific to the semantics of the dataset.  If a problem is detected, send an alert and roll back the write engine, rather than announcing.  This way a delta may be produced from the previous good state.  </p>
+<h2 id="compacting-data">Compacting Data</h2>
+<p>It is possible to produce delta chains which extend over many thousands of states.  If during this delta chain an especially large delta happens for a specific type, it’s possible that many ordinal holes will be present in that type.  If over time multiple types go through especially large deltas, this can have an impact on a dataset’s heap footprint.</p>
+<p>To reclaim heap space occupied by ordinal holes, a special <em>compaction cycle</em> can be run on the <code>HollowProducer</code>.  During compaction, no record data will change, but identical records will be relocated off of the high end of the ordinal space into more optimal ordinals.  This is accomplished by producing deltas which only include removals and additions of identical records allocated to more optimal ordinals.  </p>
+<p>To run a <em>compaction cycle</em>, call <code>runCompactionCycle(config)</code> on the <code>HollowProducer</code>.  No action will be taken unless the criteria described in the <code>CompactionConfig</code> is met.  See the <code>HollowCompactor</code> javadoc for details.</p>
 <h2 id="pinning-consumers">Pinning Consumers</h2>
-<p>Mistakes happen.  What's important is that we can recover from them quickly.  If you accidentally publish bad data, you should be able to revert those changes quickly.  If you give your <code>HollowAnnouncementWatcher</code> implementation an alternate location to read the announcement from, which <em>overrides</em> the announcement from the consumer, then you can use this to quickly force clients to go back to any arbitrary state in the past.  We call setting a state version in this alternate location <em>pinning</em> the consumers.</p>
+<p>Mistakes happen.  What's important is that we can recover from them quickly.  If you accidentally publish bad data, you should be able to revert those changes quickly.  If you give your <code>AnnouncementWatcher</code> implementation an alternate location to read the announcement from, which <em>overrides</em> the announcement from the consumer, then you can use this to quickly force clients to go back to any arbitrary state in the past.  We call setting a state version in this alternate location <em>pinning</em> the consumers.</p>
 <p>Implementing a pinning mechanism is extremely useful and highly recommended.  You can operationally reverse data issues immediately upon discovery, so that symptoms go away while you diagnose exactly what went wrong.  This can save an enormous amount of stress and money.</p>
 <div class="admonition danger">
 <p class="admonition-title">Unpinning</p>
 <p>If you've pinned consumers due to a data issue, it's probably not desirable to simply 'unpin' them after the root cause is addressed.  Instead, restart the producer and instruct it to <a href="#restoring-at-startup">restore</a> from the pinned state.  It should then produce a delta which skips over all of the bad states.  Only unpin after the delta from the pinned version to a bad version is overwritten with a delta from the pinned version to the good version.</p>
 </div>
+<h2 id="dataset-consistency">Dataset Consistency</h2>
+<p>If you have a long-running process which requires a consistent view of the dataset in a single state, you can prevent the <code>HollowConsumer</code> from updating while your process runs:</p>
+<pre><code class="java">HollowConsumer consumer = ...
+
+consumer.getRefreshLock().lock();
+try {
+    /// run your process
+} finally {
+    consumer.getRefreshLock().unlock();
+}
+</code></pre>
+
+<p>The <code>getRefreshLock()</code> call returns the read lock in a <code>ReadWriteLock</code>.  Refreshes use the write lock.</p>
 <h1 id="blob-namespaces">Blob Namespaces</h1>
 <p>Every so often, it may be required to make changes to the data model which is incompatible with prior versions.  In this case, an older producer, which produces the older data model, should run in parallel with the newer producer, producing the newer, incompatible data model. </p>
 <div class="admonition warning">
@@ -328,10 +366,10 @@ Most likely, the action you define will:</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../tooling/" class="btn btn-neutral float-right" title="Tooling">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../advanced-topics/" class="btn btn-neutral float-right" title="Advanced Topics">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../data-modeling/" class="btn btn-neutral" title="Data Modeling"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../data-ingestion/" class="btn btn-neutral" title="Data Ingestion"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -358,10 +396,10 @@ Most likely, the action you define will:</p>
           <a href="https://github.com/Netflix/hollow" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../data-modeling/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../data-ingestion/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../tooling/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../advanced-topics/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
