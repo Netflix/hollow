@@ -891,7 +891,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -2292,7 +2292,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -4397,7 +4397,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -5798,7 +5798,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -7903,7 +7903,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -9304,7 +9304,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -11409,7 +11409,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -12803,7 +12803,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -14934,7 +14934,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -16336,7 +16336,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -18638,7 +18638,7 @@
     },
     "resolutionRules": {
         "com.netflix.nebula:gradle-resolution-rules": {
-            "locked": "0.47.0",
+            "locked": "0.48.0",
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
@@ -19538,7 +19538,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -20939,7 +20939,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -23048,7 +23048,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -24449,7 +24449,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -26566,7 +26566,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
@@ -26577,11 +26577,11 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui"
             ]
@@ -28011,7 +28011,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -30199,7 +30199,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
@@ -30210,11 +30210,11 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui"
             ]
@@ -31644,7 +31644,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -33832,7 +33832,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
@@ -33843,11 +33843,11 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui"
             ]
@@ -35277,7 +35277,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -37465,7 +37465,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
@@ -37476,11 +37476,11 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui"
             ]
@@ -38910,7 +38910,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -41098,7 +41098,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
@@ -41109,11 +41109,11 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui"
             ]
@@ -42543,7 +42543,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -44731,7 +44731,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
@@ -44742,11 +44742,11 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui"
             ]
@@ -46176,7 +46176,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -48364,7 +48364,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
@@ -48375,11 +48375,11 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui"
             ]
@@ -49809,7 +49809,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -51997,7 +51997,7 @@
             "requested": "1.15.10"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
@@ -52008,11 +52008,11 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.5.4",
+            "locked": "2.6.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui"
             ]
@@ -53442,7 +53442,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.197.0",
+            "locked": "1.198.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
