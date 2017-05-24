@@ -25,12 +25,14 @@ public class HollowHistoryView extends HollowObjectView {
     private final long historicalVersion;
     private final String type;
     private final int keyOrdinal;
+    private final long latestStateEngineRandomizedTag;
 
-    public HollowHistoryView(long historicalVersion, String type, int keyOrdinal, HollowDiffViewRow rootRow, ExactRecordMatcher exactRecordMatcher) {
+    public HollowHistoryView(long historicalVersion, String type, int keyOrdinal, long latestStateEngineRandomizedTag, HollowDiffViewRow rootRow, ExactRecordMatcher exactRecordMatcher) {
         super(rootRow, exactRecordMatcher);
         this.historicalVersion = historicalVersion;
         this.type = type;
         this.keyOrdinal = keyOrdinal;
+        this.latestStateEngineRandomizedTag = latestStateEngineRandomizedTag;
     }
 
     public long getHistoricalVersion() {
@@ -43,6 +45,10 @@ public class HollowHistoryView extends HollowObjectView {
 
     public int getKeyOrdinal() {
         return keyOrdinal;
+    }
+    
+    public long getLatestStateEngineRandomizedTag() {
+        return latestStateEngineRandomizedTag;
     }
 
 }

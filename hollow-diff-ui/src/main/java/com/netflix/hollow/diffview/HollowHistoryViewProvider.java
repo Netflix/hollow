@@ -44,10 +44,13 @@ public class HollowHistoryViewProvider implements HollowObjectViewProvider {
     private HollowHistoryView getObjectView(HollowUISession session, long version, String type, int keyOrdinal) {
         HollowHistoryView objectView = (HollowHistoryView) session.getAttribute("hollow-history-view");
 
+        long currentRandomizedTag = historyUI.getHistory().getLatestState().getCurrentRandomizedTag();
+        
         if(objectView != null
                 && objectView.getHistoricalVersion() == version
                 && objectView.getType().equals(type)
-                && objectView.getKeyOrdinal() == keyOrdinal) {
+                && objectView.getKeyOrdinal() == keyOrdinal
+                && objectView.getLatestStateEngineRandomizedTag() == currentRandomizedTag) {
             return objectView;
         }
 
@@ -57,7 +60,7 @@ public class HollowHistoryViewProvider implements HollowObjectViewProvider {
         int toOrdinal = typeMapping.findAddedOrdinal(keyOrdinal);
 
         HollowDiffViewRow rootRow = new HollowObjectDiffViewGenerator(historicalState.getDataAccess(), historicalState.getDataAccess(), historyUI, type, fromOrdinal, toOrdinal).getHollowDiffViewRows();
-        objectView = new HollowHistoryView(version, type, keyOrdinal, rootRow, historyUI.getExactRecordMatcher());
+        objectView = new HollowHistoryView(version, type, keyOrdinal, currentRandomizedTag, rootRow, historyUI.getExactRecordMatcher());
         objectView.resetView();
         session.setAttribute("hollow-history-view", objectView);
 
