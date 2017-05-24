@@ -99,10 +99,10 @@ public class HollowHistory {
                     if (pKey == null) continue;
 
                     keyIndex.addTypeIndex(pKey);
+                    keyIndex.indexTypeField(pKey);
                 }
             }
         }
-
     }
 
     /**
