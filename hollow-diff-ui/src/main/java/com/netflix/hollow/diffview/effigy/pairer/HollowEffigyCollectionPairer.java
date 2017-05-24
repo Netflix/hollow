@@ -31,16 +31,13 @@ import java.util.List;
 
 public class HollowEffigyCollectionPairer extends HollowEffigyFieldPairer {
 
-    private static final long[] EMPTY_DIFF_MATRIX = new long[0];
     static final int MAX_MATRIX_ELEMENT_FIELD_VALUE = 0x1FFFFF;
 
     private final PrimaryKey matchHint;
-    private final long deadlineBeforePairingTimeout;
 
-    public HollowEffigyCollectionPairer(HollowEffigy fromCollection, HollowEffigy toCollection, PrimaryKey matchHint, long deadlineBeforePairingTimeout) {
+    public HollowEffigyCollectionPairer(HollowEffigy fromCollection, HollowEffigy toCollection, PrimaryKey matchHint) {
         super(fromCollection, toCollection);
         this.matchHint = matchHint;
-        this.deadlineBeforePairingTimeout = deadlineBeforePairingTimeout;
     }
 
     @Override
@@ -186,7 +183,7 @@ public class HollowEffigyCollectionPairer extends HollowEffigyFieldPairer {
 
         int maxPairs = Math.min(from.getFields().size(), to.getFields().size());
 
-        for(int i=0;i<maxDiffBackoff.length && fieldPairs.size() < maxPairs && System.currentTimeMillis() < deadlineBeforePairingTimeout;i++) {
+        for(int i=0;i<maxDiffBackoff.length && fieldPairs.size() < maxPairs;i++) {
 
             long diffMatrixElements[] = pair(pairedFromIndices, pairedToIndices, maxDiffBackoff[i]);
 
@@ -215,13 +212,7 @@ public class HollowEffigyCollectionPairer extends HollowEffigyFieldPairer {
             }
         }
 
-        if(System.currentTimeMillis() > deadlineBeforePairingTimeout) {
-            HollowEffigy.Field fromField = new HollowEffigy.Field(null, "TRUNCATED", "PAIRING TIMEOUT");
-            HollowEffigy.Field toField = new HollowEffigy.Field(null, "TRUNCATED", "ROWS OMITTED");
-            fieldPairs.add(new EffigyFieldPair(fromField, toField, -1, -1));
-        } else {
-            addUnmatchedElements(fieldPairs, pairedFromIndices, pairedToIndices);
-        }
+        addUnmatchedElements(fieldPairs, pairedFromIndices, pairedToIndices);
 
         return fieldPairs;
 
@@ -240,9 +231,6 @@ public class HollowEffigyCollectionPairer extends HollowEffigyFieldPairer {
     }
 
     public long[] pair(final BitSet pairedFromIndices, final BitSet pairedToIndices, final int maxDiff) {
-        if(System.currentTimeMillis() > deadlineBeforePairingTimeout)
-            return EMPTY_DIFF_MATRIX;
-
         final long diffMatrixElements[] = new long[from.getFields().size() * to.getFields().size()];
 
         int matrixElementIdx = 0;
@@ -259,7 +247,7 @@ public class HollowEffigyCollectionPairer extends HollowEffigyFieldPairer {
                 HollowEffigyDiffRecord diffRecord = new HollowEffigyDiffRecord(fromElement);
 
                 for(int j=0;j<to.getFields().size();j++) {
-                    if(pairedToIndices.get(j) || System.currentTimeMillis() > deadlineBeforePairingTimeout) {
+                    if(pairedToIndices.get(j)) {
                         diffMatrixElements[matrixElementIdx++] = getDiffMatrixElement(fromIdx, j, MAX_MATRIX_ELEMENT_FIELD_VALUE);
                     } else {
                         HollowEffigy toElement = getComparisonEffigy((HollowEffigy) to.getFields().get(j).getValue());

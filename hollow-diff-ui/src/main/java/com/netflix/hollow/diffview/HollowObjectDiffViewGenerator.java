@@ -32,15 +32,12 @@ import java.util.List;
 
 public class HollowObjectDiffViewGenerator {
 
-    private final long MAX_TIME_BEFORE_PAIRING_TIMEOUT = 15000L;
-
     private final HollowDataAccess fromDataAccess;
     private final HollowDataAccess toDataAccess;
     private final HollowRecordDiffUI diffUI;
     private final String typeName;
     private final int fromOrdinal;
     private final int toOrdinal;
-    private final long deadlineBeforePairingTimeout;
 
     public HollowObjectDiffViewGenerator(HollowDataAccess fromDataAccess, HollowDataAccess toDataAccess, HollowRecordDiffUI diffUI, String typeName, int fromOrdinal, int toOrdinal) {
         this.fromDataAccess = fromDataAccess;
@@ -49,7 +46,6 @@ public class HollowObjectDiffViewGenerator {
         this.typeName = typeName;
         this.fromOrdinal = fromOrdinal;
         this.toOrdinal = toOrdinal;
-        this.deadlineBeforePairingTimeout = System.currentTimeMillis() + MAX_TIME_BEFORE_PAIRING_TIMEOUT;
     }
 
     public HollowDiffViewRow getHollowDiffViewRows() {
@@ -86,7 +82,7 @@ public class HollowObjectDiffViewGenerator {
         HollowEffigy from = fromField == null ? null : (HollowEffigy) fromField.getValue();
         HollowEffigy to = toField == null ? null : (HollowEffigy) toField.getValue();
         
-        List<EffigyFieldPair> pairs = HollowEffigyFieldPairer.pair(from, to, diffUI.getMatchHints(), deadlineBeforePairingTimeout);
+        List<EffigyFieldPair> pairs = HollowEffigyFieldPairer.pair(from, to, diffUI.getMatchHints());
         
         List<HollowDiffViewRow> childRows = new ArrayList<HollowDiffViewRow>();
 

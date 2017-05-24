@@ -88,7 +88,7 @@ public abstract class HollowEffigyFieldPairer {
         }
     }
 
-    public static List<EffigyFieldPair> pair(HollowEffigy from, HollowEffigy to, Map<String, PrimaryKey> matchHints, long deadlineBeforePairingTimeout) {
+    public static List<EffigyFieldPair> pair(HollowEffigy from, HollowEffigy to, Map<String, PrimaryKey> matchHints) {
         if(from == null || to == null)
             return new HollowEffigyNullPartnerPairer(from, to).pair();
 
@@ -102,11 +102,11 @@ public abstract class HollowEffigyFieldPairer {
             return new HollowEffigyObjectPairer(from, to).pair();
         case MAP:
             String keyType = ((HollowMapSchema)schema).getKeyType();
-            return new HollowEffigyMapPairer(from, to, matchHints.get(keyType), deadlineBeforePairingTimeout).pair();
+            return new HollowEffigyMapPairer(from, to, matchHints.get(keyType)).pair();
         case LIST:
         case SET:
             String elementType = ((HollowCollectionSchema)schema).getElementType();
-            return new HollowEffigyCollectionPairer(from, to, matchHints.get(elementType), deadlineBeforePairingTimeout).pair();
+            return new HollowEffigyCollectionPairer(from, to, matchHints.get(elementType)).pair();
         }
         
         throw new IllegalArgumentException("I don't know how to pair fields for type " + schema.getName() + "(" + schema.getSchemaType() + ")");

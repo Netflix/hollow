@@ -22,8 +22,8 @@ import com.netflix.hollow.diffview.effigy.HollowEffigy;
 
 public class HollowEffigyMapPairer extends HollowEffigyCollectionPairer {
 
-    public HollowEffigyMapPairer(HollowEffigy fromCollection, HollowEffigy toCollection, PrimaryKey matchHint, long deadlineBeforeLazyPairingTimeout) {
-        super(fromCollection, toCollection, matchHint, deadlineBeforeLazyPairingTimeout);
+    public HollowEffigyMapPairer(HollowEffigy fromCollection, HollowEffigy toCollection, PrimaryKey matchHint) {
+        super(fromCollection, toCollection, matchHint);
     }
 
     @Override

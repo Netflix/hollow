@@ -44,7 +44,7 @@ public class HollowEffigyCollectionPairerTest {
                 element("1", 1, 1)
         );
 
-        HollowEffigyCollectionPairer pairer = new HollowEffigyCollectionPairer(list1, list2, null, System.currentTimeMillis() + 1000L);
+        HollowEffigyCollectionPairer pairer = new HollowEffigyCollectionPairer(list1, list2, null);
 
         List<EffigyFieldPair> pairs = pairer.pair();
 
