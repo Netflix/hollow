@@ -17,8 +17,6 @@
  */
 package com.netflix.hollow.explorer.ui.pages;
 
-import com.netflix.hollow.explorer.ui.model.QueryResult;
-
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
@@ -29,6 +27,7 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 import com.netflix.hollow.explorer.ui.HollowExplorerUI;
+import com.netflix.hollow.explorer.ui.model.QueryResult;
 import com.netflix.hollow.explorer.ui.model.TypeKey;
 import com.netflix.hollow.tools.stringifier.HollowRecordJsonStringifier;
 import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
@@ -64,6 +63,8 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
 
         if(session.getAttribute("query-result") != null) {
             QueryResult queryResult = (QueryResult) session.getAttribute("query-result");
+            queryResult.recalculateIfNotCurrent(ui.getStateEngine());
+            
             selectedOrdinals = queryResult.getQueryMatches().get(typeState.getSchema().getName());
             if(selectedOrdinals == null)
                 selectedOrdinals = new BitSet();

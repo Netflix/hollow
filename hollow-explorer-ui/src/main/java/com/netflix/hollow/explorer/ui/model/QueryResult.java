@@ -17,23 +17,28 @@
  */
 package com.netflix.hollow.explorer.ui.model;
 
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.tools.query.HollowFieldMatchQuery;
+import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 public class QueryResult {
     
     private final List<QueryClause> queryClauses;
-    
     private final Map<String, BitSet> queryMatches;
+    private long randomizedStateTag;
     
-    public QueryResult(QueryClause clause, Map<String, BitSet> matches) {
+    public QueryResult(long randomizedStateTag) {
         this.queryClauses = new ArrayList<QueryClause>();
-        this.queryMatches = matches;
-        this.queryClauses.add(clause);
+        this.queryMatches = new HashMap<String, BitSet>();
+        this.randomizedStateTag = randomizedStateTag;
     }
     
     public List<QueryClause> getQueryClauses() {
@@ -54,6 +59,45 @@ public class QueryResult {
 
     public Map<String, BitSet> getQueryMatches() {
         return queryMatches;
+    }
+    
+    public void recalculateIfNotCurrent(HollowReadStateEngine stateEngine) {
+        if(stateEngine.getCurrentRandomizedTag() != randomizedStateTag) {        
+            queryMatches.clear();
+            List<QueryClause> requeryClauses = new ArrayList<QueryClause>(this.queryClauses);
+            this.queryClauses.clear();
+    
+            for(QueryClause clause : requeryClauses)
+                augmentQuery(clause, stateEngine);
+        
+            randomizedStateTag = stateEngine.getCurrentRandomizedTag();
+        }
+    }
+    
+    public void augmentQuery(QueryClause clause, HollowReadStateEngine stateEngine) {
+        HollowFieldMatchQuery query = new HollowFieldMatchQuery(stateEngine);
+        Map<String, BitSet> clauseMatches = clause.getType() != null ? query.findMatchingRecords(clause.getType(), clause.getField(), clause.getValue()) : query.findMatchingRecords(clause.getField(), clause.getValue());
+        TransitiveSetTraverser.addReferencingOutsideClosure(stateEngine, clauseMatches);
+                
+        if(queryClauses.isEmpty())
+            queryMatches.putAll(clauseMatches);
+        else
+            booleanAndQueryMatches(clauseMatches);
+        
+        queryClauses.add(clause);
+    }
+    
+    public void booleanAndQueryMatches(Map<String, BitSet> newQueryMatches) {
+        Iterator<Map.Entry<String, BitSet>> iter = queryMatches.entrySet().iterator();
+        while(iter.hasNext()) {
+            Map.Entry<String, BitSet> existingEntry = iter.next();
+            BitSet newTypeMatches = newQueryMatches.get(existingEntry.getKey());
+            if(newTypeMatches != null) {
+                existingEntry.getValue().and(newTypeMatches);
+            } else {
+                iter.remove();
+            }
+        }
     }
     
     public List<QueryTypeMatches> getTypeMatches() {

@@ -17,19 +17,15 @@
  */
 package com.netflix.hollow.explorer.ui.pages;
 
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.explorer.ui.HollowExplorerUI;
 import com.netflix.hollow.explorer.ui.model.QueryResult;
 import com.netflix.hollow.explorer.ui.model.QueryResult.QueryClause;
-import com.netflix.hollow.tools.query.HollowFieldMatchQuery;
-import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
 import com.netflix.hollow.ui.HollowUISession;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.velocity.VelocityContext;
 
@@ -57,21 +53,21 @@ public class QueryPage extends HollowExplorerPage {
             allTypes.add(schema.getName());
         Collections.sort(allTypes);
         
+        QueryResult result = (QueryResult) session.getAttribute("query-result");
+        if(result != null)
+            result.recalculateIfNotCurrent(ui.getStateEngine());
+        
         if(field != null && queryValue != null) {
-            HollowFieldMatchQuery query = new HollowFieldMatchQuery(ui.getStateEngine());
-            Map<String, BitSet> queryMatches = type != null ? query.findMatchingRecords(type, field, queryValue) : query.findMatchingRecords(field, queryValue);
-            TransitiveSetTraverser.addReferencingOutsideClosure(ui.getStateEngine(), queryMatches);
-            
+            HollowReadStateEngine stateEngine = ui.getStateEngine();
+
             QueryClause queryClause = new QueryClause(type, field, queryValue);
             
-            QueryResult result = (QueryResult) session.getAttribute("query-result");
             if(result == null) {
-                result = new QueryResult(queryClause, queryMatches);
+                result = new QueryResult(stateEngine.getCurrentRandomizedTag());
                 session.setAttribute("query-result", result);
-            } else {
-                result.getQueryClauses().add(queryClause);
-                booleanAndQueryMatches(result.getQueryMatches(), queryMatches);
             }
+            
+            result.augmentQuery(queryClause, ui.getStateEngine());
             
             type = null;
             field = null;
@@ -85,17 +81,5 @@ public class QueryPage extends HollowExplorerPage {
         ctx.put("queryResult", session.getAttribute("query-result"));
     }
     
-    private void booleanAndQueryMatches(Map<String, BitSet> existingQueryMatches, Map<String, BitSet> newQueryMatches) {
-        Iterator<Map.Entry<String, BitSet>> iter = existingQueryMatches.entrySet().iterator();
-        while(iter.hasNext()) {
-            Map.Entry<String, BitSet> existingEntry = iter.next();
-            BitSet newTypeMatches = newQueryMatches.get(existingEntry.getKey());
-            if(newTypeMatches != null) {
-                existingEntry.getValue().and(newTypeMatches);
-            } else {
-                iter.remove();
-            }
-        }
-    }
 
 }

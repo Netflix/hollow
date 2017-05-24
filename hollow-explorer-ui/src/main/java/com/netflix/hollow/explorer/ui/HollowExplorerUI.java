@@ -17,9 +17,8 @@
  */
 package com.netflix.hollow.explorer.ui;
 
-import com.netflix.hollow.api.consumer.HollowConsumer;
-
 import com.netflix.hollow.api.client.HollowClient;
+import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.explorer.ui.pages.BrowseSchemaPage;
 import com.netflix.hollow.explorer.ui.pages.BrowseSelectedTypePage;
@@ -31,6 +30,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@SuppressWarnings("deprecation")
 public class HollowExplorerUI extends HollowUIRouter {
     
     private final HollowConsumer consumer;
@@ -92,18 +92,19 @@ public class HollowExplorerUI extends HollowUIRouter {
     }
 
     public long getCurrentStateVersion() {
-        if(client == null)
-            return Long.MIN_VALUE;
-        return client.getCurrentVersionId();
+        if(consumer != null)
+            return consumer.getCurrentVersionId();
+        if(client != null)
+            return client.getCurrentVersionId();
+        return Long.MIN_VALUE;
     }
     
     public HollowReadStateEngine getStateEngine() {
-        if(consumer == null) {
-            if(client == null)
-                return stateEngine;
+        if(consumer != null)
+            return consumer.getStateEngine();
+        if(client != null)
             return client.getStateEngine();
-        }
-        return consumer.getStateEngine();
+        return stateEngine;
     }
     
     public void setHeaderDisplayString(String str) {
