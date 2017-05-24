@@ -76,7 +76,7 @@
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../data-modeling/">Data Modeling</a>
+        <a class="" href="../producer-consumer/">Producers and Consumers</a>
         
     </li>
 <li>
@@ -123,6 +123,13 @@
           
             <li>
     <li class="toctree-l1 ">
+        <a class="" href="../data-modeling/">Data Modeling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
         <a class="" href="../diving-deeper/">Diving Deeper</a>
         
     </li>
@@ -138,13 +145,6 @@
             <li>
     <li class="toctree-l1 ">
         <a class="" href="../data-ingestion/">Data Ingestion</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../producer-consumer/">Producers and Consumers</a>
         
     </li>
 <li>
@@ -220,7 +220,7 @@
           <div role="main">
             <div class="section">
               
-                <p>This section describes the usage of some of the tooling which ships with Hollow, but the tools described here are by no means a comprehensive accounting of the things you can do with your data once it's Hollow.  We hope that you'll find it straightforward to use the basic building blocks provided by the Hollow framework in different ways to create new tooling — and then contribute back any tools which you develop for your use case and find useful.</p>
+                <p>Once your data is Hollow, you will be able to gain better insights into it.  Hollow ships with a number of useful tools for quickly gaining insights into your data, from broad patterns at high level, to zooming in to find and inspect specific individual records.</p>
 <h1 id="insight-tools">Insight Tools</h1>
 <h2 id="hollow-explorer">Hollow Explorer</h2>
 <p>Hollow ships with a UI which can be used to browse and search records within any dataset.</p>
@@ -251,6 +251,22 @@ server.join();
 <p>If using the <code>HollowExplorerUIServer</code>, you'll need to include a dependency on Jetty.  For example, with a Gradle build you may add the dependency: </p>
 <p><code>compile 'org.eclipse.jetty:jetty-server:9.4.3.v20170317'</code></p>
 </div>
+<p>Upon opening your browser, you should see something like this:</p>
+<p><img alt="Explorer Home" src="../img/explorer-home.png" /></p>
+<p>Click on a column header to sort by that column.  This view shows details about how many records exist for each type, and the approximate heap footprint of each type.</p>
+<p>Click on a type to browse records.  We'll arrive at a screen like the following:</p>
+<p><img alt="Explorer Browse Type" src="../img/explorer-browsetype.png" /></p>
+<p>Clicking on the record keys on the left will display the corresponding record contents in the display field.  </p>
+<p>Now imagine we wanted to search for movies in which Carrie-Anne Moss starred.  On this page, click the <strong>Browse Schema</strong> link in the header to arrive at the following page:</p>
+<p><img alt="Explorer Browse Schema" src="../img/explorer-browseschema.png" /></p>
+<p>The view on this page is a collapsible tree-view of the current type's <em>schema</em>.  Each searchable field in this view will contain a <strong>search</strong> link, which will prepopulate the <em>search</em> page with the type and field name.  We can navigate to the <code>Actor.actorName</code> field and click <strong>search</strong>.  We will arrive on the <em>search</em> page with the type and field name prepopulated:</p>
+<p><img alt="Explorer Query" src="../img/explorer-searchquery.png" /></p>
+<p>We can enter the field value we are looking for and click <strong>Submit</strong>, and we will see the number of matching records of each type.  Search query matches are not limited to the directly matching records -- they are automatically rolled up to include any referencing records as well:</p>
+<p><img alt="Explorer Search Results" src="../img/explorer-searchresult.png" /></p>
+<p>If we click on the type <strong>Movie</strong> on this page, we'll be presented with the browse view again, but this time filtered to matching records:</p>
+<p><img alt="Explorer Browse Search Results" src="../img/explorer-browsesearchresult.png" /></p>
+<p>Search queries remain active in the browser session until cleared, and can be augmented to find the intersection of matches over multiple fields by entering multiple query parameters without clearing the existing ones in the session.  For example, if we want to find movies in which <em>both</em> Carrie-Anne Moss and the Actor with ID <code>1001</code> starred, we can go back to the search page, and enter the appropriate criteria to augment our session's query.  The results will contain only records which match <em>both</em> of these criteria:</p>
+<p><img alt="Explorer Augment Query" src="../img/explorer-augmentsearchresult.png" /></p>
 <h2 id="history-tool">History tool</h2>
 <p>Hollow provides the ability to retain, in memory, the changes in a dataset over many states, and to easily access historical data.  This is accomplished via the  <code>HollowHistory</code> class:</p>
 <pre><code class="java">public HollowHistory(HollowReadStateEngine initialHollowStateEngine, 
@@ -301,7 +317,26 @@ server.join();
 </code></pre>
 
 <p>While the above code is running, you can point a browser to <em>http://localhost:8080</em> to explore the history.</p>
-<p>Right out of the box, the history tool provides the ability to get a bird’s eye view of all of the changes a dataset goes through over time, while simultaneously allowing for specific queries to see exactly how individual records change as the dataset transitions between states.  The history tool has proven to be enormously beneficial when investigating data issues in production scenarios.  When something looks incorrect, it’s easy to pinpoint exactly what changed when, which can vastly expedite data corrections and eliminate hours of potential detective work.</p>
+<p>The history tool provides the ability to get a bird’s eye view of all of the changes a dataset goes through over time, while simultaneously allowing for specific queries to see exactly how individual records change as the dataset transitions between states.  The history tool has proven to be enormously beneficial when investigating data issues in production scenarios.  When something looks incorrect, it’s easy to pinpoint exactly what changed when, which can vastly expedite data corrections and eliminate hours of potential detective work.</p>
+<p>Upon opening your browser, you will see something like this:</p>
+<p><img alt="History Home" src="../img/history-home.png" /></p>
+<p>The history UI will track changes in types for which you have defined primary keys.  In this view, we're looking at the number of records which changed between <em>data states</em>.  The changes in each state are broken down here into <em>modifications</em>, <em>additions</em>, and <em>removals</em>.  Clicking on a state will show us a further breakdown of these changes by each top-level type:</p>
+<p><img alt="History State View" src="../img/history-state.png" /></p>
+<p>Clicking on a type will show us the individual records which changed:</p>
+<p><img alt="History State Type View" src="../img/history-statetype.png" /></p>
+<p>If we click on one of these records, we'll be able to inspect precisely what happened:</p>
+<p><img alt="History Object View" src="../img/history-objectview.png" /></p>
+<p>This is a collapsible tree-view in which the entire before/after state of the record is available, but only the differences are expanded by default.  Click on individual field names to expand/collapse them.</p>
+<div class="admonition note">
+<p class="admonition-title">Partially Expanded</p>
+<p>The double-arrows in the example above mean the field is <em>partially expanded</em> to highlight the diffs.  Clicking on it will fully expand the field.</p>
+</div>
+<p>Removals show up as red, additions as green, and modifications as yellow.  The following example shows a modified actor name:</p>
+<p><img alt="History Object View 2" src="../img/history-objectview2.png" /></p>
+<p>If this specific record key has changed in multiple states tracked by this history, those states will be highlighted on the left.  We can click back and forth through the changes to see how this record evolved over time.</p>
+<p>We can also search for changes in specific records by their keys.  On each page in the history tool, a textbox is available in the header labeled <strong>Lookup</strong>.   Plugging in <em>a single field</em> of a key of any type into this field will find matching diffs through the history:</p>
+<p><img alt="History Lookup" src="../img/history-lookup.png" /></p>
+<p>Clicking on individual records will bring us back to the object diff view page to see what was changed.</p>
 <h2 id="diff-tool">Diff Tool</h2>
 <p>Just as the Hollow history tool UI makes the differences between any two <em>adjacent</em> states in a delta chain readily accessible, the Hollow diff tool is used to investigate the differences between any two <em>arbitrary</em> data states, even those which may exist in different delta chains. </p>
 <p>This is especially useful as a step in a regular release cadence, as the differences between data states produced, for example, in a test environment and production environment can be evaluated at a glance.  Sometimes, unintended consequences of code updates may be discovered this way, which prevents production issues before they happen.</p>
@@ -509,10 +544,10 @@ for(int i=0; i&lt;4; i++) {
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../diving-deeper/" class="btn btn-neutral float-right" title="Diving Deeper">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../data-modeling/" class="btn btn-neutral float-right" title="Data Modeling">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../data-modeling/" class="btn btn-neutral" title="Data Modeling"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../producer-consumer/" class="btn btn-neutral" title="Producers and Consumers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -539,10 +574,10 @@ for(int i=0; i&lt;4; i++) {
           <a href="https://github.com/Netflix/hollow" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../data-modeling/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../producer-consumer/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../diving-deeper/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../data-modeling/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

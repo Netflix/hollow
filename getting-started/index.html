@@ -107,7 +107,7 @@
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../data-modeling/">Data Modeling</a>
+        <a class="" href="../producer-consumer/">Producers and Consumers</a>
         
     </li>
 <li>
@@ -115,6 +115,13 @@
             <li>
     <li class="toctree-l1 ">
         <a class="" href="../tooling/">Tooling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-modeling/">Data Modeling</a>
         
     </li>
 <li>
@@ -136,13 +143,6 @@
             <li>
     <li class="toctree-l1 ">
         <a class="" href="../data-ingestion/">Data Ingestion</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../producer-consumer/">Producers and Consumers</a>
         
     </li>
 <li>
@@ -337,7 +337,7 @@ for(MovieHollow movie : movieApi.getAllMovieHollow()) {
 <li>The <code>HollowProducer</code> needs a <code>Publisher</code> and <code>Announcer</code></li>
 <li>The <code>HollowConsumer</code> needs a <code>BlobRetriever</code> and <code>AnnouncementWatcher</code></li>
 </ul>
-<p>Your <code>BlobRetriever</code> and <code>AnnouncementWatcher</code> implementations should be mirror your <code>Publisher</code> and <code>Announcer</code> interfaces.   Here, we're publishing and retrieving from local disk.  In production, we'll be publishing to and retrieving from a remote file store.  See the <a href="https://github.com/Netflix/hollow-reference-implementation">reference implementation</a> and the <a href="../quick-start/">quick start guide</a> for a scalable example using AWS.</p>
+<p>Your <code>BlobRetriever</code> and <code>AnnouncementWatcher</code> implementations should be mirror your <code>Publisher</code> and <code>Announcer</code> interfaces.   Here, we're publishing and retrieving from local disk.  In production, we'll be publishing to and retrieving from a remote file store.  We'll discuss in more detail how to integrate with your specific infrastructure in <a href="../producer-consumer/#infrastructure-integration">Infrastructure Integration</a>.</p>
 </div>
 <h1 id="producing-a-delta">Producing a Delta</h1>
 <p>Some time has passed and the dataset has evolved.  It now contains these records:</p>
@@ -374,7 +374,7 @@ for(MovieHollow movie : movieApi.getAllMovieHollow()) {
 <p class="admonition-title">Announcements keep consumers updated</p>
 <p>When the producer runs a cycle, it <em>announces</em> the latest version.  The <code>AnnouncementWatcher</code> implementation provided to the <code>HollowConsumer</code> will listen for changes to the announced version -- and when updates occur notify the <code>HollowConsumer</code> by calling <code>triggerAsyncRefresh()</code>.  See the source of the <code>HollowFilesystemAnnouncementWatcher</code>, or the <a href="https://github.com/Netflix/hollow-reference-implementation/blob/master/src/main/java/how/hollow/consumer/infrastructure/S3AnnouncementWatcher.java">two</a> separate <a href="https://github.com/Netflix/hollow-reference-implementation/blob/master/src/main/java/how/hollow/consumer/infrastructure/DynamoDBAnnouncementWatcher.java">examples</a> in the reference implementation.</p>
 </div>
-<p>After this delta has been applied, the read state engine is at the new state.  If the generated API is used to iterate over the movies again as shown in the prior consumer example, the new output will be:</p>
+<p>After this delta has been applied, the consumer is at the new state.  If the generated API is used to iterate over the movies again as shown in the prior consumer example, the new output will be:</p>
 <pre><code>1, The Matrix, 1999
 2, Beasts of No Nation, 2015
 4, Goodfellas, 1990
@@ -397,8 +397,6 @@ for(MovieHollow movie : movieApi.getAllMovieHollow()) {
 consumer.triggerRefresh();
 
 MoviePrimaryKeyIndex idx = new MoviePrimaryKeyIdx(consumer, &quot;id&quot;);
-HollowPrimaryKeyIndex idx = 
-                      new HollowPrimaryKeyIndex(readEngine, &quot;Movie&quot;, &quot;id&quot;);
 </code></pre>
 
 <p>This index can be held in memory and then used in conjunction with the generated Hollow API to retrieve Movie records by id:</p>

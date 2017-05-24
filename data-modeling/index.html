@@ -75,6 +75,20 @@
 <li>
           
             <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../producer-consumer/">Producers and Consumers</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../tooling/">Tooling</a>
+        
+    </li>
+<li>
+          
+            <li>
     <li class="toctree-l1 current">
         <a class="current" href="./">Data Modeling</a>
         
@@ -119,13 +133,6 @@
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../tooling/">Tooling</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
         <a class="" href="../diving-deeper/">Diving Deeper</a>
         
     </li>
@@ -141,13 +148,6 @@
             <li>
     <li class="toctree-l1 ">
         <a class="" href="../data-ingestion/">Data Ingestion</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../producer-consumer/">Producers and Consumers</a>
         
     </li>
 <li>
@@ -348,6 +348,10 @@ MaturityRating {
 <p>When adding new fields or types, existing generated client APIs will ignore the new fields, and all of the fields which existed at the time of API generation will still be visible using the same methods.  When removing fields, existing generated client APIs will see null values if the methods corresponding to the removed fields are called.  When removing types, existing generated client APIs will see removed types as having no records.</p>
 <p>It is not backwards compatible to change the type of an existing field.  The client behavior when calling a method corresponding to a field with a changed type is undefined.</p>
 <p>Backwards compatibility often has a lot to do with the use case and semantics of the data. Hollow will always behave in the stated way for evolving data models, but it’s possible that consumers require a field which starts returning null once it gets removed.  For this reason, additional caution should be exercised when removing types and fields.</p>
+<div class="admonition hint">
+<p class="admonition-title">Backwards-incompatible data remodeling</p>
+<p>Every so often, it may be required or desirable to make changes to the data model which are incompatible with prior versions.  In this case, an older producer, which produces the older data model, should run in parallel with the newer producer, producing the newer incompatible data model.  Each producer should write its blobs to a different <a href="../producer-consumer/#blob-namespaces">namespace</a>, so that older consumers can read from the old data model, and newer consumers can read from the newer data model.  Once all consumers are upgraded and reading from the newer data model, the older producer can be decommissioned.</p>
+</div>
 <h1 id="movieactor-example">Movie/Actor Example</h1>
 <p>Let's examine the <code>Movie</code> / <code>Actor</code> data model from our Getting Started Guide:</p>
 <pre><code class="java">public class Movie {
@@ -388,10 +392,10 @@ public class Actor {
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../tooling/" class="btn btn-neutral float-right" title="Tooling">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../diving-deeper/" class="btn btn-neutral float-right" title="Diving Deeper">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../indexing-querying/" class="btn btn-neutral" title="Indexing/Querying"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../tooling/" class="btn btn-neutral" title="Tooling"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -418,10 +422,10 @@ public class Actor {
           <a href="https://github.com/Netflix/hollow" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../indexing-querying/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../tooling/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../tooling/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../diving-deeper/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

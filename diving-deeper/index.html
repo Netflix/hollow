@@ -76,7 +76,7 @@
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../data-modeling/">Data Modeling</a>
+        <a class="" href="../producer-consumer/">Producers and Consumers</a>
         
     </li>
 <li>
@@ -84,6 +84,13 @@
             <li>
     <li class="toctree-l1 ">
         <a class="" href="../tooling/">Tooling</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../data-modeling/">Data Modeling</a>
         
     </li>
 <li>
@@ -114,6 +121,10 @@
             
                 <li class="toctree-l3"><a href="#indexing-data-for-retrieval">Indexing Data for Retrieval</a></li>
                 
+                    <li><a class="toctree-l4" href="#hollowprimarykeyindex">HollowPrimaryKeyIndex</a></li>
+                
+                    <li><a class="toctree-l4" href="#hollowhashindex">HollowHashIndex</a></li>
+                
             
             </ul>
         
@@ -130,13 +141,6 @@
             <li>
     <li class="toctree-l1 ">
         <a class="" href="../data-ingestion/">Data Ingestion</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../producer-consumer/">Producers and Consumers</a>
         
     </li>
 <li>
@@ -352,7 +356,95 @@ if(movieOrdinal != -1) {
 <p class="admonition-title">Ordinals</p>
 <p>See <a href="#ordinals">ordinals</a> for a discussion about ordinals.</p>
 </div>
-<p>See <a href="../indexing-querying/#diving-deeper">Indexing/Querying: Diving Deeper</a> for more details about lower-level usage of indexes.</p>
+<h3 id="hollowprimarykeyindex">HollowPrimaryKeyIndex</h3>
+<p>In the above example, the primary key is defined for <code>Movie</code> as its <code>id</code> field.  A primary key can also be defined over multiple and/or hierarchical fields.  Imagine that <code>Movie</code> additionally had a <code>country</code> field defined in its schema, and that across countries, <code>Movie</code> <code>id</code>s may be duplicated, but that there will never exist two <code>Movie</code> records with the same id and country:</p>
+<pre><code class="java">@HollowPrimaryKey(fields={&quot;id&quot;, &quot;country.id&quot;})
+public class Movie {
+    long id;
+    Country country;
+    ...
+}
+
+@HollowPrimaryKey(fields={&quot;id&quot;})
+public class Country {
+    String id;
+    String name;
+}
+</code></pre>
+
+<p>A <code>HollowPrimaryKeyIndex</code> can be defined with a primary key consisting of both fields:</p>
+<pre><code class="java">HollowPrimaryKeyIndex idx = 
+            new HollowPrimaryKeyIndex(readEngine, &quot;Movie&quot;, &quot;id&quot;, &quot;country.id.value&quot;);
+idx.listenForDeltaUpdates();
+</code></pre>
+
+<p>And to query for a <code>Movie</code> based on its id and country:</p>
+<pre><code class="java">int movieOrdinal = idx.getMatchingOrdinal(2, &quot;US&quot;);
+if(movieOrdinal != -1) {
+    Movie movie = movieApi.getMovie(movieOrdinal);
+    System.out.println(&quot;Found Movie: &quot; + movie.getTitle().getValue());
+}
+</code></pre>
+
+<p>Notice that <code>Movie</code>’s country field in the above example is actually a <code>REFERENCE</code> field.  The defined key includes the id of the movie, and the value of the id String of the referenced country.  We denote this traversal using dot notation in the primary key definition.  The field definitions can be multiple references deep.</p>
+<p>The requirement for a primary key definition is that no duplicates should exist for the defined combination of fields.  If this rule is violated, an arbitrary match will be returned for queries when multiple matches exist.  </p>
+<div class="admonition note">
+<p class="admonition-title">Primary Key Violations</p>
+<p>Violations of the "no duplicate" primary key rule can be detected using the <code>getDuplicateKeys()</code> method on a <code>HollowPrimaryKeyIndex</code>, which returns a <code>Collection&lt;Object[]&gt;</code>.  If no duplicate keys exist, the returned Collection will be empty.  If they do, the returned values will indicate the keys for which duplicate records exist.</p>
+</div>
+<p>If a <code>HollowPrimaryKeyIndex</code> will be retained for a long duration, they should be kept updated as deltas are applied to the underlying <code>HollowReadStateEngine</code>.  This is accomplished with a single call after instantiation to the <code>listenForDeltaUpdates()</code> method. </p>
+<div class="admonition warning">
+<p class="admonition-title">Detaching Primary Key Indexes</p>
+<p>If <code>listenForDeltaUpdates()</code> is called on a primary key index, then it cannot be garbage collected.  If you intend to drop an index which is listening for updates, first call <code>detachFromDeltaUpdates()</code> to prevent a memory leak.</p>
+</div>
+<p>Indexes which are listening for delta updates are updated after a dataset is updated.  In the brief interim time between when a dataset is updated and the index is updated, the index will point to the <em>ghost records</em> located at tombstoned ordinals.  This helps guarantee that all in-flight operations will observe correct data.</p>
+<h3 id="hollowhashindex">HollowHashIndex</h3>
+<p>It is sometimes desirable to index records by fields other than primary keys.  The <code>HollowHashIndex</code> allows for indexing records by fields or combinations of fields for which values may match multiple records, and records may match multiple values.</p>
+<p>In our <code>Movie</code>/<code>Actor</code> example, we may want to index movies by their starring actors:</p>
+<pre><code class="java">HollowHashIndex idx = 
+            new HollowHashIndex(readEngine, &quot;Movie&quot;, &quot;&quot;, &quot;cast.element.actor.actorId&quot;);
+</code></pre>
+
+<p>The <code>HollowHashIndex</code> expects in its constructor arguments a query start type, a select field, and a set of match fields.  The constructor arguments above indicate that queries will start with the <code>Movie</code> type, select the root of the query (indicated by the empty string), and match the id of any <code>Actor</code> record in the actors list.</p>
+<p>To query this index:</p>
+<pre><code class="java">HollowHashIndexResult result = idx.findMatches(102);
+
+if(result != null) {
+    System.out.println(&quot;Found matches: &quot; + result.numResults());
+
+    HollowOrdinalIterator iter = result.iterator();
+    int matchedOrdinal = iter.next();
+    while(matchedOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+        Movie movie = api.getMovie(matchedOrdinal);
+        System.out.println(&quot;Starred in: &quot; + movie.getTitle().getValue());
+        matchedOrdinal = iter.next();
+    }
+}
+</code></pre>
+
+<p>Alternatively, if the data model included the nationality of actors, and we needed to index actors by nationality and the titles of movies in which they starred:</p>
+<pre><code class="java">HollowHashIndex idx = 
+            new HollowHashIndex(readEngine, &quot;Movie&quot;, &quot;cast.element.actor&quot;,
+                                            &quot;title.value&quot;,
+                                            &quot;cast.element.actor.nationality.id.value&quot;);
+</code></pre>
+
+<p>In this case, the query start type is still <code>Movie</code>, but we’re selecting related <code>Actor</code> records.  Matches are selected based on the <code>Movie</code>’s title, and the actor’s nationality.  Using this index, one can query for Brazilian actors who starred in movies titled “Narcos”:</p>
+<pre><code class="java">HollowHashIndexResult result = idx.findMatches(&quot;Narcos&quot;, &quot;BR&quot;);
+
+if(result != null) {
+    HollowOrdinalIterator iter = result.iterator();
+    int matchedOrdinal = iter.next();
+    while(matchedOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+        Actor actor = api.getMovie(matchedOrdinal);
+        System.out.println(&quot;Matched actor: &quot; + 
+                                      actor.getActorName().getValue());
+        matchedOrdinal = iter.next();
+    }
+}
+</code></pre>
+
+<p>The <code>HollowHashIndex</code> does not yet have a facility for listening for delta updates.  If an index is necessary across multiple states, currently the index must be recreated on each update.</p>
               
             </div>
           </div>
@@ -363,7 +455,7 @@ if(movieOrdinal != -1) {
         <a href="../interacting-with-a-dataset/" class="btn btn-neutral float-right" title="Interacting with a Hollow Dataset">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../tooling/" class="btn btn-neutral" title="Tooling"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../data-modeling/" class="btn btn-neutral" title="Data Modeling"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -390,7 +482,7 @@ if(movieOrdinal != -1) {
           <a href="https://github.com/Netflix/hollow" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../tooling/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../data-modeling/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
         <span style="margin-left: 15px"><a href="../interacting-with-a-dataset/" style="color: #fcfcfc">Next &raquo;</a></span>
