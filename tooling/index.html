@@ -224,10 +224,10 @@
 <h1 id="insight-tools">Insight Tools</h1>
 <h2 id="hollow-explorer">Hollow Explorer</h2>
 <p>Hollow ships with a UI which can be used to browse and search records within any dataset.</p>
-<p>The <code>HollowExplorerUI</code> class in the <em>hollow-diff-ui</em> project is instantiated using either a <code>HollowReadStateEngine</code> or a <a href="../producer-consumer/#the-hollowconsumer"><code>HollowConsumer</code></a> and a base URL path:</p>
-<pre><code class="java">HollowReadStateEngine readEngine = /// or your HollowConsumer
+<p>The <code>HollowExplorerUI</code> class in the <em>hollow-explorer-ui</em> project is instantiated using either a <code>HollowReadStateEngine</code> or a <a href="../producer-consumer/#the-hollowconsumer"><code>HollowConsumer</code></a> and a base URL path:</p>
+<pre><code class="java">HollowConsumer consumer = /// or your HollowReadStateEngine
 
-HollowExplorerUI ui = new HollowExplorerUI(&quot;&quot;, readEngine);
+HollowExplorerUI ui = new HollowExplorerUI(&quot;&quot;, consumer);
 </code></pre>
 
 <p>Incoming requests should be sent to the <code>handle</code> method in your <code>HollowExplorerUI</code> instance:</p>
@@ -236,10 +236,10 @@ HollowExplorerUI ui = new HollowExplorerUI(&quot;&quot;, readEngine);
                       HttpServletResponse resp) throws IOException
 </code></pre>
 
-<p>The <code>HollowExplorerUI</code> can be used in the context of an existing web container, or can be invoked via the included <code>HollowExplorerUIServer</code>, which uses the Jetty HTTP Servlet Server:</p>
-<pre><code class="java">HollowReadStateEngine readEngine = /// or your HollowConsumer
+<p>The <code>HollowExplorerUI</code> can be used in the context of an existing web container as shown above, <em>or</em> can be invoked via the included <code>HollowExplorerUIServer</code>, which uses the Jetty HTTP Servlet Server:</p>
+<pre><code class="java">HollowConsumer consumer = /// or your HollowReadStateEngine
 
-HollowExplorerUIServer server = new HollowExplorerUIServer(client, 8080);
+HollowExplorerUIServer server = new HollowExplorerUIServer(consumer, 8080);
 
 server.start();
 server.join();
@@ -268,55 +268,31 @@ server.join();
 <p>Search queries remain active in the browser session until cleared, and can be augmented to find the intersection of matches over multiple fields by entering multiple query parameters without clearing the existing ones in the session.  For example, if we want to find movies in which <em>both</em> Carrie-Anne Moss and the Actor with ID <code>1001</code> starred, we can go back to the search page, and enter the appropriate criteria to augment our session's query.  The results will contain only records which match <em>both</em> of these criteria:</p>
 <p><img alt="Explorer Augment Query" src="../img/explorer-augmentsearchresult.png" /></p>
 <h2 id="history-tool">History tool</h2>
-<p>Hollow provides the ability to retain, in memory, the changes in a dataset over many states, and to easily access historical data.  This is accomplished via the  <code>HollowHistory</code> class:</p>
-<pre><code class="java">public HollowHistory(HollowReadStateEngine initialHollowStateEngine, 
-                     long initialVersion, 
-                     int maxHistoricalStatesToKeep)
+<p>Hollow ships with a UI which can be used to browse and search changes in a dataset over time.</p>
+<p>The <code>HollowHistoryUI</code> class in the <em>hollow-diff-ui</em> project can be instantiated using a <code>HollowConsumer</code> and a base URL path:</p>
+<pre><code class="java">HollowConsumer consumer = /// or your HollowReadStateEngine
+
+HollowHistoryUI ui = new HollowHistoryUI(&quot;&quot;, consumer);
+
 </code></pre>
 
-<div class="admonition note">
-<p class="admonition-title">State Versioning</p>
-<p>The <code>initialVersion</code> parameter above should be a unique value identifying the state.</p>
-</div>
-<p>The <code>HollowHistory</code> should be configured with the primary keys of records for which we are interested in tracking history.  For example, using our <code>Movie</code>/<code>Actor</code> example from the Getting Started guide, we may specify the following configuration:</p>
-<pre><code class="java">HollowHistory history = new HollowHistory(readEngine, 1, 1000);
-HollowHistoryKeyIndex historyIdx = history.getKeyIndex();
-
-historyIdx.addTypeIndex(&quot;Movie&quot;, &quot;id&quot;);
-historyIdx.indexTypeField(&quot;Movie&quot;, &quot;id&quot;);
-
-historyIdx.addTypeIndex(&quot;Actor&quot;, &quot;actorId&quot;);
-</code></pre>
-
-<p>Notice there are two types of calls available to the <code>HollowHistoryKeyIndex</code>:</p>
-<ul>
-<li>The <code>addTypeIndex()</code> call specifies the primary key for a type which we want to be able to view historical changes over time.  Primary keys may be defined over multiple fields.  The final parameter in the <code>addTypeIndex()</code> call is a vararg.  </li>
-<li>The <code>indexTypeField()</code> call specifies an individual primary key field over which we want to be able to <em>search</em> for historical changes over time.</li>
-</ul>
-<div class="admonition hint">
-<p class="admonition-title">Primary Keys</p>
-<p>The <code>HollowHistory</code> will, by default, automatically configure any primary keys which are defined in the <code>Object</code> schemas of your dataset.  However, the calls to <code>indexTypeField()</code> will not be automatically configured.</p>
-</div>
-<p>Once instantiated and configured, the <code>HollowHistory</code> should be notified each time the state engine is transitioned via the <code>deltaOccurred(long newVersion)</code> method.  The <code>HollowHistory</code> will track the entire dataset for each state which through which the state engine is transitioned.  </p>
-<p>This historical data is maintained by retaining and indexing all of the changes for the delta chain in memory.  Because only changes over time are retained, rather than complete states, a great length of history can often be held in memory.</p>
-<p>Hollow includes a ready-made UI which can be applied to a <code>HollowHistory</code> for any dataset.  The included UI clearly displays the changes which occur between adjacent states as the state engine transitions through a delta chain.  This will allow users to quickly realize all of the benefits of indexed, historical data retention at their fingertips.  </p>
-<p>The <code>HollowHistoryUI</code> class in the <em>hollow-diff-ui</em> project is instantiated using a <code>HollowHistory</code> and a base URL path.  Incoming requests should be sent to the handle method:</p>
+<p>The <code>HollowHistoryUI</code> will by default be configured to track all of the types for which primary keys have been specified.  By default, it will track changes through the latest rolling 1024 states.  This default can be changed with another parameter in the constructor.</p>
+<p>Incoming requests should be sent to the <code>handle</code> method in your <code>HollowExplorerUI</code> instance:</p>
 <pre><code class="java">public boolean handle(String target, 
                       HttpServletRequest req, 
                       HttpServletResponse resp) throws IOException
 </code></pre>
 
-<p>The <code>HollowHistoryUI</code> can be used in the context of an existing web container, or can be invoked via the included <code>HollowHistoryUIServer</code>, which uses the Jetty HTTP Servlet Server:</p>
-<pre><code class="java">HollowHistory history = /// set up the history;
+<p>The <code>HollowHistoryUI</code> can be used in the context of an existing web container as shown above, <em>or</em> can be invoked via the included <code>HollowHistoryUIServer</code>, which uses the Jetty HTTP Servlet Server:</p>
+<pre><code class="java">HollowConsumer consumer = ...
 
-HollowHistoryUI ui = new HollowHistoryUI(&quot;&quot;, history);
-HollowHistoryUIServer server = new HollowHistoryUIServer(ui, 8080);
+HollowHistoryUIServer server = new HollowHistoryUIServer(consumer, 8080);
 
 server.start();
 server.join();
 </code></pre>
 
-<p>While the above code is running, you can point a browser to <em>http://localhost:8080</em> to explore the history.</p>
+<p>The above call to <code>server.join()</code> will block forever.  While the above code is running, you can point a browser to <em>http://localhost:8080</em> to explore the history.</p>
 <p>The history tool provides the ability to get a bird’s eye view of all of the changes a dataset goes through over time, while simultaneously allowing for specific queries to see exactly how individual records change as the dataset transitions between states.  The history tool has proven to be enormously beneficial when investigating data issues in production scenarios.  When something looks incorrect, it’s easy to pinpoint exactly what changed when, which can vastly expedite data corrections and eliminate hours of potential detective work.</p>
 <p>Upon opening your browser, you will see something like this:</p>
 <p><img alt="History Home" src="../img/history-home.png" /></p>
