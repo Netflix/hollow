@@ -18,6 +18,8 @@
 package com.netflix.hollow.history.ui;
 
 import static com.netflix.hollow.ui.HollowUISession.getSession;
+
+import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.diffview.DiffViewOutputGenerator;
 import com.netflix.hollow.diffview.HollowHistoryViewProvider;
@@ -60,7 +62,26 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
     private final Map<String, PrimaryKey> matchHints;
     
     private String[] overviewDisplayHeaders;
-
+    
+    public HollowHistoryUI(String baseUrlPath, HollowConsumer consumer) {
+        this(baseUrlPath, consumer, 1024);
+    }
+    
+    public HollowHistoryUI(String baseUrlPath, HollowConsumer consumer, int numStatesToTrack) {
+        this(baseUrlPath, createHistory(consumer, numStatesToTrack));
+    }
+    
+    private static HollowHistory createHistory(HollowConsumer consumer, int numStatesToTrack) {
+        consumer.getRefreshLock().lock();
+        try {
+            HollowHistory history = new HollowHistory(consumer.getStateEngine(), consumer.getCurrentVersionId(), numStatesToTrack);
+            consumer.addRefreshListener(new HollowHistoryRefreshListener(history));
+            return history;
+        } finally {
+            consumer.getRefreshLock().unlock();
+        }
+    }
+    
     public HollowHistoryUI(String baseUrlPath, HollowHistory history) {
         super(baseUrlPath);
         this.history = history;
