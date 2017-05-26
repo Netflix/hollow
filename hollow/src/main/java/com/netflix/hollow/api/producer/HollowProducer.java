@@ -594,7 +594,7 @@ public class HollowProducer {
         /**
          * Returns a blob with which a {@code HollowProducer} will write a snapshot for the version specified.<p>
          *
-         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(Blob, Map)}.
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(Blob)}.
          *
          * @param version the blob version
          *
@@ -606,7 +606,7 @@ public class HollowProducer {
          * Returns a blob with which a {@code HollowProducer} will write a forward delta from the version specified to
          * the version specified, i.e. {@code fromVersion => toVersion}.<p>
          *
-         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(Blob, Map)}.
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(Blob)}.
          *
          * In the delta chain {@code fromVersion} is the older version such that {@code fromVersion < toVersion}.
          *
@@ -621,7 +621,7 @@ public class HollowProducer {
          * Returns a blob with which a {@code HollowProducer} will write a reverse delta from the version specified to
          * the version specified, i.e. {@code fromVersion <= toVersion}.<p>
          *
-         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(Blob, Map)}.
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(Blob)}.
          *
          * In the delta chain {@code fromVersion} is the older version such that {@code fromVersion < toVersion}.
          *
@@ -659,8 +659,8 @@ public class HollowProducer {
          * Publish the blob specified to this publisher's blobstore.<p>
          *
          * It is guaranteed that {@code blob} was created by calling one of
-         * {@link Publisher#openSnapshot(long)}, {@link Publisher#openDelta(long,long)}, or
-         * {@link Publisher#openReverseDelta(long,long)} on this publisher.
+         * {@link BlobStager#openSnapshot(long)}, {@link BlobStager#openDelta(long,long)}, or
+         * {@link BlobStager#openReverseDelta(long,long)} on this publisher.
          *
          * @param blob the blob to publish
          */

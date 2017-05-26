@@ -32,11 +32,11 @@ import java.util.Map;
 /**
  * A HollowFieldMatchQuery can be used to scan through all records in a dataset to match specific field name/value combinations.
  * <p>
- * Results are returned in the form of a Map<String, BitSet>.  Each type for which any records matched will have an entry in the 
+ * Results are returned in the form of a Map&lt;String, BitSet&gt;.  Each type for which any records matched will have an entry in the
  * returned Map, keyed by type name.  The corresponding value is a BitSet which is set at the positions of the ordinals of 
  * the matched records.
  * <p>
- * <b>Hint:</b> The returned Map<String, BitSet> may be in turn passed to the {@link TransitiveSetTraverser} to be augmented with any records
+ * <b>Hint:</b> The returned Map&lt;String, BitSet&gt; may be in turn passed to the {@link TransitiveSetTraverser} to be augmented with any records
  * which reference matched records.  For example, we can imagine a data model for which the following code would provide a 
  * selection which includes the Actor record for "Tom Hanks", plus any Movie records in which he stars:
  * <p>

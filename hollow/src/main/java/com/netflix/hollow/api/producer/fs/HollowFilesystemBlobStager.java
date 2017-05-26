@@ -52,7 +52,7 @@ public class HollowFilesystemBlobStager implements BlobStager {
     /**
      * Constructor to create a new HollowFilesystemBlobStager with specified disk path and compression for Hollow blobs.
      *
-     * @param dir        directory to use to write hollow blob files.
+     * @param stagingDir        directory to use to write hollow blob files.
      * @param compressor the {@link HollowProducer.BlobCompressor} to compress blob files with
      */
     public HollowFilesystemBlobStager(File stagingDir, BlobCompressor compressor) {
