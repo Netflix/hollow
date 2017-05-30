@@ -10,7 +10,6 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.OutputTypeConfig;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
-import com.netflix.vms.transformer.hollowinput.ArtworkLocaleListHollow;
 import com.netflix.vms.transformer.hollowinput.PersonArtworkSourceHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
@@ -40,7 +39,8 @@ public class PersonImagesModule extends ArtWorkModule {
         Map<Integer, Set<Artwork>> artMap = new HashMap<>();
         for(PersonArtworkSourceHollow artworkHollowInput : api.getAllPersonArtworkSourceHollow()) {
             if(!artworkHollowInput._getIsFallback()) {
-                processArtworkWithFallback(artMap, artworkHollowInput);
+                Set<ArtworkLocaleHollow> locales = getLocalTerritories(artworkHollowInput._getLocales());
+                processArtworkWithFallback(artMap, artworkHollowInput, locales);
             }
         }
 
@@ -53,14 +53,12 @@ public class PersonImagesModule extends ArtWorkModule {
         }
     }
 
-    private void processArtworkWithFallback(Map<Integer, Set<Artwork>> artMap, PersonArtworkSourceHollow artworkHollowInput) {
+    private void processArtworkWithFallback(Map<Integer, Set<Artwork>> artMap, PersonArtworkSourceHollow artworkHollowInput, Set<ArtworkLocaleHollow> localeSet) {
         String sourceFileId = artworkHollowInput._getSourceFileId()._getValue();
         HollowHashIndexResult derivativeSetMatches = artworkDerivativeSetIdx.findMatches(artworkHollowInput._getSourceFileId()._getValue());
             
         if(derivativeSetMatches != null) {
             int entityId = (int) artworkHollowInput._getPersonId();
-            ArtworkLocaleListHollow locales = artworkHollowInput._getLocales();
-            Set<ArtworkLocaleHollow> localeSet = getLocalTerritories(locales);
             if(localeSet.isEmpty()) {
                 ctx.getLogger().error(MissingLocaleForArtwork, "Missing artwork locale for {} with id={}; data will be dropped.", entityType, entityId);
                 return;
@@ -77,7 +75,7 @@ public class PersonImagesModule extends ArtWorkModule {
             if(fallbackSourceId != null) {
                 int fallbackOrdinal = personArtworkIdx.getMatchingOrdinal(fallbackSourceId._getValue());
                 PersonArtworkSourceHollow fallbackSource = api.getPersonArtworkSourceHollow(fallbackOrdinal);
-                processArtworkWithFallback(artMap, fallbackSource);
+                processArtworkWithFallback(artMap, fallbackSource, localeSet);
             }
         }
     }

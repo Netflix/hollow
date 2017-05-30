@@ -192,7 +192,7 @@ public class VideoNamedListModule {
             }
 
             final boolean isRecentlyAdded = video.data.countrySpecificData.firstDisplayDate != null && video.data.countrySpecificData.firstDisplayDate.val > (ctx.getNowMillis() - (MS_IN_DAY * 30));
-            boolean isTV = video.data.facetData.videoMetaData.isTV;
+            boolean isTV = (nodeType == constants.SHOW || nodeType == constants.SEASON || nodeType == constants.EPISODE);
 
             if(isAvailableForED) {
                 long theatricalReleaseDate = video.data.facetData.videoMetaData.theatricalReleaseDate == null ? 0 : video.data.facetData.videoMetaData.theatricalReleaseDate.val;

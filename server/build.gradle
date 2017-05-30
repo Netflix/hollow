@@ -75,6 +75,8 @@ dependencies {
     testCompile 'org.mockito:mockito-all:1.3'
     testCompile 'org.assertj:assertj-core:3.3.0'
     testCompile 'com.netflix.hollow:hollow-diff-ui:2.+'
+    testCompile 'com.netflix.hollow:hollow-explorer-ui:2.+'
+    testCompile 'com.netflix.hollow:hollow-jsonadapter:2.+'
 
     // Cassandra Aeneas unit test kit.
     testCompile "com.netflix.aeneas:aeneas-test:latest.release"

@@ -364,6 +364,10 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             passThrough.design_attribute = passThroughString;
             setBasicPassThrough = true;
         }
+        
+        if("bcc2d2d0-3a87-11e7-af12-123a833aeda8".equals(new String(desc.sourceFileId.value)))
+            System.out.println("asdf");
+        
         passThroughString = getPassThroughString("FOCAL_POINT", keyValues);
         if(passThroughString != null) {
             passThrough.focal_point = passThroughString;
@@ -411,7 +415,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         }
         
         String startX = keyValues.get("SCREENSAVER_START_X");
-        String endX = keyValues.get("SCREENSAVER_START_Y");
+        String endX = keyValues.get("SCREENSAVER_END_X");
         String offsetY = keyValues.get("SCREENSAVER_OFFSET_Y");
         if(startX != null || endX != null || offsetY != null) {
             passThrough.screensaverPassthrough = new ArtworkScreensaverPassthrough();

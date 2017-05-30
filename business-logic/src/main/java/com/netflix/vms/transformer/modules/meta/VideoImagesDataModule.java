@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.modules.meta;
 
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.ArtworkFallbackMissing;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidImagesTerritoryCode;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidPhaseTagForArtwork;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
@@ -18,7 +19,6 @@ import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.hollowinput.AbsoluteScheduleHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
-import com.netflix.vms.transformer.hollowinput.ArtworkLocaleListHollow;
 import com.netflix.vms.transformer.hollowinput.DamMerchStillsHollow;
 import com.netflix.vms.transformer.hollowinput.FlagsHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
@@ -130,10 +130,11 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
                 while (videoArtworkOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
                     VideoArtworkSourceHollow artworkHollowInput = api.getVideoArtworkSourceHollow(videoArtworkOrdinal);
                     if(!artworkHollowInput._getIsFallback()) {
-                        String rollupSourceFileId = processArtworkWithFallback(showHierarchiesByCountry.keySet(), artworkHollowInput, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry);
-                        if(rollupSourceFileId != null) {
+                        Set<ArtworkLocaleHollow> localTerritories = getLocalTerritories(artworkHollowInput._getLocales());
+                        ArtworkProcessResult processResult = processArtworkWithFallback(showHierarchiesByCountry.keySet(), artworkHollowInput, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry, localTerritories);
+                        if(processResult != null && processResult.isMerchStillRollup) {
                             rollupMerchstillVideoIds.add(videoId);
-                            rollupSourceFieldIds.add(rollupSourceFileId);
+                            rollupSourceFieldIds.add(processResult.sourceFileId);
                         }
                     }
                     videoArtworkOrdinal = iter.next();
@@ -439,37 +440,41 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
         throw new UnsupportedOperationException("Use buildVideoImagesByCountry");
     }
     
-    private String processArtworkWithFallback(Set<String> countrySet, VideoArtworkSourceHollow artworkHollowInput,
-            Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap,
-            Map<String, Map<Integer, Set<SchedulePhaseInfo>>> countrySchedulePhaseMap,
-            Set<String> merchstillSourceFieldIds,
-            Map<String, Set<String>> rolloutImagesByCountry, Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
+    private ArtworkProcessResult processArtworkWithFallback(Set<String> countrySet, VideoArtworkSourceHollow artworkHollowInput,
+                                                            Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap,
+                                                            Map<String, Map<Integer, Set<SchedulePhaseInfo>>> countrySchedulePhaseMap,
+                                                            Set<String> merchstillSourceFieldIds,
+                                                            Map<String, Set<String>> rolloutImagesByCountry, Map<String, Set<VideoHierarchy>> showHierarchiesByCountry,
+                                                            Set<ArtworkLocaleHollow> originalNonFallbackLocaleSet) {
     
-        String rollupSourceFileId = processArtwork(showHierarchiesByCountry.keySet(), artworkHollowInput, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry);
-        if (rollupSourceFileId != null) {
-            return rollupSourceFileId;
+        ArtworkProcessResult result = processArtwork(showHierarchiesByCountry.keySet(), artworkHollowInput, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry, originalNonFallbackLocaleSet);
+        if (result != null) {
+            return result;
         } else {
             StringHollow fallbackSourceId = artworkHollowInput._getFallbackSourceFileId();
             if(fallbackSourceId != null) {
                 int fallbackOrdinal = videoArtworkBySourceFileIdIndex.getMatchingOrdinal(fallbackSourceId._getValue());
-                VideoArtworkSourceHollow fallback = api.getVideoArtworkSourceHollow(fallbackOrdinal);
-                return processArtworkWithFallback(countrySet, fallback, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry);
+                if(fallbackOrdinal != -1) {
+                    VideoArtworkSourceHollow fallback = api.getVideoArtworkSourceHollow(fallbackOrdinal);
+                    return processArtworkWithFallback(countrySet, fallback, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry, originalNonFallbackLocaleSet);
+                } else {
+                    ctx.getLogger().warn(ArtworkFallbackMissing, "Artwork source " + artworkHollowInput._getSourceFileId()._getValue() + " needed to use fallback, but source data is missing: " + fallbackSourceId._getValue());
+                }
             }
         }
 
         return null;
     }
 
-    private String processArtwork(Set<String> countrySet, VideoArtworkSourceHollow artworkHollowInput,
-                                  Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap,
-                                  Map<String, Map<Integer, Set<SchedulePhaseInfo>>> countrySchedulePhaseMap,
-                                  Set<String> merchstillSourceFieldIds,
-                                  Map<String, Set<String>> rolloutImagesByCountry, Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
-        ArtworkLocaleListHollow locales = artworkHollowInput._getLocales();
+    private ArtworkProcessResult processArtwork(Set<String> countrySet, VideoArtworkSourceHollow artworkHollowInput,
+                                                Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap,
+                                                Map<String, Map<Integer, Set<SchedulePhaseInfo>>> countrySchedulePhaseMap,
+                                                Set<String> merchstillSourceFieldIds,
+                                                Map<String, Set<String>> rolloutImagesByCountry, Map<String, Set<VideoHierarchy>> showHierarchiesByCountry,
+                                                Set<ArtworkLocaleHollow> localeSet) {
         int entityId = (int) artworkHollowInput._getMovieId();
         int videoId = entityId;
 
-        Set<ArtworkLocaleHollow> localeSet = getLocalTerritories(locales);
         if (localeSet.isEmpty()) {
             ctx.getLogger().error(MissingLocaleForArtwork, "Missing artwork locale for {} with id={}; data will be dropped.", entityType, entityId);
             return null;
@@ -623,7 +628,17 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
             }
         }
 
-        return isMerchstillRollup ? sourceFileId : null;
+        return new ArtworkProcessResult(isMerchstillRollup, sourceFileId);
+    }
+    
+    private class ArtworkProcessResult {
+        private boolean isMerchStillRollup;
+        private String sourceFileId;
+        
+        public ArtworkProcessResult(boolean isMerchStillRollup, String sourceFileId) {
+            this.isMerchStillRollup = isMerchStillRollup;
+            this.sourceFileId = sourceFileId;
+        }
     }
 
     private Set<Integer> getTopNodes(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, String countryCode, int entityId) {
