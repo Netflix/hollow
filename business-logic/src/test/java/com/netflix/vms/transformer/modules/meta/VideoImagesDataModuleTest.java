@@ -1,47 +1,15 @@
 package com.netflix.vms.transformer.modules.meta;
 
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import com.netflix.hollow.core.index.HollowHashIndex;
-import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
-import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.logging.TaggingLogger;
-import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
-import com.netflix.vms.transformer.hollowinput.AbsoluteScheduleHollow;
-import com.netflix.vms.transformer.hollowinput.MasterScheduleHollow;
-import com.netflix.vms.transformer.hollowinput.OverrideScheduleHollow;
 import com.netflix.vms.transformer.hollowinput.PhaseTagHollow;
 import com.netflix.vms.transformer.hollowinput.PhaseTagListHollow;
 import com.netflix.vms.transformer.hollowinput.PhaseTagListTypeAPI;
-import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
-import com.netflix.vms.transformer.hollowinput.VideoArtworkHollow;
-import com.netflix.vms.transformer.hollowoutput.Artwork;
-import com.netflix.vms.transformer.hollowoutput.ArtworkBasicPassthrough;
-import com.netflix.vms.transformer.hollowoutput.ArtworkDerivatives;
-import com.netflix.vms.transformer.hollowoutput.ArtworkSourceString;
-import com.netflix.vms.transformer.hollowoutput.SchedulePhaseInfo;
-import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 /**
  * Test for VideoImagesDataModule. Unit tests for asset schedules.
@@ -54,7 +22,6 @@ public class VideoImagesDataModuleTest {
     private HollowHashIndex absoluteIndex;
     private HollowHashIndex masterIndex;
 
-    private VideoArtworkHollow videoArtworkHollow;
     private PhaseTagListTypeAPI listTypeAPI;
     private PhaseTagListHollow listHollow;
     private Iterator<PhaseTagHollow> iterator;

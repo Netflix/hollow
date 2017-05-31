@@ -11,7 +11,8 @@ public class RightsWindowContractTypeAPI extends HollowObjectTypeAPI {
     RightsWindowContractTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "contractId",
-            "download"
+            "download",
+            "assetSetId"
         });
         this.delegateLookupImpl = new RightsWindowContractDelegateLookupImpl(this);
     }
@@ -50,6 +51,16 @@ public class RightsWindowContractTypeAPI extends HollowObjectTypeAPI {
     }
 
 
+
+    public int getAssetSetIdOrdinal(int ordinal) {
+        if(fieldIndex[2] == -1)
+            return missingDataHandler().handleReferencedOrdinal("RightsWindowContract", ordinal, "assetSetId");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[2]);
+    }
+
+    public RightsAssetSetIdTypeAPI getAssetSetIdTypeAPI() {
+        return getAPI().getRightsAssetSetIdTypeAPI();
+    }
 
     public RightsWindowContractDelegateLookupImpl getDelegateLookupImpl() {
         return delegateLookupImpl;
