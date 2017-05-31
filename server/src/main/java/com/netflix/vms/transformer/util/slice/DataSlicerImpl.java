@@ -348,12 +348,6 @@ public class DataSlicerImpl implements DataSlicer {
                     return Integer.valueOf((int)inputAPI.getSupplementalsHollow(ordinal)._getMovieId());
                 }
             });
-            findIncludedOrdinals(stateEngine, "VideoArtwork", videoIdsToInclude, new VideoIdDeriver() {
-                @Override
-                public Integer deriveId(int ordinal) {
-                    return Integer.valueOf((int)inputAPI.getVideoArtworkHollow(ordinal)._getMovieId());
-                }
-            });
             findIncludedOrdinals(stateEngine, "VideoAward", videoIdsToInclude, new VideoIdDeriver() {
                 @Override
                 public Integer deriveId(int ordinal) {
@@ -411,7 +405,6 @@ public class DataSlicerImpl implements DataSlicer {
             includeAll(stateEngine, "Certifications");
             includeAll(stateEngine, "CertificationSystem");
             includeAll(stateEngine, "Character");
-            includeAll(stateEngine, "CharacterArtwork");
             includeAll(stateEngine, "CharacterArtworkSource");
             includeAll(stateEngine, "Characters");
             includeAll(stateEngine, "ConsolidatedCertificationSystems");
@@ -422,7 +415,6 @@ public class DataSlicerImpl implements DataSlicer {
             includeAll(stateEngine, "LocalizedCharacter");
             includeAll(stateEngine, "OriginServer");
             includeAll(stateEngine, "PersonAliases");
-            includeAll(stateEngine, "PersonArtwork");
             includeAll(stateEngine, "PersonArtworkSource");
             includeAll(stateEngine, "Persons");
             includeAll(stateEngine, "ProtectionTypes");
