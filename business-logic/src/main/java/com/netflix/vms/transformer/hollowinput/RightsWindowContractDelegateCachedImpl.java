@@ -11,11 +11,13 @@ public class RightsWindowContractDelegateCachedImpl extends HollowObjectAbstract
 
     private final Long contractId;
     private final Boolean download;
+    private final int assetSetIdOrdinal;
    private RightsWindowContractTypeAPI typeAPI;
 
     public RightsWindowContractDelegateCachedImpl(RightsWindowContractTypeAPI typeAPI, int ordinal) {
         this.contractId = typeAPI.getContractIdBoxed(ordinal);
         this.download = typeAPI.getDownloadBoxed(ordinal);
+        this.assetSetIdOrdinal = typeAPI.getAssetSetIdOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -33,6 +35,10 @@ public class RightsWindowContractDelegateCachedImpl extends HollowObjectAbstract
 
     public Boolean getDownloadBoxed(int ordinal) {
         return download;
+    }
+
+    public int getAssetSetIdOrdinal(int ordinal) {
+        return assetSetIdOrdinal;
     }
 
     @Override

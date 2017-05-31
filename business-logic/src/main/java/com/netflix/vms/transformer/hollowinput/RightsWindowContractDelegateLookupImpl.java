@@ -29,6 +29,10 @@ public class RightsWindowContractDelegateLookupImpl extends HollowObjectAbstract
         return typeAPI.getDownloadBoxed(ordinal);
     }
 
+    public int getAssetSetIdOrdinal(int ordinal) {
+        return typeAPI.getAssetSetIdOrdinal(ordinal);
+    }
+
     public RightsWindowContractTypeAPI getTypeAPI() {
         return typeAPI;
     }
