@@ -17,6 +17,7 @@ public abstract class BeforeCanaryAnnounceJob extends PublishWorkflowPublication
     protected final RegionEnum region;
     private final List<HollowBlobPublishJob> snapshotPublishJobs;
     private final List<HollowBlobPublishJob> deltaPublishJobs;
+    private final List<HollowBlobPublishJob> reverseDeltaPublishJobs;
     private final CircuitBreakerJob circuitBreakerJob;
 
 
@@ -27,6 +28,7 @@ public abstract class BeforeCanaryAnnounceJob extends PublishWorkflowPublication
         this.circuitBreakerJob = circuitBreakerJob;
         this.snapshotPublishJobs = findJob(newPublishJobs, PublishType.SNAPSHOT);
         this.deltaPublishJobs = findJob(newPublishJobs, PublishType.DELTA);
+        this.reverseDeltaPublishJobs = findJob(newPublishJobs, PublishType.REVERSEDELTA);
 	}
 
     private List<HollowBlobPublishJob> findJob(List<PublicationJob> jobs, PublishType type) {
@@ -48,6 +50,11 @@ public abstract class BeforeCanaryAnnounceJob extends PublishWorkflowPublication
             if(!deltaPublishJobs.isEmpty()) {
                 for(HollowBlobPublishJob deltaPublishJob : deltaPublishJobs) {
                     if(!jobExistsAndCompletedSuccessfully(deltaPublishJob))
+                        return false;
+                }
+                
+                for(HollowBlobPublishJob reverseDeltaPublishJob : reverseDeltaPublishJobs) {
+                    if(!jobExistsAndCompletedSuccessfully(reverseDeltaPublishJob))
                         return false;
                 }
                 return true;

@@ -1,7 +1,9 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import com.netflix.vms.transformer.common.slice.DataSlicer;
+import com.netflix.hollow.api.producer.HollowProducer.Announcer;
 
+import com.netflix.hollow.api.producer.HollowProducer.Publisher;
+import com.netflix.vms.transformer.common.slice.DataSlicer;
 import com.netflix.vms.transformer.publish.workflow.job.CreateDevSliceJob;
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
@@ -43,6 +45,8 @@ public class DefaultHollowPublishJobCreator {
 
     public DefaultHollowPublishJobCreator(TransformerContext transformerContext,
             FileStore fileStore,
+            Publisher publisher,
+            Announcer announcer,
             HermesBlobAnnouncer hermesBlobAnnouncer,
             HollowBlobDataProvider hollowBlobDataProvider, 
             PlaybackMonkeyTester playbackMonkeyTester,
@@ -58,6 +62,8 @@ public class DefaultHollowPublishJobCreator {
                 new HermesVipAnnouncer(hermesBlobAnnouncer),
                 serverUploadStatus,
                 fileStore,
+                publisher,
+                announcer,
                 vip);
     }
 
@@ -70,8 +76,8 @@ public class DefaultHollowPublishJobCreator {
         return new HermesAnnounceJob(ctx, priorVersion, newVersion, region, validationJob, delayJob, previousAnnounceJob);
     }
 
-    public HollowBlobPublishJob createPublishJob(String vip, PublishType jobType, long inputVersion, long previousVersion, long version, RegionEnum region, File fileToUpload) {
-        return new FileStoreHollowBlobPublishJob(ctx, vip, inputVersion, previousVersion, version, jobType, region, fileToUpload);
+    public HollowBlobPublishJob createPublishJob(String vip, PublishType jobType, long inputVersion, long previousVersion, long version, File fileToUpload) {
+        return new FileStoreHollowBlobPublishJob(ctx, vip, inputVersion, previousVersion, version, jobType, fileToUpload);
     }
 
     public HollowBlobDeleteFileJob createDeleteFileJob(List<PublicationJob> copyJobs, long version, String... filesToDelete) {
