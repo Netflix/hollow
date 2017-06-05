@@ -977,7 +977,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.2",
+            "locked": "2.8.3",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -2112,7 +2112,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -2125,7 +2125,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -2133,7 +2133,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.79.0",
+            "locked": "1.80.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -2147,7 +2147,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.1.7",
+            "locked": "4.3.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -2514,7 +2514,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.15",
+            "locked": "0.5.19",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -4483,7 +4483,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.2",
+            "locked": "2.8.3",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -5618,7 +5618,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -5631,7 +5631,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -5639,7 +5639,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.79.0",
+            "locked": "1.80.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -5653,7 +5653,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.1.7",
+            "locked": "4.3.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -6020,7 +6020,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.15",
+            "locked": "0.5.19",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -7989,7 +7989,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.2",
+            "locked": "2.8.3",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -9124,7 +9124,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -9137,7 +9137,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -9145,7 +9145,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.79.0",
+            "locked": "1.80.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -9159,7 +9159,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.1.7",
+            "locked": "4.3.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -9526,7 +9526,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.15",
+            "locked": "0.5.19",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -11495,7 +11495,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.2",
+            "locked": "2.8.3",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -12623,7 +12623,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -12636,7 +12636,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -12644,7 +12644,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.79.0",
+            "locked": "1.80.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -12658,7 +12658,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.1.7",
+            "locked": "4.3.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -13025,7 +13025,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.15",
+            "locked": "0.5.19",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -14256,7 +14256,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.8.6",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin",
@@ -15020,7 +15020,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.2",
+            "locked": "2.8.3",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -15338,19 +15338,19 @@
             ]
         },
         "com.netflix.spectator:spectator-ext-gc": {
-            "locked": "0.53.0",
+            "locked": "0.55.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
         "com.netflix.spectator:spectator-ext-jvm": {
-            "locked": "0.53.0",
+            "locked": "0.55.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
         "com.netflix.spectator:spectator-ext-sandbox": {
-            "locked": "0.53.0",
+            "locked": "0.55.0",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
@@ -15359,13 +15359,13 @@
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
-            "locked": "0.53.0",
+            "locked": "0.55.0",
             "transitive": [
                 "netflix:atlas-client"
             ]
         },
         "com.netflix.spectator:spectator-reg-servo": {
-            "locked": "0.53.0",
+            "locked": "0.55.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
@@ -16156,7 +16156,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -16169,7 +16169,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -16177,7 +16177,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.79.0",
+            "locked": "1.80.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -16191,7 +16191,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.1.7",
+            "locked": "4.3.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -16558,7 +16558,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.15",
+            "locked": "0.5.19",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -19624,7 +19624,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.2",
+            "locked": "2.8.3",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -20759,7 +20759,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -20772,7 +20772,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -20780,7 +20780,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.79.0",
+            "locked": "1.80.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -20794,7 +20794,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.1.7",
+            "locked": "4.3.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -21161,7 +21161,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.15",
+            "locked": "0.5.19",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -22370,7 +22370,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.8.6",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin",
@@ -23134,7 +23134,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.2",
+            "locked": "2.8.3",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -23452,19 +23452,19 @@
             ]
         },
         "com.netflix.spectator:spectator-ext-gc": {
-            "locked": "0.53.0",
+            "locked": "0.55.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
         "com.netflix.spectator:spectator-ext-jvm": {
-            "locked": "0.53.0",
+            "locked": "0.55.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
         "com.netflix.spectator:spectator-ext-sandbox": {
-            "locked": "0.53.0",
+            "locked": "0.55.0",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
@@ -23473,13 +23473,13 @@
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
-            "locked": "0.53.0",
+            "locked": "0.55.0",
             "transitive": [
                 "netflix:atlas-client"
             ]
         },
         "com.netflix.spectator:spectator-reg-servo": {
-            "locked": "0.53.0",
+            "locked": "0.55.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
@@ -24269,7 +24269,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -24282,7 +24282,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -24290,7 +24290,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.79.0",
+            "locked": "1.80.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -24304,7 +24304,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.1.7",
+            "locked": "4.3.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -24671,7 +24671,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.15",
+            "locked": "0.5.19",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -26664,7 +26664,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.2",
+            "locked": "2.8.3",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -27831,7 +27831,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -27844,7 +27844,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -27852,7 +27852,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.79.0",
+            "locked": "1.80.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -27866,7 +27866,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.1.7",
+            "locked": "4.3.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -28234,7 +28234,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.15",
+            "locked": "0.5.19",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -30297,7 +30297,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.2",
+            "locked": "2.8.3",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -31464,7 +31464,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -31477,7 +31477,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -31485,7 +31485,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.79.0",
+            "locked": "1.80.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -31499,7 +31499,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.1.7",
+            "locked": "4.3.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -31867,7 +31867,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.15",
+            "locked": "0.5.19",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -33930,7 +33930,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.2",
+            "locked": "2.8.3",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -35097,7 +35097,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -35110,7 +35110,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -35118,7 +35118,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.79.0",
+            "locked": "1.80.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -35132,7 +35132,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.1.7",
+            "locked": "4.3.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -35500,7 +35500,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.15",
+            "locked": "0.5.19",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -37563,7 +37563,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.2",
+            "locked": "2.8.3",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -38730,7 +38730,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -38743,7 +38743,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -38751,7 +38751,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.79.0",
+            "locked": "1.80.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -38765,7 +38765,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.1.7",
+            "locked": "4.3.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -39133,7 +39133,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.15",
+            "locked": "0.5.19",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -41196,7 +41196,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.2",
+            "locked": "2.8.3",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -42363,7 +42363,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -42376,7 +42376,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -42384,7 +42384,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.79.0",
+            "locked": "1.80.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -42398,7 +42398,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.1.7",
+            "locked": "4.3.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -42766,7 +42766,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.15",
+            "locked": "0.5.19",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -44829,7 +44829,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.2",
+            "locked": "2.8.3",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -45996,7 +45996,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -46009,7 +46009,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -46017,7 +46017,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.79.0",
+            "locked": "1.80.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -46031,7 +46031,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.1.7",
+            "locked": "4.3.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -46399,7 +46399,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.15",
+            "locked": "0.5.19",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -48462,7 +48462,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.2",
+            "locked": "2.8.3",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -49629,7 +49629,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -49642,7 +49642,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -49650,7 +49650,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.79.0",
+            "locked": "1.80.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -49664,7 +49664,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.1.7",
+            "locked": "4.3.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -50032,7 +50032,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.15",
+            "locked": "0.5.19",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -52095,7 +52095,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.2",
+            "locked": "2.8.3",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -53262,7 +53262,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -53275,7 +53275,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.0",
+            "locked": "2.13.1",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -53283,7 +53283,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.79.0",
+            "locked": "1.80.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -53297,7 +53297,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.1.7",
+            "locked": "4.3.5",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -53665,7 +53665,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.15",
+            "locked": "0.5.19",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
