@@ -1,21 +1,22 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.PublishedBlob;
+
+import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration;
+import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
 import com.netflix.hollow.core.write.HollowBlobWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import com.netflix.aws.file.FileStore;
-import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.videometadata.s3.HollowBlobKeybaseBuilder;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
 import com.netflix.vms.transformer.publish.workflow.logmessage.PublishBlobMessage;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import netflix.admin.videometadata.uploadstat.FileUploadStatus.FileRegionUploadStatus;
 import netflix.admin.videometadata.uploadstat.FileUploadStatus.UploadStatus;
 
@@ -31,13 +32,14 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
     protected boolean executeJob() {
         FileStore fileStore = ctx.getFileStore();
         HollowProducer.Publisher publisher = isNostreams ? ctx.getNostreamsBlobPublisher() : ctx.getBlobPublisher();
-        String keybase = getKeybase();
         String currentVersion = String.valueOf(getCycleVersion());
+        String filestoreKeybase = getKeybase();
         String fileStoreVersion = jobType == PublishType.DELTA ? String.valueOf(previousVersion) : currentVersion;
+        String filestoreVersionKey = getKeybase() + "." + fileStoreVersion;
 
         long size = fileToUpload.length();
 
-        FileRegionUploadStatus status = fileUploadStatus(currentVersion, keybase, size, RegionEnum.US_EAST_1);
+        FileRegionUploadStatus status = fileUploadStatus(currentVersion, filestoreKeybase, size, RegionEnum.US_EAST_1);
 
         boolean success = false;
 
@@ -51,19 +53,21 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
                     
                     String environmentBucketPostfix = "prod".equals(NetflixConfiguration.getEnvironment()) ? "prod" : "test";
                     
-                    fileStore.writeMetadata("netflix.bulkdata." + environmentBucketPostfix, getGutenbergS3ObjectName(), getKeybase(), fileStoreVersion, System.currentTimeMillis(), RegionEnum.US_EAST_1, getItemAttributes());
-                    fileStore.writeMetadata("us-west-2.netflix.bulkdata." + environmentBucketPostfix, getGutenbergS3ObjectName(), getKeybase(), fileStoreVersion, System.currentTimeMillis(), RegionEnum.US_WEST_2, getItemAttributes());
-                    fileStore.writeMetadata("eu-west-1.netflix.bulkdata." + environmentBucketPostfix, getGutenbergS3ObjectName(), getKeybase(), fileStoreVersion, System.currentTimeMillis(), RegionEnum.EU_WEST_1, getItemAttributes());
-                                
-                    //fileStore.publish(fileToUpload, keybase, fileStoreVersion, region, getItemAttributes());
-                    fileStore.removeObsoleteVersions(keybase, 16384, RegionEnum.US_EAST_1);
-                    fileStore.removeObsoleteVersions(keybase, 16384, RegionEnum.US_WEST_2);
-                    fileStore.removeObsoleteVersions(keybase, 16384, RegionEnum.EU_WEST_1);
+                    fileStore.writeMetadata("netflix.bulkdata." + environmentBucketPostfix, getGutenbergS3ObjectName(), filestoreKeybase, filestoreVersionKey, System.currentTimeMillis(), RegionEnum.US_EAST_1, getItemAttributes());
+                    fileStore.writeMetadata("us-west-2.netflix.bulkdata." + environmentBucketPostfix, getGutenbergS3ObjectName(), filestoreKeybase, filestoreVersionKey, System.currentTimeMillis(), RegionEnum.US_WEST_2, getItemAttributes());
+                    fileStore.writeMetadata("eu-west-1.netflix.bulkdata." + environmentBucketPostfix, getGutenbergS3ObjectName(), filestoreKeybase, filestoreVersionKey, System.currentTimeMillis(), RegionEnum.EU_WEST_1, getItemAttributes());
+                    fileStore.setCurrentVersion(filestoreKeybase, filestoreVersionKey, RegionEnum.US_EAST_1, getItemAttributes());
+                    fileStore.setCurrentVersion(filestoreKeybase, filestoreVersionKey, RegionEnum.US_WEST_2, getItemAttributes());
+                    fileStore.setCurrentVersion(filestoreKeybase, filestoreVersionKey, RegionEnum.EU_WEST_1, getItemAttributes());
+                    
+                    fileStore.removeObsoleteVersions(filestoreKeybase, 16384, RegionEnum.US_EAST_1);
+                    fileStore.removeObsoleteVersions(filestoreKeybase, 16384, RegionEnum.US_WEST_2);
+                    fileStore.removeObsoleteVersions(filestoreKeybase, 16384, RegionEnum.EU_WEST_1);
                     success=true;
                     break;
                 } catch(Exception e) {
-                    //status.setStatus(UploadStatus.RETRYING);
-                    //status.incrementRetryCount();
+                    status.setStatus(UploadStatus.RETRYING);
+                    status.incrementRetryCount();
                     e.printStackTrace();
                 }
             }
@@ -72,7 +76,7 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
             throw new RuntimeException(e);
         }
 
-        logResult(keybase, status, success, startTime);
+        logResult(filestoreKeybase, status, success, startTime);
 
         return success;
     }
