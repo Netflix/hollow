@@ -1,10 +1,8 @@
 package com.netflix.vms.transformer.publish.workflow;
 
-import com.netflix.hollow.api.producer.HollowProducer.Announcer;
-
-import com.netflix.hollow.api.producer.HollowProducer.Publisher;
-import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.aws.file.FileStore;
+import com.netflix.hollow.api.producer.HollowProducer.Announcer;
+import com.netflix.hollow.api.producer.HollowProducer.Publisher;
 import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
@@ -30,6 +28,7 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
     private final Supplier<ServerUploadStatus> uploadStatus;
     private final FileStore fileStore;
     private final Publisher publisher;
+    private final Publisher nostreamsPublisher;
     private final Announcer announcer;
     private final PublishWorkflowStatusIndicator statusIndicator;
 
@@ -37,11 +36,11 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
     private final String vip;
     private final long nowMillis;
 
-    public TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer, Supplier<ServerUploadStatus> uploadStatus, FileStore fileStore, Publisher publisher, Announcer announcer, String vip) {
-        this(ctx, vipAnnouncer, uploadStatus, new PublishWorkflowStatusIndicator(ctx.getMetricRecorder()), fileStore, publisher, announcer, vip, new CassandraBasedPoisonedStateMarker(ctx, vip));
+    public TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer, Supplier<ServerUploadStatus> uploadStatus, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, String vip) {
+        this(ctx, vipAnnouncer, uploadStatus, new PublishWorkflowStatusIndicator(ctx.getMetricRecorder()), fileStore, publisher, nostreamsPublisher, announcer, vip, new CassandraBasedPoisonedStateMarker(ctx, vip));
     }
 
-    private TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer, Supplier<ServerUploadStatus> uploadStatus, PublishWorkflowStatusIndicator statusIndicator, FileStore fileStore, Publisher publisher, Announcer announcer, String vip, PoisonedStateMarker poisonStateMarker) {
+    private TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer, Supplier<ServerUploadStatus> uploadStatus, PublishWorkflowStatusIndicator statusIndicator, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, String vip, PoisonedStateMarker poisonStateMarker) {
         this.transformerCtx = ctx;
         this.vip = vip;
         this.config = ctx.getConfig();
@@ -50,6 +49,7 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
         this.uploadStatus = uploadStatus;
         this.fileStore = fileStore;
         this.publisher = publisher;
+        this.nostreamsPublisher = nostreamsPublisher;
         this.announcer = announcer;
         this.statusIndicator = statusIndicator;
         this.logger = ctx.getLogger();
@@ -58,7 +58,7 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
 
     @Override
     public TransformerPublishWorkflowContext withCurrentLoggerAndConfig() {
-        return new TransformerPublishWorkflowContext(transformerCtx, vipAnnouncer, uploadStatus, statusIndicator, fileStore, publisher, announcer, vip, poisonStateMarker);
+        return new TransformerPublishWorkflowContext(transformerCtx, vipAnnouncer, uploadStatus, statusIndicator, fileStore, publisher, nostreamsPublisher, announcer, vip, poisonStateMarker);
     }
 
     @Override
@@ -94,6 +94,11 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
     @Override
     public Publisher getBlobPublisher() {
         return publisher;
+    }
+    
+    @Override
+    public Publisher getNostreamsBlobPublisher() {
+        return nostreamsPublisher;
     }
 
     @Override

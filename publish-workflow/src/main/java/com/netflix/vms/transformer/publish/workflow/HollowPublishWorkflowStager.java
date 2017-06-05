@@ -50,12 +50,12 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     private final String vip;
     private final Map<RegionEnum, AnnounceJob> priorAnnouncedJobs;
 
-    public HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, Publisher publisher, Announcer announcer, HermesBlobAnnouncer hermesBlobAnnouncer, DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
-        this(ctx, fileStore, publisher, announcer, hermesBlobAnnouncer, new HollowBlobDataProvider(ctx), dataSlicer, uploadStatus, vip);
+    public HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, HermesBlobAnnouncer hermesBlobAnnouncer, DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+        this(ctx, fileStore, publisher, nostreamsPublisher, announcer, hermesBlobAnnouncer, new HollowBlobDataProvider(ctx), dataSlicer, uploadStatus, vip);
     }
 
-    private HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, Publisher publisher, Announcer announcer, HermesBlobAnnouncer hermesBlobAnnouncer, HollowBlobDataProvider circuitBreakerDataProvider, DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
-        this(ctx, new DefaultHollowPublishJobCreator(ctx, fileStore, publisher, announcer, hermesBlobAnnouncer, circuitBreakerDataProvider, new PlaybackMonkeyTester(), new ValuableVideoHolder(circuitBreakerDataProvider), dataSlicer, uploadStatus, vip), vip);
+    private HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, HermesBlobAnnouncer hermesBlobAnnouncer, HollowBlobDataProvider circuitBreakerDataProvider, DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+        this(ctx, new DefaultHollowPublishJobCreator(ctx, fileStore, publisher, nostreamsPublisher, announcer, hermesBlobAnnouncer, circuitBreakerDataProvider, new PlaybackMonkeyTester(), new ValuableVideoHolder(circuitBreakerDataProvider), dataSlicer, uploadStatus, vip), vip);
         this.circuitBreakerDataProvider = circuitBreakerDataProvider;
     }
 
@@ -198,29 +198,29 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
 
         List<PublicationJob> submittedJobs = new ArrayList<>();
         if (snapshotFile.exists()) {
-            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.SNAPSHOT, inputDataVersion, previousVersion, newVersion, snapshotFile);
+            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.SNAPSHOT, false, inputDataVersion, previousVersion, newVersion, snapshotFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
             
-            publishJob = jobCreator.createPublishJob(vip + "_nostreams", PublishType.SNAPSHOT, inputDataVersion, previousVersion, newVersion, nostreamsSnapshotFile);
+            publishJob = jobCreator.createPublishJob(vip + "_nostreams", PublishType.SNAPSHOT, true, inputDataVersion, previousVersion, newVersion, nostreamsSnapshotFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
         if (deltaFile.exists()) {
-            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.DELTA, inputDataVersion, previousVersion, newVersion, deltaFile);
+            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.DELTA, false, inputDataVersion, previousVersion, newVersion, deltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
             
-            publishJob = jobCreator.createPublishJob(vip + "_nostreams", PublishType.DELTA, inputDataVersion, previousVersion, newVersion, nostreamsDeltaFile);
+            publishJob = jobCreator.createPublishJob(vip + "_nostreams", PublishType.DELTA, true, inputDataVersion, previousVersion, newVersion, nostreamsDeltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
         if (reverseDeltaFile.exists()) {
-            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.REVERSEDELTA, inputDataVersion, previousVersion, newVersion, reverseDeltaFile);
+            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.REVERSEDELTA, false, inputDataVersion, previousVersion, newVersion, reverseDeltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
             
-            publishJob = jobCreator.createPublishJob(vip + "_nostreams", PublishType.REVERSEDELTA, inputDataVersion, previousVersion, newVersion, nostreamsReverseDeltaFile);
+            publishJob = jobCreator.createPublishJob(vip + "_nostreams", PublishType.REVERSEDELTA, true, inputDataVersion, previousVersion, newVersion, nostreamsReverseDeltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }

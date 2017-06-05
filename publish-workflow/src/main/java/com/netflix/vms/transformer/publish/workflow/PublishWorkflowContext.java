@@ -32,6 +32,8 @@ public interface PublishWorkflowContext {
     
     HollowProducer.Publisher getBlobPublisher();
     
+    HollowProducer.Publisher getNostreamsBlobPublisher();
+    
     HollowProducer.Announcer getStateAnnouncer();
 
     VipAnnouncer getVipAnnouncer();

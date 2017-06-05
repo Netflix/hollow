@@ -58,10 +58,11 @@ public class TransformerCycleKickoff {
         FileStore.useMultipartUploadWhenApplicable(true);
         
         Publisher publisher = publisherFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip());
+        Publisher nostreamsPublisher = publisherFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip() + "_nostreams");
         Announcer announcer = announcerFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip());
 
         TransformerContext ctx = ctx(esClient, transformerConfig, config, octoberSkyData, cupLibrary, cassandraHelper, healthIndicator);
-        PublishWorkflowStager publishStager = publishStager(ctx, fileStore, publisher, announcer, hermesBlobAnnouncer);
+        PublishWorkflowStager publishStager = publishStager(ctx, fileStore, publisher, nostreamsPublisher, announcer, hermesBlobAnnouncer);
 
         TransformCycle cycle = new TransformCycle(
                 ctx,
@@ -160,12 +161,12 @@ public class TransformerCycleKickoff {
                 });
     }
 
-    private final PublishWorkflowStager publishStager(TransformerContext ctx, FileStore fileStore, Publisher publisher, Announcer announcer, HermesBlobAnnouncer hermesBlobAnnouncer) {
+    private final PublishWorkflowStager publishStager(TransformerContext ctx, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, HermesBlobAnnouncer hermesBlobAnnouncer) {
         Supplier<ServerUploadStatus> uploadStatus = () -> VMSServerUploadStatus.get();
         if(isFastlane(ctx.getConfig()))
             return new HollowFastlanePublishWorkflowStager(ctx, fileStore, publisher, announcer, hermesBlobAnnouncer, uploadStatus, ctx.getConfig().getTransformerVip());
 
-        return new HollowPublishWorkflowStager(ctx, fileStore, publisher, announcer, hermesBlobAnnouncer, new DataSlicerImpl(), uploadStatus, ctx.getConfig().getTransformerVip());
+        return new HollowPublishWorkflowStager(ctx, fileStore, publisher, nostreamsPublisher, announcer, hermesBlobAnnouncer, new DataSlicerImpl(), uploadStatus, ctx.getConfig().getTransformerVip());
     }
 
     private void restore(TransformCycle cycle, TransformerConfig cfg, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer) {

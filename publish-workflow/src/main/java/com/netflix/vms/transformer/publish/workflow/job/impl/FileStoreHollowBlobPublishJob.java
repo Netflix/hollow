@@ -23,14 +23,14 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
 
     private static final int  RETRY_ATTEMPTS = 10;
     
-    public FileStoreHollowBlobPublishJob(PublishWorkflowContext ctx, String vip, long inputVersion, long previousVersion, long version, PublishType jobType, File fileToUpload) {
-        super(ctx, vip, inputVersion, previousVersion, version, jobType, fileToUpload);
+    public FileStoreHollowBlobPublishJob(PublishWorkflowContext ctx, String vip, long inputVersion, long previousVersion, long version, PublishType jobType, File fileToUpload, boolean isNostreams) {
+        super(ctx, vip, inputVersion, previousVersion, version, jobType, fileToUpload, isNostreams);
     }
 
     @Override
     protected boolean executeJob() {
         FileStore fileStore = ctx.getFileStore();
-        HollowProducer.Publisher publisher = ctx.getBlobPublisher();
+        HollowProducer.Publisher publisher = isNostreams ? ctx.getNostreamsBlobPublisher() : ctx.getBlobPublisher();
         String keybase = getKeybase();
         String currentVersion = String.valueOf(getCycleVersion());
         String fileStoreVersion = jobType == PublishType.DELTA ? String.valueOf(previousVersion) : currentVersion;

@@ -44,6 +44,7 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
                 uploadStatus,
                 fileStore,
                 publisher,
+                null,
                 announcer,
                 vip);
         
@@ -75,17 +76,17 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
 
         List<PublicationJob> submittedJobs = new ArrayList<>();
         if(snapshotFile.exists()){
-            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, ctx.getVip(), inputDataVersion, previousVersion, newVersion, PublishType.SNAPSHOT, snapshotFile);
+            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, ctx.getVip(), inputDataVersion, previousVersion, newVersion, PublishType.SNAPSHOT, snapshotFile, false);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
         if(deltaFile.exists()){
-            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, ctx.getVip(), inputDataVersion, previousVersion, newVersion, PublishType.DELTA, deltaFile);
+            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, ctx.getVip(), inputDataVersion, previousVersion, newVersion, PublishType.DELTA, deltaFile, false);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
         if(reverseDeltaFile.exists()){
-            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, ctx.getVip(), inputDataVersion, previousVersion, newVersion, PublishType.REVERSEDELTA, reverseDeltaFile);
+            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, ctx.getVip(), inputDataVersion, previousVersion, newVersion, PublishType.REVERSEDELTA, reverseDeltaFile, false);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }

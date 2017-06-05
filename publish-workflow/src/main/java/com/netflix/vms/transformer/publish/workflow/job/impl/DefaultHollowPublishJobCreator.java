@@ -46,6 +46,7 @@ public class DefaultHollowPublishJobCreator {
     public DefaultHollowPublishJobCreator(TransformerContext transformerContext,
             FileStore fileStore,
             Publisher publisher,
+            Publisher nostreamsPublisher,
             Announcer announcer,
             HermesBlobAnnouncer hermesBlobAnnouncer,
             HollowBlobDataProvider hollowBlobDataProvider, 
@@ -63,6 +64,7 @@ public class DefaultHollowPublishJobCreator {
                 serverUploadStatus,
                 fileStore,
                 publisher,
+                nostreamsPublisher,
                 announcer,
                 vip);
     }
@@ -76,8 +78,8 @@ public class DefaultHollowPublishJobCreator {
         return new HermesAnnounceJob(ctx, priorVersion, newVersion, region, validationJob, delayJob, previousAnnounceJob);
     }
 
-    public HollowBlobPublishJob createPublishJob(String vip, PublishType jobType, long inputVersion, long previousVersion, long version, File fileToUpload) {
-        return new FileStoreHollowBlobPublishJob(ctx, vip, inputVersion, previousVersion, version, jobType, fileToUpload);
+    public HollowBlobPublishJob createPublishJob(String vip, PublishType jobType, boolean isNostreams, long inputVersion, long previousVersion, long version, File fileToUpload) {
+        return new FileStoreHollowBlobPublishJob(ctx, vip, inputVersion, previousVersion, version, jobType, fileToUpload, isNostreams);
     }
 
     public HollowBlobDeleteFileJob createDeleteFileJob(List<PublicationJob> copyJobs, long version, String... filesToDelete) {
