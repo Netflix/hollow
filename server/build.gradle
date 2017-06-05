@@ -68,6 +68,8 @@ dependencies {
     compile 'com.netflix.vms.logging:vmslogging-slf4j:latest.release'
     compile 'netflix:vms-hollow-generated-notemplate:56.1076'
     
+    compile 'netflix:netflix-internal-hollow:1.+'
+    
     // httpclient
     compile 'org.apache.httpcomponents:httpclient:4.3.4'
 
