@@ -48,6 +48,7 @@ public class DefaultHollowPublishJobCreator {
             Publisher publisher,
             Publisher nostreamsPublisher,
             Announcer announcer,
+            Announcer nostreamsAnnouncer,
             HermesBlobAnnouncer hermesBlobAnnouncer,
             HollowBlobDataProvider hollowBlobDataProvider, 
             PlaybackMonkeyTester playbackMonkeyTester,
@@ -65,6 +66,7 @@ public class DefaultHollowPublishJobCreator {
                 fileStore,
                 publisher,
                 nostreamsPublisher,
+                nostreamsAnnouncer,
                 announcer,
                 vip);
     }

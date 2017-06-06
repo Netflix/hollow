@@ -46,6 +46,7 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
                 publisher,
                 null,
                 announcer,
+                null,
                 vip);
         
         this.scheduler = new PublicationJobScheduler();
