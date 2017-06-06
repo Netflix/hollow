@@ -2303,21 +2303,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.185",
+            "locked": "1.190",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -2411,7 +2411,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.15",
+            "locked": "1.16",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -2723,7 +2723,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.58",
+            "locked": "2.59",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -5853,21 +5853,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.185",
+            "locked": "1.190",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -5961,7 +5961,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.15",
+            "locked": "1.16",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -6273,7 +6273,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.58",
+            "locked": "2.59",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -9403,21 +9403,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.185",
+            "locked": "1.190",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -9511,7 +9511,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.15",
+            "locked": "1.16",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -9823,7 +9823,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.58",
+            "locked": "2.59",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -12946,21 +12946,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.185",
+            "locked": "1.190",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -13054,7 +13054,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.15",
+            "locked": "1.16",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -13366,7 +13366,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.58",
+            "locked": "2.59",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -16547,21 +16547,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.185",
+            "locked": "1.190",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -16655,7 +16655,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.15",
+            "locked": "1.16",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -16967,7 +16967,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.58",
+            "locked": "2.59",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -21194,21 +21194,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.185",
+            "locked": "1.190",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -21302,7 +21302,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.15",
+            "locked": "1.16",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -21614,7 +21614,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.58",
+            "locked": "2.59",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -24748,21 +24748,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.185",
+            "locked": "1.190",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -24856,7 +24856,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.15",
+            "locked": "1.16",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -25168,7 +25168,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.58",
+            "locked": "2.59",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -28345,21 +28345,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.185",
+            "locked": "1.190",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -28453,7 +28453,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.15",
+            "locked": "1.16",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -28766,7 +28766,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.58",
+            "locked": "2.59",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -32008,21 +32008,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.185",
+            "locked": "1.190",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -32116,7 +32116,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.15",
+            "locked": "1.16",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -32429,7 +32429,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.58",
+            "locked": "2.59",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -35671,21 +35671,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.185",
+            "locked": "1.190",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -35779,7 +35779,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.15",
+            "locked": "1.16",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -36092,7 +36092,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.58",
+            "locked": "2.59",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -39334,21 +39334,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.185",
+            "locked": "1.190",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -39442,7 +39442,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.15",
+            "locked": "1.16",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -39755,7 +39755,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.58",
+            "locked": "2.59",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -42997,21 +42997,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.185",
+            "locked": "1.190",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -43105,7 +43105,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.15",
+            "locked": "1.16",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -43418,7 +43418,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.58",
+            "locked": "2.59",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -46660,21 +46660,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.185",
+            "locked": "1.190",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -46768,7 +46768,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.15",
+            "locked": "1.16",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -47081,7 +47081,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.58",
+            "locked": "2.59",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -50323,21 +50323,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.185",
+            "locked": "1.190",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -50431,7 +50431,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.15",
+            "locked": "1.16",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -50744,7 +50744,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.58",
+            "locked": "2.59",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -53986,21 +53986,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.185",
+            "locked": "1.190",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.186",
+            "locked": "1.191",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -54094,7 +54094,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.15",
+            "locked": "1.16",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -54407,7 +54407,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.58",
+            "locked": "2.59",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
