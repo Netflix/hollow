@@ -7,11 +7,11 @@ import com.netflix.vms.transformer.util.HollowBlobKeybaseBuilder;
 public class VMSOutputDataClient extends HollowClient {
     
     public VMSOutputDataClient(FileStore fileStore, String transformerVip) {
-        super(new VMSDataTransitionCreator(fileStore, new HollowBlobKeybaseBuilder(transformerVip), true));
+        super(new VMSDataTransitionCreator(fileStore, new HollowBlobKeybaseBuilder(transformerVip)));
     }
     
     public VMSOutputDataClient(String baseProxyURL, String localDataDir, String transformerVip) {
-        super(new VMSDataProxyTransitionCreator(baseProxyURL, localDataDir, new HollowBlobKeybaseBuilder(transformerVip), true));
+        super(new VMSDataProxyTransitionCreator(baseProxyURL, localDataDir, new HollowBlobKeybaseBuilder(transformerVip)));
     }
     
 }
